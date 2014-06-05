@@ -33,7 +33,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -59,8 +58,7 @@ public class TestPojoMethodMapping extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                ServerConfigListener.class.getName(), false));
+        ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 

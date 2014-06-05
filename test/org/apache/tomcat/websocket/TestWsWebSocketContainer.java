@@ -47,7 +47,6 @@ import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -85,8 +84,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
@@ -122,8 +120,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         tomcat.start();
 
@@ -142,8 +139,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
 
         tomcat.start();
 
@@ -210,8 +206,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
@@ -314,8 +309,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                BlockingConfig.class.getName(), false));
+        ctx.addApplicationListener(BlockingConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
@@ -403,8 +397,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                ConstantTxConfig.class.getName(), false));
+        ctx.addApplicationListener(ConstantTxConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
@@ -588,8 +581,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
@@ -638,8 +630,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
@@ -697,8 +688,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
@@ -784,8 +774,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
@@ -872,8 +861,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         // Must have a real docBase - just use temp
         Context ctx =
             tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        ctx.addApplicationListener(new ApplicationListener(
-                TesterEchoServer.Config.class.getName(), false));
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
