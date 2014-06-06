@@ -353,9 +353,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             running = true;
             paused = false;
 
-            // FIXME: remove when more stable
-            log.warn("The NIO2 connector is currently BETA and should not be used in production");
-
             // Create worker collection
             if ( getExecutor() == null ) {
                 createExecutor();
