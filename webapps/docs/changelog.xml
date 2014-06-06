@@ -116,6 +116,10 @@
         Tomcat. Patch provided by Greg Wilkins. (markt)
       </add>
       <fix>
+        <bug>56578</bug>: Correct regression in the fix for <bug>56339</bug>
+        that prevented sessions from expiring when using clustering. (markt)
+      </fix>
+      <fix>
         <bug>56588</bug>: Remove code previously added to enforce the
         requirements of section 4.4 of the Servlet 3.1 specification. The code
         is no longer required now that Jasper initialization has been refactored
