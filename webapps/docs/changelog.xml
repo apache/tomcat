@@ -126,6 +126,10 @@
         and TLD defined listeners are added via a different code path that
         already enforces the specification requirements. (markt)
       </fix>
+      <fix>
+        <bug>56600</bug>: In WebdavServlet: Do not waste time generating
+        response for broken PROPFIND requests. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

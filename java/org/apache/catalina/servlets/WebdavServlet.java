@@ -521,9 +521,11 @@ public class WebdavServlet
             } catch (SAXException e) {
                 // Something went wrong - bad request
                 resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return;
             } catch (IOException e) {
                 // Something went wrong - bad request
                 resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return;
             }
         }
 
