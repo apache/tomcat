@@ -41,11 +41,13 @@ import org.junit.Before;
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -372,12 +374,14 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 Container e = service.getContainer();
                 for (Container h : e.findChildren()) {
                     for (Container c : h.findChildren()) {
-                        StandardManager m = (StandardManager) c.getManager();
+                        Manager m = c.getManager();
                         if (m == null) {
                             m = new StandardManager();
-                            m.setSecureRandomClass(
-                                    "org.apache.catalina.startup.FastNonSecureRandom");
                             c.setManager(m);
+                        }
+                        if (m instanceof ManagerBase) {
+                            ((ManagerBase) m).setSecureRandomClass(
+                                    "org.apache.catalina.startup.FastNonSecureRandom");
                         }
                     }
                 }
