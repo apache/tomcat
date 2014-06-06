@@ -164,7 +164,7 @@ public class TestSetCookieSupportSeparatorsAllowed {
         Assert.assertEquals("foo=\"a\\\"b\"; Version=1", SetCookieSupport.generateHeader(cookie));
     }
 
-    @Ignore("bug 55975")
+    @Ignore("bug 55984")
     @Test
     public void v1ValueContainsNonV0Separator() {
         Cookie cookie = new Cookie("foo", "a()<>@,;:\\\"/[]?={}b");
@@ -173,7 +173,7 @@ public class TestSetCookieSupportSeparatorsAllowed {
         Assert.assertEquals("foo=\"a()<>@,;:\\\\\\\"/[]?={}b\"; Version=1", SetCookieSupport.generateHeader(cookie));
     }
 
-    @Ignore("bug 55975")
+    @Ignore("bug 55984")
     @Test
     public void v1ValueContainsBackslash() {
         Cookie cookie = new Cookie("foo", "a\\b");
@@ -183,7 +183,7 @@ public class TestSetCookieSupportSeparatorsAllowed {
     }
 
 
-    @Ignore("bug 55975")
+    @Ignore("bug 55984")
     @Test
     public void v1ValueContainsBackslashAndQuote() {
         Cookie cookie = new Cookie("foo", "a\"b\\c");
