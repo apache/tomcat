@@ -77,14 +77,14 @@
         may otherwise be triggered by a web application which in turn would
         trigger an exception when running under a security manager. (kkolinko)
       </fix>
-      <scode>
-        <bug>56588</bug>: Update deprecation of Context.addApplicationListener()
-        methods according to changes in Tomcat 8. (kkolinko)
-      </scode>
       <fix>
         <bug>56578</bug>: Correct regression in the fix for <bug>56339</bug>
         that prevented sessions from expiring when using clustering. (markt)
       </fix>
+      <scode>
+        <bug>56588</bug>: Update deprecation of Context.addApplicationListener()
+        methods according to changes in Tomcat 8. (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
