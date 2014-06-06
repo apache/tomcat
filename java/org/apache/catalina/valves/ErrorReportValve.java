@@ -80,8 +80,13 @@ public class ErrorReportValve extends ValveBase {
 
         if (response.isCommitted()) {
             if (response.isErrorAfterCommit()) {
-                // Flush any data that is still to be written to the client
-                response.flushBuffer();
+                // Attempt to flush any data that is still to be written to the
+                // client
+                try {
+                    response.flushBuffer();
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                }
                 // Close immediately to signal to the client that something went
                 // wrong
                 response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
