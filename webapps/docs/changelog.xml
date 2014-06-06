@@ -128,7 +128,7 @@
       </fix>
       <fix>
         <bug>56600</bug>: In WebdavServlet: Do not waste time generating
-        response for broken PROPFIND requests. (kkolinko)
+        response for broken PROPFIND request. (kkolinko)
       </fix>
     </changelog>
   </subsection>
