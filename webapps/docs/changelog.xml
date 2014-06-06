@@ -189,6 +189,11 @@
         <bug>56568</bug>: Allow any HTTP method when a JSP is being used as an
         error page. (markt)
       </fix>
+      <update>
+        <bug>56581</bug>: If an error on a JSP page occurs when response have
+        already been committed, do not clear the buffer of JspWriter, but flush
+        it. Thus it will become more clear where the error occurred. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
