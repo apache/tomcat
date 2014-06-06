@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11.filters;
 
 import java.io.EOFException;
@@ -41,13 +40,11 @@ public class ChunkedInputFilter implements InputFilter {
 
     // -------------------------------------------------------------- Constants
 
-
     protected static final String ENCODING_NAME = "chunked";
     protected static final ByteChunk ENCODING = new ByteChunk();
 
 
     // ----------------------------------------------------- Static Initializer
-
 
     static {
         ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1),
@@ -56,7 +53,6 @@ public class ChunkedInputFilter implements InputFilter {
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Next buffer in the pipeline.
@@ -105,6 +101,7 @@ public class ChunkedInputFilter implements InputFilter {
      */
     protected final ByteChunk trailingHeaders = new ByteChunk();
 
+
     /**
      * Flag set to true if the next call to doRead() must parse a CRLF pair
      * before doing anything else.
@@ -129,6 +126,7 @@ public class ChunkedInputFilter implements InputFilter {
      */
     private final int maxTrailerSize;
 
+
     /**
      * Size of extensions processed for this request.
      */
@@ -136,14 +134,15 @@ public class ChunkedInputFilter implements InputFilter {
 
 
     // ----------------------------------------------------------- Constructors
+
     public ChunkedInputFilter(int maxTrailerSize, int maxExtensionSize) {
         this.trailingHeaders.setLimit(maxTrailerSize);
         this.maxExtensionSize = maxExtensionSize;
         this.maxTrailerSize = maxTrailerSize;
     }
 
-    // ---------------------------------------------------- InputBuffer Methods
 
+    // ---------------------------------------------------- InputBuffer Methods
 
     /**
      * Read bytes.
@@ -155,11 +154,11 @@ public class ChunkedInputFilter implements InputFilter {
      * control, the returned value should be -1.
      */
     @Override
-    public int doRead(ByteChunk chunk, Request req)
-        throws IOException {
+    public int doRead(ByteChunk chunk, Request req) throws IOException {
 
-        if (endChunk)
+        if (endChunk) {
             return -1;
+        }
 
         if(needCRLFParse) {
             needCRLFParse = false;
@@ -206,12 +205,10 @@ public class ChunkedInputFilter implements InputFilter {
         }
 
         return result;
-
     }
 
 
     // ---------------------------------------------------- InputFilter Methods
-
 
     /**
      * Read the content length from the request.
@@ -226,8 +223,7 @@ public class ChunkedInputFilter implements InputFilter {
      * End the current request.
      */
     @Override
-    public long end()
-        throws IOException {
+    public long end() throws IOException {
 
         // Consume extra bytes : parse the stream until the end chunk is found
         while (doRead(readChunk, null) >= 0) {
@@ -235,8 +231,7 @@ public class ChunkedInputFilter implements InputFilter {
         }
 
         // Return the number of extra bytes which were consumed
-        return (lastValid - pos);
-
+        return lastValid - pos;
     }
 
 
@@ -245,7 +240,7 @@ public class ChunkedInputFilter implements InputFilter {
      */
     @Override
     public int available() {
-        return (lastValid - pos);
+        return lastValid - pos;
     }
 
 
@@ -286,12 +281,10 @@ public class ChunkedInputFilter implements InputFilter {
 
     // ------------------------------------------------------ Protected Methods
 
-
     /**
      * Read bytes from the previous buffer.
      */
-    protected int readBytes()
-        throws IOException {
+    protected int readBytes() throws IOException {
 
         int nRead = buffer.doRead(readChunk, null);
         pos = readChunk.getStart();
@@ -299,7 +292,6 @@ public class ChunkedInputFilter implements InputFilter {
         buf = readChunk.getBytes();
 
         return nRead;
-
     }
 
 
@@ -314,8 +306,7 @@ public class ChunkedInputFilter implements InputFilter {
      * digits. We should not parse F23IAMGONNAMESSTHISUP34CRLF as a valid
      * header according to the spec.
      */
-    protected boolean parseChunkHeader()
-        throws IOException {
+    protected boolean parseChunkHeader() throws IOException {
 
         int result = 0;
         boolean eol = false;
@@ -363,21 +354,22 @@ public class ChunkedInputFilter implements InputFilter {
             if (!eol) {
                 pos++;
             }
-
         }
 
-        if (readDigit == 0 || result < 0)
+        if (readDigit == 0 || result < 0) {
             return false;
+        }
 
-        if (result == 0)
+        if (result == 0) {
             endChunk = true;
+        }
 
         remaining = result;
-        if (remaining < 0)
+        if (remaining < 0) {
             return false;
+        }
 
         return true;
-
     }
 
 
@@ -394,7 +386,6 @@ public class ChunkedInputFilter implements InputFilter {
         boolean crfound = false;
 
         while (!eol) {
-
             if (pos >= lastValid) {
                 if (readBytes() <= 0)
                     throw new IOException("Invalid CRLF");
@@ -413,7 +404,6 @@ public class ChunkedInputFilter implements InputFilter {
             }
 
             pos++;
-
         }
     }
 
@@ -576,6 +566,7 @@ public class ChunkedInputFilter implements InputFilter {
 
         return true;
     }
+
 
     @Override
     public boolean isFinished() {
