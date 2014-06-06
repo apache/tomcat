@@ -101,7 +101,7 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
-        if (throwable != null) {
+        if (throwable != null && !response.isError()) {
             // Make sure that the necessary methods have been called on the
             // response. (It is possible a component may just have set the
             // Throwable. Tomcat won't do that but other components might.)
@@ -274,6 +274,7 @@ public class ErrorReportValve extends ValveBase {
                 // If writer is null, it's an indication that the response has
                 // been hard committed already, which should never happen
                 writer.write(sb.toString());
+                response.finishResponse();
             }
         } catch (IOException e) {
             // Ignore
