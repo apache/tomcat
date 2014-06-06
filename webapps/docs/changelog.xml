@@ -158,6 +158,9 @@
         make it easier for the client to differentiate between a complete
         response and one that failed part way though. (markt)
       </fix>
+      <scode>
+        Remove the beta tag from the NIO2 connectors. (remm)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
