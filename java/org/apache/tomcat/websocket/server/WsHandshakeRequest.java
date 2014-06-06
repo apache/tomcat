@@ -30,14 +30,10 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.HandshakeRequest;
 
-import org.apache.tomcat.util.res.StringManager;
-
 /**
  * Represents the request that this session was opened under.
  */
 public class WsHandshakeRequest implements HandshakeRequest {
-
-    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final URI requestUri;
     private final Map<String,List<String>> parameterMap;
@@ -58,34 +54,11 @@ public class WsHandshakeRequest implements HandshakeRequest {
         httpSession = request.getSession(false);
 
         // URI
-        // Based on request.getRequestURL() implementation
-        StringBuilder sb = new StringBuilder();
-        String scheme = request.getScheme();
-        int port = request.getServerPort();
-        if (port < 0)
-            port = 80; // Work around java.net.URL bug
-
-        if (scheme.equals("http")) {
-            sb.append("ws");
-        } else if (scheme.equals("https")) {
-            sb.append("wss");
-        } else {
-            throw new IllegalArgumentException(
-                    sm.getString("wsHandshakeRequest.unknownScheme", scheme));
-        }
-        sb.append("://");
-        sb.append(request.getServerName());
-        if ((scheme.equals("http") && (port != 80))
-            || (scheme.equals("https") && (port != 443))) {
-            sb.append(':');
-            sb.append(port);
-        }
-        sb.append(request.getRequestURI());
+        StringBuilder sb = new StringBuilder(request.getRequestURI());
         if (queryString != null) {
-            sb.append('?');
+            sb.append("?");
             sb.append(queryString);
         }
-
         try {
             requestUri = new URI(sb.toString());
         } catch (URISyntaxException e) {
