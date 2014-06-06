@@ -85,6 +85,10 @@
         <bug>56588</bug>: Update deprecation of Context.addApplicationListener()
         methods according to changes in Tomcat 8. (kkolinko)
       </scode>
+      <fix>
+        <bug>56600</bug>: In WebdavServlet: Do not waste time generating
+        response for broken PROPFIND request. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
