@@ -292,6 +292,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             // against verb tampering
             response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
                     Localizer.getMessage("jsp.error.servlet.invalid.method"));
+            return;
         }
 
         //jspFile may be configured as an init-param for this servlet instance
