@@ -446,10 +446,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             if (manager == null)
                 return;
 
-            // Mark this session as "being expired". The flag will be unset in
-            // the call to super.expire(notify)
-            expiring = true;
-
             String expiredId = getIdInternal();
 
             if(notifyCluster && expiredId != null &&
