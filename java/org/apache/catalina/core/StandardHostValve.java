@@ -290,7 +290,7 @@ final class StandardHostValve extends ValveBase {
                                  request.getRequestURI());
             if (custom(request, response, errorPage)) {
                 try {
-                    response.flushBuffer();
+                    response.finishResponse();
                 } catch (ClientAbortException e) {
                     // Ignore
                 } catch (IOException e) {
@@ -366,7 +366,7 @@ final class StandardHostValve extends ValveBase {
                               realError.getClass());
             if (custom(request, response, errorPage)) {
                 try {
-                    response.flushBuffer();
+                    response.finishResponse();
                 } catch (IOException e) {
                     container.getLogger().warn("Exception Processing " + errorPage, e);
                 }
