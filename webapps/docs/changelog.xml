@@ -81,6 +81,10 @@
         <bug>56588</bug>: Update deprecation of Context.addApplicationListener()
         methods according to changes in Tomcat 8. (kkolinko)
       </scode>
+      <fix>
+        <bug>56578</bug>: Correct regression in the fix for <bug>56339</bug>
+        that prevented sessions from expiring when using clustering. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
