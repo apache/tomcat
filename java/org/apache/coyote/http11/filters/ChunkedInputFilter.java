@@ -234,8 +234,6 @@ public class ChunkedInputFilter implements InputFilter {
      */
     @Override
     public long end() throws IOException {
-        checkError();
-
         // Consume extra bytes : parse the stream until the end chunk is found
         while (doRead(readChunk, null) >= 0) {
             // NOOP: Just consume the input
