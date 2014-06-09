@@ -168,10 +168,12 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     waitingRequests.iterator();
                 while (sockets.hasNext()) {
                     SocketWrapper<Socket> socket = sockets.next();
-                    long access = socket.getLastAccess();
-                    if (socket.getTimeout() > 0 &&
-                            (now-access)>socket.getTimeout()) {
-                        processSocket(socket, SocketStatus.TIMEOUT, true);
+                    if (socket.isAsync()) {
+                        long access = socket.getLastAccess();
+                        if (socket.getTimeout() > 0 &&
+                                (now-access) > socket.getTimeout()) {
+                            processSocket(socket, SocketStatus.TIMEOUT, true);
+                        }
                     }
                 }
 
