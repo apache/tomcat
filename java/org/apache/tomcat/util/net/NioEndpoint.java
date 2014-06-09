@@ -788,7 +788,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public void run() {
             if ( interestOps == OP_REGISTER ) {
                 try {
-                    socket.getIOChannel().register(socket.getPoller().getSelector(), SelectionKey.OP_READ, key);
+                    SelectionKey sk = socket.getIOChannel().register(socket.getPoller().getSelector(), SelectionKey.OP_READ, key);
+                    key.setKey(sk);
                 } catch (Exception x) {
                     log.error("", x);
                 }
@@ -1364,6 +1365,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             cometNotify = false;
             interestOps = 0;
             this.poller = poller;
+            this.key = null;
             sendfileData = null;
             if (readLatch != null) {
                 try {
@@ -1393,6 +1395,12 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
         public Poller getPoller() { return poller;}
         public void setPoller(Poller poller){this.poller = poller;}
+        public SelectionKey getKey() {
+            return key;
+        }
+        public void setKey(SelectionKey key) {
+            this.key = key;
+        }
         public void setCometNotify(boolean notify) { this.cometNotify = notify; }
         public boolean getCometNotify() { return cometNotify; }
         public int interestOps() { return interestOps;}
@@ -1434,6 +1442,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public long getWriteTimeout() {return this.writeTimeout;}
 
         private Poller poller = null;
+        private SelectionKey key = null;
         private int interestOps = 0;
         private boolean cometNotify = false;
         private CountDownLatch readLatch = null;
@@ -1507,8 +1516,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         @Override
         public void run() {
             NioChannel socket = ka.getSocket();
-            SelectionKey key = socket.getIOChannel().keyFor(
-                    socket.getPoller().getSelector());
+            SelectionKey key = ka.getKey();
 
             // Upgraded connections need to allow multiple threads to access the
             // connection at the same time to enable blocking IO to be used when
