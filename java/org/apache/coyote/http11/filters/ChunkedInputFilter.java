@@ -526,7 +526,7 @@ public class ChunkedInputFilter implements InputFilter {
                     // limit placed on trailing header size
                     int newlimit = trailingHeaders.getLimit() -1;
                     if (trailingHeaders.getEnd() > newlimit) {
-                        throw new IOException(sm.getString("chunkedInputFilter.maxTrailer"));
+                        throwIOException(sm.getString("chunkedInputFilter.maxTrailer"));
                     }
                     trailingHeaders.setLimit(newlimit);
                 } else {
