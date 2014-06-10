@@ -125,12 +125,9 @@ public abstract class AbstractEndpoint<S> {
                 Iterator<SocketWrapper<S>> sockets = waitingRequests.keySet().iterator();
                 while (sockets.hasNext()) {
                     SocketWrapper<S> socket = sockets.next();
-                    if (socket.isAsync()) {
-                        long access = socket.getLastAccess();
-                        if (socket.getTimeout() > 0 &&
-                                (now-access) > socket.getTimeout()) {
-                            processSocket(socket, SocketStatus.TIMEOUT, true);
-                        }
+                    long access = socket.getLastAccess();
+                    if (socket.getTimeout() > 0 && (now - access) > socket.getTimeout()) {
+                        processSocket(socket, SocketStatus.TIMEOUT, true);
                     }
                 }
 
