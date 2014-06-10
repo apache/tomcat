@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net;
 
 import java.io.IOException;
@@ -23,7 +22,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -164,8 +162,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     // Ignore
                 }
                 long now = System.currentTimeMillis();
-                Iterator<SocketWrapper<Socket>> sockets =
-                    waitingRequests.iterator();
+                Iterator<SocketWrapper<Socket>> sockets = waitingRequests.keySet().iterator();
                 while (sockets.hasNext()) {
                     SocketWrapper<Socket> socket = sockets.next();
                     if (socket.isAsync()) {
@@ -347,7 +344,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                         launch = true;
                     } else if (state == SocketState.LONG) {
                         socket.access();
-                        waitingRequests.add(socket);
+                        waitingRequests.put(socket, socket);
                     }
                 } finally {
                     if (launch) {
@@ -562,7 +559,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             // result of calling AsyncContext.dispatch() from a non-container
             // thread
             synchronized (socket) {
-                if (waitingRequests.remove(socket)) {
+                if (waitingRequests.remove(socket) != null) {
                     SocketProcessor proc = new SocketProcessor(socket,status);
                     Executor executor = getExecutor();
                     if (dispatch && executor != null) {
@@ -585,9 +582,6 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             log.error(sm.getString("endpoint.process.fail"), t);
         }
     }
-
-    protected ConcurrentLinkedQueue<SocketWrapper<Socket>> waitingRequests =
-            new ConcurrentLinkedQueue<>();
 
     @Override
     protected Log getLog() {
