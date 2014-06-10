@@ -173,7 +173,7 @@ Exactly how the usernames/passwords are configured depends on which
     edited with any text editor.  This file contains an XML
     <code>&lt;user&gt;</code> for each individual user, which might
     look something like this:
-<source><![CDATA[<user name="craigmcc" password="secret" roles="standard,manager-script" />]]></source>
+<source><![CDATA[<user username="craigmcc" password="secret" roles="standard,manager-script" />]]></source>
     which defines the username and password used by this individual to
     log on, and the role names he or she is associated with.  You can
     add the <strong>manager-script</strong> role to the comma-delimited
