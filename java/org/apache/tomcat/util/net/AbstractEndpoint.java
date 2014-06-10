@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
@@ -974,5 +975,7 @@ public abstract class AbstractEndpoint<S> {
         }
     }
 
+    protected ConcurrentHashMap<SocketWrapper<S>, SocketWrapper<S>> waitingRequests =
+            new ConcurrentHashMap<>();
 }
 

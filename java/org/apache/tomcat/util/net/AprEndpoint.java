@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net;
 
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -94,9 +92,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
      */
     protected long sslContext = 0;
 
-
-    protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
-            new ConcurrentLinkedQueue<>();
 
     private final Map<Long,AprSocketWrapper> connections = new ConcurrentHashMap<>();
 
@@ -886,7 +881,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             // result of calling AsyncContext.dispatch() from a non-container
             // thread
             synchronized (socket) {
-                if (waitingRequests.remove(socket)) {
+                if (waitingRequests.remove(socket) != null) {
                     SocketProcessor proc = new SocketProcessor(socket, status);
                     Executor executor = getExecutor();
                     if (dispatch && executor != null) {
@@ -1075,8 +1070,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     // Ignore
                 }
                 long now = System.currentTimeMillis();
-                Iterator<SocketWrapper<Long>> sockets =
-                    waitingRequests.iterator();
+                Iterator<SocketWrapper<Long>> sockets = waitingRequests.keySet().iterator();
                 while (sockets.hasNext()) {
                     SocketWrapper<Long> socket = sockets.next();
                     if (socket.isAsync()) {
@@ -2394,7 +2388,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     } else if (state == Handler.SocketState.LONG) {
                         socket.access();
                         if (socket.isAsync()) {
-                            waitingRequests.add(socket);
+                            waitingRequests.put(socket, socket);
                         }
                     }
                 }
@@ -2456,7 +2450,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             } else if (state == Handler.SocketState.LONG) {
                 socket.access();
                 if (socket.isAsync()) {
-                    waitingRequests.add(socket);
+                    waitingRequests.put(socket, socket);
                 }
             } else if (state == Handler.SocketState.ASYNC_END) {
                 socket.access();

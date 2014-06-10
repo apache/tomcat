@@ -31,7 +31,6 @@ import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -873,9 +872,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public SSLImplementation getSslImplementation();
         public void onCreateSSLEngine(SSLEngine engine);
     }
-
-    protected ConcurrentHashMap<SocketWrapper<Nio2Channel>, SocketWrapper<Nio2Channel>> waitingRequests =
-            new ConcurrentHashMap<>();
 
     /**
      * The completion handler used for asynchronous read operations
