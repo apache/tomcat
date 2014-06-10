@@ -120,6 +120,7 @@ public class NioChannel implements ByteChannel{
      */
     @Override
     public int write(ByteBuffer src) throws IOException {
+        System.out.println(Thread.currentThread().isInterrupted());
         return sc.write(src);
     }
 

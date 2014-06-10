@@ -112,6 +112,10 @@
         <bug>56561</bug>: Avoid <code>NoSuchElementException</code> while handling
         attributes with empty string value. (violetagg)
       </fix>
+      <fix>
+        <bug>56612</bug>: Correctly parse two consecutive escaped single quotes
+        when used in UEL expression in a JSP. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
