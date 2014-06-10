@@ -30,7 +30,6 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
-import java.util.Iterator;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -360,9 +359,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             initializeConnectionLatch();
             startAcceptorThreads();
 
-            // Start async timeout thread
-            Thread timeoutThread = new Thread(new AsyncTimeout(),
-                    getName() + "-AsyncTimeout");
+            setAsyncTimeout(new AsyncTimeout());
+            Thread timeoutThread = new Thread(getAsyncTimeout(), getName() + "-AsyncTimeout");
             timeoutThread.setPriority(threadPriority);
             timeoutThread.setDaemon(true);
             timeoutThread.start();
@@ -381,6 +379,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
         if (running) {
             running = false;
+            getAsyncTimeout().stop();
             unlockAccept();
         }
         // Use the executor to avoid binding the main thread if something bad
@@ -734,51 +733,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             state = AcceptorState.ENDED;
         }
 
-    }
-
-    /**
-     * Async timeout thread
-     */
-    protected class AsyncTimeout implements Runnable {
-        /**
-         * The background thread that checks async requests and fires the
-         * timeout if there has been no activity.
-         */
-        @Override
-        public void run() {
-
-            // Loop until we receive a shutdown command
-            while (running) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                long now = System.currentTimeMillis();
-                Iterator<SocketWrapper<Nio2Channel>> sockets =
-                    waitingRequests.keySet().iterator();
-                while (sockets.hasNext()) {
-                    SocketWrapper<Nio2Channel> socket = sockets.next();
-                    if (socket.isAsync()) {
-                        long access = socket.getLastAccess();
-                        if (socket.getTimeout() > 0 &&
-                                (now-access) > socket.getTimeout()) {
-                            processSocket(socket, SocketStatus.TIMEOUT, true);
-                        }
-                    }
-                }
-
-                // Loop if endpoint is paused
-                while (paused && running) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
-                }
-
-            }
-        }
     }
 
 

@@ -99,6 +99,60 @@ public abstract class AbstractEndpoint<S> {
     private static final int INITIAL_ERROR_DELAY = 50;
     private static final int MAX_ERROR_DELAY = 1600;
 
+
+    /**
+     * Async timeout thread
+     */
+    protected class AsyncTimeout implements Runnable {
+
+        private volatile boolean asyncTimeoutRunning = true;
+
+        /**
+         * The background thread that checks async requests and fires the
+         * timeout if there has been no activity.
+         */
+        @Override
+        public void run() {
+
+            // Loop until we receive a shutdown command
+            while (asyncTimeoutRunning) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                long now = System.currentTimeMillis();
+                Iterator<SocketWrapper<S>> sockets = waitingRequests.keySet().iterator();
+                while (sockets.hasNext()) {
+                    SocketWrapper<S> socket = sockets.next();
+                    if (socket.isAsync()) {
+                        long access = socket.getLastAccess();
+                        if (socket.getTimeout() > 0 &&
+                                (now-access) > socket.getTimeout()) {
+                            processSocket(socket, SocketStatus.TIMEOUT, true);
+                        }
+                    }
+                }
+
+                // Loop if endpoint is paused
+                while (paused && asyncTimeoutRunning) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                }
+
+            }
+        }
+
+
+        protected void stop() {
+            asyncTimeoutRunning = false;
+        }
+    }
+
+
     // ----------------------------------------------------------------- Fields
 
 
@@ -977,5 +1031,17 @@ public abstract class AbstractEndpoint<S> {
 
     protected ConcurrentHashMap<SocketWrapper<S>, SocketWrapper<S>> waitingRequests =
             new ConcurrentHashMap<>();
+
+
+    /**
+     * The async timeout thread.
+     */
+    private AsyncTimeout asyncTimeout = null;
+    public AsyncTimeout getAsyncTimeout() {
+        return asyncTimeout;
+    }
+    public void setAsyncTimeout(AsyncTimeout asyncTimeout) {
+        this.asyncTimeout = asyncTimeout;
+    }
 }
 
