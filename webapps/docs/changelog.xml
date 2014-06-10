@@ -201,6 +201,10 @@
         already been committed, do not clear the buffer of JspWriter, but flush
         it. Thus it will become more clear where the error occurred. (kkolinko)
       </update>
+      <fix>
+        <bug>56612</bug>: Correctly parse two consecutive escaped single quotes
+        when used in UEL expression in a JSP. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
