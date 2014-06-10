@@ -891,9 +891,9 @@ nested inside the <code>&lt;Engine&gt;</code> element, so that it applies
 to all virtual hosts and web applications.  The default contents of the
 <code>conf/tomcat-users.xml</code> file is:</p>
 <source><![CDATA[<tomcat-users>
-  <user name="tomcat" password="tomcat" roles="tomcat" />
-  <user name="role1"  password="tomcat" roles="role1"  />
-  <user name="both"   password="tomcat" roles="tomcat,role1" />
+  <user username="tomcat" password="tomcat" roles="tomcat" />
+  <user username="role1"  password="tomcat" roles="role1"  />
+  <user username="both"   password="tomcat" roles="tomcat,role1" />
 </tomcat-users>]]></source>
 
 <h5>Additional Notes</h5>
