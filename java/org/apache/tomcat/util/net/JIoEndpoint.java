@@ -21,7 +21,6 @@ import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Iterator;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -140,51 +139,6 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                 SocketStatus status);
         public SSLImplementation getSslImplementation();
         public void beforeHandshake(SocketWrapper<Socket> socket);
-    }
-
-
-    /**
-     * Async timeout thread
-     */
-    protected class AsyncTimeout implements Runnable {
-        /**
-         * The background thread that checks async requests and fires the
-         * timeout if there has been no activity.
-         */
-        @Override
-        public void run() {
-
-            // Loop until we receive a shutdown command
-            while (running) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                long now = System.currentTimeMillis();
-                Iterator<SocketWrapper<Socket>> sockets = waitingRequests.keySet().iterator();
-                while (sockets.hasNext()) {
-                    SocketWrapper<Socket> socket = sockets.next();
-                    if (socket.isAsync()) {
-                        long access = socket.getLastAccess();
-                        if (socket.getTimeout() > 0 &&
-                                (now-access) > socket.getTimeout()) {
-                            processSocket(socket, SocketStatus.TIMEOUT, true);
-                        }
-                    }
-                }
-
-                // Loop if endpoint is paused
-                while (paused && running) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
-                }
-
-            }
-        }
     }
 
 
@@ -441,8 +395,8 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             startAcceptorThreads();
 
             // Start async timeout thread
-            Thread timeoutThread = new Thread(new AsyncTimeout(),
-                    getName() + "-AsyncTimeout");
+            setAsyncTimeout(new AsyncTimeout());
+            Thread timeoutThread = new Thread(getAsyncTimeout(), getName() + "-AsyncTimeout");
             timeoutThread.setPriority(threadPriority);
             timeoutThread.setDaemon(true);
             timeoutThread.start();
@@ -457,6 +411,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
         }
         if (running) {
             running = false;
+            getAsyncTimeout().stop();
             unlockAccept();
         }
         shutdownExecutor();
