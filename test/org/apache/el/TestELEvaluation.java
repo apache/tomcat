@@ -164,6 +164,11 @@ public class TestELEvaluation {
         assertEquals("\"\\", evaluateExpression("${\"\\\"\\\\\"}"));
     }
 
+    @Test
+    public void testMultipleEscaping() throws Exception {
+        assertEquals("''", evaluateExpression("${\"\'\'\"}"));
+    }
+
     private void compareBoth(String msg, int expected, Object o1, Object o2){
         int i1 = ELSupport.compare(o1, o2);
         int i2 = ELSupport.compare(o2, o1);

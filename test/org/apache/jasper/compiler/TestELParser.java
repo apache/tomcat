@@ -266,6 +266,13 @@ public class TestELParser {
     }
 
 
+    @Test
+    public void testEscape11() throws JasperException {
+        // Bug 56612
+        doTestParser("${'\\'\\''}", "''");
+    }
+
+
     private void doTestParser(String input, String expected) throws JasperException {
         ELException elException = null;
         String elResult = null;

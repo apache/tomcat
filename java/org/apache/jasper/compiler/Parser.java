@@ -751,7 +751,7 @@ class Parser implements TagConstants {
             // XXX could move this logic to JspReader
             last = reader.mark(); // XXX somewhat wasteful
             currentChar = reader.nextChar();
-            if (currentChar == '\\' && (singleQuoted || doubleQuoted)) {
+            while (currentChar == '\\' && (singleQuoted || doubleQuoted)) {
                 // skip character following '\' within quotes
                 reader.nextChar();
                 currentChar = reader.nextChar();
