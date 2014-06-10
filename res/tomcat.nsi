@@ -936,7 +936,7 @@ Function configure
     Push $TomcatAdminRoles
     Call xmlEscape
     Pop $R3
-    StrCpy $R5 '<user name="$R1" password="$R2" roles="$R3" />$\r$\n'
+    StrCpy $R5 '<user username="$R1" password="$R2" roles="$R3" />$\r$\n'
     DetailPrint 'Admin user added: "$TomcatAdminUsername"'
   ${EndIf}
 

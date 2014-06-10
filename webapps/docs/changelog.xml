@@ -224,6 +224,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>56606</bug>: Ensure that the new attribute name
+        <code>username</code> is used in the <code>tomcat-users.xml</code>
+        examples rather than the old attribute name of <code>user</code>.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
