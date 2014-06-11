@@ -493,6 +493,46 @@ class JspReader {
         return ret;
     }
 
+    /**
+     * Parse ELExpressionBody that is a body of ${} or #{} expression. Initial
+     * reader position is expected to be just after '${' or '#{' characters.
+     * <p>
+     * In case of success, this method returns <code>Mark</code> for the last
+     * character before the terminating '}' and reader is positioned just after
+     * the '}' character. If no terminating '}' is encountered, this method
+     * returns <code>null</code>.
+     *
+     * @return Mark for the last character of EL expression or <code>null</code>
+     */
+    Mark skipELExpression() throws JasperException {
+        // ELExpressionBody.
+        //  Starts with "#{" or "${".  Ends with "}".
+        //  May contain quoted "{", "}", '{', or '}'.
+        Mark last = mark();
+        boolean singleQuoted = false, doubleQuoted = false;
+        int currentChar;
+        do {
+            currentChar = nextChar(last);
+            while (currentChar == '\\' && (singleQuoted || doubleQuoted)) {
+                // skip character following '\' within quotes
+                // No need to update 'last', as neither of these characters
+                // can be the closing '}'.
+                nextChar();
+                currentChar = nextChar();
+            }
+            if (currentChar == -1) {
+                return null;
+            }
+            if (currentChar == '"' && !singleQuoted) {
+                doubleQuoted = !doubleQuoted;
+            } else if (currentChar == '\'' && !doubleQuoted) {
+                singleQuoted = !singleQuoted;
+            }
+        } while (currentChar != '}' || (singleQuoted || doubleQuoted));
+
+        return last;
+    }
+
     final boolean isSpace() throws JasperException {
         // Note: If this logic changes, also update Node.TemplateText.rtrim()
         return peekChar() <= ' ';

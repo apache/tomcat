@@ -732,32 +732,15 @@ class Parser implements TagConstants {
     }
 
     /*
-     * ELExpressionBody (following "${" to first unquoted "}") // XXX add formal
-     * production and confirm implementation against it, // once it's decided
+     * ELExpressionBody (following "${" to first unquoted "}")
      */
     private void parseELExpression(Node parent, char type)
             throws JasperException {
         start = reader.mark();
-        Mark last = null;
-        boolean singleQuoted = false, doubleQuoted = false;
-        int currentChar;
-        do {
-            // XXX could move this logic to JspReader
-            last = reader.mark(); // XXX somewhat wasteful
-            currentChar = reader.nextChar();
-            while (currentChar == '\\' && (singleQuoted || doubleQuoted)) {
-                // skip character following '\' within quotes
-                reader.nextChar();
-                currentChar = reader.nextChar();
-            }
-            if (currentChar == -1)
-                err.jspError(start, "jsp.error.unterminated", type + "{");
-            if (currentChar == '"' && !singleQuoted) {
-                doubleQuoted = !doubleQuoted;
-            } else if (currentChar == '\'' && !doubleQuoted) {
-                singleQuoted = !singleQuoted;
-            }
-        } while (currentChar != '}' || (singleQuoted || doubleQuoted));
+        Mark last = reader.skipELExpression();
+        if (last == null) {
+            err.jspError(start, "jsp.error.unterminated", type + "{");
+        }
 
         new Node.ELExpression(type, reader.getText(start, last), start, parent);
     }
@@ -1383,7 +1366,6 @@ class Parser implements TagConstants {
                     new Node.TemplateText(ttext.toString(), start, parent);
 
                     // Mark and parse the EL expression and create its node:
-                    start = reader.mark();
                     parseELExpression(parent, (char) ch);
 
                     start = reader.mark();
