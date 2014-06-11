@@ -1601,8 +1601,7 @@ public class Request
     public AsyncContext startAsync(ServletRequest request,
             ServletResponse response) {
         if (!isAsyncSupported()) {
-            throw new IllegalStateException(
-                    "A filter or servlet of the current chain does not support asynchronous operations.");
+            throw new IllegalStateException(sm.getString("request.asyncNotSupported"));
         }
 
         if (asyncContext == null) {
