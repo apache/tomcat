@@ -135,6 +135,13 @@
         supported by a filter or servlet. Patch provided by Romain Manni-Bucau.
         (violetagg)
       </fix>
+      <fix>
+        <bug>56606</bug>: User entries in <code>tomcat-users.xml</code> file
+        are recommended to use "username" attribute rather than legacy "name"
+        attribute. Fix inconsistencies in Windows installer, examples. Update
+        digester rules and documentation for <code>MemoryRealm</code>.
+        (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -230,16 +237,6 @@
       <fix>
         <bug>56577</bug>: Improve the executor configuration used for the
         callbacks associated with asynchronous writes. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Web applications">
-    <changelog>
-      <fix>
-        <bug>56606</bug>: Ensure that the new attribute name
-        <code>username</code> is used in the <code>tomcat-users.xml</code>
-        examples rather than the old attribute name of <code>user</code>.
-        (markt)
       </fix>
     </changelog>
   </subsection>
