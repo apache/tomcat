@@ -1601,7 +1601,8 @@ public class Request
     public AsyncContext startAsync(ServletRequest request,
             ServletResponse response) {
         if (!isAsyncSupported()) {
-            throw new IllegalStateException("Not supported.");
+            throw new IllegalStateException(
+                    "A filter or servlet of the current chain does not support asynchronous operations.");
         }
 
         if (asyncContext == null) {

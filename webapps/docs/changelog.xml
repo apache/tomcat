@@ -130,6 +130,11 @@
         <bug>56600</bug>: In WebdavServlet: Do not waste time generating
         response for broken PROPFIND request. (kkolinko)
       </fix>
+      <fix>
+        Provide a better error message when asynchronous operations are not
+        supported by a filter or servlet. Patch provided by Romain Manni-Bucau.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
