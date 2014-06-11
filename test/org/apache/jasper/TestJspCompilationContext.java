@@ -27,7 +27,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestJspCpompilationContext extends TomcatBaseTest {
+public class TestJspCompilationContext extends TomcatBaseTest {
 
     @Test
     public void testTagFileInJar() throws Exception {
