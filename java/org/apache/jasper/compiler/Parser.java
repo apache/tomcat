@@ -752,10 +752,11 @@ class Parser implements TagConstants {
             }
             if (currentChar == -1)
                 err.jspError(start, "jsp.error.unterminated", type + "{");
-            if (currentChar == '"' && !singleQuoted)
+            if (currentChar == '"' && !singleQuoted) {
                 doubleQuoted = !doubleQuoted;
-            if (currentChar == '\'' && !doubleQuoted)
+            } else if (currentChar == '\'' && !doubleQuoted) {
                 singleQuoted = !singleQuoted;
+            }
         } while (currentChar != '}' || (singleQuoted || doubleQuoted));
 
         new Node.ELExpression(type, reader.getText(start, last), start, parent);
