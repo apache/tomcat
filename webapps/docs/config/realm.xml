@@ -798,8 +798,10 @@
     <li>Each <code>&lt;user&gt;</code> element must have the following
         attributes:
         <ul>
-        <li><strong>name</strong> - Username of this user (must be unique
-            within this file).</li>
+        <li><strong>username</strong> - Username of this user (must be unique
+            within this file).<br/>
+            For compatibility, it is allowed to use <strong>name</strong> as an
+            alternative name for this attribute.</li>
         <li><strong>password</strong> - Password of this user (in
             clear text).</li>
         <li><strong>roles</strong> - Comma-delimited list of the role names
