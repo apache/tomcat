@@ -37,6 +37,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
@@ -316,5 +317,33 @@ public class TestGenerator extends TomcatBaseTest {
             return EVAL_PAGE;
         }
 
+    }
+
+    @Test
+    public void testBug56581() throws LifecycleException {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir =
+            new File("test/webapp");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        try {
+            getUrl("http://localhost:" + getPort()
+                    + "/test/bug5nnnn/bug56581.jsp", res, null);
+            Assert.fail("An IOException was expected.");
+        } catch (IOException expected) {
+            // ErrorReportValve in Tomcat 8.0.9+ flushes and aborts the
+            // connection when an unexpected error is encountered and response
+            // has already been committed. It results in an exception here:
+            // java.io.IOException: Premature EOF
+        }
+
+        String result = res.toString();
+        assertTrue(result.startsWith("0 Hello world!\n"));
+        assertTrue(result.endsWith("999 Hello world!\n"));
     }
 }
