@@ -217,6 +217,11 @@
         <bug>56612</bug>: Correctly parse two consecutive escaped single quotes
         when used in UEL expression in a JSP. (markt)
       </fix>
+      <update>
+        Move code that parses EL expressions within JSP template text from
+        <code>Parser</code> to <code>JspReader</code> class for better
+        performance. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

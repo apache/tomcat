@@ -736,46 +736,20 @@ class Parser implements TagConstants {
     }
 
     /*
-     * ELExpressionBody. Starts with "#{" or "${".  Ends with "}".May contain
-     *                   quoted "{", "}", '{', or '}' and nested "{...}"
+     * ELExpressionBody. Starts with "#{" or "${".  Ends with "}".
+     * See JspReader.skipELExpression().
      */
     private void parseELExpression(Node parent, char type)
             throws JasperException {
         start = reader.mark();
-        Mark last = null;
-        boolean singleQuoted = false;
-        boolean doubleQuoted = false;
-        int nesting = 0;
-        int currentChar;
-        do {
-            // XXX could move this logic to JspReader
-            last = reader.mark(); // XXX somewhat wasteful
-            currentChar = reader.nextChar();
-            while (currentChar == '\\' && (singleQuoted || doubleQuoted)) {
-                // skip character following '\' within quotes
-                reader.nextChar();
-                currentChar = reader.nextChar();
-            }
-            if (currentChar == -1)
-                err.jspError(start, "jsp.error.unterminated", type + "{");
-            if (currentChar == '"' && !singleQuoted) {
-                doubleQuoted = !doubleQuoted;
-            } else if (currentChar == '\'' && !doubleQuoted) {
-                singleQuoted = !singleQuoted;
-            } else if (currentChar == '{' && !doubleQuoted && !singleQuoted) {
-                nesting++;
-            } else if (currentChar =='}' && !doubleQuoted && !singleQuoted) {
-                // Note: This also matches the terminating '}' at which point
-                //       nesting will be set to -1 - hence the test for
-                //       while (currentChar != '}' || nesting > -1 ||...) below
-                //       to continue the loop until the final '}' is detected
-                nesting--;
-            }
-        } while (currentChar != '}' || singleQuoted || doubleQuoted || nesting > -1);
+        Mark last = reader.skipELExpression();
+        if (last == null) {
+            err.jspError(start, "jsp.error.unterminated", type + "{");
+        }
 
         @SuppressWarnings("unused")
-        Node unused = new Node.ELExpression(
-                type, reader.getText(start, last), start, parent);
+        Node unused = new Node.ELExpression(type, reader.getText(start, last),
+                start, parent);
     }
 
     /*
@@ -1408,7 +1382,6 @@ class Parser implements TagConstants {
                             ttext.toString(), start, parent);
 
                     // Mark and parse the EL expression and create its node:
-                    start = reader.mark();
                     parseELExpression(parent, (char) ch);
 
                     start = reader.mark();
