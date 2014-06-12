@@ -74,8 +74,20 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      * Update the current error state to the new error state if the new error
      * state is more severe than the current error state.
      */
-    protected void setErrorState(ErrorState errorState) {
+    protected void setErrorState(ErrorState errorState, Throwable t) {
+        boolean blockIo = this.errorState.isIoAllowed() && !errorState.isIoAllowed();
         this.errorState = this.errorState.getMostSevere(errorState);
+        if (blockIo && !ContainerThreadMarker.isContainerThread()) {
+            // The error occurred on a non-container thread which means not all
+            // of the necessary clean-up will have been completed. Dispatch to
+            // a container thread to do the clean-up. Need to do it this way to
+            // ensure that all the necessary clean-up is performed.
+            if (response.getStatus() < 400) {
+                response.setStatus(500);
+            }
+            getLog().info(sm.getString("abstractProcessor.nonContainerThreadError"), t);
+            getEndpoint().processSocket(socketWrapper, SocketStatus.CLOSE_NOW, true);
+        }
     }
 
 
@@ -159,6 +171,11 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     @Override
     public SocketState asyncPostProcess() {
         return asyncStateMachine.asyncPostProcess();
+    }
+
+    @Override
+    public void errorDispatch() {
+        getAdapter().errorDispatch(request, response);
     }
 
     @Override

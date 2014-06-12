@@ -147,6 +147,12 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>56518</bug>: When using NIO, do not attempt to write to the socket
+        if the thread is marked interrupted as this will lead to a connection
+        limit leak. This fix was based on analysis of the issue by hanyong.
+        (markt)
+      </fix>
+      <fix>
         <bug>56521</bug>: Re-use the asynchronous write buffer between writes to
         reduce allocation and GC overhead. Based on a patch by leonzhx. Also
         make the buffer size configurable and remove copying of data within

@@ -29,8 +29,6 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 
-import org.apache.tomcat.util.res.StringManager;
-
 /**
  *
  * Implementation of a secure socket channel
@@ -38,8 +36,6 @@ import org.apache.tomcat.util.res.StringManager;
  */
 
 public class SecureNioChannel extends NioChannel  {
-
-    protected static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");
 
     protected ByteBuffer netInBuffer;
     protected ByteBuffer netOutBuffer;
@@ -475,6 +471,7 @@ public class SecureNioChannel extends NioChannel  {
      */
     @Override
     public int write(ByteBuffer src) throws IOException {
+        checkInterruptStatus();
         if ( src == this.netOutBuffer ) {
             //we can get here through a recursive call
             //by using the NioBlockingSelector

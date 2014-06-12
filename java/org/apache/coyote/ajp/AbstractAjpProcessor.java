@@ -359,7 +359,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             try {
                 finish();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
             }
             break;
         }
@@ -371,13 +371,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             try {
                 prepareResponse();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
             }
 
             try {
                 flush(false);
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
             }
             break;
         }
@@ -391,7 +391,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 try {
                     prepareResponse();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, e);
                     return;
                 }
             }
@@ -399,7 +399,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             try {
                 flush(true);
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
             }
             break;
         }
@@ -410,7 +410,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         case DISABLE_SWALLOW_INPUT: {
             // TODO: Do not swallow request input but
             // make sure we are closing the connection
-            setErrorState(ErrorState.CLOSE_CLEAN);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
             break;
         }
         case RESET: {
@@ -642,7 +642,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         case CLOSE_NOW: {
             // Prevent further writes to the response
             swallowResponse = true;
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
         }
@@ -690,14 +690,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             if(!getAdapter().asyncDispatch(request, response, status)) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, null);
             }
             resetTimeouts();
         } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, e);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, t);
             getLog().error(sm.getString("http11processor.request.process"), t);
         }
 
@@ -766,7 +766,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     try {
                         output(pongMessageArray, 0, pongMessageArray.length, true);
                     } catch (IOException e) {
-                        setErrorState(ErrorState.CLOSE_NOW);
+                        setErrorState(ErrorState.CLOSE_NOW, e);
                     }
                     recycle(false);
                     continue;
@@ -776,20 +776,20 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     if (getLog().isDebugEnabled()) {
                         getLog().debug("Unexpected message: " + type);
                     }
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, null);
                     break;
                 }
                 keptAlive = true;
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 getLog().debug(sm.getString("ajpprocessor.header.error"), t);
                 // 400 - Bad Request
                 response.setStatus(400);
-                setErrorState(ErrorState.CLOSE_CLEAN);
+                setErrorState(ErrorState.CLOSE_CLEAN, t);
                 getAdapter().log(request, response, 0);
             }
 
@@ -803,7 +803,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     getLog().debug(sm.getString("ajpprocessor.request.prepare"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
-                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    setErrorState(ErrorState.CLOSE_CLEAN, t);
                     getAdapter().log(request, response, 0);
                 }
             }
@@ -811,7 +811,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             if (!getErrorState().isError() && !cping && endpoint.isPaused()) {
                 // 503 - Service unavailable
                 response.setStatus(503);
-                setErrorState(ErrorState.CLOSE_CLEAN);
+                setErrorState(ErrorState.CLOSE_CLEAN, null);
                 getAdapter().log(request, response, 0);
             }
             cping = false;
@@ -822,13 +822,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     getAdapter().service(request, response);
                 } catch (InterruptedIOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, e);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     getLog().error(sm.getString("ajpprocessor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
-                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    setErrorState(ErrorState.CLOSE_CLEAN, t);
                     getAdapter().log(request, response, 0);
                 }
             }
@@ -843,7 +843,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     finish();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, t);
                 }
             }
 
@@ -1191,7 +1191,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 long cl = vMB.getLong();
                 if (contentLengthSet) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    setErrorState(ErrorState.CLOSE_CLEAN, null);
                 } else {
                     contentLengthSet = true;
                     // Set the content-length header for the request
@@ -1306,7 +1306,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     secret = true;
                     if (!tmpMB.equals(requiredSecret)) {
                         response.setStatus(403);
-                        setErrorState(ErrorState.CLOSE_CLEAN);
+                        setErrorState(ErrorState.CLOSE_CLEAN, null);
                     }
                 }
                 break;
@@ -1322,7 +1322,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         // Check if secret was submitted if required
         if ((requiredSecret != null) && !secret) {
             response.setStatus(403);
-            setErrorState(ErrorState.CLOSE_CLEAN);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
         }
 
         // Check for a full URI (including protocol://host:port/)
@@ -1373,7 +1373,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 request.serverName().duplicate(request.localName());
             } catch (IOException e) {
                 response.setStatus(400);
-                setErrorState(ErrorState.CLOSE_CLEAN);
+                setErrorState(ErrorState.CLOSE_CLEAN, e);
             }
             return;
         }
@@ -1423,7 +1423,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     // Invalid character
                     // 400 - Bad request
                     response.setStatus(400);
-                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    setErrorState(ErrorState.CLOSE_CLEAN, null);
                     break;
                 }
                 port = port + (charValue * mult);
@@ -1542,7 +1542,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             try {
                 prepareResponse();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
                 return;
             }
         }
@@ -1748,7 +1748,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 try {
                     prepareResponse();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, e);
                 }
             }
 

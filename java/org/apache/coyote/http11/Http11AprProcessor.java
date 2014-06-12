@@ -113,15 +113,15 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             if (!getAdapter().event(request, response, status)) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, null);
             }
         } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, e);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // 500 - Internal Server Error
             response.setStatus(500);
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, t);
             getAdapter().log(request, response, 0);
             log.error(sm.getString("http11processor.request.process"), t);
         }
@@ -178,7 +178,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         if (endpoint.isPaused()) {
             // 503 - Service unavailable
             response.setStatus(503);
-            setErrorState(ErrorState.CLOSE_CLEAN);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
             getAdapter().log(request, response, 0);
         } else {
             return true;
@@ -215,7 +215,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                         log.debug(sm.getString(
                                 "http11processor.sendfile.error"));
                     }
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, null);
                 } else {
                     // The sendfile Poller will add the socket to the main
                     // Poller once sendfile processing is complete
