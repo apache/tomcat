@@ -43,6 +43,8 @@ public interface Processor<S> {
     HttpUpgradeHandler getHttpUpgradeHandler();
     SocketState upgradeDispatch(SocketStatus status) throws IOException;
 
+    void errorDispatch();
+
     boolean isComet();
     boolean isAsync();
     boolean isUpgrade();

@@ -25,6 +25,7 @@ import java.nio.channels.SocketChannel;
 
 import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  *
@@ -35,6 +36,9 @@ import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
  * @version 1.0
  */
 public class NioChannel implements ByteChannel {
+
+    protected static final StringManager sm =
+            StringManager.getManager("org.apache.tomcat.util.net.res");
 
     protected static ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
@@ -119,6 +123,7 @@ public class NioChannel implements ByteChannel {
      */
     @Override
     public int write(ByteBuffer src) throws IOException {
+        checkInterruptStatus();
         return sc.write(src);
     }
 
@@ -211,4 +216,19 @@ public class NioChannel implements ByteChannel {
     }
 
 
+    /**
+     * This method should be used to check the interrupt status before
+     * attempting a write.
+     *
+     * If a thread has been interrupted and the interrupt has not been cleared
+     * then an attempt to write to the socket will fail. When this happens the
+     * socket is removed from the poller without the socket being selected. This
+     * results in a connection limit leak for NIO as the endpoint expects the
+     * socket to be selected even in error conditions.
+     */
+    protected void checkInterruptStatus() throws IOException {
+        if (Thread.interrupted()) {
+            throw new IOException(sm.getString("channel.nio.interrupted"));
+        }
+    }
 }

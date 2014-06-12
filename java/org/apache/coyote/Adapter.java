@@ -51,6 +51,8 @@ public interface Adapter {
     public boolean asyncDispatch(Request req,Response res, SocketStatus status)
             throws Exception;
 
+    public void errorDispatch(Request request, Response response);
+
     public void log(Request req, Response res, long time);
 
     /**

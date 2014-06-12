@@ -599,6 +599,35 @@ public class CoyoteAdapter implements Adapter {
     }
 
 
+
+    @Override
+    public void errorDispatch(org.apache.coyote.Request req,
+            org.apache.coyote.Response res) {
+        Request request = (Request) req.getNote(ADAPTER_NOTES);
+        Response response = (Response) res.getNote(ADAPTER_NOTES);
+
+        if (request != null && request.getMappingData().context != null) {
+            request.getMappingData().context.logAccess(
+                    request, response,
+                    System.currentTimeMillis() - req.getStartTime(),
+                    false);
+        } else {
+            log(req, res, System.currentTimeMillis() - req.getStartTime());
+        }
+
+        if (request != null) {
+            request.recycle();
+        }
+
+        if (response != null) {
+            response.recycle();
+        }
+
+        res.recycle();
+        res.recycle();
+    }
+
+
     @Override
     public void log(org.apache.coyote.Request req,
             org.apache.coyote.Response res, long time) {

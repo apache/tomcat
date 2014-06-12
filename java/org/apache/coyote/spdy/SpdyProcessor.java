@@ -160,7 +160,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             getAdapter().service(request, response);
         } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, e);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // log.error(sm.getString("ajpprocessor.request.process"), t);
@@ -169,7 +169,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
             t.printStackTrace();
             response.setStatus(500);
             getAdapter().log(request, response, 0);
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, t);
         }
 
         // TODO: async, etc ( detached mode - use a special light protocol)
@@ -180,7 +180,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
                 finish();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, t);
             }
         }
 
@@ -251,7 +251,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
         case DISABLE_SWALLOW_INPUT: {
             // TODO: Do not swallow request input but
             // make sure we are closing the connection
-            setErrorState(ErrorState.CLOSE_CLEAN);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
             break;
         }
         case CLOSE: {
@@ -414,7 +414,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
             break;
         }
         case CLOSE_NOW: {
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
         default: {
