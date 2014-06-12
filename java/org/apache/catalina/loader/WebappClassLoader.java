@@ -1633,14 +1633,14 @@ public class WebappClassLoader extends URLClassLoader
             List<String> driverNames = (List<String>) obj.getClass().getMethod(
                     "clearJdbcDriverRegistrations").invoke(obj);
             for (String name : driverNames) {
-                log.error(sm.getString("webappClassLoader.clearJdbc",
+                log.info(sm.getString("webappClassLoader.clearJdbc",
                         getContextName(), name));
             }
         } catch (Exception e) {
             // So many things to go wrong above...
             Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
             ExceptionUtils.handleThrowable(t);
-            log.warn(sm.getString(
+            log.info(sm.getString(
                     "webappClassLoader.jdbcRemoveFailed", getContextName()), t);
         }
     }
@@ -1820,15 +1820,11 @@ public class WebappClassLoader extends URLClassLoader
                     }
 
                     if (isRequestThread(thread)) {
-                        log.error(sm.getString("webappClassLoader.warnRequestThread",
-                                getContextName(), threadName));
                         log.info(sm.getString("webappClassLoader.stackTraceRequestThread",
-                                threadName, getStackTrace(thread)));
+                                getContextName(), threadName, getStackTrace(thread)));
                     } else {
-                        log.error(sm.getString("webappClassLoader.warnThread",
-                                getContextName(), threadName));
                         log.info(sm.getString("webappClassLoader.stackTrace",
-                                threadName, getStackTrace(thread)));
+                                getContextName(), threadName, getStackTrace(thread)));
                     }
 
                     // Don't try an stop the threads unless explicitly
@@ -2003,14 +1999,14 @@ public class WebappClassLoader extends URLClassLoader
                 }
             }
 
-            log.error(sm.getString("webappClassLoader.warnTimerThread",
+            log.info(sm.getString("webappClassLoader.warnTimerThread",
                     getContextName(), thread.getName()));
 
         } catch (Exception e) {
             // So many things to go wrong above...
             Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
             ExceptionUtils.handleThrowable(t);
-            log.warn(sm.getString(
+            log.info(sm.getString(
                     "webappClassLoader.stopTimerThreadFail",
                     thread.getName(), getContextName()), t);
         }
@@ -2057,7 +2053,7 @@ public class WebappClassLoader extends URLClassLoader
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.warn(sm.getString(
+            log.info(sm.getString(
                     "webappClassLoader.checkThreadLocalsForLeaksFail",
                     getContextName()), t);
         }
@@ -2100,7 +2096,7 @@ public class WebappClassLoader extends URLClassLoader
                                 try {
                                     args[2] = key.toString();
                                 } catch (Exception e) {
-                                    log.error(sm.getString(
+                                    log.info(sm.getString(
                                             "webappClassLoader.checkThreadLocalsForLeaks.badKey",
                                             args[1]), e);
                                     args[2] = sm.getString(
@@ -2112,7 +2108,7 @@ public class WebappClassLoader extends URLClassLoader
                                 try {
                                     args[4] = value.toString();
                                 } catch (Exception e) {
-                                    log.error(sm.getString(
+                                    log.info(sm.getString(
                                             "webappClassLoader.checkThreadLocalsForLeaks.badValue",
                                             args[3]), e);
                                     args[4] = sm.getString(
@@ -2126,7 +2122,7 @@ public class WebappClassLoader extends URLClassLoader
                                             args));
                                 }
                             } else {
-                                log.error(sm.getString(
+                                log.info(sm.getString(
                                         "webappClassLoader.checkThreadLocalsForLeaks",
                                         args));
                             }
@@ -2290,16 +2286,16 @@ public class WebappClassLoader extends URLClassLoader
             log.info(sm.getString("webappClassLoader.clearRmiInfo",
                     getContextName()), e);
         } catch (SecurityException e) {
-            log.warn(sm.getString("webappClassLoader.clearRmiFail",
+            log.info(sm.getString("webappClassLoader.clearRmiFail",
                     getContextName()), e);
         } catch (NoSuchFieldException e) {
-            log.warn(sm.getString("webappClassLoader.clearRmiFail",
+            log.info(sm.getString("webappClassLoader.clearRmiFail",
                     getContextName()), e);
         } catch (IllegalArgumentException e) {
-            log.warn(sm.getString("webappClassLoader.clearRmiFail",
+            log.info(sm.getString("webappClassLoader.clearRmiFail",
                     getContextName()), e);
         } catch (IllegalAccessException e) {
-            log.warn(sm.getString("webappClassLoader.clearRmiFail",
+            log.info(sm.getString("webappClassLoader.clearRmiFail",
                     getContextName()), e);
         }
     }
@@ -2368,12 +2364,12 @@ public class WebappClassLoader extends URLClassLoader
                         Integer.valueOf(countRemoved), getContextName()));
             }
         } catch (SecurityException e) {
-            log.error(sm.getString(
+            log.info(sm.getString(
                     "webappClassLoader.clearReferencesResourceBundlesFail",
                     getContextName()), e);
         } catch (NoSuchFieldException e) {
             if (Globals.IS_ORACLE_JVM) {
-                log.error(sm.getString(
+                log.info(sm.getString(
                         "webappClassLoader.clearReferencesResourceBundlesFail",
                         getContextName()), e);
             } else {
@@ -2382,11 +2378,11 @@ public class WebappClassLoader extends URLClassLoader
                         getContextName()), e);
             }
         } catch (IllegalArgumentException e) {
-            log.error(sm.getString(
+            log.info(sm.getString(
                     "webappClassLoader.clearReferencesResourceBundlesFail",
                     getContextName()), e);
         } catch (IllegalAccessException e) {
-            log.error(sm.getString(
+            log.info(sm.getString(
                     "webappClassLoader.clearReferencesResourceBundlesFail",
                     getContextName()), e);
         }
