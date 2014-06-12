@@ -237,7 +237,7 @@ public final class Response {
      * request processing.
      */
     public void setErrorException(Exception ex) {
-    errorException = ex;
+        errorException = ex;
     }
 
 
@@ -256,10 +256,8 @@ public final class Response {
 
 
     // -------------------- Methods --------------------
-    
-    
-    public void reset() 
-        throws IllegalStateException {
+
+    public void reset() throws IllegalStateException {
         
         // Reset the headers only if this is the main request,
         // not for included
@@ -489,10 +487,6 @@ public final class Response {
         return ret;
     }
     
-    public void setContentLength(int contentLength) {
-        this.contentLength = contentLength;
-    }
-
     public void setContentLength(long contentLength) {
         this.contentLength = contentLength;
     }
