@@ -21,16 +21,20 @@ import java.util.concurrent.Executor;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Provides functionality and attributes common to all supported protocols
  * (currently HTTP and AJP).
  */
 public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
+
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     protected Adapter adapter;
     protected final AsyncStateMachine<S> asyncStateMachine;
@@ -201,4 +205,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      * @param write Register the socket for write events
      */
     protected abstract void registerForEvent(boolean read, boolean write);
+
+    protected abstract Log getLog();
 }
