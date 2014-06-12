@@ -263,17 +263,9 @@ public final class Response {
             throw new IllegalStateException();
         }
 
-        contentType = null;
-        locale = DEFAULT_LOCALE;
-        contentLanguage = null;
-        characterEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
-        contentLength = -1;
-        charsetSet = false;
+        recycle();
 
-        status = 200;
-        message = null;
-        headers.clear();
-        
+        // Reset the stream
         action(ActionCode.RESET, this);
     }
 

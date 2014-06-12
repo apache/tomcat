@@ -248,8 +248,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer{
         if (committed)
             throw new IllegalStateException(/*FIXME:Put an error message*/);
 
-        // Recycle Request object
-        response.recycle();
         // These will need to be reset if the reset was triggered by the error
         // handling if the headers were too large
         pos = 0;
