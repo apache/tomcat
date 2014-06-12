@@ -33,6 +33,8 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.spdy.SpdyConnection;
 import org.apache.tomcat.spdy.SpdyContext;
 import org.apache.tomcat.spdy.SpdyFrame;
@@ -56,6 +58,8 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * Based on the AJP processor.
  */
 public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
+
+    private static final Log log = LogFactory.getLog(SpdyProcessor.class);
 
     // TODO: handle input
     // TODO: recycle
@@ -629,5 +633,10 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
     @Override
     public HttpUpgradeHandler getHttpUpgradeHandler() {
         return null;
+    }
+
+    @Override
+    protected Log getLog() {
+        return log;
     }
 }
