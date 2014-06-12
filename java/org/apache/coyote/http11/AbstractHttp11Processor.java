@@ -754,7 +754,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         switch (actionCode) {
         case CLOSE: {
             // End the processing of the current request
-
             try {
                 getOutputBuffer().endRequest();
             } catch (IOException e) {
@@ -765,7 +764,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
         case COMMIT: {
             // Commit current response
-
             if (response.isCommitted()) {
                 return;
             }
@@ -784,7 +782,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // Acknowledge request
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
-
             if ((response.isCommitted()) || !expectation) {
                 return;
             }
@@ -813,16 +810,14 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // Do not swallow request input but
-            // make sure we are closing the connection
+            // Do not swallow request input and make sure we are closing the
+            // connection
             error = true;
             getInputBuffer().setSwallowInput(false);
             break;
         }
         case RESET: {
-            // Reset response
             // Note: This must be called before the response is committed
-
             getOutputBuffer().reset();
             break;
         }
