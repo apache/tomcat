@@ -168,8 +168,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     log.debug(sm.getString("ajpprocessor.request.prepare"), t);
-                    // 400 - Internal Server Error
-                    response.setStatus(400);
+                    // 500 - Internal Server Error
+                    response.setStatus(500);
                     adapter.log(request, response, 0);
                     error = true;
                 }
