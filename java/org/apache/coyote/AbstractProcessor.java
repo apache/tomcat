@@ -54,9 +54,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     public AbstractProcessor(AbstractEndpoint endpoint) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine<S>(this);
-        
         request = new Request();
-
         response = new Response();
         response.setHook(this);
         request.setResponse(response);
@@ -165,8 +163,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      * with although they may change type during processing.
      */
     @Override
-    public abstract SocketState process(SocketWrapper<S> socket)
-        throws IOException;
+    public abstract SocketState process(SocketWrapper<S> socket) throws IOException;
 
     /**
      * Process in-progress Comet requests. These will start as HTTP requests.
