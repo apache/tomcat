@@ -36,7 +36,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
     protected Adapter adapter;
     protected AsyncStateMachine<S> asyncStateMachine;
-    protected AbstractEndpoint endpoint;
+    protected AbstractEndpoint<S> endpoint;
     protected Request request;
     protected Response response;
     protected SocketWrapper<S> socketWrapper = null;
@@ -55,7 +55,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         // NOOP
     }
 
-    public AbstractProcessor(AbstractEndpoint endpoint) {
+    public AbstractProcessor(AbstractEndpoint<S> endpoint) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine<S>(this);
         request = new Request();
@@ -86,7 +86,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     /**
      * The endpoint receiving connections that are handled by this processor.
      */
-    protected AbstractEndpoint getEndpoint() {
+    protected AbstractEndpoint<S> getEndpoint() {
         return endpoint;
     }
 

@@ -26,7 +26,7 @@ public class TesterBug50640SslImpl extends JSSEImplementation {
 
     @Override
     public ServerSocketFactory getServerSocketFactory(
-            AbstractEndpoint endpoint)  {
+            AbstractEndpoint<?> endpoint)  {
 
         // Check the custom attribute is visible & correcly set
         String flag = endpoint.getProperty(PROPERTY_NAME);

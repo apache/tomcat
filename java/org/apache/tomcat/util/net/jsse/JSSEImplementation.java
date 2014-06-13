@@ -43,7 +43,7 @@ public class JSSEImplementation extends SSLImplementation {
     }
 
     @Override
-    public ServerSocketFactory getServerSocketFactory(AbstractEndpoint endpoint)  {
+    public ServerSocketFactory getServerSocketFactory(AbstractEndpoint<?> endpoint)  {
         return new JSSESocketFactory(endpoint);
     }
 
@@ -58,7 +58,7 @@ public class JSSEImplementation extends SSLImplementation {
     }
 
     @Override
-    public SSLUtil getSSLUtil(AbstractEndpoint endpoint) {
+    public SSLUtil getSSLUtil(AbstractEndpoint<?> endpoint) {
         return new JSSESocketFactory(endpoint);
     }
 }

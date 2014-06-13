@@ -87,7 +87,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     @Override
     public void init(SocketWrapper<Long> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException {
+            AbstractEndpoint<Long> endpoint) throws IOException {
 
         socket = socketWrapper.getSocket().longValue();
         Socket.setsbb(this.socket, bbuf);

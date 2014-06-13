@@ -81,11 +81,11 @@ public abstract class SSLImplementation {
     public abstract String getImplementationName();
 
     public abstract ServerSocketFactory getServerSocketFactory(
-            AbstractEndpoint endpoint);
+            AbstractEndpoint<?> endpoint);
 
     public abstract SSLSupport getSSLSupport(Socket sock);
 
     public abstract SSLSupport getSSLSupport(SSLSession session);
 
-    public abstract SSLUtil getSSLUtil(AbstractEndpoint ep);
+    public abstract SSLUtil getSSLUtil(AbstractEndpoint<?> ep);
 }

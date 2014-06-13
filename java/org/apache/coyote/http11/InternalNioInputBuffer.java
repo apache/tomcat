@@ -749,7 +749,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     @Override
     protected void init(SocketWrapper<NioChannel> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException {
+            AbstractEndpoint<NioChannel> endpoint) throws IOException {
 
         socket = socketWrapper.getSocket();
         socketReadBufferSize =

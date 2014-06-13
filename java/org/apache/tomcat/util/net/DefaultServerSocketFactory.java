@@ -35,7 +35,7 @@ public class DefaultServerSocketFactory implements ServerSocketFactory {
      *
      * @param endpoint  Unused in this implementation.
      */
-    public DefaultServerSocketFactory(AbstractEndpoint endpoint) {
+    public DefaultServerSocketFactory(AbstractEndpoint<?> endpoint) {
     }
 
     @Override

@@ -233,7 +233,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     protected abstract boolean fill(boolean block) throws IOException; 
 
     protected abstract void init(SocketWrapper<S> socketWrapper,
-            AbstractEndpoint endpoint) throws IOException;
+            AbstractEndpoint<S> endpoint) throws IOException;
 
 
     // --------------------------------------------------------- Public Methods

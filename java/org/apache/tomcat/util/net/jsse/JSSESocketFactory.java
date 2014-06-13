@@ -142,7 +142,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     }
 
 
-    private AbstractEndpoint endpoint;
+    private AbstractEndpoint<?> endpoint;
 
     protected SSLServerSocketFactory sslProxy = null;
     protected String[] enabledCiphers;
@@ -160,7 +160,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     protected boolean wantClientAuth    = false;
 
 
-    public JSSESocketFactory (AbstractEndpoint endpoint) {
+    public JSSESocketFactory (AbstractEndpoint<?> endpoint) {
         this.endpoint = endpoint;
     }
 
