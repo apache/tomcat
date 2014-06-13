@@ -53,6 +53,31 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
+    public void testWithUnknownExpectation() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Use the normal Tomcat ROOT context
+        File root = new File("test/webapp");
+        tomcat.addWebapp("", root.getAbsolutePath());
+
+        tomcat.start();
+
+        String request =
+            "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
+            "Host: any" + SimpleHttpClient.CRLF +
+            "Expect: unknoen" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF;
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.processRequest();
+        assertTrue(client.isResponse417());
+    }
+
+
+    @Test
     public void testWithTEVoid() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
