@@ -50,6 +50,7 @@ public class CookieExample extends HttpServlet {
         Cookie aCookie = null;
         if (cookieName != null && cookieValue != null) {
             aCookie = new Cookie(cookieName, cookieValue);
+            aCookie.setPath(request.getServletContext().getContextPath());
             response.addCookie(aCookie);
         }
 
