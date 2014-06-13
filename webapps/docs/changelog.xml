@@ -166,6 +166,11 @@
       <fix>
         Fix input concurrency issue in NIO2 upgrade. (remm)
       </fix>
+      <fix>
+        Correct a copy/paste error and return a 500 response rather than a 400
+        response when an internal server error occurs on early stages of
+        request processing. (markt)
+      </fix>
       <scode>
         <bug>56582</bug>: Use switch(actionCode) in processors instead of a
         chain of "elseif"s. (kkolinko)
@@ -210,10 +215,6 @@
         makes it easier to use Jasper independently from Tomcat. Patch provided
         by Greg Wilkins. (markt)
       </add>
-      <fix>
-        Correct a copy/paste error and return a 500 response rather than a 400
-        response when an internal server error occurs. (markt)
-      </fix>
       <fix>
         <bug>56568</bug>: Allow any HTTP method when a JSP is being used as an
         error page. (markt)
