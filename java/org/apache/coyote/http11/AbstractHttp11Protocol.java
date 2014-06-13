@@ -20,7 +20,7 @@ package org.apache.coyote.http11;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractHttp11Protocol extends AbstractProtocol {
+public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     /**
      * The string manager for this package.

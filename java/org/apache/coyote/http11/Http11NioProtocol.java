@@ -44,7 +44,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Costin Manolache
  * @author Filip Hanik
  */
-public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
+public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
     private static final Log log = LogFactory.getLog(Http11NioProtocol.class);
 
@@ -147,7 +147,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol {
         }
 
         @Override
-        protected AbstractProtocol getProtocol() {
+        protected AbstractProtocol<NioChannel> getProtocol() {
             return proto;
         }
 

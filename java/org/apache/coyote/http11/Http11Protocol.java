@@ -39,7 +39,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Remy Maucherat
  * @author Costin Manolache
  */
-public class Http11Protocol extends AbstractHttp11JsseProtocol {
+public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
 
 
     private static final org.apache.juli.logging.Log log
@@ -110,7 +110,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol {
         }
 
         @Override
-        protected AbstractProtocol getProtocol() {
+        protected AbstractProtocol<Socket> getProtocol() {
             return proto;
         }
 

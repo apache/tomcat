@@ -36,7 +36,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * Processor is single threaded and specific to stream-based protocols,
  * will not fit Jk protocols like JNI.
  */
-public class AjpNioProtocol extends AbstractAjpProtocol {
+public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
     
     
     private static final Log log = LogFactory.getLog(AjpNioProtocol.class);
@@ -97,7 +97,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol {
         }
 
         @Override
-        protected AbstractProtocol getProtocol() {
+        protected AbstractProtocol<NioChannel> getProtocol() {
             return proto;
         }
 

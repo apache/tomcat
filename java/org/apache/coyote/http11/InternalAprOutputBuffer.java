@@ -82,7 +82,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
      */
     private ByteBuffer bbuf = null;
 
-    
+
     // --------------------------------------------------------- Public Methods
 
     @Override

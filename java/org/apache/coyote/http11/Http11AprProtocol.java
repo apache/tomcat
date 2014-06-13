@@ -40,7 +40,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * @author Remy Maucherat
  * @author Costin Manolache
  */
-public class Http11AprProtocol extends AbstractHttp11Protocol {
+public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
     private static final Log log = LogFactory.getLog(Http11AprProtocol.class);
 
@@ -215,7 +215,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol {
         }
 
         @Override
-        protected AbstractProtocol getProtocol() {
+        protected AbstractProtocol<Long> getProtocol() {
             return proto;
         }
 
