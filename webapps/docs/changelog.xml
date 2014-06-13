@@ -117,6 +117,10 @@
         chain of "elseif"s. (kkolinko)
       </scode>
       <fix>
+        If request contains an unrecognized Expect header, respond with error
+        417 (Expectation Failed), according to RFC2616 chapter 14.20. (markt)
+      </fix>
+      <fix>
         When an error occurs after the response has been committed close the
         connection immediately rather than attempting to finish the response to
         make it easier for the client to differentiate between a complete
