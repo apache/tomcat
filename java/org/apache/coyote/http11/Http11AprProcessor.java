@@ -23,6 +23,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ErrorState;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
@@ -124,21 +125,23 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.event(request, response, status);
+            if (!getAdapter().event(request, response, status)) {
+                setErrorState(ErrorState.CLOSE_NOW);
+            }
         } catch (InterruptedIOException e) {
-            error = true;
+            setErrorState(ErrorState.CLOSE_NOW);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("http11processor.request.process"), t);
             // 500 - Internal Server Error
             response.setStatus(500);
-            adapter.log(request, response, 0);
-            error = true;
+            setErrorState(ErrorState.CLOSE_NOW);
+            getAdapter().log(request, response, 0);
+            log.error(sm.getString("http11processor.request.process"), t);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (error || status==SocketStatus.STOP) {
+        if (getErrorState().isError() || status==SocketStatus.STOP) {
             return SocketState.CLOSED;
         } else if (!comet) {
             inputBuffer.nextRequest();
@@ -188,8 +191,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         if (endpoint.isPaused()) {
             // 503 - Service unavailable
             response.setStatus(503);
-            adapter.log(request, response, 0);
-            error = true;
+            setErrorState(ErrorState.CLOSE_CLEAN);
+            getAdapter().log(request, response, 0);
         } else {
             return true;
         }
@@ -213,7 +216,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     protected boolean breakKeepAliveLoop(SocketWrapper<Long> socketWrapper) {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
-        if (sendfileData != null && !error) {
+        if (sendfileData != null && !getErrorState().isError()) {
             sendfileData.socket = socketWrapper.getSocket().longValue();
             sendfileData.keepAlive = keepAlive;
             if (!((AprEndpoint)endpoint).getSendfile().add(sendfileData)) {
@@ -225,7 +228,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                         log.debug(sm.getString(
                                 "http11processor.sendfile.error"));
                     }
-                    error = true;
+                    setErrorState(ErrorState.CLOSE_NOW);
                 } else {
                     // The sendfile Poller will add the socket to the main
                     // Poller once sendfile processing is complete

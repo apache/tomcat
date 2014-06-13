@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ErrorState;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -106,11 +107,9 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         }
         boolean cping = false;
 
-        // Error flag
-        error = false;
-
-        while (!error && !endpoint.isPaused()) {
-
+        resetErrorState();
+        
+        while (!getErrorState().isError() && !endpoint.isPaused()) {
             // Parsing the request header
             try {
                 // Set keep alive timeout if enabled
@@ -138,7 +137,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     try {
                         output.write(pongMessageArray);
                     } catch (IOException e) {
-                        error = true;
+                        setErrorState(ErrorState.CLOSE_NOW);
                     }
                     continue;
                 } else if(type != Constants.JK_AJP13_FORWARD_REQUEST) {
@@ -147,23 +146,23 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     if (log.isDebugEnabled()) {
                         log.debug("Unexpected message: " + type);
                     }
-                    error = true;
+                    setErrorState(ErrorState.CLOSE_NOW);
                     break;
                 }
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
-                error = true;
+                setErrorState(ErrorState.CLOSE_NOW);
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 log.debug(sm.getString("ajpprocessor.header.error"), t);
                 // 400 - Bad Request
                 response.setStatus(400);
-                adapter.log(request, response, 0);
-                error = true;
+                setErrorState(ErrorState.CLOSE_CLEAN);
+                getAdapter().log(request, response, 0);
             }
 
-            if (!error) {
+            if (!getErrorState().isError()) {
                 // Setting up filters, and parse some request headers
                 rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
                 try {
@@ -173,37 +172,37 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     log.debug(sm.getString("ajpprocessor.request.prepare"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
-                    adapter.log(request, response, 0);
-                    error = true;
+                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    getAdapter().log(request, response, 0);
                 }
             }
 
-            if (!error && !cping && endpoint.isPaused()) {
+            if (!getErrorState().isError() && !cping && endpoint.isPaused()) {
                 // 503 - Service unavailable
                 response.setStatus(503);
-                adapter.log(request, response, 0);
-                error = true;
+                setErrorState(ErrorState.CLOSE_CLEAN);
+                getAdapter().log(request, response, 0);
             }
             cping = false;
 
             // Process the request in the adapter
-            if (!error) {
+            if (!getErrorState().isError()) {
                 try {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     adapter.service(request, response);
                 } catch (InterruptedIOException e) {
-                    error = true;
+                    setErrorState(ErrorState.CLOSE_NOW);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("ajpprocessor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
-                    adapter.log(request, response, 0);
-                    error = true;
+                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    getAdapter().log(request, response, 0);
                 }
             }
             
-            if (isAsync() && !error) {
+            if (isAsync() && !getErrorState().isError()) {
                 break;
             }
 
@@ -213,13 +212,13 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     finish();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    error = true;
+                    setErrorState(ErrorState.CLOSE_NOW);
                 }
             }
 
             // If there was an error, make sure the request is counted as
             // and error, and update the statistics counter
-            if (error) {
+            if (getErrorState().isError()) {
                 response.setStatus(500);
             }
             request.updateCounters();
@@ -230,7 +229,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (isAsync() && !error && !endpoint.isPaused()) {
+        if (isAsync() && !getErrorState().isError() && !endpoint.isPaused()) {
             return SocketState.LONG;
         } else {
             input = null;
