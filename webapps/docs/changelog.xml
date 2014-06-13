@@ -256,6 +256,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Set the path for cookies created by the examples web application so they
+        only returned to the examples application. This reduces the opportunity
+        for using such cookies for malicious purposes should the advice to
+        remove the examples web application from security sensitive systems be
+        ignored. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
