@@ -107,8 +107,6 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
         }
         boolean cping = false;
 
-        resetErrorState();
-        
         while (!getErrorState().isError() && !endpoint.isPaused()) {
             // Parsing the request header
             try {

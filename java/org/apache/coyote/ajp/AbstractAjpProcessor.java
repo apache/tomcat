@@ -620,6 +620,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         certificates.recycle();
         swallowResponse = false;
         bytesWritten = 0;
+        resetErrorState();
     }
 
 

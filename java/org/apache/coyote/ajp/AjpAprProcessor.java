@@ -109,8 +109,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
         Socket.setsbb(socketRef, outputBuffer);
         boolean cping = false;
 
-        resetErrorState();
-
         boolean keptAlive = false;
 
         while (!getErrorState().isError() && !endpoint.isPaused()) {

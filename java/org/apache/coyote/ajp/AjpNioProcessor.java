@@ -94,8 +94,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         long soTimeout = endpoint.getSoTimeout();
         boolean cping = false;
 
-        resetErrorState();
-
         while (!getErrorState().isError() && !endpoint.isPaused()) {
             // Parsing the request header
             try {
