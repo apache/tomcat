@@ -37,7 +37,12 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected Response response;
     protected SocketWrapper<S> socketWrapper = null;
 
-    
+    /**
+     * Error flag.
+     */
+    protected boolean error;
+
+
     /**
      * Intended for use by the Upgrade sub-classes that have no need to
      * initialise the request, response, etc.
