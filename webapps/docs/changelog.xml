@@ -112,6 +112,11 @@
         buffer when the buffer is only partially written on a subsequent write.
         (markt)
       </fix>
+      <fix>
+        Correct a copy/paste error and return a 500 response rather than a 400
+        response when an internal server error occurs on early stages of
+        request processing. (markt)
+      </fix>
       <scode>
         <bug>56582</bug>: Use switch(actionCode) in processors instead of a
         chain of "elseif"s. (kkolinko)
