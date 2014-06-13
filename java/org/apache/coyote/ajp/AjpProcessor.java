@@ -205,7 +205,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             }
 
             // Finish the response if not done yet
-            if (!finished) {
+            if (!finished && getErrorState().isIoAllowed()) {
                 try {
                     finish();
                 } catch (Throwable t) {

@@ -40,7 +40,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -54,7 +53,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
-    @Ignore
     public void testResponseWithErrorChunked() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -84,6 +82,8 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         assertTrue(client.isResponse200());
         // There should not be an end chunk
         assertFalse(client.getResponseBody().endsWith("0"));
+        // The last portion of text should be there
+        assertTrue(client.getResponseBody().endsWith("line03"));
     }
 
     private static class ResponseWithErrorServlet extends HttpServlet {
@@ -127,7 +127,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp");
+        File root = new File("test/webapp-3.0");
         tomcat.addWebapp("", root.getAbsolutePath());
 
         tomcat.start();

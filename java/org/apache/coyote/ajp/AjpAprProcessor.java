@@ -203,7 +203,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             }
 
             // Finish the response if not done yet
-            if (!finished) {
+            if (!finished && getErrorState().isIoAllowed()) {
                 try {
                     finish();
                 } catch (Throwable t) {

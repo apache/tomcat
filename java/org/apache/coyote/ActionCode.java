@@ -32,6 +32,15 @@ public enum ActionCode {
     COMMIT,
 
     /**
+     * A serious error occurred from which it is not possible to recover safely.
+     * Further attempts to write to the response should be ignored and the
+     * connection needs to be closed as soon as possible. This can also be used
+     * to forcibly close a connection if an error occurs after the response has
+     * been committed.
+     */
+    CLOSE_NOW,
+
+    /**
      * A flush() operation originated by the client ( i.e. a flush() on the
      * servlet output stream or writer, called by a servlet ). Argument is the
      * Response.

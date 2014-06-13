@@ -28,6 +28,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -102,6 +103,17 @@ public class ErrorReportValve extends ValveBase {
         getNext().invoke(request, response);
 
         if (response.isCommitted()) {
+            if (response.isErrorAfterCommit()) {
+                // Attempt to flush any data that is still to be written to the
+                // client
+                try {
+                    response.flushBuffer();
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                }                // Close immediately to signal to the client that something went
+                // wrong
+                response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
+            }
             return;
         }
 
@@ -112,20 +124,19 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
-        if (throwable != null) {
-            // The response is an error
-            response.setError();
-
-            // Reset the response (if possible)
-            try {
-                response.reset();
-            } catch (IllegalStateException e) {
-                // Ignore
-            }
-
+        if (throwable != null && !response.isError()) {
+            // Make sure that the necessary methods have been called on the
+            // response. (It is possible a component may just have set the
+            // Throwable. Tomcat won't do that but other components might.)
+            // These are safe to call at this point as we know that the response
+            // has not been committed.
+            response.reset();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
+        // One way or another, response.sendError() will have been called before
+        // execution reaches this point and suspended the response. Need to
+        // reverse that so this valve can write to the response.
         response.setSuspended(false);
 
         try {
@@ -153,15 +164,14 @@ public class ErrorReportValve extends ValveBase {
      */
     protected void report(Request request, Response response, Throwable throwable) {
 
-        // Do nothing on non-HTTP responses
         int statusCode = response.getStatus();
 
         // Do nothing on a 1xx, 2xx and 3xx status
         // Do nothing if anything has been written already
+        // Do nothing if the response hasn't been explicitly marked as in error
         if (statusCode < 400 || response.getContentWritten() > 0 || !response.isError()) {
             return;
         }
-
         String message = RequestUtil.filter(response.getMessage());
         if (message == null) {
             if (throwable != null) {
@@ -287,6 +297,7 @@ public class ErrorReportValve extends ValveBase {
                 // If writer is null, it's an indication that the response has
                 // been hard committed already, which should never happen
                 writer.write(sb.toString());
+                response.finishResponse();
             }
         } catch (IOException e) {
             // Ignore
