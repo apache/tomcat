@@ -37,7 +37,6 @@ import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
-import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
@@ -54,9 +53,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Base class for AJP Processor implementations.
  */
 public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
-
-    protected abstract Log getLog();
-
 
     /**
      * The string manager for this package.

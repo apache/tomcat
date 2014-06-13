@@ -19,16 +19,20 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Provides functionality and attributes common to all supported protocols
  * (currently HTTP and AJP).
  */
 public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
+
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     protected Adapter adapter;
     protected AsyncStateMachine<S> asyncStateMachine;
@@ -191,4 +195,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     @Deprecated
     @Override
     public abstract org.apache.coyote.http11.upgrade.UpgradeInbound getUpgradeInbound();
+
+    protected abstract Log getLog();
 }
