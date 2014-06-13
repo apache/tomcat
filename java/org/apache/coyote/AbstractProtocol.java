@@ -576,6 +576,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             }
 
             wrapper.setAsync(false);
+            ContainerThreadMarker.markAsContainerThread();
 
             try {
                 if (processor == null) {
