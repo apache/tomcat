@@ -116,7 +116,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             if (!getAdapter().event(request, response, status)) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, null);
             }
             if (!getErrorState().isError()) {
                 if (attach != null) {
@@ -139,12 +139,12 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 }
             }
         } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, e);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // 500 - Internal Server Error
             response.setStatus(500);
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, t);
             log.error(sm.getString("http11processor.request.process"), t);
             getAdapter().log(request, response, 0);
         }
@@ -233,7 +233,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         if (endpoint.isPaused()) {
             // 503 - Service unavailable
             response.setStatus(503);
-            setErrorState(ErrorState.CLOSE_CLEAN);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
             getAdapter().log(request, response, 0);
         } else {
             return true;
@@ -287,7 +287,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.sendfile.error"));
                 }
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, null);
             }
             return true;
         }

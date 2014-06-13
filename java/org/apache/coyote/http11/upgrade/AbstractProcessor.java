@@ -161,6 +161,11 @@ public abstract class AbstractProcessor<S>
     }
 
     @Override
+    public void errorDispatch() {
+        // NO-OP
+    }
+
+    @Override
     public final SocketState asyncPostProcess() {
         return null;
     }

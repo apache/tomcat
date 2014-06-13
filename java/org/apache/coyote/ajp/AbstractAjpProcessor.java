@@ -319,13 +319,13 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             try {
                 prepareResponse();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
             }
 
             try {
                 flush(false);
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
             }
             break;
         }
@@ -335,7 +335,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 try {
                     prepareResponse();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, e);
                     return;
                 }
             }
@@ -343,7 +343,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             try {
                 flush(true);
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
             }
             break;
         }
@@ -354,7 +354,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         case DISABLE_SWALLOW_INPUT: {
             // TODO: Do not swallow request input but
             // make sure we are closing the connection
-            setErrorState(ErrorState.CLOSE_CLEAN);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
             break;
         }
         case CLOSE: {
@@ -365,7 +365,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             try {
                 finish();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
             }
             break;
         }
@@ -494,7 +494,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         case CLOSE_NOW: {
             // Prevent further writes to the response
             swallowResponse = true;
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
         }
@@ -508,14 +508,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             if(!getAdapter().asyncDispatch(request, response, status)) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, null);
             }
             resetTimeouts();
         } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, e);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            setErrorState(ErrorState.CLOSE_NOW);
+            setErrorState(ErrorState.CLOSE_NOW, t);
             getLog().error(sm.getString("http11processor.request.process"), t);
         } finally {
             if (getErrorState().isError()) {
@@ -761,7 +761,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 long cl = vMB.getLong();
                 if (contentLengthSet) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    setErrorState(ErrorState.CLOSE_CLEAN, null);
                 } else {
                     contentLengthSet = true;
                     // Set the content-length header for the request
@@ -879,7 +879,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     secret = true;
                     if (!tmpMB.equals(requiredSecret)) {
                         response.setStatus(403);
-                        setErrorState(ErrorState.CLOSE_CLEAN);
+                        setErrorState(ErrorState.CLOSE_CLEAN, null);
                     }
                 }
                 break;
@@ -895,7 +895,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         // Check if secret was submitted if required
         if ((requiredSecret != null) && !secret) {
             response.setStatus(403);
-            setErrorState(ErrorState.CLOSE_CLEAN);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
         }
 
         // Check for a full URI (including protocol://host:port/)
@@ -946,7 +946,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 request.serverName().duplicate(request.localName());
             } catch (IOException e) {
                 response.setStatus(400);
-                setErrorState(ErrorState.CLOSE_CLEAN);
+                setErrorState(ErrorState.CLOSE_CLEAN, e);
             }
             return;
         }
@@ -996,7 +996,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     // Invalid character
                     // 400 - Bad request
                     response.setStatus(400);
-                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    setErrorState(ErrorState.CLOSE_CLEAN, null);
                     break;
                 }
                 port = port + (charValue * mult);
@@ -1112,7 +1112,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             try {
                 prepareResponse();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
                 return;
             }
         }
@@ -1196,7 +1196,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 try {
                     prepareResponse();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, e);
                 }
             }
 

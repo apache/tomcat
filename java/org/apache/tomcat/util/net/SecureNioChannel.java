@@ -471,6 +471,7 @@ public class SecureNioChannel extends NioChannel  {
      */
     @Override
     public int write(ByteBuffer src) throws IOException {
+        checkInterruptStatus();
         if ( src == this.netOutBuffer ) {
             //we can get here through a recursive call
             //by using the NioBlockingSelector

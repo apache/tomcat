@@ -135,6 +135,11 @@ public abstract class UpgradeProcessor<S> implements Processor<S> {
     }
 
     @Override
+    public void errorDispatch() {
+        // NO-OP
+    }
+
+    @Override
     public final SocketState asyncPostProcess() {
         return null;
     }

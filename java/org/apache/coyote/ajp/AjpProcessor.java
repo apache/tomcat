@@ -135,7 +135,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     try {
                         output.write(pongMessageArray);
                     } catch (IOException e) {
-                        setErrorState(ErrorState.CLOSE_NOW);
+                        setErrorState(ErrorState.CLOSE_NOW, e);
                     }
                     continue;
                 } else if(type != Constants.JK_AJP13_FORWARD_REQUEST) {
@@ -144,19 +144,19 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     if (log.isDebugEnabled()) {
                         log.debug("Unexpected message: " + type);
                     }
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, null);
                     break;
                 }
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW);
+                setErrorState(ErrorState.CLOSE_NOW, e);
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 log.debug(sm.getString("ajpprocessor.header.error"), t);
                 // 400 - Bad Request
                 response.setStatus(400);
-                setErrorState(ErrorState.CLOSE_CLEAN);
+                setErrorState(ErrorState.CLOSE_CLEAN, t);
                 getAdapter().log(request, response, 0);
             }
 
@@ -170,7 +170,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     log.debug(sm.getString("ajpprocessor.request.prepare"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
-                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    setErrorState(ErrorState.CLOSE_CLEAN, t);
                     getAdapter().log(request, response, 0);
                 }
             }
@@ -178,7 +178,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             if (!getErrorState().isError() && !cping && endpoint.isPaused()) {
                 // 503 - Service unavailable
                 response.setStatus(503);
-                setErrorState(ErrorState.CLOSE_CLEAN);
+                setErrorState(ErrorState.CLOSE_CLEAN, null);
                 getAdapter().log(request, response, 0);
             }
             cping = false;
@@ -189,13 +189,13 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     adapter.service(request, response);
                 } catch (InterruptedIOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, e);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("ajpprocessor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
-                    setErrorState(ErrorState.CLOSE_CLEAN);
+                    setErrorState(ErrorState.CLOSE_CLEAN, t);
                     getAdapter().log(request, response, 0);
                 }
             }
@@ -210,7 +210,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     finish();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    setErrorState(ErrorState.CLOSE_NOW);
+                    setErrorState(ErrorState.CLOSE_NOW, t);
                 }
             }
 
