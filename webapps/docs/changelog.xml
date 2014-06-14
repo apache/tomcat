@@ -220,9 +220,9 @@
         error page. (markt)
       </fix>
       <update>
-        <bug>56581</bug>: If an error on a JSP page occurs when response have
+        <bug>56581</bug>: If an error on a JSP page occurs when response has
         already been committed, do not clear the buffer of JspWriter, but flush
-        it. Thus it will become more clear where the error occurred. (kkolinko)
+        it. It will make more clear where the error occurred. (kkolinko)
       </update>
       <fix>
         <bug>56612</bug>: Correctly parse two consecutive escaped single quotes
