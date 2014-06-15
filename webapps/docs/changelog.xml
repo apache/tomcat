@@ -263,7 +263,7 @@
         only returned to the examples application. This reduces the opportunity
         for using such cookies for malicious purposes should the advice to
         remove the examples web application from security sensitive systems be
-        ignored. (markt)
+        ignored. (markt/kkolinko)
       </fix>
     </changelog>
   </subsection>
