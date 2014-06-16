@@ -985,7 +985,7 @@
     </xslt>
   </target>
 
-  <target name="deploy" depends="package,build-docs,build-tomcat-jdbc"
+  <target name="deploy" depends="package,build-docs,build-tomcat-jdbc,compile-webapp-examples"
           description="Default. Builds a working Tomcat instance">
 
     <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
@@ -1044,7 +1044,16 @@
       <filterset refid="version.filters"/>
     </copy>
 
+    <!-- Add sources for examples -->
+    <antcall target="examples-sources" />
+
+    <copy file="${jdt.jar}" todir="${tomcat.build}/lib" />
+  </target>
+
+  <target name="compile-webapp-examples" >
+
     <!-- Build classes for examples webapp -->
+    <mkdir dir="${tomcat.build}/webapps/examples/WEB-INF/classes"/>
     <javac   srcdir="webapps/examples/WEB-INF/classes"
              destdir="${tomcat.build}/webapps/examples/WEB-INF/classes"
              debug="${compile.debug}" deprecation="${compile.deprecation}"
@@ -1056,6 +1065,7 @@
              includeantruntime="false">
     </javac>
 
+    <mkdir dir="${tomcat.build}/webapps/examples/jsp/plugin/applet"/>
     <javac   srcdir="webapps/examples/jsp/plugin/applet"
              destdir="${tomcat.build}/webapps/examples/jsp/plugin/applet"
              debug="${compile.debug}" deprecation="${compile.deprecation}"
@@ -1066,11 +1076,6 @@
              encoding="ISO-8859-1"
              includeantruntime="false">
     </javac>
-
-    <!-- Add sources for examples -->
-    <antcall target="examples-sources" />
-
-    <copy file="${jdt.jar}" todir="${tomcat.build}/lib" />
   </target>
 
   <target name="build-tomcat-jdbc" depends="package">
@@ -1287,18 +1292,20 @@
 
   </target>
 
-  <target name="test-compile" depends="compile,download-test-compile" >
+  <target name="test-compile" depends="compile,download-test-compile,compile-webapp-examples" >
     <mkdir dir="${test.classes}"/>
     <!-- Compile -->
     <javac srcdir="test" destdir="${test.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
+           target="${compile.target}"
            encoding="ISO-8859-1"
            includeantruntime="true">
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/**" />
       <include name="javax/**" />
+      <include name="util/**" />
     </javac>
     <copy todir="${test.classes}">
         <fileset dir="test">
