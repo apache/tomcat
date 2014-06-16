@@ -241,10 +241,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             response.setStatus(503);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             getAdapter().log(request, response, 0);
-        } else {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
 
