@@ -192,6 +192,10 @@
       <scode>
         Remove the beta tag from the NIO2 connectors. (remm)
       </scode>
+      <fix>
+        <bug>56620</bug>: Avoid bogus access log entries when pausing the NIO
+        HTTP connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

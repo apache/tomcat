@@ -230,18 +230,22 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 socketWrapper.setTimeout(endpoint.getKeepAliveTimeout());
             }
         } else {
-            // Started to read request line. Need to keep processor
-            // associated with socket
-            readComplete = false;
-            // Make sure poller uses soTimeout from here onwards
-            socketWrapper.setTimeout(endpoint.getSoTimeout());
-        }
-        if (endpoint.isPaused()) {
-            // 503 - Service unavailable
-            response.setStatus(503);
-            setErrorState(ErrorState.CLOSE_CLEAN, null);
-            getAdapter().log(request, response, 0);
-            return false;
+            // Started to read request line.
+            if (request.getStartTime() < 0) {
+                request.setStartTime(System.currentTimeMillis());
+            }
+            if (endpoint.isPaused()) {
+                // Partially processed the request so need to respond
+                response.setStatus(503);
+                setErrorState(ErrorState.CLOSE_CLEAN, null);
+                getAdapter().log(request, response, 0);
+                return false;
+            } else {
+                // Need to keep processor associated with socket
+                readComplete = false;
+                // Make sure poller uses soTimeout from here onwards
+                socketWrapper.setTimeout(endpoint.getSoTimeout());
+            }
         }
         return true;
     }
