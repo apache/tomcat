@@ -137,6 +137,10 @@
         make it easier for the client to differentiate between a complete
         response and one that failed part way though. (markt)
       </fix>
+      <fix>
+        <bug>56620</bug>: Avoid bogus access log entries when pausing the NIO
+        HTTP connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -188,15 +188,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         // (long keepalive), so that the processor should be recycled
         // and the method should return true
         openSocket = true;
-        if (endpoint.isPaused()) {
-            // 503 - Service unavailable
-            response.setStatus(503);
-            setErrorState(ErrorState.CLOSE_CLEAN, null);
-            getAdapter().log(request, response, 0);
-        } else {
-            return true;
-        }
-        return false;
+        return true;
     }
 
 
