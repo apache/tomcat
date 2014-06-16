@@ -623,7 +623,7 @@ public class CoyoteAdapter implements Adapter {
             response.recycle();
         }
 
-        res.recycle();
+        req.recycle();
         res.recycle();
     }
 
