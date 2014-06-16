@@ -18,13 +18,16 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import util.CookieFilter;
 import util.HTMLFilter;
 
 /**
@@ -79,7 +82,16 @@ public class RequestHeaderExample extends HttpServlet {
             out.println("<tr><td bgcolor=\"#CCCCCC\">");
             out.println(HTMLFilter.filter(headerName));
             out.println("</td><td>");
-            out.println(HTMLFilter.filter(headerValue));
+            if (headerName.toLowerCase(Locale.ENGLISH).contains("cookie")) {
+                HttpSession session = request.getSession(false);
+                String sessionId = null;
+                if (session != null) {
+                    sessionId = session.getId();
+                }
+                out.println(HTMLFilter.filter(CookieFilter.filter(headerValue, sessionId)));
+            } else {
+                out.println(HTMLFilter.filter(headerValue));
+            }
             out.println("</td></tr>");
         }
         out.println("</table>");
