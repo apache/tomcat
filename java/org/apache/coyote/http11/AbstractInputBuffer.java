@@ -228,6 +228,10 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     }
 
 
+    /**
+     * Implementations are expected to call {@link Request#setStartTime(long)}
+     * as soon as the first byte is read from the request.
+     */
     public abstract boolean parseRequestLine(boolean useAvailableDataOnly)
         throws IOException;
 

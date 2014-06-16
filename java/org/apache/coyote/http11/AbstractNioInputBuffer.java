@@ -193,6 +193,11 @@ public abstract class AbstractNioInputBuffer<S> extends AbstractInputBuffer<S> {
                         return false;
                     }
                 }
+                // Set the start time once we start reading data (even if it is
+                // just skipping blank lines)
+                if (request.getStartTime() < 0) {
+                    request.setStartTime(System.currentTimeMillis());
+                }
                 chr = buf[pos++];
             } while ((chr == Constants.CR) || (chr == Constants.LF));
             pos--;

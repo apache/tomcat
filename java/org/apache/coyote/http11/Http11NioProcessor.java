@@ -227,10 +227,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 socketWrapper.setTimeout(endpoint.getKeepAliveTimeout());
             }
         } else {
-            // Started to read request line.
-            if (request.getStartTime() < 0) {
-                request.setStartTime(System.currentTimeMillis());
-            }
             if (endpoint.isPaused()) {
                 // Partially processed the request so need to respond
                 response.setStatus(503);
