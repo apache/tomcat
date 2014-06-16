@@ -140,9 +140,12 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 if (!fill(true))
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
-
+            // Set the start time once we start reading data (even if it is
+            // just skipping blank lines)
+            if (request.getStartTime() < 0) {
+                request.setStartTime(System.currentTimeMillis());
+            }
             chr = buf[pos++];
-
         } while ((chr == Constants.CR) || (chr == Constants.LF));
 
         pos--;
