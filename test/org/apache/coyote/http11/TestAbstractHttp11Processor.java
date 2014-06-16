@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.Socket;
 import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -546,7 +547,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         try (final Socket connection = new Socket("localhost", getPort())) {
             connection.setSoLinger(true, 0);
             Writer writer = new OutputStreamWriter(connection.getOutputStream(),
-                    B2CConverter.getCharset("US-ASCII"));
+                    StandardCharsets.US_ASCII);
             writer.write(request1);
             writer.flush();
 
