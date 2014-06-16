@@ -197,7 +197,7 @@
   <subsection name="Jasper">
     <changelog>
       <update>
-        <bug>56543</bug>: Update to the Eclipse JDT Compiler 4.4RC1 to pick up
+        <bug>56543</bug>: Update to the Eclipse JDT Compiler 4.4RC4 to pick up
         some fixes for Java 8 support. (markt/kkolinko)
       </update>
       <fix>
