@@ -265,6 +265,14 @@
         remove the examples web application from security sensitive systems be
         ignored. (markt/kkolinko)
       </fix>
+      <fix>
+        Attempt to obfuscate session cookie values associated with other web
+        applications when viewing HTTP request headers with the Request Header
+        example from the examples web application. This reduces the opportunity
+        to use this example for malicious purposes should the advice to remove
+        the examples web application from security sensitive systems be ignored.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
