@@ -278,6 +278,10 @@
         the examples web application from security sensitive systems be ignored.
         (markt)
       </fix>
+      <add>
+        Add options for all of the WebSocket echo endpoints to the WebSocket
+        echo example in the examples web application. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
