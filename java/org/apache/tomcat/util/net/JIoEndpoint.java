@@ -298,7 +298,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                         launch = true;
                     } else if (state == SocketState.LONG) {
                         socket.access();
-                        waitingRequests.put(socket, socket);
+                        waitingRequests.add(socket);
                     }
                 } finally {
                     if (launch) {
@@ -514,7 +514,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
             // result of calling AsyncContext.dispatch() from a non-container
             // thread
             synchronized (socket) {
-                if (waitingRequests.remove(socket) != null) {
+                if (waitingRequests.remove(socket)) {
                     SocketProcessor proc = new SocketProcessor(socket,status);
                     Executor executor = getExecutor();
                     if (dispatch && executor != null) {

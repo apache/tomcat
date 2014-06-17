@@ -870,7 +870,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             // result of calling AsyncContext.dispatch() from a non-container
             // thread
             synchronized (socket) {
-                if (waitingRequests.remove(socket) != null) {
+                if (waitingRequests.remove(socket)) {
                     SocketProcessor proc = new SocketProcessor(socket, status);
                     Executor executor = getExecutor();
                     if (dispatch && executor != null) {
@@ -2324,7 +2324,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     } else if (state == Handler.SocketState.LONG) {
                         socket.access();
                         if (socket.isAsync()) {
-                            waitingRequests.put(socket, socket);
+                            waitingRequests.add(socket);
                         }
                     }
                 }
@@ -2386,7 +2386,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             } else if (state == Handler.SocketState.LONG) {
                 socket.access();
                 if (socket.isAsync()) {
-                    waitingRequests.put(socket, socket);
+                    waitingRequests.add(socket);
                 }
             } else if (state == Handler.SocketState.ASYNC_END) {
                 socket.access();
