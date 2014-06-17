@@ -282,6 +282,11 @@
         Add options for all of the WebSocket echo endpoints to the WebSocket
         echo example in the examples web application. (markt)
       </add>
+      <fix>
+        Ensure that the asynchronous WebSocket echo endpoint in the examples
+        web application always waits for the previous message to complete before
+        it sends the next. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
