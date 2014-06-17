@@ -388,7 +388,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             @Override
             public void run() {
                 // Timeout any pending async request
-                for (SocketWrapper<Nio2Channel> socket : waitingRequests.keySet()) {
+                for (SocketWrapper<Nio2Channel> socket : waitingRequests) {
                     processSocket(socket, SocketStatus.TIMEOUT, false);
                 }
                 // Then close all active connections if any remains
@@ -849,11 +849,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     };
 
     public void addTimeout(SocketWrapper<Nio2Channel> socket) {
-        waitingRequests.put(socket, socket);
+        waitingRequests.add(socket);
     }
 
     public boolean removeTimeout(SocketWrapper<Nio2Channel> socket) {
-        return waitingRequests.remove(socket) != null;
+        return waitingRequests.remove(socket);
     }
 
     public static void startInline() {

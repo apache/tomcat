@@ -21,8 +21,10 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -122,9 +124,7 @@ public abstract class AbstractEndpoint<S> {
                     // Ignore
                 }
                 long now = System.currentTimeMillis();
-                Iterator<SocketWrapper<S>> sockets = waitingRequests.keySet().iterator();
-                while (sockets.hasNext()) {
-                    SocketWrapper<S> socket = sockets.next();
+                for (SocketWrapper<S> socket : waitingRequests) {
                     long access = socket.getLastAccess();
                     if (socket.getTimeout() > 0 && (now - access) > socket.getTimeout()) {
                         processSocket(socket, SocketStatus.TIMEOUT, true);
@@ -1026,8 +1026,9 @@ public abstract class AbstractEndpoint<S> {
         }
     }
 
-    protected ConcurrentHashMap<SocketWrapper<S>, SocketWrapper<S>> waitingRequests =
-            new ConcurrentHashMap<>();
+
+    protected final Set<SocketWrapper<S>> waitingRequests = Collections
+            .newSetFromMap(new ConcurrentHashMap<SocketWrapper<S>, Boolean>());
 
 
     /**
