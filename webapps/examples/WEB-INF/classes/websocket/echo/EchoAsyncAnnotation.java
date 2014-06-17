@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import javax.websocket.OnMessage;
 import javax.websocket.PongMessage;
 import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
 
 /**
  * The three annotated echo endpoints can be used to test with Autobahn and
@@ -32,7 +33,7 @@ import javax.websocket.Session;
  * Note: This one is disabled by default since it allocates memory, and needs
  * to be enabled back.
  */
-//@javax.websocket.server.ServerEndpoint("/websocket/echoAsyncAnnotation")
+@ServerEndpoint("/websocket/echoAsyncAnnotation")
 public class EchoAsyncAnnotation {
 
     StringBuilder sb = null;
