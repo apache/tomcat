@@ -590,7 +590,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
                 SocketState state = SocketState.CLOSED;
                 do {
-                    if (status == SocketStatus.DISCONNECT &&
+                    if (status == SocketStatus.CLOSE_NOW) {
+                        processor.errorDispatch();
+                        state = SocketState.CLOSED;
+                    } else if (status == SocketStatus.DISCONNECT &&
                             !processor.isComet()) {
                         // Do nothing here, just wait for it to get recycled
                         // Don't do this for Comet we need to generate an end
