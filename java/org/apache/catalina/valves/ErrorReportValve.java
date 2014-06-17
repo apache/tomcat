@@ -110,7 +110,8 @@ public class ErrorReportValve extends ValveBase {
                     response.flushBuffer();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                }                // Close immediately to signal to the client that something went
+                }
+                // Close immediately to signal to the client that something went
                 // wrong
                 response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
             }
