@@ -79,6 +79,7 @@ public class LogFactory {
             Class<? extends Log> c=log.getClass();
             try {
                 m=c.getConstructor(String.class);
+                break;
             }
             catch (NoSuchMethodException | SecurityException e) {
                 throw new Error(e);
@@ -118,7 +119,7 @@ public class LogFactory {
             return discoveredLogConstructor.newInstance(name);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
                 InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw new LogConfigurationException(e);
         }
     }
 
