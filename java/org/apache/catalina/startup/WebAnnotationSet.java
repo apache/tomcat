@@ -258,10 +258,9 @@ public class WebAnnotationSet {
         Field[] fields = Introspection.getDeclaredFields(classClass);
         if (fields != null && fields.length > 0) {
             for (Field field : fields) {
-                if (field.isAnnotationPresent(Resource.class)) {
-                    Resource annotation = field.getAnnotation(Resource.class);
-                    String defaultName =
-                            classClass.getName() + SEPARATOR + field.getName();
+                Resource annotation = field.getAnnotation(Resource.class);
+                if (annotation != null) {
+                    String defaultName = classClass.getName() + SEPARATOR + field.getName();
                     Class<?> defaultType = field.getType();
                     addResource(context, annotation, defaultName, defaultType);
                 }
@@ -276,9 +275,8 @@ public class WebAnnotationSet {
         Method[] methods = Introspection.getDeclaredMethods(classClass);
         if (methods != null && methods.length > 0) {
             for (Method method : methods) {
-                if (method.isAnnotationPresent(Resource.class)) {
-                    Resource annotation = method.getAnnotation(Resource.class);
-
+                Resource annotation = method.getAnnotation(Resource.class);
+                if (annotation != null) {
                     if (!Introspection.isValidSetter(method)) {
                         throw new IllegalArgumentException(sm.getString(
                                 "webAnnotationSet.invalidInjection"));

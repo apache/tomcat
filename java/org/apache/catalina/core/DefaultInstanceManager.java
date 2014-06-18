@@ -316,38 +316,38 @@ public class DefaultInstanceManager implements InstanceManager {
                     // JNDI is enabled
                     Field[] fields = Introspection.getDeclaredFields(clazz);
                     for (Field field : fields) {
+                        Resource resourceAnnotation;
+                        EJB ejbAnnotation;
+                        WebServiceRef webServiceRefAnnotation;
+                        PersistenceContext persistenceContextAnnotation;
+                        PersistenceUnit persistenceUnitAnnotation;
                         if (injections != null && injections.containsKey(field.getName())) {
                             annotations.add(new AnnotationCacheEntry(
                                     field.getName(), null,
                                     injections.get(field.getName()),
                                     AnnotationCacheEntryType.FIELD));
-                        } else if (field.isAnnotationPresent(Resource.class)) {
-                            Resource annotation = field.getAnnotation(Resource.class);
-                            annotations.add(new AnnotationCacheEntry(
-                                    field.getName(), null, annotation.name(),
+                        } else if ((resourceAnnotation =
+                                field.getAnnotation(Resource.class)) != null) {
+                            annotations.add(new AnnotationCacheEntry(field.getName(), null,
+                                    resourceAnnotation.name(), AnnotationCacheEntryType.FIELD));
+                        } else if ((ejbAnnotation =
+                                field.getAnnotation(EJB.class)) != null) {
+                            annotations.add(new AnnotationCacheEntry(field.getName(), null,
+                                    ejbAnnotation.name(), AnnotationCacheEntryType.FIELD));
+                        } else if ((webServiceRefAnnotation =
+                                field.getAnnotation(WebServiceRef.class)) != null) {
+                            annotations.add(new AnnotationCacheEntry(field.getName(), null,
+                                    webServiceRefAnnotation.name(),
                                     AnnotationCacheEntryType.FIELD));
-                        } else if (field.isAnnotationPresent(EJB.class)) {
-                            EJB annotation = field.getAnnotation(EJB.class);
-                            annotations.add(new AnnotationCacheEntry(
-                                    field.getName(), null, annotation.name(),
+                        } else if ((persistenceContextAnnotation =
+                                field.getAnnotation(PersistenceContext.class)) != null) {
+                            annotations.add(new AnnotationCacheEntry(field.getName(), null,
+                                    persistenceContextAnnotation.name(),
                                     AnnotationCacheEntryType.FIELD));
-                        } else if (field.isAnnotationPresent(WebServiceRef.class)) {
-                            WebServiceRef annotation =
-                                    field.getAnnotation(WebServiceRef.class);
-                            annotations.add(new AnnotationCacheEntry(
-                                    field.getName(), null, annotation.name(),
-                                    AnnotationCacheEntryType.FIELD));
-                        } else if (field.isAnnotationPresent(PersistenceContext.class)) {
-                            PersistenceContext annotation =
-                                    field.getAnnotation(PersistenceContext.class);
-                            annotations.add(new AnnotationCacheEntry(
-                                    field.getName(), null, annotation.name(),
-                                    AnnotationCacheEntryType.FIELD));
-                        } else if (field.isAnnotationPresent(PersistenceUnit.class)) {
-                            PersistenceUnit annotation =
-                                    field.getAnnotation(PersistenceUnit.class);
-                            annotations.add(new AnnotationCacheEntry(
-                                    field.getName(), null, annotation.name(),
+                        } else if ((persistenceUnitAnnotation =
+                                field.getAnnotation(PersistenceUnit.class)) != null) {
+                            annotations.add(new AnnotationCacheEntry(field.getName(), null,
+                                    persistenceUnitAnnotation.name(),
                                     AnnotationCacheEntryType.FIELD));
                         }
                     }
@@ -374,43 +374,44 @@ public class DefaultInstanceManager implements InstanceManager {
                                 continue;
                             }
                         }
-                        if (method.isAnnotationPresent(Resource.class)) {
-                            Resource annotation = method.getAnnotation(Resource.class);
+                        Resource resourceAnnotation;
+                        EJB ejbAnnotation;
+                        WebServiceRef webServiceRefAnnotation;
+                        PersistenceContext persistenceContextAnnotation;
+                        PersistenceUnit persistenceUnitAnnotation;
+                        if ((resourceAnnotation =
+                                method.getAnnotation(Resource.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(
                                     method.getName(),
                                     method.getParameterTypes(),
-                                    annotation.name(),
+                                    resourceAnnotation.name(),
                                     AnnotationCacheEntryType.SETTER));
-                        } else if (method.isAnnotationPresent(EJB.class)) {
-                            EJB annotation = method.getAnnotation(EJB.class);
+                        } else if ((ejbAnnotation =
+                                method.getAnnotation(EJB.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(
                                     method.getName(),
                                     method.getParameterTypes(),
-                                    annotation.name(),
+                                    ejbAnnotation.name(),
                                     AnnotationCacheEntryType.SETTER));
-                        } else if (method.isAnnotationPresent(WebServiceRef.class)) {
-                            WebServiceRef annotation =
-                                    method.getAnnotation(WebServiceRef.class);
+                        } else if ((webServiceRefAnnotation =
+                                method.getAnnotation(WebServiceRef.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(
                                     method.getName(),
                                     method.getParameterTypes(),
-                                    annotation.name(),
+                                    webServiceRefAnnotation.name(),
                                     AnnotationCacheEntryType.SETTER));
-                        } else if (method.isAnnotationPresent(PersistenceContext.class)) {
-                            PersistenceContext annotation =
-                                    method.getAnnotation(PersistenceContext.class);
+                        } else if ((persistenceContextAnnotation =
+                                method.getAnnotation(PersistenceContext.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(
                                     method.getName(),
                                     method.getParameterTypes(),
-                                    annotation.name(),
+                                    persistenceContextAnnotation.name(),
                                     AnnotationCacheEntryType.SETTER));
-                        } else if (method.isAnnotationPresent(PersistenceUnit.class)) {
-                            PersistenceUnit annotation =
-                                    method.getAnnotation(PersistenceUnit.class);
+                        } else if ((persistenceUnitAnnotation = method.getAnnotation(PersistenceUnit.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(
                                     method.getName(),
                                     method.getParameterTypes(),
-                                    annotation.name(),
+                                    persistenceUnitAnnotation.name(),
                                     AnnotationCacheEntryType.SETTER));
                         }
                     }

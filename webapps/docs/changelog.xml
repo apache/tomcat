@@ -142,6 +142,11 @@
         digester rules and documentation for <code>MemoryRealm</code>.
         (markt/kkolinko)
       </fix>
+      <scode>
+        <bug>56611</bug>: Refactor code to remove inefficient calls to
+        <code>Method.isAnnotationPresent()</code>. Based on a patch by Jian Mou.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
