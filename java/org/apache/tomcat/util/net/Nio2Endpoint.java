@@ -111,23 +111,17 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     /**
      * Cache for SocketProcessor objects
      */
-    private final SynchronizedStack<SocketProcessor> processorCache =
-            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getProcessorCache());
+    private SynchronizedStack<SocketProcessor> processorCache;
 
     /**
-     * Cache for key attachment objects
+     * Cache for socket wrapper objects
      */
-    private final SynchronizedStack<Nio2SocketWrapper> socketWrapperCache =
-            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getSocketWrapperCache());
+    private SynchronizedStack<Nio2SocketWrapper> socketWrapperCache;
 
     /**
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
      */
-    private final SynchronizedStack<Nio2Channel> nioChannels =
-            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getBufferPoolSize());
+    private SynchronizedStack<Nio2Channel> nioChannels;
 
 
     // ------------------------------------------------------------- Properties
@@ -354,6 +348,15 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             // Create worker collection
             if ( getExecutor() == null ) {
                 createExecutor();
+            }
+
+            if (useCaches) {
+                processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getProcessorCache());
+                socketWrapperCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getSocketWrapperCache());
+                nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                        socketProperties.getBufferPool());
             }
 
             initializeConnectionLatch();

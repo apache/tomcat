@@ -127,30 +127,22 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     /**
      * Cache for SocketProcessor objects
      */
-    private final SynchronizedStack<SocketProcessor> processorCache =
-            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getProcessorCache());
+    private SynchronizedStack<SocketProcessor> processorCache;
 
     /**
      * Cache for key attachment objects
      */
-    private final SynchronizedStack<KeyAttachment> keyCache =
-            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getKeyCache());
+    private SynchronizedStack<KeyAttachment> keyCache;
 
     /**
      * Cache for poller events
      */
-    private final SynchronizedStack<PollerEvent> eventCache =
-            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getEventCache());
+    private SynchronizedStack<PollerEvent> eventCache;
 
     /**
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
      */
-    private final SynchronizedStack<NioChannel> nioChannels =
-            new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                    socketProperties.getBufferPoolSize());
+    private SynchronizedStack<NioChannel> nioChannels;
 
 
     // ------------------------------------------------------------- Properties
@@ -413,6 +405,15 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             if ( getExecutor() == null ) {
                 createExecutor();
             }
+
+            processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                    socketProperties.getProcessorCache());
+            keyCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                            socketProperties.getKeyCache());
+            eventCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                            socketProperties.getEventCache());
+            nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                    socketProperties.getBufferPool());
 
             initializeConnectionLatch();
 
