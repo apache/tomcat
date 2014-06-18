@@ -106,6 +106,10 @@ public class ELProcessor {
         MethodSignature sig =
                 new MethodSignature(context, methodName, className);
 
+        if (function.length() == 0) {
+            function = sig.getName();
+        }
+
         Method methods[] = clazz.getMethods();
         for (Method method : methods) {
             if (!Modifier.isStatic(method.getModifiers())) {

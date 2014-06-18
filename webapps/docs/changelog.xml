@@ -246,6 +246,12 @@
         via <code>ELProcessor.defineFunction(String,String,String,String)</code>
         when using Expression Langauge. (markt)
       </fix>
+      <fix>
+        <bug>56638</bug>: When using
+        <code>ELProcessor.defineFunction(String,String,String,String)</code> and
+        no function name is specified, use the method name as the function name
+        as required by the specification. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
