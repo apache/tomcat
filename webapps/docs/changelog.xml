@@ -241,6 +241,11 @@
         <code>Parser</code> to <code>JspReader</code> class for better
         performance. (kkolinko)
       </update>
+      <fix>
+        <bug>56636</bug>: Correctly identify the required method when specified
+        via <code>ELProcessor.defineFunction(String,String,String,String)</code>
+        when using Expression Langauge. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

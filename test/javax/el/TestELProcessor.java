@@ -63,6 +63,44 @@ public class TestELProcessor {
 
 
     @Test
+    public void testDefineFunctionMethod02() throws Exception {
+        ELProcessor elp = new ELProcessor();
+        elp.defineFunction("fn", "test", "java.lang.Integer", "Integer valueOf(int)");
+        Assert.assertEquals(Integer.valueOf(1), elp.eval("fn:test(1)"));
+    }
+
+
+    @Test
+    public void testDefineFunctionMethod03() throws Exception {
+        TesterFunctions.resetCallList();
+        ELProcessor elp = new ELProcessor();
+        elp.defineFunction("fn", "test", "javax.el.TesterFunctions", "void doIt()");
+        elp.eval("fn:test()");
+        Assert.assertEquals("A", TesterFunctions.getCallList());
+    }
+
+
+    @Test
+    public void testDefineFunctionMethod04() throws Exception {
+        TesterFunctions.resetCallList();
+        ELProcessor elp = new ELProcessor();
+        elp.defineFunction("fn", "test", "javax.el.TesterFunctions", "void doIt(int)");
+        elp.eval("fn:test(5)");
+        Assert.assertEquals("B", TesterFunctions.getCallList());
+    }
+
+
+    @Test
+    public void testDefineFunctionMethod05() throws Exception {
+        TesterFunctions.resetCallList();
+        ELProcessor elp = new ELProcessor();
+        elp.defineFunction("fn", "test", "javax.el.TesterFunctions", "void doIt(Integer)");
+        elp.eval("fn:test(null)");
+        Assert.assertEquals("C", TesterFunctions.getCallList());
+    }
+
+
+    @Test
     public void testDefineFunctionName01() throws Exception {
         ELProcessor elp = new ELProcessor();
         // java.lang should be automatically imported so no need for full class
