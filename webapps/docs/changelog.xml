@@ -209,6 +209,10 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <fix>
+        <bug>56334#c15</bug>: Fix a regression in EL parsing when quoted string
+        follows a whitespace. (kkolinko/markt)
+      </fix>
       <update>
         <bug>56543</bug>: Update to the Eclipse JDT Compiler 4.4RC4 to pick up
         some fixes for Java 8 support. (markt/kkolinko)
