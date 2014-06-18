@@ -62,8 +62,6 @@
   attribute).  Any further simultaneous requests will receive "connection
   refused" errors, until resources are available to process them.</p>
 
-  <p>Note: The NIO2 connector is experimental at this time.</p>
-
 </section>
 
 
