@@ -62,8 +62,6 @@
   <p><b>Other native connectors supporting AJP may work, but are no longer
   supported.</b></p>
 
-  <p>Note: The NIO2 connector is experimental at this time.</p>
-
 </section>
 
 
