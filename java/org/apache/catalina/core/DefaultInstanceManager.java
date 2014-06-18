@@ -742,16 +742,15 @@ public class DefaultInstanceManager implements InstanceManager {
             if (method.getName().equals(methodNameFromXml)) {
                 if (!Introspection.isValidLifecycleCallback(method)) {
                     throw new IllegalArgumentException(
-                        "Invalid " + annotation.getName() + " annotation");
+                            "Invalid " + annotation.getName() + " annotation");
                 }
                 result = method;
             }
         } else {
             if (method.isAnnotationPresent(annotation)) {
-                if (currentMethod != null ||
-                    !Introspection.isValidLifecycleCallback(method)) {
+                if (currentMethod != null || !Introspection.isValidLifecycleCallback(method)) {
                     throw new IllegalArgumentException(
-                        "Invalid " + annotation.getName() + " annotation");
+                            "Invalid " + annotation.getName() + " annotation");
                 }
                 result = method;
             }
