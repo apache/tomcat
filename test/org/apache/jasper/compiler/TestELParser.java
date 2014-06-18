@@ -92,6 +92,12 @@ public class TestELParser {
 
 
     @Test
+    public void testFunction05() throws JasperException {
+        doTestParser("${do:it(x, '\\\\y',z)}", null);
+    }
+
+
+    @Test
     public void testCompound01() throws JasperException {
         doTestParser("1${'foo'}1", "1foo1");
     }

@@ -152,6 +152,10 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>56334#c15</bug>: Fix a regression in EL parsing when quoted string
+        follows a whitespace. (kkolinko/markt)
+      </fix>
+      <fix>
         <bug>56561</bug>: Avoid <code>NoSuchElementException</code> while handling
         attributes with empty string value. (violetagg)
       </fix>
