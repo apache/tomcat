@@ -294,30 +294,34 @@ public class ELParser {
         int len = input.length();
         char quote = 0;
         int lastAppend = 0;
+        int start = 0;
+        int end = len;
 
-        if (len > 1) {
+        // Look to see if the value is quoted
+        String trimmed = input.trim();
+        int trimmedLen = trimmed.length();
+        if (trimmedLen > 1) {
             // Might be quoted
-            quote = input.charAt(0);
+            quote = trimmed.charAt(0);
             if (quote == '\'' || quote == '\"') {
-                if (input.charAt(len - 1) != quote) {
+                if (trimmed.charAt(trimmedLen - 1) != quote) {
                     throw new IllegalArgumentException(Localizer.getMessage(
                             "org.apache.jasper.compiler.ELParser.invalidQuotesForStringLiteral",
                             input));
                 }
-                lastAppend = 1;
-                len--;
+                start = input.indexOf(quote) + 1;
+                end = start + trimmedLen - 2;
             } else {
                 quote = 0;
             }
         }
 
         StringBuilder output = null;
-        for (int i = lastAppend; i < len; i++) {
+        for (int i = start; i < end; i++) {
             char ch = input.charAt(i);
             if (ch == '\\' || ch == quote) {
                 if (output == null) {
                     output = new StringBuilder(len + 20);
-                    output.append(quote);
                 }
                 output.append(input.substring(lastAppend, i));
                 lastAppend = i + 1;
@@ -329,9 +333,6 @@ public class ELParser {
             return input;
         } else {
             output.append(input.substring(lastAppend, len));
-            if (quote != 0) {
-                output.append(quote);
-            }
             return output.toString();
         }
     }
