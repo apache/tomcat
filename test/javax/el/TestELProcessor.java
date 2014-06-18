@@ -109,4 +109,24 @@ public class TestELProcessor {
         elp.eval("fn:test(null)");
         Assert.assertEquals("C", TesterFunctions.getCallList());
     }
+
+
+    @Test
+    public void testDefineFunctionName06() throws Exception {
+        TesterFunctions.resetCallList();
+        ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "javax.el.TesterFunctions", "void doIt(int)");
+        elp.eval("doIt(5)");
+        Assert.assertEquals("B", TesterFunctions.getCallList());
+    }
+
+
+    @Test
+    public void testDefineFunctionName07() throws Exception {
+        TesterFunctions.resetCallList();
+        ELProcessor elp = new ELProcessor();
+        elp.defineFunction("fn", "", "javax.el.TesterFunctions", "void doIt(int)");
+        elp.eval("fn:doIt(5)");
+        Assert.assertEquals("B", TesterFunctions.getCallList());
+    }
 }
