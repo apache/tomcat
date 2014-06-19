@@ -647,14 +647,15 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Initialize standard input and output filters.
      */
-    protected void initializeFilters(int maxTrailerSize, int maxExtensionSize) {
+    protected void initializeFilters(int maxTrailerSize, int maxExtensionSize,
+            int maxSwallowSize) {
         // Create and add the identity filters.
-        getInputBuffer().addFilter(new IdentityInputFilter());
+        getInputBuffer().addFilter(new IdentityInputFilter(maxSwallowSize));
         getOutputBuffer().addFilter(new IdentityOutputFilter());
 
         // Create and add the chunked filters.
         getInputBuffer().addFilter(
-                new ChunkedInputFilter(maxTrailerSize, maxExtensionSize));
+                new ChunkedInputFilter(maxTrailerSize, maxExtensionSize, maxSwallowSize));
         getOutputBuffer().addFilter(new ChunkedOutputFilter());
 
         // Create and add the void filters.

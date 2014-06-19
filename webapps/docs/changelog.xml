@@ -205,6 +205,10 @@
       <fix>
         Improve configuration of cache sizes in the endpoint. (markt)
       </fix>
+      <add>
+        Add a new limit, defaulting to 2MB, for the amount of data Tomcat will
+        swallow for an aborted upload. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

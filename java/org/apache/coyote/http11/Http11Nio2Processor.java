@@ -60,7 +60,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
 
     public Http11Nio2Processor(int maxHttpHeaderSize, Nio2Endpoint endpoint,
-            int maxTrailerSize, int maxExtensionSize) {
+            int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
 
         super(endpoint);
 
@@ -70,7 +70,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         outputBuffer = new InternalNio2OutputBuffer(response, maxHttpHeaderSize);
         response.setOutputBuffer(outputBuffer);
 
-        initializeFilters(maxTrailerSize, maxExtensionSize);
+        initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
     }
 
 
