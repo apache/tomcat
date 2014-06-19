@@ -989,11 +989,7 @@ public interface Context extends Container {
     /**
      * Return the set of application listener class names configured
      * for this application.
-     * 
-     * @deprecated  The return type of this method will be changing to
-     *              {@link ApplicationListener}[] in Tomcat 8 
      */
-    @Deprecated
     public String[] findApplicationListeners();
 
 

@@ -76,7 +76,6 @@ public class WebAnnotationSet {
      */
     protected static void loadApplicationListenerAnnotations(Context context) {
         Class<?> classClass = null;
-        @SuppressWarnings("deprecation")
         String[] applicationListeners =
                 context.findApplicationListeners();
         for (int i = 0; i < applicationListeners.length; i++) {
