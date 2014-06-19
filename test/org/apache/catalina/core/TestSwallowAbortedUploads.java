@@ -23,7 +23,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -450,7 +449,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         try {
             conn = new Socket("localhost", getPort());
             Writer writer = new OutputStreamWriter(
-                    conn.getOutputStream(), StandardCharsets.US_ASCII);
+                    conn.getOutputStream(), "US-ASCII");
             writer.write("PUT /does-not-exist HTTP/1.1\r\n");
             writer.write("Host: any\r\n");
             writer.write("Transfer-encoding: chunked\r\n");
@@ -470,7 +469,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        conn.getInputStream(), StandardCharsets.US_ASCII));
+                        conn.getInputStream(), "US-ASCII"));
 
                 responseLine = reader.readLine();
             } catch (IOException e) {
