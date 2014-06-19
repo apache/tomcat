@@ -468,11 +468,12 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
         if (limit) {
             Assert.assertNotNull(writeEx);
+            Assert.assertNotNull(readEx);
         } else {
             Assert.assertNull(writeEx);
+            Assert.assertNull(readEx);
+            Assert.assertNotNull(responseLine);
+            Assert.assertTrue(responseLine.contains("404"));
         }
-        Assert.assertNull(readEx);
-        Assert.assertNotNull(responseLine);
-        Assert.assertTrue(responseLine.contains("404"));
     }
 }
