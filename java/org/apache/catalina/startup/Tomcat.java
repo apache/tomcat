@@ -837,15 +837,14 @@ public class Tomcat {
                 singleThreadModel = true;
                 instancePool = new Stack<>();
             }
-            this.asyncSupported = hasAsync();
+            this.asyncSupported = hasAsync(existing);
         }
 
-        public boolean hasAsync() {
-            if (isAsyncSupported()) return true;
+        private static boolean hasAsync(Servlet existing) {
             boolean result = false;
             Class<?> clazz = existing.getClass();
-            if (clazz.isAnnotationPresent(WebServlet.class)) {
-                WebServlet ws = clazz.getAnnotation(WebServlet.class);
+            WebServlet ws = clazz.getAnnotation(WebServlet.class);
+            if (ws != null) {
                 result = ws.asyncSupported();
             }
             return result;
