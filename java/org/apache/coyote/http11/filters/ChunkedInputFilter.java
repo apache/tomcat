@@ -137,6 +137,9 @@ public class ChunkedInputFilter implements InputFilter {
     private long extensionSize;
 
 
+    private final int maxSwallowSize;
+
+
     /**
      * Flag that indicates if an error has occurred.
      */
@@ -145,10 +148,11 @@ public class ChunkedInputFilter implements InputFilter {
 
     // ----------------------------------------------------------- Constructors
 
-    public ChunkedInputFilter(int maxTrailerSize, int maxExtensionSize) {
+    public ChunkedInputFilter(int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
         this.trailingHeaders.setLimit(maxTrailerSize);
         this.maxExtensionSize = maxExtensionSize;
         this.maxTrailerSize = maxTrailerSize;
+        this.maxSwallowSize = maxSwallowSize;
     }
 
 
@@ -234,9 +238,14 @@ public class ChunkedInputFilter implements InputFilter {
      */
     @Override
     public long end() throws IOException {
+        long swallowed = 0;
+        int read = 0;
         // Consume extra bytes : parse the stream until the end chunk is found
-        while (doRead(readChunk, null) >= 0) {
-            // NOOP: Just consume the input
+        while ((read = doRead(readChunk, null)) >= 0) {
+            swallowed += read;
+            if (maxSwallowSize > -1 && swallowed > maxSwallowSize) {
+                throwIOException(sm.getString("inputFilter.maxSwallow"));
+            }
         }
 
         // Return the number of extra bytes which were consumed

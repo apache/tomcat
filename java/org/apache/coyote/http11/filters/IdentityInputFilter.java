@@ -24,6 +24,7 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.InputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Identity input filter.
@@ -31,6 +32,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * @author Remy Maucherat
  */
 public class IdentityInputFilter implements InputFilter {
+
+    private static final StringManager sm = StringManager.getManager(
+            IdentityInputFilter.class.getPackage().getName());
 
 
     // -------------------------------------------------------------- Constants
@@ -74,6 +78,14 @@ public class IdentityInputFilter implements InputFilter {
      * Chunk used to read leftover bytes.
      */
     protected final ByteChunk endChunk = new ByteChunk();
+
+
+    private final int maxSwallowSize;
+
+
+    public IdentityInputFilter(int maxSwallowSize) {
+        this.maxSwallowSize = maxSwallowSize;
+    }
 
 
     // ---------------------------------------------------- InputBuffer Methods
@@ -137,8 +149,11 @@ public class IdentityInputFilter implements InputFilter {
      * End the current request.
      */
     @Override
-    public long end()
-        throws IOException {
+    public long end()  throws IOException {
+
+        if (maxSwallowSize > -1 && remaining > maxSwallowSize) {
+            throw new IOException(sm.getString("inputFilter.maxSwallow"));
+        }
 
         // Consume extra bytes.
         while (remaining > 0) {

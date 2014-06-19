@@ -436,6 +436,16 @@
       If not specified, this attribute is set to 100.</p>
     </attribute>
 
+    <attribute name="maxSwallowSize" required="false">
+      <p>The maximum number of request body bytes (excluding transfer encoding
+      overhead) that will be swallowed by Tomcat for an aborted upload. An
+      aborted upload is when Tomcat knows that the request body is going to be
+      ignored but the client still sends it. If Tomcat does not swallow the body
+      the client is unlikely to see the response. If not specified the default
+      of 2097152 (2 megabytes) will be used. A value of less than zero indicates
+      that no limit should be enforced.</p>
+    </attribute>
+
     <attribute name="maxThreads" required="false">
       <p>The maximum number of request processing threads to be created
       by this <strong>Connector</strong>, which therefore determines the

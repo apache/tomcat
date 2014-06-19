@@ -248,7 +248,8 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         public Http11Nio2Processor createProcessor() {
             Http11Nio2Processor processor = new Http11Nio2Processor(
                     proto.getMaxHttpHeaderSize(), (Nio2Endpoint) proto.endpoint,
-                    proto.getMaxTrailerSize(), proto.getMaxExtensionSize());
+                    proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
+                    proto.getMaxSwallowSize());
             processor.setAdapter(proto.getAdapter());
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());

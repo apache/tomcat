@@ -49,7 +49,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
 
     public Http11Processor(int headerBufferSize, JIoEndpoint endpoint,
-            int maxTrailerSize, int maxExtensionSize) {
+            int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
 
         super(endpoint);
 
@@ -59,7 +59,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         outputBuffer = new InternalOutputBuffer(response, headerBufferSize);
         response.setOutputBuffer(outputBuffer);
 
-        initializeFilters(maxTrailerSize, maxExtensionSize);
+        initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
     }
 
 
