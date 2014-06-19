@@ -423,7 +423,7 @@ public class TestParser extends TomcatBaseTest {
         Assert.assertTrue(result, result.contains("07d:<set data-content=\"false\"/>"));
         Assert.assertTrue(result, result.contains("07e:<set data-content=\"false\"/>"));
         Assert.assertTrue(result, result.contains("07f:<set data-content=\"\\\'something\'\"/>"));
-        /* Assert.assertTrue(result, result.contains("07g:<set data-content=\"\\\'something\'\"/>")); */
+        Assert.assertTrue(result, result.contains("07g:<set data-content=\"\\\'something\'\"/>"));
     }
 
     /** Assertion for text printed by tags:echo */
