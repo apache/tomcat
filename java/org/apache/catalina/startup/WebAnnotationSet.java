@@ -75,10 +75,9 @@ public class WebAnnotationSet {
      * Process the annotations for the listeners.
      */
     protected static void loadApplicationListenerAnnotations(Context context) {
-        Class<?> classClass = null;
         String[] applicationListeners = context.findApplicationListeners();
-        for (int i = 0; i < applicationListeners.length; i++) {
-            classClass = Introspection.loadClass(context, applicationListeners[i]);
+        for (String className : applicationListeners) {
+            Class<?> classClass = Introspection.loadClass(context, className);
             if (classClass == null) {
                 continue;
             }
@@ -94,11 +93,10 @@ public class WebAnnotationSet {
      * Process the annotations for the filters.
      */
     protected static void loadApplicationFilterAnnotations(Context context) {
-        Class<?> classClass = null;
         FilterDef[] filterDefs = context.findFilterDefs();
-        for (int i = 0; i < filterDefs.length; i++) {
-            classClass = Introspection.loadClass(context,
-                    (filterDefs[i]).getFilterClass());
+        for (FilterDef filterDef : filterDefs) {
+            Class<?> classClass = Introspection.loadClass(context,
+                    filterDef.getFilterClass());
             if (classClass == null) {
                 continue;
             }
@@ -115,19 +113,16 @@ public class WebAnnotationSet {
      */
     protected static void loadApplicationServletAnnotations(Context context) {
 
-        Wrapper wrapper = null;
-        Class<?> classClass = null;
-
         Container[] children = context.findChildren();
-        for (int i = 0; i < children.length; i++) {
-            if (children[i] instanceof Wrapper) {
+        for (Container child : children) {
+            if (child instanceof Wrapper) {
 
-                wrapper = (Wrapper) children[i];
+                Wrapper wrapper = (Wrapper) child;
                 if (wrapper.getServletClass() == null) {
                     continue;
                 }
 
-                classClass = Introspection.loadClass(context,
+                Class<?> classClass = Introspection.loadClass(context,
                         wrapper.getServletClass());
                 if (classClass == null) {
                     continue;
@@ -147,7 +142,6 @@ public class WebAnnotationSet {
                 }
             }
         }
-
 
     }
 
