@@ -350,7 +350,7 @@ public interface Wrapper extends Container {
 
     /**
      * Does the associated Servlet support async processing? Defaults to
-     * <code>true</code>
+     * <code>false</code>.
      */
     public boolean isAsyncSupported();
 
