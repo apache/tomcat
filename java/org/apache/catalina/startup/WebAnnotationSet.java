@@ -141,8 +141,8 @@ public class WebAnnotationSet {
                  * Ref JSR 250, equivalent to the run-as element in
                  * the deployment descriptor
                  */
-                if (classClass.isAnnotationPresent(RunAs.class)) {
-                    RunAs annotation = classClass.getAnnotation(RunAs.class);
+                RunAs annotation = classClass.getAnnotation(RunAs.class);
+                if (annotation != null) {
                     wrapper.setRunAs(annotation.value());
                 }
             }
@@ -157,96 +157,106 @@ public class WebAnnotationSet {
      */
     protected static void loadClassAnnotation(Context context,
             Class<?> classClass) {
-        // Initialize the annotations
-        if (classClass.isAnnotationPresent(Resource.class)) {
+        /* Process Resource annotation.
+         * Ref JSR 250
+         */
+        {
             Resource annotation = classClass.getAnnotation(Resource.class);
-            addResource(context, annotation);
+            if (annotation != null) {
+                addResource(context, annotation);
+            }
         }
         /* Process Resources annotation.
          * Ref JSR 250
          */
-        if (classClass.isAnnotationPresent(Resources.class)) {
+        {
             Resources annotation = classClass.getAnnotation(Resources.class);
-            for (int i = 0; annotation.value() != null && i < annotation.value().length; i++) {
-                addResource(context, annotation.value()[i]);
+            if (annotation != null && annotation.value() != null) {
+                for (Resource resource : annotation.value()) {
+                    addResource(context, resource);
+                }
             }
         }
         /* Process EJB annotation.
          * Ref JSR 224, equivalent to the ejb-ref or ejb-local-ref
          * element in the deployment descriptor.
-        if (classClass.isAnnotationPresent(EJB.class)) {
-            EJB annotation = (EJB)
-            classClass.getAnnotation(EJB.class);
+        {
+            EJB annotation = classClass.getAnnotation(EJB.class);
+            if (annotation != null) {
 
-            if ((annotation.mappedName().length() == 0) ||
-                    annotation.mappedName().equals("Local")) {
+                if ((annotation.mappedName().length() == 0)
+                        || annotation.mappedName().equals("Local")) {
 
-                ContextLocalEjb ejb = new ContextLocalEjb();
+                    ContextLocalEjb ejb = new ContextLocalEjb();
 
-                ejb.setName(annotation.name());
-                ejb.setType(annotation.beanInterface().getCanonicalName());
-                ejb.setDescription(annotation.description());
+                    ejb.setName(annotation.name());
+                    ejb.setType(annotation.beanInterface().getCanonicalName());
+                    ejb.setDescription(annotation.description());
 
-                ejb.setHome(annotation.beanName());
+                    ejb.setHome(annotation.beanName());
 
-                context.getNamingResources().addLocalEjb(ejb);
+                    context.getNamingResources().addLocalEjb(ejb);
 
-            } else if (annotation.mappedName().equals("Remote")) {
+                } else if (annotation.mappedName().equals("Remote")) {
 
-                ContextEjb ejb = new ContextEjb();
+                    ContextEjb ejb = new ContextEjb();
 
-                ejb.setName(annotation.name());
-                ejb.setType(annotation.beanInterface().getCanonicalName());
-                ejb.setDescription(annotation.description());
+                    ejb.setName(annotation.name());
+                    ejb.setType(annotation.beanInterface().getCanonicalName());
+                    ejb.setDescription(annotation.description());
 
-                ejb.setHome(annotation.beanName());
+                    ejb.setHome(annotation.beanName());
 
-                context.getNamingResources().addEjb(ejb);
+                    context.getNamingResources().addEjb(ejb);
 
+                }
             }
-
         }
-         */
+        */
         /* Process WebServiceRef annotation.
          * Ref JSR 224, equivalent to the service-ref element in
          * the deployment descriptor.
          * The service-ref registration is not implemented
-        if (classClass.isAnnotationPresent(WebServiceRef.class)) {
-            WebServiceRef annotation = (WebServiceRef)
-            classClass.getAnnotation(WebServiceRef.class);
+        {
+            WebServiceRef annotation = classClass
+                    .getAnnotation(WebServiceRef.class);
+            if (annotation != null) {
+                ContextService service = new ContextService();
 
-            ContextService service = new ContextService();
+                service.setName(annotation.name());
+                service.setWsdlfile(annotation.wsdlLocation());
 
-            service.setName(annotation.name());
-            service.setWsdlfile(annotation.wsdlLocation());
+                service.setType(annotation.type().getCanonicalName());
 
-            service.setType(annotation.type().getCanonicalName());
+                if (annotation.value() == null)
+                    service.setServiceinterface(annotation.type()
+                            .getCanonicalName());
 
-            if (annotation.value() == null)
-                service.setServiceinterface(annotation.type().getCanonicalName());
+                if (annotation.type().getCanonicalName().equals("Service"))
+                    service.setServiceinterface(annotation.type()
+                            .getCanonicalName());
 
-            if (annotation.type().getCanonicalName().equals("Service"))
-                service.setServiceinterface(annotation.type().getCanonicalName());
+                if (annotation.value().getCanonicalName().equals("Endpoint"))
+                    service.setServiceendpoint(annotation.type()
+                            .getCanonicalName());
 
-            if (annotation.value().getCanonicalName().equals("Endpoint"))
-                service.setServiceendpoint(annotation.type().getCanonicalName());
+                service.setPortlink(annotation.type().getCanonicalName());
 
-            service.setPortlink(annotation.type().getCanonicalName());
-
-            context.getNamingResources().addService(service);
-
-
+                context.getNamingResources().addService(service);
+            }
         }
-         */
+        */
         /* Process DeclareRoles annotation.
          * Ref JSR 250, equivalent to the security-role element in
          * the deployment descriptor
          */
-        if (classClass.isAnnotationPresent(DeclareRoles.class)) {
-            DeclareRoles annotation =
-                classClass.getAnnotation(DeclareRoles.class);
-            for (int i = 0; annotation.value() != null && i < annotation.value().length; i++) {
-                context.addSecurityRole(annotation.value()[i]);
+        {
+            DeclareRoles annotation = classClass
+                    .getAnnotation(DeclareRoles.class);
+            if (annotation != null && annotation.value() != null) {
+                for (String role : annotation.value()) {
+                    context.addSecurityRole(role);
+                }
             }
         }
     }
