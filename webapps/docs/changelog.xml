@@ -44,6 +44,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.0.10 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        <bug>56611</bug>: Refactor code to remove inefficient calls to
+        <code>Method.isAnnotationPresent()</code>. Based on a patch by Jian Mou.
+        (markt/kkolinko)
+      </scode>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 8.0.9 (markt)">
   <subsection name="Catalina">
     <changelog>
@@ -142,11 +153,6 @@
         digester rules and documentation for <code>MemoryRealm</code>.
         (markt/kkolinko)
       </fix>
-      <scode>
-        <bug>56611</bug>: Refactor code to remove inefficient calls to
-        <code>Method.isAnnotationPresent()</code>. Based on a patch by Jian Mou.
-        (markt)
-      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
