@@ -47,6 +47,10 @@
 <section name="Tomcat 8.0.10 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>44312</bug>: Log an error if there is a conflict between Host and
+        Alias names. (kkolinko)
+      </fix>
       <scode>
         <bug>56611</bug>: Refactor code to remove inefficient calls to
         <code>Method.isAnnotationPresent()</code>. Based on a patch by Jian Mou.
