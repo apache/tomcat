@@ -3806,7 +3806,7 @@ public class StandardContext extends ContainerBase
             // Make sure this welcome file is currently present
             int n = -1;
             for (int i = 0; i < applicationListeners.length; i++) {
-                if (applicationListeners.equals(listener)) {
+                if (applicationListeners[i].equals(listener)) {
                     n = i;
                     break;
                 }
