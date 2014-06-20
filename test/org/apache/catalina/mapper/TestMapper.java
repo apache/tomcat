@@ -75,7 +75,6 @@ public class TestMapper extends LoggingBaseTest {
         mapper.addHost("fwehoihoihwfeo", new String[0], createHost("blah5"));
         mapper.addHost("owefojiwefoi", new String[0], createHost("blah6"));
         mapper.addHost("iowejoiejfoiew", new String[0], createHost("blah7"));
-        mapper.addHost("iowejoiejfoiew", new String[0], createHost("blah17"));
         mapper.addHost("ohewoihfewoih", new String[0], createHost("blah8"));
         mapper.addHost("fewohfoweoih", new String[0], createHost("blah9"));
         mapper.addHost("ttthtiuhwoih", new String[0], createHost("blah10"));
@@ -121,13 +120,24 @@ public class TestMapper extends LoggingBaseTest {
 
     @Test
     public void testAddHost() throws Exception {
+        // Try to add duplicates
+        // Duplicate Host name
+        mapper.addHost("iowejoiejfoiew", new String[0], createHost("blah17"));
+        // Alias conflicting with existing Host
+        mapper.addHostAlias("iowejoiejfoiew", "qwigqwiwoih");
+        // Redundancy. Alias name = Host name. No error here.
+        mapper.addHostAlias("qwigqwiwoih", "qwigqwiwoih");
+
         // Check we have the right number
-        // (added 17 including one host alias but one is a duplicate)
+        // (added 16 including one host alias. Three duplicates do not increase the count.)
         assertEquals(16, mapper.hosts.length);
 
         // Make sure adding a duplicate *does not* overwrite
         final int iowPos = 3;
         assertEquals("blah7", mapper.hosts[iowPos].object.getName());
+
+        final int qwigPos = 8;
+        assertEquals("blah14", mapper.hosts[qwigPos].object.getName());
 
         // Check for alphabetical order of host names
         String previous;
