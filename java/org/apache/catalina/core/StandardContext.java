@@ -4030,7 +4030,7 @@ public class StandardContext extends ContainerBase
 
         synchronized (applicationListenersLock) {
 
-            // Make sure this welcome file is currently present
+            // Make sure this listener is currently present
             int n = -1;
             for (int i = 0; i < applicationListeners.length; i++) {
                 if (applicationListeners[i].getClassName().equals(listener)) {
@@ -4041,7 +4041,7 @@ public class StandardContext extends ContainerBase
             if (n < 0)
                 return;
 
-            // Remove the specified constraint
+            // Remove the specified listener
             int j = 0;
             ApplicationListener results[] =
                     new ApplicationListener[applicationListeners.length - 1];
@@ -4230,7 +4230,7 @@ public class StandardContext extends ContainerBase
 
         synchronized (instanceListenersLock) {
 
-            // Make sure this welcome file is currently present
+            // Make sure this listener is currently present
             int n = -1;
             for (int i = 0; i < instanceListeners.length; i++) {
                 if (instanceListeners[i].equals(listener)) {
@@ -4241,7 +4241,7 @@ public class StandardContext extends ContainerBase
             if (n < 0)
                 return;
 
-            // Remove the specified constraint
+            // Remove the specified listener
             int j = 0;
             String results[] = new String[instanceListeners.length - 1];
             for (int i = 0; i < instanceListeners.length; i++) {
@@ -4457,7 +4457,7 @@ public class StandardContext extends ContainerBase
             if (n < 0)
                 return;
 
-            // Remove the specified constraint
+            // Remove the specified welcome file
             int j = 0;
             String results[] = new String[welcomeFiles.length - 1];
             for (int i = 0; i < welcomeFiles.length; i++) {
@@ -4487,7 +4487,7 @@ public class StandardContext extends ContainerBase
 
         synchronized (wrapperLifecyclesLock) {
 
-            // Make sure this welcome file is currently present
+            // Make sure this lifecycle listener is currently present
             int n = -1;
             for (int i = 0; i < wrapperLifecycles.length; i++) {
                 if (wrapperLifecycles[i].equals(listener)) {
@@ -4498,7 +4498,7 @@ public class StandardContext extends ContainerBase
             if (n < 0)
                 return;
 
-            // Remove the specified constraint
+            // Remove the specified lifecycle listener
             int j = 0;
             String results[] = new String[wrapperLifecycles.length - 1];
             for (int i = 0; i < wrapperLifecycles.length; i++) {
@@ -4527,7 +4527,7 @@ public class StandardContext extends ContainerBase
 
         synchronized (wrapperListenersLock) {
 
-            // Make sure this welcome file is currently present
+            // Make sure this listener is currently present
             int n = -1;
             for (int i = 0; i < wrapperListeners.length; i++) {
                 if (wrapperListeners[i].equals(listener)) {
@@ -4538,7 +4538,7 @@ public class StandardContext extends ContainerBase
             if (n < 0)
                 return;
 
-            // Remove the specified constraint
+            // Remove the specified listener
             int j = 0;
             String results[] = new String[wrapperListeners.length - 1];
             for (int i = 0; i < wrapperListeners.length; i++) {
