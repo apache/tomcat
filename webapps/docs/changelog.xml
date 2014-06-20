@@ -56,6 +56,10 @@
         <code>Method.isAnnotationPresent()</code>. Based on a patch by Jian Mou.
         (markt/kkolinko)
       </scode>
+      <fix>
+        Fix regression in <code>StandardContext.removeApplicationListener()</code>,
+        introduced by the fix for bug <bug>56588</bug>. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
