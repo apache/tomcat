@@ -17,6 +17,7 @@
 package org.apache.catalina.mapper;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -204,6 +205,63 @@ public class TestMapper extends LoggingBaseTest {
         assertEquals("/bobou", mappingData.wrapperPath.toString());
         assertEquals("/foo", mappingData.pathInfo.toString());
         assertTrue(mappingData.redirectPath.isNull());
+    }
+
+    @Test
+    public void testContextListConcurrencyBug56653() throws Exception {
+        final Host host = createHost("localhost");
+        final Context contextRoot = createContext("ROOT");
+        final Context context1 = createContext("foo");
+        final Context context2 = createContext("foo#bar");
+        final Context context3 = createContext("foo#bar#bla");
+        final Context context4 = createContext("foo#bar#bla#baz");
+
+        mapper.addHost("localhost", new String[0], host);
+        mapper.setDefaultHostName("localhost");
+
+        mapper.addContextVersion("localhost", host, "", "0", contextRoot,
+                new String[0], null);
+        mapper.addContextVersion("localhost", host, "/foo", "0", context1,
+                new String[0], null);
+        mapper.addContextVersion("localhost", host, "/foo/bar", "0", context2,
+                new String[0], null);
+        mapper.addContextVersion("localhost", host, "/foo/bar/bla", "0",
+                context3, new String[0], null);
+        mapper.addContextVersion("localhost", host, "/foo/bar/bla/baz", "0",
+                context4, new String[0], null);
+
+        final AtomicBoolean running = new AtomicBoolean(true);
+        Thread t = new Thread() {
+            @Override
+            public void run() {
+                for (int i = 0; i < 100000; i++) {
+                    mapper.removeContextVersion(context4, "localhost",
+                            "/foo/bar/bla/baz", "0");
+                    mapper.addContextVersion("localhost", host,
+                            "/foo/bar/bla/baz", "0", context4, new String[0],
+                            null);
+                }
+                running.set(false);
+            }
+        };
+
+        MappingData mappingData = new MappingData();
+        MessageBytes hostMB = MessageBytes.newInstance();
+        hostMB.setString("localhost");
+        MessageBytes uriMB = MessageBytes.newInstance();
+        char[] uri = "/foo/bar/bla/bobou/foo".toCharArray();
+        uriMB.setChars(uri, 0, uri.length);
+
+        mapper.map(hostMB, uriMB, null, mappingData);
+        assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+
+        t.start();
+        while (running.get()) {
+            mappingData.recycle();
+            uriMB.setChars(uri, 0, uri.length);
+            mapper.map(hostMB, uriMB, null, mappingData);
+            assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+        }
     }
 
     @Test
