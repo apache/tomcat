@@ -215,26 +215,20 @@ public final class Mapper {
             MappedContext mappedContext = exactFind(
                     mappedHost.contextList.contexts, path);
             if (mappedContext == null) {
-                mappedContext = new MappedContext();
-                mappedContext.name = path;
+                mappedContext = new MappedContext(path);
                 mappedHost.contextList = mappedHost.contextList.addContext(
                         mappedContext, slashCount);
             }
 
             ContextVersion[] contextVersions = mappedContext.versions;
-            ContextVersion[] newContextVersions =
-                new ContextVersion[contextVersions.length + 1];
-            ContextVersion newContextVersion = new ContextVersion();
-            newContextVersion.path = path;
-            newContextVersion.slashCount = slashCount;
-            newContextVersion.name = version;
-            newContextVersion.object = context;
+            ContextVersion[] newContextVersions = new ContextVersion[contextVersions.length + 1];
+            ContextVersion newContextVersion = new ContextVersion(version,
+                    path, slashCount, context, resources);
             newContextVersion.welcomeResources = welcomeResources;
-            newContextVersion.resources = resources;
-            if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
+            if (insertMap(contextVersions, newContextVersions,
+                    newContextVersion)) {
                 mappedContext.versions = newContextVersions;
-                contextObjectToContextVersionMap.put(
-                        context, newContextVersion);
+                contextObjectToContextVersionMap.put(context, newContextVersion);
             }
         }
 
@@ -273,7 +267,7 @@ public final class Mapper {
             if (removeMap(contextVersions, newContextVersions, version)) {
                 context.versions = newContextVersions;
 
-                if (context.versions.length == 0) {
+                if (newContextVersions.length == 0) {
                     // Remove the context
                     mappedHost.contextList = mappedHost.contextList
                             .removeContext(path);
@@ -322,16 +316,13 @@ public final class Mapper {
             Wrapper wrapper, boolean jspWildCard, boolean resourceOnly) {
 
         synchronized (context) {
-            MappedWrapper newWrapper = new MappedWrapper();
-            newWrapper.object = wrapper;
-            newWrapper.jspWildCard = jspWildCard;
-            newWrapper.resourceOnly = resourceOnly;
             if (path.endsWith("/*")) {
                 // Wildcard wrapper
-                newWrapper.name = path.substring(0, path.length() - 2);
+                String name = path.substring(0, path.length() - 2);
+                MappedWrapper newWrapper = new MappedWrapper(name, wrapper,
+                        jspWildCard, resourceOnly);
                 MappedWrapper[] oldWrappers = context.wildcardWrappers;
-                MappedWrapper[] newWrappers =
-                    new MappedWrapper[oldWrappers.length + 1];
+                MappedWrapper[] newWrappers = new MappedWrapper[oldWrappers.length + 1];
                 if (insertMap(oldWrappers, newWrappers, newWrapper)) {
                     context.wildcardWrappers = newWrappers;
                     int slashCount = slashCount(newWrapper.name);
@@ -341,7 +332,9 @@ public final class Mapper {
                 }
             } else if (path.startsWith("*.")) {
                 // Extension wrapper
-                newWrapper.name = path.substring(2);
+                String name = path.substring(2);
+                MappedWrapper newWrapper = new MappedWrapper(name, wrapper,
+                        jspWildCard, resourceOnly);
                 MappedWrapper[] oldWrappers = context.extensionWrappers;
                 MappedWrapper[] newWrappers =
                     new MappedWrapper[oldWrappers.length + 1];
@@ -350,20 +343,23 @@ public final class Mapper {
                 }
             } else if (path.equals("/")) {
                 // Default wrapper
-                newWrapper.name = "";
+                MappedWrapper newWrapper = new MappedWrapper("", wrapper,
+                        jspWildCard, resourceOnly);
                 context.defaultWrapper = newWrapper;
             } else {
                 // Exact wrapper
+                final String name;
                 if (path.length() == 0) {
                     // Special case for the Context Root mapping which is
                     // treated as an exact match
-                    newWrapper.name = "/";
+                    name = "/";
                 } else {
-                    newWrapper.name = path;
+                    name = path;
                 }
+                MappedWrapper newWrapper = new MappedWrapper(name, wrapper,
+                        jspWildCard, resourceOnly);
                 MappedWrapper[] oldWrappers = context.exactWrappers;
-                MappedWrapper[] newWrappers =
-                    new MappedWrapper[oldWrappers.length + 1];
+                MappedWrapper[] newWrappers = new MappedWrapper[oldWrappers.length + 1];
                 if (insertMap(oldWrappers, newWrappers, newWrapper)) {
                     context.exactWrappers = newWrappers;
                 }
@@ -1411,9 +1407,13 @@ public final class Mapper {
 
     protected abstract static class MapElement<T> {
 
-        public String name = null;
-        public T object = null;
+        public final String name;
+        public final T object;
 
+        public MapElement(String name, T object) {
+            this.name = name;
+            this.object = object;
+        }
     }
 
 
@@ -1422,9 +1422,15 @@ public final class Mapper {
 
     protected static final class HostMapping extends MapElement<MappedHost> {
         private final boolean alias;
-        public HostMapping(String nameOrAlias, MappedHost host, boolean alias) {
-            this.name = nameOrAlias;
-            this.object = host;
+        /**
+         * Create a HostMapping.
+         * @param name The name of a Host or an Alias
+         * @param host A MappedHost object, shared between Host and all Aliases
+         * @param alias <code>false</code> if this is the primary mapping
+         *  (represents a Host), <code>true</code> if this is an Alias.
+         */
+        public HostMapping(String name, MappedHost host, boolean alias) {
+            super(name, host);
             this.alias = alias;
         }
         public boolean isAlias() {
@@ -1489,32 +1495,47 @@ public final class Mapper {
     // ---------------------------------------------------- Context Inner Class
 
 
-    protected static final class MappedContext extends MapElement<Context> {
-        public ContextVersion[] versions = new ContextVersion[0];
+    protected static final class MappedContext extends MapElement<Void> {
+        public volatile ContextVersion[] versions = new ContextVersion[0];
+
+        public MappedContext(String name) {
+            super(name, null);
+        }
     }
 
-
     protected static final class ContextVersion extends MapElement<Context> {
-        public String path = null;
-        public int slashCount;
+        public final String path;
+        public final int slashCount;
+        public final WebResourceRoot resources;
         public String[] welcomeResources = new String[0];
-        public WebResourceRoot resources = null;
         public MappedWrapper defaultWrapper = null;
         public MappedWrapper[] exactWrappers = new MappedWrapper[0];
         public MappedWrapper[] wildcardWrappers = new MappedWrapper[0];
         public MappedWrapper[] extensionWrappers = new MappedWrapper[0];
         public int nesting = 0;
 
+        public ContextVersion(String name, String path, int slashCount,
+                Context context, WebResourceRoot resources) {
+            super(name, context);
+            this.path = path;
+            this.slashCount = slashCount;
+            this.resources = resources;
+        }
     }
-
 
     // ---------------------------------------------------- Wrapper Inner Class
 
 
-    protected static class MappedWrapper
-        extends MapElement<Wrapper> {
+    protected static class MappedWrapper extends MapElement<Wrapper> {
 
-        public boolean jspWildCard = false;
-        public boolean resourceOnly = false;
+        public final boolean jspWildCard;
+        public final boolean resourceOnly;
+
+        public MappedWrapper(String name, Wrapper wrapper, boolean jspWildCard,
+                boolean resourceOnly) {
+            super(name, wrapper);
+            this.jspWildCard = jspWildCard;
+            this.resourceOnly = resourceOnly;
+        }
     }
 }
