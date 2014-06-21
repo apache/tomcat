@@ -622,99 +622,100 @@ public final class Mapper {
     private final void internalMap(CharChunk host, CharChunk uri,
             String version, MappingData mappingData) throws Exception {
 
+        if (mappingData.host != null) {
+            // The legacy code (dating down at least to Tomcat 4.1) just
+            // skipped all mapping work in this case. That behaviour has a risk
+            // of returning an inconsistent result.
+            // I do not see a valid use case for it.
+            throw new AssertionError();
+        }
+
         uri.setLimit(-1);
 
-        ContextList contextList = null;
-        MappedContext context = null;
-        ContextVersion contextVersion = null;
-
         // Virtual host mapping
-        if (mappingData.host == null) {
-            HostMapping[] hosts = this.hosts;
-            HostMapping hostMapping = exactFindIgnoreCase(hosts, host);
-            if (hostMapping == null) {
-                if (defaultHostName == null) {
-                    return;
-                }
-                hostMapping = exactFind(hosts, defaultHostName);
-                if (hostMapping == null) {
-                    return;
-                }
-            }
-            mappingData.host = hostMapping.object.host;
-            contextList = hostMapping.object.contextList;
-        }
-
-        // Context mapping
-        if (mappingData.context == null && contextList != null) {
-            MappedContext[] contexts = contextList.contexts;
-            int pos = find(contexts, uri);
-            if (pos == -1) {
+        HostMapping[] hosts = this.hosts;
+        HostMapping hostMapping = exactFindIgnoreCase(hosts, host);
+        if (hostMapping == null) {
+            if (defaultHostName == null) {
                 return;
             }
-
-            int lastSlash = -1;
-            int uriEnd = uri.getEnd();
-            int length = -1;
-            boolean found = false;
-            while (pos >= 0) {
-                if (uri.startsWith(contexts[pos].name)) {
-                    length = contexts[pos].name.length();
-                    if (uri.getLength() == length) {
-                        found = true;
-                        break;
-                    } else if (uri.startsWithIgnoreCase("/", length)) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (lastSlash == -1) {
-                    lastSlash = nthSlash(uri, contextList.nesting + 1);
-                } else {
-                    lastSlash = lastSlash(uri);
-                }
-                uri.setEnd(lastSlash);
-                pos = find(contexts, uri);
-            }
-            uri.setEnd(uriEnd);
-
-            if (found) {
-                context = contexts[pos];
-            } else if (contexts[0].name.equals("")) {
-                context = contexts[0];
-            }
-
-            if (context != null) {
-                mappingData.contextPath.setString(context.name);
+            hostMapping = exactFind(hosts, defaultHostName);
+            if (hostMapping == null) {
+                return;
             }
         }
+        mappingData.host = hostMapping.object.host;
 
-        if (context != null) {
-            ContextVersion[] contextVersions = context.versions;
-            int versionCount = contextVersions.length;
-            if (versionCount > 1) {
-                Context[] contextObjects = new Context[contextVersions.length];
-                for (int i = 0; i < contextObjects.length; i++) {
-                    contextObjects[i] = contextVersions[i].object;
-                }
-                mappingData.contexts = contextObjects;
-            }
-
-            if (version != null) {
-                contextVersion = exactFind(contextVersions, version);
-            }
-            if (contextVersion == null) {
-                // Return the latest version
-                contextVersion = contextVersions[versionCount - 1];
-            }
-            mappingData.context = contextVersion.object;
-            mappingData.contextSlashCount = contextVersion.slashCount;
+        // Context mapping
+        ContextList contextList = hostMapping.object.contextList;
+        MappedContext[] contexts = contextList.contexts;
+        int pos = find(contexts, uri);
+        if (pos == -1) {
+            return;
         }
+
+        int lastSlash = -1;
+        int uriEnd = uri.getEnd();
+        int length = -1;
+        boolean found = false;
+        while (pos >= 0) {
+            if (uri.startsWith(contexts[pos].name)) {
+                length = contexts[pos].name.length();
+                if (uri.getLength() == length) {
+                    found = true;
+                    break;
+                } else if (uri.startsWithIgnoreCase("/", length)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (lastSlash == -1) {
+                lastSlash = nthSlash(uri, contextList.nesting + 1);
+            } else {
+                lastSlash = lastSlash(uri);
+            }
+            uri.setEnd(lastSlash);
+            pos = find(contexts, uri);
+        }
+        uri.setEnd(uriEnd);
+
+        MappedContext context;
+        if (found) {
+            context = contexts[pos];
+        } else if (contexts[0].name.equals("")) {
+            context = contexts[0];
+        } else {
+            context = null;
+        }
+
+        if (context == null) {
+            return;
+        }
+        mappingData.contextPath.setString(context.name);
+
+        ContextVersion[] contextVersions = context.versions;
+        int versionCount = contextVersions.length;
+        if (versionCount > 1) {
+            Context[] contextObjects = new Context[contextVersions.length];
+            for (int i = 0; i < contextObjects.length; i++) {
+                contextObjects[i] = contextVersions[i].object;
+            }
+            mappingData.contexts = contextObjects;
+        }
+
+        ContextVersion contextVersion = null;
+        if (version != null) {
+            contextVersion = exactFind(contextVersions, version);
+        }
+        if (contextVersion == null) {
+            // Return the latest version
+            contextVersion = contextVersions[versionCount - 1];
+        }
+        mappingData.context = contextVersion.object;
+        mappingData.contextSlashCount = contextVersion.slashCount;
 
         // Wrapper mapping
-        if ((contextVersion != null) && (mappingData.wrapper == null)) {
-            internalMapWrapper(contextVersion, uri, mappingData);
-        }
+        internalMapWrapper(contextVersion, uri, mappingData);
 
     }
 
