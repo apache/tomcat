@@ -160,7 +160,7 @@ public class TesterDigestAuthenticatorPerformance {
             this.requestCount = requestCount;
 
             request = new TesterDigestRequest();
-            request.setContext(authenticator.context);
+            request.getMappingData().context = authenticator.context;
 
             response = new TesterHttpServletResponse();
         }
