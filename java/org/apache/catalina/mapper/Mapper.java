@@ -212,23 +212,26 @@ public final class Mapper {
         MappedHost mappedHost = hostMapping.object;
         int slashCount = slashCount(path);
         synchronized (mappedHost) {
+            ContextVersion newContextVersion = new ContextVersion(version,
+                    path, slashCount, context, resources);
+            newContextVersion.welcomeResources = welcomeResources;
+
             MappedContext mappedContext = exactFind(
                     mappedHost.contextList.contexts, path);
             if (mappedContext == null) {
                 mappedContext = new MappedContext(path);
+                mappedContext.versions = new ContextVersion[] { newContextVersion };
                 mappedHost.contextList = mappedHost.contextList.addContext(
                         mappedContext, slashCount);
-            }
-
-            ContextVersion[] contextVersions = mappedContext.versions;
-            ContextVersion[] newContextVersions = new ContextVersion[contextVersions.length + 1];
-            ContextVersion newContextVersion = new ContextVersion(version,
-                    path, slashCount, context, resources);
-            newContextVersion.welcomeResources = welcomeResources;
-            if (insertMap(contextVersions, newContextVersions,
-                    newContextVersion)) {
-                mappedContext.versions = newContextVersions;
                 contextObjectToContextVersionMap.put(context, newContextVersion);
+            } else {
+                ContextVersion[] contextVersions = mappedContext.versions;
+                ContextVersion[] newContextVersions = new ContextVersion[contextVersions.length + 1];
+                if (insertMap(contextVersions, newContextVersions,
+                        newContextVersion)) {
+                    mappedContext.versions = newContextVersions;
+                    contextObjectToContextVersionMap.put(context, newContextVersion);
+                }
             }
         }
 
@@ -265,12 +268,12 @@ public final class Mapper {
             ContextVersion[] newContextVersions =
                 new ContextVersion[contextVersions.length - 1];
             if (removeMap(contextVersions, newContextVersions, version)) {
-                context.versions = newContextVersions;
-
                 if (newContextVersions.length == 0) {
                     // Remove the context
                     mappedHost.contextList = mappedHost.contextList
                             .removeContext(path);
+                } else {
+                    context.versions = newContextVersions;
                 }
             }
         }
