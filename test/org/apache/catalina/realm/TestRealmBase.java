@@ -618,7 +618,7 @@ public class TestRealmBase {
         for (String applicationRole : applicationRoles) {
             context.addSecurityRole(applicationRole);
         }
-        request.setContext(context);
+        request.getMappingData().context = context;
 
         // Set up an authenticated user
         // Configure the users in the Realm
@@ -669,7 +669,7 @@ public class TestRealmBase {
         Context context = new TesterContext();
         context.addSecurityRole(ROLE1);
         context.addSecurityRole(ROLE2);
-        request.setContext(context);
+        request.getMappingData().context = context;
 
         // Create the principals
         List<String> userRoles1 = new ArrayList<>();

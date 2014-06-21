@@ -439,9 +439,6 @@ public class Request
      */
     public void recycle() {
 
-        context = null;
-        wrapper = null;
-
         internalDispatcherType = null;
         requestDispatcherPath = null;
 
@@ -574,28 +571,14 @@ public class Request
 
 
     /**
-     * Associated context.
-     */
-    protected Context context = null;
-
-    /**
      * Return the Context within which this Request is being processed.
+     * <p>
+     * This is available as soon as the appropriate Context is identified.
+     * Note that availability of a Context allows <code>getContextPath()</code>
+     * to return a value, and thus enables parsing of the request URI.
      */
     public Context getContext() {
-        return this.context;
-    }
-
-
-    /**
-     * Set the Context within which this Request is being processed.  This
-     * must be called as soon as the appropriate Context is identified, because
-     * it identifies the value to be returned by <code>getContextPath()</code>,
-     * and thus enables parsing of the request URI.
-     *
-     * @param context The newly associated Context
-     */
-    public void setContext(Context context) {
-        this.context = context;
+        return mappingData.context;
     }
 
 
@@ -713,26 +696,10 @@ public class Request
 
 
     /**
-     * Associated wrapper.
-     */
-    protected Wrapper wrapper = null;
-
-    /**
      * Return the Wrapper within which this Request is being processed.
      */
     public Wrapper getWrapper() {
-        return this.wrapper;
-    }
-
-
-    /**
-     * Set the Wrapper within which this Request is being processed.  This
-     * must be called as soon as the appropriate Wrapper is identified, and
-     * before the Request is ultimately passed to an application servlet.
-     * @param wrapper The newly associated Wrapper
-     */
-    public void setWrapper(Wrapper wrapper) {
-        this.wrapper = wrapper;
+        return mappingData.wrapper;
     }
 
 
@@ -1208,6 +1175,7 @@ public class Request
     @Deprecated
     public String getRealPath(String path) {
 
+        Context context = getContext();
         if (context == null) {
             return null;
         }
@@ -1321,6 +1289,7 @@ public class Request
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
 
+        Context context = getContext();
         if (context == null) {
             return null;
         }
@@ -1490,6 +1459,7 @@ public class Request
      */
     private void notifyAttributeAssigned(String name, Object value,
             Object oldValue) {
+        Context context = getContext();
         Object listeners[] = context.getApplicationEventListeners();
         if ((listeners == null) || (listeners.length == 0)) {
             return;
@@ -1518,9 +1488,9 @@ public class Request
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
                 // Error valve will pick this exception up and display it to user
                 attributes.put(RequestDispatcher.ERROR_EXCEPTION, t);
+                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
             }
         }
     }
@@ -1530,6 +1500,7 @@ public class Request
      * Notify interested listeners that attribute has been removed.
      */
     private void notifyAttributeRemoved(String name, Object value) {
+        Context context = getContext();
         Object listeners[] = context.getApplicationEventListeners();
         if ((listeners == null) || (listeners.length == 0)) {
             return;
@@ -1547,9 +1518,9 @@ public class Request
                 listener.attributeRemoved(event);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
                 // Error valve will pick this exception up and display it to user
                 attributes.put(RequestDispatcher.ERROR_EXCEPTION, t);
+                context.getLogger().error(sm.getString("coyoteRequest.attributeEvent"), t);
             }
         }
     }
@@ -1589,7 +1560,7 @@ public class Request
 
     @Override
     public ServletContext getServletContext() {
-        return context.getServletContext();
+        return getContext().getServletContext();
      }
 
     @Override
@@ -1866,7 +1837,7 @@ public class Request
 
         T handler;
         try {
-            handler = (T) context.getInstanceManager().newInstance(httpUpgradeHandlerClass);
+            handler = (T) getContext().getInstanceManager().newInstance(httpUpgradeHandlerClass);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NamingException e) {
             throw new ServletException(e);
         }
@@ -2029,6 +2000,7 @@ public class Request
     @Override
     public String getPathTranslated() {
 
+        Context context = getContext();
         if (context == null) {
             return null;
         }
@@ -2231,6 +2203,7 @@ public class Request
             return false;
         }
 
+        Context context = getContext();
         if (context == null) {
             return false;
         }
@@ -2286,6 +2259,7 @@ public class Request
         }
 
         // Identify the Realm we will use for checking role assignments
+        Context context = getContext();
         if (context == null) {
             return false;
         }
@@ -2308,7 +2282,7 @@ public class Request
         }
 
         // Check for a role defined directly as a <security-role>
-        return (realm.hasRole(wrapper, userPrincipal, role));
+        return (realm.hasRole(getWrapper(), userPrincipal, role));
     }
 
 
@@ -2378,9 +2352,11 @@ public class Request
             requestedSessionId = newSessionId;
         }
 
-        if (context != null && !context.getServletContext()
-                .getEffectiveSessionTrackingModes().contains(
-                        SessionTrackingMode.COOKIE)) {
+        Context context = getContext();
+        if (context != null
+                && !context.getServletContext()
+                        .getEffectiveSessionTrackingModes()
+                        .contains(SessionTrackingMode.COOKIE)) {
             return;
         }
 
@@ -2512,7 +2488,7 @@ public class Request
                     sm.getString("coyoteRequest.authenticate.ise"));
         }
 
-        return context.getAuthenticator().authenticate(this, response);
+        return getContext().getAuthenticator().authenticate(this, response);
     }
 
     /**
@@ -2527,6 +2503,7 @@ public class Request
                     sm.getString("coyoteRequest.alreadyAuthenticated"));
         }
 
+        Context context = getContext();
         if (context.getAuthenticator() == null) {
             throw new ServletException("no authenticator");
         }
@@ -2539,7 +2516,7 @@ public class Request
      */
     @Override
     public void logout() throws ServletException {
-        context.getAuthenticator().logout(this);
+        getContext().getAuthenticator().logout(this);
     }
 
     /**
@@ -2571,10 +2548,11 @@ public class Request
             return;
         }
 
+        Context context = getContext();
         MultipartConfigElement mce = getWrapper().getMultipartConfigElement();
 
         if (mce == null) {
-            if(getContext().getAllowCasualMultipartParsing()) {
+            if(context.getAllowCasualMultipartParsing()) {
                 mce = new MultipartConfigElement(null,
                                                  connector.getMaxPostSize(),
                                                  connector.getMaxPostSize(),
@@ -2742,6 +2720,7 @@ public class Request
     protected Session doGetSession(boolean create) {
 
         // There cannot be a session if no context has been assigned yet
+        Context context = getContext();
         if (context == null) {
             return (null);
         }
@@ -2755,12 +2734,8 @@ public class Request
         }
 
         // Return the requested session if it exists and is valid
-        Manager manager = null;
-        if (context != null) {
-            manager = context.getManager();
-        }
-        if (manager == null)
-         {
+        Manager manager = context.getManager();
+        if (manager == null) {
             return (null);      // Sessions are not supported
         }
         if (requestedSessionId != null) {
@@ -2782,12 +2757,13 @@ public class Request
         if (!create) {
             return (null);
         }
-        if ((context != null) && (response != null) &&
-            context.getServletContext().getEffectiveSessionTrackingModes().
-                    contains(SessionTrackingMode.COOKIE) &&
-            response.getResponse().isCommitted()) {
-            throw new IllegalStateException
-              (sm.getString("coyoteRequest.sessionCreateCommitted"));
+        if (response != null
+                && context.getServletContext()
+                        .getEffectiveSessionTrackingModes()
+                        .contains(SessionTrackingMode.COOKIE)
+                && response.getResponse().isCommitted()) {
+            throw new IllegalStateException(
+                    sm.getString("coyoteRequest.sessionCreateCommitted"));
         }
 
         // Attempt to reuse session id if one was submitted in a cookie
@@ -2802,10 +2778,10 @@ public class Request
         }
 
         // Creating a new session cookie based on that session
-        if ((session != null) && (getContext() != null)
-               && getContext().getServletContext().
-                       getEffectiveSessionTrackingModes().contains(
-                               SessionTrackingMode.COOKIE)) {
+        if (session != null
+                && context.getServletContext()
+                        .getEffectiveSessionTrackingModes()
+                        .contains(SessionTrackingMode.COOKIE)) {
             Cookie cookie =
                 ApplicationSessionCookieConfig.createSessionCookie(
                         context, session.getIdInternal(), isSecure());
@@ -2963,7 +2939,8 @@ public class Request
             if (len > 0) {
                 int maxPostSize = connector.getMaxPostSize();
                 if ((maxPostSize > 0) && (len > maxPostSize)) {
-                    if (context.getLogger().isDebugEnabled()) {
+                    Context context = getContext();
+                    if (context != null && context.getLogger().isDebugEnabled()) {
                         context.getLogger().debug(
                                 sm.getString("coyoteRequest.postTooLarge"));
                     }
@@ -2985,9 +2962,11 @@ public class Request
                     }
                 } catch (IOException e) {
                     // Client disconnect
-                    if (context.getLogger().isDebugEnabled()) {
+                    Context context = getContext();
+                    if (context != null && context.getLogger().isDebugEnabled()) {
                         context.getLogger().debug(
-                                sm.getString("coyoteRequest.parseParameters"), e);
+                                sm.getString("coyoteRequest.parseParameters"),
+                                e);
                     }
                     return;
                 }
@@ -2999,9 +2978,11 @@ public class Request
                     formData = readChunkedPostBody();
                 } catch (IOException e) {
                     // Client disconnect or chunkedPostTooLarge error
-                    if (context.getLogger().isDebugEnabled()) {
+                    Context context = getContext();
+                    if (context != null && context.getLogger().isDebugEnabled()) {
                         context.getLogger().debug(
-                                sm.getString("coyoteRequest.parseParameters"), e);
+                                sm.getString("coyoteRequest.parseParameters"),
+                                e);
                     }
                     return;
                 }

@@ -70,6 +70,10 @@
         Assert that mapping result object is empty before performing mapping
         work in <code>Mapper</code>. (kkolinko)
       </fix>
+      <scode>
+        Remove <code>context</code> and <code>wrapper</code> fields and setters
+        from <code>Request</code> class. (kkolinko)
+      </scode>
     </changelog>
   </subsection>
 </section>
