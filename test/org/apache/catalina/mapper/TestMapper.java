@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -135,10 +136,10 @@ public class TestMapper extends LoggingBaseTest {
 
         // Make sure adding a duplicate *does not* overwrite
         final int iowPos = 3;
-        assertEquals("blah7", mapper.hosts[iowPos].object.getName());
+        assertEquals("blah7", mapper.hosts[iowPos].object.host.getName());
 
         final int qwigPos = 8;
-        assertEquals("blah14", mapper.hosts[qwigPos].object.getName());
+        assertEquals("blah14", mapper.hosts[qwigPos].object.host.getName());
 
         // Check for alphabetical order of host names
         String previous;
@@ -150,12 +151,36 @@ public class TestMapper extends LoggingBaseTest {
         }
 
         // Check that host alias has the same data
-        Mapper.MappedHost host = mapper.hosts[iowPos];
-        Mapper.MappedHost alias = mapper.hosts[iowPos + 1];
-        assertEquals("iowejoiejfoiew", host.name);
-        assertEquals("iowejoiejfoiew_alias", alias.name);
-        assertEquals(host.contextList, alias.contextList);
-        assertEquals(host.object, alias.object);
+        Mapper.HostMapping hostMapping = mapper.hosts[iowPos];
+        Mapper.HostMapping aliasMapping = mapper.hosts[iowPos + 1];
+        assertEquals("iowejoiejfoiew", hostMapping.name);
+        assertEquals("iowejoiejfoiew_alias", aliasMapping.name);
+        assertFalse(hostMapping.isAlias());
+        assertTrue(aliasMapping.isAlias());
+        assertEquals(hostMapping.object, aliasMapping.object);
+    }
+
+    @Test
+    public void testRemoveHost() {
+        assertEquals(16, mapper.hosts.length);
+        mapper.removeHostAlias("iowejoiejfoiew");
+        mapper.removeHost("iowejoiejfoiew_alias");
+        assertEquals(16, mapper.hosts.length); // No change
+        mapper.removeHostAlias("iowejoiejfoiew_alias");
+        assertEquals(15, mapper.hosts.length); // Removed
+
+        mapper.addHostAlias("iowejoiejfoiew", "iowejoiejfoiew_alias");
+        assertEquals(16, mapper.hosts.length);
+
+        final int iowPos = 3;
+        Mapper.HostMapping hostMapping = mapper.hosts[iowPos];
+        Mapper.HostMapping aliasMapping = mapper.hosts[iowPos + 1];
+        assertEquals("iowejoiejfoiew_alias", aliasMapping.name);
+        assertTrue(aliasMapping.isAlias());
+        assertEquals(hostMapping.object, aliasMapping.object);
+
+        mapper.removeHost("iowejoiejfoiew");
+        assertEquals(14, mapper.hosts.length); // Both host and alias removed
     }
 
     @Test
