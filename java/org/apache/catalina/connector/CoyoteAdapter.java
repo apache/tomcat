@@ -862,11 +862,6 @@ public class CoyoteAdapter implements Adapter {
             connector.getService().getMapper().map(serverName, decodedURI,
                     version, request.getMappingData());
 
-            // Single contextVersion therefore no possibility of remap
-            if (request.getMappingData().contexts == null) {
-                mapRequired = false;
-            }
-
             // If there is no context at this point, it is likely no ROOT context
             // has been deployed
             if (request.getContext() == null) {
@@ -884,7 +879,7 @@ public class CoyoteAdapter implements Adapter {
             // Now we have the context, we can parse the session ID from the URL
             // (if any). Need to do this before we redirect in case we need to
             // include the session id in the redirect
-            String sessionID = null;
+            String sessionID;
             if (request.getServletContext().getEffectiveSessionTrackingModes()
                     .contains(SessionTrackingMode.URL)) {
 
@@ -905,31 +900,26 @@ public class CoyoteAdapter implements Adapter {
             sessionID = request.getRequestedSessionId();
 
             if (mapRequired) {
-                if (sessionID == null) {
-                    // No session means no possibility of needing to remap
-                    mapRequired = false;
-                } else {
+                mapRequired = false;
+                Context[] contexts = request.getMappingData().contexts;
+                // Single contextVersion therefore no possibility of remap
+                // No session means no possibility of needing to remap
+                if (contexts != null && sessionID != null) {
                     // Find the context associated with the session
-                    Context[] contexts = request.getMappingData().contexts;
                     for (int i = (contexts.length); i > 0; i--) {
                         Context ctxt = contexts[i - 1];
                         if (ctxt.getManager().findSession(sessionID) != null) {
                             // Was the correct context already mapped?
-                            if (ctxt.equals(request.getMappingData().context)) {
-                                mapRequired = false;
-                            } else {
+                            if (!ctxt.equals(request.getMappingData().context)) {
                                 // Set version so second time through mapping the
                                 // correct context is found
                                 version = ctxt.getWebappVersion();
                                 // Reset mapping
                                 request.getMappingData().recycle();
+                                mapRequired = true;
                                 break;
                             }
                         }
-                    }
-                    if (version == null) {
-                        // No matching context found. No need to re-map
-                        mapRequired = false;
                     }
                 }
             }
