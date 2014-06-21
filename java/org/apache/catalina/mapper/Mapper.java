@@ -661,9 +661,11 @@ public final class Mapper {
         int uriEnd = uri.getEnd();
         int length = -1;
         boolean found = false;
+        MappedContext context = null;
         while (pos >= 0) {
-            if (uri.startsWith(contexts[pos].name)) {
-                length = contexts[pos].name.length();
+            context = contexts[pos];
+            if (uri.startsWith(context.name)) {
+                length = context.name.length();
                 if (uri.getLength() == length) {
                     found = true;
                     break;
@@ -682,20 +684,20 @@ public final class Mapper {
         }
         uri.setEnd(uriEnd);
 
-        MappedContext context;
-        if (found) {
-            context = contexts[pos];
-        } else if (contexts[0].name.equals("")) {
-            context = contexts[0];
-        } else {
-            context = null;
+        if (!found) {
+            if (contexts[0].name.equals("")) {
+                context = contexts[0];
+            } else {
+                context = null;
+            }
         }
-
         if (context == null) {
             return;
         }
+
         mappingData.contextPath.setString(context.name);
 
+        ContextVersion contextVersion = null;
         ContextVersion[] contextVersions = context.versions;
         int versionCount = contextVersions.length;
         if (versionCount > 1) {
@@ -704,11 +706,9 @@ public final class Mapper {
                 contextObjects[i] = contextVersions[i].object;
             }
             mappingData.contexts = contextObjects;
-        }
-
-        ContextVersion contextVersion = null;
-        if (version != null) {
-            contextVersion = exactFind(contextVersions, version);
+            if (version != null) {
+                contextVersion = exactFind(contextVersions, version);
+            }
         }
         if (contextVersion == null) {
             // Return the latest version
