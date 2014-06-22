@@ -69,7 +69,8 @@
       <fix>
         <bug>56657</bug>: When using parallel deployment, if the same session id
         matches different versions of a web application, prefer the latest
-        version. (kkolinko)
+        version. Ensure that remapping selects the version that we expect.
+        (kkolinko)
       </fix>
       <fix>
         Assert that mapping result object is empty before performing mapping

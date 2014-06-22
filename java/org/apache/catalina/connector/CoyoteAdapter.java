@@ -850,14 +850,13 @@ public class CoyoteAdapter implements Adapter {
             request.getMappingData().recycle();
         }
 
-        boolean mapRequired = true;
+        // Version for the second mapping loop and
+        // Context that we expect to get for that version
         String version = null;
+        Context versionContext = null;
+        boolean mapRequired = true;
 
         while (mapRequired) {
-            if (version != null) {
-                // Once we have a version - that is it
-                mapRequired = false;
-            }
             // This will map the the latest version by default
             connector.getService().getMapper().map(serverName, decodedURI,
                     version, request.getMappingData());
@@ -899,8 +898,13 @@ public class CoyoteAdapter implements Adapter {
 
             sessionID = request.getRequestedSessionId();
 
-            if (mapRequired) {
-                mapRequired = false;
+            mapRequired = false;
+            if (version != null && request.getContext() == versionContext) {
+                // We got the version that we asked for. That is it.
+            } else {
+                version = null;
+                versionContext = null;
+
                 Context[] contexts = request.getMappingData().contexts;
                 // Single contextVersion means no need to remap
                 // No session ID means no possibility of remap
@@ -909,11 +913,13 @@ public class CoyoteAdapter implements Adapter {
                     for (int i = (contexts.length); i > 0; i--) {
                         Context ctxt = contexts[i - 1];
                         if (ctxt.getManager().findSession(sessionID) != null) {
-                            // We found a context. Is it the one that has already been mapped?
+                            // We found a context. Is it the one that has
+                            // already been mapped?
                             if (!ctxt.equals(request.getMappingData().context)) {
-                                // Set version so second time through mapping the
-                                // correct context is found
+                                // Set version so second time through mapping
+                                // the correct context is found
                                 version = ctxt.getWebappVersion();
+                                versionContext = ctxt;
                                 // Reset mapping
                                 request.getMappingData().recycle();
                                 mapRequired = true;
@@ -923,6 +929,7 @@ public class CoyoteAdapter implements Adapter {
                     }
                 }
             }
+
             if (!mapRequired && request.getContext().getPaused()) {
                 // Found a matching context but it is paused. Mapping data will
                 // be wrong since some Wrappers may not be registered at this
