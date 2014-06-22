@@ -1518,9 +1518,9 @@ public final class Mapper {
         public MappedWrapper[] extensionWrappers = new MappedWrapper[0];
         public int nesting = 0;
 
-        public ContextVersion(String name, String path, int slashCount,
+        public ContextVersion(String version, String path, int slashCount,
                 Context context, WebResourceRoot resources) {
-            super(name, context);
+            super(version, context);
             this.path = path;
             this.slashCount = slashCount;
             this.resources = resources;
