@@ -764,7 +764,7 @@ public class CoyoteAdapter implements Adapter {
                     for (int i = (contexts.length); i > 0; i--) {
                         Context ctxt = (Context) contexts[i - 1];
                         if (ctxt.getManager().findSession(sessionID) != null) {
-                            // Was the correct context already mapped?
+                            // We found a context. Is it the one that has already been mapped?
                             if (!ctxt.equals(request.getMappingData().context)) {
                                 // Set version so second time through mapping the
                                 // correct context is found
@@ -772,8 +772,8 @@ public class CoyoteAdapter implements Adapter {
                                 // Reset mapping
                                 request.getMappingData().recycle();
                                 mapRequired = true;
-                                break;
                             }
+                            break;
                         }
                     }
                 }
