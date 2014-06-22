@@ -902,8 +902,8 @@ public class CoyoteAdapter implements Adapter {
             if (mapRequired) {
                 mapRequired = false;
                 Context[] contexts = request.getMappingData().contexts;
-                // Single contextVersion therefore no possibility of remap
-                // No session means no possibility of needing to remap
+                // Single contextVersion means no need to remap
+                // No session ID means no possibility of remap
                 if (contexts != null && sessionID != null) {
                     // Find the context associated with the session
                     for (int i = (contexts.length); i > 0; i--) {
