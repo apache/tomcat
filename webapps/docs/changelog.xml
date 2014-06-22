@@ -112,6 +112,10 @@
         version. Ensure that remapping selects the version that we expect.
         (kkolinko)
       </fix>
+      <fix>
+        Assert that mapping result object is empty before performing mapping
+        work in <code>Mapper</code>. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

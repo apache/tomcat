@@ -726,79 +726,83 @@ public final class Mapper {
     private final void internalMap(CharChunk host, CharChunk uri,
             String version, MappingData mappingData) throws Exception {
 
+        if (mappingData.host != null) {
+            // The legacy code (dating down at least to Tomcat 4.1) just
+            // skipped all mapping work in this case. That behaviour has a risk
+            // of returning an inconsistent result.
+            // I do not see a valid use case for it.
+            throw new AssertionError();
+        }
+
         uri.setLimit(-1);
 
-        Context[] contexts = null;
+        Context[] contexts;
         Context context = null;
         ContextVersion contextVersion = null;
 
         int nesting = 0;
 
         // Virtual host mapping
-        if (mappingData.host == null) {
-            Host[] hosts = this.hosts;
-            int pos = findIgnoreCase(hosts, host);
-            if ((pos != -1) && (host.equalsIgnoreCase(hosts[pos].name))) {
+        Host[] hosts = this.hosts;
+        int pos = findIgnoreCase(hosts, host);
+        if ((pos != -1) && (host.equalsIgnoreCase(hosts[pos].name))) {
+            mappingData.host = hosts[pos].object;
+            contexts = hosts[pos].contextList.contexts;
+            nesting = hosts[pos].contextList.nesting;
+        } else {
+            if (defaultHostName == null) {
+                return;
+            }
+            pos = find(hosts, defaultHostName);
+            if ((pos != -1) && (defaultHostName.equals(hosts[pos].name))) {
                 mappingData.host = hosts[pos].object;
                 contexts = hosts[pos].contextList.contexts;
                 nesting = hosts[pos].contextList.nesting;
             } else {
-                if (defaultHostName == null) {
-                    return;
-                }
-                pos = find(hosts, defaultHostName);
-                if ((pos != -1) && (defaultHostName.equals(hosts[pos].name))) {
-                    mappingData.host = hosts[pos].object;
-                    contexts = hosts[pos].contextList.contexts;
-                    nesting = hosts[pos].contextList.nesting;
-                } else {
-                    return;
-                }
+                return;
             }
         }
 
         // Context mapping
-        if (mappingData.context == null) {
-            int pos = find(contexts, uri);
-            if (pos == -1) {
-                return;
-            }
+        pos = find(contexts, uri);
+        if (pos == -1) {
+            return;
+        }
 
-            int lastSlash = -1;
-            int uriEnd = uri.getEnd();
-            int length = -1;
-            boolean found = false;
-            while (pos >= 0) {
-                if (uri.startsWith(contexts[pos].name)) {
-                    length = contexts[pos].name.length();
-                    if (uri.getLength() == length) {
-                        found = true;
-                        break;
-                    } else if (uri.startsWithIgnoreCase("/", length)) {
-                        found = true;
-                        break;
-                    }
+        int lastSlash = -1;
+        int uriEnd = uri.getEnd();
+        int length = -1;
+        boolean found = false;
+        while (pos >= 0) {
+            if (uri.startsWith(contexts[pos].name)) {
+                length = contexts[pos].name.length();
+                if (uri.getLength() == length) {
+                    found = true;
+                    break;
+                } else if (uri.startsWithIgnoreCase("/", length)) {
+                    found = true;
+                    break;
                 }
-                if (lastSlash == -1) {
-                    lastSlash = nthSlash(uri, nesting + 1);
-                } else {
-                    lastSlash = lastSlash(uri);
-                }
-                uri.setEnd(lastSlash);
-                pos = find(contexts, uri);
             }
-            uri.setEnd(uriEnd);
-
-            if (!found) {
-                if (contexts[0].name.equals("")) {
-                    context = contexts[0];
-                }
+            if (lastSlash == -1) {
+                lastSlash = nthSlash(uri, nesting + 1);
             } else {
-                context = contexts[pos];
+                lastSlash = lastSlash(uri);
             }
-            if (context != null) {
-                mappingData.contextPath.setString(context.name);
+            uri.setEnd(lastSlash);
+            pos = find(contexts, uri);
+        }
+        uri.setEnd(uriEnd);
+
+        if (!found) {
+            if (contexts[0].name.equals("")) {
+                context = contexts[0];
             }
+        } else {
+            context = contexts[pos];
+        }
+        if (context != null) {
+            mappingData.contextPath.setString(context.name);
         }
 
         if (context != null) {
@@ -816,7 +820,7 @@ public final class Mapper {
                 // Return the latest version
                 contextVersion = contextVersions[versionCount - 1];
             } else {
-                int pos = find(contextVersions, version);
+                pos = find(contextVersions, version);
                 if (pos < 0 || !contextVersions[pos].name.equals(version)) {
                     // Return the latest version
                     contextVersion = contextVersions[versionCount - 1];
@@ -829,7 +833,7 @@ public final class Mapper {
         }
 
         // Wrapper mapping
-        if ((contextVersion != null) && (mappingData.wrapper == null)) {
+        if (contextVersion != null) {
             internalMapWrapper(contextVersion, uri, mappingData);
         }
 
