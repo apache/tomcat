@@ -55,7 +55,13 @@ public final class Mapper {
     protected String defaultHostName = null;
 
     /**
-     * Context associated with this wrapper, used for wrapper mapping.
+     * ContextVersion associated with this Mapper, used for wrapper mapping.
+     *
+     * <p>
+     * It is used only by Mapper in a Context. Is not used by Mapper in a
+     * Connector.
+     *
+     * @see #setContext(String, String[], javax.naming.Context)
      */
     protected ContextVersion context = new ContextVersion();
 
