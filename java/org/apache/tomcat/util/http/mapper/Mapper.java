@@ -362,13 +362,11 @@ public final class Mapper {
             Object wrapper, boolean jspWildCard, boolean resourceOnly) {
 
         synchronized (context) {
-            Wrapper newWrapper = new Wrapper();
-            newWrapper.object = wrapper;
-            newWrapper.jspWildCard = jspWildCard;
-            newWrapper.resourceOnly = resourceOnly;
             if (path.endsWith("/*")) {
                 // Wildcard wrapper
-                newWrapper.name = path.substring(0, path.length() - 2);
+                String name = path.substring(0, path.length() - 2);
+                Wrapper newWrapper = new Wrapper(name, wrapper, jspWildCard,
+                        resourceOnly);
                 Wrapper[] oldWrappers = context.wildcardWrappers;
                 Wrapper[] newWrappers =
                     new Wrapper[oldWrappers.length + 1];
@@ -381,7 +379,9 @@ public final class Mapper {
                 }
             } else if (path.startsWith("*.")) {
                 // Extension wrapper
-                newWrapper.name = path.substring(2);
+                String name = path.substring(2);
+                Wrapper newWrapper = new Wrapper(name, wrapper, jspWildCard,
+                        resourceOnly);
                 Wrapper[] oldWrappers = context.extensionWrappers;
                 Wrapper[] newWrappers =
                     new Wrapper[oldWrappers.length + 1];
@@ -390,17 +390,21 @@ public final class Mapper {
                 }
             } else if (path.equals("/")) {
                 // Default wrapper
-                newWrapper.name = "";
+                Wrapper newWrapper = new Wrapper("", wrapper, jspWildCard,
+                        resourceOnly);
                 context.defaultWrapper = newWrapper;
             } else {
                 // Exact wrapper
+                final String name;
                 if (path.length() == 0) {
                     // Special case for the Context Root mapping which is
                     // treated as an exact match
-                    newWrapper.name = "/";
+                    name = "/";
                 } else {
-                    newWrapper.name = path;
+                    name = path;
                 }
+                Wrapper newWrapper = new Wrapper(name, wrapper, jspWildCard,
+                        resourceOnly);
                 Wrapper[] oldWrappers = context.exactWrappers;
                 Wrapper[] newWrappers =
                     new Wrapper[oldWrappers.length + 1];
@@ -1470,6 +1474,13 @@ public final class Mapper {
         public String name = null;
         public Object object = null;
 
+        public MapElement() {
+        }
+
+        public MapElement(String name, Object object) {
+            this.name = name;
+            this.object = object;
+        }
     }
 
 
@@ -1520,10 +1531,16 @@ public final class Mapper {
     // ---------------------------------------------------- Wrapper Inner Class
 
 
-    protected static class Wrapper
-        extends MapElement {
+    protected static class Wrapper extends MapElement {
 
-        public boolean jspWildCard = false;
-        public boolean resourceOnly = false;
+        public final boolean jspWildCard;
+        public final boolean resourceOnly;
+
+        public Wrapper(String name, /* Wrapper */Object wrapper,
+                boolean jspWildCard, boolean resourceOnly) {
+            super(name, wrapper);
+            this.jspWildCard = jspWildCard;
+            this.resourceOnly = resourceOnly;
+        }
     }
 }
