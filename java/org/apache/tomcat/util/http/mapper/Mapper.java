@@ -315,35 +315,22 @@ public final class Mapper {
     public void addWrapper(String hostName, String contextPath, String version,
                            String path, Object wrapper, boolean jspWildCard,
                            boolean resourceOnly) {
-        Host[] hosts = this.hosts;
-        int pos = find(hosts, hostName);
-        if (pos < 0) {
+        Host host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        Host host = hosts[pos];
-        if (host.name.equals(hostName)) {
-            Context[] contexts = host.contextList.contexts;
-            int pos2 = find(contexts, contextPath);
-            if (pos2 < 0) {
-                log.error("No context found: " + contextPath );
-                return;
-            }
-            Context context = contexts[pos2];
-            if (context.name.equals(contextPath)) {
-                ContextVersion[] contextVersions = context.versions;
-                int pos3 = find(contextVersions, version);
-                if( pos3<0 ) {
-                    log.error("No context version found: " + contextPath + " " +
-                            version);
-                    return;
-                }
-                ContextVersion contextVersion = contextVersions[pos3];
-                if (contextVersion.name.equals(version)) {
-                    addWrapper(contextVersion, path, wrapper, jspWildCard,
-                            resourceOnly);
-                }
-            }
+        Context context = exactFind(host.contextList.contexts, contextPath);
+        if (context == null) {
+            log.error("No context found: " + contextPath);
+            return;
         }
+        ContextVersion contextVersion = exactFind(context.versions, version);
+        if (contextVersion == null) {
+            log.error("No context version found: " + contextPath + " "
+                    + version);
+            return;
+        }
+        addWrapper(contextVersion, path, wrapper, jspWildCard, resourceOnly);
     }
 
 
@@ -1283,6 +1270,7 @@ public final class Mapper {
      * Find a map element given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
+     * @see #exactFind(MapElement[], String)
      */
     private static final int find(MapElement[] map, String name) {
 
@@ -1322,6 +1310,25 @@ public final class Mapper {
             }
         }
 
+    }
+
+
+    /**
+     * Find a map element given its name in a sorted array of map elements. This
+     * will return the element that you were searching for. Otherwise it will
+     * return <code>null</code>.
+     * @see #find(MapElement[], String)
+     */
+    private static final <E extends MapElement> E exactFind(E[] map,
+            String name) {
+        int pos = find(map, name);
+        if (pos >= 0) {
+            E result = map[pos];
+            if (name.equals(result.name)) {
+                return result;
+            }
+        }
+        return null;
     }
 
 
