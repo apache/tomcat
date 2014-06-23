@@ -662,35 +662,29 @@ public final class Mapper {
 
         uri.setLimit(-1);
 
-        Context[] contexts;
         Context context = null;
         ContextVersion contextVersion = null;
 
-        int nesting = 0;
-
         // Virtual host mapping
         Host[] hosts = this.hosts;
-        int pos = findIgnoreCase(hosts, host);
-        if ((pos != -1) && (host.equalsIgnoreCase(hosts[pos].name))) {
-            mappingData.host = hosts[pos].object;
-            contexts = hosts[pos].contextList.contexts;
-            nesting = hosts[pos].contextList.nesting;
-        } else {
+        Host mappedHost = exactFindIgnoreCase(hosts, host);
+        if (mappedHost == null) {
             if (defaultHostName == null) {
                 return;
             }
-            pos = find(hosts, defaultHostName);
-            if ((pos != -1) && (defaultHostName.equals(hosts[pos].name))) {
-                mappingData.host = hosts[pos].object;
-                contexts = hosts[pos].contextList.contexts;
-                nesting = hosts[pos].contextList.nesting;
-            } else {
+            mappedHost = exactFind(hosts, defaultHostName);
+            if (mappedHost == null) {
                 return;
             }
         }
+        mappingData.host = mappedHost.object;
 
         // Context mapping
-        pos = find(contexts, uri);
+        ContextList contextList = mappedHost.contextList;
+        Context[] contexts = contextList.contexts;
+        int nesting = contextList.nesting;
+
+        int pos = find(contexts, uri);
         if (pos == -1) {
             return;
         }
@@ -1264,6 +1258,24 @@ public final class Mapper {
         if (pos >= 0) {
             E result = map[pos];
             if (name.equals(result.name)) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find a map element given its name in a sorted array of map elements. This
+     * will return the element that you were searching for. Otherwise it will
+     * return <code>null</code>.
+     * @see #findIgnoreCase(MapElement[], CharChunk)
+     */
+    private static final <E extends MapElement> E exactFindIgnoreCase(E[] map,
+            CharChunk name) {
+        int pos = findIgnoreCase(map, name);
+        if (pos >= 0) {
+            E result = map[pos];
+            if (name.equalsIgnoreCase(result.name)) {
                 return result;
             }
         }
