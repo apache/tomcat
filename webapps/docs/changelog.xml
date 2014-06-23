@@ -59,8 +59,9 @@
         (markt/kkolinko)
       </scode>
       <fix>
-        Fix regression in <code>StandardContext.removeApplicationListener()</code>,
-        introduced by the fix for bug <bug>56588</bug>. (kkolinko)
+        Fix regression in
+        <code>StandardContext.removeApplicationListener()</code>, introduced by
+        the fix for bug <bug>56588</bug>. (kkolinko)
       </fix>
       <fix>
         <bug>56653</bug>: Fix concurrency issue with
@@ -80,6 +81,18 @@
         Remove <code>context</code> and <code>wrapper</code> fields and setters
         from <code>Request</code> class. (kkolinko)
       </scode>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Attempt to obfuscate session cookie values associated with other web
+        applications when viewing HTTP request headers with the Cookies example
+        from the examples web application. This reduces the opportunity to use
+        this example for malicious purposes should the advice to remove the
+        examples web application from security sensitive systems be ignored.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
