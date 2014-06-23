@@ -518,41 +518,28 @@ public final class Mapper {
      */
     public void addWelcomeFile(String hostName, String contextPath,
             String version, String welcomeFile) {
-        Host[] hosts = this.hosts;
-        int pos = find(hosts, hostName);
-        if (pos < 0) {
+        Host host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        Host host = hosts[pos];
-        if (host.name.equals(hostName)) {
-            Context[] contexts = host.contextList.contexts;
-            int pos2 = find(contexts, contextPath);
-            if (pos2 < 0) {
-                log.error("No context found: " + contextPath );
-                return;
-            }
-            Context context = contexts[pos2];
-            if (context.name.equals(contextPath)) {
-                ContextVersion[] contextVersions = context.versions;
-                int pos3 = find(contextVersions, version);
-                if( pos3<0 ) {
-                    log.error("No context version found: " + contextPath + " " +
-                            version);
-                    return;
-                }
-                ContextVersion contextVersion = contextVersions[pos3];
-                if (contextVersion.name.equals(version)) {
-                    int len = contextVersion.welcomeResources.length + 1;
-                    String[] newWelcomeResources = new String[len];
-                    System.arraycopy(contextVersion.welcomeResources, 0,
-                            newWelcomeResources, 0, len - 1);
-                    newWelcomeResources[len - 1] = welcomeFile;
-                    contextVersion.welcomeResources = newWelcomeResources;
-                }
-            }
+        Context context = exactFind(host.contextList.contexts, contextPath);
+        if (context == null) {
+            log.error("No context found: " + contextPath);
+            return;
         }
+        ContextVersion contextVersion = exactFind(context.versions, version);
+        if (contextVersion == null) {
+            log.error("No context version found: " + contextPath + " "
+                    + version);
+            return;
+        }
+        int len = contextVersion.welcomeResources.length + 1;
+        String[] newWelcomeResources = new String[len];
+        System.arraycopy(contextVersion.welcomeResources, 0,
+                newWelcomeResources, 0, len - 1);
+        newWelcomeResources[len - 1] = welcomeFile;
+        contextVersion.welcomeResources = newWelcomeResources;
     }
-
 
     /**
      * Remove a welcome file from the given context.
@@ -563,53 +550,40 @@ public final class Mapper {
      */
     public void removeWelcomeFile(String hostName, String contextPath,
             String version, String welcomeFile) {
-        Host[] hosts = this.hosts;
-        int pos = find(hosts, hostName);
-        if (pos < 0) {
+        Host host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        Host host = hosts[pos];
-        if (host.name.equals(hostName)) {
-            Context[] contexts = host.contextList.contexts;
-            int pos2 = find(contexts, contextPath);
-            if (pos2 < 0) {
-                log.error("No context found: " + contextPath );
-                return;
-            }
-            Context context = contexts[pos2];
-            if (context.name.equals(contextPath)) {
-                ContextVersion[] contextVersions = context.versions;
-                int pos3 = find(contextVersions, version);
-                if( pos3<0 ) {
-                    log.error("No context version found: " + contextPath + " " +
-                            version);
-                    return;
-                }
-                ContextVersion contextVersion = contextVersions[pos3];
-                if (contextVersion.name.equals(version)) {
-                    int match = -1;
-                    for (int i = 0; i < contextVersion.welcomeResources.length; i++) {
-                        if (welcomeFile.equals(contextVersion.welcomeResources[i])) {
-                            match = i;
-                            break;
-                        }
-                    }
-                    if (match > -1) {
-                        int len = contextVersion.welcomeResources.length - 1;
-                        String[] newWelcomeResources = new String[len];
-                        System.arraycopy(contextVersion.welcomeResources, 0,
-                                newWelcomeResources, 0, match);
-                        if (match < len) {
-                            System.arraycopy(contextVersion.welcomeResources, match + 1,
-                                    newWelcomeResources, match, len - match);
-                        }
-                        contextVersion.welcomeResources = newWelcomeResources;
-                    }
-                }
+        Context context = exactFind(host.contextList.contexts, contextPath);
+        if (context == null) {
+            log.error("No context found: " + contextPath);
+            return;
+        }
+        ContextVersion contextVersion = exactFind(context.versions, version);
+        if (contextVersion == null) {
+            log.error("No context version found: " + contextPath + " "
+                    + version);
+            return;
+        }
+        int match = -1;
+        for (int i = 0; i < contextVersion.welcomeResources.length; i++) {
+            if (welcomeFile.equals(contextVersion.welcomeResources[i])) {
+                match = i;
+                break;
             }
         }
+        if (match > -1) {
+            int len = contextVersion.welcomeResources.length - 1;
+            String[] newWelcomeResources = new String[len];
+            System.arraycopy(contextVersion.welcomeResources, 0,
+                    newWelcomeResources, 0, match);
+            if (match < len) {
+                System.arraycopy(contextVersion.welcomeResources, match + 1,
+                        newWelcomeResources, match, len - match);
+            }
+            contextVersion.welcomeResources = newWelcomeResources;
+        }
     }
-
 
     /**
      * Clear the welcome files for the given context.
@@ -619,34 +593,22 @@ public final class Mapper {
      */
     public void clearWelcomeFiles(String hostName, String contextPath,
             String version) {
-        Host[] hosts = this.hosts;
-        int pos = find(hosts, hostName);
-        if (pos < 0) {
+        Host host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        Host host = hosts[pos];
-        if (host.name.equals(hostName)) {
-            Context[] contexts = host.contextList.contexts;
-            int pos2 = find(contexts, contextPath);
-            if (pos2 < 0) {
-                log.error("No context found: " + contextPath );
-                return;
-            }
-            Context context = contexts[pos2];
-            if (context.name.equals(contextPath)) {
-                ContextVersion[] contextVersions = context.versions;
-                int pos3 = find(contextVersions, version);
-                if( pos3<0 ) {
-                    log.error("No context version found: " + contextPath + " " +
-                            version);
-                    return;
-                }
-                ContextVersion contextVersion = contextVersions[pos3];
-                if (contextVersion.name.equals(version)) {
-                    contextVersion.welcomeResources = new String[0];
-                }
-            }
+        Context context = exactFind(host.contextList.contexts, contextPath);
+        if (context == null) {
+            log.error("No context found: " + contextPath);
+            return;
         }
+        ContextVersion contextVersion = exactFind(context.versions, version);
+        if (contextVersion == null) {
+            log.error("No context version found: " + contextPath + " "
+                    + version);
+            return;
+        }
+        contextVersion.welcomeResources = new String[0];
     }
 
 
