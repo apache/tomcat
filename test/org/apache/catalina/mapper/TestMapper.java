@@ -141,10 +141,10 @@ public class TestMapper extends LoggingBaseTest {
 
         // Make sure adding a duplicate *does not* overwrite
         final int iowPos = 3;
-        assertEquals("blah7", mapper.hosts[iowPos].object.host.getName());
+        assertEquals("blah7", mapper.hosts[iowPos].object.getName());
 
         final int qwigPos = 8;
-        assertEquals("blah14", mapper.hosts[qwigPos].object.host.getName());
+        assertEquals("blah14", mapper.hosts[qwigPos].object.getName());
 
         // Check for alphabetical order of host names
         String previous;
@@ -156,13 +156,13 @@ public class TestMapper extends LoggingBaseTest {
         }
 
         // Check that host alias has the same data
-        Mapper.HostMapping hostMapping = mapper.hosts[iowPos];
-        Mapper.HostMapping aliasMapping = mapper.hosts[iowPos + 1];
-        assertEquals("iowejoiejfoiew", hostMapping.name);
-        assertEquals("iowejoiejfoiew_alias", aliasMapping.name);
-        assertFalse(hostMapping.isAlias());
-        assertTrue(aliasMapping.isAlias());
-        assertEquals(hostMapping.object, aliasMapping.object);
+        Mapper.MappedHost host = mapper.hosts[iowPos];
+        Mapper.MappedHost alias = mapper.hosts[iowPos + 1];
+        assertEquals("iowejoiejfoiew", host.name);
+        assertEquals("iowejoiejfoiew_alias", alias.name);
+        assertFalse(host.isAlias());
+        assertTrue(alias.isAlias());
+        assertEquals(host.object, alias.object);
     }
 
     @Test
@@ -178,8 +178,8 @@ public class TestMapper extends LoggingBaseTest {
         assertEquals(16, mapper.hosts.length);
 
         final int iowPos = 3;
-        Mapper.HostMapping hostMapping = mapper.hosts[iowPos];
-        Mapper.HostMapping aliasMapping = mapper.hosts[iowPos + 1];
+        Mapper.MappedHost hostMapping = mapper.hosts[iowPos];
+        Mapper.MappedHost aliasMapping = mapper.hosts[iowPos + 1];
         assertEquals("iowejoiejfoiew_alias", aliasMapping.name);
         assertTrue(aliasMapping.isAlias());
         assertEquals(hostMapping.object, aliasMapping.object);

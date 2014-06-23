@@ -50,7 +50,7 @@ public final class Mapper {
     /**
      * Array containing the virtual hosts definitions.
      */
-    protected HostMapping[] hosts = new HostMapping[0];
+    protected MappedHost[] hosts = new MappedHost[0];
 
 
     /**
@@ -86,16 +86,14 @@ public final class Mapper {
      */
     public synchronized void addHost(String name, String[] aliases,
                                      Host host) {
-        MappedHost newHost = new MappedHost(host);
-        HostMapping newHostMapping = new HostMapping(name, newHost, false);
-        HostMapping[] newHostMappings = new HostMapping[hosts.length + 1];
-        if (insertMap(hosts, newHostMappings, newHostMapping)) {
-            hosts = newHostMappings;
+        MappedHost[] newHosts = new MappedHost[hosts.length + 1];
+        MappedHost newHost = new MappedHost(name, host);
+        if (insertMap(hosts, newHosts, newHost)) {
+            hosts = newHosts;
         } else {
-            HostMapping duplicate = hosts[find(hosts, name)];
-            String duplicateHostName = duplicate.object.host.getName();
+            MappedHost duplicate = hosts[find(hosts, name)];
             log.error(sm.getString("mapper.duplicateHost", name,
-                    duplicateHostName));
+                    duplicate.realHostName));
             // Do not add aliases, as removeHost(hostName) won't be able to remove them
             return;
         }
@@ -112,19 +110,19 @@ public final class Mapper {
      */
     public synchronized void removeHost(String name) {
         // Find and remove the old host
-        HostMapping hostMapping = exactFind(hosts, name);
-        if (hostMapping == null || hostMapping.isAlias()) {
+        MappedHost host = exactFind(hosts, name);
+        if (host == null || host.isAlias()) {
             return;
         }
-        MappedHost object = hostMapping.object;
-        HostMapping[] newHosts = new HostMapping[hosts.length - 1];
+        Host object = host.object;
+        MappedHost[] newHosts = new MappedHost[hosts.length - 1];
         if (removeMap(hosts, newHosts, name)) {
             hosts = newHosts;
 
-            // Remove all aliases (they will map to the same HostMapping object)
+            // Remove all aliases (they will map to the same host object)
             for (int i = 0; i < newHosts.length; i++) {
                 if (newHosts[i].object == object) {
-                    HostMapping[] newHosts2 = new HostMapping[hosts.length - 1];
+                    MappedHost[] newHosts2 = new MappedHost[hosts.length - 1];
                     if (removeMap(hosts, newHosts2, newHosts[i].name)) {
                         hosts = newHosts2;
                     }
@@ -139,31 +137,30 @@ public final class Mapper {
      * @param alias The alias to add
      */
     public synchronized void addHostAlias(String name, String alias) {
-        HostMapping realHost = exactFind(hosts, name);
+        MappedHost realHost = exactFind(hosts, name);
         if (realHost == null) {
             // Should not be adding an alias for a host that doesn't exist but
             // just in case...
             return;
         }
-        addHostAliasImpl(alias, realHost.object);
+        addHostAliasImpl(alias, realHost);
     }
 
-    private void addHostAliasImpl(String alias, MappedHost mappedHost) {
-        HostMapping[] newHostMappings = new HostMapping[hosts.length + 1];
-        HostMapping newHostMapping = new HostMapping(alias, mappedHost, true);
-        if (insertMap(hosts, newHostMappings, newHostMapping)) {
-            hosts = newHostMappings;
+    private void addHostAliasImpl(String alias, MappedHost realHost) {
+        MappedHost newHost = new MappedHost(alias, realHost);
+        MappedHost[] newHosts = new MappedHost[hosts.length + 1];
+        if (insertMap(hosts, newHosts, newHost)) {
+            hosts = newHosts;
         } else {
-            HostMapping duplicate = hosts[find(hosts, alias)];
-            if (duplicate.object == mappedHost) {
+            MappedHost duplicate = hosts[find(hosts, alias)];
+            if (duplicate.object == realHost.object) {
                 // A duplicate Alias for the same Host.
                 // A harmless redundancy. E.g.
                 // <Host name="localhost"><Alias>localhost</Alias></Host>
                 return;
             }
-            String duplicateHostName = duplicate.object.host.getName();
             log.error(sm.getString("mapper.duplicateHostAlias", alias,
-                    mappedHost.host.getName(), duplicateHostName));
+                    realHost.realHostName, duplicate.realHostName));
         }
     }
 
@@ -173,11 +170,11 @@ public final class Mapper {
      */
     public synchronized void removeHostAlias(String alias) {
         // Find and remove the alias
-        HostMapping hostMapping = exactFind(hosts, alias);
+        MappedHost hostMapping = exactFind(hosts, alias);
         if (hostMapping == null || !hostMapping.isAlias()) {
             return;
         }
-        HostMapping[] newHosts = new HostMapping[hosts.length - 1];
+        MappedHost[] newHosts = new MappedHost[hosts.length - 1];
         if (removeMap(hosts, newHosts, alias)) {
             hosts = newHosts;
         }
@@ -200,16 +197,15 @@ public final class Mapper {
             String version, Context context, String[] welcomeResources,
             WebResourceRoot resources) {
 
-        HostMapping hostMapping = exactFind(hosts, hostName);
-        if (hostMapping == null) {
+        MappedHost mappedHost  = exactFind(hosts, hostName);
+        if (mappedHost == null) {
             addHost(hostName, new String[0], host);
-            hostMapping = exactFind(hosts, hostName);
-            if (hostMapping == null) {
+            mappedHost = exactFind(hosts, hostName);
+            if (mappedHost == null) {
                 log.error("No host found: " + hostName);
                 return;
             }
         }
-        MappedHost mappedHost = hostMapping.object;
         int slashCount = slashCount(path);
         synchronized (mappedHost) {
             ContextVersion newContextVersion = new ContextVersion(version,
@@ -249,15 +245,13 @@ public final class Mapper {
 
         contextObjectToContextVersionMap.remove(ctxt);
 
-        HostMapping hostMapping = exactFind(hosts, hostName);
-        if (hostMapping == null) {
+        MappedHost host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
 
-        MappedHost mappedHost = hostMapping.object;
-        synchronized (mappedHost) {
-            MappedContext context = exactFind(mappedHost.contextList.contexts,
-                    path);
+        synchronized (host) {
+            MappedContext context = exactFind(host.contextList.contexts, path);
             if (context == null) {
                 return;
             }
@@ -268,8 +262,7 @@ public final class Mapper {
             if (removeMap(contextVersions, newContextVersions, version)) {
                 if (newContextVersions.length == 0) {
                     // Remove the context
-                    mappedHost.contextList = mappedHost.contextList
-                            .removeContext(path);
+                    host.contextList = host.contextList.removeContext(path);
                 } else {
                     context.versions = newContextVersions;
                 }
@@ -281,12 +274,12 @@ public final class Mapper {
     public void addWrapper(String hostName, String contextPath, String version,
                            String path, Wrapper wrapper, boolean jspWildCard,
                            boolean resourceOnly) {
-        HostMapping hostMapping = exactFind(hosts, hostName);
-        if (hostMapping == null) {
+        MappedHost host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        MappedContext context = exactFind(
-                hostMapping.object.contextList.contexts, contextPath);
+        MappedContext context = exactFind(host.contextList.contexts,
+                contextPath);
         if (context == null) {
             log.error("No context found: " + contextPath );
             return;
@@ -377,12 +370,12 @@ public final class Mapper {
      */
     public void removeWrapper(String hostName, String contextPath,
             String version, String path) {
-        HostMapping hostMapping = exactFind(hosts, hostName);
-        if (hostMapping == null) {
+        MappedHost host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        MappedContext context = exactFind(
-                hostMapping.object.contextList.contexts, contextPath);
+        MappedContext context = exactFind(host.contextList.contexts,
+                contextPath);
         if (context == null) {
             return;
         }
@@ -468,12 +461,12 @@ public final class Mapper {
      */
     public void addWelcomeFile(String hostName, String contextPath,
             String version, String welcomeFile) {
-        HostMapping hostMapping = exactFind(hosts, hostName);
-        if (hostMapping == null) {
+        MappedHost host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        MappedContext context = exactFind(
-                hostMapping.object.contextList.contexts, contextPath);
+        MappedContext context = exactFind(host.contextList.contexts,
+                contextPath);
         if (context == null) {
             log.error("No context found: " + contextPath);
             return;
@@ -501,12 +494,12 @@ public final class Mapper {
      */
     public void removeWelcomeFile(String hostName, String contextPath,
             String version, String welcomeFile) {
-        HostMapping hostMapping = exactFind(hosts, hostName);
-        if (hostMapping == null) {
+        MappedHost host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        MappedContext context = exactFind(
-                hostMapping.object.contextList.contexts, contextPath);
+        MappedContext context = exactFind(host.contextList.contexts,
+                contextPath);
         if (context == null) {
             log.error("No context found: " + contextPath);
             return;
@@ -545,12 +538,12 @@ public final class Mapper {
      */
     public void clearWelcomeFiles(String hostName, String contextPath,
             String version) {
-        HostMapping hostMapping = exactFind(hosts, hostName);
-        if (hostMapping == null) {
+        MappedHost host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        MappedContext context = exactFind(
-                hostMapping.object.contextList.contexts, contextPath);
+        MappedContext context = exactFind(host.contextList.contexts,
+                contextPath);
         if (context == null) {
             log.error("No context found: " + contextPath);
             return;
@@ -629,21 +622,21 @@ public final class Mapper {
         uri.setLimit(-1);
 
         // Virtual host mapping
-        HostMapping[] hosts = this.hosts;
-        HostMapping hostMapping = exactFindIgnoreCase(hosts, host);
-        if (hostMapping == null) {
+        MappedHost[] hosts = this.hosts;
+        MappedHost mappedHost = exactFindIgnoreCase(hosts, host);
+        if (mappedHost == null) {
             if (defaultHostName == null) {
                 return;
             }
-            hostMapping = exactFind(hosts, defaultHostName);
-            if (hostMapping == null) {
+            mappedHost = exactFind(hosts, defaultHostName);
+            if (mappedHost == null) {
                 return;
             }
         }
-        mappingData.host = hostMapping.object.host;
+        mappingData.host = mappedHost.object;
 
         // Context mapping
-        ContextList contextList = hostMapping.object.contextList;
+        ContextList contextList = mappedHost.contextList;
         MappedContext[] contexts = contextList.contexts;
         int pos = find(contexts, uri);
         if (pos == -1) {
@@ -1417,33 +1410,31 @@ public final class Mapper {
     // ------------------------------------------------------- Host Inner Class
 
 
-    protected static final class HostMapping extends MapElement<MappedHost> {
-        private final boolean alias;
-        /**
-         * Create a HostMapping.
-         * @param name The name of a Host or an Alias
-         * @param host A MappedHost object, shared between Host and all Aliases
-         * @param alias <code>false</code> if this is the primary mapping
-         *  (represents a Host), <code>true</code> if this is an Alias.
-         */
-        public HostMapping(String name, MappedHost host, boolean alias) {
-            super(name, host);
-            this.alias = alias;
-        }
-        public boolean isAlias() {
-            return alias;
-        }
-    }
+    protected static final class MappedHost extends MapElement<Host> {
 
-    protected static final class MappedHost {
-
-        public final Host host;
-
+        public final String realHostName;
         public volatile ContextList contextList;
 
-        public MappedHost(Host host) {
-            this.host = host;
+        /**
+         * Constructor used for the primary Host
+         */
+        public MappedHost(String name, Host host) {
+            super(name, host);
+            this.realHostName = name;
             this.contextList = new ContextList();
+        }
+
+        /**
+         * Constructor used for an Alias
+         */
+        public MappedHost(String alias, MappedHost realHost) {
+            super(alias, realHost.object);
+            this.realHostName = realHost.name;
+            this.contextList = realHost.contextList;
+        }
+
+        public boolean isAlias() {
+            return !name.equals(realHostName);
         }
     }
 
