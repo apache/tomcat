@@ -181,6 +181,21 @@ public final class Mapper {
 
     }
 
+    /**
+     * Replace {@link MappedHost#contextList} field in <code>realHost</code> and
+     * all its aliases with a new value.
+     */
+    private void updateContextList(MappedHost realHost,
+            ContextList newContextList) {
+
+        // The real host and all the aliases map to the same host object
+        Host object = realHost.object;
+        for (MappedHost host : hosts) {
+            if (host.object == object) {
+                host.contextList = newContextList;
+            }
+        }
+    }
 
     /**
      * Add a new Context to an existing Host.
@@ -211,13 +226,16 @@ public final class Mapper {
             ContextVersion newContextVersion = new ContextVersion(version,
                     path, slashCount, context, resources, welcomeResources);
 
-            MappedContext mappedContext = exactFind(
-                    mappedHost.contextList.contexts, path);
+            ContextList contextList = mappedHost.contextList;
+            MappedContext mappedContext = exactFind(contextList.contexts, path);
             if (mappedContext == null) {
                 mappedContext = new MappedContext(path, newContextVersion);
-                mappedHost.contextList = mappedHost.contextList.addContext(
+                ContextList newContextList = contextList.addContext(
                         mappedContext, slashCount);
-                contextObjectToContextVersionMap.put(context, newContextVersion);
+                if (newContextList != null) {
+                    updateContextList(mappedHost, newContextList);
+                    contextObjectToContextVersionMap.put(context, newContextVersion);
+                }
             } else {
                 ContextVersion[] contextVersions = mappedContext.versions;
                 ContextVersion[] newContextVersions = new ContextVersion[contextVersions.length + 1];
@@ -251,7 +269,8 @@ public final class Mapper {
         }
 
         synchronized (host) {
-            MappedContext context = exactFind(host.contextList.contexts, path);
+            ContextList contextList = host.contextList;
+            MappedContext context = exactFind(contextList.contexts, path);
             if (context == null) {
                 return;
             }
@@ -262,7 +281,10 @@ public final class Mapper {
             if (removeMap(contextVersions, newContextVersions, version)) {
                 if (newContextVersions.length == 0) {
                     // Remove the context
-                    host.contextList = host.contextList.removeContext(path);
+                    ContextList newContextList = contextList.removeContext(path);
+                    if (newContextList != null) {
+                        updateContextList(host, newContextList);
+                    }
                 } else {
                     context.versions = newContextVersions;
                 }
@@ -1463,7 +1485,7 @@ public final class Mapper {
                 return new ContextList(newContexts, Math.max(nesting,
                         slashCount));
             }
-            return this;
+            return null;
         }
 
         public ContextList removeContext(String path) {
@@ -1475,7 +1497,7 @@ public final class Mapper {
                 }
                 return new ContextList(newContexts, newNesting);
             }
-            return this;
+            return null;
         }
     }
 
