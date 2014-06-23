@@ -965,10 +965,10 @@ public final class Mapper {
      */
     private final void internalMapExactWrapper
         (Wrapper[] wrappers, CharChunk path, MappingData mappingData) {
-        int pos = find(wrappers, path);
-        if ((pos != -1) && (path.equals(wrappers[pos].name))) {
-            mappingData.requestPath.setString(wrappers[pos].name);
-            mappingData.wrapper = wrappers[pos].object;
+        Wrapper wrapper = exactFind(wrappers, path);
+        if (wrapper != null) {
+            mappingData.requestPath.setString(wrapper.name);
+            mappingData.wrapper = wrapper.object;
             if (path.equals("/")) {
                 // Special handling for Context Root mapped servlet
                 mappingData.pathInfo.setString("/");
@@ -976,7 +976,7 @@ public final class Mapper {
                 // This seems wrong but it is what the spec says...
                 mappingData.contextPath.setString("");
             } else {
-                mappingData.wrapperPath.setString(wrappers[pos].name);
+                mappingData.wrapperPath.setString(wrapper.name);
             }
         }
     }
@@ -1064,14 +1064,14 @@ public final class Mapper {
             if (period >= 0) {
                 path.setOffset(period + 1);
                 path.setEnd(pathEnd);
-                int pos = find(wrappers, path);
-                if ((pos != -1) && (path.equals(wrappers[pos].name)) &&
-                        (resourceExpected || !wrappers[pos].resourceOnly)) {
-                    mappingData.wrapperPath.setChars
-                        (buf, servletPath, pathEnd - servletPath);
-                    mappingData.requestPath.setChars
-                        (buf, servletPath, pathEnd - servletPath);
-                    mappingData.wrapper = wrappers[pos].object;
+                Wrapper wrapper = exactFind(wrappers, path);
+                if (wrapper != null
+                        && (resourceExpected || !wrapper.resourceOnly)) {
+                    mappingData.wrapperPath.setChars(buf, servletPath, pathEnd
+                            - servletPath);
+                    mappingData.requestPath.setChars(buf, servletPath, pathEnd
+                            - servletPath);
+                    mappingData.wrapper = wrapper.object;
                 }
                 path.setOffset(servletPath);
                 path.setEnd(pathEnd);
@@ -1247,6 +1247,23 @@ public final class Mapper {
      */
     private static final <E extends MapElement> E exactFind(E[] map,
             String name) {
+        int pos = find(map, name);
+        if (pos >= 0) {
+            E result = map[pos];
+            if (name.equals(result.name)) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Find a map element given its name in a sorted array of map elements. This
+     * will return the element that you were searching for. Otherwise it will
+     * return <code>null</code>.
+     */
+    private static final <E extends MapElement> E exactFind(E[] map,
+            CharChunk name) {
         int pos = find(map, name);
         if (pos >= 0) {
             E result = map[pos];
