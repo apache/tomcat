@@ -113,8 +113,8 @@ public class WsSession implements Session {
             URI requestUri, Map<String,List<String>> requestParameterMap,
             String queryString, Principal userPrincipal, String httpSessionId,
             String subProtocol, Map<String,String> pathParameters,
-            boolean secure, EndpointConfig endpointConfig)
-                    throws DeploymentException {
+            boolean secure, EndpointConfig endpointConfig,
+            Transformation transformation) throws DeploymentException {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);

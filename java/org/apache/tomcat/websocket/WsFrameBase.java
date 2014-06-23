@@ -46,6 +46,7 @@ public abstract class WsFrameBase {
     // Connection level attributes
     protected final WsSession wsSession;
     protected final byte[] inputBuffer;
+    private final Transformation transformation;
 
     // Attributes for control messages
     // Control messages can appear in the middle of other messages so need
@@ -84,14 +85,25 @@ public abstract class WsFrameBase {
     private int readPos = 0;
     protected int writePos = 0;
 
-    public WsFrameBase(WsSession wsSession) {
-
+    public WsFrameBase(WsSession wsSession, Transformation transformation) {
         inputBuffer = new byte[Constants.DEFAULT_BUFFER_SIZE];
         messageBufferBinary =
                 ByteBuffer.allocate(wsSession.getMaxBinaryMessageBufferSize());
         messageBufferText =
                 CharBuffer.allocate(wsSession.getMaxTextMessageBufferSize());
         this.wsSession = wsSession;
+        Transformation finalTransformation;
+        if (isMasked()) {
+            finalTransformation = new UnmaskTransformation();
+        } else {
+            finalTransformation = new NoopTransformation();
+        }
+        if (transformation == null) {
+            this.transformation = finalTransformation;
+        } else {
+            transformation.setNext(finalTransformation);
+            this.transformation = transformation;
+        }
     }
 
 
@@ -134,14 +146,14 @@ public abstract class WsFrameBase {
         int b = inputBuffer[readPos++];
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
-        if (rsv != 0) {
-            // Note extensions may use rsv bits but currently no extensions are
-            // supported
+        opCode = (byte) (b & 0x0F);
+        if (!transformation.validateRsv(rsv, opCode)) {
             throw new WsIOException(new CloseReason(
                     CloseCodes.PROTOCOL_ERROR,
-                    sm.getString("wsFrame.wrongRsv", Integer.valueOf(rsv))));
+                    sm.getString("wsFrame.wrongRsv", Integer.valueOf(rsv),
+                            Integer.valueOf(opCode))));
         }
-        opCode = (byte) (b & 0x0F);
+
         if (Util.isControl(opCode)) {
             if (!fin) {
                 throw new WsIOException(new CloseReason(
@@ -288,7 +300,7 @@ public abstract class WsFrameBase {
 
 
     private boolean processDataControl() throws IOException {
-        if (!appendPayloadToMessage(controlBufferBinary)) {
+        if (!transformation.getMoreData(opCode, rsv, controlBufferBinary)) {
             return false;
         }
         controlBufferBinary.flip();
@@ -386,7 +398,7 @@ public abstract class WsFrameBase {
 
     private boolean processDataText() throws IOException {
         // Copy the available data to the buffer
-        while (!appendPayloadToMessage(messageBufferBinary)) {
+        while (!transformation.getMoreData(opCode, rsv, messageBufferBinary)) {
             // Frame not complete - we ran out of something
             // Convert bytes to UTF-8
             messageBufferBinary.flip();
@@ -481,7 +493,7 @@ public abstract class WsFrameBase {
 
     private boolean processDataBinary() throws IOException {
         // Copy the available data to the buffer
-        while (!appendPayloadToMessage(messageBufferBinary)) {
+        while (!transformation.getMoreData(opCode, rsv, messageBufferBinary)) {
             // Frame not complete - what did we run out of?
             if (readPos == writePos) {
                 // Ran out of input data - get some more
@@ -626,34 +638,6 @@ public abstract class WsFrameBase {
         } else {
             // Must be binary
             return binaryMsgHandler instanceof MessageHandler.Partial<?>;
-        }
-    }
-
-
-    private boolean appendPayloadToMessage(ByteBuffer dest) {
-        if (isMasked()) {
-            while (payloadWritten < payloadLength && readPos < writePos &&
-                    dest.hasRemaining()) {
-                byte b = (byte) ((inputBuffer[readPos] ^ mask[maskIndex]) & 0xFF);
-                maskIndex++;
-                if (maskIndex == 4) {
-                    maskIndex = 0;
-                }
-                readPos++;
-                payloadWritten++;
-                dest.put(b);
-            }
-            return (payloadWritten == payloadLength);
-        } else {
-            long toWrite = Math.min(
-                    payloadLength - payloadWritten, writePos - readPos);
-            toWrite = Math.min(toWrite, dest.remaining());
-
-            dest.put(inputBuffer, readPos, (int) toWrite);
-            readPos += toWrite;
-            payloadWritten += toWrite;
-            return (payloadWritten == payloadLength);
-
         }
     }
 

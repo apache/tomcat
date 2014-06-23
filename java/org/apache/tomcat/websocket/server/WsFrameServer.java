@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import javax.servlet.ServletInputStream;
 
+import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsFrameBase;
 import org.apache.tomcat.websocket.WsSession;
 
@@ -30,8 +31,9 @@ public class WsFrameServer extends WsFrameBase {
     private final Object connectionReadLock = new Object();
 
 
-    public WsFrameServer(ServletInputStream sis, WsSession wsSession) {
-        super(wsSession);
+    public WsFrameServer(ServletInputStream sis, WsSession wsSession,
+            Transformation transformation) {
+        super(wsSession, transformation);
         this.sis = sis;
     }
 

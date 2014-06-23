@@ -36,6 +36,7 @@ import javax.websocket.EndpointConfig;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsIOException;
 import org.apache.tomcat.websocket.WsSession;
 
@@ -56,6 +57,7 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
     private WsServerContainer webSocketContainer;
     private WsHandshakeRequest handshakeRequest;
     private String subProtocol;
+    private Transformation transformation;
     private Map<String,String> pathParameters;
     private boolean secure;
     private WebConnection connection;
@@ -70,13 +72,14 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
 
     public void preInit(Endpoint ep, EndpointConfig endpointConfig,
             WsServerContainer wsc, WsHandshakeRequest handshakeRequest,
-            String subProtocol, Map<String,String> pathParameters,
-            boolean secure) {
+            String subProtocol, Transformation transformation,
+            Map<String,String> pathParameters, boolean secure) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         this.webSocketContainer = wsc;
         this.handshakeRequest = handshakeRequest;
         this.subProtocol = subProtocol;
+        this.transformation = transformation;
         this.pathParameters = pathParameters;
         this.secure = secure;
     }
@@ -120,12 +123,9 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
                     handshakeRequest.getParameterMap(),
                     handshakeRequest.getQueryString(),
                     handshakeRequest.getUserPrincipal(), httpSessionId,
-                    subProtocol, pathParameters, secure, endpointConfig);
-            WsFrameServer wsFrame = new WsFrameServer(
-                    sis,
-                    wsSession);
-            sos.setWriteListener(
-                    new WsWriteListener(this, wsRemoteEndpointServer));
+                    subProtocol, pathParameters, secure, endpointConfig, transformation);
+            WsFrameServer wsFrame = new WsFrameServer(sis, wsSession, transformation);
+            sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpointServer));
             ep.onOpen(wsSession, endpointConfig);
             webSocketContainer.registerSession(ep, wsSession);
             sis.setReadListener(new WsReadListener(this, wsFrame));
