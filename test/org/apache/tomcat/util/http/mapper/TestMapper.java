@@ -43,7 +43,6 @@ public class TestMapper extends LoggingBaseTest {
         mapper.addHost("fwehoihoihwfeo", new String[0], "blah5");
         mapper.addHost("owefojiwefoi", new String[0], "blah6");
         mapper.addHost("iowejoiejfoiew", new String[0], "blah7");
-        mapper.addHost("iowejoiejfoiew", new String[0], "blah17");
         mapper.addHost("ohewoihfewoih", new String[0], "blah8");
         mapper.addHost("fewohfoweoih", new String[0], "blah9");
         mapper.addHost("ttthtiuhwoih", new String[0], "blah10");
@@ -88,8 +87,16 @@ public class TestMapper extends LoggingBaseTest {
 
     @Test
     public void testAddHost() throws Exception {
+        // Try to add duplicates
+        // Duplicate Host name
+        mapper.addHost("iowejoiejfoiew", new String[0], "blah17");
+        // Alias conflicting with existing Host
+        mapper.addHostAlias("iowejoiejfoiew", "qwigqwiwoih");
+        // Redundancy. Alias name = Host name. No error here.
+        mapper.addHostAlias("qwigqwiwoih", "qwigqwiwoih");
+
         // Check we have the right number
-        // (added 17 including one host alias but one is a duplicate)
+        // (added 16 including one host alias. Three duplicates do not increase the count.)
         assertEquals(16, mapper.hosts.length);
 
         // Make sure adding a duplicate *does not* overwrite
@@ -104,6 +111,9 @@ public class TestMapper extends LoggingBaseTest {
             current = mapper.hosts[i].name;
             assertTrue(previous.compareTo(current) < 0);
         }
+
+        final int qwigPos = 8;
+        assertEquals("blah14", mapper.hosts[qwigPos].object);
 
         // Check that host alias has the same data
         Mapper.Host host = mapper.hosts[iowPos];
