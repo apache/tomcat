@@ -87,23 +87,18 @@ public final class Mapper {
     public synchronized void addHost(String name, String[] aliases,
                                      Object host) {
         Host[] newHosts = new Host[hosts.length + 1];
-        Host newHost = new Host();
-        ContextList contextList = new ContextList();
-        newHost.name = name;
-        newHost.contextList = contextList;
-        newHost.object = host;
+        Host newHost = new Host(name, host);
         if (insertMap(hosts, newHosts, newHost)) {
             hosts = newHosts;
+        } else {
+            Host duplicate = hosts[find(hosts, name)];
+            log.error(sm.getString("mapper.duplicateHost", name,
+                    duplicate.realHostName));
+            // Do not add aliases, as removeHost(hostName) won't be able to remove them
+            return;
         }
-        for (int i = 0; i < aliases.length; i++) {
-            newHosts = new Host[hosts.length + 1];
-            newHost = new Host();
-            newHost.name = aliases[i];
-            newHost.contextList = contextList;
-            newHost.object = host;
-            if (insertMap(hosts, newHosts, newHost)) {
-                hosts = newHosts;
-            }
+        for (String alias : aliases) {
+            addHostAliasImpl(alias, newHost);
         }
     }
 
@@ -115,21 +110,22 @@ public final class Mapper {
      */
     public synchronized void removeHost(String name) {
         // Find and remove the old host
-        int pos = find(hosts, name);
-        if (pos < 0) {
+        Host host = exactFind(hosts, name);
+        if (host == null || host.isAlias()) {
             return;
         }
-        Object host = hosts[pos].object;
+        Object catalinaHost = host.object;
         Host[] newHosts = new Host[hosts.length - 1];
         if (removeMap(hosts, newHosts, name)) {
             hosts = newHosts;
-        }
-        // Remove all aliases (they will map to the same host object)
-        for (int i = 0; i < newHosts.length; i++) {
-            if (newHosts[i].object == host) {
-                Host[] newHosts2 = new Host[hosts.length - 1];
-                if (removeMap(hosts, newHosts2, newHosts[i].name)) {
-                    hosts = newHosts2;
+
+            // Remove all aliases (they will map to the same host object)
+            for (int i = 0; i < newHosts.length; i++) {
+                if (newHosts[i].object == catalinaHost) {
+                    Host[] newHosts2 = new Host[hosts.length - 1];
+                    if (removeMap(hosts, newHosts2, newHosts[i].name)) {
+                        hosts = newHosts2;
+                    }
                 }
             }
         }
@@ -141,21 +137,30 @@ public final class Mapper {
      * @param alias The alias to add
      */
     public synchronized void addHostAlias(String name, String alias) {
-        int pos = find(hosts, name);
-        if (pos < 0) {
+        Host realHost = exactFind(hosts, name);
+        if (realHost == null) {
             // Should not be adding an alias for a host that doesn't exist but
             // just in case...
             return;
         }
-        Host realHost = hosts[pos];
+        addHostAliasImpl(alias, realHost);
+    }
 
+    private void addHostAliasImpl(String alias, Host realHost) {
+        Host newHost = new Host(alias, realHost);
         Host[] newHosts = new Host[hosts.length + 1];
-        Host newHost = new Host();
-        newHost.name = alias;
-        newHost.contextList = realHost.contextList;
-        newHost.object = realHost.object;
         if (insertMap(hosts, newHosts, newHost)) {
             hosts = newHosts;
+        } else {
+            Host duplicate = hosts[find(hosts, alias)];
+            if (duplicate.object == realHost.object) {
+                // A duplicate Alias for the same Host.
+                // A harmless redundancy. E.g.
+                // <Host name="localhost"><Alias>localhost</Alias></Host>
+                return;
+            }
+            log.error(sm.getString("mapper.duplicateHostAlias", alias,
+                    realHost.realHostName, duplicate.realHostName));
         }
     }
 
@@ -165,8 +170,8 @@ public final class Mapper {
      */
     public synchronized void removeHostAlias(String alias) {
         // Find and remove the alias
-        int pos = find(hosts, alias);
-        if (pos < 0) {
+        Host host = exactFind(hosts, alias);
+        if (host == null || !host.isAlias()) {
             return;
         }
         Host[] newHosts = new Host[hosts.length - 1];
@@ -1441,8 +1446,30 @@ public final class Mapper {
     protected static final class Host
         extends MapElement {
 
-        public ContextList contextList = null;
+        public final String realHostName;
+        public ContextList contextList;
 
+        /**
+         * Creates an object for primary Host
+         */
+        public Host(String name, Object host) {
+            super(name, host);
+            this.realHostName = name;
+            this.contextList = new ContextList();
+        }
+
+        /**
+         * Creates an object for an Alias
+         */
+        public Host(String alias, Host realHost) {
+            super(alias, realHost.object);
+            this.realHostName = realHost.name;
+            this.contextList = realHost.contextList;
+        }
+
+        public boolean isAlias() {
+            return !name.equals(realHostName);
+        }
     }
 
 
