@@ -43,6 +43,7 @@ import javax.websocket.Decoder.TextStream;
 import javax.websocket.DeploymentException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
+import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 import javax.websocket.Session;
@@ -347,7 +348,6 @@ public class Util {
     }
 
 
-
     public static Set<MessageHandlerResult> getMessageHandlers(
             MessageHandler listener, EndpointConfig endpointConfig,
             Session session) {
@@ -443,6 +443,52 @@ public class Util {
     }
 
 
+    public static void parseExtensionHeader(List<Extension> extensions,
+            String header) {
+        // The relevant ABNF for the Sec-WebSocket-Extensions is as follows:
+        //      extension-list = 1#extension
+        //      extension = extension-token *( ";" extension-param )
+        //      extension-token = registered-token
+        //      registered-token = token
+        //      extension-param = token [ "=" (token | quoted-string) ]
+        //             ; When using the quoted-string syntax variant, the value
+        //             ; after quoted-string unescaping MUST conform to the
+        //             ; 'token' ABNF.
+        //
+        // The limiting of parameter values to tokens or "quoted tokens" makes
+        // the parsing of the header significantly simpler and allows a number
+        // of short-cuts to be taken.
+
+        // Step one, split the header into individual extensions using ',' as a
+        // separator
+        String unparsedExtensions[] = header.split(",");
+        for (String unparsedExtension : unparsedExtensions) {
+            // Step two, split the extension into the registered name and
+            // parameter/value pairs using ';' as a separator
+            String unparsedParameters[] = unparsedExtension.split(";");
+            WsExtension extension = new WsExtension(unparsedParameters[0].trim());
+
+            for (int i = 1; i < unparsedParameters.length; i++) {
+                int equalsPos = unparsedParameters[i].indexOf('=');
+                String name;
+                String value;
+                if (equalsPos == -1) {
+                    name = unparsedParameters[i].trim();
+                    value = null;
+                } else {
+                    name = unparsedParameters[i].substring(0, equalsPos).trim();
+                    value = unparsedParameters[i].substring(equalsPos + 1).trim();
+                    if (value.length() > 2 && value.charAt(0) == '\"') {
+                        value = value.substring(1, value.length() - 1);
+                    }
+                }
+                extension.addParameter(new WsExtensionParameter(name, value));
+            }
+            extensions.add(extension);
+        }
+    }
+
+
     private static Method getOnMessageMethod(MessageHandler listener) {
         try {
             return listener.getClass().getMethod("onMessage", Object.class);
@@ -451,6 +497,7 @@ public class Util {
                     sm.getString("util.invalidMessageHandler"), e);
         }
     }
+
 
     public static class DecoderMatch {
 
