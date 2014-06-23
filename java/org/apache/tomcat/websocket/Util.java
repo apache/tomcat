@@ -478,9 +478,23 @@ public class Util {
                 } else {
                     name = unparsedParameters[i].substring(0, equalsPos).trim();
                     value = unparsedParameters[i].substring(equalsPos + 1).trim();
-                    if (value.length() > 2 && value.charAt(0) == '\"') {
-                        value = value.substring(1, value.length() - 1);
+                    int len = value.length();
+                    if (len > 1) {
+                        if (value.charAt(0) == '\"' && value.charAt(len - 1) == '\"') {
+                            value = value.substring(1, value.length() - 1);
+                        }
                     }
+                }
+                // Make sure value doesn't contain any of the delimiters since
+                // that would indicate something went wrong
+                if (containsDelims(name) || containsDelims(value)) {
+                    throw new IllegalArgumentException(sm.getString(
+                            "util.notToken", name, value));
+                }
+                if (value != null &&
+                        (value.indexOf(',') > -1 || value.indexOf(';') > -1 ||
+                        value.indexOf('\"') > -1 || value.indexOf('=') > -1)) {
+                    throw new IllegalArgumentException(sm.getString("", value));
                 }
                 extension.addParameter(new WsExtensionParameter(name, value));
             }
@@ -488,6 +502,25 @@ public class Util {
         }
     }
 
+
+    private static boolean containsDelims(String input) {
+        if (input == null || input.length() == 0) {
+            return false;
+        }
+        for (char c : input.toCharArray()) {
+            switch (c) {
+                case ',':
+                case ';':
+                case '\"':
+                case '=':
+                    return true;
+                default:
+                    // NO_OP
+            }
+
+        }
+        return false;
+    }
 
     private static Method getOnMessageMethod(MessageHandler listener) {
         try {
