@@ -221,6 +221,7 @@ public class UpgradeUtil {
         return result;
     }
 
+
     private static void append(StringBuilder sb, Extension extension) {
         if (extension == null || extension.getName() == null || extension.getName().length() == 0) {
             return;
