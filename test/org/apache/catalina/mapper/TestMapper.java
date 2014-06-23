@@ -127,6 +127,8 @@ public class TestMapper extends LoggingBaseTest {
         mapper.addHost("iowejoiejfoiew", new String[0], createHost("blah17"));
         // Alias conflicting with existing Host
         mapper.addHostAlias("iowejoiejfoiew", "qwigqwiwoih");
+        // Alias conflicting with existing Alias
+        mapper.addHostAlias("sjbjdvwsbvhrb", "iowejoiejfoiew_alias");
         // Redundancy. Alias name = Host name. No error here.
         mapper.addHostAlias("qwigqwiwoih", "qwigqwiwoih");
         // Redundancy. Duplicate Alias for the same Host name. No error here.
