@@ -726,7 +726,7 @@ public final class Mapper {
 
         mappingData.contextPath.setString(context.name);
 
-        ContextVersion contextVersion;
+        ContextVersion contextVersion = null;
         ContextVersion[] contextVersions = context.versions;
         int versionCount = contextVersions.length;
         if (versionCount > 1) {
@@ -735,27 +735,20 @@ public final class Mapper {
                 contextObjects[i] = contextVersions[i].object;
             }
             mappingData.contexts = contextObjects;
-        }
-
-        if (version == null) {
-            // Return the latest version
-            contextVersion = contextVersions[versionCount - 1];
-        } else {
-            pos = find(contextVersions, version);
-            if (pos < 0 || !contextVersions[pos].name.equals(version)) {
-                // Return the latest version
-                contextVersion = contextVersions[versionCount - 1];
-            } else {
-                contextVersion = contextVersions[pos];
+            if (version != null) {
+                contextVersion = exactFind(contextVersions, version);
             }
         }
+        if (contextVersion == null) {
+            // Return the latest version
+            contextVersion = contextVersions[versionCount - 1];
+        }
+
         mappingData.context = contextVersion.object;
         mappingData.contextSlashCount = contextVersion.slashCount;
 
         // Wrapper mapping
-        if (contextVersion != null) {
-            internalMapWrapper(contextVersion, uri, mappingData);
-        }
+        internalMapWrapper(contextVersion, uri, mappingData);
 
     }
 
