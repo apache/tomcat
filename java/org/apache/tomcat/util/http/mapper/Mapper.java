@@ -206,51 +206,44 @@ public final class Mapper {
             String version, Object context, String[] welcomeResources,
             javax.naming.Context resources) {
 
-        Host[] hosts = this.hosts;
-        int pos = find(hosts, hostName);
-        if( pos <0 ) {
+        Host mappedHost = exactFind(hosts, hostName);
+        if (mappedHost == null) {
             addHost(hostName, new String[0], host);
-            hosts = this.hosts;
-            pos = find(hosts, hostName);
+            mappedHost = exactFind(hosts, hostName);
+            if (mappedHost == null) {
+                log.error("No host found: " + hostName);
+                return;
+            }
         }
-        if (pos < 0) {
-            log.error("No host found: " + hostName);
-        }
-        Host mappedHost = hosts[pos];
-        if (mappedHost.name.equals(hostName)) {
-            int slashCount = slashCount(path);
-            synchronized (mappedHost) {
-                Context[] contexts = mappedHost.contextList.contexts;
-                // Update nesting
-                if (slashCount > mappedHost.contextList.nesting) {
-                    mappedHost.contextList.nesting = slashCount;
+        int slashCount = slashCount(path);
+        synchronized (mappedHost) {
+            Context[] contexts = mappedHost.contextList.contexts;
+            // Update nesting
+            if (slashCount > mappedHost.contextList.nesting) {
+                mappedHost.contextList.nesting = slashCount;
+            }
+            Context mappedContext = exactFind(contexts, path);
+            if (mappedContext == null) {
+                mappedContext = new Context();
+                mappedContext.name = path;
+                Context[] newContexts = new Context[contexts.length + 1];
+                if (insertMap(contexts, newContexts, mappedContext)) {
+                    mappedHost.contextList.contexts = newContexts;
                 }
-                int pos2 = find(contexts, path);
-                if (pos2 < 0 || !path.equals(contexts[pos2].name)) {
-                    Context newContext = new Context();
-                    newContext.name = path;
-                    Context[] newContexts = new Context[contexts.length + 1];
-                    if (insertMap(contexts, newContexts, newContext)) {
-                        mappedHost.contextList.contexts = newContexts;
-                    }
-                    pos2 = find(newContexts, path);
-                }
+            }
 
-                Context mappedContext = mappedHost.contextList.contexts[pos2];
-
-                ContextVersion[] contextVersions = mappedContext.versions;
-                ContextVersion[] newContextVersions =
-                    new ContextVersion[contextVersions.length + 1];
-                ContextVersion newContextVersion = new ContextVersion();
-                newContextVersion.path = path;
-                newContextVersion.slashCount = slashCount;
-                newContextVersion.name = version;
-                newContextVersion.object = context;
-                newContextVersion.welcomeResources = welcomeResources;
-                newContextVersion.resources = resources;
-                if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
-                    mappedContext.versions = newContextVersions;
-                }
+            ContextVersion[] contextVersions = mappedContext.versions;
+            ContextVersion[] newContextVersions =
+                new ContextVersion[contextVersions.length + 1];
+            ContextVersion newContextVersion = new ContextVersion();
+            newContextVersion.path = path;
+            newContextVersion.slashCount = slashCount;
+            newContextVersion.name = version;
+            newContextVersion.object = context;
+            newContextVersion.welcomeResources = welcomeResources;
+            newContextVersion.resources = resources;
+            if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
+                mappedContext.versions = newContextVersions;
             }
         }
 
