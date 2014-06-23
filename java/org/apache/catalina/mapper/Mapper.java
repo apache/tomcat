@@ -213,14 +213,12 @@ public final class Mapper {
         int slashCount = slashCount(path);
         synchronized (mappedHost) {
             ContextVersion newContextVersion = new ContextVersion(version,
-                    path, slashCount, context, resources);
-            newContextVersion.welcomeResources = welcomeResources;
+                    path, slashCount, context, resources, welcomeResources);
 
             MappedContext mappedContext = exactFind(
                     mappedHost.contextList.contexts, path);
             if (mappedContext == null) {
-                mappedContext = new MappedContext(path);
-                mappedContext.versions = new ContextVersion[] { newContextVersion };
+                mappedContext = new MappedContext(path, newContextVersion);
                 mappedHost.contextList = mappedHost.contextList.addContext(
                         mappedContext, slashCount);
                 contextObjectToContextVersionMap.put(context, newContextVersion);
@@ -1495,10 +1493,11 @@ public final class Mapper {
 
 
     protected static final class MappedContext extends MapElement<Void> {
-        public volatile ContextVersion[] versions = new ContextVersion[0];
+        public volatile ContextVersion[] versions;
 
-        public MappedContext(String name) {
+        public MappedContext(String name, ContextVersion firstVersion) {
             super(name, null);
+            this.versions = new ContextVersion[] { firstVersion };
         }
     }
 
@@ -1506,7 +1505,7 @@ public final class Mapper {
         public final String path;
         public final int slashCount;
         public final WebResourceRoot resources;
-        public String[] welcomeResources = new String[0];
+        public String[] welcomeResources;
         public MappedWrapper defaultWrapper = null;
         public MappedWrapper[] exactWrappers = new MappedWrapper[0];
         public MappedWrapper[] wildcardWrappers = new MappedWrapper[0];
@@ -1514,11 +1513,13 @@ public final class Mapper {
         public int nesting = 0;
 
         public ContextVersion(String version, String path, int slashCount,
-                Context context, WebResourceRoot resources) {
+                Context context, WebResourceRoot resources,
+                String[] welcomeResources) {
             super(version, context);
             this.path = path;
             this.slashCount = slashCount;
             this.resources = resources;
+            this.welcomeResources = welcomeResources;
         }
     }
 
