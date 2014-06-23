@@ -156,7 +156,7 @@ public final class Mapper {
         } else {
             HostMapping duplicate = hosts[find(hosts, alias)];
             if (duplicate.object == mappedHost) {
-                // An Alias with the same name as its own Host.
+                // A duplicate Alias for the same Host.
                 // A harmless redundancy. E.g.
                 // <Host name="localhost"><Alias>localhost</Alias></Host>
                 return;

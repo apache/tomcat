@@ -129,6 +129,9 @@ public class TestMapper extends LoggingBaseTest {
         mapper.addHostAlias("iowejoiejfoiew", "qwigqwiwoih");
         // Redundancy. Alias name = Host name. No error here.
         mapper.addHostAlias("qwigqwiwoih", "qwigqwiwoih");
+        // Redundancy. Duplicate Alias for the same Host name. No error here.
+        mapper.addHostAlias("iowejoiejfoiew", "iowejoiejfoiew_alias");
+        mapper.addHostAlias("iowejoiejfoiew", "iowejoiejfoiew_alias");
 
         // Check we have the right number
         // (added 16 including one host alias. Three duplicates do not increase the count.)
