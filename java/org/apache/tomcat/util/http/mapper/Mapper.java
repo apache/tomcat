@@ -266,43 +266,34 @@ public final class Mapper {
      */
     public void removeContextVersion(String hostName, String path,
             String version) {
-        Host[] hosts = this.hosts;
-        int pos = find(hosts, hostName);
-        if (pos < 0) {
+        Host host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        Host host = hosts[pos];
-        if (host.name.equals(hostName)) {
-            synchronized (host) {
-                Context[] contexts = host.contextList.contexts;
-                if (contexts.length == 0 ){
-                    return;
-                }
+        synchronized (host) {
+            Context[] contexts = host.contextList.contexts;
+            Context context = exactFind(contexts, path);
+            if (context == null) {
+                return;
+            }
 
-                int pos2 = find(contexts, path);
-                if (pos2 < 0 || !path.equals(contexts[pos2].name)) {
-                    return;
-                }
-                Context context = contexts[pos2];
+            ContextVersion[] contextVersions = context.versions;
+            ContextVersion[] newContextVersions =
+                new ContextVersion[contextVersions.length - 1];
+            if (removeMap(contextVersions, newContextVersions, version)) {
+                context.versions = newContextVersions;
 
-                ContextVersion[] contextVersions = context.versions;
-                ContextVersion[] newContextVersions =
-                    new ContextVersion[contextVersions.length - 1];
-                if (removeMap(contextVersions, newContextVersions, version)) {
-                    context.versions = newContextVersions;
-
-                    if (context.versions.length == 0) {
-                        // Remove the context
-                        Context[] newContexts = new Context[contexts.length -1];
-                        if (removeMap(contexts, newContexts, path)) {
-                            host.contextList.contexts = newContexts;
-                            // Recalculate nesting
-                            host.contextList.nesting = 0;
-                            for (int i = 0; i < newContexts.length; i++) {
-                                int slashCount = slashCount(newContexts[i].name);
-                                if (slashCount > host.contextList.nesting) {
-                                    host.contextList.nesting = slashCount;
-                                }
+                if (context.versions.length == 0) {
+                    // Remove the context
+                    Context[] newContexts = new Context[contexts.length -1];
+                    if (removeMap(contexts, newContexts, path)) {
+                        host.contextList.contexts = newContexts;
+                        // Recalculate nesting
+                        host.contextList.nesting = 0;
+                        for (int i = 0; i < newContexts.length; i++) {
+                            int slashCount = slashCount(newContexts[i].name);
+                            if (slashCount > host.contextList.nesting) {
+                                host.contextList.nesting = slashCount;
                             }
                         }
                     }
