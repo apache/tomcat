@@ -25,6 +25,7 @@ import java.nio.charset.CodingErrorAction;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 
@@ -697,5 +698,87 @@ public abstract class WsFrameBase {
 
     private static enum State {
         NEW_FRAME, PARTIAL_HEADER, DATA
+    }
+
+
+    private abstract class TerminalTransformation implements Transformation {
+
+        @Override
+        public boolean validateRsvBits(int i) {
+            // Terminal transformations don't use RSV bits and there is no next
+            // transformation so always return true.
+            return true;
+        }
+
+        @Override
+        public Extension getExtensionResponse() {
+            // Return null since terminal transformations are not extensions
+            return null;
+        }
+
+        @Override
+        public void setNext(Transformation t) {
+            // NO-OP since this is the terminal transformation
+        }
+
+        /**
+         * {@inheritDoc}
+         * <p>
+         * Anything other than a value of zero for rsv is invalid.
+         */
+        @Override
+        public boolean validateRsv(int rsv, byte opCode) {
+            return rsv == 0;
+        }
+    }
+
+
+    /**
+     * For use by the client implementation that needs to obtain payload data
+     * without the need for unmasking.
+     */
+    private final class NoopTransformation extends TerminalTransformation {
+
+        @Override
+        public boolean getMoreData(byte opCode, int rsv, ByteBuffer dest) {
+            // opCode is ignored as the transformation is the same for all
+            // opCodes
+            // rsv is ignored as it known to be zero at this point
+            long toWrite = Math.min(
+                    payloadLength - payloadWritten, writePos - readPos);
+            toWrite = Math.min(toWrite, dest.remaining());
+
+            dest.put(inputBuffer, readPos, (int) toWrite);
+            readPos += toWrite;
+            payloadWritten += toWrite;
+            return (payloadWritten == payloadLength);
+        }
+    }
+
+
+    /**
+     * For use by the server implementation that needs to obtain payload data
+     * and unmask it before any further processing.
+     */
+    private final class UnmaskTransformation extends TerminalTransformation {
+
+        @Override
+        public boolean getMoreData(byte opCode, int rsv, ByteBuffer dest) {
+            // opCode is ignored as the transformation is the same for all
+            // opCodes
+            // rsv is ignored as it known to be zero at this point
+            while (payloadWritten < payloadLength && readPos < writePos &&
+                    dest.hasRemaining()) {
+                byte b = (byte) ((inputBuffer[readPos] ^ mask[maskIndex]) & 0xFF);
+                maskIndex++;
+                if (maskIndex == 4) {
+                    maskIndex = 0;
+                }
+                readPos++;
+                payloadWritten++;
+                dest.put(b);
+            }
+            return (payloadWritten == payloadLength);
+        }
     }
 }
