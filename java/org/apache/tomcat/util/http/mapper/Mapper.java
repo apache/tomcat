@@ -426,33 +426,21 @@ public final class Mapper {
      * @param contextPath Context path this wrapper belongs to
      * @param path Wrapper mapping
      */
-    public void removeWrapper
-        (String hostName, String contextPath, String version, String path) {
-        Host[] hosts = this.hosts;
-        int pos = find(hosts, hostName);
-        if (pos < 0) {
+    public void removeWrapper(String hostName, String contextPath,
+            String version, String path) {
+        Host host = exactFind(hosts, hostName);
+        if (host == null) {
             return;
         }
-        Host host = hosts[pos];
-        if (host.name.equals(hostName)) {
-            Context[] contexts = host.contextList.contexts;
-            int pos2 = find(contexts, contextPath);
-            if (pos2 < 0) {
-                return;
-            }
-            Context context = contexts[pos2];
-            if (context.name.equals(contextPath)) {
-                ContextVersion[] contextVersions = context.versions;
-                int pos3 = find(contextVersions, version);
-                if( pos3<0 ) {
-                    return;
-                }
-                ContextVersion contextVersion = contextVersions[pos3];
-                if (contextVersion.name.equals(version)) {
-                    removeWrapper(contextVersion, path);
-                }
-            }
+        Context context = exactFind(host.contextList.contexts, contextPath);
+        if (context == null) {
+            return;
         }
+        ContextVersion contextVersion = exactFind(context.versions, version);
+        if (contextVersion == null) {
+            return;
+        }
+        removeWrapper(contextVersion, path);
     }
 
     protected void removeWrapper(ContextVersion context, String path) {
