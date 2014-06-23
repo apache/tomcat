@@ -16,11 +16,14 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
+import javax.websocket.Extension;
+import javax.websocket.Extension.Parameter;
 import javax.websocket.MessageHandler;
 
 import org.junit.Assert;
@@ -370,4 +373,92 @@ public class TestUtil {
             return null;
         }
     }
+
+
+    @Test
+    public void testParseExtensionHeaderSimple01() {
+        doTestParseExtensionHeaderSimple("ext;a=1;b=2");
+    }
+
+    @Test
+    public void testParseExtensionHeaderSimple02() {
+        doTestParseExtensionHeaderSimple("ext;a=\"1\";b=2");
+    }
+
+    @Test
+    public void testParseExtensionHeaderSimple03() {
+        doTestParseExtensionHeaderSimple("ext;a=1;b=\"2\"");
+    }
+
+    @Test
+    public void testParseExtensionHeaderSimple04() {
+        doTestParseExtensionHeaderSimple(" ext ; a = 1 ; b = 2 ");
+    }
+
+    private void doTestParseExtensionHeaderSimple(String header) {
+        // Simple test
+        List<Extension> result = new ArrayList<>();
+        Util.parseExtensionHeader(result, header);
+
+        Assert.assertEquals(1, result.size());
+
+        Extension ext = result.get(0);
+        Assert.assertEquals("ext", ext.getName());
+        List<Parameter> params = ext.getParameters();
+        Assert.assertEquals(2, params.size());
+        Parameter paramA = params.get(0);
+        Assert.assertEquals("a", paramA.getName());
+        Assert.assertEquals("1", paramA.getValue());
+        Parameter paramB = params.get(1);
+        Assert.assertEquals("b", paramB.getName());
+        Assert.assertEquals("2", paramB.getValue());
+    }
+
+
+    @Test
+    public void testParseExtensionHeaderMultiple01() {
+        doTestParseExtensionHeaderMultiple("ext;a=1;b=2,ext2;c;d=xyz,ext3");
+    }
+
+    @Test
+    public void testParseExtensionHeaderMultiple02() {
+        doTestParseExtensionHeaderMultiple(
+                " ext ; a = 1 ; b = 2 , ext2 ; c ; d = xyz , ext3 ");
+    }
+
+    private void doTestParseExtensionHeaderMultiple(String header) {
+        // Simple test
+        List<Extension> result = new ArrayList<>();
+        Util.parseExtensionHeader(result, header);
+
+        Assert.assertEquals(3, result.size());
+
+        Extension ext = result.get(0);
+        Assert.assertEquals("ext", ext.getName());
+        List<Parameter> params = ext.getParameters();
+        Assert.assertEquals(2, params.size());
+        Parameter paramA = params.get(0);
+        Assert.assertEquals("a", paramA.getName());
+        Assert.assertEquals("1", paramA.getValue());
+        Parameter paramB = params.get(1);
+        Assert.assertEquals("b", paramB.getName());
+        Assert.assertEquals("2", paramB.getValue());
+
+        Extension ext2 = result.get(1);
+        Assert.assertEquals("ext2", ext2.getName());
+        List<Parameter> params2 = ext2.getParameters();
+        Assert.assertEquals(2, params2.size());
+        Parameter paramC = params2.get(0);
+        Assert.assertEquals("c", paramC.getName());
+        Assert.assertNull(paramC.getValue());
+        Parameter paramD = params2.get(1);
+        Assert.assertEquals("d", paramD.getName());
+        Assert.assertEquals("xyz", paramD.getValue());
+
+        Extension ext3 = result.get(2);
+        Assert.assertEquals("ext3", ext3.getName());
+        List<Parameter> params3 = ext3.getParameters();
+        Assert.assertEquals(0, params3.size());
+    }
+
 }
