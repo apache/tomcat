@@ -21,9 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,6 +40,9 @@ import javax.websocket.server.ServerEndpointConfig;
 
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.websocket.Constants;
+import org.apache.tomcat.websocket.Transformation;
+import org.apache.tomcat.websocket.TransformationFactory;
+import org.apache.tomcat.websocket.Util;
 import org.apache.tomcat.websocket.WsHandshakeResponse;
 import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 
@@ -86,7 +87,6 @@ public class UpgradeUtil {
         // validation fails
         String key;
         String subProtocol = null;
-        List<Extension> extensions = Collections.emptyList();
         if (!headerContainsToken(req, Constants.CONNECTION_HEADER_NAME,
                 Constants.CONNECTION_HEADER_VALUE)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -119,7 +119,42 @@ public class UpgradeUtil {
                 sec.getSubprotocols(), subProtocols);
 
         // Extensions
-        // Currently no extensions are supported by this implementation
+        // Should normally only be one header but handle the case of multiple
+        // headers
+        List<Extension> extensionsRequested = new ArrayList<>();
+        Enumeration<String> extHeaders = req.getHeaders("Sec-WebSocket-Extensions");
+        while (extHeaders.hasMoreElements()) {
+            Util.parseExtensionHeader(extensionsRequested, extHeaders.nextElement());
+        }
+        List<Extension> negotiatedExtensions = sec.getConfigurator().getNegotiatedExtensions(
+                Constants.INSTALLED_EXTENSIONS, extensionsRequested);
+
+        // Create the Transformations that will be applied to this connection
+        List<Transformation> transformations = createTransformations(negotiatedExtensions);
+
+        // Build the transformation pipeline
+        Transformation transformation = null;
+        StringBuilder responseHeaderExtensions = new StringBuilder();
+        boolean first = true;
+        for (Transformation t : transformations) {
+            if (first) {
+                first = false;
+            } else {
+                responseHeaderExtensions.append(',');
+            }
+            append(responseHeaderExtensions, t.getExtensionResponse());
+            if (transformation == null) {
+                transformation = t;
+            } else {
+                transformation.setNext(t);
+            }
+        }
+
+        // Now we have the full pipeline, validate the use of the RSV bits.
+        if (transformation != null && !transformation.validateRsvBits(0)) {
+            // TODO i18n
+            throw new ServletException("Incompatible RSV bit usage");
+        }
 
         // If we got this far, all is good. Accept the connection.
         resp.setHeader(Constants.UPGRADE_HEADER_NAME,
@@ -132,16 +167,8 @@ public class UpgradeUtil {
             // RFC6455 4.2.2 explicitly states "" is not valid here
             resp.setHeader("Sec-WebSocket-Protocol", subProtocol);
         }
-        if (!extensions.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            Iterator<Extension> iter = extensions.iterator();
-            // There must be at least one
-            sb.append(iter.next());
-            while (iter.hasNext()) {
-                sb.append(',');
-                sb.append(iter.next().getName());
-            }
-            resp.setHeader("Sec-WebSocket-Extensions", sb.toString());
+        if (!transformations.isEmpty()) {
+            resp.setHeader("Sec-WebSocket-Extensions", responseHeaderExtensions.toString());
         }
 
         WsHandshakeRequest wsRequest = new WsHandshakeRequest(req);
@@ -176,8 +203,39 @@ public class UpgradeUtil {
         WsHttpUpgradeHandler wsHandler =
                 req.upgrade(WsHttpUpgradeHandler.class);
         wsHandler.preInit(ep, perSessionServerEndpointConfig, sc, wsRequest,
-                subProtocol, pathParams, req.isSecure());
+                subProtocol, transformation, pathParams, req.isSecure());
 
+    }
+
+
+    private static List<Transformation> createTransformations(
+            List<Extension> negotiatedExtensions) {
+
+        TransformationFactory factory = TransformationFactory.getInstance();
+
+        List<Transformation> result = new ArrayList<>(negotiatedExtensions.size());
+
+        for (Extension extension : negotiatedExtensions) {
+            result.add(factory.create(extension));
+        }
+        return result;
+    }
+
+    private static void append(StringBuilder sb, Extension extension) {
+        if (extension == null || extension.getName() == null || extension.getName().length() == 0) {
+            return;
+        }
+
+        sb.append(extension.getName());
+
+        for (Extension.Parameter p : extension.getParameters()) {
+            sb.append(';');
+            sb.append(p.getName());
+            if (p.getValue() != null) {
+                sb.append('=');
+                sb.append(p.getValue());
+            }
+        }
     }
 
 

@@ -324,7 +324,7 @@ public class WsWebSocketContainer
         WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
                 this, null, null, null, null, null, subProtocol,
                 Collections.<String, String> emptyMap(), secure,
-                clientEndpointConfiguration);
+                clientEndpointConfiguration, null);
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
         registerSession(endpoint, wsSession);
 
