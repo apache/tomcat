@@ -480,8 +480,7 @@ public final class Mapper {
             log.error("No context found: " + contextPath);
             return;
         }
-        ContextVersion[] contextVersions = context.versions;
-        ContextVersion contextVersion = exactFind(contextVersions, version);
+        ContextVersion contextVersion = exactFind(context.versions, version);
         if (contextVersion == null) {
             log.error("No context version found: " + contextPath + " "
                     + version);
@@ -514,8 +513,7 @@ public final class Mapper {
             log.error("No context found: " + contextPath);
             return;
         }
-        ContextVersion[] contextVersions = context.versions;
-        ContextVersion contextVersion = exactFind(contextVersions, version);
+        ContextVersion contextVersion = exactFind(context.versions, version);
         if (contextVersion == null) {
             log.error("No context version found: " + contextPath + " "
                     + version);
@@ -559,8 +557,7 @@ public final class Mapper {
             log.error("No context found: " + contextPath);
             return;
         }
-        ContextVersion[] contextVersions = context.versions;
-        ContextVersion contextVersion = exactFind(contextVersions, version);
+        ContextVersion contextVersion = exactFind(context.versions, version);
         if (contextVersion == null) {
             log.error("No context version found: " + contextPath + " "
                     + version);
