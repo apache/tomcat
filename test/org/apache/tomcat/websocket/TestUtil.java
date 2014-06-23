@@ -461,4 +461,13 @@ public class TestUtil {
         Assert.assertEquals(0, params3.size());
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void testParseExtensionHeaderInvalid01() {
+        Util.parseExtensionHeader(new ArrayList<Extension>(), "ext;a=\"1;b=2");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testParseExtensionHeaderInvalid02() {
+        Util.parseExtensionHeader(new ArrayList<Extension>(), "ext;a=1\";b=2");
+    }
 }
