@@ -388,8 +388,7 @@ public final class Mapper {
         if (context == null) {
             return;
         }
-        ContextVersion[] contextVersions = context.versions;
-        ContextVersion contextVersion = exactFind(contextVersions, version);
+        ContextVersion contextVersion = exactFind(context.versions, version);
         if (contextVersion == null) {
             return;
         }
