@@ -300,9 +300,13 @@ public abstract class WsFrameBase {
 
 
     private boolean processDataControl() throws IOException {
-        if (!transformation.getMoreData(opCode, rsv, controlBufferBinary)) {
+        TransformationResult tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
+        if (TransformationResult.UNDERFLOW.equals(tr)) {
             return false;
         }
+        // Control messages have fixed message size so
+        // TransformationResult.OVERFLOW is not possible here
+
         controlBufferBinary.flip();
         if (opCode == Constants.OPCODE_CLOSE) {
             open = false;
@@ -398,7 +402,8 @@ public abstract class WsFrameBase {
 
     private boolean processDataText() throws IOException {
         // Copy the available data to the buffer
-        while (!transformation.getMoreData(opCode, rsv, messageBufferBinary)) {
+        TransformationResult tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
+        while (!TransformationResult.END_OF_FRAME.equals(tr)) {
             // Frame not complete - we ran out of something
             // Convert bytes to UTF-8
             messageBufferBinary.flip();
@@ -421,21 +426,24 @@ public abstract class WsFrameBase {
                                 sm.getString("wsFrame.textMessageTooBig")));
                     }
                 } else if (cr.isUnderflow()) {
-                    // Need more input
                     // Compact what we have to create as much space as possible
                     messageBufferBinary.compact();
 
+                    // Need more input
                     // What did we run out of?
-                    if (readPos == writePos) {
-                        // Ran out of input data - get some more
-                        return false;
-                    } else {
+                    if (TransformationResult.OVERFLOW.equals(tr)) {
                         // Ran out of message buffer - exit inner loop and
                         // refill
                         break;
+                    } else {
+                        // TransformationResult.UNDERFLOW
+                        // Ran out of input data - get some more
+                        return false;
                     }
                 }
             }
+            // Read more input data
+            tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
         }
 
         messageBufferBinary.flip();
@@ -493,29 +501,32 @@ public abstract class WsFrameBase {
 
     private boolean processDataBinary() throws IOException {
         // Copy the available data to the buffer
-        while (!transformation.getMoreData(opCode, rsv, messageBufferBinary)) {
+        TransformationResult tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
+        while (!TransformationResult.END_OF_FRAME.equals(tr)) {
             // Frame not complete - what did we run out of?
-            if (readPos == writePos) {
+            if (TransformationResult.UNDERFLOW.equals(tr)) {
                 // Ran out of input data - get some more
                 return false;
-            } else {
-                // Ran out of message buffer - flush it
-                if (!usePartial()) {
-                    CloseReason cr = new CloseReason(CloseCodes.TOO_BIG,
-                            sm.getString("wsFrame.bufferTooSmall",
-                                    Integer.valueOf(
-                                            messageBufferBinary.capacity()),
-                                    Long.valueOf(payloadLength)));
-                    throw new WsIOException(cr);
-                }
-                messageBufferBinary.flip();
-                ByteBuffer copy =
-                        ByteBuffer.allocate(messageBufferBinary.limit());
-                copy.put(messageBufferBinary);
-                copy.flip();
-                sendMessageBinary(copy, false);
-                messageBufferBinary.clear();
             }
+
+            // Ran out of message buffer - flush it
+            if (!usePartial()) {
+                CloseReason cr = new CloseReason(CloseCodes.TOO_BIG,
+                        sm.getString("wsFrame.bufferTooSmall",
+                                Integer.valueOf(
+                                        messageBufferBinary.capacity()),
+                                Long.valueOf(payloadLength)));
+                throw new WsIOException(cr);
+            }
+            messageBufferBinary.flip();
+            ByteBuffer copy =
+                    ByteBuffer.allocate(messageBufferBinary.limit());
+            copy.put(messageBufferBinary);
+            copy.flip();
+            sendMessageBinary(copy, false);
+            messageBufferBinary.clear();
+            // Read more data
+            tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
         }
 
         // Frame is fully received
@@ -724,7 +735,7 @@ public abstract class WsFrameBase {
     private final class NoopTransformation extends TerminalTransformation {
 
         @Override
-        public boolean getMoreData(byte opCode, int rsv, ByteBuffer dest) {
+        public TransformationResult getMoreData(byte opCode, int rsv, ByteBuffer dest) {
             // opCode is ignored as the transformation is the same for all
             // opCodes
             // rsv is ignored as it known to be zero at this point
@@ -735,7 +746,15 @@ public abstract class WsFrameBase {
             dest.put(inputBuffer, readPos, (int) toWrite);
             readPos += toWrite;
             payloadWritten += toWrite;
-            return (payloadWritten == payloadLength);
+
+            if (payloadWritten == payloadLength) {
+                return TransformationResult.END_OF_FRAME;
+            } else if (readPos == writePos) {
+                return TransformationResult.UNDERFLOW;
+            } else {
+                // !dest.hasRemaining()
+                return TransformationResult.OVERFLOW;
+            }
         }
     }
 
@@ -747,7 +766,7 @@ public abstract class WsFrameBase {
     private final class UnmaskTransformation extends TerminalTransformation {
 
         @Override
-        public boolean getMoreData(byte opCode, int rsv, ByteBuffer dest) {
+        public TransformationResult getMoreData(byte opCode, int rsv, ByteBuffer dest) {
             // opCode is ignored as the transformation is the same for all
             // opCodes
             // rsv is ignored as it known to be zero at this point
@@ -762,7 +781,14 @@ public abstract class WsFrameBase {
                 payloadWritten++;
                 dest.put(b);
             }
-            return (payloadWritten == payloadLength);
+            if (payloadWritten == payloadLength) {
+                return TransformationResult.END_OF_FRAME;
+            } else if (readPos == writePos) {
+                return TransformationResult.UNDERFLOW;
+            } else {
+                // !dest.hasRemaining()
+                return TransformationResult.OVERFLOW;
+            }
         }
     }
 }

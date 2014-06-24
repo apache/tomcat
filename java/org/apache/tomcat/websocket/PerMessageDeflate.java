@@ -89,40 +89,50 @@ public class PerMessageDeflate implements Transformation {
     }
 
     @Override
-    public boolean getMoreData(byte opCode, int rsv, ByteBuffer dest) throws IOException {
+    public TransformationResult getMoreData(byte opCode, int rsv, ByteBuffer dest) throws IOException {
 
-        // Control frames are never compressed
+        // Control frames are never compressed. Pass control frames and
+        // uncompressed frames straight through.
         if (Util.isControl(opCode) || (rsv & RSV_BITMASK) == 0) {
             return next.getMoreData(opCode, rsv, dest);
         }
 
-        boolean endOfInputFrame = false;
+        int written;
+        boolean usedEomBytes = false;
 
-        if (inflator.needsInput()) {
-            readBuffer.clear();
-            endOfInputFrame = next.getMoreData(opCode, (rsv ^ RSV_BITMASK), readBuffer);
-            inflator.setInput(readBuffer.array(), readBuffer.arrayOffset(), readBuffer.position());
-        }
-
-        int written = 0;
-        try {
-            written = inflator.inflate(dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
-            if (endOfInputFrame && !inflator.finished()) {
-                inflator.setInput(EOM_BYTES);
-                inflator.inflate(dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
+        while (dest.remaining() > 0) {
+            // Space available in destination. Try and fill it.
+            try {
+                written = inflator.inflate(
+                        dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
+            } catch (DataFormatException e) {
+                throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
             }
-        } catch (DataFormatException e) {
-            throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
+            dest.position(dest.position() + written);
+
+            if (inflator.needsInput() && !usedEomBytes ) {
+                if (dest.hasRemaining()) {
+                    readBuffer.clear();
+                    TransformationResult nextResult =
+                            next.getMoreData(opCode, (rsv ^ RSV_BITMASK), readBuffer);
+                    inflator.setInput(
+                            readBuffer.array(), readBuffer.arrayOffset(), readBuffer.position());
+                    if (TransformationResult.UNDERFLOW.equals(nextResult)) {
+                        return nextResult;
+                    } else if (TransformationResult.END_OF_FRAME.equals(nextResult) &&
+                            readBuffer.position() == 0) {
+                        inflator.setInput(EOM_BYTES);
+                        usedEomBytes = true;
+                    }
+                }
+            } else if (written == 0) {
+                return TransformationResult.END_OF_FRAME;
+            }
         }
-        dest.position(dest.position() + written);
 
-
-        if (endOfInputFrame && !clientContextTakeover) {
-            inflator.reset();
-        }
-
-        return endOfInputFrame;
+        return TransformationResult.OVERFLOW;
     }
+
 
     @Override
     public boolean validateRsv(int rsv, byte opCode) {
