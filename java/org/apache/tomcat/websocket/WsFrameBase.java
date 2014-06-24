@@ -170,7 +170,7 @@ public abstract class WsFrameBase {
             }
         } else {
             if (continuationExpected) {
-                if (opCode != Constants.OPCODE_CONTINUATION) {
+                if (!Util.isContinuation(opCode)) {
                     throw new WsIOException(new CloseReason(
                             CloseCodes.PROTOCOL_ERROR,
                             sm.getString("wsFrame.noContinuation")));
