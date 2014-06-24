@@ -36,11 +36,8 @@ public interface Transformation {
      * @param rsv       The reserved bits for the frame currently being
      *                      processed
      * @param dest      The buffer in which the data is to be written
-     *
-     * @return <code>true</code> if the data source has been fully read
-     *         otherwise <code>false</code>
      */
-    boolean getMoreData(byte opCode, int rsv, ByteBuffer dest) throws IOException;
+    TransformationResult getMoreData(byte opCode, int rsv, ByteBuffer dest) throws IOException;
 
     /**
      * Validates the RSV and opcode combination (assumed to have been extracted
