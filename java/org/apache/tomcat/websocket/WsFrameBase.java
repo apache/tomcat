@@ -300,7 +300,7 @@ public abstract class WsFrameBase {
 
 
     private boolean processDataControl() throws IOException {
-        TransformationResult tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
+        TransformationResult tr = transformation.getMoreData(opCode, fin, rsv, messageBufferBinary);
         if (TransformationResult.UNDERFLOW.equals(tr)) {
             return false;
         }
@@ -402,7 +402,7 @@ public abstract class WsFrameBase {
 
     private boolean processDataText() throws IOException {
         // Copy the available data to the buffer
-        TransformationResult tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
+        TransformationResult tr = transformation.getMoreData(opCode, fin, rsv, messageBufferBinary);
         while (!TransformationResult.END_OF_FRAME.equals(tr)) {
             // Frame not complete - we ran out of something
             // Convert bytes to UTF-8
@@ -443,7 +443,7 @@ public abstract class WsFrameBase {
                 }
             }
             // Read more input data
-            tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
+            tr = transformation.getMoreData(opCode, fin, rsv, messageBufferBinary);
         }
 
         messageBufferBinary.flip();
@@ -501,7 +501,7 @@ public abstract class WsFrameBase {
 
     private boolean processDataBinary() throws IOException {
         // Copy the available data to the buffer
-        TransformationResult tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
+        TransformationResult tr = transformation.getMoreData(opCode, fin, rsv, messageBufferBinary);
         while (!TransformationResult.END_OF_FRAME.equals(tr)) {
             // Frame not complete - what did we run out of?
             if (TransformationResult.UNDERFLOW.equals(tr)) {
@@ -526,7 +526,7 @@ public abstract class WsFrameBase {
             sendMessageBinary(copy, false);
             messageBufferBinary.clear();
             // Read more data
-            tr = transformation.getMoreData(opCode, rsv, messageBufferBinary);
+            tr = transformation.getMoreData(opCode, fin, rsv, messageBufferBinary);
         }
 
         // Frame is fully received
@@ -735,7 +735,8 @@ public abstract class WsFrameBase {
     private final class NoopTransformation extends TerminalTransformation {
 
         @Override
-        public TransformationResult getMoreData(byte opCode, int rsv, ByteBuffer dest) {
+        public TransformationResult getMoreData(byte opCode, boolean fin, int rsv,
+                ByteBuffer dest) {
             // opCode is ignored as the transformation is the same for all
             // opCodes
             // rsv is ignored as it known to be zero at this point
@@ -766,7 +767,8 @@ public abstract class WsFrameBase {
     private final class UnmaskTransformation extends TerminalTransformation {
 
         @Override
-        public TransformationResult getMoreData(byte opCode, int rsv, ByteBuffer dest) {
+        public TransformationResult getMoreData(byte opCode, boolean fin, int rsv,
+                ByteBuffer dest) {
             // opCode is ignored as the transformation is the same for all
             // opCodes
             // rsv is ignored as it known to be zero at this point
