@@ -33,11 +33,12 @@ public interface Transformation {
      * Obtain more input data.
      *
      * @param opCode    The opcode for the frame currently being processed
+     * @param fin       Is this the final frame in this WebSocket message?
      * @param rsv       The reserved bits for the frame currently being
      *                      processed
      * @param dest      The buffer in which the data is to be written
      */
-    TransformationResult getMoreData(byte opCode, int rsv, ByteBuffer dest) throws IOException;
+    TransformationResult getMoreData(byte opCode, boolean fin, int rsv, ByteBuffer dest) throws IOException;
 
     /**
      * Validates the RSV and opcode combination (assumed to have been extracted
