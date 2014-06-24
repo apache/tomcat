@@ -78,6 +78,11 @@ public class Util {
     }
 
 
+    static boolean isContinuation(byte opCode) {
+        return opCode == Constants.OPCODE_CONTINUATION;
+    }
+
+
     static CloseCode getCloseCode(int code) {
         if (code > 2999 && code < 5000) {
             return CloseCodes.NORMAL_CLOSURE;
