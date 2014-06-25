@@ -2088,8 +2088,25 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </antcall>
   </target>
 
+  <target name="sign-windows-binaries" depends="installer">
+
+    <taskdef name="signcode"
+             classname="org.apache.tomcat.buildutil.SignCode"
+             classpath="${tomcat.classes}" />
+
+    <signcode>
+      <fileset dir="${tomcat.release}">
+        <filename name="v${version}/bin/${final.name}.exe"/>
+      </fileset>
+      <fileset dir="${tomcat.dist}/bin">
+        <include name="**/*.exe"/>
+      </fileset>
+    </signcode>
+
+  </target>
+
   <target name="release"
-    depends="clean,release-init,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
+    depends="clean,release-init,dist-deployer,sign-windows-binaries,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
     description="Create a Tomcat packaged distribution">
 
     <copy file="KEYS"
