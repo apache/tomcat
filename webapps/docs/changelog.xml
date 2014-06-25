@@ -86,6 +86,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        Add support for the <code>permessage-deflate</code> extension. This is
+        currently limited to decompressing incoming messages on the server side.
+        It is expected that support will be extended to outgoing messages and to
+        the client side shortly. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.util.List;
+
 import javax.websocket.Extension;
 
 public class TransformationFactory {
@@ -30,9 +32,9 @@ public class TransformationFactory {
         return factory;
     }
 
-    public Transformation create(Extension ext) {
-        if (PerMessageDeflate.NAME.equals(ext.getName())) {
-            return new PerMessageDeflate(ext.getParameters());
+    public Transformation create(String name, List<List<Extension.Parameter>> preferences) {
+        if (PerMessageDeflate.NAME.equals(name)) {
+            return PerMessageDeflate.negotiate(preferences);
         }
         // TODO i18n
         throw new IllegalArgumentException("Unsupported extension");

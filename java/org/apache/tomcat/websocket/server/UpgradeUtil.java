@@ -22,6 +22,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -213,10 +214,30 @@ public class UpgradeUtil {
 
         TransformationFactory factory = TransformationFactory.getInstance();
 
+        LinkedHashMap<String,List<List<Extension.Parameter>>> extensionPreferences =
+                new LinkedHashMap<>();
+
+        // Result will likely be smaller than this
         List<Transformation> result = new ArrayList<>(negotiatedExtensions.size());
 
         for (Extension extension : negotiatedExtensions) {
-            result.add(factory.create(extension));
+            List<List<Extension.Parameter>> preferences =
+                    extensionPreferences.get(extension.getName());
+
+            if (preferences == null) {
+                preferences = new ArrayList<>();
+                extensionPreferences.put(extension.getName(), preferences);
+            }
+
+            preferences.add(extension.getParameters());
+        }
+
+        for (Map.Entry<String,List<List<Extension.Parameter>>> entry :
+            extensionPreferences.entrySet()) {
+            Transformation transformation = factory.create(entry.getKey(), entry.getValue());
+            if (transformation != null) {
+                result.add(transformation);
+            }
         }
         return result;
     }
