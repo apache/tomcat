@@ -94,6 +94,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the API stability section of the release notes now that Tomcat 8
+        has had its first stable release. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.9 (markt)">
   <subsection name="Catalina">

@@ -45,17 +45,14 @@ Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java SE 7 and later.
 API Stability:
 ==============
 
-*** This is an alpha release. Currently no guarantees are made regarding API ***
-*** stability.                                                               ***
-
 The public interfaces for the following classes are fixed and will not be
 changed at all during the remaining lifetime of the @VERSION_MAJOR@.x series:
-- None
+- All classes in the javax namespace
 
 The public interfaces for the following classes may be added to in order to
-resolve bugs and/or add new features. No existing interface will be removed or
-changed although it may be deprecated.
-- None
+resolve bugs and/or add new features. No existing interface method will be
+removed or changed although it may be deprecated.
+- org.apache.catalina.* (excluding sub-packages) 
 
 Note: As Tomcat @VERSION_MAJOR@ matures, the above list will be added to. The list is not
       considered complete at this time.
