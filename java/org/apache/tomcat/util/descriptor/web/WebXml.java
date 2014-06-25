@@ -1299,15 +1299,24 @@ public class WebXml {
 
     private static void appendElement(StringBuilder sb, String indent,
             String elementName, String value) {
-        if (value == null || value.length() == 0) return;
-        sb.append(indent);
-        sb.append('<');
-        sb.append(elementName);
-        sb.append('>');
-        sb.append(escapeXml(value));
-        sb.append("</");
-        sb.append(elementName);
-        sb.append(">\n");
+        if (value == null) {
+            return;
+        }
+        if (value.length() == 0) {
+            sb.append(indent);
+            sb.append('<');
+            sb.append(elementName);
+            sb.append("/>\n");
+        } else {
+            sb.append(indent);
+            sb.append('<');
+            sb.append(elementName);
+            sb.append('>');
+            sb.append(escapeXml(value));
+            sb.append("</");
+            sb.append(elementName);
+            sb.append(">\n");
+        }
     }
 
     private static void appendElement(StringBuilder sb, String indent,

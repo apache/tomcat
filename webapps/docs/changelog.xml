@@ -80,6 +80,10 @@
         Remove <code>context</code> and <code>wrapper</code> fields and setters
         from <code>Request</code> class. (kkolinko)
       </scode>
+      <fix>
+        <bug>56665</bug>: Correct the generation of the effective web.xml when
+        elements contain an empty string as value. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
