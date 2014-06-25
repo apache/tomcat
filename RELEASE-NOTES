@@ -52,7 +52,7 @@ changed at all during the remaining lifetime of the @VERSION_MAJOR@.x series:
 The public interfaces for the following classes may be added to in order to
 resolve bugs and/or add new features. No existing interface method will be
 removed or changed although it may be deprecated.
-- org.apache.catalina.* (excluding sub-packages) 
+- org.apache.catalina.* (excluding sub-packages)
 
 Note: As Tomcat @VERSION_MAJOR@ matures, the above list will be added to. The list is not
       considered complete at this time.
