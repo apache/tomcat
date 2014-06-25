@@ -86,6 +86,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>56543</bug>: Update to the Eclipse JDT Compiler 4.4. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <add>
