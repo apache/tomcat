@@ -300,7 +300,7 @@ public abstract class WsFrameBase {
 
 
     private boolean processDataControl() throws IOException {
-        TransformationResult tr = transformation.getMoreData(opCode, fin, rsv, messageBufferBinary);
+        TransformationResult tr = transformation.getMoreData(opCode, fin, rsv, controlBufferBinary);
         if (TransformationResult.UNDERFLOW.equals(tr)) {
             return false;
         }
