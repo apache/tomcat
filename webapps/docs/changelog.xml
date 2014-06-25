@@ -121,6 +121,10 @@
         Assert that mapping result object is empty before performing mapping
         work in <code>Mapper</code>. (kkolinko)
       </fix>
+      <fix>
+        <bug>56665</bug>: Correct the generation of the effective web.xml when
+        elements contain an empty string as value. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
