@@ -592,7 +592,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     // ----------------------------------------------------------- JMX Lifecycle
     @Override
     protected String getDomainInternal() {
-        return (context != null) ? context.getDomain() : null;
+        return context.getDomain();
     }
 
     @Override
