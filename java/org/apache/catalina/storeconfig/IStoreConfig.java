@@ -61,7 +61,7 @@ public interface IStoreConfig {
      * @exception Exception
      *                if an exception occurs while storing
      */
-    void storeConfig() throws Exception;
+    void storeConfig();
 
     /**
      * Store the specified Server properties.
@@ -72,7 +72,7 @@ public interface IStoreConfig {
      * @exception Exception
      *                if an exception occurs while storing
      */
-    void store(Server aServer) throws Exception;
+    boolean store(Server aServer);
 
     /**
      * Store the specified Server properties.
@@ -84,7 +84,7 @@ public interface IStoreConfig {
      * @param aServer
      *            Object to be stored
      */
-    void store(PrintWriter aWriter, int indent, Server aServer);
+    void store(PrintWriter aWriter, int indent, Server aServer) throws Exception;
 
     /**
      * Store the specified Service properties.
@@ -96,7 +96,7 @@ public interface IStoreConfig {
      * @param aService
      *            Object to be stored
      */
-    void store(PrintWriter aWriter, int indent, Service aService);
+    void store(PrintWriter aWriter, int indent, Service aService) throws Exception;
 
     /**
      * Store the specified Host properties.
@@ -108,7 +108,7 @@ public interface IStoreConfig {
      * @param aHost
      *            Object to be stored
      */
-    void store(PrintWriter aWriter, int indent, Host aHost);
+    void store(PrintWriter aWriter, int indent, Host aHost) throws Exception;
 
     /**
      * Store the specified Context properties.
@@ -116,7 +116,7 @@ public interface IStoreConfig {
      * @param aContext
      *            Object to be stored
      */
-    void store(Context aContext);
+    boolean store(Context aContext);
 
     /**
      * Store the specified Context properties.
@@ -128,5 +128,5 @@ public interface IStoreConfig {
      * @param aContext
      *            Object to be stored
      */
-    void store(PrintWriter aWriter, int indent, Context aContext);
+    void store(PrintWriter aWriter, int indent, Context aContext) throws Exception;
 }

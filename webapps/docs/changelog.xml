@@ -84,6 +84,10 @@
         <bug>56665</bug>: Correct the generation of the effective web.xml when
         elements contain an empty string as value. (violetagg)
       </fix>
+      <fix>
+        Fix storeconfig exception routing issues, so that a major problem
+        should avoid configuration overwrite. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
