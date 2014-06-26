@@ -2088,7 +2088,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </antcall>
   </target>
 
-  <target name="sign-windows-binaries" depends="installer">
+  <target name="sign-windows-binaries" depends="installer" unless="skip.codesigning">
 
     <taskdef name="signcode"
              classname="org.apache.tomcat.buildutil.SignCode"
