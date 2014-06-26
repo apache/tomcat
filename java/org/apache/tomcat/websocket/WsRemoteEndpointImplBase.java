@@ -409,42 +409,6 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private static class MessagePart {
-        private final byte opCode;
-        private final ByteBuffer payload;
-        private final boolean last;
-        private final SendHandler handler;
-
-        public MessagePart(byte opCode, ByteBuffer payload, boolean last,
-                SendHandler handler) {
-            this.opCode = opCode;
-            this.payload = payload;
-            this.last = last;
-            this.handler = handler;
-        }
-
-
-        public byte getOpCode() {
-            return opCode;
-        }
-
-
-        public ByteBuffer getPayload() {
-            return payload;
-        }
-
-
-        public boolean isLast() {
-            return last;
-        }
-
-
-        public SendHandler getHandler() {
-            return handler;
-        }
-    }
-
-
     /**
      * Wraps the user provided handler so that the end point is notified when
      * the message is complete.
