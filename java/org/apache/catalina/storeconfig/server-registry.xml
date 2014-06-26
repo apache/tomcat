@@ -259,6 +259,7 @@
         <TransientAttribute>cacheObjectMaxSize</TransientAttribute>
         <TransientAttribute>cached</TransientAttribute>
         <TransientAttribute>caseSensitive</TransientAttribute>
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
     <Description
         id="org.apache.catalina.WebResourceSet.[PreResources]"
