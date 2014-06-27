@@ -90,6 +90,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>56663</bug>: Fix edge cases demonstrated by ByteCounter relating
+        to data available, remaining and extra write events, mostly occurring
+        with non blocking Servlet 3.1. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
