@@ -130,6 +130,10 @@
         updated, it will delete the old JAR from <code>build/lib</code>
         directory. (kkolinko)
       </update>
+      <scode>
+        Simplify implementation of "setproxy" target in <code>build.xml</code>.
+        (kkolinko)
+      </scode>
     </changelog>
   </subsection>
 </section>

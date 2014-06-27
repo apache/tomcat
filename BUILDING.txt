@@ -144,7 +144,7 @@ ${tomcat.source}.
   The following properties should be added to the ${tomcat.source}/build.properties
   file.
 
-        proxy.use=on
+        proxy.use=true
         proxy.host=proxy.domain
         proxy.port=8080
         proxy.user=username
