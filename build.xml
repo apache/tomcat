@@ -1044,10 +1044,19 @@
       <filterset refid="version.filters"/>
     </copy>
 
+    <!-- Delete all other versions of Eclipse JDT Compiler and copy the current one -->
+    <local name="jdt.jar.filename" />
+    <basename property="jdt.jar.filename" file="${jdt.jar}"/>
+    <delete verbose="true">
+      <fileset dir="${tomcat.build}/lib">
+        <include name="ecj-*.jar"/>
+        <exclude name="${jdt.jar.filename}"/>
+      </fileset>
+    </delete>
+    <copy file="${jdt.jar}" todir="${tomcat.build}/lib"/>
+
     <!-- Add sources for examples -->
     <antcall target="examples-sources" />
-
-    <copy file="${jdt.jar}" todir="${tomcat.build}/lib" />
   </target>
 
   <target name="compile-webapp-examples" >
