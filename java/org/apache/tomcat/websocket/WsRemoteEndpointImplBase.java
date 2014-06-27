@@ -61,6 +61,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     private final StateMachine stateMachine = new StateMachine();
 
+    private Transformation transformation = null;
     private boolean messagePartInProgress = false;
     private final Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
     private final Object messagePartLock = new Object();
@@ -81,6 +82,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private volatile long sendTimeout = -1;
     private WsSession wsSession;
     private List<EncoderEntry> encoderEntries = new ArrayList<>();
+
+
+    protected void setTransformation(Transformation transformation) {
+        this.transformation = transformation;
+    }
+
 
     public long getSendTimeout() {
         return sendTimeout;
@@ -249,8 +256,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         wsSession.updateLastActive();
 
-        MessagePart mp = new MessagePart(opCode, payload, last,
-                new EndMessageHandler(this, handler));
+        List<MessagePart> messageParts = new ArrayList<>();
+        messageParts.add(new MessagePart(opCode, payload, last,
+                new EndMessageHandler(this, handler)));
+
+        messageParts = transformation.sendMessagePart(messageParts);
+
+        MessagePart mp = messageParts.remove(0);
 
         boolean doWrite = false;
         synchronized (messagePartLock) {
@@ -277,6 +289,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 messagePartInProgress = true;
                 doWrite = true;
             }
+            // Add any remaining messages to the queue
+            messagePartQueue.addAll(messageParts);
         }
         if (doWrite) {
             // Actual write has to be outside sync block to avoid possible

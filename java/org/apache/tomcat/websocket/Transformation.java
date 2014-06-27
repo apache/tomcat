@@ -18,16 +18,42 @@ package org.apache.tomcat.websocket;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 import javax.websocket.Extension;
 
 /**
  * The internal representation of the transformation that a WebSocket extension
  * performs on a message.
- *
- * TODO Add support for transformation of outgoing data as well as incoming.
  */
 public interface Transformation {
+
+    /**
+     * Sets the next transformation in the pipeline.
+     */
+    void setNext(Transformation t);
+
+    /**
+     * Validate that the RSV bit(s) required by this transformation are not
+     * being used by another extension. The implementation is expected to set
+     * any bits it requires before passing the set of in-use bits to the next
+     * transformation.
+     *
+     * @param i         The RSV bits marked as in use so far as an int in the
+     *                  range zero to seven with RSV1 as the MSB and RSV3 as the
+     *                  LSB
+     *
+     * @return <code>true</code> if the combination of RSV bits used by the
+     *         transformations in the pipeline do not conflict otherwise
+     *         <code>false</code>
+     */
+    boolean validateRsvBits(int i);
+
+    /**
+     * Obtain the extension that describes the information to be returned to the
+     * client.
+     */
+    Extension getExtensionResponse();
 
     /**
      * Obtain more input data.
@@ -56,29 +82,16 @@ public interface Transformation {
     boolean validateRsv(int rsv, byte opCode);
 
     /**
-     * Obtain the extension that describes the information to be returned to the
-     * client.
-     */
-    Extension getExtensionResponse();
-
-    /**
-     * Sets the next transformation in the pipeline.
-     */
-    void setNext(Transformation t);
-
-    /**
-     * Validate that the RSV bit(s) required by this transformation are not
-     * being used by another extension. The implementation is expected to set
-     * any bits it requires before passing the set of in-use bits to the next
-     * transformation.
+     * Takes the provided list of messages, transforms them, passes the
+     * transformed list on to the next transformation (if any) and then returns
+     * the resulting list of message parts after all of the transformations have
+     * been applied.
      *
-     * @param i         The RSV bits marked as in use so far as an int in the
-     *                  range zero to seven with RSV1 as the MSB and RSV3 as the
-     *                  LSB
+     * @param messageParts  The list of messages to be transformed
      *
-     * @return <code>true</code> if the combination of RSV bits used by the
-     *         transformations in the pipeline do not conflict otherwise
-     *         <code>false</code>
+     * @return  The list of messages after this any any subsequent
+     *          transformations have been applied. The size of the returned list
+     *          may be bigger or smaller than the size of the input list
      */
-    boolean validateRsvBits(int i);
+    List<MessagePart> sendMessagePart(List<MessagePart> messageParts);
 }
