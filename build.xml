@@ -2758,14 +2758,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- =============== Utility Targets to support downloads ================ -->
 
-  <target name="proxyflags">
-    <!-- check proxy parameters. -->
-    <condition property="useproxy">
-      <equals arg1="${proxy.use}" arg2="on" />
-    </condition>
-  </target>
-
-  <target name="setproxy" depends="proxyflags" if="useproxy">
+  <target name="setproxy" if="${proxy.use}">
     <taskdef name="setproxy"
             classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
     <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"
@@ -2778,7 +2771,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <available file="${destfile}" property="exist"/>
   </target>
 
-  <target name="downloadgz" unless="exist" depends="setproxy,testexist">
+  <target name="downloadgz" unless="exist" depends="testexist,setproxy">
     <!-- Download and extract the package -->
     <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${base.path}/file.tar.gz" />
     <gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar"/>
@@ -2805,7 +2798,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <delete file="${base.path}/file.tar.gz"/>
   </target>
 
-  <target name="downloadzip" unless="exist" depends="setproxy,testexist">
+  <target name="downloadzip" unless="exist" depends="testexist,setproxy">
     <!-- Download and extract the package -->
     <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${base.path}/file.zip" />
     <mkdir dir="${destdir}" />
@@ -2829,7 +2822,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <delete file="${base.path}/file.zip"/>
   </target>
 
-  <target name="downloadfile" unless="exist" depends="setproxy,testexist">
+  <target name="downloadfile" unless="exist" depends="testexist,setproxy">
     <!-- Download extract the file -->
     <mkdir dir="${destdir}" />
     <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${destfile}" />
