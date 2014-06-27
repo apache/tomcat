@@ -651,6 +651,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         state = processor.event(status);
                     } else if (processor.isUpgrade()) {
                         state = processor.upgradeDispatch(status);
+                    } else if (status == SocketStatus.OPEN_WRITE) {
+                        // Extra write event likely after async, ignore
+                        state = SocketState.LONG;
                     } else {
                         state = processor.process(wrapper);
                     }

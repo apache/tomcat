@@ -214,6 +214,6 @@ public class IdentityInputFilter implements InputFilter {
     public boolean isFinished() {
         // Only finished if a content length is defined and there is no data
         // remaining
-        return contentLength > -1 && remaining == 0;
+        return contentLength > -1 && remaining <= 0;
     }
 }

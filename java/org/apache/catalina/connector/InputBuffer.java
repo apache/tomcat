@@ -266,7 +266,17 @@ public class InputBuffer extends Reader
 
 
     public boolean isFinished() {
-        return coyoteRequest.isFinished();
+        int available = 0;
+        if (state == BYTE_STATE) {
+            available = bb.getLength();
+        } else if (state == CHAR_STATE) {
+            available = cb.getLength();
+        }
+        if (available > 0) {
+            return false;
+        } else {
+            return coyoteRequest.isFinished();
+        }
     }
 
 
