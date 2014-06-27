@@ -581,6 +581,18 @@ public class Request
         return mappingData.context;
     }
 
+    /**
+     * @param context The newly associated Context
+     * @deprecated Use setters on {@link #getMappingData() MappingData} object.
+     * Depending on use case, you may need to update other
+     * <code>MappingData</code> fields as well, such as
+     * <code>contextSlashCount</code> and <code>host</code>.
+     */
+    @Deprecated
+    public void setContext(Context context) {
+        mappingData.context = context;
+    }
+
 
     /**
      * Filter chain associated with the request.
@@ -700,6 +712,18 @@ public class Request
      */
     public Wrapper getWrapper() {
         return mappingData.wrapper;
+    }
+
+    /**
+     * @param wrapper The newly associated Wrapper
+     * @deprecated Use setters on {@link #getMappingData() MappingData} object.
+     * Depending on use case, you may need to update other
+     * <code>MappingData</code> fields as well, such as <code>context</code>
+     * and <code>contextSlashCount</code>.
+     */
+    @Deprecated
+    public void setWrapper(Wrapper wrapper) {
+        mappingData.wrapper = wrapper;
     }
 
 
