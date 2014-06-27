@@ -50,7 +50,7 @@ public abstract class PojoMessageHandlerBase<T>
             int indexSession, long maxMessageSize) {
         this.pojo = pojo;
         this.method = method;
-        // TODO: The method should already accessible here but the following
+        // TODO: The method should already be accessible here but the following
         // code seems to be necessary in some as yet not fully understood cases.
         try {
             this.method.setAccessible(true);
