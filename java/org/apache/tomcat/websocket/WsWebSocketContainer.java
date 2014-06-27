@@ -316,15 +316,15 @@ public class WsWebSocketContainer
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         }
 
-        // Switch to WebSocket
-        WsRemoteEndpointImplClient wsRemoteEndpointClient =
-                new WsRemoteEndpointImplClient(channel);
+        // TODO Add extension/transformation support to the client
 
+        // Switch to WebSocket
+        WsRemoteEndpointImplClient wsRemoteEndpointClient = new WsRemoteEndpointImplClient(channel);
 
         WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
                 this, null, null, null, null, null, subProtocol,
                 Collections.<String, String> emptyMap(), secure,
-                clientEndpointConfiguration, null);
+                clientEndpointConfiguration);
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
         registerSession(endpoint, wsSession);
 

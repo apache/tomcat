@@ -65,4 +65,11 @@ public class WsFrameServer extends WsFrameBase {
         // Data is from the client so it should be masked
         return true;
     }
+
+
+    @Override
+    protected Transformation getTransformation() {
+        // Overridden to make it visible to other classes in this package
+        return super.getTransformation();
+    }
 }
