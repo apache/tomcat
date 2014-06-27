@@ -125,6 +125,11 @@
         Update the API stability section of the release notes now that Tomcat 8
         has had its first stable release. (markt)
       </update>
+      <update>
+        Improve <code>build.xml</code> so that when Eclipse JDT Compiler is
+        updated, it will delete the old JAR from <code>build/lib</code>
+        directory. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
