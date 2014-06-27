@@ -260,7 +260,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         messageParts.add(new MessagePart(opCode, payload, last,
                 new EndMessageHandler(this, handler)));
 
-        messageParts = transformation.sendMessagePart(messageParts);
+        if (transformation != null) {
+            messageParts = transformation.sendMessagePart(messageParts);
+        }
 
         MessagePart mp = messageParts.remove(0);
 
