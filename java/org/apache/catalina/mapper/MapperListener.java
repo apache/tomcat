@@ -171,7 +171,7 @@ public class MapperListener extends LifecycleMBeanBase
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
-            String version = ((Context) wrapper.getParent()).getWebappVersion();
+            String version = context.getWebappVersion();
             String hostName = context.getParent().getName();
             String wrapperName = wrapper.getName();
             String mapping = (String) event.getData();
@@ -406,7 +406,7 @@ public class MapperListener extends LifecycleMBeanBase
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
-        String version = ((Context) wrapper.getParent()).getWebappVersion();
+        String version = context.getWebappVersion();
         String hostName = context.getParent().getName();
 
         String[] mappings = wrapper.findMappings();
