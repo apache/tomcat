@@ -93,7 +93,7 @@ public final class Mapper {
         } else {
             MappedHost duplicate = hosts[find(hosts, name)];
             log.error(sm.getString("mapper.duplicateHost", name,
-                    duplicate.realHostName));
+                    duplicate.getRealHostName()));
             // Do not add aliases, as removeHost(hostName) won't be able to remove them
             return;
         }
@@ -160,7 +160,7 @@ public final class Mapper {
                 return;
             }
             log.error(sm.getString("mapper.duplicateHostAlias", alias,
-                    realHost.realHostName, duplicate.realHostName));
+                    realHost.getRealHostName(), duplicate.getRealHostName()));
         }
     }
 
@@ -1434,7 +1434,7 @@ public final class Mapper {
 
     protected static final class MappedHost extends MapElement<Host> {
 
-        public final String realHostName;
+        private final MappedHost realHost;
         public volatile ContextList contextList;
 
         /**
@@ -1442,8 +1442,8 @@ public final class Mapper {
          */
         public MappedHost(String name, Host host) {
             super(name, host);
-            this.realHostName = name;
-            this.contextList = new ContextList();
+            realHost = this;
+            contextList = new ContextList();
         }
 
         /**
@@ -1451,12 +1451,20 @@ public final class Mapper {
          */
         public MappedHost(String alias, MappedHost realHost) {
             super(alias, realHost.object);
-            this.realHostName = realHost.name;
+            this.realHost = realHost;
             this.contextList = realHost.contextList;
         }
 
         public boolean isAlias() {
-            return !name.equals(realHostName);
+            return realHost != this;
+        }
+
+        public MappedHost getRealHost() {
+            return realHost;
+        }
+
+        public String getRealHostName() {
+            return realHost.name;
         }
     }
 
