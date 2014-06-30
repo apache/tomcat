@@ -77,9 +77,13 @@
         work in <code>Mapper</code>. (kkolinko)
       </fix>
       <scode>
-        Remove <code>context</code> and <code>wrapper</code> fields and
-        deprecate their setters in <code>Request</code> class. (kkolinko)
+        Remove <code>context</code> and <code>wrapper</code> fields in
+        <code>Request</code> class and deprecate their setters. (kkolinko)
       </scode>
+      <fix>
+        <bug>56658</bug>: Avoid delay between registrations of mappings for
+        context and for its servlets. (kkolinko)
+      </fix>
       <fix>
         <bug>56665</bug>: Correct the generation of the effective web.xml when
         elements contain an empty string as value. (violetagg)

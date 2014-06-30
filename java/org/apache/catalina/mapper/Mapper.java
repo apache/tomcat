@@ -214,10 +214,31 @@ public final class Mapper {
      * @param context Context object
      * @param welcomeResources Welcome files defined for this context
      * @param resources Static resources of the context
+     * @deprecated Use {@link #addContextVersion(String, Host, String, String, Context, String[], WebResourceRoot, Collection)}
      */
+    @Deprecated
     public void addContextVersion(String hostName, Host host, String path,
             String version, Context context, String[] welcomeResources,
             WebResourceRoot resources) {
+        addContextVersion(hostName, host, path, version, context,
+                welcomeResources, resources, null);
+    }
+
+    /**
+     * Add a new Context to an existing Host.
+     *
+     * @param hostName Virtual host name this context belongs to
+     * @param host Host object
+     * @param path Context path
+     * @param version Context version
+     * @param context Context object
+     * @param welcomeResources Welcome files defined for this context
+     * @param resources Static resources of the context
+     * @param wrappers Information on wrapper mappings
+     */
+    public void addContextVersion(String hostName, Host host, String path,
+            String version, Context context, String[] welcomeResources,
+            WebResourceRoot resources, Collection<WrapperMappingInfo> wrappers) {
 
         MappedHost mappedHost  = exactFind(hosts, hostName);
         if (mappedHost == null) {
@@ -236,6 +257,9 @@ public final class Mapper {
         synchronized (mappedHost) {
             ContextVersion newContextVersion = new ContextVersion(version,
                     path, slashCount, context, resources, welcomeResources);
+            if (wrappers != null) {
+                addWrappers(newContextVersion, wrappers);
+            }
 
             ContextList contextList = mappedHost.contextList;
             MappedContext mappedContext = exactFind(contextList.contexts, path);
@@ -304,28 +328,70 @@ public final class Mapper {
     }
 
 
-    public void addWrapper(String hostName, String contextPath, String version,
-                           String path, Wrapper wrapper, boolean jspWildCard,
-                           boolean resourceOnly) {
+    private ContextVersion findContextVersion(String hostName,
+            String contextPath, String version, boolean silent) {
         MappedHost host = exactFind(hosts, hostName);
         if (host == null) {
-            return;
+            if (!silent) {
+                log.error("No host found: " + hostName);
+            }
+            return null;
         }
         MappedContext context = exactFind(host.contextList.contexts,
                 contextPath);
         if (context == null) {
-            log.error("No context found: " + contextPath );
-            return;
+            if (!silent) {
+                log.error("No context found: " + contextPath);
+            }
+            return null;
         }
         ContextVersion contextVersion = exactFind(context.versions, version);
         if (contextVersion == null) {
-            log.error("No context version found: " + contextPath + " " +
-                    version);
+            if (!silent) {
+                log.error("No context version found: " + contextPath + " "
+                        + version);
+            }
+            return null;
+        }
+        return contextVersion;
+    }
+
+
+    public void addWrapper(String hostName, String contextPath, String version,
+                           String path, Wrapper wrapper, boolean jspWildCard,
+                           boolean resourceOnly) {
+        ContextVersion contextVersion = findContextVersion(hostName,
+                contextPath, version, false);
+        if (contextVersion == null) {
             return;
         }
         addWrapper(contextVersion, path, wrapper, jspWildCard, resourceOnly);
     }
 
+    public void addWrappers(String hostName, String contextPath,
+            String version, Collection<WrapperMappingInfo> wrappers) {
+        ContextVersion contextVersion = findContextVersion(hostName,
+                contextPath, version, false);
+        if (contextVersion == null) {
+            return;
+        }
+        addWrappers(contextVersion, wrappers);
+    }
+
+    /**
+     * Adds wrappers to the given context.
+     *
+     * @param contextVersion The context to which to add the wrappers
+     * @param wrappers Information on wrapper mappings
+     */
+    private void addWrappers(ContextVersion contextVersion,
+            Collection<WrapperMappingInfo> wrappers) {
+        for (WrapperMappingInfo wrapper : wrappers) {
+            addWrapper(contextVersion, wrapper.getMapping(),
+                    wrapper.getWrapper(), wrapper.isJspWildCard(),
+                    wrapper.isResourceOnly());
+        }
+    }
 
     /**
      * Adds a wrapper to the given context.
@@ -334,9 +400,9 @@ public final class Mapper {
      * @param path Wrapper mapping
      * @param wrapper The Wrapper object
      * @param jspWildCard true if the wrapper corresponds to the JspServlet
+     *   and the mapping path contains a wildcard; false otherwise
      * @param resourceOnly true if this wrapper always expects a physical
      *                     resource to be present (such as a JSP)
-     * and the mapping path contains a wildcard; false otherwise
      */
     protected void addWrapper(ContextVersion context, String path,
             Wrapper wrapper, boolean jspWildCard, boolean resourceOnly) {
@@ -403,16 +469,8 @@ public final class Mapper {
      */
     public void removeWrapper(String hostName, String contextPath,
             String version, String path) {
-        MappedHost host = exactFind(hosts, hostName);
-        if (host == null) {
-            return;
-        }
-        MappedContext context = exactFind(host.contextList.contexts,
-                contextPath);
-        if (context == null) {
-            return;
-        }
-        ContextVersion contextVersion = exactFind(context.versions, version);
+        ContextVersion contextVersion = findContextVersion(hostName,
+                contextPath, version, true);
         if (contextVersion == null) {
             return;
         }
@@ -494,20 +552,9 @@ public final class Mapper {
      */
     public void addWelcomeFile(String hostName, String contextPath,
             String version, String welcomeFile) {
-        MappedHost host = exactFind(hosts, hostName);
-        if (host == null) {
-            return;
-        }
-        MappedContext context = exactFind(host.contextList.contexts,
-                contextPath);
-        if (context == null) {
-            log.error("No context found: " + contextPath);
-            return;
-        }
-        ContextVersion contextVersion = exactFind(context.versions, version);
+        ContextVersion contextVersion = findContextVersion(hostName,
+                contextPath, version, false);
         if (contextVersion == null) {
-            log.error("No context version found: " + contextPath + " "
-                    + version);
             return;
         }
         int len = contextVersion.welcomeResources.length + 1;
@@ -527,20 +574,9 @@ public final class Mapper {
      */
     public void removeWelcomeFile(String hostName, String contextPath,
             String version, String welcomeFile) {
-        MappedHost host = exactFind(hosts, hostName);
-        if (host == null) {
-            return;
-        }
-        MappedContext context = exactFind(host.contextList.contexts,
-                contextPath);
-        if (context == null) {
-            log.error("No context found: " + contextPath);
-            return;
-        }
-        ContextVersion contextVersion = exactFind(context.versions, version);
+        ContextVersion contextVersion = findContextVersion(hostName,
+                contextPath, version, false);
         if (contextVersion == null) {
-            log.error("No context version found: " + contextPath + " "
-                    + version);
             return;
         }
         int match = -1;
@@ -571,20 +607,9 @@ public final class Mapper {
      */
     public void clearWelcomeFiles(String hostName, String contextPath,
             String version) {
-        MappedHost host = exactFind(hosts, hostName);
-        if (host == null) {
-            return;
-        }
-        MappedContext context = exactFind(host.contextList.contexts,
-                contextPath);
-        if (context == null) {
-            log.error("No context found: " + contextPath);
-            return;
-        }
-        ContextVersion contextVersion = exactFind(context.versions, version);
+        ContextVersion contextVersion = findContextVersion(hostName,
+                contextPath, version, false);
         if (contextVersion == null) {
-            log.error("No context version found: " + contextPath + " "
-                    + version);
             return;
         }
         contextVersion.welcomeResources = new String[0];
