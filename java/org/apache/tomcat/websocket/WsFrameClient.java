@@ -37,7 +37,10 @@ public class WsFrameClient extends WsFrameBase {
         this.response = response;
         this.channel = channel;
         this.handler = new WsFrameClientCompletionHandler();
+    }
 
+
+    void startInputProcessing() {
         try {
             processSocketRead();
         } catch (IOException e) {

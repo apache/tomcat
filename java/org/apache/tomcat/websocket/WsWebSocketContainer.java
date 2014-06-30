@@ -316,8 +316,6 @@ public class WsWebSocketContainer
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         }
 
-        // TODO Add extension/transformation support to the client
-
         // Switch to WebSocket
         WsRemoteEndpointImplClient wsRemoteEndpointClient = new WsRemoteEndpointImplClient(channel);
 
@@ -325,13 +323,17 @@ public class WsWebSocketContainer
                 this, null, null, null, null, null, subProtocol,
                 Collections.<String, String> emptyMap(), secure,
                 clientEndpointConfiguration);
+
+        WsFrameClient wsFrameClient = new WsFrameClient(response, channel,
+                wsSession);
+        // WsFrame adds the necessary final transformations. Copy the
+        // completed transformation chain to the remote end point.
+        wsRemoteEndpointClient.setTransformation(wsFrameClient.getTransformation());
+
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
         registerSession(endpoint, wsSession);
 
-        // Object creation will trigger input processing
-        @SuppressWarnings("unused")
-        WsFrameClient wsFrameClient = new WsFrameClient(response, channel,
-                wsSession);
+        wsFrameClient.startInputProcessing();
 
         return wsSession;
     }
