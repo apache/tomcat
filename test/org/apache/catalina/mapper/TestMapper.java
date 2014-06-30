@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.mapper;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -95,30 +96,39 @@ public class TestMapper extends LoggingBaseTest {
 
         Host host = createHost("blah7");
         mapper.addContextVersion("iowejoiejfoiew", host, "",
-                "0", createContext("context0"), new String[0], null);
+                "0", createContext("context0"), new String[0], null, null);
         mapper.addContextVersion("iowejoiejfoiew", host, "/foo",
-                "0", createContext("context1"), new String[0], null);
+                "0", createContext("context1"), new String[0], null, null);
         mapper.addContextVersion("iowejoiejfoiew", host, "/foo/bar",
-                "0", createContext("context2"), welcomes, null);
-        mapper.addContextVersion("iowejoiejfoiew", host, "/foo/bar/bla",
-                "0", createContext("context3"), new String[0], null);
+                "0", createContext("context2"), welcomes, null, null);
 
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/fo/*",
-                createWrapper("wrapper0"), false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/",
-                createWrapper("wrapper1"), false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/blh",
-                createWrapper("wrapper2"), false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "*.jsp",
-                createWrapper("wrapper3"), false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/blah/bou/*",
-                createWrapper("wrapper4"), false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "/blah/bobou/*",
-                createWrapper("wrapper5"), false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar", "0", "*.htm",
-                createWrapper("wrapper6"), false, false);
-        mapper.addWrapper("iowejoiejfoiew", "/foo/bar/bla", "0", "/bobou/*",
-                createWrapper("wrapper7"), false, false);
+        mapper.addWrappers("iowejoiejfoiew", "/foo/bar", "0", Arrays
+                .asList(new WrapperMappingInfo[] {
+                        new WrapperMappingInfo("/fo/*",
+                                createWrapper("wrapper0"), false, false),
+                        new WrapperMappingInfo("/", createWrapper("wrapper1"),
+                                false, false),
+                        new WrapperMappingInfo("/blh",
+                                createWrapper("wrapper2"), false, false),
+                        new WrapperMappingInfo("*.jsp",
+                                createWrapper("wrapper3"), false, false),
+                        new WrapperMappingInfo("/blah/bou/*",
+                                createWrapper("wrapper4"), false, false),
+                        new WrapperMappingInfo("/blah/bobou/*",
+                                createWrapper("wrapper5"), false, false),
+                        new WrapperMappingInfo("*.htm",
+                                createWrapper("wrapper6"), false, false) }));
+
+        mapper.addContextVersion(
+                "iowejoiejfoiew",
+                host,
+                "/foo/bar/bla",
+                "0",
+                createContext("context3"),
+                new String[0],
+                null,
+                Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
+                        "/bobou/*", createWrapper("wrapper7"), false, false) }));
     }
 
     @Test
@@ -259,15 +269,15 @@ public class TestMapper extends LoggingBaseTest {
         mapper.setDefaultHostName("localhost");
 
         mapper.addContextVersion("localhost", host, "", "0", contextRoot,
-                new String[0], null);
+                new String[0], null, null);
         mapper.addContextVersion("localhost", host, "/foo", "0", context1,
-                new String[0], null);
+                new String[0], null, null);
         mapper.addContextVersion("localhost", host, "/foo/bar", "0", context2,
-                new String[0], null);
+                new String[0], null, null);
         mapper.addContextVersion("localhost", host, "/foo/bar/bla", "0",
-                context3, new String[0], null);
+                context3, new String[0], null, null);
         mapper.addContextVersion("localhost", host, "/foo/bar/bla/baz", "0",
-                context4, new String[0], null);
+                context4, new String[0], null, null);
 
         final AtomicBoolean running = new AtomicBoolean(true);
         Thread t = new Thread() {
@@ -278,7 +288,7 @@ public class TestMapper extends LoggingBaseTest {
                             "/foo/bar/bla/baz", "0");
                     mapper.addContextVersion("localhost", host,
                             "/foo/bar/bla/baz", "0", context4, new String[0],
-                            null);
+                            null, null);
                 }
                 running.set(false);
             }
