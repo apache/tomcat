@@ -16,8 +16,13 @@
  */
 package org.apache.catalina.mapper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -82,6 +87,7 @@ public final class Mapper {
      * Add a new host to the mapper.
      *
      * @param name Virtual host name
+     * @param aliases Alias names for the virtual host
      * @param host Host object
      */
     public synchronized void addHost(String name, String[] aliases,
@@ -97,9 +103,14 @@ public final class Mapper {
             // Do not add aliases, as removeHost(hostName) won't be able to remove them
             return;
         }
+        List<MappedHost> newAliases = new ArrayList<>(aliases.length);
         for (String alias : aliases) {
-            addHostAliasImpl(alias, newHost);
+            MappedHost newAlias = new MappedHost(alias, newHost);
+            if (addHostAliasImpl(newAlias)) {
+                newAliases.add(newAlias);
+            }
         }
+        newHost.addAliases(newAliases);
     }
 
 
@@ -114,21 +125,15 @@ public final class Mapper {
         if (host == null || host.isAlias()) {
             return;
         }
-        Host object = host.object;
-        MappedHost[] newHosts = new MappedHost[hosts.length - 1];
-        if (removeMap(hosts, newHosts, name)) {
-            hosts = newHosts;
-
-            // Remove all aliases (they will map to the same host object)
-            for (int i = 0; i < newHosts.length; i++) {
-                if (newHosts[i].object == object) {
-                    MappedHost[] newHosts2 = new MappedHost[hosts.length - 1];
-                    if (removeMap(hosts, newHosts2, newHosts[i].name)) {
-                        hosts = newHosts2;
-                    }
-                }
+        MappedHost[] newHosts = hosts.clone();
+        // Remove real host and all its aliases
+        int j = 0;
+        for (int i = 0; i < newHosts.length; i++) {
+            if (newHosts[i].getRealHost() != host) {
+                newHosts[j++] = newHosts[i];
             }
         }
+        hosts = Arrays.copyOf(newHosts, j);
     }
 
     /**
@@ -143,24 +148,28 @@ public final class Mapper {
             // just in case...
             return;
         }
-        addHostAliasImpl(alias, realHost);
+        MappedHost newAlias = new MappedHost(alias, realHost);
+        if (addHostAliasImpl(newAlias)) {
+            realHost.addAlias(newAlias);
+        }
     }
 
-    private void addHostAliasImpl(String alias, MappedHost realHost) {
-        MappedHost newHost = new MappedHost(alias, realHost);
+    private boolean addHostAliasImpl(MappedHost newAlias) {
         MappedHost[] newHosts = new MappedHost[hosts.length + 1];
-        if (insertMap(hosts, newHosts, newHost)) {
+        if (insertMap(hosts, newHosts, newAlias)) {
             hosts = newHosts;
+            return true;
         } else {
-            MappedHost duplicate = hosts[find(hosts, alias)];
-            if (duplicate.object == realHost.object) {
+            MappedHost duplicate = hosts[find(hosts, newAlias.name)];
+            if (duplicate.getRealHost() == newAlias.getRealHost()) {
                 // A duplicate Alias for the same Host.
                 // A harmless redundancy. E.g.
                 // <Host name="localhost"><Alias>localhost</Alias></Host>
-                return;
+                return false;
             }
-            log.error(sm.getString("mapper.duplicateHostAlias", alias,
-                    realHost.getRealHostName(), duplicate.getRealHostName()));
+            log.error(sm.getString("mapper.duplicateHostAlias", newAlias.name,
+                    newAlias.getRealHostName(), duplicate.getRealHostName()));
+            return false;
         }
     }
 
@@ -177,6 +186,7 @@ public final class Mapper {
         MappedHost[] newHosts = new MappedHost[hosts.length - 1];
         if (removeMap(hosts, newHosts, alias)) {
             hosts = newHosts;
+            hostMapping.getRealHost().removeAlias(hostMapping);
         }
 
     }
@@ -188,12 +198,9 @@ public final class Mapper {
     private void updateContextList(MappedHost realHost,
             ContextList newContextList) {
 
-        // The real host and all the aliases map to the same host object
-        Host object = realHost.object;
-        for (MappedHost host : hosts) {
-            if (host.object == object) {
-                host.contextList = newContextList;
-            }
+        realHost.contextList = newContextList;
+        for (MappedHost alias : realHost.getAliases()) {
+            alias.contextList = newContextList;
         }
     }
 
@@ -220,6 +227,10 @@ public final class Mapper {
                 log.error("No host found: " + hostName);
                 return;
             }
+        }
+        if (mappedHost.isAlias()) {
+            log.error("No host found: " + hostName);
+            return;
         }
         int slashCount = slashCount(path);
         synchronized (mappedHost) {
@@ -264,7 +275,7 @@ public final class Mapper {
         contextObjectToContextVersionMap.remove(ctxt);
 
         MappedHost host = exactFind(hosts, hostName);
-        if (host == null) {
+        if (host == null || host.isAlias()) {
             return;
         }
 
@@ -1434,8 +1445,19 @@ public final class Mapper {
 
     protected static final class MappedHost extends MapElement<Host> {
 
-        private final MappedHost realHost;
         public volatile ContextList contextList;
+
+        /**
+         * Link to the "real" MappedHost, shared by all aliases.
+         */
+        private final MappedHost realHost;
+
+        /**
+         * Links to all registered aliases, for easy enumeration. This field
+         * is available only in the "real" MappedHost. In an alias this field
+         * is <code>null</code>.
+         */
+        private final List<MappedHost> aliases;
 
         /**
          * Constructor used for the primary Host
@@ -1444,6 +1466,7 @@ public final class Mapper {
             super(name, host);
             realHost = this;
             contextList = new ContextList();
+            aliases = new CopyOnWriteArrayList<>();
         }
 
         /**
@@ -1453,6 +1476,7 @@ public final class Mapper {
             super(alias, realHost.object);
             this.realHost = realHost;
             this.contextList = realHost.contextList;
+            this.aliases = null;
         }
 
         public boolean isAlias() {
@@ -1465,6 +1489,22 @@ public final class Mapper {
 
         public String getRealHostName() {
             return realHost.name;
+        }
+
+        public Collection<MappedHost> getAliases() {
+            return aliases;
+        }
+
+        public void addAlias(MappedHost alias) {
+            aliases.add(alias);
+        }
+
+        public void addAliases(Collection<? extends MappedHost> c) {
+            aliases.addAll(c);
+        }
+
+        public void removeAlias(MappedHost alias) {
+            aliases.remove(alias);
         }
     }
 

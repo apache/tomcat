@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -182,10 +183,18 @@ public class TestMapper extends LoggingBaseTest {
         Mapper.MappedHost aliasMapping = mapper.hosts[iowPos + 1];
         assertEquals("iowejoiejfoiew_alias", aliasMapping.name);
         assertTrue(aliasMapping.isAlias());
-        assertEquals(hostMapping.object, aliasMapping.object);
+        assertSame(hostMapping.object, aliasMapping.object);
+
+        assertEquals("iowejoiejfoiew", hostMapping.getRealHostName());
+        assertEquals("iowejoiejfoiew", aliasMapping.getRealHostName());
+        assertSame(hostMapping, hostMapping.getRealHost());
+        assertSame(hostMapping, aliasMapping.getRealHost());
 
         mapper.removeHost("iowejoiejfoiew");
         assertEquals(14, mapper.hosts.length); // Both host and alias removed
+        for (Mapper.MappedHost host : mapper.hosts) {
+            assertTrue(host.name, !host.name.startsWith("iowejoiejfoiew"));
+        }
     }
 
     @Test
@@ -246,7 +255,7 @@ public class TestMapper extends LoggingBaseTest {
         final Context context3 = createContext("foo#bar#bla");
         final Context context4 = createContext("foo#bar#bla#baz");
 
-        mapper.addHost("localhost", new String[0], host);
+        mapper.addHost("localhost", new String[] { "alias" }, host);
         mapper.setDefaultHostName("localhost");
 
         mapper.addContextVersion("localhost", host, "", "0", contextRoot,
@@ -278,6 +287,8 @@ public class TestMapper extends LoggingBaseTest {
         MappingData mappingData = new MappingData();
         MessageBytes hostMB = MessageBytes.newInstance();
         hostMB.setString("localhost");
+        MessageBytes aliasMB = MessageBytes.newInstance();
+        aliasMB.setString("alias");
         MessageBytes uriMB = MessageBytes.newInstance();
         char[] uri = "/foo/bar/bla/bobou/foo".toCharArray();
         uriMB.setChars(uri, 0, uri.length);
@@ -285,11 +296,21 @@ public class TestMapper extends LoggingBaseTest {
         mapper.map(hostMB, uriMB, null, mappingData);
         assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
 
+        mappingData.recycle();
+        uriMB.setChars(uri, 0, uri.length);
+        mapper.map(aliasMB, uriMB, null, mappingData);
+        assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+
         t.start();
         while (running.get()) {
             mappingData.recycle();
             uriMB.setChars(uri, 0, uri.length);
             mapper.map(hostMB, uriMB, null, mappingData);
+            assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+
+            mappingData.recycle();
+            uriMB.setChars(uri, 0, uri.length);
+            mapper.map(aliasMB, uriMB, null, mappingData);
             assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
         }
     }
