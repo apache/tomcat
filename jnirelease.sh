@@ -192,7 +192,7 @@ fi
 # Remove first 25 lines from converted file which contains
 # page navagation data.
 # Remember to increase the lines when new file is added to news.
-sed -i '1,25d' ../../CHANGELOG.txt
+sed -i '' '1,25d' ../../CHANGELOG.txt
 cd "$top"
 mv ${JKJNIDIST}/jni/build/docs ${JKJNIDIST}/jni/docs
 rm -rf ${JKJNIDIST}/jni/build
