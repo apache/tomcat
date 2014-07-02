@@ -994,7 +994,7 @@ TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
         goto init_failed;
     }
     j = (BIO_JAVA *)bio->ptr;
-    if ((j = (BIO_JAVA *)bio->ptr) == NULL) {
+    if (j == NULL) {
         tcn_ThrowException(e, "Create BIO failed");
         goto init_failed;
     }
