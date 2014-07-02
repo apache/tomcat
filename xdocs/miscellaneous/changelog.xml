@@ -40,7 +40,8 @@
   <changelog>
     <fix>
       <bug>55938</bug>: Fix "Dereference of null pointer" issues in rarely
-      used methods in ssl.c, as identified by clang-analyzer. (kkolinko)
+      used methods in ssl.c. Fix possible memory leak in Socket.sendto().
+      The issues were identified with clang-analyzer. (kkolinko)
     </fix>
     <fix>
       <bug>56396</bug>: Do not create RSA keys shorter the 1024 bits

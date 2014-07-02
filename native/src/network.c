@@ -719,13 +719,12 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->sock != NULL);
 
-    bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-    TCN_ASSERT(bytes != NULL);
     apr_socket_opt_get(s->sock, APR_SO_NONBLOCK, &nb);
     if (nb)
          bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
     else
          bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+    TCN_ASSERT(bytes != NULL);
     ss = apr_socket_sendto(s->sock, w, flag, (char *)(bytes + offset), &nbytes);
 
     if (nb)
