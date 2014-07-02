@@ -51,6 +51,9 @@
       <bug>56423</bug>: Implement stubs for methods fipsModeGet, fipsModeSet
       when library is compiled without OpenSSL. (kkolinko)
     </fix>
+    <fix>
+      <bug>56596</bug>: Use OpenSSL 1.0.1h with Windows binaries. (markt)
+    </fix>
   </changelog>
 </section>
 <section name="Changes between 1.1.29 and 1.1.30">
