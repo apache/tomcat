@@ -92,6 +92,9 @@
         Fix storeconfig exception routing issues, so that a major problem
         should avoid configuration overwrite. (remm)
       </fix>
+      <fix>
+        Add configuration fields for header names in SSLValve. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
