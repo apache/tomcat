@@ -1165,11 +1165,18 @@ TCN_IMPLEMENT_CALL(void, SSL, randSet)(TCN_STDARGS, jstring file)
     UNREFERENCED(file);
 }
 
+TCN_IMPLEMENT_CALL(jint, SSL, fipsModeGet)(TCN_STDARGS)
+{
+    UNREFERENCED(o);
+    tcn_ThrowException(e, "FIPS was not available to tcnative at build time. You will need to re-build tcnative against an OpenSSL with FIPS.");
+    return 0;
+}
+
 TCN_IMPLEMENT_CALL(jint, SSL, fipsModeSet)(TCN_STDARGS, jint mode)
 {
-    UNREFERENCED_STDARGS;
+    UNREFERENCED(o);
     UNREFERENCED(mode);
-
+    tcn_ThrowException(e, "FIPS was not available to tcnative at build time. You will need to re-build tcnative against an OpenSSL with FIPS.");
     return 0;
 }
 
