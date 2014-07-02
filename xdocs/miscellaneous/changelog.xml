@@ -39,6 +39,10 @@
 <section name="Changes between 1.1.30 and 1.1.31">
   <changelog>
     <fix>
+      <bug>55938</bug>: Fix "Dereference of null pointer" issues in rarely
+      used methods in ssl.c, as identified by clang-analyzer. (kkolinko)
+    </fix>
+    <fix>
       <bug>56396</bug>: Do not create RSA keys shorter the 1024 bits
       if inside FIPS mode. (mturk)
     </fix>

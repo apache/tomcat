@@ -884,8 +884,8 @@ static int jbs_write(BIO *b, const char *in, int inl)
     if (b->init && in != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
         JNIEnv   *e = NULL;
-        jbyteArray jb = (*e)->NewByteArray(e, inl);
         tcn_get_java_env(&e);
+        jbyteArray jb = (*e)->NewByteArray(e, inl);
         if (!(*e)->ExceptionOccurred(e)) {
             (*e)->SetByteArrayRegion(e, jb, 0, inl, (jbyte *)in);
             ret = (*e)->CallIntMethod(e, j->cb.obj,
@@ -903,8 +903,8 @@ static int jbs_read(BIO *b, char *out, int outl)
     if (b->init && out != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
         JNIEnv   *e = NULL;
-        jbyteArray jb = (*e)->NewByteArray(e, outl);
         tcn_get_java_env(&e);
+        jbyteArray jb = (*e)->NewByteArray(e, outl);
         if (!(*e)->ExceptionOccurred(e)) {
             ret = (*e)->CallIntMethod(e, j->cb.obj,
                                       j->cb.mid[1], jb);
