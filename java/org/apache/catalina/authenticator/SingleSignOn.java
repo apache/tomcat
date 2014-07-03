@@ -313,7 +313,26 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug(" No cached principal found, erasing SSO cookie");
             }
+            // No need to return a valid SSO session ID
+            cookie.setValue("REMOVE");
+            // Age of zero will trigger removal
             cookie.setMaxAge(0);
+            // Domain and path have to match the original cookie to 'replace'
+            // the original cookie
+            cookie.setPath("/");
+            String domain = getCookieDomain();
+            if (domain != null) {
+                cookie.setDomain(domain);
+            }
+            // This is going to trigger a Set-Cookie header. While the value is
+            // not security sensitive, ensure that expectations for secure and
+            // httpOnly are met
+            cookie.setSecure(request.isSecure());
+            if (request.getServletContext().getSessionCookieConfig().isHttpOnly() ||
+                    request.getContext().getUseHttpOnly()) {
+                cookie.setHttpOnly(true);
+            }
+
             response.addCookie(cookie);
         }
 

@@ -95,6 +95,11 @@
       <fix>
         Add configuration fields for header names in SSLValve. (remm)
       </fix>
+      <fix>
+        <bug>56666</bug>: When clearing the SSO cookie use the same values for
+        domain, path, httpOnly and secure as were used to set the SSO cookie.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
