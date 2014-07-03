@@ -193,9 +193,9 @@ hamcrest.jar=${hamcrest.home}/hamcrest-core-${hamcrest.version}.jar
 hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest-core/${hamcrest.version}/hamcrest-core-${hamcrest.version}.jar
 
 # ----- Checkstyle, version 5.1 or later -----
-checkstyle.version=5.6
+checkstyle.version=5.7
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
-checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle-${checkstyle.version}-bin.zip
+checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-bin.zip
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- JSON Libraries (for bayeux module) -----

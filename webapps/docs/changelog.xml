@@ -233,6 +233,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update optional Checkstyle library to 5.7. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.54 (violetagg)" rtext="released 2014-05-22">
   <subsection name="Catalina">
