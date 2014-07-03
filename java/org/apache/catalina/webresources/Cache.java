@@ -68,7 +68,7 @@ public class Cache {
         CachedResource cacheEntry = resourceCache.get(path);
 
         if (cacheEntry != null && !cacheEntry.validate(useClassLoaderResources)) {
-            removeCacheEntry(path, true);
+            removeCacheEntry(path);
             cacheEntry = null;
         }
 
@@ -105,7 +105,7 @@ public class Cache {
                     if (newSize > maxSize) {
                         // Unable to create sufficient space for this resource
                         // Remove it from the cache
-                        removeCacheEntry(path, true);
+                        removeCacheEntry(path);
                         log.warn(sm.getString("cache.addFail", path));
                     }
                 }
@@ -167,7 +167,7 @@ public class Cache {
             }
 
             // Remove the entry from the cache
-            removeCacheEntry(resource.getWebappPath(), true);
+            removeCacheEntry(resource.getWebappPath());
 
             newSize = size.get();
         }
@@ -175,11 +175,11 @@ public class Cache {
         return newSize;
     }
 
-    private void removeCacheEntry(String path, boolean updateSize) {
+    private void removeCacheEntry(String path) {
         // With concurrent calls for the same path, the entry is only removed
         // once and the cache size is only updated (if required) once.
         CachedResource cachedResource = resourceCache.remove(path);
-        if (cachedResource != null && updateSize) {
+        if (cachedResource != null) {
             long delta = cachedResource.getSize();
             size.addAndGet(-delta);
         }
