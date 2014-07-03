@@ -1676,6 +1676,18 @@ public class WebdavServlet
                 copyResource(errorList, childSrc, childDest);
             }
         } else if (sourceResource.isFile()) {
+            WebResource destResource = resources.getResource(dest);
+            if (!destResource.exists() && !destResource.getWebappPath().endsWith("/")) {
+                int lastSlash = destResource.getWebappPath().lastIndexOf('/');
+                if (lastSlash > 0) {
+                    String parent = destResource.getWebappPath().substring(0, lastSlash);
+                    WebResource parentResource = resources.getResource(parent);
+                    if (!parentResource.isDirectory()) {
+                        errorList.put(source, new Integer(WebdavStatus.SC_CONFLICT));
+                        return false;
+                    }
+                }
+            }
             if (!resources.write(dest, sourceResource.getInputStream(),
                     false)) {
                 errorList.put(source,
