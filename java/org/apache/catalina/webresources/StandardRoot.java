@@ -164,7 +164,13 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             return false;
         }
 
-        return main.mkdir(path);
+        boolean mkdirResult = main.mkdir(path);
+
+        if (mkdirResult && isCachingAllowed()) {
+            // Remove the entry from the cache so the new directory is visible
+            cache.removeCacheEntry(path);
+        }
+        return mkdirResult;
     }
 
     @Override
@@ -175,7 +181,14 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             return false;
         }
 
-        return main.write(path, is, overwrite);
+        boolean writeResult = main.write(path, is, overwrite);
+
+        if (writeResult && isCachingAllowed()) {
+            // Remove the entry from the cache so the new resource is visible
+            cache.removeCacheEntry(path);
+        }
+
+        return writeResult;
     }
 
     private boolean preResourceExists(String path) {

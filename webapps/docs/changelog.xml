@@ -100,6 +100,13 @@
         domain, path, httpOnly and secure as were used to set the SSO cookie.
         (markt)
       </fix>
+      <fix>
+        <bug>56693</bug>: Fix various issues in the static resource cache
+        implementation where the cache retained a stale entry after the
+        successful completion of an operation that always invalidates the cache
+        entry such as a delete operation.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

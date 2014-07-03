@@ -76,7 +76,7 @@ public class Cache {
             // Local copy to ensure consistency
             int objectMaxSizeBytes = getObjectMaxSizeBytes();
             CachedResource newCacheEntry =
-                    new CachedResource(root, path, getTtl(), objectMaxSizeBytes);
+                    new CachedResource(this, root, path, getTtl(), objectMaxSizeBytes);
 
             // Concurrent callers will end up with the same CachedResource
             // instance
@@ -175,7 +175,7 @@ public class Cache {
         return newSize;
     }
 
-    private void removeCacheEntry(String path) {
+    void removeCacheEntry(String path) {
         // With concurrent calls for the same path, the entry is only removed
         // once and the cache size is only updated (if required) once.
         CachedResource cachedResource = resourceCache.remove(path);

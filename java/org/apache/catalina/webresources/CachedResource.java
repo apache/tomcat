@@ -36,6 +36,7 @@ public class CachedResource implements WebResource {
     // based on profiler data.
     private static final long CACHE_ENTRY_SIZE = 500;
 
+    private final Cache cache;
     private final StandardRoot root;
     private final String webAppPath;
     private final long ttl;
@@ -54,8 +55,9 @@ public class CachedResource implements WebResource {
     private volatile Long cachedContentLength = null;
 
 
-    public CachedResource(StandardRoot root, String path, long ttl,
+    public CachedResource(Cache cache, StandardRoot root, String path, long ttl,
             int objectMaxSizeBytes) {
+        this.cache = cache;
         this.root = root;
         this.webAppPath = path;
         this.ttl = ttl;
@@ -180,7 +182,11 @@ public class CachedResource implements WebResource {
 
     @Override
     public boolean delete() {
-        return webResource.delete();
+        boolean deleteResult = webResource.delete();
+        if (deleteResult) {
+            cache.removeCacheEntry(webAppPath);
+        }
+        return deleteResult;
     }
 
     @Override
