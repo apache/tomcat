@@ -243,6 +243,7 @@ public class Cache {
 
     public void clear() {
         resourceCache.clear();
+        size.set(0);
     }
 
     public long getSize() {
