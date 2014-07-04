@@ -123,6 +123,10 @@
       <fix>
         <bug>56543</bug>: Update to the Eclipse JDT Compiler 4.4. (violetagg)
       </fix>
+      <fix>
+        <bug>56652</bug>: Add support for method parameters that use arrays and
+        varargs to <code>ELProcessor.defineFunction()</code>.(markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

@@ -39,4 +39,28 @@ public class TesterFunctions {
     public static void doIt(@SuppressWarnings("unused") Integer a) {
         calls.append('C');
     }
+
+    public static void doIt(@SuppressWarnings("unused") int[] a) {
+        calls.append('D');
+    }
+
+    public static void doIt(@SuppressWarnings("unused") int[][] a) {
+        calls.append('E');
+    }
+
+    public static void doIt(@SuppressWarnings("unused") Integer[] a) {
+        calls.append('F');
+    }
+
+    public static void doIt(@SuppressWarnings("unused") Integer[][] a) {
+        calls.append('G');
+    }
+
+    public static void doIt(@SuppressWarnings("unused") long... a) {
+        calls.append('H');
+    }
+
+    public static void doIt(@SuppressWarnings("unused") Object... a) {
+        calls.append('I');
+    }
 }
