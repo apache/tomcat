@@ -352,7 +352,7 @@ public class Cookie implements Cloneable, Serializable {
         try {
             return super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
