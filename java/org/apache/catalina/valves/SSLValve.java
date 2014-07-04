@@ -64,10 +64,10 @@ public class SSLValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(SSLValve.class);
 
-    protected String sslClientCertHeader = "ssl_client_cert";
-    protected String sslCipherHeader = "ssl_cipher";
-    protected String sslSessionIdHeader = "ssl_session_id";
-    protected String sslCipherUserKeySizeHeader = "ssl_cipher_usekeysize";
+    private String sslClientCertHeader = "ssl_client_cert";
+    private String sslCipherHeader = "ssl_cipher";
+    private String sslSessionIdHeader = "ssl_session_id";
+    private String sslCipherUserKeySizeHeader = "ssl_cipher_usekeysize";
 
     //------------------------------------------------------ Constructor
     public SSLValve() {
