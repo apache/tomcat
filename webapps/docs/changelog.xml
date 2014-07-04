@@ -145,6 +145,13 @@
         examples web application from security sensitive systems be ignored.
         (markt)
       </fix>
+      <fix>
+        <bug>56694</bug>: Remove references to <code>Manager</code> attribute
+        <code>checkInterval</code> from documentation and Javadoc since it no
+        longer exists. Based on a patch by Felix Schumacher. Also remove other
+        references to <code>checkInterval</code> that are no longer valid.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

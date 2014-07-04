@@ -305,12 +305,6 @@
 
   <attributes>
 
-    <attribute name="checkInterval" required="false">
-      <p>The interval (in seconds) between checks for expired sessions
-      among those sessions that are currently swapped out.  By default,
-      this interval is set to 60 seconds (one minute).</p>
-    </attribute>
-
     <attribute name="className" required="true">
       <p>Java class name of the implementation to use.  This class must
       implement the <code>org.apache.catalina.Store</code> interface.  You
@@ -342,12 +336,6 @@
   </p>
 
   <attributes>
-
-    <attribute name="checkInterval" required="false">
-      <p>The interval (in seconds) between checks for expired sessions
-      among those sessions that are currently swapped out.  By default,
-      this interval is set to 60 seconds (one minute).</p>
-    </attribute>
 
     <attribute name="className" required="true">
       <p>Java class name of the implementation to use.  This class must

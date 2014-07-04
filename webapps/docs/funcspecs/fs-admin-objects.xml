@@ -367,12 +367,9 @@ Operations</a> that can be performed when the administrative application is
   <em>Context</em>.</p>
 
   <p>The standard component implementing a <em>Loader</em> is
-  <code>org.apache.catalina.loader.StandardLoader</code>.  It supports
+  <code>org.apache.catalina.loader.WebappLoader</code>.  It supports
   the following configurable properties:</p>
   <ul>
-  <li><code>checkInterval</code> - Number of seconds between checks for
-      modified classes, if automatic reloading is enabled.  [15]</li>
-  <li><code>debug</code> - Debugging detail level.  [0]</li>
   <li><code>reloadable</code> - Should this class loader check for modified
       classes and initiate automatic reloads?  [Set automatically from the
       <code>reloadable</code> property of the corresponding <em>Context</em>]
@@ -394,9 +391,6 @@ Operations</a> that can be performed when the administrative application is
   <code>org.apache.catalina.session.StandardManager</code>.  It supports
   the following configurable properties:</p>
   <ul>
-  <li><code>checkInterval</code> - Number of seconds between checks for
-      expired sessions.  [60]</li>
-  <li><code>debug</code> - Debugging detail level.  [0]</li>
   <li><code>maxActiveSessions</code> - The maximum number of active sessions
       that are allowed, or -1 for no limit.  [-1]</li>
   </ul>
