@@ -57,9 +57,6 @@ public interface IStoreConfig {
 
     /**
      * Store the current StoreFactory Server.
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
      */
     void storeConfig();
 
@@ -68,9 +65,6 @@ public interface IStoreConfig {
      *
      * @param aServer
      *            Object to be stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
      */
     boolean store(Server aServer);
 
