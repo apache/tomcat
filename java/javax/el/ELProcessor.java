@@ -134,7 +134,17 @@ public class ELProcessor {
                     if (types.length == typeNames.length) {
                         boolean match = true;
                         for (int i = 0; i < types.length; i++) {
-                            if (!types[i].getName().equals(typeNames[i])) {
+                            if (i == types.length -1 && method.isVarArgs()) {
+                                String typeName = typeNames[i];
+                                if (typeName.endsWith("...")) {
+                                    typeName = typeName.substring(0, typeName.length() - 3);
+                                    if (!typeName.equals(types[i].getName())) {
+                                        match = false;
+                                    }
+                                } else {
+                                    match = false;
+                                }
+                            } else if (!types[i].getName().equals(typeNames[i])) {
                                 match = false;
                                 break;
                             }
@@ -235,7 +245,58 @@ public class ELProcessor {
                     ImportHandler importHandler = context.getImportHandler();
                     for (int i = 0; i < parameterTypeNames.length; i++) {
                         String parameterTypeName = parameterTypeNames[i].trim();
-                        if (!PRIMITIVES.contains(parameterTypeName) &&
+                        int dimension = 0;
+                        int bracketPos = parameterTypeName.indexOf('[');
+                        if (bracketPos > -1) {
+                            String parameterTypeNameOnly =
+                                    parameterTypeName.substring(0, bracketPos).trim();
+                            while (bracketPos > -1) {
+                                dimension++;
+                                bracketPos = parameterTypeName.indexOf('[', bracketPos+ 1);
+                            }
+                            parameterTypeName = parameterTypeNameOnly;
+                        }
+                        boolean varArgs = false;
+                        if (parameterTypeName.endsWith("...")) {
+                            varArgs = true;
+                            dimension = 1;
+                            parameterTypeName = parameterTypeName.substring(
+                                    0, parameterTypeName.length() -3);
+                        }
+                        boolean isPrimitive = PRIMITIVES.contains(parameterTypeName);
+                        if (isPrimitive && dimension > 0) {
+                            // When in an array, class name changes for primitive
+                            switch(parameterTypeName)
+                            {
+                                case "boolean":
+                                    parameterTypeName = "Z";
+                                    break;
+                                case "byte":
+                                    parameterTypeName = "B";
+                                    break;
+                                case "char":
+                                    parameterTypeName = "C";
+                                    break;
+                                case "double":
+                                    parameterTypeName = "D";
+                                    break;
+                                case "float":
+                                    parameterTypeName = "F";
+                                    break;
+                                case "int":
+                                    parameterTypeName = "I";
+                                    break;
+                                case "long":
+                                    parameterTypeName = "J";
+                                    break;
+                                case "short":
+                                    parameterTypeName = "S";
+                                    break;
+                                default:
+                                    // Should never happen
+                                    break;
+                            }
+                        } else  if (!isPrimitive &&
                                 !parameterTypeName.contains(".")) {
                             Class<?> clazz = importHandler.resolveClass(
                                     parameterTypeName);
@@ -246,8 +307,27 @@ public class ELProcessor {
                                         parameterTypeNames[i], methodName,
                                         className));
                             }
-                            parameterTypeNames[i] = clazz.getName();
+                            parameterTypeName = clazz.getName();
                         }
+                        if (dimension > 0) {
+                            // Convert to array form of class name
+                            StringBuilder sb = new StringBuilder();
+                            for (int j = 0; j < dimension; j++) {
+                                sb.append('[');
+                            }
+                            if (!isPrimitive) {
+                                sb.append('L');
+                            }
+                            sb.append(parameterTypeName);
+                            if (!isPrimitive) {
+                                sb.append(';');
+                            }
+                            parameterTypeName = sb.toString();
+                        }
+                        if (varArgs) {
+                            parameterTypeName += "...";
+                        }
+                        parameterTypeNames[i] = parameterTypeName;
                     }
                 }
             }

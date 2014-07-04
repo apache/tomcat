@@ -19,6 +19,7 @@ package org.apache.el.lang;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.AccessController;
@@ -478,8 +479,32 @@ public class ELSupport {
             return Collections.EMPTY_MAP;
         }
 
+        // Handle arrays
+        if (type.isArray()) {
+            return coerceToArray(obj, type);
+        }
+
         throw new ELException(MessageFactory.get("error.convert",
                 obj, obj.getClass(), type));
+    }
+
+    private static Object coerceToArray(final Object obj,
+            final Class<?> type) {
+        // Note: Nested arrays will result in nested calls to this method.
+
+        // Cast the input object to an array (calling method has checked it is
+        // an array)
+        Object[] array = (Object[]) obj;
+        // Get the target type for the array elements
+        Class<?> componentType = type.getComponentType();
+        // Create a new array of the correct type
+        Object result = Array.newInstance(componentType, array.length);
+        // Coerce each element in turn.
+        for (int i = 0; i < array.length; i++) {
+            Array.set(result, i, coerceToType(array[i], componentType));
+        }
+
+        return result;
     }
 
     public static final boolean isBigDecimalOp(final Object obj0,

@@ -210,12 +210,14 @@ public final class ExpressionBuilder implements NodeVisitor {
                         "error.fnMapper.method", funcNode.getOutputName()));
             }
 
-            int pcnt = m.getParameterTypes().length;
+            int methodParameterCount = m.getParameterTypes().length;
             // AstFunction->MethodParameters->Parameters()
-            if (node.jjtGetChild(0).jjtGetNumChildren() != pcnt) {
+            int inputParameterCount = node.jjtGetChild(0).jjtGetNumChildren();
+            if (m.isVarArgs() && inputParameterCount < methodParameterCount - 1 ||
+                    !m.isVarArgs() && inputParameterCount != methodParameterCount) {
                 throw new ELException(MessageFactory.get(
                         "error.fnMapper.paramcount", funcNode.getOutputName(),
-                        "" + pcnt, "" + node.jjtGetNumChildren()));
+                        "" + methodParameterCount, "" + node.jjtGetChild(0).jjtGetNumChildren()));
             }
         } else if (node instanceof AstIdentifier && this.varMapper != null) {
             String variable = ((AstIdentifier) node).getImage();
