@@ -130,6 +130,11 @@
         domain, path, httpOnly and secure as were used to set the SSO cookie.
         (markt) 
       </fix>
+      <fix>
+        <bug>56677</bug>: Ensure that
+        <code>HttpServletRequest.getServletContext()</code> returns the correct
+        value during a cross-context dispatch. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
