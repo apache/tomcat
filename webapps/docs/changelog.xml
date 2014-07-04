@@ -107,6 +107,12 @@
         entry such as a delete operation.
         (markt)
       </fix>
+      <fix>
+        When the current PathInfo is modified as a result of dispatching a
+        request, ensure that a call to
+        <code>HttpServletRequest.getPathTranslated()</code> returns a value that
+        is based on the modified PathInfo. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
