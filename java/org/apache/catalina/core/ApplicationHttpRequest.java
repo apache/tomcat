@@ -451,6 +451,20 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     /**
+     * Override the <code>getPathTranslated()</code> method of the wrapped
+     * request.
+     */
+    @Override
+    public String getPathTranslated() {
+        if (getPathInfo() == null) {
+            return null;
+        }
+
+        return getServletContext().getRealPath(getPathInfo());
+    }
+
+
+    /**
      * Override the <code>getQueryString()</code> method of the wrapped
      * request.
      */
