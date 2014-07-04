@@ -30,6 +30,7 @@ import java.util.NoSuchElementException;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
@@ -187,6 +188,14 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     // ------------------------------------------------- ServletRequest Methods
+
+    @Override
+    public ServletContext getServletContext() {
+        if (context == null) {
+            return null;
+        }
+        return context.getServletContext();
+    }
 
 
     /**

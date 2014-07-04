@@ -101,6 +101,11 @@
         (markt)
       </fix>
       <fix>
+        <bug>56677</bug>: Ensure that
+        <code>HttpServletRequest.getServletContext()</code> returns the correct
+        value during a cross-context dispatch. (markt)
+      </fix>
+      <fix>
         <bug>56693</bug>: Fix various issues in the static resource cache
         implementation where the cache retained a stale entry after the
         successful completion of an operation that always invalidates the cache
