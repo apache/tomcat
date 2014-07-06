@@ -261,7 +261,7 @@ public class ELProcessor {
                             varArgs = true;
                             dimension = 1;
                             parameterTypeName = parameterTypeName.substring(
-                                    0, parameterTypeName.length() -3);
+                                    0, parameterTypeName.length() -3).trim();
                         }
                         boolean isPrimitive = PRIMITIVES.contains(parameterTypeName);
                         if (isPrimitive && dimension > 0) {
