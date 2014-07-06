@@ -449,7 +449,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public String getPathTranslated() {
-        if (getPathInfo() == null) {
+        if (getPathInfo() == null || getServletContext() == null) {
             return null;
         }
 
