@@ -1821,7 +1821,7 @@
         tofile="${tomcat.dist}/bin/i64/tomcat${version.major}.exe" />
     <!-- tc native -->
     <copy todir="${tomcat.dist}/bin">
-      <fileset dir="${tomcat-native.home}/bin">
+      <fileset dir="${tomcat-native.home}/${tomcat-native.win.path}/bin">
         <include name="*.dll"/>
         <include name="**/*.dll"/>
       </fileset>
@@ -2737,7 +2737,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <antcall target="downloadzip-2">
       <param name="sourcefile.1" value="${tomcat-native.win.1}"/>
       <param name="sourcefile.2" value="${tomcat-native.win.2}"/>
-      <param name="destfile" value="${tomcat-native.home}/LICENSE"/>
+      <param name="destfile" value="${tomcat-native.home}/${tomcat-native.win.path}/LICENSE"/>
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
