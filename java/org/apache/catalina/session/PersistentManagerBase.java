@@ -135,6 +135,12 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     private static final String name = "PersistentManagerBase";
 
+    /**
+     * Key of the note of a session in which the timestamp of last backup is stored.
+     */
+    private static final String PERSISTED_LAST_ACCESSED_TIME =
+            "org.apache.catalina.session.PersistentManagerBase.persistedLastAccessedTime";
+
 
     /**
      * Store object which will manage the Session store.
@@ -988,6 +994,12 @@ public abstract class PersistentManagerBase extends ManagerBase
                 synchronized (session) {
                     if (!session.isValid())
                         continue;
+                    long lastAccessedTime = session.getLastAccessedTime();
+                    Long persistedLastAccessedTime =
+                            (Long) session.getNote(PERSISTED_LAST_ACCESSED_TIME);
+                    if (persistedLastAccessedTime != null &&
+                            lastAccessedTime == persistedLastAccessedTime.longValue())
+                        continue;
                     int timeIdle = (int) (session.getIdleTime() / 1000L);
                     if (timeIdle > maxIdleBackup) {
                         if (log.isDebugEnabled())
@@ -1001,6 +1013,8 @@ public abstract class PersistentManagerBase extends ManagerBase
                         } catch (IOException e) {
                             // This is logged in writeSession()
                         }
+                        session.setNote(PERSISTED_LAST_ACCESSED_TIME,
+                                Long.valueOf(lastAccessedTime));
                     }
                 }
             }

@@ -118,6 +118,10 @@
         <code>HttpServletRequest.getPathTranslated()</code> returns a value that
         is based on the modified PathInfo. (markt)
       </fix>
+      <fix>
+        <bug>56698</bug>: When persisting idle sessions, only persist newly idle
+        sessions. Patch provided by Felix Schumacher. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
