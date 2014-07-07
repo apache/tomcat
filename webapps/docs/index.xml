@@ -137,6 +137,8 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
     Configuring Tomcat to use an alternative JDBC pool.</li>
 <li><a href="web-socket-howto.html"><strong>WebSocket support</strong></a> -
     Developing WebSocket applications for Apache Tomcat.</li>
+<li><a href="rewrite.html"><strong>URL rewrite</strong></a> -
+    Using the regexp based rewrite valve for conditional URL and host rewrite.</li>
 
 </ol>
 
