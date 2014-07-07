@@ -253,6 +253,10 @@
       <update>
         Update optional Checkstyle library to 5.7. (kkolinko)
       </update>
+      <fix>
+        <bug>56685</bug>: Add quotes necessary for <code>daemon.sh</code> to 
+        work correctly on Solaris. Based on a suggesiton by lfuka. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
