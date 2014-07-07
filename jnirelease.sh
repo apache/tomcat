@@ -29,6 +29,10 @@ JKJNIVER=""
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/native
 TCTRUNK_SVNBASE=https://svn.apache.org/repos/asf/tomcat/trunk
 
+# Set the environment variable that stops OSX storing extended
+# attributes in tar archives etc. with a file starting with ._
+export COPYFILE_DISABLE=1
+
 for o
 do
     case "$o" in
