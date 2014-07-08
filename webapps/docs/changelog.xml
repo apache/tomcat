@@ -192,11 +192,11 @@
         Update optional Checkstyle library to 5.7. (kkolinko)
       </update>
       <update>
-        Update to Tomcat Native Library version 1.1.31 to pick up the Windows
-        binaries that are based on OpenSSL 1.0.1h. (markt)
+        <bug>56596</bug>: Update to Tomcat Native Library version 1.1.31 to
+        pick up the Windows binaries that are based on OpenSSL 1.0.1h. (markt)
       </update>
       <fix>
-        <bug>56685</bug>: Add quotes necessary for <code>daemon.sh</code> to 
+        <bug>56685</bug>: Add quotes necessary for <code>daemon.sh</code> to
         work correctly on Solaris. Based on a suggesiton by lfuka. (markt)
       </fix>
     </changelog>
