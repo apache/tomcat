@@ -93,7 +93,7 @@ public final class Mapper {
         } else {
             Host duplicate = hosts[find(hosts, name)];
             log.error(sm.getString("mapper.duplicateHost", name,
-                    duplicate.realHostName));
+                    duplicate.getRealHostName()));
             // Do not add aliases, as removeHost(hostName) won't be able to remove them
             return;
         }
@@ -160,7 +160,7 @@ public final class Mapper {
                 return;
             }
             log.error(sm.getString("mapper.duplicateHostAlias", alias,
-                    realHost.realHostName, duplicate.realHostName));
+                    realHost.getRealHostName(), duplicate.getRealHostName()));
         }
     }
 
@@ -1468,7 +1468,7 @@ public final class Mapper {
     protected static final class Host
         extends MapElement {
 
-        public final String realHostName;
+        private final String realHostName;
         public ContextList contextList;
 
         /**
@@ -1491,6 +1491,10 @@ public final class Mapper {
 
         public boolean isAlias() {
             return !name.equals(realHostName);
+        }
+
+        public String getRealHostName() {
+            return realHostName;
         }
     }
 
