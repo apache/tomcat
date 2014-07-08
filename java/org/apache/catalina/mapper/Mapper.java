@@ -331,7 +331,7 @@ public final class Mapper {
     private ContextVersion findContextVersion(String hostName,
             String contextPath, String version, boolean silent) {
         MappedHost host = exactFind(hosts, hostName);
-        if (host == null) {
+        if (host == null || host.isAlias()) {
             if (!silent) {
                 log.error("No host found: " + hostName);
             }

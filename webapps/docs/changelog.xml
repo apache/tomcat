@@ -50,7 +50,8 @@
       <fix>
         <bug>44312</bug>: Log an error if there is a conflict between Host and
         Alias names. Improve host management methods in <code>Mapper</code>
-        to avoid occasionally removing a wrong host. (kkolinko)
+        to avoid occasionally removing a wrong host. Check that host management
+        operations are performed on the host and not on an alias. (kkolinko)
       </fix>
       <scode>
         <bug>56611</bug>: Refactor code to remove inefficient calls to
