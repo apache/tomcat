@@ -30,10 +30,10 @@
 <body>
 
 <section name="2014 News &amp; Status">
- <subsection anchor="20140415.1" name="15 April - TC-Native-1.1.30 released">
+ <subsection anchor="20140415.1" name="7 July 2014 - TC-Native-1.1.31 released">
   <p>The Apache Tomcat team is proud to announce the immediate availability
-  of Tomcat Native 1.1.30. This is a bug fixing release with added support for
-  EC ciphers if supported by OpenSSL.
+  of Tomcat Native 1.1.31. This is a bug fixing release and includes Windows
+  binaries built with OpenSSL 1.0.1h.
   </p>
  </subsection>    
 </section>
