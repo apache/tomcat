@@ -131,6 +131,10 @@
         to data available, remaining and extra write events, mostly occurring
         with non blocking Servlet 3.1. (remm)
       </fix>
+      <fix>
+        Avoid possible NPE stopping endpoints that are not started (stop
+        shouldn't do anything in that case). (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

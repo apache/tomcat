@@ -345,11 +345,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             running = true;
             paused = false;
 
-            // Create worker collection
-            if ( getExecutor() == null ) {
-                createExecutor();
-            }
-
             if (useCaches) {
                 processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                         socketProperties.getProcessorCache());
@@ -357,6 +352,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         socketProperties.getSocketWrapperCache());
                 nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                         socketProperties.getBufferPool());
+            }
+
+            // Create worker collection
+            if ( getExecutor() == null ) {
+                createExecutor();
             }
 
             initializeConnectionLatch();
@@ -384,30 +384,30 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             running = false;
             getAsyncTimeout().stop();
             unlockAccept();
-        }
-        // Use the executor to avoid binding the main thread if something bad
-        // occurs and unbind will also wait for a bit for it to complete
-        getExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                // Timeout any pending async request
-                for (SocketWrapper<Nio2Channel> socket : waitingRequests) {
-                    processSocket(socket, SocketStatus.TIMEOUT, false);
+            // Use the executor to avoid binding the main thread if something bad
+            // occurs and unbind will also wait for a bit for it to complete
+            getExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    // Timeout any pending async request
+                    for (SocketWrapper<Nio2Channel> socket : waitingRequests) {
+                        processSocket(socket, SocketStatus.TIMEOUT, false);
+                    }
+                    // Then close all active connections if any remains
+                    try {
+                        handler.closeAll();
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                    } finally {
+                        allClosed = true;
+                    }
                 }
-                // Then close all active connections if any remains
-                try {
-                    handler.closeAll();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                } finally {
-                    allClosed = true;
-                }
+            });
+            if (useCaches) {
+                socketWrapperCache.clear();
+                nioChannels.clear();
+                processorCache.clear();
             }
-        });
-        if (useCaches) {
-            socketWrapperCache.clear();
-            nioChannels.clear();
-            processorCache.clear();
         }
     }
 
