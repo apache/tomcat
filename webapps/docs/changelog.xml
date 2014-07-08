@@ -107,6 +107,11 @@
         value during a cross-context dispatch. (markt)
       </fix>
       <fix>
+        <bug>56684</bug>: Ensure that Tomcat does not shut down if the socket
+        waiting for the shutdown command experiences a
+        <code>SocketTimeoutException</code>. (markt)
+      </fix>
+      <fix>
         <bug>56693</bug>: Fix various issues in the static resource cache
         implementation where the cache retained a stale entry after the
         successful completion of an operation that always invalidates the cache

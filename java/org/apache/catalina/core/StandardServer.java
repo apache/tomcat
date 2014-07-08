@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -440,10 +441,18 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 StringBuilder command = new StringBuilder();
                 try {
                     InputStream stream;
+                    long acceptStartTime = System.currentTimeMillis();
                     try {
+                        serverSocket.setSoTimeout(5000);
                         socket = serverSocket.accept();
                         socket.setSoTimeout(10 * 1000);  // Ten seconds
                         stream = socket.getInputStream();
+                    } catch (SocketTimeoutException ste) {
+                        // This should never happen but bug 56684 suggests that
+                        // it does.
+                        log.warn(sm.getString("standardServer.accept.timeout",
+                                Long.valueOf(System.currentTimeMillis() - acceptStartTime)), ste);
+                        continue;
                     } catch (AccessControlException ace) {
                         log.warn("StandardServer.accept security exception: "
                                 + ace.getMessage(), ace);
