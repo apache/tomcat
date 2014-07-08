@@ -136,6 +136,10 @@
         Avoid possible NPE stopping endpoints that are not started (stop
         shouldn't do anything in that case). (remm)
       </fix>
+      <add>
+        <bug>56704</bug>: Add support for OpenSSL syntax for ciphers when
+        using JSSE SSL connectors. Submitted by Emmanuel Hugonnet. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
