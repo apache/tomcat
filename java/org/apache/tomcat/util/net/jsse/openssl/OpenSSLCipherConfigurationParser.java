@@ -52,7 +52,7 @@ public class OpenSSLCipherConfigurationParser {
      * If ! is used then the ciphers are permanently deleted from the list. The ciphers deleted can never reappear in the list
      * even if they are explicitly stated.
      */
-    private final static String EXCLUDE = "!";
+    private static final String EXCLUDE = "!";
     /**
      * If - is used then the ciphers are deleted from the list, but some or all of the ciphers can be added again by later
      * options.
