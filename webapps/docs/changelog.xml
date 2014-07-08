@@ -61,7 +61,8 @@
       <fix>
         <bug>44312</bug>: Log an error if there is a conflict between Host and
         Alias names. Improve host management methods in <code>Mapper</code>
-        to avoid occasionally removing a wrong host. (kkolinko)
+        to avoid occasionally removing a wrong host. Check that host management
+        operations are performed on the host and not on an alias. (kkolinko)
       </fix>
       <fix>
         <bug>55282</bug>: Ensure that one and the same application listener is
