@@ -65,6 +65,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.ServerSocketFactory;
+import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -234,10 +235,14 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         }
 
         List<String> requestedCiphers = new ArrayList<>();
-        for (String rc : requestedCiphersStr.split(",")) {
-            final String cipher = rc.trim();
-            if (cipher.length() > 0) {
-                requestedCiphers.add(cipher);
+        if (requestedCiphersStr.indexOf(':') != -1) {
+            requestedCiphers = OpenSSLCipherConfigurationParser.parseExpression(requestedCiphersStr);
+        } else {
+            for (String rc : requestedCiphersStr.split(",")) {
+                final String cipher = rc.trim();
+                if (cipher.length() > 0) {
+                    requestedCiphers.add(cipher);
+                }
             }
         }
         if (requestedCiphers.isEmpty()) {
