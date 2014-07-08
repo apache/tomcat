@@ -401,11 +401,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             running = true;
             paused = false;
 
-            // Create worker collection
-            if ( getExecutor() == null ) {
-                createExecutor();
-            }
-
             processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getProcessorCache());
             keyCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
@@ -414,6 +409,11 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                             socketProperties.getEventCache());
             nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                     socketProperties.getBufferPool());
+
+            // Create worker collection
+            if ( getExecutor() == null ) {
+                createExecutor();
+            }
 
             initializeConnectionLatch();
 
@@ -453,12 +453,12 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 stopLatch.await(selectorTimeout + 100, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ignore) {
             }
+            shutdownExecutor();
+            eventCache.clear();
+            keyCache.clear();
+            nioChannels.clear();
+            processorCache.clear();
         }
-        eventCache.clear();
-        keyCache.clear();
-        nioChannels.clear();
-        processorCache.clear();
-        shutdownExecutor();
 
     }
 
