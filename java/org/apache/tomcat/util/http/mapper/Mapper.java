@@ -237,24 +237,6 @@ public final class Mapper {
         }
         int slashCount = slashCount(path);
         synchronized (mappedHost) {
-            Context[] contexts = mappedHost.contextList.contexts;
-            // Update nesting
-            if (slashCount > mappedHost.contextList.nesting) {
-                mappedHost.contextList.nesting = slashCount;
-            }
-            Context mappedContext = exactFind(contexts, path);
-            if (mappedContext == null) {
-                mappedContext = new Context();
-                mappedContext.name = path;
-                Context[] newContexts = new Context[contexts.length + 1];
-                if (insertMap(contexts, newContexts, mappedContext)) {
-                    mappedHost.contextList.contexts = newContexts;
-                }
-            }
-
-            ContextVersion[] contextVersions = mappedContext.versions;
-            ContextVersion[] newContextVersions =
-                new ContextVersion[contextVersions.length + 1];
             ContextVersion newContextVersion = new ContextVersion();
             newContextVersion.path = path;
             newContextVersion.slashCount = slashCount;
@@ -262,8 +244,26 @@ public final class Mapper {
             newContextVersion.object = context;
             newContextVersion.welcomeResources = welcomeResources;
             newContextVersion.resources = resources;
-            if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
-                mappedContext.versions = newContextVersions;
+
+            Context[] contexts = mappedHost.contextList.contexts;
+            // Update nesting
+            if (slashCount > mappedHost.contextList.nesting) {
+                mappedHost.contextList.nesting = slashCount;
+            }
+            Context mappedContext = exactFind(contexts, path);
+            if (mappedContext == null) {
+                mappedContext = new Context(path, newContextVersion);
+                Context[] newContexts = new Context[contexts.length + 1];
+                if (insertMap(contexts, newContexts, mappedContext)) {
+                    mappedHost.contextList.contexts = newContexts;
+                }
+            } else {
+                ContextVersion[] contextVersions = mappedContext.versions;
+                ContextVersion[] newContextVersions =
+                    new ContextVersion[contextVersions.length + 1];
+                if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
+                    mappedContext.versions = newContextVersions;
+                }
             }
         }
 
@@ -294,8 +294,6 @@ public final class Mapper {
             ContextVersion[] newContextVersions =
                 new ContextVersion[contextVersions.length - 1];
             if (removeMap(contextVersions, newContextVersions, version)) {
-                context.versions = newContextVersions;
-
                 if (context.versions.length == 0) {
                     // Remove the context
                     Context[] newContexts = new Context[contexts.length -1];
@@ -310,6 +308,8 @@ public final class Mapper {
                             }
                         }
                     }
+                } else {
+                    context.versions = newContextVersions;
                 }
             }
         }
@@ -1542,7 +1542,12 @@ public final class Mapper {
 
 
     protected static final class Context extends MapElement {
-        public ContextVersion[] versions = new ContextVersion[0];
+        public volatile ContextVersion[] versions;
+
+        public Context(String name, ContextVersion firstVersion) {
+            super(name, null);
+            versions = new ContextVersion[] { firstVersion };
+        }
     }
 
 
