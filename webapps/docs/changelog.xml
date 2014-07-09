@@ -141,6 +141,11 @@
         value during a cross-context dispatch. (markt)
       </fix>
       <fix>
+        <bug>56684</bug>: Ensure that Tomcat does not shut down if the socket
+        waiting for the shutdown command experiences a
+        <code>SocketTimeoutException</code>. (markt)
+      </fix>
+      <fix>
         When the current PathInfo is modified as a result of dispatching a
         request, ensure that a call to
         <code>HttpServletRequest.getPathTranslated()</code> returns a value that
