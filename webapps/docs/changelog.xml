@@ -64,8 +64,8 @@
         the fix for bug <bug>56588</bug>. (kkolinko)
       </fix>
       <fix>
-        <bug>56653</bug>: Fix concurrency issue with
-        <code>Mapper$ContextList</code> when stopping Contexts. (kkolinko)
+        <bug>56653</bug>: Fix concurrency issue with lists of contexts in
+        <code>Mapper</code> when stopping Contexts. (kkolinko)
       </fix>
       <fix>
         <bug>56657</bug>: When using parallel deployment, if the same session id
