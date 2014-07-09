@@ -217,10 +217,6 @@
         <bug>56685</bug>: Add quotes necessary for <code>daemon.sh</code> to
         work correctly on Solaris. Based on a suggesiton by lfuka. (markt)
       </fix>
-      <update>
-        Update package renamed Apache Commons Pool2 to r1609323 to pick various
-        bug fixes. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
