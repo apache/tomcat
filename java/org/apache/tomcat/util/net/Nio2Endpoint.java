@@ -315,6 +315,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             // Determine which cipher suites and protocols to enable
             enabledCiphers = sslUtil.getEnableableCiphers(sslContext);
             enabledProtocols = sslUtil.getEnableableProtocols(sslContext);
+            // FIXME: temporary, investigate apparent sendfile issue
+            useSendfile = false;
         }
 
         if (oomParachute>0) reclaimParachute(true);
