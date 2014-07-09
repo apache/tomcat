@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -122,6 +123,9 @@ public class TestMapper extends LoggingBaseTest {
         final int iowPos = 3;
         assertEquals("blah7", mapper.hosts[iowPos].object);
 
+        final int qwigPos = 8;
+        assertEquals("blah14", mapper.hosts[qwigPos].object);
+
         // Check for alphabetical order of host names
         String previous;
         String current = mapper.hosts[0].name;
@@ -131,15 +135,13 @@ public class TestMapper extends LoggingBaseTest {
             assertTrue(previous.compareTo(current) < 0);
         }
 
-        final int qwigPos = 8;
-        assertEquals("blah14", mapper.hosts[qwigPos].object);
-
         // Check that host alias has the same data
         Mapper.Host host = mapper.hosts[iowPos];
         Mapper.Host alias = mapper.hosts[iowPos + 1];
         assertEquals("iowejoiejfoiew", host.name);
         assertEquals("iowejoiejfoiew_alias", alias.name);
-        assertEquals(host.contextList, alias.contextList);
+        assertFalse(host.isAlias());
+        assertTrue(alias.isAlias());
         assertEquals(host.object, alias.object);
     }
 
