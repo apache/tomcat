@@ -63,6 +63,7 @@ public abstract class BaseGenericObjectPool<T> {
     private volatile long maxWaitMillis =
             BaseObjectPoolConfig.DEFAULT_MAX_WAIT_MILLIS;
     private volatile boolean lifo = BaseObjectPoolConfig.DEFAULT_LIFO;
+    private final boolean fairness;
     private volatile boolean testOnCreate =
             BaseObjectPoolConfig.DEFAULT_TEST_ON_CREATE;
     private volatile boolean testOnBorrow =
@@ -135,6 +136,7 @@ public abstract class BaseGenericObjectPool<T> {
 
         // save the current CCL to be used later by the evictor Thread
         factoryClassLoader = Thread.currentThread().getContextClassLoader();
+        fairness = config.getFairness();
     }
 
 
@@ -246,6 +248,17 @@ public abstract class BaseGenericObjectPool<T> {
      */
     public final boolean getLifo() {
         return lifo;
+    }
+    
+    /**
+     * Returns whether or not the pool serves threads waiting to borrow objects fairly.
+     * True means that waiting threads are served as if waiting in a FIFO queue.
+     *
+     * @return <code>true</code> if waiting threads are to be served
+     *             by the pool in arrival order
+     */
+    public final boolean getFairness() {
+        return fairness;
     }
 
     /**

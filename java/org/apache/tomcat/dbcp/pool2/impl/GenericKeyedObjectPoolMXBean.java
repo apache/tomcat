@@ -41,6 +41,11 @@ public interface GenericKeyedObjectPoolMXBean<K> {
      */
     boolean getBlockWhenExhausted();
     /**
+     * See {@link GenericKeyedObjectPool#getFairness()}
+     * @return See {@link GenericKeyedObjectPool#getFairness()}
+     */
+    boolean getFairness();
+    /**
      * See {@link GenericKeyedObjectPool#getLifo()}
      * @return See {@link GenericKeyedObjectPool#getLifo()}
      */
