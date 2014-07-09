@@ -145,6 +145,10 @@
         <bug>56704</bug>: Add support for OpenSSL syntax for ciphers when
         using JSSE SSL connectors. Submitted by Emmanuel Hugonnet. (remm)
       </add>
+      <update>
+        Allow to configure <code>maxSwallowSize</code> attribute of an HTTP
+        connector via JMX. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
