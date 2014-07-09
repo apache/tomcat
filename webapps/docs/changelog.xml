@@ -127,6 +127,10 @@
         work in <code>Mapper</code>. (kkolinko)
       </fix>
       <fix>
+        <bug>56658</bug>: Avoid delay between registrations of mappings for
+        context and for its servlets. (kkolinko)
+      </fix>
+      <fix>
         <bug>56665</bug>: Correct the generation of the effective web.xml when
         elements contain an empty string as value. (violetagg)
       </fix>

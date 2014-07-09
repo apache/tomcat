@@ -16,6 +16,9 @@
  */
 package org.apache.catalina.connector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
@@ -32,6 +35,7 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.mapper.Mapper;
+import org.apache.tomcat.util.http.mapper.WrapperMappingInfo;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -360,13 +364,20 @@ public class MapperListener extends LifecycleMBeanBase
 
         javax.naming.Context resources = context.getResources();
         String[] welcomeFiles = context.findWelcomeFiles();
-
-        mapper.addContextVersion(host.getName(), host, contextPath,
-                context.getWebappVersion(), context, welcomeFiles, resources);
+        List<WrapperMappingInfo> wrappers = new ArrayList<WrapperMappingInfo>();
 
         for (Container container : context.findChildren()) {
-            registerWrapper((Wrapper) container);
+            prepareWrapperMappingInfo(context, (Wrapper) container, wrappers);
+
+            if(log.isDebugEnabled()) {
+                log.debug(sm.getString("mapperListener.registerWrapper",
+                        container.getName(), contextPath, connector));
+            }
         }
+
+        mapper.addContextVersion(host.getName(), host, contextPath,
+                context.getWebappVersion(), context, welcomeFiles, resources,
+                wrappers);
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerContext",
@@ -406,28 +417,42 @@ public class MapperListener extends LifecycleMBeanBase
      */
     private void registerWrapper(Wrapper wrapper) {
 
-        String wrapperName = wrapper.getName();
         Context context = (Context) wrapper.getParent();
         String contextPath = context.getPath();
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
-        String version = ((Context) wrapper.getParent()).getWebappVersion();
+        String version = context.getWebappVersion();
         String hostName = context.getParent().getName();
 
-        String[] mappings = wrapper.findMappings();
-
-        for (String mapping : mappings) {
-            boolean jspWildCard = (wrapperName.equals("jsp")
-                                   && mapping.endsWith("/*"));
-            mapper.addWrapper(hostName, contextPath, version, mapping, wrapper,
-                              jspWildCard,
-                              context.isResourceOnlyServlet(wrapperName));
-        }
+        List<WrapperMappingInfo> wrappers = new ArrayList<WrapperMappingInfo>();
+        prepareWrapperMappingInfo(context, wrapper, wrappers);
+        mapper.addWrappers(hostName, contextPath, version, wrappers);
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerWrapper",
-                    wrapperName, contextPath, connector));
+                    wrapper.getName(), contextPath, connector));
+        }
+    }
+
+    /**
+     * Populate <code>wrappers</code> list with information for registration of
+     * mappings for this wrapper in this context.
+     *
+     * @param context
+     * @param wrapper
+     * @param list
+     */
+    private void prepareWrapperMappingInfo(Context context, Wrapper wrapper,
+            List<WrapperMappingInfo> wrappers) {
+        String wrapperName = wrapper.getName();
+        boolean resourceOnly = context.isResourceOnlyServlet(wrapperName);
+        String[] mappings = wrapper.findMappings();
+        for (String mapping : mappings) {
+            boolean jspWildCard = (wrapperName.equals("jsp")
+                                   && mapping.endsWith("/*"));
+            wrappers.add(new WrapperMappingInfo(mapping, wrapper, jspWildCard,
+                    resourceOnly));
         }
     }
 
