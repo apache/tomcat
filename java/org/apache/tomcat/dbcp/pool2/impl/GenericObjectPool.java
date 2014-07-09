@@ -109,6 +109,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         }
         this.factory = factory;
 
+        idleObjects = new LinkedBlockingDeque<>(config.getFairness());
+
         setConfig(config);
 
         startEvictor(getTimeBetweenEvictionRunsMillis());
@@ -420,7 +422,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         boolean blockWhenExhausted = getBlockWhenExhausted();
 
         boolean create;
-        long waitTime = 0;
+        long waitTime = System.currentTimeMillis();
 
         while (p == null) {
             create = false;
@@ -434,10 +436,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                     if (borrowMaxWaitMillis < 0) {
                         p = idleObjects.takeFirst();
                     } else {
-                        waitTime = System.currentTimeMillis();
                         p = idleObjects.pollFirst(borrowMaxWaitMillis,
                                 TimeUnit.MILLISECONDS);
-                        waitTime = System.currentTimeMillis() - waitTime;
                     }
                 }
                 if (p == null) {
@@ -506,7 +506,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             }
         }
 
-        updateStatsBorrow(p, waitTime);
+        updateStatsBorrow(p, System.currentTimeMillis() - waitTime);
 
         return p.getObject();
     }
@@ -606,6 +606,12 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                 idleObjects.addFirst(p);
             } else {
                 idleObjects.addLast(p);
+            }
+            if (isClosed()) {
+                // Pool closed while object was being added to idle objects.
+                // Make sure the returned object is destroyed rather than left
+                // in the idle object pool (which would effectively be a leak)
+                clear();
             }
         }
         updateStatsReturn(activeTime);
@@ -903,6 +909,12 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                 idleObjects.addLast(p);
             }
         }
+        if (isClosed()) {
+            // Pool closed while object was being added to idle objects.
+            // Make sure the returned object is destroyed rather than left
+            // in the idle object pool (which would effectively be a leak)
+            clear();
+        }
     }
 
     /**
@@ -1097,8 +1109,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * {@link #_maxActive} objects created at any one time.
      */
     private final AtomicLong createCount = new AtomicLong(0);
-    private final LinkedBlockingDeque<PooledObject<T>> idleObjects =
-        new LinkedBlockingDeque<>();
+    private final LinkedBlockingDeque<PooledObject<T>> idleObjects;
 
     // JMX specific attributes
     private static final String ONAME_BASE =
