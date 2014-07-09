@@ -146,7 +146,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     /**
      * Filter library.
-     * Note: Filter[0] is always the "chunked" filter.
+     * Note: Filter[Constants.CHUNKED_FILTER] is always the "chunked" filter.
      */
     protected InputFilter[] filterLibrary;
 
