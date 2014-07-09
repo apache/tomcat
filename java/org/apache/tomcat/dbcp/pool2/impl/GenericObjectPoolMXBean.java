@@ -41,6 +41,11 @@ public interface GenericObjectPoolMXBean {
      * See {@link GenericObjectPool#getLifo()}
      * @return See {@link GenericObjectPool#getLifo()}
      */
+    boolean getFairness();  
+    /**
+     * See {@link GenericObjectPool#getFairness()}
+     * @return See {@link GenericObjectPool#getFairness()}
+     */
     boolean getLifo();
     /**
      * See {@link GenericObjectPool#getMaxIdle()}
