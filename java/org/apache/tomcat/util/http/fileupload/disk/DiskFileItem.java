@@ -292,7 +292,7 @@ public class DiskFileItem
         InputStream fis = null;
 
         try {
-            fis = new BufferedInputStream(new FileInputStream(dfos.getFile()));
+            fis = new FileInputStream(dfos.getFile());
             IOUtils.readFully(fis, fileData);
         } catch (IOException e) {
             fileData = null;
@@ -395,6 +395,7 @@ public class DiskFileItem
                         out = new BufferedOutputStream(
                                 new FileOutputStream(file));
                         IOUtils.copy(in, out);
+                        out.close();
                     } finally {
                         IOUtils.closeQuietly(in);
                         IOUtils.closeQuietly(out);

@@ -225,6 +225,10 @@
         Update package renamed Apache Commons DBCP2 to r1609329 to pick up a
         minor bug fix. (markt)
       </update>
+      <update>
+        Update package renamed Apache Commons FileUpload to r1596086 to pick
+        various bug fixes. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
