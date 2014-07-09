@@ -37,7 +37,6 @@ public abstract class ElementValue
         this.cpool = cpool;
     }
 
-
     public abstract String stringifyValue();
 
     public static final int STRING = 's';
