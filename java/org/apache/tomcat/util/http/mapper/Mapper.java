@@ -268,11 +268,9 @@ public final class Mapper {
         }
         int slashCount = slashCount(path);
         synchronized (mappedHost) {
-            ContextVersion newContextVersion = new ContextVersion();
+            ContextVersion newContextVersion = new ContextVersion(version, context);
             newContextVersion.path = path;
             newContextVersion.slashCount = slashCount;
-            newContextVersion.name = version;
-            newContextVersion.object = context;
             newContextVersion.welcomeResources = welcomeResources;
             newContextVersion.resources = resources;
             if (wrappers != null) {
@@ -1492,11 +1490,8 @@ public final class Mapper {
 
     protected abstract static class MapElement {
 
-        public String name = null;
-        public Object object = null;
-
-        public MapElement() {
-        }
+        public final String name;
+        public final Object object;
 
         public MapElement(String name, Object object) {
             this.name = name;
@@ -1638,6 +1633,13 @@ public final class Mapper {
         public Wrapper[] extensionWrappers = new Wrapper[0];
         public int nesting = 0;
 
+        public ContextVersion() {
+            super(null, null);
+        }
+
+        public ContextVersion(String version, Object context) {
+            super(version, context);
+        }
     }
 
 
