@@ -103,7 +103,6 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
             throw new IllegalArgumentException("factory may not be null");
         }
         this.factory = factory;
-        this.fairness = config.getFairness();
 
         setConfig(config);
 
@@ -341,7 +340,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         boolean blockWhenExhausted = getBlockWhenExhausted();
 
         boolean create;
-        long waitTime = System.currentTimeMillis();
+        long waitTime = 0;
         ObjectDeque<T> objectDeque = register(key);
 
         try {
@@ -357,8 +356,10 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                         if (borrowMaxWaitMillis < 0) {
                             p = objectDeque.getIdleObjects().takeFirst();
                         } else {
+                            waitTime = System.currentTimeMillis();
                             p = objectDeque.getIdleObjects().pollFirst(
                                     borrowMaxWaitMillis, TimeUnit.MILLISECONDS);
+                            waitTime = System.currentTimeMillis() - waitTime;
                         }
                     }
                     if (p == null) {
@@ -430,7 +431,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
             deregister(key);
         }
 
-        updateStatsBorrow(p, System.currentTimeMillis() - waitTime);
+        updateStatsBorrow(p, waitTime);
 
         return p.getObject();
     }
@@ -532,12 +533,6 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                 idleObjects.addFirst(p);
             } else {
                 idleObjects.addLast(p);
-            }
-            if (isClosed()) {
-                // Pool closed while object was being added to idle objects.
-                // Make sure the returned object is destroyed rather than left
-                // in the idle object pool (which would effectively be a leak)
-                clear(key);
             }
         }
 
@@ -1088,7 +1083,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                 lock.lock();
                 objectDeque = poolMap.get(k);
                 if (objectDeque == null) {
-                    objectDeque = new ObjectDeque<>(fairness);
+                    objectDeque = new ObjectDeque<>();
                     objectDeque.getNumInterested().incrementAndGet();
                     // NOTE: Keys must always be added to both poolMap and
                     //       poolKeyList at the same time while protected by
@@ -1404,7 +1399,8 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
      */
     private class ObjectDeque<S> {
 
-        private final LinkedBlockingDeque<PooledObject<S>> idleObjects;
+        private final LinkedBlockingDeque<PooledObject<S>> idleObjects =
+                new LinkedBlockingDeque<>();
 
         /*
          * Number of instances created - number destroyed.
@@ -1427,15 +1423,6 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
          *            is 0.
          */
         private final AtomicLong numInterested = new AtomicLong(0);
-
-        /**
-         * Create a new ObjecDeque with the given fairness policy.
-         * @param fairness true means client threads waiting to borrow / return instances
-         * will be served as if waiting in a FIFO queue.
-         */
-        public ObjectDeque(boolean fairness) {
-            idleObjects = new LinkedBlockingDeque<>(fairness);
-        }
 
         /**
          * Obtain the idle objects for the current key.
@@ -1483,7 +1470,6 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
     private volatile int maxTotalPerKey =
         GenericKeyedObjectPoolConfig.DEFAULT_MAX_TOTAL_PER_KEY;
     private final KeyedPooledObjectFactory<K,T> factory;
-    private final boolean fairness;
 
 
     //--- internal attributes --------------------------------------------------

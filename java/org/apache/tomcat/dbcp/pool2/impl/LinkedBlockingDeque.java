@@ -146,13 +146,14 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
     private final int capacity;
 
     /** Main lock guarding all access */
-    private final InterruptibleReentrantLock lock;
+    private final InterruptibleReentrantLock lock =
+            new InterruptibleReentrantLock();
 
     /** Condition for waiting takes */
-    private final Condition notEmpty;
+    private final Condition notEmpty = lock.newCondition();
 
     /** Condition for waiting puts */
-    private final Condition notFull;
+    private final Condition notFull = lock.newCondition();
 
     /**
      * Creates a {@code LinkedBlockingDeque} with a capacity of
@@ -160,16 +161,6 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      */
     public LinkedBlockingDeque() {
         this(Integer.MAX_VALUE);
-    }
-    
-    /**
-     * Creates a {@code LinkedBlockingDeque} with a capacity of
-     * {@link Integer#MAX_VALUE} and the given fairness policy.
-     * @param fairness true means threads waiting on the deque should be served
-     * as if waiting in a FIFO request queue
-     */
-    public LinkedBlockingDeque(boolean fairness) {
-        this(Integer.MAX_VALUE, fairness);
     }
 
     /**
@@ -179,24 +170,8 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @throws IllegalArgumentException if {@code capacity} is less than 1
      */
     public LinkedBlockingDeque(int capacity) {
-        this(capacity, false);
-    }
-    
-    /**
-     * Creates a {@code LinkedBlockingDeque} with the given (fixed) capacity
-     * and fairness policy.
-     *
-     * @param capacity the capacity of this deque
-     * @param fairness true means threads waiting on the deque should be served
-     * as if waiting in a FIFO request queue
-     * @throws IllegalArgumentException if {@code capacity} is less than 1
-     */
-    public LinkedBlockingDeque(int capacity, boolean fairness) {
         if (capacity <= 0) throw new IllegalArgumentException();
         this.capacity = capacity;
-        lock = new InterruptibleReentrantLock(fairness);
-        notEmpty = lock.newCondition();
-        notFull = lock.newCondition();
     }
 
     /**
