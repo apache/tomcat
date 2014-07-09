@@ -186,12 +186,13 @@ public class MapperListener extends LifecycleMBeanBase
             // Handle dynamically removing wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
 
-            String contextPath = ((Context) wrapper.getParent()).getPath();
+            Context context = (Context) wrapper.getParent();
+            String contextPath = context.getPath();
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
-            String version = ((Context) wrapper.getParent()).getWebappVersion();
-            String hostName = wrapper.getParent().getParent().getName();
+            String version = context.getWebappVersion();
+            String hostName = context.getParent().getName();
 
             String mapping = (String) event.getData();
 
@@ -330,7 +331,7 @@ public class MapperListener extends LifecycleMBeanBase
             contextPath = "";
         }
         String version = context.getWebappVersion();
-        String hostName = wrapper.getParent().getParent().getName();
+        String hostName = context.getParent().getName();
 
         String[] mappings = wrapper.findMappings();
 
