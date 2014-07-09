@@ -933,7 +933,7 @@ public abstract class InstanceKeyDataSource
                 // Password has not changed, so refuse client, but return connection to the pool
                 closeDueToException(info);
                 throw new SQLException("Given password did not match password used"
-                                       + " to create the PooledConnection.");
+                                       + " to create the PooledConnection.", ex);
             } catch (javax.naming.NamingException ne) {
                 throw new SQLException(
                         "NamingException encountered connecting to database", ne);
