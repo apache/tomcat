@@ -106,6 +106,10 @@
           description="Maximum size of a POST which will be saved by the container during authentication"
                  type="int"/>
 
+    <attribute   name="maxSwallowSize"
+          description="The maximum number of request body bytes to be swallowed by Tomcat for an aborted upload"
+                 type="int"/>
+
     <!-- Common -->
     <attribute   name="maxThreads"
           description="The maximum number of request processing threads to be created"
