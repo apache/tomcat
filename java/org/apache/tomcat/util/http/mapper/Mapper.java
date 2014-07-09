@@ -1466,13 +1466,13 @@ public final class Mapper {
         public ContextList contextList;
 
         /**
-         * Link to the "real" MappedHost, shared by all aliases.
+         * Link to the "real" Host, shared by all aliases.
          */
         private final Host realHost;
 
         /**
          * Links to all registered aliases, for easy enumeration. This field
-         * is available only in the "real" MappedHost. In an alias this field
+         * is available only in the "real" Host. In an alias this field
          * is <code>null</code>.
          */
         private final List<Host> aliases;
