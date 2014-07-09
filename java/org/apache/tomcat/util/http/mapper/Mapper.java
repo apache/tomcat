@@ -192,6 +192,16 @@ public final class Mapper {
 
     }
 
+    /**
+     * Replace {@link Host#contextList} field in <code>realHost</code> and
+     * all its aliases with a new value.
+     */
+    private void updateContextList(Host realHost, ContextList newContextList) {
+        realHost.contextList = newContextList;
+        for (Host alias : realHost.getAliases()) {
+            alias.contextList = newContextList;
+        }
+    }
 
     /**
      * Set context, used for wrapper mapping (request dispatcher).
@@ -245,17 +255,14 @@ public final class Mapper {
             newContextVersion.welcomeResources = welcomeResources;
             newContextVersion.resources = resources;
 
-            Context[] contexts = mappedHost.contextList.contexts;
-            // Update nesting
-            if (slashCount > mappedHost.contextList.nesting) {
-                mappedHost.contextList.nesting = slashCount;
-            }
-            Context mappedContext = exactFind(contexts, path);
+            ContextList contextList = mappedHost.contextList;
+            Context mappedContext = exactFind(contextList.contexts, path);
             if (mappedContext == null) {
                 mappedContext = new Context(path, newContextVersion);
-                Context[] newContexts = new Context[contexts.length + 1];
-                if (insertMap(contexts, newContexts, mappedContext)) {
-                    mappedHost.contextList.contexts = newContexts;
+                ContextList newContextList = contextList.addContext(
+                        mappedContext, slashCount);
+                if (newContextList != null) {
+                    updateContextList(mappedHost, newContextList);
                 }
             } else {
                 ContextVersion[] contextVersions = mappedContext.versions;
@@ -284,8 +291,8 @@ public final class Mapper {
             return;
         }
         synchronized (host) {
-            Context[] contexts = host.contextList.contexts;
-            Context context = exactFind(contexts, path);
+            ContextList contextList = host.contextList;
+            Context context = exactFind(contextList.contexts, path);
             if (context == null) {
                 return;
             }
@@ -296,17 +303,9 @@ public final class Mapper {
             if (removeMap(contextVersions, newContextVersions, version)) {
                 if (context.versions.length == 0) {
                     // Remove the context
-                    Context[] newContexts = new Context[contexts.length -1];
-                    if (removeMap(contexts, newContexts, path)) {
-                        host.contextList.contexts = newContexts;
-                        // Recalculate nesting
-                        host.contextList.nesting = 0;
-                        for (int i = 0; i < newContexts.length; i++) {
-                            int slashCount = slashCount(newContexts[i].name);
-                            if (slashCount > host.contextList.nesting) {
-                                host.contextList.nesting = slashCount;
-                            }
-                        }
+                    ContextList newContextList = contextList.removeContext(path);
+                    if (newContextList != null) {
+                        updateContextList(host, newContextList);
                     }
                 } else {
                     context.versions = newContextVersions;
@@ -1463,7 +1462,7 @@ public final class Mapper {
 
     protected static final class Host extends MapElement {
 
-        public ContextList contextList;
+        public volatile ContextList contextList;
 
         /**
          * Link to the "real" Host, shared by all aliases.
@@ -1532,9 +1531,38 @@ public final class Mapper {
 
     protected static final class ContextList {
 
-        public Context[] contexts = new Context[0];
-        public int nesting = 0;
+        public final Context[] contexts;
+        public final int nesting;
 
+        public ContextList() {
+            this(new Context[0], 0);
+        }
+
+        private ContextList(Context[] contexts, int nesting) {
+            this.contexts = contexts;
+            this.nesting = nesting;
+        }
+
+        public ContextList addContext(Context mappedContext, int slashCount) {
+            Context[] newContexts = new Context[contexts.length + 1];
+            if (insertMap(contexts, newContexts, mappedContext)) {
+                return new ContextList(newContexts, Math.max(nesting,
+                        slashCount));
+            }
+            return null;
+        }
+
+        public ContextList removeContext(String path) {
+            Context[] newContexts = new Context[contexts.length - 1];
+            if (removeMap(contexts, newContexts, path)) {
+                int newNesting = 0;
+                for (Context context : newContexts) {
+                    newNesting = Math.max(newNesting, slashCount(context.name));
+                }
+                return new ContextList(newContexts, newNesting);
+            }
+            return null;
+        }
     }
 
 
