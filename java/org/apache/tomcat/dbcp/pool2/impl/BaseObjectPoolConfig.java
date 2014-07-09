@@ -33,6 +33,13 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      * @see GenericKeyedObjectPool#getLifo()
      */
     public static final boolean DEFAULT_LIFO = true;
+    
+    /**
+     * The default value for the {@code fairness} configuration attribute.
+     * @see GenericObjectPool#getFairness()
+     * @see GenericKeyedObjectPool#getFairness()
+     */
+    public static final boolean DEFAULT_FAIRNESS = false;
 
     /**
      * The default value for the {@code maxWait} configuration attribute.
@@ -146,6 +153,8 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
 
 
     private boolean lifo = DEFAULT_LIFO;
+    
+    private boolean fairness = DEFAULT_FAIRNESS;
 
     private long maxWaitMillis = DEFAULT_MAX_WAIT_MILLIS;
 
@@ -194,6 +203,20 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
     public boolean getLifo() {
         return lifo;
     }
+    
+    /**
+     * Get the value for the {@code fairness} configuration attribute for pools
+     * created with this configuration instance.
+     *
+     * @return  The current setting of {@code fairness} for this configuration
+     *          instance
+     *
+     * @see GenericObjectPool#getFairness()
+     * @see GenericKeyedObjectPool#getFairness()
+     */
+    public boolean getFairness() {
+        return fairness;
+    }
 
     /**
      * Set the value for the {@code lifo} configuration attribute for pools
@@ -207,6 +230,20 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      */
     public void setLifo(boolean lifo) {
         this.lifo = lifo;
+    }
+    
+    /**
+     * Set the value for the {@code fairness} configuration attribute for pools
+     * created with this configuration instance.
+     *
+     * @param fairness The new setting of {@code fairness}
+     *        for this configuration instance
+     *
+     * @see GenericObjectPool#getFairness()
+     * @see GenericKeyedObjectPool#getFairness()
+     */
+    public void setFairness(boolean fairness) {
+        this.fairness = fairness;
     }
 
     /**
