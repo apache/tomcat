@@ -204,6 +204,10 @@
         Add a new limit, defaulting to 2MB, for the amount of data Tomcat will
         swallow for an aborted upload. (markt)
       </add>
+      <update>
+        Allow to configure <code>maxSwallowSize</code> attribute of an HTTP
+        connector via JMX. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
