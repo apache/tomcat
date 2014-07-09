@@ -175,7 +175,7 @@ public class MapperListener extends LifecycleMBeanBase
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
-            String version = ((Context) wrapper.getParent()).getWebappVersion();
+            String version = context.getWebappVersion();
             String hostName = context.getParent().getName();
             String wrapperName = wrapper.getName();
             String mapping = (String) event.getData();
@@ -187,12 +187,13 @@ public class MapperListener extends LifecycleMBeanBase
             // Handle dynamically removing wrappers
             Wrapper wrapper = (Wrapper) event.getSource();
 
-            String contextPath = ((Context) wrapper.getParent()).getPath();
+            Context context = (Context) wrapper.getParent();
+            String contextPath = context.getPath();
             if ("/".equals(contextPath)) {
                 contextPath = "";
             }
-            String version = ((Context) wrapper.getParent()).getWebappVersion();
-            String hostName = wrapper.getParent().getParent().getName();
+            String version = context.getWebappVersion();
+            String hostName = context.getParent().getName();
 
             String mapping = (String) event.getData();
 
@@ -323,14 +324,15 @@ public class MapperListener extends LifecycleMBeanBase
      */
     private void unregisterWrapper(Wrapper wrapper) {
 
-        String contextPath = ((Context) wrapper.getParent()).getPath();
+        Context context = (Context) wrapper.getParent();
+        String contextPath = context.getPath();
         String wrapperName = wrapper.getName();
 
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
-        String version = ((Context) wrapper.getParent()).getWebappVersion();
-        String hostName = wrapper.getParent().getParent().getName();
+        String version = context.getWebappVersion();
+        String hostName = context.getParent().getName();
 
         String[] mappings = wrapper.findMappings();
 
