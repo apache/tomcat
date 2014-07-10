@@ -62,6 +62,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>56709</bug>: Fix property name. Submitted by Robert Kish. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.10 (markt)">
   <subsection name="Catalina">
