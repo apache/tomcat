@@ -44,6 +44,25 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.0.11 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix NIO2 sendfile state tracking and error handling to fix
+        various corruption issues. (remm)
+      </fix>
+      <fix>
+        Allow inline processing for NIO2 sendfile and optimize keepalive
+        behavior. (remm)
+      </fix>
+      <fix>
+        Fix excessive NIO2 sendfile direct memory use in some cases, sendfile
+        will now instead use the regular socket write buffer as configured.
+        (remm)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 8.0.10 (markt)">
   <subsection name="Catalina">
     <changelog>
