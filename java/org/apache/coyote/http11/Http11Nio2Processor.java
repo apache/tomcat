@@ -280,17 +280,21 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         if (sendfileData != null && !getErrorState().isError()) {
             ((Nio2Endpoint.Nio2SocketWrapper) socketWrapper).setSendfileData(sendfileData);
             sendfileData.keepAlive = keepAlive;
-            if (((Nio2Endpoint) endpoint).processSendfile(
-                    (Nio2Endpoint.Nio2SocketWrapper) socketWrapper)) {
-                sendfileInProgress = true;
-            } else {
+            switch (((Nio2Endpoint) endpoint)
+                    .processSendfile((Nio2Endpoint.Nio2SocketWrapper) socketWrapper)) {
+            case DONE:
+                return false;
+            case ERROR:
                 // Write failed
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.sendfile.error"));
                 }
                 setErrorState(ErrorState.CLOSE_NOW, null);
+                return true;
+            case PENDING:
+                sendfileInProgress = true;
+                return true;
             }
-            return true;
         }
         return false;
     }

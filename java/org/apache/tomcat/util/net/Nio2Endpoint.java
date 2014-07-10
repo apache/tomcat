@@ -17,11 +17,11 @@
 
 package org.apache.tomcat.util.net;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousServerSocketChannel;
@@ -315,8 +315,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             // Determine which cipher suites and protocols to enable
             enabledCiphers = sslUtil.getEnableableCiphers(sslContext);
             enabledProtocols = sslUtil.getEnableableProtocols(sslContext);
-            // FIXME: temporary, investigate apparent sendfile issue
-            useSendfile = false;
         }
 
         if (oomParachute>0) reclaimParachute(true);
@@ -888,7 +886,85 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                TimeUnit.MILLISECONDS, socket, awaitBytes);
     }
 
-    public boolean processSendfile(final Nio2SocketWrapper socket) {
+    public enum SendfileState {
+        PENDING, DONE, ERROR
+    }
+
+    private CompletionHandler<Integer, SendfileData> sendfile = new CompletionHandler<Integer, SendfileData>() {
+
+        @Override
+        public void completed(Integer nWrite, SendfileData attachment) {
+            if (nWrite.intValue() < 0) { // Reach the end of stream
+                failed(new EOFException(), attachment);
+                return;
+            }
+            attachment.pos += nWrite.intValue();
+            if (!attachment.buffer.hasRemaining()) {
+                if (attachment.length <= 0) {
+                    // All data has now been written
+                    attachment.socket.setSendfileData(null);
+                    attachment.buffer.clear();
+                    try {
+                        attachment.fchannel.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                    if (attachment.keepAlive) {
+                        if (!isInline()) {
+                            awaitBytes(attachment.socket);
+                        } else {
+                            attachment.doneInline = true;
+                        }
+                    } else {
+                        if (!isInline()) {
+                            processSocket(attachment.socket, SocketStatus.DISCONNECT, false);
+                        } else {
+                            attachment.doneInline = true;
+                        }
+                    }
+                    return;
+                } else {
+                    attachment.buffer.clear();
+                    int nRead = -1;
+                    try {
+                        nRead = attachment.fchannel.read(attachment.buffer);
+                    } catch (IOException e) {
+                        failed(e, attachment);
+                        return;
+                    }
+                    if (nRead > 0) {
+                        attachment.buffer.flip();
+                        if (attachment.length < attachment.buffer.remaining()) {
+                            attachment.buffer.limit(attachment.buffer.limit() - attachment.buffer.remaining() + (int) attachment.length);
+                        }
+                        attachment.length -= nRead;
+                    } else {
+                        failed(new EOFException(), attachment);
+                        return;
+                    }
+                }
+            }
+            attachment.socket.getSocket().write(attachment.buffer, attachment.socket.getTimeout(),
+                    TimeUnit.MILLISECONDS, attachment, this);
+        }
+
+        @Override
+        public void failed(Throwable exc, SendfileData attachment) {
+            try {
+                attachment.fchannel.close();
+            } catch (IOException e) {
+                // Ignore
+            }
+            if (!isInline()) {
+                processSocket(attachment.socket, SocketStatus.ERROR, false);
+            } else {
+                attachment.doneInline = true;
+                attachment.error = true;
+            }
+        }
+    };
+            
+    public SendfileState processSendfile(Nio2SocketWrapper socket) {
 
         // Configure the send file data
         SendfileData data = socket.getSendfileData();
@@ -898,125 +974,41 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 data.fchannel = java.nio.channels.FileChannel
                         .open(path, StandardOpenOption.READ).position(data.pos);
             } catch (IOException e) {
-                closeSocket(socket, SocketStatus.ERROR);
-                return false;
+                return SendfileState.ERROR;
             }
         }
-
-        final ByteBuffer buffer;
-        if (!socketProperties.getDirectBuffer() && sslContext == null) {
-            // If not using SSL and direct buffers are not used, the
-            // idea of sendfile is to avoid memory copies, so allocate a
-            // direct buffer
-            int bufferSize;
-            try {
-                Integer bufferSizeInteger = socket.getSocket().getIOChannel().getOption(StandardSocketOptions.SO_SNDBUF);
-                if (bufferSizeInteger != null) {
-                    bufferSize = bufferSizeInteger.intValue();
-                } else {
-                    bufferSize = 8192;
-                }
-            } catch (IOException e) {
-                bufferSize = 8192;
-            }
-            buffer = ByteBuffer.allocateDirect(bufferSize);
-        } else {
-            buffer = socket.getSocket().getBufHandler().getWriteBuffer();
-        }
-        int nr = -1;
+        ByteBuffer buffer = socket.getSocket().getBufHandler().getWriteBuffer();
+        buffer.clear();
+        int nRead = -1;
         try {
-            nr = data.fchannel.read(buffer);
+            nRead = data.fchannel.read(buffer);
         } catch (IOException e1) {
-            closeSocket(socket, SocketStatus.ERROR);
-            return false;
+            return SendfileState.ERROR;
         }
 
-        if (nr >= 0) {
+        if (nRead >= 0) {
             buffer.flip();
-            socket.getSocket().write(buffer, data, new CompletionHandler<Integer, SendfileData>() {
-
-                @Override
-                public void completed(Integer nw, SendfileData attachment) {
-                    if (nw.intValue() < 0) { // Reach the end of stream
-                        closeSocket(socket, SocketStatus.DISCONNECT);
-                        try {
-                            attachment.fchannel.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                        return;
-                    }
-
-                    attachment.pos += nw.intValue();
-                    attachment.length -= nw.intValue();
-
-                    if (attachment.length <= 0) {
-                        socket.setSendfileData(null);
-                        try {
-                            attachment.fchannel.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                        if (attachment.keepAlive) {
-                            awaitBytes(socket);
-                        } else {
-                            closeSocket(socket, SocketStatus.DISCONNECT);
-                        }
-                        return;
-                    }
-
-                    boolean ok = true;
-
-                    if (!buffer.hasRemaining()) {
-                        // This means that all data in the buffer has
-                        // been
-                        // written => Empty the buffer and read again
-                        buffer.clear();
-                        try {
-                            if (attachment.fchannel.read(buffer) >= 0) {
-                                buffer.flip();
-                                if (attachment.length < buffer.remaining()) {
-                                    buffer.limit(buffer.limit() - buffer.remaining() + (int) attachment.length);
-                                }
-                            } else {
-                                // Reach the EOF
-                                ok = false;
-                            }
-                        } catch (Throwable th) {
-                            ExceptionUtils.handleThrowable(th);
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("endpoint.sendfile.error"), th);
-                            }
-                            ok = false;
-                        }
-                    }
-
-                    if (ok) {
-                        socket.getSocket().write(buffer, attachment, this);
-                    } else {
-                        try {
-                            attachment.fchannel.close();
-                        } catch (IOException e) {
-                            // Ignore
-                        }
-                        closeSocket(socket, SocketStatus.ERROR);
-                    }
+            data.socket = socket;
+            data.buffer = buffer;
+            data.length -= nRead;
+            startInline();
+            try {
+                socket.getSocket().write(buffer, socket.getTimeout(), TimeUnit.MILLISECONDS,
+                        data, sendfile);
+            } finally {
+                endInline();
+            }
+            if (data.doneInline) {
+                if (data.error) {
+                    return SendfileState.ERROR;
+                } else {
+                    return SendfileState.DONE;
                 }
-
-                @Override
-                public void failed(Throwable exc, SendfileData attachment) {
-                    // Closing channels
-                    closeSocket(socket, SocketStatus.ERROR);
-                    try {
-                        attachment.fchannel.close();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
-            });
-            return true;
+            } else {
+                return SendfileState.PENDING;
+            }
         } else {
-            return false;
+            return SendfileState.ERROR;
         }
     }
 
@@ -1172,5 +1164,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public long length;
         // KeepAlive flag
         public boolean keepAlive;
+        // Internal use only
+        private Nio2SocketWrapper socket;
+        private ByteBuffer buffer;
+        private boolean doneInline = false;
+        private boolean error = false;
     }
 }
