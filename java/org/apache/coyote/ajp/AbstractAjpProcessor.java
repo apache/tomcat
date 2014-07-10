@@ -486,13 +486,17 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             break;
         }
         case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            // Copy from local name for now, which should simply be an address
-            request.localAddr().setString(request.localName().toString());
+            // Automatically populated during prepareRequest() when using
+            // modern AJP forwarder, otherwise copy from local name
+            if (request.localAddr().isNull()) {
+                request.localAddr().setString(request.localName().toString());
+            }
             break;
         }
         case REQ_REMOTEPORT_ATTRIBUTE: {
             // NO-OP
-            // This information is not available when using the AJP protocol
+            // Automatically populated during prepareRequest() when using
+            // modern AJP forwarder, otherwise not available
             break;
         }
         case REQ_LOCALPORT_ATTRIBUTE: {
@@ -1221,13 +1225,15 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 requestHeaderMessage.getBytes(tmpMB);
                 String v = tmpMB.toString();
                 /*
-                 * AJP13 misses to forward the remotePort.
-                 * Allow the AJP connector to add this info via
-                 * a private request attribute.
-                 * We will accept the forwarded data as the remote port,
-                 * and remove it from the public list of request attributes.
+                 * AJP13 misses to forward the local IP address and the
+                 * remote port. Allow the AJP connector to add this info via
+                 * private request attributes.
+                 * We will accept the forwarded data and remove it from the
+                 * public list of request attributes.
                  */
-                if(n.equals(Constants.SC_A_REQ_REMOTE_PORT)) {
+                if(n.equals(Constants.SC_A_REQ_LOCAL_ADDR)) {
+                    request.localAddr().setString(v);
+                } else if(n.equals(Constants.SC_A_REQ_REMOTE_PORT)) {
                     try {
                         request.setRemotePort(Integer.parseInt(v));
                     } catch (NumberFormatException nfe) {
