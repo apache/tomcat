@@ -249,7 +249,7 @@ public abstract class BaseGenericObjectPool<T> {
     public final boolean getLifo() {
         return lifo;
     }
-    
+
     /**
      * Returns whether or not the pool serves threads waiting to borrow objects fairly.
      * True means that waiting threads are served as if waiting in a FIFO queue.
