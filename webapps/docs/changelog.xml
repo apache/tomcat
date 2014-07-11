@@ -208,6 +208,11 @@
         Allow to configure <code>maxSwallowSize</code> attribute of an HTTP
         connector via JMX. (kkolinko)
       </update>
+      <fix>
+        <bug>56661</bug>: Fix <code>getLocalAddr()</code> for AJP connectors.
+        The complete fix is only available with a recent AJP forwarder like
+        the forthcoming mod_jk 1.2.41. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
