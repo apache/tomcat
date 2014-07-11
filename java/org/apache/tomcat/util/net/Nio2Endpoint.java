@@ -963,7 +963,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             }
         }
     };
-            
+
     public SendfileState processSendfile(Nio2SocketWrapper socket) {
 
         // Configure the send file data
