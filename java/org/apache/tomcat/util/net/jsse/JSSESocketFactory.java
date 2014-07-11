@@ -124,7 +124,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             // can be achieved via the standard API but there is no guarantee
             // that every JVM implementation determines the defaults the same
             // way. Therefore the defaults are determined by creating a server
-            // socket and requested the configured values.
+            // socket and requesting the configured values.
 
             SSLServerSocket socket = (SSLServerSocket) ssf.createServerSocket();
             ciphers = socket.getEnabledCipherSuites();

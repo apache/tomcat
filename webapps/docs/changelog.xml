@@ -65,6 +65,12 @@
         The complete fix is only available with a recent AJP forwarder like
         the forthcoming mod_jk 1.2.41. (rjung)
       </fix>
+      <fix>
+        Add new <code>tomcat.ssl.ciphers</code> system property to define
+        default ciphers, and add it in <code>conf/catalina.properties</code>
+        defined as <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code> so
+        that no weak ciphers are enabled by default. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

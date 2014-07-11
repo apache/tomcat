@@ -1078,15 +1078,20 @@
     </attribute>
 
     <attribute name="ciphers" required="false">
-      <p>The comma separated list of encryption ciphers to support for HTTPS
-      connections. If specified, only the ciphers that are listed and supported
-      by the SSL implementation will be used. By default, the default ciphers
-      for the JVM will be used. Note that this usually means that the weak
-      export grade ciphers will be included in the list of available ciphers.
+      <p>If specified and using ',' as a separator, only the ciphers that are
+      listed and supported by the SSL implementation will be used.
       The ciphers are specified using the JSSE cipher naming convention. The
       special value of <code>ALL</code> will enable all supported ciphers. This
       will include many that are not secure. <code>ALL</code> is intended for
       testing purposes only.</p>
+      <p>The list can also use ':' as a separator, in that case
+      it will use the OpenSSL syntax (see OpenSSL documentation for the list
+      of ciphers supported and the syntax).</p>
+      <p>The default cipher suite can be set using the
+      <code>tomcat.ssl.ciphers</code> system property.</p>
+      <p>If not specified, the default ciphers
+      for the JVM will be used. Note that this usually means that the weak
+      export grade ciphers will be included in the list of available ciphers.</p>
     </attribute>
 
     <attribute name="clientAuth" required="false">
@@ -1339,7 +1344,9 @@
     </attribute>
 
     <attribute name="SSLCipherSuite" required="false">
-      <p>Ciphers which may be used for communicating with clients. The default
+      <p>Ciphers which may be used for communicating with clients.
+      The default cipher suite can be set using the
+      <code>tomcat.ssl.ciphers</code> system property. The default
       is "ALL", with other acceptable values being a list of ciphers, with ":"
       used as the delimiter (see OpenSSL documentation for the list of ciphers
       supported).</p>
