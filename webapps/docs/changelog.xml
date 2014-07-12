@@ -159,6 +159,10 @@
         <bug>56698</bug>: When persisting idle sessions, only persist newly idle
         sessions. Patch provided by Felix Schumacher. (markt)
       </fix>
+      <fix>
+        <bug>56712</bug>: Fix session idle time calculations in
+        <code>PersistenceManager</code>. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
