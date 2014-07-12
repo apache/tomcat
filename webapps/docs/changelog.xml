@@ -80,7 +80,8 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
-        <bug>56709</bug>: Fix property name. Submitted by Robert Kish. (remm)
+        <bug>56709</bug>: Fix system property name in a log message. Submitted
+        by Robert Kish. (remm)
       </fix>
     </changelog>
   </subsection>
