@@ -16,7 +16,10 @@
  */
 package org.apache.tomcat.util.http.mapper;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,14 +30,18 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestMapperContextRoot extends TomcatBaseTest{
+/**
+ * Mapper tests that use real web applications on a running Tomcat.
+ */
+public class TestMapperWebapps extends TomcatBaseTest{
 
     @Test
-    public void testBug53339() throws Exception {
+    public void testContextRoot_Bug53339() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
@@ -75,5 +82,63 @@ public class TestMapperContextRoot extends TomcatBaseTest{
                 resp.getWriter().write("FAIL");
             }
         }
+    }
+
+    @Test
+    public void testWelcomeFileNotStrict() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+
+        StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
+                appDir.getAbsolutePath());
+        ctxt.setReplaceWelcomeFiles(true);
+        ctxt.addWelcomeFile("index.jsp");
+        // Mapping for *.do is defined in web.xml
+        ctxt.addWelcomeFile("index.do");
+
+        tomcat.start();
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/welcome-files", bc, new HashMap<String,List<String>>());
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(bc.toString().contains("JSP"));
+
+        rc = getUrl("http://localhost:" + getPort() +
+                "/test/welcome-files/sub", bc,
+                new HashMap<String,List<String>>());
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(bc.toString().contains("Servlet"));
+    }
+
+    @Test
+    public void testWelcomeFileStrict() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0");
+
+        StandardContext ctxt = (StandardContext) tomcat.addWebapp(null, "/test",
+                appDir.getAbsolutePath());
+        ctxt.setReplaceWelcomeFiles(true);
+        ctxt.addWelcomeFile("index.jsp");
+        // Mapping for *.do is defined in web.xml
+        ctxt.addWelcomeFile("index.do");
+
+        // Simulate STRICT_SERVLET_COMPLIANCE
+        ctxt.setResourceOnlyServlets("");
+
+        tomcat.start();
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() +
+                "/test/welcome-files", bc, new HashMap<String,List<String>>());
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(bc.toString().contains("JSP"));
+
+        rc = getUrl("http://localhost:" + getPort() +
+                "/test/welcome-files/sub", bc,
+                new HashMap<String,List<String>>());
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
     }
 }
