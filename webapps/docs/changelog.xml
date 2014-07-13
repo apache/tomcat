@@ -45,6 +45,18 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.11 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>56658</bug>: Fix regression that a context was inaccessible after
+        reload. (kkolinko)
+      </fix>
+      <fix>
+        <bug>56712</bug>: Fix session idle time calculations in
+        <code>PersistenceManager</code>. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
@@ -71,10 +83,6 @@
         defined as <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code> so
         that no weak ciphers are enabled by default. (remm)
       </fix>
-      <fix>
-        <bug>56712</bug>: Fix session idle time calculations in
-        <code>PersistenceManager</code>. (kkolinko)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -86,7 +94,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 8.0.10 (markt)">
+<section name="Tomcat 8.0.10 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>

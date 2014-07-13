@@ -278,6 +278,13 @@ public final class Mapper {
                         newContextVersion)) {
                     mappedContext.versions = newContextVersions;
                     contextObjectToContextVersionMap.put(context, newContextVersion);
+                } else {
+                    // Re-registration after Context.reload()
+                    // Replace ContextVersion with the new one
+                    int pos = find(contextVersions, version);
+                    if (pos >= 0 && contextVersions[pos].name.equals(version)) {
+                        contextVersions[pos] = newContextVersion;
+                    }
                 }
             }
         }
