@@ -52,6 +52,10 @@
         reload. (kkolinko)
       </fix>
       <fix>
+        <bug>56710</bug>: Do not map requests to servlets when context is
+        being reloaded. (kkolinko)
+      </fix>
+      <fix>
         <bug>56712</bug>: Fix session idle time calculations in
         <code>PersistenceManager</code>. (kkolinko)
       </fix>

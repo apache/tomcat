@@ -386,24 +386,29 @@ public class MapperListener extends LifecycleMBeanBase
      */
     private void unregisterContext(Context context) {
 
-        // Don't un-map a context that is paused
-        if (context.getPaused()){
-            return;
-        }
-
         String contextPath = context.getPath();
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
         String hostName = context.getParent().getName();
 
-        if(log.isDebugEnabled()) {
-            log.debug(sm.getString("mapperListener.unregisterContext",
-                    contextPath, service));
-        }
+        if (context.getPaused()) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("mapperListener.pauseContext",
+                        contextPath, service));
+            }
 
-        mapper.removeContextVersion(context, hostName, contextPath,
-                context.getWebappVersion());
+            mapper.pauseContextVersion(context, hostName, contextPath,
+                    context.getWebappVersion());
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("mapperListener.unregisterContext",
+                        contextPath, service));
+            }
+
+            mapper.removeContextVersion(context, hostName, contextPath,
+                    context.getWebappVersion());
+        }
     }
 
 
@@ -477,12 +482,7 @@ public class MapperListener extends LifecycleMBeanBase
             if (obj instanceof Wrapper) {
                 unregisterWrapper((Wrapper) obj);
             } else if (obj instanceof Context) {
-                Context c = (Context) obj;
-                // Only unregister if not paused. If paused, need to keep
-                // registration in place to prevent 404's during reload
-                if (!c.getPaused()) {
-                    unregisterContext(c);
-                }
+                unregisterContext((Context) obj);
             } else if (obj instanceof Host) {
                 unregisterHost((Host) obj);
             }

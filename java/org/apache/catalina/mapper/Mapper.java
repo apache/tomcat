@@ -335,6 +335,27 @@ public final class Mapper {
     }
 
 
+    /**
+     * Mark a context as being reloaded. Reversion of this state is performed
+     * by calling <code>addContextVersion(...)</code> when context starts up.
+     *
+     * @param ctxt      The actual context
+     * @param hostName  Virtual host name this context belongs to
+     * @param contextPath Context path
+     * @param version   Context version
+     */
+    public void pauseContextVersion(Context ctxt, String hostName,
+            String contextPath, String version) {
+
+        ContextVersion contextVersion = findContextVersion(hostName,
+                contextPath, version, true);
+        if (contextVersion == null || !ctxt.equals(contextVersion.object)) {
+            return;
+        }
+        contextVersion.markPaused();
+    }
+
+
     private ContextVersion findContextVersion(String hostName,
             String contextPath, String version, boolean silent) {
         MappedHost host = exactFind(hosts, hostName);
@@ -478,7 +499,7 @@ public final class Mapper {
             String version, String path) {
         ContextVersion contextVersion = findContextVersion(hostName,
                 contextPath, version, true);
-        if (contextVersion == null) {
+        if (contextVersion == null || contextVersion.isPaused()) {
             return;
         }
         removeWrapper(contextVersion, path);
@@ -583,7 +604,7 @@ public final class Mapper {
             String version, String welcomeFile) {
         ContextVersion contextVersion = findContextVersion(hostName,
                 contextPath, version, false);
-        if (contextVersion == null) {
+        if (contextVersion == null || contextVersion.isPaused()) {
             return;
         }
         int match = -1;
@@ -763,13 +784,16 @@ public final class Mapper {
         }
         if (contextVersion == null) {
             // Return the latest version
+            // The versions array is known to contain at least one element
             contextVersion = contextVersions[versionCount - 1];
         }
         mappingData.context = contextVersion.object;
         mappingData.contextSlashCount = contextVersion.slashCount;
 
         // Wrapper mapping
-        internalMapWrapper(contextVersion, uri, mappingData);
+        if (!contextVersion.isPaused()) {
+            internalMapWrapper(contextVersion, uri, mappingData);
+        }
 
     }
 
@@ -1604,6 +1628,7 @@ public final class Mapper {
         public MappedWrapper[] wildcardWrappers = new MappedWrapper[0];
         public MappedWrapper[] extensionWrappers = new MappedWrapper[0];
         public int nesting = 0;
+        private volatile boolean paused;
 
         public ContextVersion(String version, String path, int slashCount,
                 Context context, WebResourceRoot resources,
@@ -1613,6 +1638,14 @@ public final class Mapper {
             this.slashCount = slashCount;
             this.resources = resources;
             this.welcomeResources = welcomeResources;
+        }
+
+        public boolean isPaused() {
+            return paused;
+        }
+
+        public void markPaused() {
+            paused = true;
         }
     }
 
