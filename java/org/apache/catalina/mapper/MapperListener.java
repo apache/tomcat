@@ -151,7 +151,11 @@ public class MapperListener extends LifecycleMBeanBase
                 } else if (child instanceof Context) {
                     registerContext((Context) child);
                 } else if (child instanceof Wrapper) {
-                    registerWrapper((Wrapper) child);
+                    // Only if the Context has started. If it has not, then it
+                    // will have its own "after_start" life-cycle event later.
+                    if (child.getParent().getState().isAvailable()) {
+                        registerWrapper((Wrapper) child);
+                    }
                 }
             }
         } else if (Container.REMOVE_CHILD_EVENT.equals(event.getType())) {
