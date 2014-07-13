@@ -750,7 +750,7 @@ public final class Mapper {
 
         ContextVersion contextVersion = null;
         ContextVersion[] contextVersions = context.versions;
-        int versionCount = contextVersions.length;
+        final int versionCount = contextVersions.length;
         if (versionCount > 1) {
             Context[] contextObjects = new Context[contextVersions.length];
             for (int i = 0; i < contextObjects.length; i++) {
