@@ -330,7 +330,7 @@ public final class Mapper {
             ContextVersion[] newContextVersions =
                 new ContextVersion[contextVersions.length - 1];
             if (removeMap(contextVersions, newContextVersions, version)) {
-                if (context.versions.length == 0) {
+                if (newContextVersions.length == 0) {
                     // Remove the context
                     ContextList newContextList = contextList.removeContext(path);
                     if (newContextList != null) {
@@ -776,7 +776,7 @@ public final class Mapper {
 
         ContextVersion contextVersion = null;
         ContextVersion[] contextVersions = context.versions;
-        int versionCount = contextVersions.length;
+        final int versionCount = contextVersions.length;
         if (versionCount > 1) {
             Object[] contextObjects = new Object[contextVersions.length];
             for (int i = 0; i < contextObjects.length; i++) {
