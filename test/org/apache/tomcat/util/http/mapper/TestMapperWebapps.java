@@ -85,6 +85,52 @@ public class TestMapperWebapps extends TomcatBaseTest{
     }
 
     @Test
+    public void testContextReload_Bug56658() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
+        // app dir is relative to server home
+        org.apache.catalina.Context ctxt  = tomcat.addWebapp(
+                null, "/examples", appDir.getAbsolutePath());
+        tomcat.start();
+
+        // The tests are from TestTomcat#testSingleWebapp(), #testJsps()
+        // We reload the context and verify that the pages are still accessible
+        ByteChunk res;
+        String text;
+
+        res = getUrl("http://localhost:" + getPort()
+                + "/examples/servlets/servlet/HelloWorldExample");
+        text = res.toString();
+        Assert.assertTrue(text, text.contains("<h1>Hello World!</h1>"));
+
+        res = getUrl("http://localhost:" + getPort()
+                + "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
+        text = res.toString();
+        Assert.assertTrue(text, text.contains("<td>${(1==2) ? 3 : 4}</td>"));
+
+        res = getUrl("http://localhost:" + getPort() + "/examples/index.html");
+        text = res.toString();
+        Assert.assertTrue(text, text.contains("<title>Apache Tomcat Examples</title>"));
+
+        ctxt.reload();
+
+        res = getUrl("http://localhost:" + getPort()
+                + "/examples/servlets/servlet/HelloWorldExample");
+        text = res.toString();
+        Assert.assertTrue(text, text.contains("<h1>Hello World!</h1>"));
+
+        res = getUrl("http://localhost:" + getPort()
+                + "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
+        text = res.toString();
+        Assert.assertTrue(text, text.contains("<td>${(1==2) ? 3 : 4}</td>"));
+
+        res = getUrl("http://localhost:" + getPort() + "/examples/index.html");
+        text = res.toString();
+        Assert.assertTrue(text, text.contains("<title>Apache Tomcat Examples</title>"));
+    }
+
+    @Test
     public void testWelcomeFileNotStrict() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();

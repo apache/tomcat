@@ -292,6 +292,13 @@ public final class Mapper {
                     new ContextVersion[contextVersions.length + 1];
                 if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
                     mappedContext.versions = newContextVersions;
+                } else {
+                    // Re-registration after Context.reload()
+                    // Replace ContextVersion with the new one
+                    int pos = find(contextVersions, version);
+                    if (pos >= 0 && contextVersions[pos].name.equals(version)) {
+                        contextVersions[pos] = newContextVersion;
+                    }
                 }
             }
         }
