@@ -59,6 +59,11 @@
         <bug>56712</bug>: Fix session idle time calculations in
         <code>PersistenceManager</code>. (kkolinko)
       </fix>
+      <fix>
+        <bug>56717</bug>: Fix duplicate registration of
+        <code>MapperListener</code> during repeated starts of embedded Tomcat.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
