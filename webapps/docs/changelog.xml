@@ -73,6 +73,9 @@
         various corruption issues. (remm)
       </fix>
       <fix>
+        Missing timeout for NIO2 sendfile writes. (remm)
+      </fix>
+      <fix>
         Allow inline processing for NIO2 sendfile and optimize keepalive
         behavior. (remm)
       </fix>
