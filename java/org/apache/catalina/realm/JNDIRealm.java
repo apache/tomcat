@@ -2171,7 +2171,10 @@ public class JNDIRealm extends RealmBase {
         try {
             open();
         } catch (NamingException e) {
-            throw new LifecycleException(sm.getString("jndiRealm.open"), e);
+			// Something went wrong, log the exception
+			// but don't throw Lifecycle Exception as
+			// the directory can be available later.
+            containerLog.error(sm.getString("jndiRealm.open"), e);
         }
 
         super.startInternal();
