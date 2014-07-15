@@ -175,6 +175,28 @@ public class TestMapper extends LoggingBaseTest {
         assertFalse(host.isAlias());
         assertTrue(alias.isAlias());
         assertEquals(host.object, alias.object);
+
+        // Test addContextVersion() followed by addHost()
+        Host hostZ = createHost("zzzz");
+        Context contextZ = createContext("contextZ");
+
+        assertEquals(16, mapper.hosts.length);
+        mapper.addContextVersion("zzzz", hostZ, "/", "", contextZ, null, null,
+                null);
+        assertEquals(17, mapper.hosts.length);
+
+        mapper.addHost("zzzz", new String[] { "zzzz_alias1", "zzzz_alias2" },
+                hostZ);
+        assertEquals(19, mapper.hosts.length);
+
+        assertEquals("zzzz", mapper.hosts[16].name);
+        assertEquals("zzzz_alias1", mapper.hosts[17].name);
+        assertEquals("zzzz_alias2", mapper.hosts[18].name);
+        assertEquals(2, mapper.hosts[16].getAliases().size());
+        assertSame(contextZ,
+                mapper.hosts[16].contextList.contexts[0].versions[0].object);
+        assertSame(contextZ,
+                mapper.hosts[18].contextList.contexts[0].versions[0].object);
     }
 
     @Test
