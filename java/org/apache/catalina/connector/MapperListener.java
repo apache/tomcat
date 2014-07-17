@@ -124,6 +124,9 @@ public class MapperListener extends LifecycleMBeanBase
     @Override
     public void stopInternal() throws LifecycleException {
         setState(LifecycleState.STOPPING);
+
+        Engine engine = (Engine) connector.getService().getContainer();
+        removeListeners(engine);
     }
 
 
