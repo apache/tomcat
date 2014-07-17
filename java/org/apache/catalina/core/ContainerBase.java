@@ -1335,14 +1335,28 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         @Override
         public void run() {
-            while (!threadDone) {
-                try {
-                    Thread.sleep(backgroundProcessorDelay * 1000L);
-                } catch (InterruptedException e) {
-                    // Ignore
+            Throwable t = null;
+            String unexpectedDeathMessage = sm.getString(
+                    "containerBase.backgroundProcess.unexpectedThreadDeath",
+                    Thread.currentThread().getName());
+            try {
+                while (!threadDone) {
+                    try {
+                        Thread.sleep(backgroundProcessorDelay * 1000L);
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                    if (!threadDone) {
+                        processChildren(ContainerBase.this);
+                    }
                 }
+            } catch (RuntimeException|Error e) {
+                t = e;
+                throw e;
+            } finally {
+                thread = null;
                 if (!threadDone) {
-                    processChildren(ContainerBase.this);
+                    log.error(unexpectedDeathMessage, t);
                 }
             }
         }

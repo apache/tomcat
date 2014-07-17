@@ -64,6 +64,10 @@
         <code>MapperListener</code> during repeated starts of embedded Tomcat.
         (kkolinko)
       </fix>
+      <add>
+        <bug>56724</bug>: Write an error message to Tomcat logs if container
+        background thread is aborted unexpectedly. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
