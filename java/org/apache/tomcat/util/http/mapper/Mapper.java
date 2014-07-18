@@ -97,12 +97,25 @@ public final class Mapper {
         Host newHost = new Host(name, host);
         if (insertMap(hosts, newHosts, newHost)) {
             hosts = newHosts;
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("mapper.addHost.success", name));
+            }
         } else {
             Host duplicate = hosts[find(hosts, name)];
-            log.error(sm.getString("mapper.duplicateHost", name,
-                    duplicate.getRealHostName()));
-            // Do not add aliases, as removeHost(hostName) won't be able to remove them
-            return;
+            if (duplicate.object == host) {
+                // The host is already registered in the mapper.
+                // E.g. it might have been added by addContextVersion()
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mapper.addHost.sameHost", name));
+                }
+                newHost = duplicate;
+            } else {
+                log.error(sm.getString("mapper.duplicateHost", name,
+                        duplicate.getRealHostName()));
+                // Do not add aliases, as removeHost(hostName) won't be able to
+                // remove them
+                return;
+            }
         }
         List<Host> newAliases = new ArrayList<Host>(aliases.length);
         for (String alias : aliases) {
@@ -159,6 +172,10 @@ public final class Mapper {
         Host[] newHosts = new Host[hosts.length + 1];
         if (insertMap(hosts, newHosts, newAlias)) {
             hosts = newHosts;
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("mapper.addHostAlias.success",
+                        newAlias.name, newAlias.getRealHostName()));
+            }
             return true;
         } else {
             Host duplicate = hosts[find(hosts, newAlias.name)];
@@ -166,6 +183,10 @@ public final class Mapper {
                 // A duplicate Alias for the same Host.
                 // A harmless redundancy. E.g.
                 // <Host name="localhost"><Alias>localhost</Alias></Host>
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mapper.addHostAlias.sameHost",
+                            newAlias.name, newAlias.getRealHostName()));
+                }
                 return false;
             }
             log.error(sm.getString("mapper.duplicateHostAlias", newAlias.name,
@@ -292,6 +313,13 @@ public final class Mapper {
                     new ContextVersion[contextVersions.length + 1];
                 if (insertMap(contextVersions, newContextVersions, newContextVersion)) {
                     mappedContext.versions = newContextVersions;
+                } else {
+                    // Re-registration after Context.reload()
+                    // Replace ContextVersion with the new one
+                    int pos = find(contextVersions, version);
+                    if (pos >= 0 && contextVersions[pos].name.equals(version)) {
+                        contextVersions[pos] = newContextVersion;
+                    }
                 }
             }
         }
@@ -323,7 +351,7 @@ public final class Mapper {
             ContextVersion[] newContextVersions =
                 new ContextVersion[contextVersions.length - 1];
             if (removeMap(contextVersions, newContextVersions, version)) {
-                if (context.versions.length == 0) {
+                if (newContextVersions.length == 0) {
                     // Remove the context
                     ContextList newContextList = contextList.removeContext(path);
                     if (newContextList != null) {
@@ -334,6 +362,27 @@ public final class Mapper {
                 }
             }
         }
+    }
+
+
+    /**
+     * Mark a context as being reloaded. Reversion of this state is performed
+     * by calling <code>addContextVersion(...)</code> when context starts up.
+     *
+     * @param ctxt      The actual context
+     * @param hostName  Virtual host name this context belongs to
+     * @param contextPath Context path
+     * @param version   Context version
+     */
+    public void pauseContextVersion(Object ctxt, String hostName,
+            String contextPath, String version) {
+
+        ContextVersion contextVersion = findContextVersion(hostName,
+                contextPath, version, true);
+        if (contextVersion == null || !ctxt.equals(contextVersion.object)) {
+            return;
+        }
+        contextVersion.markPaused();
     }
 
 
@@ -497,7 +546,7 @@ public final class Mapper {
             String version, String path) {
         ContextVersion contextVersion = findContextVersion(hostName,
                 contextPath, version, true);
-        if (contextVersion == null) {
+        if (contextVersion == null || contextVersion.isPaused()) {
             return;
         }
         removeWrapper(contextVersion, path);
@@ -602,7 +651,7 @@ public final class Mapper {
             String version, String welcomeFile) {
         ContextVersion contextVersion = findContextVersion(hostName,
                 contextPath, version, false);
-        if (contextVersion == null) {
+        if (contextVersion == null || contextVersion.isPaused()) {
             return;
         }
         int match = -1;
@@ -769,7 +818,7 @@ public final class Mapper {
 
         ContextVersion contextVersion = null;
         ContextVersion[] contextVersions = context.versions;
-        int versionCount = contextVersions.length;
+        final int versionCount = contextVersions.length;
         if (versionCount > 1) {
             Object[] contextObjects = new Object[contextVersions.length];
             for (int i = 0; i < contextObjects.length; i++) {
@@ -782,6 +831,7 @@ public final class Mapper {
         }
         if (contextVersion == null) {
             // Return the latest version
+            // The versions array is known to contain at least one element
             contextVersion = contextVersions[versionCount - 1];
         }
 
@@ -789,7 +839,9 @@ public final class Mapper {
         mappingData.contextSlashCount = contextVersion.slashCount;
 
         // Wrapper mapping
-        internalMapWrapper(contextVersion, uri, mappingData);
+        if (!contextVersion.isPaused()) {
+            internalMapWrapper(contextVersion, uri, mappingData);
+        }
 
     }
 
@@ -1632,6 +1684,7 @@ public final class Mapper {
         public Wrapper[] wildcardWrappers = new Wrapper[0];
         public Wrapper[] extensionWrappers = new Wrapper[0];
         public int nesting = 0;
+        private volatile boolean paused;
 
         public ContextVersion() {
             super(null, null);
@@ -1639,6 +1692,14 @@ public final class Mapper {
 
         public ContextVersion(String version, Object context) {
             super(version, context);
+        }
+
+        public boolean isPaused() {
+            return paused;
+        }
+
+        public void markPaused() {
+            paused = true;
         }
     }
 

@@ -926,11 +926,11 @@ public abstract class PersistentManagerBase extends ManagerBase
                         continue;
                     int timeIdle;
                     if (StandardSession.LAST_ACCESS_AT_START) {
-                        timeIdle = (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
+                        timeIdle = (int) ((timeNow - session.getLastAccessedTimeInternal()) / 1000L);
                     } else {
-                        timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
+                        timeIdle = (int) ((timeNow - session.getThisAccessedTimeInternal()) / 1000L);
                     }
-                    if (timeIdle > maxIdleSwap && timeIdle > minIdleSwap) {
+                    if (timeIdle >= maxIdleSwap && timeIdle >= minIdleSwap) {
                         if (session.accessCount != null &&
                                 session.accessCount.get() > 0) {
                             // Session is currently being accessed - skip it
@@ -981,11 +981,11 @@ public abstract class PersistentManagerBase extends ManagerBase
             synchronized (session) {
                 int timeIdle;
                 if (StandardSession.LAST_ACCESS_AT_START) {
-                    timeIdle = (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
+                    timeIdle = (int) ((timeNow - session.getLastAccessedTimeInternal()) / 1000L);
                 } else {
-                    timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
+                    timeIdle = (int) ((timeNow - session.getThisAccessedTimeInternal()) / 1000L);
                 }
-                if (timeIdle > minIdleSwap) {
+                if (timeIdle >= minIdleSwap) {
                     if (session.accessCount != null &&
                             session.accessCount.get() > 0) {
                         // Session is currently being accessed - skip it
@@ -1027,7 +1027,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                 synchronized (session) {
                     if (!session.isValid())
                         continue;
-                    long lastAccessedTime = session.getLastAccessedTime();
+                    long lastAccessedTime = session.getLastAccessedTimeInternal();
                     Long persistedLastAccessedTime =
                             (Long) session.getNote(PERSISTED_LAST_ACCESSED_TIME);
                     if (persistedLastAccessedTime != null &&
@@ -1035,11 +1035,11 @@ public abstract class PersistentManagerBase extends ManagerBase
                         continue;
                     int timeIdle;
                     if (StandardSession.LAST_ACCESS_AT_START) {
-                        timeIdle = (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
+                        timeIdle = (int) ((timeNow - session.getLastAccessedTimeInternal()) / 1000L);
                     } else {
-                        timeIdle = (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
+                        timeIdle = (int) ((timeNow - session.getThisAccessedTimeInternal()) / 1000L);
                     }
-                    if (timeIdle > maxIdleBackup) {
+                    if (timeIdle >= maxIdleBackup) {
                         if (log.isDebugEnabled())
                             log.debug(sm.getString
                                 ("persistentManager.backupMaxIdle",

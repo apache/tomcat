@@ -1503,20 +1503,36 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         @Override
         public void run() {
-            while (!threadDone) {
-                try {
-                    Thread.sleep(backgroundProcessorDelay * 1000L);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                if (!threadDone) {
-                    Container parent = (Container) getMappingObject();
-                    ClassLoader cl = 
-                        Thread.currentThread().getContextClassLoader();
-                    if (parent.getLoader() != null) {
-                        cl = parent.getLoader().getClassLoader();
+            Throwable t = null;
+            String unexpectedDeathMessage = sm.getString(
+                    "containerBase.backgroundProcess.unexpectedThreadDeath",
+                    Thread.currentThread().getName());
+            try {
+                while (!threadDone) {
+                    try {
+                        Thread.sleep(backgroundProcessorDelay * 1000L);
+                    } catch (InterruptedException e) {
+                        // Ignore
                     }
-                    processChildren(parent, cl);
+                    if (!threadDone) {
+                        Container parent = (Container) getMappingObject();
+                        ClassLoader cl = 
+                            Thread.currentThread().getContextClassLoader();
+                        if (parent.getLoader() != null) {
+                            cl = parent.getLoader().getClassLoader();
+                        }
+                        processChildren(parent, cl);
+                    }
+                }
+            } catch (RuntimeException e) {
+                t = e;
+                throw e;
+            } catch (Error e) {
+                t = e;
+                throw e;
+            } finally {
+                if (!threadDone) {
+                    log.error(unexpectedDeathMessage, t);
                 }
             }
         }

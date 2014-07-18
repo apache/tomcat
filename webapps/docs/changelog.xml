@@ -159,6 +159,23 @@
         <bug>56698</bug>: When persisting idle sessions, only persist newly idle
         sessions. Patch provided by Felix Schumacher. (markt)
       </fix>
+      <fix>
+        <bug>56710</bug>: Do not map requests to servlets when context is
+        being reloaded. (kkolinko)
+      </fix>
+      <fix>
+        <bug>56712</bug>: Fix session idle time calculations in
+        <code>PersistenceManager</code>. (kkolinko)
+      </fix>
+      <fix>
+        <bug>56717</bug>: Fix duplicate registration of
+        <code>MapperListener</code> during repeated starts of embedded Tomcat.
+        (kkolinko)
+      </fix>
+      <add>
+        <bug>56724</bug>: Write an error message to Tomcat logs if container
+        background thread is aborted unexpectedly. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -208,6 +225,11 @@
         Allow to configure <code>maxSwallowSize</code> attribute of an HTTP
         connector via JMX. (kkolinko)
       </update>
+      <fix>
+        <bug>56661</bug>: Fix <code>getLocalAddr()</code> for AJP connectors.
+        The complete fix is only available with a recent AJP forwarder like
+        the forthcoming mod_jk 1.2.41. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
