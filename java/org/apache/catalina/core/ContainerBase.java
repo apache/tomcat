@@ -1531,7 +1531,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 t = e;
                 throw e;
             } finally {
-                thread = null;
                 if (!threadDone) {
                     log.error(unexpectedDeathMessage, t);
                 }
