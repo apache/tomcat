@@ -148,14 +148,36 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 //unlock the global lock
                 lock.unlock();
                 //wait for the specified timeout
-                if (!c.await(timeout, unit)) {
-                    //if we timed out, remove ourselves from the waitlist
+                boolean didtimeout = true;
+                InterruptedException interruptedException = null;
+                try {
+                    //wait for the specified timeout
+                    didtimeout = !c.await(timeout, unit);
+                } catch (InterruptedException ix) {
+                    interruptedException = ix;
+                }
+                if (didtimeout) {
+                    //if we timed out, or got interrupted
+                    // remove ourselves from the waitlist
                     lock.lock();
-                    waiters.remove(c);
-                    lock.unlock();
+                    try {
+                        waiters.remove(c);
+                    } finally {
+                        lock.unlock();
+                    }
                 }
                 //return the item we received, can be null if we timed out
                 result = c.getItem();
+                if (null!=interruptedException) {
+                    //we got interrupted
+                    if (null!=result) {
+                        //we got a result - clear the interrupt status
+                        //don't propagate cause we have removed a connection from pool
+                        Thread.interrupted();
+                    } else {
+                        throw interruptedException;
+                    }
+                }
             } else {
                 //we have an object, release
                 lock.unlock();
