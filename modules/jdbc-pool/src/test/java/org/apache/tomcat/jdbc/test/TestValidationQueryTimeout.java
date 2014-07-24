@@ -22,6 +22,7 @@ import java.sql.DriverPropertyInfo;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.sql.SQLTimeoutException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -119,9 +120,6 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
     @Test(expected=SQLException.class)
     public void testValidationQueryTimeoutOnConnection() throws Exception {
         // use our mock driver
-        this.datasource.setDriverClassName("org.h2.Driver");
-        this.datasource.setUrl("jdbc:h2:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE");
-
         // Required to trigger validation query's execution
         this.datasource.setTestOnConnect(true);
         this.datasource.setValidationInterval(-1);
@@ -151,8 +149,6 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
     @Test
     public void testLongValidationQueryTime() throws Exception {
         // use our mock driver
-        this.datasource.setDriverClassName("org.h2.Driver");
-        this.datasource.setUrl("jdbc:h2:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE");
         Connection con = this.datasource.getConnection();
         Statement stmt = null;
         long start = 0, end = 0;
@@ -259,8 +255,20 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
         @Override
         public void setQueryTimeout(int seconds) throws SQLException {
             super.setQueryTimeout(seconds);
-            Assert.assertEquals(TIMEOUT, seconds);
             isTimeoutSet = true;
+        }
+
+        @Override
+        public boolean execute(String sql) throws SQLException {
+            if (longQuery.equals(sql)) {
+                try {
+                    Thread.sleep(getQueryTimeout() * 1000);
+                }catch (Exception x) {
+                }
+                throw new SQLTimeoutException();
+            } else {
+                return super.execute(sql);
+            }
         }
     }
 }
