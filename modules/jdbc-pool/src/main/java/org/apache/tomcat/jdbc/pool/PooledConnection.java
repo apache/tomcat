@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool;
 
 
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -242,9 +243,13 @@ public class PooledConnection {
                 if (log.isDebugEnabled()) {
                     log.debug("Instantiating driver using class: "+poolProperties.getDriverClassName()+" [url="+poolProperties.getUrl()+"]");
                 }
-                driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
-                                                         true, PooledConnection.class.getClassLoader()
-                                                         ).newInstance();
+                if (poolProperties.getDriverClassName()==null) {
+                	//rely on DriverManager
+                	log.warn("Not loading a JDBC driver as driverClassName property is null.");
+                } else {
+                	driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
+                			true, PooledConnection.class.getClassLoader()).newInstance();
+                }
             }
         } catch (java.lang.Exception cn) {
             if (log.isDebugEnabled()) {
@@ -274,7 +279,11 @@ public class PooledConnection {
         if (pwd != null) properties.setProperty(PROP_PASSWORD, pwd);
 
         try {
-            connection = driver.connect(driverURL, properties);
+            if (driver==null) {
+            	connection = DriverManager.getConnection(driverURL, properties);
+            } else {
+            	connection = driver.connect(driverURL, properties);
+            }
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to connect to database.", x);
