@@ -145,7 +145,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 waiters.addLast(c);
                 //unlock the global lock
                 lock.unlock();
-                boolean didtimeout = false;
+                boolean didtimeout = true;
                 InterruptedException interruptedException = null;
                 try {
                     //wait for the specified timeout
@@ -174,7 +174,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                     } else {
                         throw interruptedException;
                     }
-                } 
+                }
             } else {
                 //we have an object, release
                 lock.unlock();
