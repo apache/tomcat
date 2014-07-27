@@ -244,11 +244,11 @@ public class PooledConnection {
                     log.debug("Instantiating driver using class: "+poolProperties.getDriverClassName()+" [url="+poolProperties.getUrl()+"]");
                 }
                 if (poolProperties.getDriverClassName()==null) {
-                	//rely on DriverManager
-                	log.warn("Not loading a JDBC driver as driverClassName property is null.");
+                    //rely on DriverManager
+                    log.warn("Not loading a JDBC driver as driverClassName property is null.");
                 } else {
-                	driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
-                			true, PooledConnection.class.getClassLoader()).newInstance();
+                    driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
+                            true, PooledConnection.class.getClassLoader()).newInstance();
                 }
             }
         } catch (java.lang.Exception cn) {
@@ -280,9 +280,9 @@ public class PooledConnection {
 
         try {
             if (driver==null) {
-            	connection = DriverManager.getConnection(driverURL, properties);
+                connection = DriverManager.getConnection(driverURL, properties);
             } else {
-            	connection = driver.connect(driverURL, properties);
+                connection = driver.connect(driverURL, properties);
             }
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
