@@ -68,6 +68,12 @@
         <bug>56724</bug>: Write an error message to Tomcat logs if container
         background thread is aborted unexpectedly. (kkolinko)
       </add>
+      <fix>
+        When scanning class files (e.g. for annotations) and reading the number
+        of parameters in a <code>MethodParameters</code> structure only read a
+        single byte (rather than two bytes) as per the JVM specification. Patch
+        provided by labes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

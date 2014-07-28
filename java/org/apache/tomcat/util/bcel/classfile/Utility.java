@@ -182,7 +182,7 @@ final class Utility {
     }
 
     static void swallowMethodParameters(DataInput file) throws IOException {
-        int parameters_count = file.readUnsignedShort();
+        int parameters_count = file.readUnsignedByte();
         for (int i = 0; i < parameters_count; i++) {
             file.readUnsignedShort();   // Unused name_index
             file.readUnsignedShort();   // Unused access_flags
