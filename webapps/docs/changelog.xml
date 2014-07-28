@@ -72,7 +72,13 @@
         When scanning class files (e.g. for annotations) and reading the number
         of parameters in a <code>MethodParameters</code> structure only read a
         single byte (rather than two bytes) as per the JVM specification. Patch
-        provided by labes. (markt)
+        provided by Francesco Komauli. (markt)
+      </fix>
+      <fix>
+        Allow the JNDI Realm to start even if the directory is not available.
+        The directory not being available is not fatal once the Realm is started
+        and it need not be fatal when the Realm starts. Based on a patch by
+        Cédric Couralet. (markt)
       </fix>
     </changelog>
   </subsection>
