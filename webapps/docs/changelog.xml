@@ -56,6 +56,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.56 (violetagg)">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the label in the list of sessions by idle time for the bin that
+        represents the idle time immediately below the maximum permitted idle
+        time when using the expire command of the Manager application. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.55 (violetagg)" rtext="released 2014-07-27">
   <subsection name="Catalina">
