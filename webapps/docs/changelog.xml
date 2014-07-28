@@ -109,6 +109,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the label in the list of sessions by idle time for the bin that
+        represents the idle time immediately below the maximum permitted idle
+        time when using the expire command of the Manager application. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.10 (markt)" rtext="not released">
   <subsection name="Catalina">

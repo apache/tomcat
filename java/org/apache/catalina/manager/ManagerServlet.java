@@ -1191,18 +1191,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 writer.println(smClient.getString(
                         "managerServlet.sessiontimeout",
                         "<" + histoInterval, "" + timeout[0]));
-            for (int i = 1; i < maxCount-1; i++) {
+            for (int i = 1; i < maxCount; i++) {
                 if (timeout[i] > 0)
                     writer.println(smClient.getString(
                             "managerServlet.sessiontimeout",
                             "" + (i)*histoInterval + " - <" + (i+1)*histoInterval,
                             "" + timeout[i]));
             }
-            if (timeout[maxCount-1] > 0)
-                writer.println(smClient.getString(
-                        "managerServlet.sessiontimeout",
-                        ">=" + maxCount*histoInterval,
-                        "" + timeout[maxCount-1]));
             if (notimeout > 0)
                 writer.println(smClient.getString(
                         "managerServlet.sessiontimeout.unlimited",
@@ -1210,7 +1205,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             if (idle >= 0)
                 writer.println(smClient.getString(
                         "managerServlet.sessiontimeout.expired",
-                        "" + idle,"" + expired));
+                        ">" + idle,"" + expired));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log("ManagerServlet.sessions[" + displayPath + "]", t);
