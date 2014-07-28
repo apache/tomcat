@@ -201,13 +201,13 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             E item = items.poll();
             if (item==null) {
                 //queue is empty, add ourselves as waiters
-                ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<E>(1);
+                ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<>(1);
                 waiters.addLast(c);
                 //return a future that will wait for the object
-                result = new ItemFuture<E>(c);
+                result = new ItemFuture<>(c);
             } else {
                 //return a future with the item
-                result = new ItemFuture<E>(item);
+                result = new ItemFuture<>(item);
             }
         } finally {
             lock.unlock();
