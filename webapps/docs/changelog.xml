@@ -56,6 +56,16 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.56 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        When scanning class files (e.g. for annotations) and reading the number
+        of parameters in a <code>MethodParameters</code> structure only read a
+        single byte (rather than two bytes) as per the JVM specification. Patch
+        provided by labes. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
