@@ -121,6 +121,18 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>56746</bug>: Allow secure WebSocket client threads to use the
+        current context class loader rather than explicitly setting it to the
+        class loader that loaded the WebSocket implementation. This allows
+        WebSocket client connections from within web applications to access,
+        amongst other things, the JNDI resources associated with the web
+        application. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

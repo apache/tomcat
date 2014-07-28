@@ -566,7 +566,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
             t.setName("WebSocketClient-SecureIO-" + count.incrementAndGet());
-            t.setContextClassLoader(this.getClass().getClassLoader());
+            // No need to set the context class loader. The threads will be
+            // cleaned up when the connection is closed.
             t.setDaemon(true);
             return t;
         }
