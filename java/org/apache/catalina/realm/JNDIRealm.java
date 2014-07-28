@@ -2167,11 +2167,15 @@ public class JNDIRealm extends RealmBase {
     @Override
     protected void startInternal() throws LifecycleException {
 
-        // Validate that we can open our connection
+        // Check to see if the connection to the directory can be opened
         try {
             open();
         } catch (NamingException e) {
-            throw new LifecycleException(sm.getString("jndiRealm.open"), e);
+            // A failure here is not fatal as the directory may be unavailable
+            // now but available later. Unavailability of the directory is not
+            // fatal once the Realm has started so there is no reason for it to
+            // be fatal when the Realm starts.
+            containerLog.error(sm.getString("jndiRealm.open"), e);
         }
 
         super.startInternal();
