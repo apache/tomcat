@@ -72,7 +72,7 @@ public class OpenSSLCipherConfigurationParser {
     /**
      * All ciphers by their openssl alias name.
      */
-    private static final Map<String, List<Ciphers>> aliases = new LinkedHashMap<>();
+    private static final Map<String, List<Cipher>> aliases = new LinkedHashMap<>();
 
     /**
      * the 'NULL' ciphers that is those offering no encryption. Because these offer no encryption at all and are a security risk
@@ -361,20 +361,20 @@ public class OpenSSLCipherConfigurationParser {
 
     private static final void init() {
 
-        for (Ciphers cipher : Ciphers.values()) {
+        for (Cipher cipher : Cipher.values()) {
             String alias = cipher.getOpenSSLAlias();
             if (aliases.containsKey(alias)) {
                 aliases.get(alias).add(cipher);
             } else {
-                List<Ciphers> list = new ArrayList<>();
+                List<Cipher> list = new ArrayList<>();
                 list.add(cipher);
                 aliases.put(alias, list);
             }
             aliases.put(cipher.name(), Collections.singletonList(cipher));
         }
-        List<Ciphers> allCiphers = Arrays.asList(Ciphers.values());
+        List<Cipher> allCiphers = Arrays.asList(Cipher.values());
         Collections.reverse(allCiphers);
-        LinkedHashSet<Ciphers> all = defaultSort(new LinkedHashSet<>(allCiphers));
+        LinkedHashSet<Cipher> all = defaultSort(new LinkedHashSet<>(allCiphers));
         addListAlias(ALL, all);
         addListAlias(HIGH, filterByEncryptionLevel(all, Collections.singleton(EncryptionLevel.HIGH)));
         addListAlias(MEDIUM, filterByEncryptionLevel(all, Collections.singleton(EncryptionLevel.MEDIUM)));
@@ -392,7 +392,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(RSA, filter(all, null, Collections.singleton(KeyExchange.RSA), Collections.singleton(Authentication.RSA), null, null, null));
         addListAlias(kEDH, filterByKeyExchange(all, Collections.singleton(KeyExchange.EDH)));
         addListAlias(kDHE, filterByKeyExchange(all, Collections.singleton(KeyExchange.EDH)));
-        Set<Ciphers> edh = filterByKeyExchange(all, Collections.singleton(KeyExchange.EDH));
+        Set<Cipher> edh = filterByKeyExchange(all, Collections.singleton(KeyExchange.EDH));
         edh.removeAll(filterByAuthentication(all, Collections.singleton(Authentication.DH)));
         addListAlias(EDH, edh);
         addListAlias(DHE, edh);
@@ -411,7 +411,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(aDSS, filterByAuthentication(all, Collections.singleton(Authentication.DSS)));
         aliases.put("DSS", aliases.get(aDSS));
         addListAlias(aDH, filterByAuthentication(all, Collections.singleton(Authentication.DH)));
-        Set<Ciphers> aecdh = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr)));
+        Set<Cipher> aecdh = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr)));
         aecdh.removeAll(filterByAuthentication(all, Collections.singleton(Authentication.aNULL)));
         addListAlias(AECDH, aecdh);
         addListAlias(aECDH, filterByAuthentication(all, Collections.singleton(Authentication.ECDH)));
@@ -427,7 +427,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(SSLv3, filterByProtocol(all, Collections.singleton(Protocol.SSLv3)));
         addListAlias(SSLv2, filterByProtocol(all, Collections.singleton(Protocol.SSLv2)));
         addListAlias(DH, filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd, KeyExchange.EDH))));
-        Set<Ciphers> adh = filterByKeyExchange(all, Collections.singleton(KeyExchange.EDH));
+        Set<Cipher> adh = filterByKeyExchange(all, Collections.singleton(KeyExchange.EDH));
         adh.retainAll(filterByAuthentication(all, Collections.singleton(Authentication.aNULL)));
         addListAlias(ADH, adh);
         addListAlias(AES128, filterByEncryption(all, new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128GCM))));
@@ -459,56 +459,56 @@ public class OpenSSLCipherConfigurationParser {
         initialized = true;
         String defaultExpression = System.getProperty(DEFAULT_EXPRESSION_KEY, "ALL:!eNULL:!aNULL");
         addListAlias(DEFAULT, parse(defaultExpression));
-        LinkedHashSet<Ciphers> complementOfDefault = new LinkedHashSet<>(all);
+        LinkedHashSet<Cipher> complementOfDefault = new LinkedHashSet<>(all);
         complementOfDefault.removeAll(aliases.get(DEFAULT));
         addListAlias(COMPLEMENTOFDEFAULT, complementOfDefault);
     }
 
-    static void addListAlias(String alias, Set<Ciphers> ciphers) {
+    static void addListAlias(String alias, Set<Cipher> ciphers) {
         aliases.put(alias, new ArrayList<>(ciphers));
     }
 
-    static void moveToEnd(final LinkedHashSet<Ciphers> ciphers, final String alias) {
+    static void moveToEnd(final LinkedHashSet<Cipher> ciphers, final String alias) {
         moveToEnd(ciphers, aliases.get(alias));
     }
 
-    static void moveToEnd(final LinkedHashSet<Ciphers> ciphers, final Collection<Ciphers> toBeMovedCiphers) {
-        List<Ciphers> movedCiphers = new ArrayList<>(toBeMovedCiphers);
+    static void moveToEnd(final LinkedHashSet<Cipher> ciphers, final Collection<Cipher> toBeMovedCiphers) {
+        List<Cipher> movedCiphers = new ArrayList<>(toBeMovedCiphers);
         movedCiphers.retainAll(ciphers);
         ciphers.removeAll(movedCiphers);
         ciphers.addAll(movedCiphers);
     }
 
-    static void add(final LinkedHashSet<Ciphers> ciphers, final String alias) {
+    static void add(final LinkedHashSet<Cipher> ciphers, final String alias) {
         ciphers.addAll(aliases.get(alias));
     }
 
-    static void remove(final LinkedHashSet<Ciphers> ciphers, final String alias) {
+    static void remove(final LinkedHashSet<Cipher> ciphers, final String alias) {
         ciphers.removeAll(aliases.get(alias));
     }
 
-    static LinkedHashSet<Ciphers> strengthSort(final LinkedHashSet<Ciphers> ciphers) {
+    static LinkedHashSet<Cipher> strengthSort(final LinkedHashSet<Cipher> ciphers) {
         /*
          * This routine sorts the ciphers with descending strength. The sorting
          * must keep the pre-sorted sequence, so we apply the normal sorting
          * routine as '+' movement to the end of the list.
          */
         Set<Integer> keySizes = new HashSet<>();
-        for (Ciphers cipher : ciphers) {
+        for (Cipher cipher : ciphers) {
             keySizes.add(Integer.valueOf(cipher.getStrength_bits()));
         }
         List<Integer> strength_bits = new ArrayList<>(keySizes);
         Collections.sort(strength_bits);
         Collections.reverse(strength_bits);
-        final LinkedHashSet<Ciphers> result = new LinkedHashSet<>(ciphers);
+        final LinkedHashSet<Cipher> result = new LinkedHashSet<>(ciphers);
         for (int strength : strength_bits) {
             moveToEnd(result, filterByStrengthBits(ciphers, strength));
         }
         return result;
     }
 
-    static LinkedHashSet<Ciphers> defaultSort(final LinkedHashSet<Ciphers> ciphers) {
-        final LinkedHashSet<Ciphers> result = new LinkedHashSet<>(ciphers.size());
+    static LinkedHashSet<Cipher> defaultSort(final LinkedHashSet<Cipher> ciphers) {
+        final LinkedHashSet<Cipher> result = new LinkedHashSet<>(ciphers.size());
         /* Now arrange all ciphers by preference: */
 
         /* Everything else being equal, prefer ephemeral ECDH over other key exchange mechanisms */
@@ -538,9 +538,9 @@ public class OpenSSLCipherConfigurationParser {
         return strengthSort(result);
     }
 
-    static Set<Ciphers> filterByStrengthBits(Set<Ciphers> ciphers, int strength_bits) {
-        Set<Ciphers> result = new LinkedHashSet<>(ciphers.size());
-        for (Ciphers cipher : ciphers) {
+    static Set<Cipher> filterByStrengthBits(Set<Cipher> ciphers, int strength_bits) {
+        Set<Cipher> result = new LinkedHashSet<>(ciphers.size());
+        for (Cipher cipher : ciphers) {
             if (cipher.getStrength_bits() == strength_bits) {
                 result.add(cipher);
             }
@@ -548,34 +548,34 @@ public class OpenSSLCipherConfigurationParser {
         return result;
     }
 
-    static Set<Ciphers> filterByProtocol(Set<Ciphers> ciphers, Set<Protocol> protocol) {
+    static Set<Cipher> filterByProtocol(Set<Cipher> ciphers, Set<Protocol> protocol) {
         return filter(ciphers, protocol, null, null, null, null, null);
     }
 
-    static Set<Ciphers> filterByKeyExchange(Set<Ciphers> ciphers, Set<KeyExchange> kx) {
+    static Set<Cipher> filterByKeyExchange(Set<Cipher> ciphers, Set<KeyExchange> kx) {
         return filter(ciphers, null, kx, null, null, null, null);
     }
 
-    static Set<Ciphers> filterByAuthentication(Set<Ciphers> ciphers, Set<Authentication> au) {
+    static Set<Cipher> filterByAuthentication(Set<Cipher> ciphers, Set<Authentication> au) {
         return filter(ciphers, null, null, au, null, null, null);
     }
 
-    static Set<Ciphers> filterByEncryption(Set<Ciphers> ciphers, Set<Encryption> enc) {
+    static Set<Cipher> filterByEncryption(Set<Cipher> ciphers, Set<Encryption> enc) {
         return filter(ciphers, null, null, null, enc, null, null);
     }
 
-    static Set<Ciphers> filterByEncryptionLevel(Set<Ciphers> ciphers, Set<EncryptionLevel> level) {
+    static Set<Cipher> filterByEncryptionLevel(Set<Cipher> ciphers, Set<EncryptionLevel> level) {
         return filter(ciphers, null, null, null, null, level, null);
     }
 
-    static Set<Ciphers> filterByMessageDigest(Set<Ciphers> ciphers, Set<MessageDigest> mac) {
+    static Set<Cipher> filterByMessageDigest(Set<Cipher> ciphers, Set<MessageDigest> mac) {
         return filter(ciphers, null, null, null, null, null, mac);
     }
 
-    static Set<Ciphers> filter(Set<Ciphers> ciphers, Set<Protocol> protocol, Set<KeyExchange> kx,
+    static Set<Cipher> filter(Set<Cipher> ciphers, Set<Protocol> protocol, Set<KeyExchange> kx,
             Set<Authentication> au, Set<Encryption> enc, Set<EncryptionLevel> level, Set<MessageDigest> mac) {
-        Set<Ciphers> result = new LinkedHashSet<>(ciphers.size());
-        for (Ciphers cipher : ciphers) {
+        Set<Cipher> result = new LinkedHashSet<>(ciphers.size());
+        for (Cipher cipher : ciphers) {
             if (protocol != null && protocol.contains(cipher.getProtocol())) {
                 result.add(cipher);
             }
@@ -598,13 +598,13 @@ public class OpenSSLCipherConfigurationParser {
         return result;
     }
 
-    static LinkedHashSet<Ciphers> parse(String expression) {
+    static LinkedHashSet<Cipher> parse(String expression) {
         if (!initialized) {
             init();
         }
         String[] elements = expression.split(SEPARATOR);
-        LinkedHashSet<Ciphers> ciphers = new LinkedHashSet<>();
-        Set<Ciphers> removedCiphers = new HashSet<>();
+        LinkedHashSet<Cipher> ciphers = new LinkedHashSet<>();
+        Set<Cipher> removedCiphers = new HashSet<>();
         for (String element : elements) {
             if (element.startsWith(DELETE)) {
                 String alias = element.substring(1);
@@ -631,7 +631,7 @@ public class OpenSSLCipherConfigurationParser {
             } else if (element.contains(AND)) {
                 String[] intersections = element.split("\\" + AND);
                 if(intersections.length > 0) {
-                    List<Ciphers> result = new ArrayList<>(aliases.get(intersections[0]));
+                    List<Cipher> result = new ArrayList<>(aliases.get(intersections[0]));
                     for(int i = 1; i < intersections.length; i++) {
                         if(aliases.containsKey(intersections[i])) {
                             result.retainAll(aliases.get(intersections[i]));
@@ -645,9 +645,9 @@ public class OpenSSLCipherConfigurationParser {
         return defaultSort(ciphers);
     }
 
-    static List<String> convertForJSSE(Collection<Ciphers> ciphers) {
+    static List<String> convertForJSSE(Collection<Cipher> ciphers) {
         List<String> result = new ArrayList<>(ciphers.size());
-        for (Ciphers cipher : ciphers) {
+        for (Cipher cipher : ciphers) {
             result.add(cipher.name());
         }
         if (log.isDebugEnabled()) {
@@ -666,12 +666,12 @@ public class OpenSSLCipherConfigurationParser {
         return convertForJSSE(parse(expression));
     }
 
-    static String displayResult(Collection<Ciphers> ciphers, boolean useJSSEFormat, String separator) {
+    static String displayResult(Collection<Cipher> ciphers, boolean useJSSEFormat, String separator) {
         if (ciphers.isEmpty()) {
             return "";
         }
         StringBuilder builder = new StringBuilder(ciphers.size() * 16);
-        for (Ciphers cipher : ciphers) {
+        for (Cipher cipher : ciphers) {
             if (useJSSEFormat) {
                 builder.append(cipher.name());
             } else {
