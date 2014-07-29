@@ -425,12 +425,12 @@ public abstract class BaseDirContext implements DirContext {
 
         if (path != null)
             return path;
-        
+
+        String resourceName = "/META-INF/resources" + name;
         // Check the alternate locations
         for (DirContext altDirContext : altDirContexts) {
             if (altDirContext instanceof BaseDirContext){
-                path = ((BaseDirContext) altDirContext).getRealPath(
-                        "/META-INF/resources" + name);
+                path = ((BaseDirContext) altDirContext).getRealPath(resourceName);
                 if (path != null)
                     return path;
             }
@@ -463,40 +463,60 @@ public abstract class BaseDirContext implements DirContext {
     /**
      * Retrieves the named object.
      * 
-     * @param name the name of the object to look up
+     * @param name
+     *            the name of the object to look up
      * @return the object bound to name
-     * @exception NamingException if a naming exception is encountered
+     * @exception NamingException
+     *                if a naming exception is encountered
      */
     @Override
     public final Object lookup(String name) throws NamingException {
         // First check for aliases
+        Object obj = doLookupWithoutNNFE(name);
+        if (obj != null) {
+            return obj;
+        }
+
+        // Really not found
+        throw new NameNotFoundException(
+                sm.getString("resources.notFound", name));
+    }
+
+    private Object doLookupWithoutNNFE(String name) throws NamingException {
         if (!aliases.isEmpty()) {
             AliasResult result = findAlias(name);
             if (result.dirContext != null) {
                 return result.dirContext.lookup(result.aliasName);
             }
         }
-        
+
         // Next do a standard lookup
         Object obj = doLookup(name);
 
-        if (obj != null)
+        if (obj != null) {
             return obj;
-        
+        }
+
         // Check the alternate locations
+        String resourceName = "/META-INF/resources" + name;
         for (DirContext altDirContext : altDirContexts) {
-            try {
-                obj = altDirContext.lookup("/META-INF/resources" + name);
-                if (obj != null)
-                    return obj;
-            } catch ( NamingException ex) {
-                // ignore
+            if (altDirContext instanceof BaseDirContext) {
+                obj = ((BaseDirContext) altDirContext)
+                        .doLookupWithoutNNFE(resourceName);
+            } else {
+                try {
+                    obj = altDirContext.lookup(resourceName);
+                } catch (NamingException ex) {
+                    // ignore
+                }
+            }
+            if (obj != null) {
+                return obj;
             }
         }
-        
-        // Really not found
-        throw new NameNotFoundException(
-                sm.getString("resources.notFound", name));
+
+        // Return null instead
+        return null;
     }
 
     /**
@@ -689,10 +709,10 @@ public abstract class BaseDirContext implements DirContext {
         // Check the alternate locations
         List<NamingEntry> altBindings = null;
 
+        String resourceName = "/META-INF/resources" + name;
         for (DirContext altDirContext : altDirContexts) {
             if (altDirContext instanceof BaseDirContext) {
-                altBindings = ((BaseDirContext) altDirContext).doListBindings(
-                        "/META-INF/resources" + name);
+                altBindings = ((BaseDirContext) altDirContext).doListBindings(resourceName);
             }
             if (altBindings != null) {
                 if (bindings == null) {
@@ -758,10 +778,10 @@ public abstract class BaseDirContext implements DirContext {
         // Check the alternate locations
         List<NamingEntry> altBindings = null;
 
+        String resourceName = "/META-INF/resources" + name;
         for (DirContext altDirContext : altDirContexts) {
             if (altDirContext instanceof BaseDirContext) {
-                altBindings = ((BaseDirContext) altDirContext).doListBindings(
-                        "/META-INF/resources" + name);
+                altBindings = ((BaseDirContext) altDirContext).doListBindings(resourceName);
             }
             if (altBindings != null) {
                 if (bindings == null) {
@@ -791,7 +811,7 @@ public abstract class BaseDirContext implements DirContext {
      * This method is idempotent. It succeeds even if the terminal atomic 
      * name is not bound in the target context, but throws 
      * NameNotFoundException if any of the intermediate contexts do not exist. 
-     * 
+     *
      * In a federated naming system, a context from one naming system may be 
      * bound to a name in another. One can subsequently look up and perform 
      * operations on the foreign context using a composite name. However, an 
@@ -1138,12 +1158,12 @@ public abstract class BaseDirContext implements DirContext {
 
         if (attrs != null)
             return attrs;
-        
+
+        String resourceName = "/META-INF/resources" + name;
         // Check the alternate locations
         for (DirContext altDirContext : altDirContexts) {
             if (altDirContext instanceof BaseDirContext)
-                attrs = ((BaseDirContext) altDirContext).doGetAttributes(
-                        "/META-INF/resources" + name, attrIds);
+                attrs = ((BaseDirContext) altDirContext).doGetAttributes(resourceName, attrIds);
             else {
                 try {
                     attrs = altDirContext.getAttributes(name, attrIds);

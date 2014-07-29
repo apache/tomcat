@@ -70,6 +70,14 @@
         and it need not be fatal when the Realm starts. Based on a patch by
         Cédric Couralet. (markt)
       </fix>
+      <fix>
+        <bug>56771</bug>: When lookup for a resource in all the alternate or
+        backup <code>javax.naming.directory.DirContext</code>,
+        <code>javax.naming.NameNotFoundException</code> will be thrown at the
+        end of the search if the resource is not available in these alternate
+        or backup <code>javax.naming.directory.DirContext</code>. Based on a
+        patch by Sheldon Shao. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
