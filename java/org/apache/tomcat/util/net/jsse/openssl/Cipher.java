@@ -18,7 +18,20 @@
 package org.apache.tomcat.util.net.jsse.openssl;
 
 /**
- * All Ciphers for SSL/TSL.
+ * All the standard cipher suites for SSL/TSL.
+ *
+ * TODO Change the name of the enumeration entry to the registry name for the
+ *      cipher (not the Java standard name which may vary between Java
+ *      implementations).
+ *
+ * @see <a href="http://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4"
+ *      >The cipher suite registry</a>
+ * @see <a href="https://www.thesprawl.org/research/tls-and-ssl-cipher-suites/"
+ *      >Another list of cipher suites with some non-standard IDs</a>
+ * @see <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#ciphersuites"
+ *      >Oracle standard names for cipher suites</a>
+ * @see <a href="https://www.openssl.org/docs/apps/ciphers.html"
+ *      >Mapping of OpenSSL cipher suites names to registry names</a>
  */
 enum Cipher {
     /* The RSA ciphers */
@@ -2161,7 +2174,7 @@ enum Cipher {
             false,
             168,
             168
-    );
+    ),
 
     /* TEMP_GOST_TLS*/
     /*
@@ -2217,6 +2230,23 @@ enum Cipher {
      256,
      256
      };*/
+
+    // Cipher 0x030080 / 0x040080
+    SSL2_RC2_CBC_128_CBC_WITH_MD5(
+            "RC2-CBC-MD5",
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.RC2,
+            MessageDigest.MD5,
+            Protocol.SSLv2,
+            false,
+            EncryptionLevel.MEDIUM,
+            true,
+            128,
+            128
+            );
+
+
     private final String openSSLAlias;
     private final KeyExchange kx;
     private final Authentication au;
