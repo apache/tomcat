@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.junit.Assert;
+//import org.junit.Test;
 
 public class TestCipher {
 
@@ -314,9 +315,13 @@ public class TestCipher {
      * These are all the IBM standard Java names for cipher suites taken from
      * http://www-01.ibm.com/support/knowledgecenter/SSYKE2_7.0.0/com.ibm.java.security.component.71.doc/security-component/jsse2Docs/ciphersuites.html?lang=en
      * on 29th July 2014.
+     * <br>
+     * Note that IBM cipher suites names can begin with TLS or SSL.
      */
-    private static final Set<String> CIPHER_SUITE_STANDARD_NAMES_IBM =
-            Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+    private static final Set<String> CIPHER_SUITE_STANDARD_NAMES_IBM;
+
+    static {
+        Set<String> sslNames = new HashSet<>(Arrays.asList(
             "SSL_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384",
             "SSL_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
             "SSL_RSA_WITH_AES_256_CBC_SHA256",
@@ -416,7 +421,18 @@ public class TestCipher {
             "SSL_KRB5_EXPORT_WITH_RC4_40_MD5",
             "SSL_KRB5_EXPORT_WITH_DES_CBC_40_SHA",
             "SSL_KRB5_EXPORT_WITH_DES_CBC_40_MD5",
-            "SSL_RSA_EXPORT_WITH_RC2_CBC_40_MD5")));
+            "SSL_RSA_EXPORT_WITH_RC2_CBC_40_MD5"));
+
+        Set<String> allNames = new HashSet<>();
+
+        allNames.addAll(sslNames);
+
+        for (String sslName : sslNames) {
+            allNames.add("TLS" + sslName.substring(3));
+        }
+
+        CIPHER_SUITE_STANDARD_NAMES_IBM = Collections.unmodifiableSet(allNames);
+    }
 
 
     /**
