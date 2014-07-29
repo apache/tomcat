@@ -2447,14 +2447,16 @@ enum Cipher {
      */
     private final int alg_bits;
 
-    Cipher(String openSSLAlias, Set<String> jsseAltNames, KeyExchange kx, Authentication au,
+    Cipher(String openSSLAlias, String[] jsseAltNames, KeyExchange kx, Authentication au,
             Encryption enc, MessageDigest mac, Protocol protocol, boolean export,
             EncryptionLevel level, boolean fipsCompatible, int strength_bits,
             int alg_bits) {
         this.openSSLAlias = openSSLAlias;
         Set<String> names = new HashSet<>();
         if (jsseAltNames != null) {
-            names.addAll(jsseAltNames);
+            for (String jsseAltName : jsseAltNames) {
+                names.add(jsseAltName);
+            }
         }
         names.add(name());
         this.jsseNames = Collections.unmodifiableSet(names);
