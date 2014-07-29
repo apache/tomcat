@@ -2322,20 +2322,6 @@ enum Cipher {
             128,
             128
     ),
-    // DES_64_CBC_WITH_MD5
-    SSL_CK_DES_64_CBC_WITH_MD5("DES-CBC-MD5",
-            null,
-            KeyExchange.RSA,
-            Authentication.RSA,
-            Encryption.DES,
-            MessageDigest.MD5,
-            Protocol.SSLv2,
-            false,
-            EncryptionLevel.LOW,
-            false,
-            56,
-            56
-    ),
     // DES_192_EDE3_CBC_WITH_MD5
     SSL_CK_DES_192_EDE3_CBC_WITH_MD5("DES-CBC3-MD5",
             null,
@@ -2424,7 +2410,22 @@ enum Cipher {
             true,
             128,
             128
-            );
+            ),
+    // Cipher 0x060040
+    SSL2_DES_64_CBC_WITH_MD5(
+            "DES-CBC-MD5",
+            null,
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.DES,
+            MessageDigest.MD5,
+            Protocol.SSLv2,
+            false,
+            EncryptionLevel.LOW,
+            false,
+            56,
+            56
+    );
 
 
     private final String openSSLAlias;
