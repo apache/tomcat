@@ -129,7 +129,7 @@
         class loader that loaded the WebSocket implementation. This allows
         WebSocket client connections from within web applications to access,
         amongst other things, the JNDI resources associated with the web
-        application. (markt) 
+        application. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -138,7 +138,7 @@
       <fix>
         Correct the label in the list of sessions by idle time for the bin that
         represents the idle time immediately below the maximum permitted idle
-        time when using the expire command of the Manager application. (markt) 
+        time when using the expire command of the Manager application. (markt)
       </fix>
     </changelog>
   </subsection>
