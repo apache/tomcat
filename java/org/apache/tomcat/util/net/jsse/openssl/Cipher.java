@@ -20,7 +20,7 @@ package org.apache.tomcat.util.net.jsse.openssl;
 /**
  * All Ciphers for SSL/TSL.
  */
-enum Ciphers {
+enum Cipher {
     /* The RSA ciphers */
     // Cipher 01
     SSL_RSA_WITH_NULL_MD5("NULL-MD5",
@@ -2235,7 +2235,7 @@ enum Ciphers {
      */
     private final int alg_bits;
 
-    Ciphers(String openSSLAlias, KeyExchange kx, Authentication au,
+    Cipher(String openSSLAlias, KeyExchange kx, Authentication au,
             Encryption enc, MessageDigest mac, Protocol protocol, boolean export,
             EncryptionLevel level, boolean fipsCompatible, int strength_bits,
             int alg_bits) {
