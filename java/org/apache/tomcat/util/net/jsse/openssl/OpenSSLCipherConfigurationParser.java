@@ -648,7 +648,7 @@ public class OpenSSLCipherConfigurationParser {
     static List<String> convertForJSSE(Collection<Cipher> ciphers) {
         List<String> result = new ArrayList<>(ciphers.size());
         for (Cipher cipher : ciphers) {
-            result.add(cipher.name());
+            result.addAll(cipher.getJsseNames());
         }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("jsse.openssl.effectiveCiphers", displayResult(ciphers, true, ",")));
@@ -673,7 +673,10 @@ public class OpenSSLCipherConfigurationParser {
         StringBuilder builder = new StringBuilder(ciphers.size() * 16);
         for (Cipher cipher : ciphers) {
             if (useJSSEFormat) {
-                builder.append(cipher.name());
+                for (String name : cipher.getJsseNames()) {
+                    builder.append(name);
+                    builder.append(separator);
+                }
             } else {
                 builder.append(cipher.getOpenSSLAlias());
             }
