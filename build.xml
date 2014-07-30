@@ -179,6 +179,9 @@
   <available file="/dev/urandom" property="test.jvmarg.egd" value="-Djava.security.egd=file:/dev/./urandom"/>
   <property name="test.jvmarg.egd" value="" />
 
+  <!-- Location of OpenSSL binary -->
+  <property name="test.openssl.path" value="" />
+
   <!-- Include .gitignore in src distributions. -->
   <!-- .git and .gitignore are in defaultexcludes since Ant 1.8.2 -->
   <defaultexcludes add="**/.git" />
@@ -1370,13 +1373,11 @@
     <condition property="test.openssl.exists">
       <or>
         <and>
-          <isset property="test.openssl.path"/>
+          <length string="${test.openssl.path}" trim="true" length="0" when="gt"/>
           <available file="${test.openssl.path}" property="test.openssl.exists"/>
         </and>
         <and>
-          <not>
-            <isset property="test.openssl.path"/>
-          </not>
+          <length string="${test.openssl.path}" trim="true" length="0" when="eq"/>
           <available file="openssl" filepath="${env.PATH}" property="test.openssl.exists"/>
         </and>
       </or>
