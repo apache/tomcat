@@ -89,12 +89,12 @@ public class TestCipher {
             if (openSSLAlias.contains("GOST")) {
                 continue;
             }
-            // OpenSSL does not implement any DH_DSS or DH_RSA algorithms so
+            // OpenSSL does not implement any DH-DSS or DH-RSA algorithms so
             // exclude them from the expected list
-            if (openSSLAlias.contains("DH-DSS")) {
+            if (openSSLAlias.startsWith("DH-DSS") || openSSLAlias.startsWith("EXP-DH-DSS")) {
                 continue;
             }
-            if (openSSLAlias.contains("DH-RSA")) {
+            if (openSSLAlias.startsWith("DH-RSA") || openSSLAlias.startsWith("EXP-DH-RSA")) {
                 continue;
             }
             // OpenSSL does not enable the experimental EXP1024 and
@@ -123,6 +123,17 @@ public class TestCipher {
             unavailableList.append(' ');
         }
         Assert.assertEquals(unavailableList.toString(), 0,  unavailableCipherSuites.size());
+
+        Set<String> unexpectedCipherSuites = new HashSet<>();
+        unexpectedCipherSuites.addAll(availableCipherSuites);
+        unexpectedCipherSuites.removeAll(expectedCipherSuites);
+        StringBuilder unexpectedList = new StringBuilder();
+        for (String cipher : unexpectedCipherSuites) {
+            unexpectedList.append(cipher);
+            unexpectedList.append(' ');
+        }
+        Assert.assertEquals(unexpectedList.toString(), 0,  unexpectedCipherSuites.size());
+
     }
 
     private static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
