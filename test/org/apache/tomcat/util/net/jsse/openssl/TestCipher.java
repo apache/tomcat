@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
-
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
@@ -67,6 +67,32 @@ public class TestCipher {
     }
 
 
+    /**
+     * Checks that the unit tests are running with a version of OpenSSL that
+     * includes all the expected ciphers and does not include any unexpected
+     * ones.
+     */
+    @Test
+    @Ignore // Mapping code currently defines 48 extra cipher suites. Figure out
+            // why.
+    public void testOpenSSLCipherAvailability() throws Exception {
+        Set<String> availableCipherSuites = getOpenSSLCiphersAsSet("ALL");
+        Set<String> expectedCipherSuites = new HashSet<>();
+        for (Cipher cipher : Cipher.values()) {
+            expectedCipherSuites.add(cipher.getOpenSSLAlias());
+        }
+
+        Set<String> unavailableCipherSuites = new HashSet<>();
+        unavailableCipherSuites.addAll(expectedCipherSuites);
+        unavailableCipherSuites.removeAll(availableCipherSuites);
+        StringBuilder unavailableList = new StringBuilder();
+        for (String cipher : unavailableCipherSuites) {
+            unavailableList.append(cipher);
+            unavailableList.append(' ');
+        }
+        Assert.assertEquals(unavailableList.toString(), 0,  unavailableCipherSuites.size());
+    }
+
     private static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
         String[] ciphers = getOpenSSLCiphersAsExpression(specification).trim().split(":");
         Set<String> result = new HashSet<>(ciphers.length);
@@ -79,7 +105,7 @@ public class TestCipher {
 
 
     private static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
-        String openSSLPath = System.getProperty("test.openssl.path","openssl");
+        String openSSLPath = System.getProperty("tomcat.test.openssl.path","openssl");
         StringBuilder cmd = new StringBuilder(openSSLPath + " ciphers");
         if (specification != null) {
             cmd.append(' ');
