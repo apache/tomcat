@@ -175,7 +175,7 @@ public class TestCipher {
     private static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
         String openSSLPath = System.getProperty("tomcat.test.openssl.path");
         if (openSSLPath == null || openSSLPath.length() == 0) {
-            openSSLPath = "/opt/local/bin/openssl";
+            openSSLPath = "openssl";
         }
         StringBuilder cmd = new StringBuilder(openSSLPath + " ciphers");
         if (specification != null) {
