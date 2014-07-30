@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.util.IOTools;
@@ -38,8 +37,7 @@ public class TestCipher {
      * not to be supported by JSSE.
      */
     @Test
-    @Ignore //FIXME: enable the test
-    public void testAllOpenSSlCiphersMapped() throws Exception {
+    public void testAllOpenSSLCiphersMapped() throws Exception {
         Set<String> openSSLCipherSuites = getOpenSSLCiphersAsSet("ALL");
 
         for (String openSSLCipherSuite : openSSLCipherSuites) {
@@ -81,8 +79,8 @@ public class TestCipher {
 
 
     private static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
-        // TODO The path to OpenSSL needs to be made configurable
-        StringBuilder cmd = new StringBuilder("/opt/local/bin/openssl ciphers");
+        String openSSLPath = System.getProperty("test.openssl.path","openssl");
+        StringBuilder cmd = new StringBuilder(openSSLPath + " ciphers");
         if (specification != null) {
             cmd.append(' ');
             cmd.append(specification);
