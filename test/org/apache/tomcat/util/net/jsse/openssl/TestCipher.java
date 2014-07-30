@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.util.IOTools;
@@ -39,7 +38,7 @@ public class TestCipher {
      */
     @Test
     public void testAllOpenSSLCiphersMapped() throws Exception {
-        Set<String> openSSLCipherSuites = getOpenSSLCiphersAsSet("ALL");
+        Set<String> openSSLCipherSuites = getOpenSSLCiphersAsSet("ALL:eNULL");
 
         for (String openSSLCipherSuite : openSSLCipherSuites) {
             List<String> jsseCipherSuites =
@@ -74,13 +73,45 @@ public class TestCipher {
      * ones.
      */
     @Test
-    @Ignore // Mapping code currently defines 48 extra cipher suites. Figure out
-            // why.
     public void testOpenSSLCipherAvailability() throws Exception {
-        Set<String> availableCipherSuites = getOpenSSLCiphersAsSet("ALL");
+        Set<String> availableCipherSuites = getOpenSSLCiphersAsSet("ALL:eNULL");
         Set<String> expectedCipherSuites = new HashSet<>();
         for (Cipher cipher : Cipher.values()) {
-            expectedCipherSuites.add(cipher.getOpenSSLAlias());
+            String openSSLAlias = cipher.getOpenSSLAlias();
+            // OpenSSL does not implement any FORTEZZA algorithms so exclude
+            // them from the expected list
+            if (openSSLAlias.contains("FZA")) {
+                continue;
+            }
+            // GOST algorithms are not enabled by default and no JSSE
+            // implementation supports them so exclude them from the expected
+            // list
+            if (openSSLAlias.contains("GOST")) {
+                continue;
+            }
+            // OpenSSL does not implement any DH_DSS or DH_RSA algorithms so
+            // exclude them from the expected list
+            if (openSSLAlias.contains("DH-DSS")) {
+                continue;
+            }
+            if (openSSLAlias.contains("DH-RSA")) {
+                continue;
+            }
+            // OpenSSL does not enable the experimental EXP1024 and
+            // DHE-DSS-RC4-SHA cipher suites unless the source is explicitly
+            // patched so exclude them from the expected list
+            if (openSSLAlias.contains("EXP1024")) {
+                continue;
+            }
+            if (openSSLAlias.contains("DHE-DSS-RC4-SHA")) {
+                continue;
+            }
+            // RC2-MD5 is not referenced in the OpenSSL source so exclude it
+            // from the expected list
+            if (openSSLAlias.contains("RC2-MD5")) {
+                continue;
+            }
+            expectedCipherSuites.add(openSSLAlias);
         }
 
         Set<String> unavailableCipherSuites = new HashSet<>();
@@ -108,7 +139,7 @@ public class TestCipher {
     private static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
         String openSSLPath = System.getProperty("tomcat.test.openssl.path");
         if (openSSLPath == null || openSSLPath.length() == 0) {
-            openSSLPath = "openssl";
+            openSSLPath = "/opt/local/bin/openssl";
         }
         StringBuilder cmd = new StringBuilder(openSSLPath + " ciphers");
         if (specification != null) {
