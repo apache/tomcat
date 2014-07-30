@@ -66,8 +66,8 @@ enum Cipher {
             0,
             0),
     // Cipher 03
-    SSL_RSA_EXPORT_WITH_RC4_40_MD5("EXP-RC4-MD5",
-            null,
+    TLS_RSA_EXPORT_WITH_RC4_40_MD5("EXP-RC4-MD5",
+            new String[] { "SSL_RSA_EXPORT_WITH_RC4_40_MD5" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC4,
@@ -290,7 +290,7 @@ enum Cipher {
             168),
     // Cipher 14
     TLS_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA("EXP-EDH-RSA-DES-CBC-SHA",
-            null,
+            new String[] { "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.DES,
@@ -303,7 +303,7 @@ enum Cipher {
             56),
     // Cipher 15
     TLS_DHE_RSA_WITH_DES_CBC_SHA("EDH-RSA-DES-CBC-SHA",
-            null,
+            new String[] { "SSL_DHE_RSA_WITH_DES_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.DES,
@@ -316,7 +316,7 @@ enum Cipher {
             56),
     // Cipher 16
     TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA("EDH-RSA-DES-CBC3-SHA",
-            null,
+            new String[] { "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.TRIPLE_DES,
@@ -355,7 +355,7 @@ enum Cipher {
             128),
     // Cipher 19
     TLS_DH_anon_EXPORT_WITH_DES40_CBC_SHA("EXP-ADH-DES-CBC-SHA",
-            null,
+            new String[] { "SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.DES,
@@ -2267,20 +2267,6 @@ enum Cipher {
             128,
             128
     ),
-    // RC4_128_EXPORT40_WITH_MD5
-    SSL_CK_RC4_128_EXPORT40_WITH_MD5("EXP-RC4-MD5",
-            null,
-            KeyExchange.RSA,
-            Authentication.RSA,
-            Encryption.RC4,
-            MessageDigest.MD5,
-            Protocol.SSLv2,
-            true,
-            EncryptionLevel.EXP40,
-            false,
-            40,
-            128
-    ),
     // RC2_128_CBC_WITH_MD5
     SSL_CK_RC2_128_CBC_WITH_MD5("RC2-MD5",
             null,
@@ -2308,20 +2294,6 @@ enum Cipher {
             false,
             40,
             128
-    ),
-    // DES_192_EDE3_CBC_WITH_MD5
-    SSL_CK_DES_192_EDE3_CBC_WITH_MD5("DES-CBC3-MD5",
-            null,
-            KeyExchange.RSA,
-            Authentication.RSA,
-            Encryption.TRIPLE_DES,
-            MessageDigest.MD5,
-            Protocol.SSLv2,
-            false,
-            EncryptionLevel.HIGH,
-            false,
-            168,
-            168
     ),
 
     /* TEMP_GOST_TLS*/
@@ -2383,6 +2355,20 @@ enum Cipher {
      256
      };*/
 
+    // Cipher 0x020080
+    SSL2_RC4_128_EXPORT40_WITH_MD5("EXP-RC4-MD5",
+            null,
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.RC4,
+            MessageDigest.MD5,
+            Protocol.SSLv2,
+            true,
+            EncryptionLevel.EXP40,
+            false,
+            40,
+            128
+    ),
     // Cipher 0x030080 / 0x040080
     SSL2_RC2_CBC_128_CBC_WITH_MD5(
             "RC2-CBC-MD5",
@@ -2399,7 +2385,8 @@ enum Cipher {
             128
             ),
     // Cipher 0x050080
-    SSL2_IDEA_128_CBC_WITH_MD5("IDEA-CBC-MD5",
+    SSL2_IDEA_128_CBC_WITH_MD5(
+            "IDEA-CBC-MD5",
             null,
             KeyExchange.RSA,
             Authentication.RSA,
@@ -2425,6 +2412,21 @@ enum Cipher {
             false,
             56,
             56
+    ),
+    // Cipher 0x0700C0
+    SSL2_DES_192_EDE3_CBC_WITH_MD5(
+            "DES-CBC3-MD5",
+            null,
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.TRIPLE_DES,
+            MessageDigest.MD5,
+            Protocol.SSLv2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            168,
+            168
     );
 
 
