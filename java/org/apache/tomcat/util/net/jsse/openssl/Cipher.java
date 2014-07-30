@@ -329,7 +329,7 @@ enum Cipher {
             168),
     // Cipher 17
     TLS_DH_anon_EXPORT_WITH_RC4_40_MD5("EXP-ADH-RC4-MD5",
-            null,
+            new String[] { "SSL_DH_anon_EXPORT_WITH_RC4_40_MD5" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.RC4,
@@ -342,7 +342,7 @@ enum Cipher {
             128),
     // Cipher 18
     TLS_DH_anon_WITH_RC4_128_MD5("ADH-RC4-MD5",
-            null,
+            new String[] { "SSL_DH_anon_WITH_RC4_128_MD5" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.RC4,
@@ -368,7 +368,7 @@ enum Cipher {
             128),
     // Cipher 1A
     TLS_DH_anon_WITH_DES_CBC_SHA("ADH-DES-CBC-SHA",
-            null,
+            new String[] { "SSL_DH_anon_WITH_DES_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.DES,
@@ -381,7 +381,7 @@ enum Cipher {
             56),
     // Cipher 1B
     TLS_DH_anon_WITH_3DES_EDE_CBC_SHA("ADH-DES-CBC3-SHA",
-            null,
+            new String[] { "SSL_DH_anon_WITH_3DES_EDE_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.TRIPLE_DES,
@@ -2309,19 +2309,6 @@ enum Cipher {
             40,
             128
     ),
-    // IDEA_128_CBC_WITH_MD5
-    SSL_CK_IDEA_128_CBC_WITH_MD5("IDEA-CBC-MD5",
-            null,
-            KeyExchange.RSA,
-            Authentication.RSA,
-            Encryption.IDEA,
-            MessageDigest.MD5,
-            Protocol.SSLv2,
-            false, EncryptionLevel.MEDIUM,
-            false,
-            128,
-            128
-    ),
     // DES_192_EDE3_CBC_WITH_MD5
     SSL_CK_DES_192_EDE3_CBC_WITH_MD5("DES-CBC3-MD5",
             null,
@@ -2411,6 +2398,19 @@ enum Cipher {
             128,
             128
             ),
+    // Cipher 0x050080
+    SSL2_IDEA_128_CBC_WITH_MD5("IDEA-CBC-MD5",
+            null,
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.IDEA,
+            MessageDigest.MD5,
+            Protocol.SSLv2,
+            false, EncryptionLevel.MEDIUM,
+            false,
+            128,
+            128
+    ),
     // Cipher 0x060040
     SSL2_DES_64_CBC_WITH_MD5(
             "DES-CBC-MD5",
