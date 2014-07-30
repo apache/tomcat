@@ -70,7 +70,7 @@ public class TestCipher {
 
 
     private static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
-        String[] ciphers = getOpenSSLCiphersAsExpression(specification).split(":");
+        String[] ciphers = getOpenSSLCiphersAsExpression(specification).trim().split(":");
         Set<String> result = new HashSet<>(ciphers.length);
         for (String cipher : ciphers) {
             result.add(cipher);
@@ -327,7 +327,10 @@ public class TestCipher {
      */
     private static Set<String> OPENSSL_UNMAPPED_ORACLE =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                    "DES-CBC-MD5")));
+                    "DES-CBC-MD5",
+                    "DES-CBC3-MD5",
+                    "IDEA-CBC-MD5",
+                    "RC2-CBC-MD5")));
 
 
     /**
@@ -460,7 +463,36 @@ public class TestCipher {
      */
     private static Set<String> OPENSSL_UNMAPPED_IBM =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                    "DES-CBC-MD5")));
+                    "ADH-CAMELLIA128-SHA",
+                    "ADH-CAMELLIA256-SHA",
+                    "ADH-SEED-SHA",
+                    "CAMELLIA128-SHA",
+                    "CAMELLIA256-SHA",
+                    "DES-CBC-MD5",
+                    "DES-CBC3-MD5",
+                    "DHE-DSS-CAMELLIA128-SHA",
+                    "DHE-DSS-CAMELLIA256-SHA",
+                    "DHE-DSS-SEED-SHA",
+                    "DHE-RSA-CAMELLIA128-SHA",
+                    "DHE-RSA-CAMELLIA256-SHA",
+                    "DHE-RSA-SEED-SHA",
+                    "IDEA-CBC-MD5",
+                    "IDEA-CBC-SHA",
+                    "PSK-3DES-EDE-CBC-SHA",
+                    "PSK-AES128-CBC-SHA",
+                    "PSK-AES256-CBC-SHA",
+                    "PSK-RC4-SHA",
+                    "RC2-CBC-MD5",
+                    "SEED-SHA",
+                    "SRP-AES-128-CBC-SHA",
+                    "SRP-AES-256-CBC-SHA",
+                    "SRP-3DES-EDE-CBC-SHA",
+                    "SRP-DSS-3DES-EDE-CBC-SHA",
+                    "SRP-DSS-AES-128-CBC-SHA",
+                    "SRP-DSS-AES-256-CBC-SHA",
+                    "SRP-RSA-3DES-EDE-CBC-SHA",
+                    "SRP-RSA-AES-128-CBC-SHA",
+                    "SRP-RSA-AES-256-CBC-SHA")));
 
 
     private static JsseImpl ORACLE_JSSE_CIPHER_IMPL = new JsseImpl("Oracle",
