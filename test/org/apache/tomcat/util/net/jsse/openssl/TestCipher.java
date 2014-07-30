@@ -26,6 +26,7 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
@@ -105,7 +106,10 @@ public class TestCipher {
 
 
     private static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
-        String openSSLPath = System.getProperty("tomcat.test.openssl.path","openssl");
+        String openSSLPath = System.getProperty("tomcat.test.openssl.path");
+        if (openSSLPath == null || openSSLPath.length() == 0) {
+            openSSLPath = "openssl";
+        }
         StringBuilder cmd = new StringBuilder(openSSLPath + " ciphers");
         if (specification != null) {
             cmd.append(' ');
