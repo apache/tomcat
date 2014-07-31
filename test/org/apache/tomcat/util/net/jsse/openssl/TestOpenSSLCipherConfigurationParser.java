@@ -19,67 +19,100 @@ package org.apache.tomcat.util.net.jsse.openssl;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestOpenSSLCipherConfigurationParser {
 
     @Test
-    public void testANull() throws Exception {
+    public void testALL() throws Exception {
+        testSpecification("ALL");
+    }
+
+
+    @Test
+    public void testaNULL() throws Exception {
         testSpecification("aNULL");
     }
 
 
     @Test
-    public void testeNull() throws Exception {
+    public void testeNULL() throws Exception {
         testSpecification("eNULL");
     }
 
 
     @Test
-    public void testHigh() throws Exception {
+    public void testHIGH() throws Exception {
         testSpecification("HIGH");
     }
 
 
     @Test
-    public void testMedium() throws Exception {
+    public void testMEDIUM() throws Exception {
         testSpecification("MEDIUM");
     }
 
 
     @Test
-    public void testLow() throws Exception {
+    public void testLOW() throws Exception {
         testSpecification("LOW");
     }
 
 
     @Test
-    public void testExport40() throws Exception {
+    public void testEXPORT40() throws Exception {
         testSpecification("EXPORT40");
     }
 
 
     @Test
-    public void testExport() throws Exception {
+    public void testEXPORT() throws Exception {
         testSpecification("EXPORT");
     }
 
 
     @Test
-    public void testRsa() throws Exception {
+    public void testRSA() throws Exception {
         testSpecification("RSA");
     }
 
 
     @Test
-    public void testARsa() throws Exception {
+    public void testaRSA() throws Exception {
         testSpecification("aRSA");
     }
 
 
     @Test
-    public void testKRsa() throws Exception {
+    public void testkRSA() throws Exception {
         testSpecification("kRSA");
+    }
+
+
+    @Test
+    public void testkEDH() throws Exception {
+        testSpecification("kEDH");
+    }
+
+
+    @Test
+    @Ignore("Contrary to the docs, OpenSSL does not recognise kDHE")
+    public void testkDHE() throws Exception {
+        testSpecification("kDHE");
+    }
+
+
+    @Test
+    public void testEDH() throws Exception {
+        testSpecification("EDH");
+    }
+
+
+    @Test
+    @Ignore("Contrary to the docs, OpenSSL does not recognise DHE")
+    public void testDHE() throws Exception {
+        testSpecification("DHE");
     }
 
 
