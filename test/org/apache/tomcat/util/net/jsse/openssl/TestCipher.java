@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net.jsse.openssl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -177,12 +178,13 @@ public class TestCipher {
         if (openSSLPath == null || openSSLPath.length() == 0) {
             openSSLPath = "openssl";
         }
-        StringBuilder cmd = new StringBuilder(openSSLPath + " ciphers");
+        List<String> cmd = new ArrayList<>();
+        cmd.add(openSSLPath);
+        cmd.add("ciphers");
         if (specification != null) {
-            cmd.append(' ');
-            cmd.append(specification);
+            cmd.add(specification);
         }
-        Process process = Runtime.getRuntime().exec(cmd.toString());
+        Process process = Runtime.getRuntime().exec(cmd.toArray(new String[cmd.size()]));
         InputStream stderr = process.getErrorStream();
         InputStream stdout = process.getInputStream();
 
