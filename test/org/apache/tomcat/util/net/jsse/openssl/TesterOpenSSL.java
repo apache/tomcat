@@ -66,7 +66,13 @@ public class TesterOpenSSL {
                     Cipher.SSL_CK_RC2_128_CBC_EXPORT40_WITH_MD5,
                     Cipher.SSL_FORTEZZA_DMS_WITH_NULL_SHA,
                     Cipher.SSL_FORTEZZA_DMS_WITH_FORTEZZA_CBC_SHA,
-                    Cipher.SSL_FORTEZZA_DMS_WITH_RC4_128_SHA)));
+                    Cipher.SSL_FORTEZZA_DMS_WITH_RC4_128_SHA,
+                    Cipher.TLS_DHE_DSS_EXPORT1024_WITH_DES_CBC_SHA,
+                    Cipher.TLS_RSA_EXPORT1024_WITH_DES_CBC_SHA,
+                    Cipher.TLS_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5,
+                    Cipher.TLS_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA,
+                    Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_SHA,
+                    Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_MD5)));
 
     static {
         String versionString = null;

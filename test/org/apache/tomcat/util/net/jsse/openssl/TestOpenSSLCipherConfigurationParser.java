@@ -24,14 +24,14 @@ import org.junit.Test;
 public class TestOpenSSLCipherConfigurationParser {
 
     @Test
-    public void testENull() throws Exception {
-        testSpecification("eNULL");
+    public void testANull() throws Exception {
+        testSpecification("aNULL");
     }
 
 
     @Test
-    public void testANull() throws Exception {
-        testSpecification("aNULL");
+    public void testeNull() throws Exception {
+        testSpecification("eNULL");
     }
 
 
@@ -56,6 +56,30 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testExport40() throws Exception {
         testSpecification("EXPORT40");
+    }
+
+
+    @Test
+    public void testExport() throws Exception {
+        testSpecification("EXPORT");
+    }
+
+
+    @Test
+    public void testRsa() throws Exception {
+        testSpecification("RSA");
+    }
+
+
+    @Test
+    public void testARsa() throws Exception {
+        testSpecification("aRSA");
+    }
+
+
+    @Test
+    public void testKRsa() throws Exception {
+        testSpecification("kRSA");
     }
 
 
