@@ -19,7 +19,6 @@ package org.apache.tomcat.util.net.jsse.openssl;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestOpenSSLCipherConfigurationParser {
@@ -37,9 +36,20 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    @Ignore("Results don't match - probably due to unimplemented ciphers")
     public void testHigh() throws Exception {
         testSpecification("HIGH");
+    }
+
+
+    @Test
+    public void testMedium() throws Exception {
+        testSpecification("MEDIUM");
+    }
+
+
+    @Test
+    public void testLow() throws Exception {
+        testSpecification("LOW");
     }
 
 
@@ -60,6 +70,16 @@ public class TestOpenSSLCipherConfigurationParser {
 
         TesterOpenSSL.removeUnimplementedCiphersJsse(jsseCipherListFromParser);
 
-        Assert.assertEquals(jsseCipherListFromOpenSSL, jsseCipherListFromParser);
+        Assert.assertEquals(listToString(jsseCipherListFromOpenSSL), listToString(jsseCipherListFromParser));
+    }
+
+
+    private String listToString(List<String> list) {
+        StringBuilder sb = new StringBuilder();
+        for (String entry : list) {
+            sb.append(entry);
+            sb.append(',');
+        }
+        return sb.toString();
     }
 }
