@@ -19,13 +19,11 @@ package org.apache.tomcat.util.net.jsse.openssl;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestOpenSSLCipherConfigurationParser {
 
     @Test
-    @Ignore("Disabled as test currently fails")
     public void testExport40() throws Exception {
         testSpecification("EXPORT40");
     }
@@ -39,6 +37,8 @@ public class TestOpenSSLCipherConfigurationParser {
                 OpenSSLCipherConfigurationParser.parseExpression(openSSLCipherList);
         List<String> jsseCipherListFromParser =
                 OpenSSLCipherConfigurationParser.parseExpression(parserSpecification);
+
+        TesterOpenSSL.removeUnimplementedCiphersJsse(jsseCipherListFromParser);
 
         Assert.assertEquals(jsseCipherListFromOpenSSL, jsseCipherListFromParser);
     }

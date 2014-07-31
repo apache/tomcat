@@ -2522,6 +2522,9 @@ enum Cipher {
      };*/
 
     // Cipher 0x020080
+    /*
+     * Same as Cipher 03 and name isn't recognised by JSSE so ignore this as it
+     * adds no value and complicates the unit tests.
     SSL2_RC4_128_EXPORT40_WITH_MD5(
             "EXP-RC4-MD5",
             null,
@@ -2536,6 +2539,7 @@ enum Cipher {
             40,
             128
     ),
+    */
     // Cipher 0x030080 / 0x040080
     SSL2_RC2_CBC_128_CBC_WITH_MD5(
             "RC2-CBC-MD5",
