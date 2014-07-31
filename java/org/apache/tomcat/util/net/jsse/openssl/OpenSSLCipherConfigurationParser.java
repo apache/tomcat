@@ -120,7 +120,8 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String aRSA = "aRSA";
     /**
-     * Cipher suites using RSA for key exchange or for authentication.
+     * Cipher suites using RSA for key exchange
+     * Despite what the docs say, RSA is equivalent to kRSA.
      */
     private static final String RSA = "RSA";
     /**
@@ -389,7 +390,8 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(aNULL, filterByAuthentication(all, Collections.singleton(Authentication.aNULL)));
         addListAlias(kRSA, filterByKeyExchange(all, Collections.singleton(KeyExchange.RSA)));
         addListAlias(aRSA, filterByAuthentication(all, Collections.singleton(Authentication.RSA)));
-        addListAlias(RSA, filter(all, null, Collections.singleton(KeyExchange.RSA), Collections.singleton(Authentication.RSA), null, null, null));
+        // Despite what the docs say, RSA is equivalent to kRSA
+        aliases.put(RSA, aliases.get(kRSA));
         addListAlias(kEDH, filterByKeyExchange(all, Collections.singleton(KeyExchange.EDH)));
         addListAlias(kDHE, filterByKeyExchange(all, Collections.singleton(KeyExchange.EDH)));
         Set<Cipher> edh = filterByKeyExchange(all, Collections.singleton(KeyExchange.EDH));
