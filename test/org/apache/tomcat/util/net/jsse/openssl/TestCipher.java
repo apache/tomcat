@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.util.net.jsse.openssl;
 
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,9 +24,6 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.apache.catalina.util.IOTools;
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 public class TestCipher {
 
@@ -39,7 +34,7 @@ public class TestCipher {
      */
     @Test
     public void testAllOpenSSLCiphersMapped() throws Exception {
-        Set<String> openSSLCipherSuites = getOpenSSLCiphersAsSet("ALL:eNULL");
+        Set<String> openSSLCipherSuites = TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL");
 
         for (String openSSLCipherSuite : openSSLCipherSuites) {
             List<String> jsseCipherSuites =
@@ -75,7 +70,7 @@ public class TestCipher {
      */
     @Test
     public void testOpenSSLCipherAvailability() throws Exception {
-        Set<String> availableCipherSuites = getOpenSSLCiphersAsSet("ALL:eNULL");
+        Set<String> availableCipherSuites = TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL");
         Set<String> expectedCipherSuites = new HashSet<>();
         for (Cipher cipher : Cipher.values()) {
             String openSSLAlias = cipher.getOpenSSLAlias();
@@ -159,43 +154,6 @@ public class TestCipher {
             Assert.assertTrue("Non-registered name used in Cipher enumeration: " + cipher,
                     REGISTERED_NAMES.contains(name));
         }
-    }
-
-
-    private static Set<String> getOpenSSLCiphersAsSet(String specification) throws Exception {
-        String[] ciphers = getOpenSSLCiphersAsExpression(specification).trim().split(":");
-        Set<String> result = new HashSet<>(ciphers.length);
-        for (String cipher : ciphers) {
-            result.add(cipher);
-        }
-        return result;
-
-    }
-
-
-    private static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
-        String openSSLPath = System.getProperty("tomcat.test.openssl.path");
-        if (openSSLPath == null || openSSLPath.length() == 0) {
-            openSSLPath = "openssl";
-        }
-        List<String> cmd = new ArrayList<>();
-        cmd.add(openSSLPath);
-        cmd.add("ciphers");
-        if (specification != null) {
-            cmd.add(specification);
-        }
-        Process process = Runtime.getRuntime().exec(cmd.toArray(new String[cmd.size()]));
-        InputStream stderr = process.getErrorStream();
-        InputStream stdout = process.getInputStream();
-
-        ByteArrayOutputStream stderrBytes = new ByteArrayOutputStream();
-        IOTools.flow(stderr, stderrBytes);
-        //String errorText = stderrBytes.toString();
-        //Assert.assertTrue(errorText, errorText.length() == 0);
-
-        ByteArrayOutputStream stdoutBytes = new ByteArrayOutputStream();
-        IOTools.flow(stdout, stdoutBytes);
-        return stdoutBytes.toString();
     }
 
 
