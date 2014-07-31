@@ -19,6 +19,8 @@ package org.apache.tomcat.util.net.jsse.openssl;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,8 +33,13 @@ import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 public class TesterOpenSSL {
 
     public static final String EXPECTED_VERSION = "1.0.1h";
-
     public static final boolean IS_EXPECTED_VERSION;
+
+    public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS =
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+                    Cipher.TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA,
+                    Cipher.TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA,
+                    Cipher.SSL_CK_RC2_128_CBC_EXPORT40_WITH_MD5)));
 
     static {
         String versionString = null;
@@ -66,6 +73,19 @@ public class TesterOpenSSL {
             return executeOpenSSLCommand("ciphers");
         } else {
             return executeOpenSSLCommand("ciphers", specification);
+        }
+    }
+
+
+    /**
+     * Use this method to filter parser results when comparing them to OpenSSL
+     * results to take account of unimplemented cipher suites.
+     */
+    public static void removeUnimplementedCiphersJsse(List<String> list) {
+        for (Cipher cipher : OPENSSL_UNIMPLEMENTED_CIPHERS) {
+            for (String jsseName : cipher.getJsseNames()) {
+                list.remove(jsseName);
+            }
         }
     }
 
