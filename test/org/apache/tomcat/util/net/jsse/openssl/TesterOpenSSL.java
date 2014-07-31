@@ -25,8 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Assert;
-
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
@@ -141,7 +139,9 @@ public class TesterOpenSSL {
         ByteArrayOutputStream stderrBytes = new ByteArrayOutputStream();
         IOTools.flow(stderr, stderrBytes);
         String errorText = stderrBytes.toString();
-        Assert.assertTrue(errorText, errorText.length() == 0);
+        if (errorText.length() > 0) {
+            System.err.println(errorText);
+        }
 
         ByteArrayOutputStream stdoutBytes = new ByteArrayOutputStream();
         IOTools.flow(stdout, stdoutBytes);

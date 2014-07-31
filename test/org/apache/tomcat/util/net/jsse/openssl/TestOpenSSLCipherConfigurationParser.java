@@ -116,6 +116,64 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
+    @Test
+    public void testkDHr() throws Exception {
+        testSpecification("kDHr");
+    }
+
+
+    @Test
+    public void testkDHd() throws Exception {
+        testSpecification("kDHd");
+    }
+
+
+    @Test
+    public void testkDH() throws Exception {
+        testSpecification("kDH");
+    }
+
+
+    @Test
+    public void testkECDHr() throws Exception {
+        testSpecification("kECDHr");
+    }
+
+
+    @Test
+    public void testkECDHe() throws Exception {
+        testSpecification("kECDHe");
+    }
+
+
+    @Test
+    public void testkECDH() throws Exception {
+        testSpecification("kECDH");
+    }
+
+
+    @Test
+    public void testkEECDH() throws Exception {
+        testSpecification("kEECDH");
+    }
+
+
+    // TODO
+    @Test
+    @Ignore("Currently failing - needs investigation")
+    public void testECDH() throws Exception {
+        testSpecification("ECDH");
+    }
+
+
+    // TODO
+    @Test
+    @Ignore("Currently failing - needs investigation")
+    public void testkECDHE() throws Exception {
+        testSpecification("kECDHE");
+    }
+
+
     private void testSpecification(String specification) throws Exception {
         // Filter out cipher suites that OpenSSL does not implement
         String parserSpecification = "" + specification;
