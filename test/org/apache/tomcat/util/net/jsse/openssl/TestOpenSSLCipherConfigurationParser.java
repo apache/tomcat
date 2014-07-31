@@ -19,9 +19,29 @@ package org.apache.tomcat.util.net.jsse.openssl;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestOpenSSLCipherConfigurationParser {
+
+    @Test
+    public void testENull() throws Exception {
+        testSpecification("eNULL");
+    }
+
+
+    @Test
+    public void testANull() throws Exception {
+        testSpecification("aNULL");
+    }
+
+
+    @Test
+    @Ignore("Results don't match - probably due to unimplemented ciphers")
+    public void testHigh() throws Exception {
+        testSpecification("HIGH");
+    }
+
 
     @Test
     public void testExport40() throws Exception {

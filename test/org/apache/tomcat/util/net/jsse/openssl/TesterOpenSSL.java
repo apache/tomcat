@@ -39,7 +39,10 @@ public class TesterOpenSSL {
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                     Cipher.TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA,
                     Cipher.TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA,
-                    Cipher.SSL_CK_RC2_128_CBC_EXPORT40_WITH_MD5)));
+                    Cipher.SSL_CK_RC2_128_CBC_EXPORT40_WITH_MD5,
+                    Cipher.SSL_FORTEZZA_DMS_WITH_NULL_SHA,
+                    Cipher.SSL_FORTEZZA_DMS_WITH_FORTEZZA_CBC_SHA,
+                    Cipher.SSL_FORTEZZA_DMS_WITH_RC4_128_SHA)));
 
     static {
         String versionString = null;
@@ -112,6 +115,6 @@ public class TesterOpenSSL {
 
         ByteArrayOutputStream stdoutBytes = new ByteArrayOutputStream();
         IOTools.flow(stdout, stdoutBytes);
-        return stdoutBytes.toString();
+        return stdoutBytes.toString().trim();
     }
 }
