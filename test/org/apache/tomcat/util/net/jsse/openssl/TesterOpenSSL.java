@@ -16,16 +16,34 @@
  */
 package org.apache.tomcat.util.net.jsse.openssl;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Assert;
+
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 public class TesterOpenSSL {
+
+    public static final String EXPECTED_VERSION = "1.0.1h";
+
+    public static final boolean IS_EXPECTED_VERSION;
+
+    static {
+        String versionString = null;
+        try {
+            versionString = executeOpenSSLCommand("version");
+        } catch (IOException e) {
+            versionString = "";
+        }
+        IS_EXPECTED_VERSION = versionString.contains(EXPECTED_VERSION);
+    }
+
 
     private TesterOpenSSL() {
         // Utility class. Hide default constructor.
@@ -44,30 +62,36 @@ public class TesterOpenSSL {
 
 
     public static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
+        if (specification == null) {
+            return executeOpenSSLCommand("ciphers");
+        } else {
+            return executeOpenSSLCommand("ciphers", specification);
+        }
+    }
+
+
+    private static String executeOpenSSLCommand(String... args) throws IOException {
         String openSSLPath = System.getProperty("tomcat.test.openssl.path");
         if (openSSLPath == null || openSSLPath.length() == 0) {
             openSSLPath = "openssl";
         }
         List<String> cmd = new ArrayList<>();
         cmd.add(openSSLPath);
-        cmd.add("ciphers");
-        if (specification != null) {
-            cmd.add(specification);
+        for (String arg : args) {
+            cmd.add(arg);
         }
+
         Process process = Runtime.getRuntime().exec(cmd.toArray(new String[cmd.size()]));
         InputStream stderr = process.getErrorStream();
         InputStream stdout = process.getInputStream();
 
         ByteArrayOutputStream stderrBytes = new ByteArrayOutputStream();
         IOTools.flow(stderr, stderrBytes);
-        //String errorText = stderrBytes.toString();
-        //Assert.assertTrue(errorText, errorText.length() == 0);
+        String errorText = stderrBytes.toString();
+        Assert.assertTrue(errorText, errorText.length() == 0);
 
         ByteArrayOutputStream stdoutBytes = new ByteArrayOutputStream();
         IOTools.flow(stdout, stdoutBytes);
         return stdoutBytes.toString();
     }
-
-
-
 }
