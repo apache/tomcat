@@ -165,9 +165,7 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
-    // TODO
     @Test
-    @Ignore("Currently failing - needs investigation")
     public void testECDH() throws Exception {
         testSpecification("ECDH");
     }
@@ -175,7 +173,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     // TODO
     @Test
-    @Ignore("Currently failing - needs investigation")
+    //@Ignore("Currently failing - needs investigation")
     public void testkECDHE() throws Exception {
         testSpecification("kECDHE");
     }

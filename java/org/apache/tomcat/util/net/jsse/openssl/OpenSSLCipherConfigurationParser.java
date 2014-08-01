@@ -407,7 +407,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(kECDHr, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.ECDHr)));
         addListAlias(kECDHe, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.ECDHe)));
         addListAlias(kECDH, filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr))));
-        aliases.put(ECDH, aliases.get(kECDH));
+        addListAlias(ECDH, filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr, KeyExchange.EECDH))));
         addListAlias(kECDHE, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.ECDHe)));
         aliases.put(ECDHE, aliases.get(kECDHE));
         addListAlias(kEECDH, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH)));
