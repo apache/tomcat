@@ -415,7 +415,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(aDSS, filterByAuthentication(allCiphers, Collections.singleton(Authentication.DSS)));
         aliases.put("DSS", aliases.get(aDSS));
         addListAlias(aDH, filterByAuthentication(allCiphers, Collections.singleton(Authentication.DH)));
-        Set<Cipher> aecdh = filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.EECDH)));
+        Set<Cipher> aecdh = filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH));
         addListAlias(AECDH, filterByAuthentication(aecdh, Collections.singleton(Authentication.aNULL)));
         addListAlias(aECDH, filterByAuthentication(allCiphers, Collections.singleton(Authentication.ECDH)));
         addListAlias(ECDSA, filterByAuthentication(allCiphers, Collections.singleton(Authentication.ECDSA)));
@@ -426,8 +426,8 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(FZA, filter(allCiphers, null, Collections.singleton(KeyExchange.FZA), Collections.singleton(Authentication.FZA), Collections.singleton(Encryption.FZA), null, null));
         addListAlias(TLSv1_2, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1_2)));
         addListAlias("TLSv1.1", filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv3)));
-        addListAlias(TLSv1, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1)));
-        addListAlias(SSLv3, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv3)));
+        addListAlias(TLSv1, filterByProtocol(allCiphers, new HashSet<>(Arrays.asList(Protocol.TLSv1, Protocol.SSLv3))));
+        aliases.put(SSLv3, aliases.get(TLSv1));
         addListAlias(SSLv2, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv2)));
         addListAlias(DH, filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd, KeyExchange.EDH))));
         Set<Cipher> adh = filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EDH));
