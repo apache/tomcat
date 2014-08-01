@@ -523,6 +523,8 @@ public class OpenSSLCipherConfigurationParser {
         /* Temporarily enable everything else for sorting */
         result.addAll(ciphers);
 
+        /* Low priority for SSLv2 */
+        moveToEnd(result, filterByProtocol(result, Collections.singleton(Protocol.SSLv2)));
 
         /* Low priority for MD5 */
         moveToEnd(result, filterByMessageDigest(result, Collections.singleton(MessageDigest.MD5)));
