@@ -279,9 +279,7 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
-    // TODO
     @Test
-    @Ignore("Currently fails - needs investigation")
     public void testTLSv1() throws Exception {
         testSpecification("TLSv1");
     }
@@ -295,9 +293,7 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
-    // TODO
     @Test
-    @Ignore("Currently fails - needs investigation")
     public void testSSLv3() throws Exception {
         testSpecification("SSLv3");
     }
