@@ -218,7 +218,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     /**
      * SSL cipher suite.
      */
-    protected String SSLCipherSuite = System.getProperty("tomcat.ssl.ciphers", "ALL");
+    protected String SSLCipherSuite = DEFAULT_CIPHERS;
     public String getSSLCipherSuite() { return SSLCipherSuite; }
     public void setSSLCipherSuite(String SSLCipherSuite) { this.SSLCipherSuite = SSLCipherSuite; }
 
