@@ -415,9 +415,8 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(aDSS, filterByAuthentication(allCiphers, Collections.singleton(Authentication.DSS)));
         aliases.put("DSS", aliases.get(aDSS));
         addListAlias(aDH, filterByAuthentication(allCiphers, Collections.singleton(Authentication.DH)));
-        Set<Cipher> aecdh = filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr)));
-        aecdh.removeAll(filterByAuthentication(allCiphers, Collections.singleton(Authentication.aNULL)));
-        addListAlias(AECDH, aecdh);
+        Set<Cipher> aecdh = filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.EECDH)));
+        addListAlias(AECDH, filterByAuthentication(aecdh, Collections.singleton(Authentication.aNULL)));
         addListAlias(aECDH, filterByAuthentication(allCiphers, Collections.singleton(Authentication.ECDH)));
         addListAlias(ECDSA, filterByAuthentication(allCiphers, Collections.singleton(Authentication.ECDSA)));
         aliases.put(aECDSA, aliases.get(ECDSA));
