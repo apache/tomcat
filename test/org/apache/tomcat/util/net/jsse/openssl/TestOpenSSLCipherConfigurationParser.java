@@ -171,11 +171,30 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
-    // TODO
     @Test
-    //@Ignore("Currently failing - needs investigation")
+    @Ignore("Contrary to the docs, OpenSSL does not recognise kECDHE")
     public void testkECDHE() throws Exception {
         testSpecification("kECDHE");
+    }
+
+
+    @Test
+    @Ignore("Contrary to the docs, OpenSSL does not recognise kECDHE")
+    public void testECDHE() throws Exception {
+        testSpecification("ECDHE");
+    }
+
+
+    @Test
+    @Ignore("Contrary to the docs, OpenSSL does not recognise kECDHE")
+    public void testEECDHE() throws Exception {
+        testSpecification("EECDHE");
+    }
+
+
+    @Test
+    public void testAECDH() throws Exception {
+        testSpecification("AECDH");
     }
 
 
