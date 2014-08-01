@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
@@ -100,11 +101,43 @@ public class TesterOpenSSL {
 
 
     public static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
+        String stdout;
         if (specification == null) {
-            return executeOpenSSLCommand("ciphers");
+            stdout = executeOpenSSLCommand("ciphers", "-v");
         } else {
-            return executeOpenSSLCommand("ciphers", specification);
+            stdout = executeOpenSSLCommand("ciphers", "-v", specification);
         }
+
+        if (stdout.length() == 0) {
+            return stdout;
+        }
+
+        StringBuilder output = new StringBuilder();
+        boolean first = true;
+
+        // OpenSSL should have returned one cipher per line
+        String ciphers[] = stdout.split("\n");
+        for (String cipher : ciphers) {
+            if (first) {
+                first = false;
+            } else {
+                output.append(':');
+            }
+            // Name is first part
+            int i = cipher.indexOf(' ');
+            output.append(cipher.substring(0, i));
+
+            // Advance i past the space
+            while (Character.isWhitespace(cipher.charAt(i))) {
+                i++;
+            }
+
+            // Protocol is the second
+            int j = cipher.indexOf(' ', i);
+            output.append('+');
+            output.append(cipher.substring(i, j));
+        }
+        return output.toString();
     }
 
 
@@ -132,19 +165,54 @@ public class TesterOpenSSL {
             cmd.add(arg);
         }
 
-        Process process = Runtime.getRuntime().exec(cmd.toArray(new String[cmd.size()]));
-        InputStream stderr = process.getErrorStream();
-        InputStream stdout = process.getInputStream();
+        ProcessBuilder pb = new ProcessBuilder(cmd.toArray(new String[cmd.size()]));
+        Process p = pb.start();
 
-        ByteArrayOutputStream stderrBytes = new ByteArrayOutputStream();
-        IOTools.flow(stderr, stderrBytes);
-        String errorText = stderrBytes.toString();
+        InputStreamToText stdout = new InputStreamToText(p.getInputStream());
+        InputStreamToText stderr = new InputStreamToText(p.getErrorStream());
+
+        Thread t1 = new Thread(stdout);
+        t1.setName("OpenSSL stdout reader");
+        t1.start();
+
+        Thread t2 = new Thread(stderr);
+        t2.setName("OpenSSL stderr reader");
+        t2.start();
+
+        try {
+            p.waitFor(2, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new IOException(e);
+        }
+
+        String errorText = stderr.getText();
         if (errorText.length() > 0) {
             System.err.println(errorText);
         }
 
-        ByteArrayOutputStream stdoutBytes = new ByteArrayOutputStream();
-        IOTools.flow(stdout, stdoutBytes);
-        return stdoutBytes.toString().trim();
+        return stdout.getText().trim();
+    }
+
+    private static class InputStreamToText implements Runnable {
+
+        private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        private final InputStream is;
+
+        InputStreamToText(InputStream is) {
+            this.is = is;
+        }
+
+        @Override
+        public void run() {
+            try {
+                IOTools.flow(is, baos);
+            } catch (IOException e) {
+                // Ignore
+            }
+        }
+
+        public String getText() {
+            return baos.toString();
+        }
     }
 }

@@ -285,9 +285,7 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
-    // TODO
     @Test
-    @Ignore("Currently fails - needs investigation")
     public void testSSLv2() throws Exception {
         testSpecification("SSLv2");
     }
@@ -469,12 +467,11 @@ public class TestOpenSSLCipherConfigurationParser {
 
     private void testSpecification(String specification) throws Exception {
         // Filter out cipher suites that OpenSSL does not implement
-        String parserSpecification = "" + specification;
         String openSSLCipherList = TesterOpenSSL.getOpenSSLCiphersAsExpression(specification);
         List<String> jsseCipherListFromOpenSSL =
                 OpenSSLCipherConfigurationParser.parseExpression(openSSLCipherList);
         List<String> jsseCipherListFromParser =
-                OpenSSLCipherConfigurationParser.parseExpression(parserSpecification);
+                OpenSSLCipherConfigurationParser.parseExpression(specification);
 
         TesterOpenSSL.removeUnimplementedCiphersJsse(jsseCipherListFromParser);
 

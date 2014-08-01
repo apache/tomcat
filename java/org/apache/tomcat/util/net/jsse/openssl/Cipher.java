@@ -2415,9 +2415,6 @@ enum Cipher {
             256
     ),
     // RC4_128_WITH_MD5
-    /*
-     * Same as Cipher 04 and name isn't recognised by JSSE so ignore this as it
-     * adds no value and complicates the unit tests.
     SSL_CK_RC4_128_WITH_MD5(
             "RC4-MD5",
             null,
@@ -2431,7 +2428,7 @@ enum Cipher {
             false,
             128,
             128
-    ),*/
+    ),
     // RC2_128_CBC_WITH_MD5
     SSL_CK_RC2_128_CBC_WITH_MD5(
             "RC2-MD5",
