@@ -457,8 +457,10 @@ public class OpenSSLCipherConfigurationParser {
         initialized = true;
         // Despite what the OpenSSL docs say, DEFAULT also excludes SSLv2
         addListAlias(DEFAULT, parse("ALL:!eNULL:!aNULL:!SSLv2"));
-        LinkedHashSet<Cipher> complementOfDefault = new LinkedHashSet<>(all);
-        complementOfDefault.removeAll(aliases.get(DEFAULT));
+        // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
+        Set<Cipher> complementOfDefault = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH,KeyExchange.EECDH)));
+        complementOfDefault = filterByAuthentication(complementOfDefault, Collections.singleton(Authentication.aNULL));
+        complementOfDefault.removeAll(aliases.get(eNULL));
         addListAlias(COMPLEMENTOFDEFAULT, complementOfDefault);
     }
 
