@@ -460,9 +460,10 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(PSK, filter(allCiphers, null, Collections.singleton(KeyExchange.PSK), Collections.singleton(Authentication.PSK), null, null, null));
         addListAlias(KRB5, filter(allCiphers, null, Collections.singleton(KeyExchange.KRB5), Collections.singleton(Authentication.KRB5), null, null, null));
         initialized = true;
-        String defaultExpression = System.getProperty(DEFAULT_EXPRESSION_KEY, "ALL:!eNULL:!aNULL");
+        // Despite what the OpenSSL docs say, DEFAULT also excludes SSLv2
+        String defaultExpression = System.getProperty(DEFAULT_EXPRESSION_KEY, "ALL:!eNULL:!aNULL:!SSLv2");
         addListAlias(DEFAULT, parse(defaultExpression));
-        LinkedHashSet<Cipher> complementOfDefault = new LinkedHashSet<>(allCiphers);
+        LinkedHashSet<Cipher> complementOfDefault = new LinkedHashSet<>(all);
         complementOfDefault.removeAll(aliases.get(DEFAULT));
         addListAlias(COMPLEMENTOFDEFAULT, complementOfDefault);
     }

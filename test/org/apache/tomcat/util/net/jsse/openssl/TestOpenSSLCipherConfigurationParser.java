@@ -32,9 +32,7 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
-    // TODO
     @Test
-    @Ignore("Currently fails - needs investigation")
     public void testDEFAULT() throws Exception {
         testSpecification("DEFAULT");
     }
