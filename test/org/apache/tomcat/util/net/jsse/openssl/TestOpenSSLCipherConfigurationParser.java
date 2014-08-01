@@ -38,9 +38,7 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
-    // TODO
     @Test
-    @Ignore("Currently fails - needs investigation")
     public void testCOMPLEMENTOFDEFAULT() throws Exception {
         testSpecification("COMPLEMENTOFDEFAULT");
     }
