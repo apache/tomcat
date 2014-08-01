@@ -198,6 +198,36 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
+    @Test
+    public void testaDSS() throws Exception {
+        testSpecification("aDSS");
+    }
+
+
+    @Test
+    public void testaDH() throws Exception {
+        testSpecification("aDH");
+    }
+
+
+    @Test
+    public void testaECDH() throws Exception {
+        testSpecification("aECDH");
+    }
+
+
+    @Test
+    public void testaECDSA() throws Exception {
+        testSpecification("aECDSA");
+    }
+
+
+    @Test
+    public void testECDSA() throws Exception {
+        testSpecification("ECDSA");
+    }
+
+
     private void testSpecification(String specification) throws Exception {
         // Filter out cipher suites that OpenSSL does not implement
         String parserSpecification = "" + specification;
