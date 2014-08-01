@@ -31,9 +31,32 @@ public class TestOpenSSLCipherConfigurationParser {
         Assume.assumeTrue(TesterOpenSSL.IS_EXPECTED_VERSION);
     }
 
+
+    // TODO
+    @Test
+    @Ignore("Currently fails - needs investigation")
+    public void testDEFAULT() throws Exception {
+        testSpecification("DEFAULT");
+    }
+
+
+    // TODO
+    @Test
+    @Ignore("Currently fails - needs investigation")
+    public void testCOMPLEMENTOFDEFAULT() throws Exception {
+        testSpecification("COMPLEMENTOFDEFAULT");
+    }
+
+
     @Test
     public void testALL() throws Exception {
         testSpecification("ALL");
+    }
+
+
+    @Test
+    public void testCOMPLEMENTOFALL() throws Exception {
+        testSpecification("COMPLEMENTOFALL");
     }
 
 
@@ -225,6 +248,230 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testECDSA() throws Exception {
         testSpecification("ECDSA");
+    }
+
+
+    @Test
+    public void testkFZA() throws Exception {
+        testSpecification("kFZA");
+    }
+
+
+    @Test
+    public void testaFZA() throws Exception {
+        testSpecification("aFZA");
+    }
+
+
+    @Test
+    public void testeFZA() throws Exception {
+        testSpecification("eFZA");
+    }
+
+
+    @Test
+    public void testFZA() throws Exception {
+        testSpecification("FZA");
+    }
+
+
+    // TODO
+    @Test
+    @Ignore("Currently fails - needs investigation")
+    public void testTLSv1_2() throws Exception {
+        testSpecification("TLSv1_2");
+    }
+
+
+    // TODO
+    @Test
+    @Ignore("Currently fails - needs investigation")
+    public void testTLSv1() throws Exception {
+        testSpecification("TLSv1");
+    }
+
+
+    // TODO
+    @Test
+    @Ignore("Currently fails - needs investigation")
+    public void testSSLv2() throws Exception {
+        testSpecification("SSLv2");
+    }
+
+
+    // TODO
+    @Test
+    @Ignore("Currently fails - needs investigation")
+    public void testSSLv3() throws Exception {
+        testSpecification("SSLv3");
+    }
+
+
+    @Test
+    public void testDH() throws Exception {
+        testSpecification("DH");
+    }
+
+
+    @Test
+    public void testADH() throws Exception {
+        testSpecification("ADH");
+    }
+
+
+    @Test
+    public void testAES128() throws Exception {
+        testSpecification("AES128");
+    }
+
+
+    @Test
+    public void testAES256() throws Exception {
+        testSpecification("AES256");
+    }
+
+
+    @Test
+    public void testAES() throws Exception {
+        testSpecification("AES");
+    }
+
+
+    @Test
+    public void testAESGCM() throws Exception {
+        testSpecification("AESGCM");
+    }
+
+
+    @Test
+    public void testCAMELLIA128() throws Exception {
+        testSpecification("CAMELLIA128");
+    }
+
+
+    @Test
+    public void testCAMELLIA256() throws Exception {
+        testSpecification("CAMELLIA256");
+    }
+
+
+    @Test
+    public void testCAMELLIA() throws Exception {
+        testSpecification("CAMELLIA");
+    }
+
+
+    @Test
+    public void test3DES() throws Exception {
+        testSpecification("3DES");
+    }
+
+
+    @Test
+    public void testDES() throws Exception {
+        testSpecification("DES");
+    }
+
+
+    @Test
+    public void testRC4() throws Exception {
+        testSpecification("RC4");
+    }
+
+
+    @Test
+    public void testRC2() throws Exception {
+        testSpecification("RC2");
+    }
+
+
+    @Test
+    public void testIDEA() throws Exception {
+        testSpecification("IDEA");
+    }
+
+
+    @Test
+    public void testSEED() throws Exception {
+        testSpecification("SEED");
+    }
+
+
+    @Test
+    public void testMD5() throws Exception {
+        testSpecification("MD5");
+    }
+
+
+    @Test
+    public void testSHA1() throws Exception {
+        testSpecification("SHA1");
+    }
+
+
+    @Test
+    public void testSHA() throws Exception {
+        testSpecification("SHA");
+    }
+
+
+    @Test
+    public void testSHA256() throws Exception {
+        testSpecification("SHA256");
+    }
+
+
+    @Test
+    public void testSHA384() throws Exception {
+        testSpecification("SHA384");
+    }
+
+
+    @Test
+    public void testKRB5() throws Exception {
+        testSpecification("KRB5");
+    }
+
+
+    @Test
+    public void testaGOST() throws Exception {
+        testSpecification("aGOST");
+    }
+
+
+    @Test
+    public void testaGOST01() throws Exception {
+        testSpecification("aGOST01");
+    }
+
+
+    @Test
+    public void testaGOST94() throws Exception {
+        testSpecification("aGOST94");
+    }
+
+
+    @Test
+    public void testkGOST() throws Exception {
+        testSpecification("kGOST");
+    }
+
+
+    @Test
+    public void testGOST94() throws Exception {
+        testSpecification("GOST94");
+    }
+
+
+    @Test
+    public void testGOST89MAC() throws Exception {
+        testSpecification("GOST89MAC");
+    }
+
+
+    @Test
+    public void testPSK() throws Exception {
+        testSpecification("PSK");
     }
 
 
