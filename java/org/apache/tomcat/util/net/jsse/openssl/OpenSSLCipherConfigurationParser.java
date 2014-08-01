@@ -227,7 +227,7 @@ public class OpenSSLCipherConfigurationParser {
     /**
      * TLS v1.2 cipher suites. Note: there are no cipher suites specific to TLS v1.1.
      */
-    private static final String TLSv1_2 = "TLSv1_2";
+    private static final String TLSv1_2 = "TLSv1.2";
     /**
      * TLS v1.0 cipher suites.
      */
