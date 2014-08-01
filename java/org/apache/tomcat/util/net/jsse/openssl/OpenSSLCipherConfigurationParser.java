@@ -40,11 +40,6 @@ public class OpenSSLCipherConfigurationParser {
     private static final StringManager sm =
             StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
-    /**
-     * System property key to define the DEFAULT ciphers.
-     */
-    public static final String DEFAULT_EXPRESSION_KEY = "openssl.default.ciphers";
-
     private static boolean initialized = false;
 
     private static final String SEPARATOR = ":|,| ";
@@ -461,10 +456,10 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(KRB5, filter(allCiphers, null, Collections.singleton(KeyExchange.KRB5), Collections.singleton(Authentication.KRB5), null, null, null));
         initialized = true;
         // Despite what the OpenSSL docs say, DEFAULT also excludes SSLv2
-        String defaultExpression = System.getProperty(DEFAULT_EXPRESSION_KEY, "ALL:!eNULL:!aNULL:!SSLv2");
-        addListAlias(DEFAULT, parse(defaultExpression));
+        addListAlias(DEFAULT, parse("ALL:!eNULL:!aNULL:!SSLv2"));
         LinkedHashSet<Cipher> complementOfDefault = new LinkedHashSet<>(all);
         complementOfDefault.removeAll(aliases.get(DEFAULT));
+        complementOfDefault.removeAll(aliases.get(SSLv2));
         addListAlias(COMPLEMENTOFDEFAULT, complementOfDefault);
     }
 

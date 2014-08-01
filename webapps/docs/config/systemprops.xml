@@ -611,10 +611,6 @@
       <p>The URL for the catalina.properties configuration file.</p>
     </property>
 
-    <property name="tomcat.ssl.ciphers">
-      <p>The default cipher suite that will be used by the endpoints.</p>
-    </property>
-
     <property name="tomcat.util.buf.StringCache.byte.enabled">
       <p>If <code>true</code>, the String cache is enabled for
       <code>ByteChunk</code>.</p>
