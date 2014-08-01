@@ -459,7 +459,6 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(DEFAULT, parse("ALL:!eNULL:!aNULL:!SSLv2"));
         LinkedHashSet<Cipher> complementOfDefault = new LinkedHashSet<>(all);
         complementOfDefault.removeAll(aliases.get(DEFAULT));
-        complementOfDefault.removeAll(aliases.get(SSLv2));
         addListAlias(COMPLEMENTOFDEFAULT, complementOfDefault);
     }
 
