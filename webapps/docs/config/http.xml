@@ -1087,11 +1087,10 @@
       <p>The list can also use ':' as a separator, in that case
       it will use the OpenSSL syntax (see OpenSSL documentation for the list
       of ciphers supported and the syntax).</p>
-      <p>The default cipher suite can be set using the
-      <code>tomcat.ssl.ciphers</code> system property.</p>
-      <p>If not specified, the default ciphers
-      for the JVM will be used. Note that this usually means that the weak
-      export grade ciphers will be included in the list of available ciphers.</p>
+      <p>If not specified, a default (using the OpenSSL notation) of
+      <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code> will be used.</p>
+      <p>Note that Java does treat the order in which ciphers are defined as an
+      order of preference.</p>
     </attribute>
 
     <attribute name="clientAuth" required="false">
@@ -1344,12 +1343,9 @@
     </attribute>
 
     <attribute name="SSLCipherSuite" required="false">
-      <p>Ciphers which may be used for communicating with clients.
-      The default cipher suite can be set using the
-      <code>tomcat.ssl.ciphers</code> system property. The default
-      is "ALL", with other acceptable values being a list of ciphers, with ":"
-      used as the delimiter (see OpenSSL documentation for the list of ciphers
-      supported).</p>
+      <p>Ciphers which may be used for communicating with clients. The default
+      is <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code>. See the OpenSSL
+      documentation for details of the syntax for this attribute.</p>
     </attribute>
 
     <attribute name="SSLDisableCompression" required="false">
