@@ -78,6 +78,10 @@
         or backup <code>javax.naming.directory.DirContext</code>. Based on a
         patch by Sheldon Shao. (violetagg)
       </fix>
+      <fix>
+        <bug>56796</bug>: Remove unnecessary sleep when stopping a web
+        application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
