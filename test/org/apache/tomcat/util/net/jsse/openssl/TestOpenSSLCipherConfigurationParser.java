@@ -198,14 +198,14 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    @Ignore("Contrary to the docs, OpenSSL does not recognise kECDHE")
+    @Ignore("Contrary to the docs, OpenSSL does not recognise ECDHE")
     public void testECDHE() throws Exception {
         testSpecification("ECDHE");
     }
 
 
     @Test
-    @Ignore("Contrary to the docs, OpenSSL does not recognise kECDHE")
+    @Ignore("Contrary to the docs, OpenSSL does not recognise EECDHE")
     public void testEECDHE() throws Exception {
         testSpecification("EECDHE");
     }
@@ -473,10 +473,9 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    @Ignore("Currently fails - figure out why")
     public void testSpecification02() throws Exception {
-        // Suggestion from dev list
-        testSpecification("!aNULL:!eNULL:!EXPORT:!DSS:!DES:!SSLv2:ECDHE:ECDH:DHE:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:MEDIUM");
+        // Suggestion from dev list (s/ECDHE/kEECDH/, s/DHE/EDH/
+        testSpecification("!aNULL:!eNULL:!EXPORT:!DSS:!DES:!SSLv2:kEECDH:ECDH:EDH:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:MEDIUM"); //
     }
 
 
