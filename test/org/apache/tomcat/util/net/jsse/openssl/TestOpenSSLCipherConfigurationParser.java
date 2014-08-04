@@ -468,6 +468,8 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testSpecification01() throws Exception {
         // Tomcat 8 default as of 2014-08-04
+        // This gets an A- from https://www.ssllabs.com/ssltest with no FS for
+        // a number of the reference browsers
         testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
     }
 
