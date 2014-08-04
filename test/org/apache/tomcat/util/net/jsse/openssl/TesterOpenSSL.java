@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
@@ -180,7 +179,7 @@ public class TesterOpenSSL {
         t2.start();
 
         try {
-            p.waitFor(2, TimeUnit.SECONDS);
+            p.waitFor();
         } catch (InterruptedException e) {
             throw new IOException(e);
         }
