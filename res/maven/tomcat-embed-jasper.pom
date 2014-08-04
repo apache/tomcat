@@ -43,9 +43,10 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.jdt.core.compiler</groupId>
-      <artifactId>ecj</artifactId>
-      <version>4.4</version>
+      <groupId>org.eclipse.tycho</groupId>
+      <artifactId>org.eclipse.jdt.core</artifactId>
+      <version>3.10.0.v20140604-1726</version>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>
