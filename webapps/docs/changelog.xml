@@ -86,6 +86,10 @@
         header is returned for resources that might be returned directly in
         compressed form.
       </fix>
+      <fix>
+        <bug>56796</bug>: Remove unnecessary sleep when stopping a web
+        application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
