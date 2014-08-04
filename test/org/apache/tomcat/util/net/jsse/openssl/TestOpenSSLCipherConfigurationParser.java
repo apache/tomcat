@@ -463,6 +463,23 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
+    // TODO: Add tests for the individual operators
+
+    @Test
+    public void testSpecification01() throws Exception {
+        // Tomcat 8 default as of 2014-08-04
+        testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+    }
+
+
+    @Test
+    @Ignore("Currently fails - figure out why")
+    public void testSpecification02() throws Exception {
+        // Suggestion from dev list
+        testSpecification("!aNULL:!eNULL:!EXPORT:!DSS:!DES:!SSLv2:ECDHE:ECDH:DHE:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:MEDIUM");
+    }
+
+
     private void testSpecification(String specification) throws Exception {
         // Filter out cipher suites that OpenSSL does not implement
         String openSSLCipherList = TesterOpenSSL.getOpenSSLCiphersAsExpression(specification);
