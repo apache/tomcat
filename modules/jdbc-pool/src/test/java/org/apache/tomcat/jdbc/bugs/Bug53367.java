@@ -48,7 +48,7 @@ public class Bug53367 {
     }
 
     @Parameterized.Parameters
-    public static Collection parameters() {
+    public static Collection<Object[]> parameters() {
         return Arrays.asList(new Object[][]{
             new Object[] {Boolean.TRUE},
             new Object[] {Boolean.FALSE},
@@ -102,7 +102,7 @@ public class Bug53367 {
         Assert.assertEquals(threadsCount, pool.getActive());
         Assert.assertEquals(threadsCount, pool.getSize());
 
-        List<Thread> threads = new ArrayList<Thread>();
+        List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < threadsCount; i++) {
             Thread thread = new Thread(new Runnable() {
                 @Override
@@ -138,7 +138,7 @@ public class Bug53367 {
         Assert.assertEquals(threadsCount, pool.getSize());
 
         final AtomicInteger failedCount = new AtomicInteger();
-        final ArrayBlockingQueue<Connection> cons = new ArrayBlockingQueue<Connection>(threadsCount);
+        final ArrayBlockingQueue<Connection> cons = new ArrayBlockingQueue<>(threadsCount);
         threads.clear();
         for (int i = 0; i < threadsCount; i++) {
             Thread thread = new Thread(new Runnable() {
