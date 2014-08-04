@@ -799,16 +799,15 @@ public class DefaultServlet extends HttpServlet {
 
         // Serve a gzipped version of the file if present
         boolean usingGzippedVersion = false;
-        if (gzip &&
-                resource.isFile() &&
-                !included &&
-                !path.endsWith(".gz") &&
-                checkIfGzip(request)) {
+        if (gzip && resource.isFile() && !path.endsWith(".gz")) {
             WebResource gzipResource = resources.getResource(path + ".gz");
             if (gzipResource.exists() && gzipResource.isFile()) {
-                response.addHeader("Content-Encoding", "gzip");
-                resource = gzipResource;
-                usingGzippedVersion = true;
+                response.addHeader("Vary", "accept-encoding");
+                if (!included && checkIfGzip(request)) {
+                    response.addHeader("Content-Encoding", "gzip");
+                    resource = gzipResource;
+                    usingGzippedVersion = true;
+                }
             }
         }
 
