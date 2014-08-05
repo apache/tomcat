@@ -310,12 +310,13 @@ class Util {
                 return w;
             }
 
-            candidates.put(w, new MatchResult(exactMatch, assignableMatch, coercibleMatch));
+            candidates.put(w, new MatchResult(
+                    exactMatch, assignableMatch, coercibleMatch, w.isBridge()));
         }
 
         // Look for the method that has the highest number of parameters where
         // the type matches exactly
-        MatchResult bestMatch = new MatchResult(0, 0, 0);
+        MatchResult bestMatch = new MatchResult(0, 0, 0, false);
         Wrapper match = null;
         boolean multiple = false;
         for (Map.Entry<Wrapper, MatchResult> entry : candidates.entrySet()) {
@@ -662,6 +663,7 @@ class Util {
         public abstract Object unWrap();
         public abstract Class<?>[] getParameterTypes();
         public abstract boolean isVarArgs();
+        public abstract boolean isBridge();
     }
 
 
@@ -686,6 +688,11 @@ class Util {
         public boolean isVarArgs() {
             return m.isVarArgs();
         }
+
+        @Override
+        public boolean isBridge() {
+            return m.isBridge();
+        }
     }
 
     private static class ConstructorWrapper extends Wrapper {
@@ -709,6 +716,11 @@ class Util {
         public boolean isVarArgs() {
             return c.isVarArgs();
         }
+
+        @Override
+        public boolean isBridge() {
+            return false;
+        }
     }
 
     /*
@@ -720,11 +732,13 @@ class Util {
         private final int exact;
         private final int assignable;
         private final int coercible;
+        private final boolean bridge;
 
-        public MatchResult(int exact, int assignable, int coercible) {
+        public MatchResult(int exact, int assignable, int coercible, boolean bridge) {
             this.exact = exact;
             this.assignable = assignable;
             this.coercible = coercible;
+            this.bridge = bridge;
         }
 
         public int getExact() {
@@ -739,6 +753,10 @@ class Util {
             return coercible;
         }
 
+        public boolean isBridge() {
+            return bridge;
+        }
+
         @Override
         public int compareTo(MatchResult o) {
             int cmp = Integer.compare(this.getExact(), o.getExact());
@@ -746,6 +764,13 @@ class Util {
                 cmp = Integer.compare(this.getAssignable(), o.getAssignable());
                 if (cmp == 0) {
                     cmp = Integer.compare(this.getCoercible(), o.getCoercible());
+                    if (cmp == 0) {
+                        // The nature of bridge methods is such that it actually
+                        // doesn't matter which one we pick as long as we pick
+                        // one. That said, pick the 'right' one (the non-bridge
+                        // one) anyway.
+                        cmp = Boolean.compare(o.isBridge(), this.isBridge());
+                    }
                 }
             }
             return cmp;

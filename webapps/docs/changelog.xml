@@ -139,6 +139,11 @@
         <bug>56709</bug>: Fix system property name in a log message. Submitted
         by Robert Kish. (remm)
       </fix>
+      <fix>
+        <bug>56797</bug>: When matching a method in an EL expression, do not
+        treat bridge methods as duplicates of the method they bridge to. In this
+        case always call the target of the bridge method. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

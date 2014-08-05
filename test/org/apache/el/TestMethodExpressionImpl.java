@@ -464,4 +464,22 @@ public class TestMethodExpressionImpl {
         Integer result = (Integer) me.invoke(context, null);
         assertEquals(beanB.sayHello().length(), result.intValue());
     }
+
+
+    @Test
+    public void testBug56797a() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanAA.echo1('Hello World!')}", null , null);
+        Object r = me.invoke(context, null);
+        assertEquals("AA1Hello World!", r.toString());
+    }
+
+
+    @Test
+    public void testBug56797b() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanAA.echo2('Hello World!')}", null , null);
+        Object r = me.invoke(context, null);
+        assertEquals("AA2Hello World!", r.toString());
+    }
 }
