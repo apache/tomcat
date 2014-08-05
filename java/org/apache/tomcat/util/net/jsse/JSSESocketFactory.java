@@ -108,6 +108,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         String[] ciphers = null;
         String[] protocols = null;
         try {
+            // BZ 56780 IBM JRE can throw IllegalArgumentException here
             context = SSLContext.getInstance("TLS");
             context.init(null, null, null);
             SSLServerSocketFactory ssf = context.getServerSocketFactory();
@@ -129,12 +130,11 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             SSLServerSocket socket = (SSLServerSocket) ssf.createServerSocket();
             ciphers = socket.getEnabledCipherSuites();
             protocols = socket.getEnabledProtocols();
-        } catch (NoSuchAlgorithmException e) {
-            // Assume no RFC 5746 support
-        } catch (KeyManagementException e) {
-            // Assume no RFC 5746 support
-        } catch (IOException e) {
-            // Unable to determine default ciphers/protocols so use none
+        } catch (NoSuchAlgorithmException | KeyManagementException | IOException |
+                IllegalArgumentException e) {
+            // Assume no RFC 5746 support if an SSLContext could not be created
+            // If an IOException is thrown trying to determine default
+            //     ciphers/protocols use none as the default
         }
         RFC_5746_SUPPORTED = result;
         DEFAULT_SERVER_CIPHER_SUITES = ciphers;
