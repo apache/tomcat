@@ -56,4 +56,12 @@ public class TesterBeanA {
     public void setValList(List<?> valList) {
         this.valList = valList;
     }
+
+    public CharSequence echo1(CharSequence cs) {
+        return "A1" + cs;
+    }
+
+    public CharSequence echo2(String s) {
+        return "A2" + s;
+    }
 }
