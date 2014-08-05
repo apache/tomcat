@@ -84,6 +84,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>56780</bug>: Enable Tomcat to start when using SSL with an IBM JRE
+        in strict SP800-131a mode. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
