@@ -81,7 +81,7 @@
         Cédric Couralet. (markt)
       </fix>
       <fix>
-        When the <code>gzip</code> option is enabled for the
+        <bug>56815</bug>: When the <code>gzip</code> option is enabled for the
         <code>DefaultServlet</code> ensure that a suitable <code>Vary</code>
         header is returned for resources that might be returned directly in
         compressed form.
