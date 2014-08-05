@@ -90,6 +90,12 @@
         <bug>56796</bug>: Remove unnecessary sleep when stopping a web
         application. (markt)
       </fix>
+      <fix>
+        <bug>56801</bug>: Improve performance of
+        <code>org.apache.tomcat.util.file.Matcher</code> which is to filter JARs
+        for scanning during web application start. Based on a patch by Sheldon
+        Shao. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
