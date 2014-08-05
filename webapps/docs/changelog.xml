@@ -137,6 +137,10 @@
         that no weak ciphers are enabled by default. (remm)
       </fix>
       <fix>
+        <bug>56780</bug>: Enable Tomcat to start when using SSL with an IBM JRE
+        in strict SP800-131a mode. (markt)
+      </fix>
+      <fix>
         <bug>56810</bug>: Remove use of Java 8 specific API calls in unit tests
         for OpenSSL to JSSE cipher conversion. (markt)
       </fix>
