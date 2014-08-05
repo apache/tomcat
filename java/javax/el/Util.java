@@ -778,7 +778,13 @@ class Util {
                         // doesn't matter which one we pick as long as we pick
                         // one. That said, pick the 'right' one (the non-bridge
                         // one) anyway.
-                        return Boolean.compare(o.isBridge(), this.isBridge());
+                        if (o.isBridge() && !this.isBridge()) {
+                            return 1;
+                        } else if (!o.isBridge() && this.isBridge()) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
                     }
                 }
             }
