@@ -81,12 +81,6 @@
         Cédric Couralet. (markt)
       </fix>
       <fix>
-        <bug>56815</bug>: When the <code>gzip</code> option is enabled for the
-        <code>DefaultServlet</code> ensure that a suitable <code>Vary</code>
-        header is returned for resources that might be returned directly in
-        compressed form.
-      </fix>
-      <fix>
         <bug>56796</bug>: Remove unnecessary sleep when stopping a web
         application. (markt)
       </fix>
@@ -95,6 +89,12 @@
         <code>org.apache.tomcat.util.file.Matcher</code> which is to filter JARs
         for scanning during web application start. Based on a patch by Sheldon
         Shao. (markt)
+      </fix>
+      <fix>
+        <bug>56815</bug>: When the <code>gzip</code> option is enabled for the
+        <code>DefaultServlet</code> ensure that a suitable <code>Vary</code>
+        header is returned for resources that might be returned directly in
+        compressed form. (markt)
       </fix>
     </changelog>
   </subsection>
