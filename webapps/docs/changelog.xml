@@ -81,6 +81,11 @@
         Cédric Couralet. (markt)
       </fix>
       <fix>
+        <bug>56785</bug>: Avoid <code>NullPointerException</code> if directory
+        exists on the class path that is not readable by the Tomcat user.
+        (markt)
+      </fix>
+      <fix>
         <bug>56796</bug>: Remove unnecessary sleep when stopping a web
         application. (markt)
       </fix>

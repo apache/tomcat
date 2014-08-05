@@ -1960,10 +1960,13 @@ public class ContextConfig implements LifecycleListener {
             boolean handlesTypesOnly) {
 
         if (file.isDirectory()) {
+            // Returns null if directory is not readable
             String[] dirs = file.list();
-            for (String dir : dirs) {
-                processAnnotationsFile(
-                        new File(file,dir), fragment, handlesTypesOnly);
+            if (dirs != null) {
+                for (String dir : dirs) {
+                    processAnnotationsFile(
+                            new File(file,dir), fragment, handlesTypesOnly);
+                }
             }
         } else if (file.canRead() && file.getName().endsWith(".class")) {
             try (FileInputStream fis = new FileInputStream(file)) {
