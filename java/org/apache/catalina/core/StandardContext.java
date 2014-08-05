@@ -41,6 +41,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -469,7 +470,7 @@ public class StandardContext extends ContainerBase
      * The context initialization parameters for this web application,
      * keyed by name.
      */
-    private HashMap<String, String> parameters = new HashMap<>();
+    private final ConcurrentHashMap<String, String> parameters = new ConcurrentHashMap<>();
 
 
     /**
@@ -3009,19 +3010,20 @@ public class StandardContext extends ContainerBase
     @Override
     public void addParameter(String name, String value) {
         // Validate the proposed context initialization parameter
-        if ((name == null) || (value == null))
+        if ((name == null) || (value == null)) {
             throw new IllegalArgumentException
                 (sm.getString("standardContext.parameter.required"));
-        if (parameters.get(name) != null)
-            throw new IllegalArgumentException
-                (sm.getString("standardContext.parameter.duplicate", name));
-
-        // Add this parameter to our defined set
-        synchronized (parameters) {
-            parameters.put(name, value);
         }
-        fireContainerEvent("addParameter", name);
 
+        // Add this parameter to our defined set if not already present
+        String oldValue = parameters.putIfAbsent(name, value);
+
+        if (oldValue != null) {
+            throw new IllegalArgumentException(
+                    sm.getString("standardContext.parameter.duplicate", name));
+        }
+
+        fireContainerEvent("addParameter", name);
     }
 
 
@@ -3515,11 +3517,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String findParameter(String name) {
-
-        synchronized (parameters) {
-            return (parameters.get(name));
-        }
-
+        return parameters.get(name);
     }
 
 
@@ -3530,12 +3528,9 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String[] findParameters() {
-
-        synchronized (parameters) {
-            String results[] = new String[parameters.size()];
-            return (parameters.keySet().toArray(results));
-        }
-
+        List<String> parameterNames = new ArrayList<>(parameters.size());
+        parameterNames.addAll(parameters.keySet());
+        return parameterNames.toArray(new String[parameterNames.size()]);
     }
 
 
@@ -4079,12 +4074,8 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public void removeParameter(String name) {
-
-        synchronized (parameters) {
-            parameters.remove(name);
-        }
+        parameters.remove(name);
         fireContainerEvent("removeParameter", name);
-
     }
 
 
