@@ -127,57 +127,59 @@ final class StandardHostValve extends ValveBase {
         // ensure an infinite error handling loop is not entered
         boolean errorAtStart = response.isError();
 
-        context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
+        try {
+            context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
 
-        if (asyncAtStart || context.fireRequestInitEvent(request)) {
+            if (asyncAtStart || context.fireRequestInitEvent(request)) {
 
-            // Ask this Context to process this request
-            try {
-                context.getPipeline().getFirst().invoke(request, response);
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                if (errorAtStart) {
-                    container.getLogger().error("Exception Processing " +
-                            request.getRequestURI(), t);
-                } else {
-                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
-                    throwable(request, response, t);
-                }
-            }
-
-            Throwable t = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-
-            // If the request was async at the start and an error occurred then
-            // the async error handling will kick-in and that will fire the
-            // request destroyed event *after* the error handling has taken
-            // place
-            if (!(request.isAsync() || (asyncAtStart && t != null))) {
-                // Protect against NPEs if context was destroyed during a
-                // long running request.
-                if (context.getState().isAvailable()) {
-                    if (!errorAtStart) {
-                        // Error page processing
-                        response.setSuspended(false);
-
-                        if (t != null) {
-                            throwable(request, response, t);
-                        } else {
-                            status(request, response);
-                        }
+                // Ask this Context to process this request
+                try {
+                    context.getPipeline().getFirst().invoke(request, response);
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    if (errorAtStart) {
+                        container.getLogger().error("Exception Processing " +
+                                request.getRequestURI(), t);
+                    } else {
+                        request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
+                        throwable(request, response, t);
                     }
+                }
 
-                    context.fireRequestDestroyEvent(request);
+                Throwable t = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+
+                // If the request was async at the start and an error occurred
+                // then the async error handling will kick-in and that will fire
+                // the request destroyed event *after* the error handling has
+                // taken place.
+                if (!(request.isAsync() || (asyncAtStart && t != null))) {
+                    // Protect against NPEs if context was destroyed during a
+                    // long running request.
+                    if (context.getState().isAvailable()) {
+                        if (!errorAtStart) {
+                            // Error page processing
+                            response.setSuspended(false);
+
+                            if (t != null) {
+                                throwable(request, response, t);
+                            } else {
+                                status(request, response);
+                            }
+                        }
+
+                        context.fireRequestDestroyEvent(request);
+                    }
                 }
             }
-        }
 
-        // Access a session (if present) to update last accessed time, based on a
-        // strict interpretation of the specification
-        if (ACCESS_SESSION) {
-            request.getSession(false);
+            // Access a session (if present) to update last accessed time, based
+            // on a strict interpretation of the specification
+            if (ACCESS_SESSION) {
+                request.getSession(false);
+            }
+        } finally {
+            context.unbind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
         }
-
-        context.unbind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
     }
 
 
