@@ -110,8 +110,7 @@ final class StandardHostValve extends ValveBase {
         // Select the Context to be used for this Request
         Context context = request.getContext();
         if (context == null) {
-            response.sendError
-                (HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                  sm.getString("standardHost.noContext"));
             return;
         }
@@ -145,22 +144,19 @@ final class StandardHostValve extends ValveBase {
                 }
             }
 
+            Throwable t = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+
             // If the request was async at the start and an error occurred then
             // the async error handling will kick-in and that will fire the
             // request destroyed event *after* the error handling has taken
             // place
-            if (!(request.isAsync() || (asyncAtStart &&
-                    request.getAttribute(
-                            RequestDispatcher.ERROR_EXCEPTION) != null))) {
+            if (!(request.isAsync() || (asyncAtStart && t != null))) {
                 // Protect against NPEs if context was destroyed during a
                 // long running request.
                 if (context.getState().isAvailable()) {
                     if (!errorAtStart) {
                         // Error page processing
                         response.setSuspended(false);
-
-                        Throwable t = (Throwable) request.getAttribute(
-                                RequestDispatcher.ERROR_EXCEPTION);
 
                         if (t != null) {
                             throwable(request, response, t);
