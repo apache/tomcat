@@ -898,7 +898,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             break;
         }
         case DISPATCH_EXECUTE: {
-            getEndpoint().executeNonBlockingDispatches(socketWrapper);
+            SocketWrapper<S> wrapper = socketWrapper;
+            if (wrapper != null) {
+                getEndpoint().executeNonBlockingDispatches(wrapper);
+            }
             break;
         }
         case CLOSE_NOW: {
