@@ -115,8 +115,6 @@ final class StandardHostValve extends ValveBase {
             return;
         }
 
-        context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
-
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(context.getPipeline().isAsyncSupported());
         }
@@ -128,6 +126,9 @@ final class StandardHostValve extends ValveBase {
         // An async error page may dispatch to another resource. This flag helps
         // ensure an infinite error handling loop is not entered
         boolean errorAtStart = response.isError();
+
+        context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
+
         if (asyncAtStart || context.fireRequestInitEvent(request)) {
 
             // Ask this Context to process this request
