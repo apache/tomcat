@@ -48,6 +48,12 @@ test.cobertura=false
 # Location of GPG executable (used only for releases)
 gpg.exec=/path/to/gpg
 
+# Code signing of Windows installer
+do.codesigning=false
+codesigning.user=request-via-pmc
+codesigning.pwd=request-via-pmc
+codesigning.partnercode=request-via-pmc
+
 # ----- Settings to use when downloading files -----
 trydownload.httpusecaches=true
 
