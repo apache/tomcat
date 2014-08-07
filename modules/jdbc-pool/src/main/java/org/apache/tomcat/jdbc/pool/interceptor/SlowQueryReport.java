@@ -58,6 +58,16 @@ public class SlowQueryReport extends AbstractQueryReport  {
     protected int  maxQueries= 1000; //don't store more than this amount of queries
 
     /**
+     * Flag to enable disable logging of slow queries
+     */
+    protected boolean logSlow = true;
+
+    /**
+     * Flag to enable disable logging of failed queries
+     */
+    protected boolean logFailed = true;
+
+    /**
      * Returns the query stats for a given pool
      * @param poolname - the name of the pool we want to retrieve stats for
      * @return a hash map containing statistics for 0 to maxQueries
@@ -86,7 +96,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             long delta = now - start;
             QueryStats qs = this.getQueryStats(sql);
             qs.failure(delta, now);
-            if (log.isWarnEnabled()) {
+            if (isLogFailed() && log.isWarnEnabled()) {
                 log.warn("Failed Query Report SQL="+sql+"; time="+delta+" ms;");
             }
         }
@@ -99,7 +109,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
         if (this.maxQueries > 0 ) {
             QueryStats qs = this.getQueryStats(sql);
             qs.add(delta, start);
-            if (log.isWarnEnabled()) {
+            if (isLogSlow() && log.isWarnEnabled()) {
                 log.warn("Slow Query Report SQL="+sql+"; time="+delta+" ms;");
             }
         }
@@ -199,18 +209,44 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
 
+    public boolean isLogSlow() {
+        return logSlow;
+    }
+
+    public void setLogSlow(boolean logSlow) {
+        this.logSlow = logSlow;
+    }
+
+    public boolean isLogFailed() {
+        return logFailed;
+    }
+
+    public void setLogFailed(boolean logFailed) {
+        this.logFailed = logFailed;
+    }
+
     @Override
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
         final String threshold = "threshold";
         final String maxqueries= "maxQueries";
+        final String logslow = "logSlow";
+        final String logfailed = "logFailed";
         InterceptorProperty p1 = properties.get(threshold);
         InterceptorProperty p2 = properties.get(maxqueries);
+        InterceptorProperty p3 = properties.get(logSlow);
+        InterceptorProperty p4 = properties.get(logfailed);
         if (p1!=null) {
             setThreshold(Long.parseLong(p1.getValue()));
         }
         if (p2!=null) {
             setMaxQueries(Integer.parseInt(p2.getValue()));
+        }
+        if (p3!=null) {
+            setLogSlow(Boolean.getBoolean(p3.getValue()));
+        }
+        if (p4!=null) {
+            setLogFailed(Boolean.getBoolean(p4.getValue()));
         }
     }
 
