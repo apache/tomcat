@@ -31,6 +31,8 @@ import javax.naming.spi.ObjectFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.ClassLoaderUtil;
+
 /**
  * Simple way of configuring generic resources by using reflection.
  * Example usage:
@@ -57,7 +59,12 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
         Enumeration<RefAddr> refs = ref.getAll();
 
         String type = ref.getClassName();
-        Object o = Class.forName(type).newInstance();
+        Object o = 
+            ClassLoaderUtil.loadClass(
+                type,
+                GenericNamingResourcesFactory.class.getClassLoader(),
+                Thread.currentThread().getContextClassLoader())
+            .newInstance();
 
         while (refs.hasMoreElements()) {
             RefAddr addr = refs.nextElement();

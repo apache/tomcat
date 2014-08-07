@@ -247,8 +247,12 @@ public class PooledConnection {
                     //rely on DriverManager
                     log.warn("Not loading a JDBC driver as driverClassName property is null.");
                 } else {
-                    driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
-                            true, PooledConnection.class.getClassLoader()).newInstance();
+                    driver = (java.sql.Driver) 
+                        ClassLoaderUtil.loadClass(
+                            poolProperties.getDriverClassName(),
+                            PooledConnection.class.getClassLoader(),
+                            Thread.currentThread().getContextClassLoader()
+                        ).newInstance();
                 }
             }
         } catch (java.lang.Exception cn) {
