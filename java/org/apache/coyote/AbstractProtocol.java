@@ -609,7 +609,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             }
 
             wrapper.setAsync(false);
-            ContainerThreadMarker.markAsContainerThread();
+            ContainerThreadMarker.set();
 
             try {
                 if (processor == null) {
@@ -753,7 +753,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 // less-than-verbose logs.
                 getLog().error(
                         sm.getString("abstractConnectionHandler.error"), e);
+            } finally {
+                ContainerThreadMarker.clear();
             }
+
             // Make sure socket/processor is removed from the list of current
             // connections
             connections.remove(socket);

@@ -118,6 +118,12 @@
         header is returned for resources that might be returned directly in
         compressed form. (markt)
       </fix>
+      <fix>
+        Do not mark threads from the container thread pool as container threads
+        when being used to process <code>AsyncContext.start(Runnable)</code> so
+        processing is correctly transferred back to a genuine container thread
+        when necessary. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
