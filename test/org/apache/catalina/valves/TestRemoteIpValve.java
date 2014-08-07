@@ -319,6 +319,85 @@ public class TestRemoteIpValve {
     }
 
     @Test
+    public void test172dash12InternalProxies() throws Exception {
+
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setInternalProxies("172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}");
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProtocolHeader("x-forwarded-proto");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        request.setRemoteAddr("172.16.0.5");
+        request.setRemoteHost("remote-host-original-value");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("209.244.0.3");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-proto").setString("https");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        assertEquals("remoteAddr", "209.244.0.3", actualRemoteAddr);
+
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        assertEquals("remoteHost", "209.244.0.3", actualRemoteHost);
+
+        String actualPostInvokeRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        assertEquals("postInvoke remoteAddr", "209.244.0.3", actualPostInvokeRemoteAddr);
+
+        String actualPostInvokeRemoteHost = request.getRemoteHost();
+        assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+
+        boolean isSecure = remoteAddrAndHostTrackerValve.isSecure();
+        assertTrue("request from internal proxy should be marked secure", isSecure);
+
+        String scheme = remoteAddrAndHostTrackerValve.getScheme();
+        assertEquals("Scheme should be marked to https.","https",scheme);
+
+        request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        request.setRemoteAddr("172.25.250.250");
+        request.setRemoteHost("remote-host-original-value");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("209.244.0.3");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-proto").setString("https");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        actualXForwardedFor = request.getHeader("x-forwarded-for");
+        assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+
+        actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        assertEquals("remoteAddr", "209.244.0.3", actualRemoteAddr);
+
+        actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        assertEquals("remoteHost", "209.244.0.3", actualRemoteHost);
+
+        actualPostInvokeRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        assertEquals("postInvoke remoteAddr", "209.244.0.3", actualPostInvokeRemoteAddr);
+
+        actualPostInvokeRemoteHost = request.getRemoteHost();
+        assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+
+        isSecure = remoteAddrAndHostTrackerValve.isSecure();
+        assertTrue("request from internal proxy should be marked secure", isSecure);
+
+        scheme = remoteAddrAndHostTrackerValve.getScheme();
+        assertEquals("Scheme should be marked to https.","https",scheme);
+
+
+    }
+
+
+    @Test
     public void testInvokeXforwardedProtoSaysHttpsForIncomingHttpRequest() throws Exception {
 
         // PREPARE
