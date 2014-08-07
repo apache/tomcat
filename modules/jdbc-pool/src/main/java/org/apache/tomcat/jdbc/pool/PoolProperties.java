@@ -791,7 +791,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     @Override
     public void setInitSQL(String initSQL) {
-        this.initSQL = initSQL;
+        this.initSQL = initSQL!=null && initSQL.trim().length()>0 ? initSQL : null;
     }
 
     /**
