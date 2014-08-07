@@ -24,16 +24,11 @@ import java.util.Properties;
 import org.junit.After;
 import org.junit.Before;
 
-//import org.apache.commons.dbcp2.BasicDataSource;
-//import org.apache.commons.dbcp2.BasicDataSourceFactory;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
-//import com.mchange.v2.c3p0.ComboPooledDataSource;
-//import com.mchange.v2.log.MLevel;
-//import com.mchange.v2.log.MLog;
 
 /**
  * @version 1.0
