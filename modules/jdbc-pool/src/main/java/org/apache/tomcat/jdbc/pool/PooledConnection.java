@@ -318,6 +318,19 @@ public class PooledConnection {
     }
 
     /**
+     * Returns true if the connection has been connected more than 
+     * {@link PoolConfiguration#getMaxAge()} milliseconds. false otherwise.
+     * @return Returns true if the connection has been connected more than 
+     * {@link PoolConfiguration#getMaxAge()} milliseconds. false otherwise.
+     */
+    public boolean isMaxAgeExpired() {
+        if (getPoolProperties().getMaxAge()>0 ) {
+            return (System.currentTimeMillis() - getLastConnected()) > getPoolProperties().getMaxAge();
+        } else {
+            return false;
+        }
+    }
+    /**
      * Issues a call to {@link #disconnect(boolean)} with the argument false followed by a call to
      * {@link #connect()}
      * @throws SQLException if the call to {@link #connect()} fails.

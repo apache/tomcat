@@ -279,6 +279,10 @@ public class ConnectionPool {
      * @throws SQLException if an interceptor can't be configured, if the proxy can't be instantiated
      */
     protected Connection setupConnection(PooledConnection con) throws SQLException {
+        //check if it's been sitting in the pool too long
+        if (con.isMaxAgeExpired()) {
+            con.reconnect();
+        }
         //fetch previously cached interceptor proxy - one per connection
         JdbcInterceptor handler = con.getHandler();
         if (handler==null) {
@@ -862,11 +866,8 @@ public class ConnectionPool {
         if (isClosed()) return true;
         if (!con.validate(action)) return true;
         if (!terminateTransaction(con)) return true;
-        if (getPoolProperties().getMaxAge()>0 ) {
-            return (System.currentTimeMillis()-con.getLastConnected()) > getPoolProperties().getMaxAge();
-        } else {
-            return false;
-        }
+        if (con.isMaxAgeExpired()) return true;
+        else return false;
     }
 
     /**
