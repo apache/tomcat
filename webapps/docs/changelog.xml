@@ -81,6 +81,12 @@
         Cédric Couralet. (markt)
       </fix>
       <fix>
+        <bug>56736</bug>: Avoid an incorrect <code>IllegalStateException</code>
+        if the async timeout fires after a non-container thread has called
+        <code>AsyncContext.dispatch()</code> but before a container thread
+        starts processing the dispatch. (markt)
+      </fix>
+      <fix>
         <bug>56739</bug>: If an application handles an error on an application
         thread during asynchronous processing by calling
         <code>HttpServletResponse.sendError()</code>, then ensure that the
