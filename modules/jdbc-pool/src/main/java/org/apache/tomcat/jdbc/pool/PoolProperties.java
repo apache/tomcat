@@ -481,7 +481,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     } else {
                         String name = interceptorValues[i].substring(0,propIndex).trim();
                         definitions[i+1] = new InterceptorDefinition(name);
-                        String propsAsString = interceptorValues[i].substring(propIndex+1, interceptorValues[i].length()-1);
+                        String propsAsString = interceptorValues[i].substring(propIndex+1, endIndex);
                         String[] props = propsAsString.split(",");
                         for (int j=0; j<props.length; j++) {
                             int pidx = props[j].indexOf("=");
