@@ -259,9 +259,10 @@ public class AsyncStateMachine<S> {
             state = AsyncState.TIMING_OUT;
             return true;
         } else if (state == AsyncState.COMPLETING ||
+                state == AsyncState.DISPATCHING ||
                 state == AsyncState.DISPATCHED) {
-            // NOOP - App called complete between the the timeout firing and
-            // execution reaching this point
+            // NOOP - App called complete() or dispatch() between the the
+            // timeout firing and execution reaching this point
             return false;
         } else {
             throw new IllegalStateException(
