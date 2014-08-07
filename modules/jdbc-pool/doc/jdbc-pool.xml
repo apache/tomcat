@@ -658,6 +658,16 @@
            The default value is <code>1000</code>.
         </p>
       </attribute>
+      <attribute name="logSlow" required="false">
+        <p>(boolean as String) Set to true if you wish to log slow queries
+            The default value is <code>true</code>.
+        </p>
+      </attribute>
+      <attribute name="logFailed" required="false">
+        <p>(boolean as String) Set to true if you wish to log slow queries
+            The default value is <code>true</code>.
+        </p>
+      </attribute>
     </attributes>
   </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx">
