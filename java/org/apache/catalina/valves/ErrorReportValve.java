@@ -79,9 +79,10 @@ public class ErrorReportValve extends ValveBase {
         getNext().invoke(request, response);
 
         if (response.isCommitted()) {
-            if (response.isErrorAfterCommit()) {
-                // Attempt to flush any data that is still to be written to the
-                // client
+            if (response.setErrorReported()) {
+                // Error wasn't previously reported but we can't write an error
+                // page because the response has already been committed. Attempt
+                // to flush any data that is still to be written to the client.
                 try {
                     response.flushBuffer();
                 } catch (Throwable t) {
@@ -146,7 +147,8 @@ public class ErrorReportValve extends ValveBase {
         // Do nothing on a 1xx, 2xx and 3xx status
         // Do nothing if anything has been written already
         // Do nothing if the response hasn't been explicitly marked as in error
-        if (statusCode < 400 || response.getContentWritten() > 0 || !response.isError()) {
+        //    and that error has not been reported.
+        if (statusCode < 400 || response.getContentWritten() > 0 || !response.setErrorReported()) {
             return;
         }
         String message = RequestUtil.filter(response.getMessage());
