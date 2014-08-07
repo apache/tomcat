@@ -191,7 +191,12 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     public ConnectionPool getPool() {
-        return pool;
+        try {
+            return createPool();
+        }catch (SQLException x) {
+            log.error("Error during connection pool creation.", x);
+            return null;
+        }
     }
 
 
@@ -208,7 +213,7 @@ public class DataSourceProxy implements PoolConfiguration {
                 }
             }
         }catch (Exception x) {
-            log.warn("Error duing connection pool closure.", x);
+            log.warn("Error during connection pool closure.", x);
         }
     }
 
