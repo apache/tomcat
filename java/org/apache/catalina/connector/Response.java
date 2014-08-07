@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.SessionTrackingMode;
@@ -195,10 +196,35 @@ public class Response
     private boolean isCharacterEncodingSet = false;
 
     /**
-     * The error flag.
+     * With the introduction of async processing and the possibility of
+     * non-container threads calling sendError() tracking the current error
+     * state and ensuring that the correct error page is called becomes more
+     * complicated. This state attribute helps by tracking the current error
+     * state and informing callers that attempt to change state if the change
+     * was successful or if another thread got there first.
+     *
+     * <pre>
+     * The state machine is very simple:
+     *
+     * 0 - NONE
+     * 1 - NOT_REPORTED
+     * 2 - REPORTED
+     *
+     *
+     *   -->---->-- >NONE
+     *   |   |        |
+     *   |   |        | setError()
+     *   ^   ^        |
+     *   |   |       \|/
+     *   |   |-<-NOT_REPORTED
+     *   |            |
+     *   ^            | report()
+     *   |            |
+     *   |           \|/
+     *   |----<----REPORTED
+     * </pre>
      */
-    protected boolean error = false;
-    private boolean errorAfterCommit = false;
+    private AtomicInteger errorState = new AtomicInteger(0);
 
 
     /**
@@ -239,8 +265,7 @@ public class Response
         usingWriter = false;
         appCommitted = false;
         included = false;
-        error = false;
-        errorAfterCommit = false;
+        errorState.set(0);
         isCharacterEncodingSet = false;
 
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
@@ -387,15 +412,15 @@ public class Response
     /**
      * Set the error flag.
      */
-    public void setError() {
-        if (!error) {
-            error = true;
-            errorAfterCommit = coyoteResponse.isCommitted();
+    public boolean setError() {
+        boolean result = errorState.compareAndSet(0, 1);
+        if (result) {
             Wrapper wrapper = getRequest().getWrapper();
             if (wrapper != null) {
                 wrapper.incrementErrorCount();
             }
         }
+        return result;
     }
 
 
@@ -403,12 +428,17 @@ public class Response
      * Error flag accessor.
      */
     public boolean isError() {
-        return error;
+        return errorState.get() > 0;
     }
 
 
-    public boolean isErrorAfterCommit() {
-        return errorAfterCommit;
+    public boolean isErrorReportRequired() {
+        return errorState.get() == 1;
+    }
+
+
+    public boolean setErrorReported() {
+        return errorState.compareAndSet(1, 2);
     }
 
 

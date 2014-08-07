@@ -81,6 +81,13 @@
         Cédric Couralet. (markt)
       </fix>
       <fix>
+        <bug>56739</bug>: If an application handles an error on an application
+        thread during asynchronous processing by calling
+        <code>HttpServletResponse.sendError()</code>, then ensure that the
+        application is given an opportunity to report that error via an
+        appropriate application defined error page if one is configured. (markt)
+      </fix>
+      <fix>
         <bug>56784</bug>: Fix a couple of rare but theoretically possible
         atomicity bugs. (markt)
       </fix>

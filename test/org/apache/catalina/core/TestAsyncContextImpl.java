@@ -1302,14 +1302,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
 
-        // SRV 10.9.2 - Writing the response is entirely the application's
+        // SRV 10.9.2 - Handling an error is entirely the application's
         // responsibility when an error occurs on an application thread.
-        // The test servlet writes no content in this case.
-        if (threaded) {
-            assertEquals(0, res.getLength());
-        } else {
-            assertTrue(res.getLength() > 0);
-        }
+        // Calling sendError() followed by complete() and expecting the standard
+        // error page mechanism to kick in could be viewed as handling the error
+        assertTrue(res.getLength() > 0);
 
         // Without this test may complete before access log has a chance to log
         // the request
