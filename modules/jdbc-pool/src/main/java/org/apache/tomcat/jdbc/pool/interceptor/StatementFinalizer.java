@@ -16,15 +16,16 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
-import java.sql.Statement;
-import java.util.ArrayList;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
+import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.List;
 /**
  * Keeps track of statements associated with a connection and invokes close upon {@link java.sql.Connection#close()}
  * Useful for applications that dont close the associated statements after being done with a connection.
@@ -33,7 +34,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(StatementFinalizer.class);
 
-    protected ArrayList<WeakReference<Statement>> statements = new ArrayList<>();
+    protected List<WeakReference<Statement>> statements = new LinkedList<>();
 
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
