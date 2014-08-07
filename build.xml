@@ -2119,18 +2119,19 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </antcall>
   </target>
 
-  <target name="sign-windows-binaries" depends="installer" unless="skip.codesigning">
+  <target name="sign-windows-binaries" depends="installer" if="${do.codesigning}" >
 
     <taskdef name="signcode"
              classname="org.apache.tomcat.buildutil.SignCode"
              classpath="${tomcat.classes}" />
 
-    <signcode>
+    <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
+              partnerCode="${codesigning.partnercode}"
+              applicationName="Apache Tomcat ${version.major.minor}"
+              applicationversion="${version}"
+              signingService="Microsoft Signing">
       <fileset dir="${tomcat.release}">
         <filename name="v${version}/bin/${final.name}.exe"/>
-      </fileset>
-      <fileset dir="${tomcat.dist}/bin">
-        <include name="**/*.exe"/>
       </fileset>
     </signcode>
 

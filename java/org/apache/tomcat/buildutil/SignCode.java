@@ -16,25 +16,95 @@
 */
 package org.apache.tomcat.buildutil;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPConnectionFactory;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.soap.SOAPPart;
+
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Ant task that submits a file to the Symantec code-signing service.
  */
 public class SignCode extends Task {
 
-    private final List<FileSet> filesets = new ArrayList<>();
+    private static final String NS = "cod";
 
+    private static final MessageFactory SOAP_MSG_FACTORY;
+
+    static {
+        try {
+            SOAP_MSG_FACTORY = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
+        } catch (SOAPException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private final List<FileSet> filesets = new ArrayList<>();
+    private String userName;
+    private String password;
+    private String partnerCode;
+    private String applicationName;
+    private String applicationVersion;
+    private String signingService;
 
     public void addFileset(FileSet fileset) {
         filesets.add(fileset);
+    }
+
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+    public void setPartnerCode(String partnerCode) {
+        this.partnerCode = partnerCode;
+    }
+
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+
+    public void setApplicationVersion(String applicationVersion) {
+        this.applicationVersion = applicationVersion;
+    }
+
+
+    public void setSigningService(String signingService) {
+        this.signingService = signingService;
     }
 
 
@@ -53,7 +123,236 @@ public class SignCode extends Task {
                 for (int i = 0; i < files.length; i++) {
                     File file = new File(basedir, files[i]);
                     filesToSign.add(file);
-                    log("TODO: Sign " + file.getAbsolutePath());
+                }
+            }
+        }
+
+        try {
+            String signingSetID = makeSigningRequest(filesToSign);
+            downloadSignedFiles(filesToSign, signingSetID);
+        } catch (SOAPException | IOException e) {
+            throw new BuildException(e);
+        }
+    }
+
+
+    private String makeSigningRequest(List<File> filesToSign) throws SOAPException, IOException {
+        log("Constructing the code signing request");
+
+        SOAPMessage message = SOAP_MSG_FACTORY.createMessage();
+        SOAPBody body = populateEnvelope(message, NS);
+
+        SOAPElement requestSigning = body.addChildElement("requestSigning", NS);
+        SOAPElement requestSigningRequest =
+                requestSigning.addChildElement("requestSigningRequest", NS);
+
+        addCredentials(requestSigningRequest, this.userName, this.password, this.partnerCode);
+
+        SOAPElement applicationName =
+                requestSigningRequest.addChildElement("applicationName", NS);
+        applicationName.addTextNode(this.applicationName);
+
+        SOAPElement applicationVersion =
+                requestSigningRequest.addChildElement("applicationVersion", NS);
+        applicationVersion.addTextNode(this.applicationVersion);
+
+        SOAPElement signingServiceName =
+                requestSigningRequest.addChildElement("signingServiceName", NS);
+        signingServiceName.addTextNode(this.signingService);
+
+        SOAPElement commaDelimitedFileNames =
+                requestSigningRequest.addChildElement("commaDelimitedFileNames", NS);
+        commaDelimitedFileNames.addTextNode(getFileNames(filesToSign.size()));
+
+        SOAPElement application =
+                requestSigningRequest.addChildElement("application", NS);
+        application.addTextNode(getApplicationString(filesToSign));
+
+        // Send the message
+        SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+        SOAPConnection connection = soapConnectionFactory.createConnection();
+        URL endpoint = new URL("https://test-api.ws.symantec.com:443/webtrust/SigningService");
+
+        log("Sending siging request to server and waiting for response");
+        SOAPMessage response = connection.call(message, endpoint);
+
+        log("Processing response");
+        SOAPElement responseBody = response.getSOAPBody();
+
+        // Should come back signed
+        NodeList bodyNodes = responseBody.getChildNodes();
+        NodeList requestSigningResponseNodes = bodyNodes.item(0).getChildNodes();
+        NodeList returnNodes = requestSigningResponseNodes.item(0).getChildNodes();
+
+        String signingSetID = null;
+        String signingSetStatus = null;
+
+        for (int i = 0; i < returnNodes.getLength(); i++) {
+            Node returnNode = returnNodes.item(i);
+            if (returnNode.getLocalName().equals("signingSetID")) {
+                signingSetID = returnNode.getTextContent();
+            } else if (returnNode.getLocalName().equals("signingSetStatus")) {
+                signingSetStatus = returnNode.getTextContent();
+            }
+        }
+
+        if (!"SIGNED".equals(signingSetStatus)) {
+            throw new BuildException("Signing failed. Status was: " + signingSetStatus);
+        }
+
+        return signingSetID;
+    }
+
+
+    private void downloadSignedFiles(List<File> filesToSign, String id)
+            throws SOAPException, IOException {
+
+        log("Downloading signed files. The signing set ID is: " + id);
+
+        SOAPMessage message = SOAP_MSG_FACTORY.createMessage();
+        SOAPBody body = populateEnvelope(message, NS);
+
+        SOAPElement getSigningSetDetails = body.addChildElement("getSigningSetDetails", NS);
+        SOAPElement getSigningSetDetailsRequest =
+                getSigningSetDetails.addChildElement("getSigningSetDetailsRequest", NS);
+
+        addCredentials(getSigningSetDetailsRequest, this.userName, this.password, this.partnerCode);
+
+        SOAPElement signingSetID =
+                getSigningSetDetailsRequest.addChildElement("signingSetID", NS);
+        signingSetID.addTextNode(id);
+
+        SOAPElement returnApplication =
+                getSigningSetDetailsRequest.addChildElement("returnApplication", NS);
+        returnApplication.addTextNode("true");
+
+        // Send the message
+        SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
+        SOAPConnection connection = soapConnectionFactory.createConnection();
+        URL endpoint = new URL("https://test-api.ws.symantec.com:443/webtrust/SigningService");
+
+        log("Requesting signed files from server and waiting for response");
+        SOAPMessage response = connection.call(message, endpoint);
+
+        log("Processing response");
+        SOAPElement responseBody = response.getSOAPBody();
+
+        // Check for success
+
+        // Extract the signed file(s) from the ZIP
+        NodeList bodyNodes = responseBody.getChildNodes();
+        NodeList getSigningSetDetailsResponseNodes = bodyNodes.item(0).getChildNodes();
+        NodeList returnNodes = getSigningSetDetailsResponseNodes.item(0).getChildNodes();
+
+        String result = null;
+        String data = null;
+
+        for (int i = 0; i < returnNodes.getLength(); i++) {
+            Node returnNode = returnNodes.item(i);
+            if (returnNode.getLocalName().equals("result")) {
+                result = returnNode.getChildNodes().item(0).getTextContent();
+            } else if (returnNode.getLocalName().equals("signingSet")) {
+                data = returnNode.getChildNodes().item(1).getTextContent();
+            }
+        }
+
+        if (!"0".equals(result)) {
+            throw new BuildException("Download failed. Result code was: " + result);
+        }
+
+        extractFilesFromApplicationString(data, filesToSign);
+    }
+
+
+    private static SOAPBody populateEnvelope(SOAPMessage message, String namespace)
+            throws SOAPException {
+        SOAPPart soapPart = message.getSOAPPart();
+        SOAPEnvelope envelope = soapPart.getEnvelope();
+        envelope.addNamespaceDeclaration(
+                "soapenv","http://schemas.xmlsoap.org/soap/envelope/");
+        envelope.addNamespaceDeclaration(
+                namespace,"http://api.ws.symantec.com/webtrust/codesigningservice");
+        return envelope.getBody();
+    }
+
+
+    private static void addCredentials(SOAPElement requestSigningRequest,
+            String user, String pwd, String code) throws SOAPException {
+        SOAPElement authToken = requestSigningRequest.addChildElement("authToken", NS);
+        SOAPElement userName = authToken.addChildElement("userName", NS);
+        userName.addTextNode(user);
+        SOAPElement password = authToken.addChildElement("password", NS);
+        password.addTextNode(pwd);
+        SOAPElement partnerCode = authToken.addChildElement("partnerCode", NS);
+        partnerCode.addTextNode(code);
+    }
+
+
+    /**
+     * Signing service requires unique files names. Since files will be returned
+     * in order, use dummy names that we know are unique.
+     */
+    private static String getFileNames(int fileCount) {
+        StringBuilder sb = new StringBuilder();
+
+        boolean first = true;
+
+        for (int i = 0; i < fileCount; i++) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(',');
+            }
+            sb.append(Integer.toString(i));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Zips the files, base 64 encodes the resulting zip and then returns the
+     * string. It would be far more efficient to stream this directly to the
+     * signing server but the files that need to be signed are relatively small
+     * and this simpler to write.
+     *
+     * @param files Files to be signed
+     */
+    private static String getApplicationString(List<File> files) throws IOException {
+        // 10 MB should be more than enough for Tomcat
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(10 * 1024 * 1024);
+        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+            byte[] buf = new byte[32 * 1024];
+            for (int i = 0; i < files.size(); i++) {
+                try (FileInputStream fis = new FileInputStream(files.get(i))) {
+                    ZipEntry zipEntry = new ZipEntry(Integer.toString(i));
+                    zos.putNextEntry(zipEntry);
+                    int numRead;
+                    while ( (numRead = fis.read(buf)) >= 0) {
+                        zos.write(buf, 0, numRead);
+                    }
+                }
+            }
+        }
+
+        return Base64.encodeBase64String(baos.toByteArray());
+    }
+
+
+    /**
+     * Removes base64 encoding, unzips the files and writes the new files over
+     * the top of the old ones.
+     */
+    private static void extractFilesFromApplicationString(String data, List<File> files)
+            throws IOException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decodeBase64(data));
+        try (ZipInputStream zis = new ZipInputStream(bais)) {
+            byte[] buf = new byte[32 * 1024];
+            for (int i = 0; i < files.size(); i ++) {
+                try (FileOutputStream fos = new FileOutputStream(files.get(i))) {
+                    zis.getNextEntry();
+                    int numRead;
+                    while ( (numRead = zis.read(buf)) >= 0) {
+                        fos.write(buf, 0 , numRead);
+                    }
                 }
             }
         }
