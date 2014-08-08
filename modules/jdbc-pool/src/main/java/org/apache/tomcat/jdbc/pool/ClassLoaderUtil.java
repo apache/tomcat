@@ -47,11 +47,7 @@ public class ClassLoaderUtil {
                     errorMsg.append(";");
                 }
                 errorMsg.append("ClassLoader:");
-                if (cl == null) {
-                    errorMsg.append("null");
-                } else {
-                    errorMsg.append(cl.toString());
-                }
+                errorMsg.append(cl);
             }
             if (onlyAttemptFirstLoader) {
                 break;
