@@ -138,19 +138,21 @@ public class PooledConnection {
      * @deprecated use {@link #shouldForceReconnect(String, String)}
      * method kept since it was public, to avoid changing interface. name was pooo
      */
+    @Deprecated
     public boolean checkUser(String username, String password) {
         return !shouldForceReconnect(username, password);
     }
+
     /**
      * Returns true if we must force reconnect based on credentials passed in.
      * Returns false if {@link PoolConfiguration#isAlternateUsernameAllowed()} method returns false.
      * Returns false if the username/password has not changed since this connection was connected
      * @param username the username you wish to connect with, pass in null to accept the default username from {@link PoolConfiguration#getUsername()}
-     * @param password the password you wish to connect with, pass in null to accept the default username from {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#getPassword()} 
+     * @param password the password you wish to connect with, pass in null to accept the default username from {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#getPassword()}
      * @return true is the pool must reconnect
      */
     public boolean shouldForceReconnect(String username, String password) {
-        
+
         if (!getPoolProperties().isAlternateUsernameAllowed()) return false;
 
         if (username==null) username = poolProperties.getUsername();
@@ -263,7 +265,7 @@ public class PooledConnection {
                     //rely on DriverManager
                     log.warn("Not loading a JDBC driver as driverClassName property is null.");
                 } else {
-                    driver = (java.sql.Driver) 
+                    driver = (java.sql.Driver)
                         ClassLoaderUtil.loadClass(
                             poolProperties.getDriverClassName(),
                             PooledConnection.class.getClassLoader(),
@@ -334,9 +336,9 @@ public class PooledConnection {
     }
 
     /**
-     * Returns true if the connection has been connected more than 
+     * Returns true if the connection has been connected more than
      * {@link PoolConfiguration#getMaxAge()} milliseconds. false otherwise.
-     * @return Returns true if the connection has been connected more than 
+     * @return Returns true if the connection has been connected more than
      * {@link PoolConfiguration#getMaxAge()} milliseconds. false otherwise.
      */
     public boolean isMaxAgeExpired() {
