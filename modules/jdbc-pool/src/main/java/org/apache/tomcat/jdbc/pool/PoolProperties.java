@@ -962,7 +962,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                         log.debug("Loading interceptor class:"+PoolConfiguration.PKG_PREFIX+getClassName());
                     }
                     clazz = ClassLoaderUtil.loadClass(
-                        PoolConfiguration.PKG_PREFIX+getClassName(), 
+                        PoolConfiguration.PKG_PREFIX+getClassName(),
                         this.getClass().getClassLoader(),
                         Thread.currentThread().getContextClassLoader()
                     );
@@ -971,7 +971,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                         log.debug("Loading interceptor class:"+getClassName());
                     }
                     clazz = ClassLoaderUtil.loadClass(
-                        getClassName(), 
+                        getClassName(),
                         this.getClass().getClassLoader(),
                         Thread.currentThread().getContextClassLoader()
                     );
