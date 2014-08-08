@@ -234,7 +234,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
         final String logfailed = "logFailed";
         InterceptorProperty p1 = properties.get(threshold);
         InterceptorProperty p2 = properties.get(maxqueries);
-        InterceptorProperty p3 = properties.get(logSlow);
+        InterceptorProperty p3 = properties.get(logslow);
         InterceptorProperty p4 = properties.get(logfailed);
         if (p1!=null) {
             setThreshold(Long.parseLong(p1.getValue()));
