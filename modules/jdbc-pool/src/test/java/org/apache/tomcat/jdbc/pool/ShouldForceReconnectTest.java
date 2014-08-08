@@ -16,23 +16,23 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class ShouldForceReconnectTest {
 
     private ConnectionPool pool;
     private PoolProperties properties;
-    
+
     private static final String DEFAULT_USER = "username_def";
     private static final String DEFAULT_PASSWD = "password_def";
     private static final String ALT_USER = "username_alt";
     private static final String ALT_PASSWD = "password_alt";
-    
+
     @Before
     public void setUp() throws Exception {
         properties = new PoolProperties();
@@ -47,10 +47,10 @@ public class ShouldForceReconnectTest {
 
     @After
     public void tearDown() throws Exception {
-        
-        
-        
-        
+
+
+
+
     }
 
     @Test
@@ -60,47 +60,47 @@ public class ShouldForceReconnectTest {
         //connection previously connect with default
         configureDefault(con);
         assertFalse(con.shouldForceReconnect(null, null));
-        
+
         configureDefault(con);
         assertFalse(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD));
-        
+
         configureDefault(con);
         assertFalse(con.shouldForceReconnect(null,DEFAULT_PASSWD));
-        
+
         configureDefault(con);
         assertFalse(con.shouldForceReconnect(DEFAULT_USER, null));
-        
+
         configureDefault(con);
         assertTrue(con.shouldForceReconnect(ALT_USER,ALT_PASSWD));
-        
+
         configureDefault(con);
         assertTrue(con.shouldForceReconnect(null,ALT_PASSWD));
-        
+
         configureDefault(con);
         assertTrue(con.shouldForceReconnect(ALT_USER,null));
 
         //connection previously connect with alternate
         configureAlt(con);
         assertFalse(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
-        
+
         configureAlt(con);
         assertTrue(con.shouldForceReconnect(null, null));
-        
+
         configureAlt(con);
         assertTrue(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD));
-        
+
         configureAlt(con);
         assertTrue(con.shouldForceReconnect(null, DEFAULT_PASSWD));
-        
+
         configureAlt(con);
         assertTrue(con.shouldForceReconnect(DEFAULT_USER, null));
-        
+
         configureAlt(con);
         assertTrue(con.shouldForceReconnect(null,ALT_PASSWD));
-        
+
         configureAlt(con);
         assertTrue(con.shouldForceReconnect(ALT_USER,null));
-        
+
         //test changes in username password
         configureDefault(con);
         assertFalse(con.shouldForceReconnect(null, null));
@@ -120,7 +120,7 @@ public class ShouldForceReconnectTest {
         assertTrue(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD));
         assertFalse(con.shouldForceReconnect(null, null));
         assertTrue(con.shouldForceReconnect(ALT_USER, ALT_PASSWD));
-        
+
 
         configureAlt(con);
         assertTrue(con.shouldForceReconnect(DEFAULT_USER, DEFAULT_PASSWD));
