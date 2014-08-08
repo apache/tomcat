@@ -16,17 +16,18 @@
  */
 package org.apache.tomcat.jdbc.test;
 
-import org.apache.tomcat.jdbc.pool.PoolProperties;
-import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
-import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
-import org.apache.tomcat.jdbc.pool.TrapException;
-import org.junit.Test;
-
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
+import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
+import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
+import org.apache.tomcat.jdbc.pool.TrapException;
 
 /**
  * Test of JdbcInterceptor configuration parsing in the
@@ -108,7 +109,7 @@ public class TestJdbcInterceptorConfigParsing {
      * Some of these should probably be handled more cleanly by the parser, but a few known
      * exception scenarios are presented here just to document current behavior.  In many cases
      * failure in parsing will just be propagated to a definition that will fail later
-     * when instantiated.  Should we be failing faster (and with more detail)? 
+     * when instantiated.  Should we be failing faster (and with more detail)?
      *
      * @throws Exception
      */

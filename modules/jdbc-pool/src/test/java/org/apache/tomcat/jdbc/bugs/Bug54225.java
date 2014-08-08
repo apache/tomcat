@@ -16,29 +16,20 @@
  */
 package org.apache.tomcat.jdbc.bugs;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertNull;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PoolExhaustedException;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.test.DefaultProperties;
 
-import static org.junit.Assert.assertNull;
 
 @RunWith(Parameterized.class)
 public class Bug54225 {
@@ -58,7 +49,7 @@ public class Bug54225 {
     }
 
     @Test
-    public void testPool() throws SQLException, InterruptedException {
+    public void testPool() throws SQLException {
         PoolProperties poolProperties = new DefaultProperties();
         poolProperties.setMinIdle(0);
         poolProperties.setInitialSize(0);

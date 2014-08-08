@@ -19,7 +19,6 @@ package org.apache.tomcat.jdbc.test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.SQLTimeoutException;
@@ -27,14 +26,14 @@ import java.sql.Statement;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.fail;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
-
-import static org.junit.Assert.fail;
 
 public class TestValidationQueryTimeout extends DefaultTestCase {
 
@@ -164,9 +163,9 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
             start = System.currentTimeMillis();
             stmt.execute(longQuery);
         } catch (SQLTimeoutException ex) {
-            
+
         } catch (SQLException x) {
-            fail("We should have got a timeout exception.");  
+            fail("We should have got a timeout exception.");
         } finally {
             end = System.currentTimeMillis();
 
@@ -187,7 +186,7 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
         this.datasource.setValidationQuery(longQuery);
         this.datasource.setValidationQueryTimeout(1);
         // assert that even though the validation query we don't get a connection
-        Connection con = this.datasource.getConnection();
+        this.datasource.getConnection();
     }
 
     /**

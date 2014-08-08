@@ -16,19 +16,20 @@
  */
 package org.apache.tomcat.jdbc.bugs;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
-import org.apache.tomcat.jdbc.pool.PoolProperties;
-import org.apache.tomcat.jdbc.test.DefaultProperties;
-import org.junit.Test;
-
 import java.sql.SQLException;
 
 import static org.junit.Assert.fail;
 
+import org.junit.Test;
+
+import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.apache.tomcat.jdbc.test.DefaultProperties;
+
 public class Bug54978 {
 
     @Test
-    public void testIllegalValidationQuery() throws SQLException, InterruptedException {
+    public void testIllegalValidationQuery() {
         PoolProperties poolProperties = new DefaultProperties();
         poolProperties.setMinIdle(0);
         poolProperties.setInitialSize(1);
@@ -48,7 +49,7 @@ public class Bug54978 {
     }
 
     @Test
-    public void testIllegalValidationQueryWithLegalInit() throws SQLException, InterruptedException {
+    public void testIllegalValidationQueryWithLegalInit() throws SQLException {
         PoolProperties poolProperties = new DefaultProperties();
         poolProperties.setMinIdle(0);
         poolProperties.setInitialSize(1);
