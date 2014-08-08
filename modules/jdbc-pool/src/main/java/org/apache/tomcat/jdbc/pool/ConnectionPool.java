@@ -279,10 +279,6 @@ public class ConnectionPool {
      * @throws SQLException if an interceptor can't be configured, if the proxy can't be instantiated
      */
     protected Connection setupConnection(PooledConnection con) throws SQLException {
-        //check if it's been sitting in the pool too long
-        if (con.isMaxAgeExpired()) {
-            con.reconnect();
-        }
         //fetch previously cached interceptor proxy - one per connection
         JdbcInterceptor handler = con.getHandler();
         if (handler==null) {
@@ -750,30 +746,20 @@ public class ConnectionPool {
         boolean setToNull = false;
         try {
             con.lock();
-            boolean usercheck = con.checkUser(username, password);
-
             if (con.isReleased()) {
                 return null;
             }
 
+            //evaluate username/password change as well as max age functionality
+            boolean forceReconnect = con.shouldForceReconnect(username, password) || con.isMaxAgeExpired();
+
             if (!con.isDiscarded() && !con.isInitialized()) {
-                //attempt to connect
-                try {
-                    con.connect();
-                } catch (Exception x) {
-                    release(con);
-                    setToNull = true;
-                    if (x instanceof SQLException) {
-                        throw (SQLException)x;
-                    } else {
-                        SQLException ex  = new SQLException(x.getMessage());
-                        ex.initCause(x);
-                        throw ex;
-                    }
-                }
+                //here it states that the connection not discarded, but the connection is null
+                //don't attempt a connect here. It will be done during the reconnect.
+                forceReconnect = true;
             }
 
-            if (usercheck) {
+            if (!forceReconnect) {
                 if ((!con.isDiscarded()) && con.validate(PooledConnection.VALIDATE_BORROW)) {
                     //set the timestamp
                     con.setTimestamp(now);

@@ -30,7 +30,7 @@ public class PoolCleanerTest extends DefaultTestCase {
         Map<Thread, StackTraceElement[]> threadmap = Thread.getAllStackTraces();
         int result = 0;
         for (Thread t : threadmap.keySet()) {
-            if (t.getName().startsWith("PoolCleaner[")) result++;
+            if (t.getName().startsWith("Tomcat JDBC Pool Cleaner[")) result++;
         }
         return result;
     }

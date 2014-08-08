@@ -134,8 +134,24 @@ public class PooledConnection {
         return connectionVersion;
     }
 
+    /**
+     * @deprecated use {@link #shouldForceReconnect(String, String)}
+     * method kept since it was public, to avoid changing interface. name was pooo
+     */
     public boolean checkUser(String username, String password) {
-        if (!getPoolProperties().isAlternateUsernameAllowed()) return true;
+        return !shouldForceReconnect(username, password);
+    }
+    /**
+     * Returns true if we must force reconnect based on credentials passed in.
+     * Returns false if {@link PoolConfiguration#isAlternateUsernameAllowed()} method returns false.
+     * Returns false if the username/password has not changed since this connection was connected
+     * @param username the username you wish to connect with, pass in null to accept the default username from {@link PoolConfiguration#getUsername()}
+     * @param password the password you wish to connect with, pass in null to accept the default username from {@link org.apache.tomcat.jdbc.pool.PoolConfiguration#getPassword()} 
+     * @return true is the pool must reconnect
+     */
+    public boolean shouldForceReconnect(String username, String password) {
+        
+        if (!getPoolProperties().isAlternateUsernameAllowed()) return false;
 
         if (username==null) username = poolProperties.getUsername();
         if (password==null) password = poolProperties.getPassword();
@@ -143,15 +159,15 @@ public class PooledConnection {
         String storedUsr = (String)getAttributes().get(PROP_USER);
         String storedPwd = (String)getAttributes().get(PROP_PASSWORD);
 
-        boolean result = (username==null && storedUsr==null);
-        result = (result || (username!=null && username.equals(storedUsr)));
+        boolean noChangeInCredentials = (username==null && storedUsr==null);
+        noChangeInCredentials = (noChangeInCredentials || (username!=null && username.equals(storedUsr)));
 
-        result = result && ((password==null && storedPwd==null) || (password!=null && password.equals(storedPwd)));
+        noChangeInCredentials = noChangeInCredentials && ((password==null && storedPwd==null) || (password!=null && password.equals(storedPwd)));
 
         if (username==null)  getAttributes().remove(PROP_USER); else getAttributes().put(PROP_USER, username);
         if (password==null)  getAttributes().remove(PROP_PASSWORD); else getAttributes().put(PROP_PASSWORD, password);
 
-        return result;
+        return !noChangeInCredentials;
     }
 
     /**
