@@ -608,6 +608,13 @@
        and closes these statements when the connection is returned to the pool.
     </p>
     <attributes>
+      <attribute name="trace" required="false">
+        <p>(boolean as String) Enable tracing of unclosed statements. 
+           When enabled and a connection is closed, and statements are not closed, 
+           the interceptor will log all stack traces.
+           The default value is <code>false</code>.
+        </p>
+      </attribute>
     </attributes>
   </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.StatementCache">
