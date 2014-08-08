@@ -780,10 +780,10 @@ public class ConnectionPool {
             //the connection shouldn't have to poll again.
             try {
                 con.reconnect();
-                int validationMode = getPoolProperties().isTestOnConnect() || getPoolProperties().getInitSQL()!=null ? 
-                    PooledConnection.VALIDATE_INIT : 
+                int validationMode = getPoolProperties().isTestOnConnect() || getPoolProperties().getInitSQL()!=null ?
+                    PooledConnection.VALIDATE_INIT :
                     PooledConnection.VALIDATE_BORROW;
-                
+
                 if (con.validate(validationMode)) {
                     //set the timestamp
                     con.setTimestamp(now);

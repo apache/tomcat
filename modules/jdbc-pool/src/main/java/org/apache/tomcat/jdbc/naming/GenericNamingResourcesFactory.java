@@ -59,7 +59,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
         Enumeration<RefAddr> refs = ref.getAll();
 
         String type = ref.getClassName();
-        Object o = 
+        Object o =
             ClassLoaderUtil.loadClass(
                 type,
                 GenericNamingResourcesFactory.class.getClassLoader(),
