@@ -22,11 +22,11 @@ import org.apache.juli.logging.LogFactory;
 
 public class ClassLoaderUtil {
     private static final Log log = LogFactory.getLog(ClassLoaderUtil.class);
-    
-    private static final boolean onlyAttemptFirstLoader = 
-        Boolean.getBoolean(System.getProperty("org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader", "false")); 
-    
-    public static Class loadClass(String className, ClassLoader... classLoaders) throws ClassNotFoundException {
+
+    private static final boolean onlyAttemptFirstLoader =
+        Boolean.getBoolean(System.getProperty("org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader", "false"));
+
+    public static Class<?> loadClass(String className, ClassLoader... classLoaders) throws ClassNotFoundException {
         ClassNotFoundException last = null;
         StringBuffer errorMsg = null;
         for (ClassLoader cl : classLoaders) {
@@ -47,7 +47,11 @@ public class ClassLoaderUtil {
                     errorMsg.append(";");
                 }
                 errorMsg.append("ClassLoader:");
-                errorMsg.append(cl.toString());
+                if (cl == null) {
+                    errorMsg.append("null");
+                } else {
+                    errorMsg.append(cl.toString());
+                }
             }
             if (onlyAttemptFirstLoader) {
                 break;
