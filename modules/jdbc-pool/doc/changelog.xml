@@ -28,6 +28,25 @@
   </properties>
 
 <body>
+
+<section name="Tomcat JDBC Connection Pool - Apache Tomcat 8.0.10">
+  <subsection name="pool">
+    <changelog>
+      <fix><rev>1616760</rev> <bug>54227</bug> Evaluate max age upon borrow (fhanik)</fix>
+      <fix><rev>1616644</rev> <bug>56318</bug> Ability to trace statement creation in StatementFinalizer (fhanik)</fix>
+      <fix><rev>1616639</rev> <bug>53088</bug> More identifiable thread name (fhanik)</fix>
+      <fix><rev>1616629</rev> <bug>56789</bug> getPool() returns the actual pool, always (fhanik)</fix>
+      <fix><rev>1616625</rev> <bug>54978</bug> Make sure proper connection validation always happens, regardless of config (fhanik)</fix>
+      <fix><rev>1616602</rev> <bug>54537</bug> Performance improvement in StatementFinalizer (fhanik)</fix>
+      <fix><rev>1616599</rev> <bug>54395</bug> Fix JDBC interceptor parsing bug (fhanik)</fix>
+      <fix><rev>1616595</rev> <bug>54235</bug> Disallow nested pools exploitating using data source (fhanik)</fix>
+      <fix><rev>1616592</rev> <bug>54225</bug> Disallow empty init SQL (fhanik)</fix>
+      <fix><rev>1616584</rev> <bug>53853</bug> More flexible classloading (fhanik)</fix>
+      <fix><rev>1616570</rev> <bug>53200</bug> Selective logging for slow versus failed queries (fhanik)</fix>
+    </changelog>
+  </subsection>
+</section>
+
 <section name="Tomcat JDBC Connection Pool 1.1.0.0">
   <subsection name="pool">
     <changelog>
