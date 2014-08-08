@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 import java.lang.ref.WeakReference;
@@ -26,6 +27,8 @@ import java.lang.reflect.Method;
 import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 /**
  * Keeps track of statements associated with a connection and invokes close upon {@link java.sql.Connection#close()}
  * Useful for applications that dont close the associated statements after being done with a connection.
@@ -34,13 +37,15 @@ import java.util.List;
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(StatementFinalizer.class);
 
-    protected List<WeakReference<Statement>> statements = new LinkedList<>();
-
+    protected List<WeakReference<StatementEntry>> statements = new LinkedList<>();
+    
+    private boolean logCreationStack = false;
+    
     @Override
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         try {
             if (statement instanceof Statement)
-                statements.add(new WeakReference<>((Statement)statement));
+                statements.add(new WeakReference<>(new StatementEntry((Statement)statement)));
         }catch (ClassCastException x) {
             //ignore this one
         }
@@ -50,17 +55,30 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     @Override
     public void closeInvoked() {
         while (statements.size()>0) {
-            WeakReference<Statement> ws = statements.remove(0);
-            Statement st = ws.get();
+            WeakReference<StatementEntry> ws = statements.remove(0);
+            StatementEntry st = ws.get();
             if (st!=null) {
                 try {
-                    st.close();
+                    st.getStatement().close();
                 } catch (Exception ignore) {
                     if (log.isDebugEnabled()) {
                         log.debug("Unable to closed statement upon connection close.",ignore);
                     }
                 }
+                if (logCreationStack) {
+                    log.warn("Statement created, but was not closed at:", st.getAllocationStack());
+                }
             }
+        }
+    }
+
+    @Override
+    public void setProperties(Map<String, PoolProperties.InterceptorProperty> properties) {
+        super.setProperties(properties);
+
+        PoolProperties.InterceptorProperty logProperty = properties.get("trace");
+        if (null != logProperty) {
+            logCreationStack = logProperty.getValueAsBoolean(logCreationStack);
         }
     }
 
@@ -68,6 +86,26 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     public void reset(ConnectionPool parent, PooledConnection con) {
         statements.clear();
         super.reset(parent, con);
+    }
+
+    protected class StatementEntry {
+        private Statement statement;
+       private Throwable allocationStack;
+
+        public StatementEntry(Statement statement) {
+            this.statement = statement;
+            if (logCreationStack) {
+                this.allocationStack = new Throwable();
+            }
+        }
+
+        public Statement getStatement() {
+            return statement;
+        }
+
+        public Throwable getAllocationStack() {
+            return allocationStack;
+        }
     }
 
 
