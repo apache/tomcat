@@ -963,7 +963,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     }
                     clazz = ClassLoaderUtil.loadClass(
                         PoolConfiguration.PKG_PREFIX+getClassName(),
-                        this.getClass().getClassLoader(),
+                        PoolProperties.class.getClassLoader(),
                         Thread.currentThread().getContextClassLoader()
                     );
                 } else {
@@ -972,7 +972,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     }
                     clazz = ClassLoaderUtil.loadClass(
                         getClassName(),
-                        this.getClass().getClassLoader(),
+                        PoolProperties.class.getClassLoader(),
                         Thread.currentThread().getContextClassLoader()
                     );
                 }
