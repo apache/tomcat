@@ -680,17 +680,17 @@
         </p>
       </attribute>
       <attribute name="maxQueries" required="false">
-        <p>(int as String) The maximum number of queries to keep track of in order to preserve memory space
+        <p>(int as String) The maximum number of queries to keep track of in order to preserve memory space.
            The default value is <code>1000</code>.
         </p>
       </attribute>
       <attribute name="logSlow" required="false">
-        <p>(boolean as String) Set to true if you wish to log slow queries
+        <p>(boolean as String) Set to <code>true</code> if you wish to log slow queries.
             The default value is <code>true</code>.
         </p>
       </attribute>
       <attribute name="logFailed" required="false">
-        <p>(boolean as String) Set to true if you wish to log slow queries
+        <p>(boolean as String) Set to <code>true</code> if you wish to log failed queries.
             The default value is <code>true</code>.
         </p>
       </attribute>
