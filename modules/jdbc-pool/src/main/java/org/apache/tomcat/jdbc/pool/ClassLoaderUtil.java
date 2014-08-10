@@ -28,7 +28,7 @@ public class ClassLoaderUtil {
 
     public static Class<?> loadClass(String className, ClassLoader... classLoaders) throws ClassNotFoundException {
         ClassNotFoundException last = null;
-        StringBuffer errorMsg = null;
+        StringBuilder errorMsg = null;
         for (ClassLoader cl : classLoaders) {
             try {
                 if (cl!=null) {
@@ -42,9 +42,9 @@ public class ClassLoaderUtil {
             } catch (ClassNotFoundException x) {
                 last = x;
                 if (errorMsg==null) {
-                    errorMsg = new StringBuffer();
+                    errorMsg = new StringBuilder();
                 } else {
-                    errorMsg.append(";");
+                    errorMsg.append(';');
                 }
                 errorMsg.append("ClassLoader:");
                 errorMsg.append(cl);
@@ -53,7 +53,7 @@ public class ClassLoaderUtil {
                 break;
             }
         }
-        throw new ClassNotFoundException("Unable to load class:"+className+" from "+errorMsg, last);
+        throw new ClassNotFoundException("Unable to load class: "+className+" from "+errorMsg, last);
     }
 
 
