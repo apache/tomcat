@@ -176,12 +176,15 @@
     <attributes>
       <attribute name="org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader" required="false">
         <p>(boolean) Controls classloading of dynamic classes, such as
-           jdbc drivers, interceptors and validators. If set to false, default value,
-           the pool will first attempt to load using the current loader and if class loading fails
-           attempt to load using the thread context loader.
-           Set this value to try, if you wish to remain backwards compatible,
-           Apache Tomcat 8.0.8 and earlier, and only attempt the current loader.
-           If not set then the default value is <code>false</code>.)
+           JDBC drivers, interceptors and validators. If set to
+           <code>false</code>, default value, the pool will first attempt
+           to load using the current loader (i.e. the class loader that
+           loaded the pool classes) and if class loading fails attempt to
+           load using the thread context loader. Set this value to
+           <code>true</code>, if you wish to remain backwards compatible
+           with Apache Tomcat 8.0.8 and earlier, and only attempt the
+           current loader.
+           If not set then the default value is <code>false</code>.
         </p>
       </attribute>
     </attributes>
