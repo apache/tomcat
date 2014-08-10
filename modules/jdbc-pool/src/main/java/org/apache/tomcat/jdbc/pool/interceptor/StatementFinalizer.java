@@ -57,15 +57,18 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         while (statements.size()>0) {
             WeakReference<StatementEntry> ws = statements.remove(0);
             StatementEntry st = ws.get();
-            if (st!=null) {
-                try {
+            boolean shallClose = false;
+            try {
+                shallClose = st!=null && (!st.getStatement().isClosed());
+                if (shallClose) {
                     st.getStatement().close();
-                } catch (Exception ignore) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Unable to closed statement upon connection close.",ignore);
-                    }
                 }
-                if (logCreationStack) {
+            } catch (Exception ignore) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to closed statement upon connection close.",ignore);
+                }
+            } finally {
+                if (logCreationStack && shallClose) {
                     log.warn("Statement created, but was not closed at:", st.getAllocationStack());
                 }
             }
