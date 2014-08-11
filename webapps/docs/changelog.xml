@@ -211,7 +211,7 @@
       </add>
       <add>
         <bug>56829</bug>: Add the ability for users to define their own values
-        for <code>_RUNJAVA</code> and <code>_RUNJBD</code>. Based on a patch by
+        for <code>_RUNJAVA</code> and <code>_RUNJDB</code>. Based on a patch by
         Neeme Praks. (markt)
       </add>
     </changelog>
