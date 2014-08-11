@@ -35,9 +35,7 @@ public abstract class AbstractTestFileResourceSet extends AbstractTestResourceSe
     public WebResourceRoot getWebResourceRoot() {
         File f = new File(getBaseDir());
         TesterWebResourceRoot root = new TesterWebResourceRoot();
-        WebResourceSet webResourceSet =
-                new DirResourceSet(new TesterWebResourceRoot(), "/",
-                        f.getAbsolutePath(), "/");
+        WebResourceSet webResourceSet = new DirResourceSet(root, "/", f.getAbsolutePath(), "/");
         webResourceSet.setReadOnly(readOnly);
         root.setMainResources(webResourceSet);
 
