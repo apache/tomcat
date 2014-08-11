@@ -67,7 +67,7 @@ public class Cache {
 
         CachedResource cacheEntry = resourceCache.get(path);
 
-        if (cacheEntry != null && !cacheEntry.validate(useClassLoaderResources)) {
+        if (cacheEntry != null && !cacheEntry.validateResource(useClassLoaderResources)) {
             removeCacheEntry(path);
             cacheEntry = null;
         }
@@ -85,7 +85,7 @@ public class Cache {
             if (cacheEntry == null) {
                 // newCacheEntry was inserted into the cache - validate it
                 cacheEntry = newCacheEntry;
-                cacheEntry.validate(useClassLoaderResources);
+                cacheEntry.validateResource(useClassLoaderResources);
 
                 // Even if the resource content larger than objectMaxSizeBytes
                 // there is still benefit in caching the resource metadata
@@ -112,13 +112,73 @@ public class Cache {
             } else {
                 // Another thread added the entry to the cache
                 // Make sure it is validated
-                cacheEntry.validate(useClassLoaderResources);
+                cacheEntry.validateResource(useClassLoaderResources);
             }
         } else {
             hitCount.incrementAndGet();
         }
 
         return cacheEntry;
+    }
+
+    protected WebResource[] getResources(String path, boolean useClassLoaderResources) {
+        lookupCount.incrementAndGet();
+
+        // Don't call noCache(path) since the class loader only caches
+        // individual resources. Therefore, always cache collections here
+
+        CachedResource cacheEntry = resourceCache.get(path);
+
+        if (cacheEntry != null && !cacheEntry.validateResources(useClassLoaderResources)) {
+            removeCacheEntry(path);
+            cacheEntry = null;
+        }
+
+        if (cacheEntry == null) {
+            // Local copy to ensure consistency
+            int objectMaxSizeBytes = getObjectMaxSizeBytes();
+            CachedResource newCacheEntry =
+                    new CachedResource(this, root, path, getTtl(), objectMaxSizeBytes);
+
+            // Concurrent callers will end up with the same CachedResource
+            // instance
+            cacheEntry = resourceCache.putIfAbsent(path, newCacheEntry);
+
+            if (cacheEntry == null) {
+                // newCacheEntry was inserted into the cache - validate it
+                cacheEntry = newCacheEntry;
+                cacheEntry.validateResources(useClassLoaderResources);
+
+                // Content will not be cached but we still need metadata size
+                long delta = cacheEntry.getSize();
+                size.addAndGet(delta);
+
+                if (size.get() > maxSize) {
+                    // Process resources unordered for speed. Trades cache
+                    // efficiency (younger entries may be evicted before older
+                    // ones) for speed since this is on the critical path for
+                    // request processing
+                    long targetSize =
+                            maxSize * (100 - TARGET_FREE_PERCENT_GET) / 100;
+                    long newSize = evict(
+                            targetSize, resourceCache.values().iterator());
+                    if (newSize > maxSize) {
+                        // Unable to create sufficient space for this resource
+                        // Remove it from the cache
+                        removeCacheEntry(path);
+                        log.warn(sm.getString("cache.addFail", path));
+                    }
+                }
+            } else {
+                // Another thread added the entry to the cache
+                // Make sure it is validated
+                cacheEntry.validateResources(useClassLoaderResources);
+            }
+        } else {
+            hitCount.incrementAndGet();
+        }
+
+        return cacheEntry.getWebResources();
     }
 
     protected void backgroundProcess() {

@@ -310,6 +310,15 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             boolean useClassLoaderResources) {
         path = validate(path);
 
+        if (isCachingAllowed()) {
+            return cache.getResources(path, useClassLoaderResources);
+        } else {
+            return getResourcesInternal(path, useClassLoaderResources);
+        }
+    }
+
+    protected WebResource[] getResourcesInternal(String path,
+            boolean useClassLoaderResources) {
         ArrayList<WebResource> result = new ArrayList<>();
         for (ArrayList<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
