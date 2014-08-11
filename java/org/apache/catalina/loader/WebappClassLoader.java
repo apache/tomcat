@@ -2501,8 +2501,8 @@ public class WebappClassLoader extends URLClassLoader
 
 
     private String binaryNameToPath(String binaryName, boolean withLeadingSlash) {
-        StringBuilder path = new StringBuilder(
-                1 + binaryName.length() + CLASS_FILE_SUFFIX.length());
+        // 1 for leading '/', 6 for ".class"
+        StringBuilder path = new StringBuilder(7 + binaryName.length());
         if (withLeadingSlash) {
             path.append('/');
         }
