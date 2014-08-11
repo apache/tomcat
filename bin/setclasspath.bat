@@ -71,11 +71,18 @@ rem Set the default -Djava.endorsed.dirs argument
 set "JAVA_ENDORSED_DIRS=%CATALINA_HOME%\endorsed"
 :gotEndorseddir
 
+rem Don't override _RUNJAVA if the user has set it previously
+if not "%_RUNJAVA%" == "" goto gotRunJava
 rem Set standard command for invoking Java.
 rem Note that NT requires a window name argument when using start.
 rem Also note the quoting as JAVA_HOME may contain spaces.
 set _RUNJAVA="%JRE_HOME%\bin\java"
+:gotRunJava
+
+rem Don't override _RUNJDB if the user has set it previously
+if not "%_RUNJAVA%" == "" goto gotRunJdb
 set _RUNJDB="%JAVA_HOME%\bin\jdb"
+:gotRunJdb
 
 goto end
 
