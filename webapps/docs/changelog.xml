@@ -124,6 +124,10 @@
         processing is correctly transferred back to a genuine container thread
         when necessary. (markt)
       </fix>
+      <add>
+        Add simple caching for calls to <code>StandardRoot.getResoucres()</code>
+        in the new (for 8.0.x) resources implementation. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
