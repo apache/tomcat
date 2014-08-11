@@ -52,6 +52,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
         return statement;
     }
 
+    @SuppressWarnings("null") // st is not null when used
     @Override
     public void closeInvoked() {
         while (statements.size()>0) {
