@@ -37,7 +37,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     private static final Log log = LogFactory.getLog(StatementFinalizer.class);
 
-    protected List<WeakReference<StatementEntry>> statements = new LinkedList<>();
+    protected List<StatementEntry> statements = new LinkedList<>();
 
     private boolean logCreationStack = false;
 
@@ -45,7 +45,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         try {
             if (statement instanceof Statement)
-                statements.add(new WeakReference<>(new StatementEntry((Statement)statement)));
+                statements.add(new StatementEntry((Statement)statement));
         }catch (ClassCastException x) {
             //ignore this one
         }
@@ -55,13 +55,13 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     @Override
     public void closeInvoked() {
         while (statements.size()>0) {
-            WeakReference<StatementEntry> ws = statements.remove(0);
-            StatementEntry st = ws.get();
+            StatementEntry ws = statements.remove(0);
+            Statement st = ws.getStatement();
             boolean shallClose = false;
             try {
-                shallClose = st!=null && (!st.getStatement().isClosed());
+                shallClose = st!=null && (!st.isClosed());
                 if (shallClose) {
-                    st.getStatement().close();
+                    st.close();
                 }
             } catch (Exception ignore) {
                 if (log.isDebugEnabled()) {
@@ -69,7 +69,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
                 }
             } finally {
                 if (logCreationStack && shallClose) {
-                    log.warn("Statement created, but was not closed at:", st.getAllocationStack());
+                    log.warn("Statement created, but was not closed at:", ws.getAllocationStack());
                 }
             }
         }
@@ -92,18 +92,18 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     }
 
     protected class StatementEntry {
-        private Statement statement;
-       private Throwable allocationStack;
+        private WeakReference<Statement> statement;
+        private Throwable allocationStack;
 
         public StatementEntry(Statement statement) {
-            this.statement = statement;
+            this.statement = new WeakReference<>(statement);
             if (logCreationStack) {
                 this.allocationStack = new Throwable();
             }
         }
 
         public Statement getStatement() {
-            return statement;
+            return statement.get();
         }
 
         public Throwable getAllocationStack() {
