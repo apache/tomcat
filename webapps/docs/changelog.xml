@@ -209,6 +209,11 @@
         applications when installed via the Windows installer package. Patch
         provided by Alexandre Garnier. (markt)
       </add>
+      <add>
+        <bug>56829</bug>: Add the ability for users to define their own values
+        for <code>_RUNJAVA</code> and <code>_RUNJBD</code>. Based on a patch by
+        Neeme Praks. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
