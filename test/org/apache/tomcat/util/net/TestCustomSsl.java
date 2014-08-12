@@ -144,7 +144,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         }
         if (serverTrustAll) {
             assertEquals(200, rc);
-            assertEquals("OK", res.toString());
+            assertEquals("OK-" + TesterSupport.ROLE, res.toString());
         } else {
             assertTrue(rc != 200);
             assertEquals("", res.toString());
