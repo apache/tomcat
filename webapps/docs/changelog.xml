@@ -125,7 +125,7 @@
         when necessary. (markt)
       </fix>
       <add>
-        Add simple caching for calls to <code>StandardRoot.getResoucres()</code>
+        Add simple caching for calls to <code>StandardRoot.getResources()</code>
         in the new (for 8.0.x) resources implementation. (markt)
       </add>
     </changelog>
