@@ -45,15 +45,23 @@ public class TestClientCert extends TomcatBaseTest {
         doTestClientCertGet(true);
     }
 
-    public void doTestClientCertGet(boolean preemtive) throws Exception {
+    private void doTestClientCertGet(boolean preemtive) throws Exception {
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
         if (preemtive) {
+            Tomcat tomcat = getTomcatInstance();
             // Only one context deployed
-            Context c = (Context) getTomcatInstance().getHost().findChildren()[0];
+            Context c = (Context) tomcat.getHost().findChildren()[0];
+            // Enable pre-emptive auth
             c.setPreemptiveAuthentication(true);
+
+            // Connector needs to advertise is accepts client certs for
+            // pre-emptive to work
+            tomcat.getConnector().setAttribute("clientAuth", "want");
         }
+
+        getTomcatInstance().start();
 
         // Unprotected resource
         ByteChunk res =
@@ -95,6 +103,8 @@ public class TestClientCert extends TomcatBaseTest {
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
+        getTomcatInstance().start();
+
         byte[] body = new byte[bodySize];
         Arrays.fill(body, TesterSupport.DATA);
 
@@ -121,9 +131,6 @@ public class TestClientCert extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         TesterSupport.configureClientCertContext(tomcat);
-
-        // Start Tomcat
-        tomcat.start();
 
         TesterSupport.configureClientSsl();
     }

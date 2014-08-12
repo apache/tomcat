@@ -350,17 +350,19 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         }
         case REQ_SSL_CERTIFICATE: {
             if (sslSupport != null) {
-                /*
-                 * Consume and buffer the request body, so that it does not
-                 * interfere with the client's handshake messages
-                 */
-                InputFilter[] inputFilters = inputBuffer.getFilters();
-                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
-                    .setLimit(maxSavePostSize);
-                inputBuffer.addActiveFilter
-                    (inputFilters[Constants.BUFFERED_FILTER]);
+                boolean force = ((Boolean) param).booleanValue();
+                if (force) {
+                    /* Forced triggers a handshake so consume and buffer the
+                     * request body, so that it does not interfere with the
+                     * client's handshake messages
+                     */
+                    InputFilter[] inputFilters = inputBuffer.getFilters();
+                    ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
+                            .setLimit(maxSavePostSize);
+                    inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
+                }
                 try {
-                    Object sslO = sslSupport.getPeerCertificateChain(true);
+                    Object sslO = sslSupport.getPeerCertificateChain(force);
                     if( sslO != null) {
                         request.setAttribute
                             (SSLSupport.CERTIFICATE_KEY, sslO);
