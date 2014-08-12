@@ -128,6 +128,10 @@
         Add simple caching for calls to <code>StandardRoot.getResources()</code>
         in the new (for 8.0.x) resources implementation. (markt)
       </add>
+      <fix>
+        <bug>56825</bug>: Enable pre-emptive authentication to work with the
+        SSL authenticator. Based on a patch by jlmonteiro. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
