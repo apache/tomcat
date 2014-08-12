@@ -61,7 +61,6 @@ public class TesterOpenSSL {
                     Cipher.TLS_DH_DSS_WITH_SEED_CBC_SHA,
                     Cipher.TLS_DHE_DSS_WITH_RC4_128_SHA,
                     Cipher.SSL_CK_RC2_128_CBC_WITH_MD5,
-                    Cipher.SSL_CK_RC2_128_CBC_EXPORT40_WITH_MD5,
                     Cipher.SSL_FORTEZZA_DMS_WITH_NULL_SHA,
                     Cipher.SSL_FORTEZZA_DMS_WITH_FORTEZZA_CBC_SHA,
                     Cipher.SSL_FORTEZZA_DMS_WITH_RC4_128_SHA,
