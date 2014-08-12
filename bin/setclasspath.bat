@@ -80,7 +80,7 @@ set _RUNJAVA="%JRE_HOME%\bin\java"
 :gotRunJava
 
 rem Don't override _RUNJDB if the user has set it previously
-if not "%_RUNJAVA%" == "" goto gotRunJdb
+if not "%_RUNJDB%" == "" goto gotRunJdb
 set _RUNJDB="%JAVA_HOME%\bin\jdb"
 :gotRunJdb
 
