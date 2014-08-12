@@ -114,7 +114,8 @@ public class TestCipher {
             if (openSSLAlias.contains("RC2-MD5")) {
                 continue;
             }
-            expectedCipherSuites.add(openSSLAlias + "+" + cipher.getProtocol());
+            expectedCipherSuites.add(openSSLAlias + "+" +
+                    cipher.getProtocol().getOpenSSLName());
         }
 
         Set<String> unavailableCipherSuites = new HashSet<>();
@@ -136,7 +137,6 @@ public class TestCipher {
             unexpectedList.append(' ');
         }
         Assert.assertEquals(unexpectedList.toString(), 0,  unexpectedCipherSuites.size());
-
     }
 
 
