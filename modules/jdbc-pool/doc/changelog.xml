@@ -18,6 +18,7 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "@TOMCAT_PROJECT_DEST@">
 ]>
+<?xml-stylesheet type="text/xsl" href="package.xsl"?>
 <document url="changelog.html">
 
   &project;
@@ -28,6 +29,15 @@
   </properties>
 
 <body>
+<section name="Tomcat JDBC Connection Pool - Apache Tomcat 7.0.19 and later">
+  <p>
+    Starting with Apache Tomcat 7.0.19 in July 2011, Tomcat JDBC Connection Pool
+    is built and released as a component in official releases of Tomcat.
+    The changes are now listed in "jdbc-pool" sections of Apache Tomcat
+    changelog file. This changelog file is obsolete.
+  </p>
+</section>
+
 <section name="Tomcat JDBC Connection Pool 1.1.0.0">
   <subsection name="pool">
     <changelog>
@@ -64,12 +74,12 @@
 <section name="Tomcat JDBC Connection Pool 1.0.9.0">
   <subsection name="pool">
     <changelog>
-      <fix><rev>997321</rev></fix> Ensure threads borrowing connections do not
+      <fix><rev>997321</rev> Ensure threads borrowing connections do not
       get stuck waiting for a new connection if a connection is released in
-      another thread. (markt)
-      <fix><rev>995432</rev></fix> Make interceptor class names, property names
+      another thread. (markt)</fix>
+      <fix><rev>995432</rev> Make interceptor class names, property names
       and property values tolerant of whitespace by trimming the values before
-      use. (markt)
+      use. (markt)</fix>
       <fix><rev>995091</rev> <bug>49831</bug> Make sure pooled XAConnections are
       closed when the connection pool shuts down. Patch provided by Daniel
       Mikusa. (markt)</fix>
