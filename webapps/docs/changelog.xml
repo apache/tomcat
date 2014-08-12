@@ -89,6 +89,12 @@
         application. (markt)
       </fix>
       <fix>
+        <bug>56801</bug>: Improve performance of
+        <code>org.apache.tomcat.util.file.Matcher</code> which is to filter JARs
+        for scanning during web application start. Based on a patch by Sheldon
+        Shao. (kkolinko)
+      </fix>
+      <fix>
         <bug>56825</bug>: Enable pre-emptive authentication to work with the
         SSL authenticator. Based on a patch by jlmonteiro. (markt)
       </fix>
