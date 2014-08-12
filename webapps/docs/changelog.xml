@@ -215,8 +215,9 @@
       </add>
       <add>
         <bug>56829</bug>: Add the ability for users to define their own values
-        for <code>_RUNJAVA</code> and <code>_RUNJDB</code>. Based on a patch by
-        Neeme Praks. (markt)
+        for <code>_RUNJAVA</code> and <code>_RUNJDB</code> environment
+        variables. Be more strict with executable filename on Windows
+        (s/java/java.exe/). Based on a patch by Neeme Praks. (markt/kkolinko)
       </add>
     </changelog>
   </subsection>

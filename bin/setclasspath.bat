@@ -75,13 +75,13 @@ rem Don't override _RUNJAVA if the user has set it previously
 if not "%_RUNJAVA%" == "" goto gotRunJava
 rem Set standard command for invoking Java.
 rem Also note the quoting as JRE_HOME may contain spaces.
-set _RUNJAVA="%JRE_HOME%\bin\java"
+set _RUNJAVA="%JRE_HOME%\bin\java.exe"
 :gotRunJava
 
 rem Don't override _RUNJDB if the user has set it previously
 rem Also note the quoting as JAVA_HOME may contain spaces.
 if not "%_RUNJDB%" == "" goto gotRunJdb
-set _RUNJDB="%JAVA_HOME%\bin\jdb"
+set _RUNJDB="%JAVA_HOME%\bin\jdb.exe"
 :gotRunJdb
 
 goto end
