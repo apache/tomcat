@@ -419,18 +419,26 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         }
         case REQ_SSL_CERTIFICATE: {
             if (endpoint.isSSLEnabled() && (socketRef != 0)) {
-                // Consume and buffer the request body, so that it does not
-                // interfere with the client's handshake messages
-                InputFilter[] inputFilters = inputBuffer.getFilters();
-                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(maxSavePostSize);
-                inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
+                boolean force = ((Boolean) param).booleanValue();
+                if (force) {
+                    /* Forced triggers a handshake so consume and buffer the
+                     * request body, so that it does not interfere with the
+                     * client's handshake messages
+                     */
+                    InputFilter[] inputFilters = inputBuffer.getFilters();
+                    ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
+                            .setLimit(maxSavePostSize);
+                    inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
+                }
                 try {
-                    // Configure connection to require a certificate
-                    SSLSocket.setVerify(socketRef, SSL.SSL_CVERIFY_REQUIRE,
-                            ((AprEndpoint)endpoint).getSSLVerifyDepth());
-                    // Renegotiate certificates
-                    if (SSLSocket.renegotiate(socketRef) == 0) {
-                        // Don't look for certs unless we know renegotiation worked.
+                    if (force) {
+                        // Configure connection to require a certificate
+                        SSLSocket.setVerify(socketRef, SSL.SSL_CVERIFY_REQUIRE,
+                                ((AprEndpoint)endpoint).getSSLVerifyDepth());
+                    }
+                    if (!force || SSLSocket.renegotiate(socketRef) == 0) {
+                        // Only look for certs if not forcing a renegotiation or
+                        // if we know renegotiation worked.
                         // Get client certificate and the certificate chain if present
                         // certLength == -1 indicates an error
                         int certLength = SSLSocket.getInfoI(socketRef,SSL.SSL_INFO_CLIENT_CERT_CHAIN);
