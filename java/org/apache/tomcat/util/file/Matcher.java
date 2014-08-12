@@ -56,10 +56,22 @@ public final class Matcher {
 
 
     /**
-     * @deprecated Use {@link #match(String, char[], boolean)}. This method will
-     *             be removed in Tomcat 9.0.x onwards.
+     * Tests whether or not a string matches against a pattern.
+     * The pattern may contain two special characters:<br>
+     * '*' means zero or more characters<br>
+     * '?' means one and only one character
+     *
+     * @param pattern The pattern to match against.
+     *                Must not be <code>null</code>.
+     * @param str     The string which must be matched against the
+     *                pattern. Must not be <code>null</code>.
+     * @param caseSensitive Whether or not matching should be performed
+     *                        case sensitively.
+     *
+     *
+     * @return <code>true</code> if the string matches against the pattern,
+     *         or <code>false</code> otherwise.
      */
-    @Deprecated
     public static boolean match(String pattern, String str,
             boolean caseSensitive) {
 
@@ -84,7 +96,7 @@ public final class Matcher {
      * @return <code>true</code> if the string matches against the pattern,
      *         or <code>false</code> otherwise.
      */
-    public static boolean match(String pattern, char[] strArr,
+    private static boolean match(String pattern, char[] strArr,
                                 boolean caseSensitive) {
         char[] patArr = pattern.toCharArray();
         int patIdxStart = 0;
