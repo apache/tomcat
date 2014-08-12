@@ -114,7 +114,7 @@ public class TestCipher {
             if (openSSLAlias.contains("RC2-MD5")) {
                 continue;
             }
-            expectedCipherSuites.add(openSSLAlias);
+            expectedCipherSuites.add(openSSLAlias + "+" + cipher.getProtocol());
         }
 
         Set<String> unavailableCipherSuites = new HashSet<>();
@@ -142,7 +142,7 @@ public class TestCipher {
 
     /**
      * Check that the elements of the Cipher enumeration are all using standard
-     * names from the TLS registry orare known exceptions.
+     * names from the TLS registry or are known exceptions.
      */
     @Test
     public void testNames() {
@@ -389,10 +389,13 @@ public class TestCipher {
      */
     private static Set<String> OPENSSL_UNMAPPED_ORACLE =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                    "DES-CBC-MD5",
-                    "DES-CBC3-MD5",
-                    "IDEA-CBC-MD5",
-                    "RC2-CBC-MD5")));
+                    "DES-CBC-MD5+SSLv2",
+                    "DES-CBC3-MD5+SSLv2",
+                    "EXP-RC2-CBC-MD5+SSLv2",
+                    "EXP-RC4-MD5+SSLv2",
+                    "IDEA-CBC-MD5+SSLv2",
+                    "RC2-CBC-MD5+SSLv2",
+                    "RC4-MD5+SSLv2")));
 
 
     /**
@@ -525,36 +528,39 @@ public class TestCipher {
      */
     private static Set<String> OPENSSL_UNMAPPED_IBM =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                    "ADH-CAMELLIA128-SHA",
-                    "ADH-CAMELLIA256-SHA",
-                    "ADH-SEED-SHA",
-                    "CAMELLIA128-SHA",
-                    "CAMELLIA256-SHA",
-                    "DES-CBC-MD5",
-                    "DES-CBC3-MD5",
-                    "DHE-DSS-CAMELLIA128-SHA",
-                    "DHE-DSS-CAMELLIA256-SHA",
-                    "DHE-DSS-SEED-SHA",
-                    "DHE-RSA-CAMELLIA128-SHA",
-                    "DHE-RSA-CAMELLIA256-SHA",
-                    "DHE-RSA-SEED-SHA",
-                    "IDEA-CBC-MD5",
-                    "IDEA-CBC-SHA",
-                    "PSK-3DES-EDE-CBC-SHA",
-                    "PSK-AES128-CBC-SHA",
-                    "PSK-AES256-CBC-SHA",
-                    "PSK-RC4-SHA",
-                    "RC2-CBC-MD5",
-                    "SEED-SHA",
-                    "SRP-AES-128-CBC-SHA",
-                    "SRP-AES-256-CBC-SHA",
-                    "SRP-3DES-EDE-CBC-SHA",
-                    "SRP-DSS-3DES-EDE-CBC-SHA",
-                    "SRP-DSS-AES-128-CBC-SHA",
-                    "SRP-DSS-AES-256-CBC-SHA",
-                    "SRP-RSA-3DES-EDE-CBC-SHA",
-                    "SRP-RSA-AES-128-CBC-SHA",
-                    "SRP-RSA-AES-256-CBC-SHA")));
+                    "ADH-CAMELLIA128-SHA+SSLv3",
+                    "ADH-CAMELLIA256-SHA+SSLv3",
+                    "ADH-SEED-SHA+SSLv3",
+                    "CAMELLIA128-SHA+SSLv3",
+                    "CAMELLIA256-SHA+SSLv3",
+                    "DES-CBC-MD5+SSLv2",
+                    "DES-CBC3-MD5+SSLv2",
+                    "DHE-DSS-CAMELLIA128-SHA+SSLv3",
+                    "DHE-DSS-CAMELLIA256-SHA+SSLv3",
+                    "DHE-DSS-SEED-SHA+SSLv3",
+                    "DHE-RSA-CAMELLIA128-SHA+SSLv3",
+                    "DHE-RSA-CAMELLIA256-SHA+SSLv3",
+                    "DHE-RSA-SEED-SHA+SSLv3",
+                    "EXP-RC2-CBC-MD5+SSLv2",
+                    "EXP-RC4-MD5+SSLv2",
+                    "IDEA-CBC-MD5+SSLv2",
+                    "IDEA-CBC-SHA+SSLv3",
+                    "PSK-3DES-EDE-CBC-SHA+SSLv3",
+                    "PSK-AES128-CBC-SHA+SSLv3",
+                    "PSK-AES256-CBC-SHA+SSLv3",
+                    "PSK-RC4-SHA+SSLv3",
+                    "RC2-CBC-MD5+SSLv2",
+                    "RC4-MD5+SSLv2",
+                    "SEED-SHA+SSLv3",
+                    "SRP-AES-128-CBC-SHA+SSLv3",
+                    "SRP-AES-256-CBC-SHA+SSLv3",
+                    "SRP-3DES-EDE-CBC-SHA+SSLv3",
+                    "SRP-DSS-3DES-EDE-CBC-SHA+SSLv3",
+                    "SRP-DSS-AES-128-CBC-SHA+SSLv3",
+                    "SRP-DSS-AES-256-CBC-SHA+SSLv3",
+                    "SRP-RSA-3DES-EDE-CBC-SHA+SSLv3",
+                    "SRP-RSA-AES-128-CBC-SHA+SSLv3",
+                    "SRP-RSA-AES-256-CBC-SHA+SSLv3")));
 
 
     private static JsseImpl ORACLE_JSSE_CIPHER_IMPL = new JsseImpl("Oracle",
