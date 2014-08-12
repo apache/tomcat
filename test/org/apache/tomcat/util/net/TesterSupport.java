@@ -54,6 +54,8 @@ import org.apache.catalina.startup.Tomcat;
 
 public final class TesterSupport {
 
+    public static final String ROLE = "testrole";
+
     protected static final boolean RFC_5746_SUPPORTED;
 
     static {
@@ -210,14 +212,14 @@ public final class TesterSupport {
         SecurityCollection collection = new SecurityCollection();
         collection.addPattern("/protected");
         SecurityConstraint sc = new SecurityConstraint();
-        sc.addAuthRole("testrole");
+        sc.addAuthRole(ROLE);
         sc.addCollection(collection);
         ctx.addConstraint(sc);
 
         // Configure the Realm
         MapRealm realm = new MapRealm();
         realm.addUser("CN=user1, C=US", "not used");
-        realm.addUserRole("CN=user1, C=US", "testrole");
+        realm.addUserRole("CN=user1, C=US", ROLE);
         ctx.setRealm(realm);
 
         // Configure the authenticator
@@ -238,6 +240,9 @@ public final class TesterSupport {
                 throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.getWriter().print("OK");
+            if (req.isUserInRole(ROLE)) {
+                resp.getWriter().print("-" + ROLE);
+            }
         }
 
         @Override

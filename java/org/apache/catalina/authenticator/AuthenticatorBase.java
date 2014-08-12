@@ -47,6 +47,7 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.DateTool;
 import org.apache.catalina.util.SessionIdGenerator;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -561,8 +562,7 @@ public abstract class AuthenticatorBase extends ValveBase
         }
 
         if (!authRequired && context.getPreemptiveAuthentication()) {
-            X509Certificate[] certs = (X509Certificate[]) request.getAttribute(
-                    Globals.CERTIFICATES_ATTR);
+            X509Certificate[] certs = getRequestCertificates(request);
             authRequired = certs != null && certs.length > 0;
         }
 
@@ -613,6 +613,35 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     // ------------------------------------------------------ Protected Methods
+
+    /**
+     * Look for the X509 certificate chain in the Request under the key
+     * <code>javax.servlet.request.X509Certificate</code>. If not found, trigger
+     * extracting the certificate chain from the Coyote request.
+     *
+     * @param request   Request to be processed
+     *
+     * @return          The X509 certificate chain if found, <code>null</code>
+     *                  otherwise.
+     */
+    protected X509Certificate[] getRequestCertificates(final Request request)
+            throws IllegalStateException {
+
+        X509Certificate certs[] =
+                (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+
+        if ((certs == null) || (certs.length < 1)) {
+            try {
+                request.getCoyoteRequest().action (ActionCode.REQ_SSL_CERTIFICATE, null);
+                certs = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+            } catch (IllegalStateException ise) {
+                // Request body was too large for save buffer
+                // Return null which will trigger an auth failure
+            }
+        }
+
+        return certs;
+    }
 
 
     /**

@@ -26,10 +26,8 @@ import java.security.cert.X509Certificate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.coyote.ActionCode;
 
 
 
@@ -129,27 +127,14 @@ public class SSLAuthenticator
         if (containerLog.isDebugEnabled())
             containerLog.debug(" Looking up certificates");
 
-        X509Certificate certs[] = (X509Certificate[])
-            request.getAttribute(Globals.CERTIFICATES_ATTR);
-        if ((certs == null) || (certs.length < 1)) {
-            try {
-                request.getCoyoteRequest().action
-                                  (ActionCode.REQ_SSL_CERTIFICATE, null);
-            } catch (IllegalStateException ise) {
-                // Request body was too large for save buffer
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                        sm.getString("authenticator.certificates"));
-                return false;
-            }
-            certs = (X509Certificate[])
-                request.getAttribute(Globals.CERTIFICATES_ATTR);
-        }
+        X509Certificate certs[] = getRequestCertificates(request);
+
         if ((certs == null) || (certs.length < 1)) {
             if (containerLog.isDebugEnabled())
                 containerLog.debug("  No certificates included with this request");
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                               sm.getString("authenticator.certificates"));
-            return (false);
+                    sm.getString("authenticator.certificates"));
+            return false;
         }
 
         // Authenticate the specified certificate chain
