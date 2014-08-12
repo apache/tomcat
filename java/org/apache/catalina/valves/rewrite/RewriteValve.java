@@ -444,11 +444,15 @@ public class RewriteValve extends ValveBase {
                         urlString = urlString.substring(0, queryIndex);
                     }
                     // Set the new URL
+                    String contextPath = null;
+                    if (context) {
+                        contextPath = request.getContextPath();
+                    }
                     request.getCoyoteRequest().requestURI().setString(null);
                     CharChunk chunk = request.getCoyoteRequest().requestURI().getCharChunk();
                     chunk.recycle();
                     if (context) {
-                        chunk.append(request.getContextPath());
+                        chunk.append(contextPath);
                     }
                     chunk.append(urlString);
                     request.getCoyoteRequest().requestURI().toChars();
