@@ -28,5 +28,6 @@ enum Authentication {
     PSK /* PSK auth */,
     GOST94 /* GOST R 34.10-94 signature auth */,
     GOST01 /* GOST R 34.10-2001 */,
-    FZA /* Fortezza */;
+    FZA /* Fortezza */,
+    SRP
 }
