@@ -17,6 +17,7 @@
 
 package org.apache.tomcat.util.net.jsse.openssl;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,7 +39,6 @@ enum Cipher {
     // Cipher 01
     TLS_RSA_WITH_NULL_MD5(
             "NULL-MD5",
-            new String[] { "SSL_RSA_WITH_NULL_MD5" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.eNULL,
@@ -48,11 +48,10 @@ enum Cipher {
             EncryptionLevel.STRONG_NONE,
             false,
             0,
-            0),
+            0, "SSL_RSA_WITH_NULL_MD5"),
     // Cipher 02
     TLS_RSA_WITH_NULL_SHA(
             "NULL-SHA",
-            new String[] { "SSL_RSA_WITH_NULL_SHA" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.eNULL,
@@ -62,11 +61,10 @@ enum Cipher {
             EncryptionLevel.STRONG_NONE,
             true,
             0,
-            0),
+            0, "SSL_RSA_WITH_NULL_SHA"),
     // Cipher 03
     TLS_RSA_EXPORT_WITH_RC4_40_MD5(
             "EXP-RC4-MD5",
-            new String[] { "SSL_RSA_EXPORT_WITH_RC4_40_MD5" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC4,
@@ -76,11 +74,10 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            128),
+            128, "SSL_RSA_EXPORT_WITH_RC4_40_MD5"),
     // Cipher 04
     TLS_RSA_WITH_RC4_128_MD5(
             "RC4-MD5",
-            new String[] { "SSL_RSA_WITH_RC4_128_MD5" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC4,
@@ -90,11 +87,10 @@ enum Cipher {
             EncryptionLevel.MEDIUM,
             false,
             128,
-            128),
+            128, "SSL_RSA_WITH_RC4_128_MD5"),
     // Cipher 05
     TLS_RSA_WITH_RC4_128_SHA(
             "RC4-SHA",
-            new String[] { "SSL_RSA_WITH_RC4_128_SHA" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC4,
@@ -104,11 +100,10 @@ enum Cipher {
             EncryptionLevel.MEDIUM,
             false,
             128,
-            128),
+            128, "SSL_RSA_WITH_RC4_128_SHA"),
     // Cipher 06
     TLS_RSA_EXPORT_WITH_RC2_CBC_40_MD5(
             "EXP-RC2-CBC-MD5",
-            new String[] { "SSL_RSA_EXPORT_WITH_RC2_CBC_40_MD5" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC2,
@@ -118,11 +113,10 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            128),
+            128, "SSL_RSA_EXPORT_WITH_RC2_CBC_40_MD5"),
     // Cipher 07
     TLS_RSA_WITH_IDEA_CBC_SHA(
             "IDEA-CBC-SHA",
-            new String[] { "SSL_RSA_WITH_IDEA_CBC_SHA" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.IDEA,
@@ -132,11 +126,10 @@ enum Cipher {
             EncryptionLevel.MEDIUM,
             false,
             128,
-            128),
+            128, "SSL_RSA_WITH_IDEA_CBC_SHA"),
     // Cipher 08
     TLS_RSA_EXPORT_WITH_DES40_CBC_SHA(
             "EXP-DES-CBC-SHA",
-            new String[] { "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.DES,
@@ -146,11 +139,10 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            56),
+            56, "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA"),
     // Cipher 09
     TLS_RSA_WITH_DES_CBC_SHA(
             "DES-CBC-SHA",
-            new String[] { "SSL_RSA_WITH_DES_CBC_SHA" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.DES,
@@ -160,11 +152,10 @@ enum Cipher {
             EncryptionLevel.LOW,
             false,
             56,
-            56),
+            56, "SSL_RSA_WITH_DES_CBC_SHA"),
     // Cipher 0A
     TLS_RSA_WITH_3DES_EDE_CBC_SHA(
             "DES-CBC3-SHA",
-            new String[] { "SSL_RSA_WITH_3DES_EDE_CBC_SHA" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.TRIPLE_DES,
@@ -174,12 +165,11 @@ enum Cipher {
             EncryptionLevel.HIGH,
             true,
             168,
-            168),
+            168, "SSL_RSA_WITH_3DES_EDE_CBC_SHA"),
     /* The DH ciphers */
     // Cipher 0B
     TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA(
             "EXP-DH-DSS-DES-CBC-SHA",
-            new String[] { "SSL_DH_DSS_EXPORT_WITH_DES40_CBC_SHA" },
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.DES,
@@ -189,11 +179,10 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            56),
+            56, "SSL_DH_DSS_EXPORT_WITH_DES40_CBC_SHA"),
     // Cipher 0C
     TLS_DH_DSS_WITH_DES_CBC_SHA(
             "DH-DSS-DES-CBC-SHA",
-            new String[] { "SSL_DH_DSS_WITH_DES_CBC_SHA" },
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.DES,
@@ -203,11 +192,10 @@ enum Cipher {
             EncryptionLevel.LOW,
             false,
             56,
-            56),
+            56, "SSL_DH_DSS_WITH_DES_CBC_SHA"),
     // Cipher 0D
     TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA(
             "DH-DSS-DES-CBC3-SHA",
-            new String[] { "SSL_DH_DSS_WITH_3DES_EDE_CBC_SHA" },
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.TRIPLE_DES,
@@ -217,11 +205,10 @@ enum Cipher {
             EncryptionLevel.HIGH,
             true,
             168,
-            168),
+            168, "SSL_DH_DSS_WITH_3DES_EDE_CBC_SHA"),
     // Cipher 0E
     TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA(
             "EXP-DH-RSA-DES-CBC-SHA",
-            new String[] { "SSL_DH_RSA_EXPORT_WITH_DES40_CBC_SHA" },
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.DES,
@@ -231,11 +218,10 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            56),
+            56, "SSL_DH_RSA_EXPORT_WITH_DES40_CBC_SHA"),
     // Cipher 0F
     TLS_DH_RSA_WITH_DES_CBC_SHA(
             "DH-RSA-DES-CBC-SHA",
-            new String[] { "SSL_DH_RSA_WITH_DES_CBC_SHA" },
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.DES,
@@ -245,11 +231,10 @@ enum Cipher {
             EncryptionLevel.LOW,
             false,
             56,
-            56),
+            56, "SSL_DH_RSA_WITH_DES_CBC_SHA"),
     // Cipher 10
     TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA(
             "DH-RSA-DES-CBC3-SHA",
-            new String[] { "SSL_DH_RSA_WITH_3DES_EDE_CBC_SHA" },
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.TRIPLE_DES,
@@ -259,12 +244,11 @@ enum Cipher {
             EncryptionLevel.HIGH,
             true,
             168,
-            168),
+            168, "SSL_DH_RSA_WITH_3DES_EDE_CBC_SHA"),
     /* The Ephemeral DH ciphers */
     // Cipher 11
     TLS_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA(
             "EXP-EDH-DSS-DES-CBC-SHA",
-            new String[] { "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.DES,
@@ -274,11 +258,10 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            56),
+            56, "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA"),
     // Cipher 12
     TLS_DHE_DSS_WITH_DES_CBC_SHA(
             "EDH-DSS-DES-CBC-SHA",
-            new String[] { "SSL_DHE_DSS_WITH_DES_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.DES,
@@ -288,11 +271,10 @@ enum Cipher {
             EncryptionLevel.LOW,
             false,
             56,
-            56),
+            56, "SSL_DHE_DSS_WITH_DES_CBC_SHA"),
     // Cipher 13
     TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA(
             "EDH-DSS-DES-CBC3-SHA",
-            new String[] { "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.TRIPLE_DES,
@@ -302,11 +284,10 @@ enum Cipher {
             EncryptionLevel.HIGH,
             true,
             168,
-            168),
+            168, "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA"),
     // Cipher 14
     TLS_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA(
             "EXP-EDH-RSA-DES-CBC-SHA",
-            new String[] { "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.DES,
@@ -316,11 +297,10 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            56),
+            56, "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA"),
     // Cipher 15
     TLS_DHE_RSA_WITH_DES_CBC_SHA(
             "EDH-RSA-DES-CBC-SHA",
-            new String[] { "SSL_DHE_RSA_WITH_DES_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.DES,
@@ -330,11 +310,10 @@ enum Cipher {
             EncryptionLevel.LOW,
             false,
             56,
-            56),
+            56, "SSL_DHE_RSA_WITH_DES_CBC_SHA"),
     // Cipher 16
     TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA(
             "EDH-RSA-DES-CBC3-SHA",
-            new String[] { "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.TRIPLE_DES,
@@ -344,11 +323,10 @@ enum Cipher {
             EncryptionLevel.HIGH,
             true,
             168,
-            168),
+            168, "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA"),
     // Cipher 17
     TLS_DH_anon_EXPORT_WITH_RC4_40_MD5(
             "EXP-ADH-RC4-MD5",
-            new String[] { "SSL_DH_anon_EXPORT_WITH_RC4_40_MD5" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.RC4,
@@ -358,11 +336,10 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            128),
+            128, "SSL_DH_anon_EXPORT_WITH_RC4_40_MD5"),
     // Cipher 18
     TLS_DH_anon_WITH_RC4_128_MD5(
             "ADH-RC4-MD5",
-            new String[] { "SSL_DH_anon_WITH_RC4_128_MD5" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.RC4,
@@ -372,11 +349,10 @@ enum Cipher {
             EncryptionLevel.MEDIUM,
             false,
             128,
-            128),
+            128, "SSL_DH_anon_WITH_RC4_128_MD5"),
     // Cipher 19
     TLS_DH_anon_EXPORT_WITH_DES40_CBC_SHA(
             "EXP-ADH-DES-CBC-SHA",
-            new String[] { "SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.DES,
@@ -386,11 +362,10 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            128),
+            128, "SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA"),
     // Cipher 1A
     TLS_DH_anon_WITH_DES_CBC_SHA(
             "ADH-DES-CBC-SHA",
-            new String[] { "SSL_DH_anon_WITH_DES_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.DES,
@@ -400,11 +375,10 @@ enum Cipher {
             EncryptionLevel.LOW,
             false,
             56,
-            56),
+            56, "SSL_DH_anon_WITH_DES_CBC_SHA"),
     // Cipher 1B
     TLS_DH_anon_WITH_3DES_EDE_CBC_SHA(
             "ADH-DES-CBC3-SHA",
-            new String[] { "SSL_DH_anon_WITH_3DES_EDE_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.TRIPLE_DES,
@@ -414,11 +388,10 @@ enum Cipher {
             EncryptionLevel.HIGH,
             true,
             168,
-            168),
+            168, "SSL_DH_anon_WITH_3DES_EDE_CBC_SHA"),
     /* Fortezza ciphersuite from SSL 3.0 spec */
     SSL_FORTEZZA_DMS_WITH_NULL_SHA(
             "FZA-NULL-SHA",
-            null,
             KeyExchange.FZA,
             Authentication.FZA,
             Encryption.eNULL,
@@ -431,7 +404,6 @@ enum Cipher {
             0),
     SSL_FORTEZZA_DMS_WITH_FORTEZZA_CBC_SHA(
             "FZA-FZA-CBC-SHA",
-            null,
             KeyExchange.FZA,
             Authentication.FZA,
             Encryption.FZA,
@@ -444,7 +416,6 @@ enum Cipher {
             0),
     SSL_FORTEZZA_DMS_WITH_RC4_128_SHA(
             "FZA-RC4-SHA",
-            null,
             KeyExchange.FZA,
             Authentication.FZA,
             Encryption.RC4,
@@ -459,7 +430,6 @@ enum Cipher {
     // Cipher 1E
     /*TLS_KRB5_WITH_DES_CBC_SHA(
             "KRB5-DES-CBC-SHA",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.DES,
@@ -473,7 +443,6 @@ enum Cipher {
     // Cipher 1F
     TLS_KRB5_WITH_3DES_EDE_CBC_SHA(
             "KRB5-DES-CBC3-SHA",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.TRIPLE_DES,
@@ -487,7 +456,6 @@ enum Cipher {
     // Cipher 20
     TLS_KRB5_WITH_RC4_128_SHA(
             "KRB5-RC4-SHA",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.RC4,
@@ -501,7 +469,6 @@ enum Cipher {
     // Cipher 21
     TLS_KRB5_WITH_IDEA_CBC_SHA(
             "KRB5-IDEA-CBC-SHA",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.IDEA,
@@ -515,7 +482,6 @@ enum Cipher {
     // Cipher 22
     TLS_KRB5_WITH_DES_CBC_MD5(
             "KRB5-DES-CBC-MD5",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.DES,
@@ -529,7 +495,6 @@ enum Cipher {
     // Cipher 23
     TLS_KRB5_WITH_3DES_EDE_CBC_MD5(
             "KRB5-DES-CBC3-MD5",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.TRIPLE_DES,
@@ -543,7 +508,6 @@ enum Cipher {
     // Cipher 24
     TLS_KRB5_WITH_RC4_128_MD5(
             "KRB5-RC4-MD5",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.RC4,
@@ -557,7 +521,6 @@ enum Cipher {
     // Cipher 25
     TLS_KRB5_WITH_IDEA_CBC_MD5(
             "KRB5-IDEA-CBC-MD5",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.IDEA,
@@ -571,7 +534,6 @@ enum Cipher {
     // Cipher 26
     TLS_KRB5_EXPORT_WITH_DES_CBC_40_SHA(
             "EXP-KRB5-DES-CBC-SHA",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.DES,
@@ -585,7 +547,6 @@ enum Cipher {
     // Cipher 27
     TLS_KRB5_EXPORT_WITH_RC2_CBC_40_SHA(
             "EXP-KRB5-RC2-CBC-SHA",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.RC2,
@@ -599,7 +560,6 @@ enum Cipher {
     // Cipher 28
     TLS_KRB5_EXPORT_WITH_RC4_40_SHA(
             "EXP-KRB5-RC4-SHA",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.RC4,
@@ -613,7 +573,6 @@ enum Cipher {
     // Cipher 29
     TLS_KRB5_EXPORT_WITH_DES_CBC_40_MD5(
             "EXP-KRB5-DES-CBC-MD5",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.DES,
@@ -627,7 +586,6 @@ enum Cipher {
     // Cipher 2A
     TLS_KRB5_EXPORT_WITH_RC2_CBC_40_MD5(
             "EXP-KRB5-RC2-CBC-MD5",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.RC2,
@@ -641,7 +599,6 @@ enum Cipher {
     // Cipher 2B
     TLS_KRB5_EXPORT_WITH_RC4_40_MD5(
             "EXP-KRB5-RC4-MD5",
-            null,
             KeyExchange.KRB5,
             Authentication.KRB5,
             Encryption.RC4,
@@ -656,7 +613,6 @@ enum Cipher {
     // Cipher 2F
     TLS_RSA_WITH_AES_128_CBC_SHA(
             "AES128-SHA",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.AES128,
@@ -670,7 +626,6 @@ enum Cipher {
     // Cipher 30
     TLS_DH_DSS_WITH_AES_128_CBC_SHA(
             "DH-DSS-AES128-SHA",
-            null,
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.AES128,
@@ -684,7 +639,6 @@ enum Cipher {
     // Cipher 31
     TLS_DH_RSA_WITH_AES_128_CBC_SHA(
             "DH-RSA-AES128-SHA",
-            null,
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.AES128,
@@ -698,7 +652,6 @@ enum Cipher {
     // Cipher 32
     TLS_DHE_DSS_WITH_AES_128_CBC_SHA(
             "DHE-DSS-AES128-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.AES128,
@@ -712,7 +665,6 @@ enum Cipher {
     // Cipher 33
     TLS_DHE_RSA_WITH_AES_128_CBC_SHA(
             "DHE-RSA-AES128-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.AES128,
@@ -726,7 +678,6 @@ enum Cipher {
     // Cipher 34
     TLS_DH_anon_WITH_AES_128_CBC_SHA(
             "ADH-AES128-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.AES128,
@@ -740,7 +691,6 @@ enum Cipher {
     // Cipher 35
     TLS_RSA_WITH_AES_256_CBC_SHA(
             "AES256-SHA",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.AES256,
@@ -754,7 +704,6 @@ enum Cipher {
     // Cipher 36
     TLS_DH_DSS_WITH_AES_256_CBC_SHA(
             "DH-DSS-AES256-SHA",
-            null,
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.AES256,
@@ -768,7 +717,6 @@ enum Cipher {
     // Cipher 37
     TLS_DH_RSA_WITH_AES_256_CBC_SHA(
             "DH-RSA-AES256-SHA",
-            null,
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.AES256,
@@ -782,7 +730,6 @@ enum Cipher {
     // Cipher 38
     TLS_DHE_DSS_WITH_AES_256_CBC_SHA(
             "DHE-DSS-AES256-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.AES256,
@@ -796,7 +743,6 @@ enum Cipher {
     // Cipher 39
     TLS_DHE_RSA_WITH_AES_256_CBC_SHA(
             "DHE-RSA-AES256-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.AES256,
@@ -809,7 +755,6 @@ enum Cipher {
             256), // Cipher 3A
     TLS_DH_anon_WITH_AES_256_CBC_SHA(
             "ADH-AES256-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.AES256,
@@ -824,7 +769,6 @@ enum Cipher {
     // Cipher 3B
     TLS_RSA_WITH_NULL_SHA256(
             "NULL-SHA256",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.eNULL,
@@ -838,7 +782,6 @@ enum Cipher {
     // Cipher 3C
     TLS_RSA_WITH_AES_128_CBC_SHA256(
             "AES128-SHA256",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.AES128,
@@ -852,7 +795,6 @@ enum Cipher {
     // Cipher 3D
     TLS_RSA_WITH_AES_256_CBC_SHA256(
             "AES256-SHA256",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.AES256,
@@ -866,7 +808,6 @@ enum Cipher {
     // Cipher 3E
     TLS_DH_DSS_WITH_AES_128_CBC_SHA256(
             "DH-DSS-AES128-SHA256",
-            null,
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.AES128,
@@ -880,7 +821,6 @@ enum Cipher {
     // Cipher 3F
     TLS_DH_RSA_WITH_AES_128_CBC_SHA256(
             "DH-RSA-AES128-SHA256",
-            null,
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.AES128,
@@ -894,7 +834,6 @@ enum Cipher {
     // Cipher 40
     TLS_DHE_DSS_WITH_AES_128_CBC_SHA256(
             "DHE-DSS-AES128-SHA256",
-            null,
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.AES128,
@@ -910,7 +849,6 @@ enum Cipher {
     // Cipher 41
     TLS_RSA_WITH_CAMELLIA_128_CBC_SHA(
             "CAMELLIA128-SHA",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.CAMELLIA128,
@@ -924,7 +862,6 @@ enum Cipher {
     // Cipher 42
     TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA(
             "DH-DSS-CAMELLIA128-SHA",
-            null,
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.CAMELLIA128,
@@ -938,7 +875,6 @@ enum Cipher {
     // Cipher 43
     TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA(
             "DH-RSA-CAMELLIA128-SHA",
-            null,
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.CAMELLIA128,
@@ -952,7 +888,6 @@ enum Cipher {
     // Cipher 44
     TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA(
             "DHE-DSS-CAMELLIA128-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.CAMELLIA128,
@@ -966,7 +901,6 @@ enum Cipher {
     // Cipher 45
     TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA(
             "DHE-RSA-CAMELLIA128-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.CAMELLIA128,
@@ -980,7 +914,6 @@ enum Cipher {
     // Cipher 46
     TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA(
             "ADH-CAMELLIA128-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.CAMELLIA128,
@@ -995,7 +928,6 @@ enum Cipher {
     // Cipher 60
     TLS_RSA_EXPORT1024_WITH_RC4_56_MD5(
             "EXP1024-RC4-MD5",
-            new String[] { "SSL_RSA_EXPORT1024_WITH_RC4_56_MD5" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC4,
@@ -1005,11 +937,10 @@ enum Cipher {
             EncryptionLevel.EXP56,
             false,
             56,
-            128),
+            128, "SSL_RSA_EXPORT1024_WITH_RC4_56_MD5"),
     // Cipher 61
     TLS_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5(
             "EXP1024-RC2-CBC-MD5",
-            new String[] { "SSL_RSA_EXPORT1024_WITH_RC2_CBC_56_MD" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC2,
@@ -1019,11 +950,10 @@ enum Cipher {
             EncryptionLevel.EXP56,
             false,
             56,
-            128),
+            128, "SSL_RSA_EXPORT1024_WITH_RC2_CBC_56_MD"),
     // Cipher 62
     TLS_RSA_EXPORT1024_WITH_DES_CBC_SHA(
             "EXP1024-DES-CBC-SHA",
-            new String[] { "SSL_RSA_EXPORT1024_WITH_DES_CBC_SHA" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.DES,
@@ -1033,11 +963,10 @@ enum Cipher {
             EncryptionLevel.EXP56,
             false,
             56,
-            56),
+            56, "SSL_RSA_EXPORT1024_WITH_DES_CBC_SHA"),
     // Cipher 63
     TLS_DHE_DSS_EXPORT1024_WITH_DES_CBC_SHA(
             "EXP1024-DHE-DSS-DES-CBC-SHA",
-            new String[] { "SSL_DHE_DSS_EXPORT1024_WITH_DES_CBC_SHA" },
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.DES,
@@ -1047,11 +976,10 @@ enum Cipher {
             EncryptionLevel.EXP56,
             false,
             56,
-            56),
+            56, "SSL_DHE_DSS_EXPORT1024_WITH_DES_CBC_SHA"),
     // Cipher 64
     TLS_RSA_EXPORT1024_WITH_RC4_56_SHA(
             "EXP1024-RC4-SHA",
-            new String[] { "SSL_RSA_EXPORT1024_WITH_RC4_56_SHA" },
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC4,
@@ -1061,11 +989,10 @@ enum Cipher {
             EncryptionLevel.EXP56,
             false,
             56,
-            128),
+            128, "SSL_RSA_EXPORT1024_WITH_RC4_56_SHA"),
     // Cipher 65
     TLS_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA(
             "EXP1024-DHE-DSS-RC4-SHA",
-            new String[] { "SSL_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA" },
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.RC4,
@@ -1075,11 +1002,10 @@ enum Cipher {
             EncryptionLevel.EXP56,
             false,
             56,
-            128),
+            128, "SSL_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA"),
     // Cipher 66
     TLS_DHE_DSS_WITH_RC4_128_SHA(
             "DHE-DSS-RC4-SHA",
-            new String[] { "SSL_DHE_DSS_WITH_RC4_128_SHA" },
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.RC4,
@@ -1089,12 +1015,11 @@ enum Cipher {
             EncryptionLevel.MEDIUM,
             false,
             128,
-            128),
+            128, "SSL_DHE_DSS_WITH_RC4_128_SHA"),
     /* TLS v1.2 ciphersuites */
     // Cipher 67
     TLS_DHE_RSA_WITH_AES_128_CBC_SHA256(
             "DHE-RSA-AES128-SHA256",
-            null,
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.AES128,
@@ -1108,7 +1033,6 @@ enum Cipher {
     // Cipher 68
     TLS_DH_DSS_WITH_AES_256_CBC_SHA256(
             "DH-DSS-AES256-SHA256",
-            null,
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.AES256,
@@ -1122,7 +1046,6 @@ enum Cipher {
     // Cipher 69
     TLS_DH_RSA_WITH_AES_256_CBC_SHA256(
             "DH-RSA-AES256-SHA256",
-            null,
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.AES256,
@@ -1136,7 +1059,6 @@ enum Cipher {
     // Cipher 6A
     TLS_DHE_DSS_WITH_AES_256_CBC_SHA256(
             "DHE-DSS-AES256-SHA256",
-            null,
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.AES256,
@@ -1150,7 +1072,6 @@ enum Cipher {
     // Cipher 6B
     TLS_DHE_RSA_WITH_AES_256_CBC_SHA256(
             "DHE-RSA-AES256-SHA256",
-            null,
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.AES256,
@@ -1164,7 +1085,6 @@ enum Cipher {
     // Cipher 6C
     TLS_DH_anon_WITH_AES_128_CBC_SHA256(
             "ADH-AES128-SHA256",
-            null,
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.AES128,
@@ -1179,7 +1099,6 @@ enum Cipher {
     // Cipher 6D
     TLS_DH_anon_WITH_AES_256_CBC_SHA256(
             "ADH-AES256-SHA256",
-            null,
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.AES256,
@@ -1194,7 +1113,6 @@ enum Cipher {
     /*
     TLS_GOSTR341094_WITH_28147_CNT_IMIT(
             "GOST94-GOST89-GOST89",
-            null,
             KeyExchange.GOST,
             Authentication.GOST94,
             Encryption.eGOST2814789CNT,
@@ -1207,7 +1125,6 @@ enum Cipher {
             256),
     TLS_GOSTR341001_WITH_28147_CNT_IMIT(
             "GOST2001-GOST89-GOST89",
-            null,
             KeyExchange.GOST,
             Authentication.GOST01,
             Encryption.eGOST2814789CNT,
@@ -1220,7 +1137,6 @@ enum Cipher {
             256),
     TLS_GOSTR341094_WITH_NULL_GOSTR3411(
             "GOST94-NULL-GOST94",
-            null,
             KeyExchange.GOST,
             Authentication.GOST94,
             Encryption.eNULL,
@@ -1233,7 +1149,6 @@ enum Cipher {
             0),
     TLS_GOSTR341001_WITH_NULL_GOSTR3411(
             "GOST2001-NULL-GOST94",
-            null,
             KeyExchange.GOST,
             Authentication.GOST01,
             Encryption.eNULL,
@@ -1249,7 +1164,6 @@ enum Cipher {
     // Cipher 84
     TLS_RSA_WITH_CAMELLIA_256_CBC_SHA(
             "CAMELLIA256-SHA",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.CAMELLIA256,
@@ -1263,7 +1177,6 @@ enum Cipher {
     // Cipher 85
     TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA(
             "DH-DSS-CAMELLIA256-SHA",
-            null,
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.CAMELLIA256,
@@ -1277,7 +1190,6 @@ enum Cipher {
     // Cipher 86
     TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA(
             "DH-RSA-CAMELLIA256-SHA",
-            null,
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.CAMELLIA256,
@@ -1291,7 +1203,6 @@ enum Cipher {
     // Cipher 87
     TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA(
             "DHE-DSS-CAMELLIA256-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.CAMELLIA256,
@@ -1305,7 +1216,6 @@ enum Cipher {
     // Cipher 88
     TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA(
             "DHE-RSA-CAMELLIA256-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.CAMELLIA256,
@@ -1318,7 +1228,6 @@ enum Cipher {
             256), // Cipher 89
     TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA(
             "ADH-CAMELLIA256-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.CAMELLIA256,
@@ -1332,7 +1241,6 @@ enum Cipher {
     // Cipher 8A
     TLS_PSK_WITH_RC4_128_SHA(
             "PSK-RC4-SHA",
-            null,
             KeyExchange.PSK,
             Authentication.PSK,
             Encryption.RC4,
@@ -1346,7 +1254,6 @@ enum Cipher {
     // Cipher 8B
     TLS_PSK_WITH_3DES_EDE_CBC_SHA(
             "PSK-3DES-EDE-CBC-SHA",
-            null,
             KeyExchange.PSK,
             Authentication.PSK,
             Encryption.TRIPLE_DES,
@@ -1361,7 +1268,6 @@ enum Cipher {
     // Cipher 8C
     TLS_PSK_WITH_AES_128_CBC_SHA(
             "PSK-AES128-CBC-SHA",
-            null,
             KeyExchange.PSK,
             Authentication.PSK,
             Encryption.AES128,
@@ -1376,7 +1282,6 @@ enum Cipher {
     // Cipher 8D
     TLS_PSK_WITH_AES_256_CBC_SHA(
             "PSK-AES256-CBC-SHA",
-            null,
             KeyExchange.PSK,
             Authentication.PSK,
             Encryption.AES256,
@@ -1392,7 +1297,6 @@ enum Cipher {
     // Cipher 96
     TLS_RSA_WITH_SEED_CBC_SHA(
             "SEED-SHA",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.SEED,
@@ -1407,7 +1311,6 @@ enum Cipher {
     // Cipher 97
     TLS_DH_DSS_WITH_SEED_CBC_SHA(
             "DH-DSS-SEED-SHA",
-            null,
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.SEED,
@@ -1422,7 +1325,6 @@ enum Cipher {
     // Cipher 98
     TLS_DH_RSA_WITH_SEED_CBC_SHA(
             "DH-RSA-SEED-SHA",
-            null,
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.SEED,
@@ -1437,7 +1339,6 @@ enum Cipher {
     // Cipher 99
     TLS_DHE_DSS_WITH_SEED_CBC_SHA(
             "DHE-DSS-SEED-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.SEED,
@@ -1452,7 +1353,6 @@ enum Cipher {
     // Cipher 9A
     TLS_DHE_RSA_WITH_SEED_CBC_SHA(
             "DHE-RSA-SEED-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.SEED,
@@ -1467,7 +1367,6 @@ enum Cipher {
     // Cipher 9B
     TLS_DH_anon_WITH_SEED_CBC_SHA(
             "ADH-SEED-SHA",
-            null,
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.SEED,
@@ -1483,7 +1382,6 @@ enum Cipher {
     // Cipher 9C
     TLS_RSA_WITH_AES_128_GCM_SHA256(
             "AES128-GCM-SHA256",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.AES128GCM,
@@ -1498,7 +1396,6 @@ enum Cipher {
     // Cipher 9D
     TLS_RSA_WITH_AES_256_GCM_SHA384(
             "AES256-GCM-SHA384",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.AES256GCM,
@@ -1513,7 +1410,6 @@ enum Cipher {
     // Cipher 9E
     TLS_DHE_RSA_WITH_AES_128_GCM_SHA256(
             "DHE-RSA-AES128-GCM-SHA256",
-            null,
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.AES128GCM,
@@ -1528,7 +1424,6 @@ enum Cipher {
     // Cipher 9F
     TLS_DHE_RSA_WITH_AES_256_GCM_SHA384(
             "DHE-RSA-AES256-GCM-SHA384",
-            null,
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.AES256GCM,
@@ -1543,7 +1438,6 @@ enum Cipher {
     // Cipher A0
     TLS_DH_RSA_WITH_AES_128_GCM_SHA256(
             "DH-RSA-AES128-GCM-SHA256",
-            null,
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.AES128GCM,
@@ -1558,7 +1452,6 @@ enum Cipher {
     // Cipher A1
     TLS_DH_RSA_WITH_AES_256_GCM_SHA384(
             "DH-RSA-AES256-GCM-SHA384",
-            null,
             KeyExchange.DHr,
             Authentication.DH,
             Encryption.AES256GCM,
@@ -1573,7 +1466,6 @@ enum Cipher {
     // Cipher A2
     TLS_DHE_DSS_WITH_AES_128_GCM_SHA256(
             "DHE-DSS-AES128-GCM-SHA256",
-            null,
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.AES128GCM,
@@ -1588,7 +1480,6 @@ enum Cipher {
     // Cipher A3
     TLS_DHE_DSS_WITH_AES_256_GCM_SHA384(
             "DHE-DSS-AES256-GCM-SHA384",
-            null,
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.AES256GCM,
@@ -1603,7 +1494,6 @@ enum Cipher {
     // Cipher A4
     TLS_DH_DSS_WITH_AES_128_GCM_SHA256(
             "DH-DSS-AES128-GCM-SHA256",
-            null,
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.AES128GCM,
@@ -1618,7 +1508,6 @@ enum Cipher {
     // Cipher A5
     TLS_DH_DSS_WITH_AES_256_GCM_SHA384(
             "DH-DSS-AES256-GCM-SHA384",
-            null,
             KeyExchange.DHd,
             Authentication.DH,
             Encryption.AES256GCM,
@@ -1633,7 +1522,6 @@ enum Cipher {
     // Cipher A6
     TLS_DH_anon_WITH_AES_128_GCM_SHA256(
             "ADH-AES128-GCM-SHA256",
-            null,
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.AES128GCM,
@@ -1648,7 +1536,6 @@ enum Cipher {
     // Cipher A7
     TLS_DH_anon_WITH_AES_256_GCM_SHA384(
             "ADH-AES256-GCM-SHA384",
-            null,
             KeyExchange.EDH,
             Authentication.aNULL,
             Encryption.AES256GCM,
@@ -1665,7 +1552,6 @@ enum Cipher {
     // Cipher C001
     TLS_ECDH_ECDSA_WITH_NULL_SHA(
             "ECDH-ECDSA-NULL-SHA",
-            null,
             KeyExchange.ECDHe,
             Authentication.ECDH,
             Encryption.eNULL,
@@ -1680,7 +1566,6 @@ enum Cipher {
     // Cipher C002
     TLS_ECDH_ECDSA_WITH_RC4_128_SHA(
             "ECDH-ECDSA-RC4-SHA",
-            null,
             KeyExchange.ECDHe,
             Authentication.ECDH,
             Encryption.RC4,
@@ -1695,7 +1580,6 @@ enum Cipher {
     // Cipher C003
     TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA(
             "ECDH-ECDSA-DES-CBC3-SHA",
-            null,
             KeyExchange.ECDHe,
             Authentication.ECDH,
             Encryption.TRIPLE_DES,
@@ -1710,7 +1594,6 @@ enum Cipher {
     // Cipher C004
     TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA(
             "ECDH-ECDSA-AES128-SHA",
-            null,
             KeyExchange.ECDHe,
             Authentication.ECDH,
             Encryption.AES128,
@@ -1725,7 +1608,6 @@ enum Cipher {
     // Cipher C005
     TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA(
             "ECDH-ECDSA-AES256-SHA",
-            null,
             KeyExchange.ECDHe,
             Authentication.ECDH,
             Encryption.AES256,
@@ -1740,7 +1622,6 @@ enum Cipher {
     // Cipher C006
     TLS_ECDHE_ECDSA_WITH_NULL_SHA(
             "ECDHE-ECDSA-NULL-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.eNULL,
@@ -1755,7 +1636,6 @@ enum Cipher {
     // Cipher C007
     TLS_ECDHE_ECDSA_WITH_RC4_128_SHA(
             "ECDHE-ECDSA-RC4-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.RC4,
@@ -1770,7 +1650,6 @@ enum Cipher {
     // Cipher C008
     TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA(
             "ECDHE-ECDSA-DES-CBC3-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.TRIPLE_DES,
@@ -1785,7 +1664,6 @@ enum Cipher {
     // Cipher C009
     TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA(
             "ECDHE-ECDSA-AES128-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES128,
@@ -1800,7 +1678,6 @@ enum Cipher {
     // Cipher C00A
     TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA(
             "ECDHE-ECDSA-AES256-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES256,
@@ -1815,7 +1692,6 @@ enum Cipher {
     // Cipher C00B
     TLS_ECDH_RSA_WITH_NULL_SHA(
             "ECDH-RSA-NULL-SHA",
-            null,
             KeyExchange.ECDHr,
             Authentication.ECDH,
             Encryption.eNULL,
@@ -1830,7 +1706,6 @@ enum Cipher {
     // Cipher C00C
     TLS_ECDH_RSA_WITH_RC4_128_SHA(
             "ECDH-RSA-RC4-SHA",
-            null,
             KeyExchange.ECDHr,
             Authentication.ECDH,
             Encryption.RC4,
@@ -1845,7 +1720,6 @@ enum Cipher {
     // Cipher C00D
     TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA(
             "ECDH-RSA-DES-CBC3-SHA",
-            null,
             KeyExchange.ECDHr,
             Authentication.ECDH,
             Encryption.TRIPLE_DES,
@@ -1860,7 +1734,6 @@ enum Cipher {
     // Cipher C00E
     TLS_ECDH_RSA_WITH_AES_128_CBC_SHA(
             "ECDH-RSA-AES128-SHA",
-            null,
             KeyExchange.ECDHr,
             Authentication.ECDH,
             Encryption.AES128,
@@ -1875,7 +1748,6 @@ enum Cipher {
     // Cipher C00F
     TLS_ECDH_RSA_WITH_AES_256_CBC_SHA(
             "ECDH-RSA-AES256-SHA",
-            null,
             KeyExchange.ECDHr,
             Authentication.ECDH,
             Encryption.AES256,
@@ -1889,7 +1761,6 @@ enum Cipher {
     ),
     TLS_ECDHE_RSA_WITH_NULL_SHA(
             "ECDHE-RSA-NULL-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.eNULL,
@@ -1904,7 +1775,6 @@ enum Cipher {
     // Cipher C011
     TLS_ECDHE_RSA_WITH_RC4_128_SHA(
             "ECDHE-RSA-RC4-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.RC4,
@@ -1919,7 +1789,6 @@ enum Cipher {
     // Cipher C012
     TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA(
             "ECDHE-RSA-DES-CBC3-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.TRIPLE_DES,
@@ -1934,7 +1803,6 @@ enum Cipher {
     // Cipher C013
     TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA(
             "ECDHE-RSA-AES128-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.AES128,
@@ -1949,7 +1817,6 @@ enum Cipher {
     // Cipher C014
     TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA(
             "ECDHE-RSA-AES256-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.AES256,
@@ -1964,7 +1831,6 @@ enum Cipher {
     // Cipher C015
     TLS_ECDH_anon_WITH_NULL_SHA(
             "AECDH-NULL-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.aNULL,
             Encryption.eNULL,
@@ -1979,7 +1845,6 @@ enum Cipher {
     // Cipher C016
     TLS_ECDH_anon_WITH_RC4_128_SHA(
             "AECDH-RC4-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.aNULL,
             Encryption.RC4,
@@ -1994,7 +1859,6 @@ enum Cipher {
     // Cipher C017
     TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA(
             "AECDH-DES-CBC3-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.aNULL,
             Encryption.TRIPLE_DES,
@@ -2009,7 +1873,6 @@ enum Cipher {
     // Cipher C018
     TLS_ECDH_anon_WITH_AES_128_CBC_SHA(
             "AECDH-AES128-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.aNULL,
             Encryption.AES128,
@@ -2024,7 +1887,6 @@ enum Cipher {
     // Cipher C019
     TLS_ECDH_anon_WITH_AES_256_CBC_SHA(
             "AECDH-AES256-SHA",
-            null,
             KeyExchange.EECDH,
             Authentication.aNULL,
             Encryption.AES256,
@@ -2040,7 +1902,6 @@ enum Cipher {
     // Cipher C01A
     TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA(
             "SRP-3DES-EDE-CBC-SHA",
-            null,
             KeyExchange.SRP,
             Authentication.aNULL,
             Encryption.TRIPLE_DES,
@@ -2055,7 +1916,6 @@ enum Cipher {
     // Cipher C01B
     TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA(
             "SRP-RSA-3DES-EDE-CBC-SHA",
-            null,
             KeyExchange.SRP,
             Authentication.RSA,
             Encryption.TRIPLE_DES,
@@ -2070,7 +1930,6 @@ enum Cipher {
     // Cipher C01C
     TLS_SRP_SHA_DSS_WITH_3DES_EDE_CBC_SHA(
             "SRP-DSS-3DES-EDE-CBC-SHA",
-            null,
             KeyExchange.SRP,
             Authentication.DSS,
             Encryption.TRIPLE_DES,
@@ -2085,7 +1944,6 @@ enum Cipher {
     // Cipher C01D
     TLS_SRP_SHA_WITH_AES_128_CBC_SHA(
             "SRP-AES-128-CBC-SHA",
-            null,
             KeyExchange.SRP,
             Authentication.aNULL,
             Encryption.AES128,
@@ -2100,7 +1958,6 @@ enum Cipher {
     // Cipher C01E
     TLS_SRP_SHA_RSA_WITH_AES_128_CBC_SHA(
             "SRP-RSA-AES-128-CBC-SHA",
-            null,
             KeyExchange.SRP,
             Authentication.RSA,
             Encryption.AES128,
@@ -2115,7 +1972,6 @@ enum Cipher {
     // Cipher C01F
     TLS_SRP_SHA_DSS_WITH_AES_128_CBC_SHA(
             "SRP-DSS-AES-128-CBC-SHA",
-            null,
             KeyExchange.SRP,
             Authentication.DSS,
             Encryption.AES128,
@@ -2130,7 +1986,6 @@ enum Cipher {
     // Cipher C020
     TLS_SRP_SHA_WITH_AES_256_CBC_SHA(
             "SRP-AES-256-CBC-SHA",
-            null,
             KeyExchange.SRP,
             Authentication.aNULL,
             Encryption.AES256,
@@ -2145,7 +2000,6 @@ enum Cipher {
     // Cipher C021
     TLS_SRP_SHA_RSA_WITH_AES_256_CBC_SHA(
             "SRP-RSA-AES-256-CBC-SHA",
-            null,
             KeyExchange.SRP,
             Authentication.RSA,
             Encryption.AES256,
@@ -2160,7 +2014,6 @@ enum Cipher {
     // Cipher C022
     TLS_SRP_SHA_DSS_WITH_AES_256_CBC_SHA(
             "SRP-DSS-AES-256-CBC-SHA",
-            null,
             KeyExchange.SRP,
             Authentication.DSS,
             Encryption.AES256,
@@ -2176,7 +2029,6 @@ enum Cipher {
     // Cipher C023
     TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256(
             "ECDHE-ECDSA-AES128-SHA256",
-            null,
             KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES128,
@@ -2191,7 +2043,6 @@ enum Cipher {
     // Cipher C024
     TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384(
             "ECDHE-ECDSA-AES256-SHA384",
-            null,
             KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES256,
@@ -2206,7 +2057,6 @@ enum Cipher {
     // Cipher C025
     TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256(
             "ECDH-ECDSA-AES128-SHA256",
-            null,
             KeyExchange.ECDHe,
             Authentication.ECDH,
             Encryption.AES128,
@@ -2221,7 +2071,6 @@ enum Cipher {
     // Cipher C026
     TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384(
             "ECDH-ECDSA-AES256-SHA384",
-            null,
             KeyExchange.ECDHe,
             Authentication.ECDH,
             Encryption.AES256,
@@ -2236,7 +2085,6 @@ enum Cipher {
     // Cipher C027
     TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256(
             "ECDHE-RSA-AES128-SHA256",
-            null,
             KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.AES128,
@@ -2251,7 +2099,6 @@ enum Cipher {
     // Cipher C028
     TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384(
             "ECDHE-RSA-AES256-SHA384",
-            null,
             KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.AES256,
@@ -2266,7 +2113,6 @@ enum Cipher {
     // Cipher C029
     TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256(
             "ECDH-RSA-AES128-SHA256",
-            null,
             KeyExchange.ECDHr,
             Authentication.ECDH,
             Encryption.AES128,
@@ -2281,7 +2127,6 @@ enum Cipher {
     // Cipher C02A
     TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384(
             "ECDH-RSA-AES256-SHA384",
-            null,
             KeyExchange.ECDHr,
             Authentication.ECDH,
             Encryption.AES256,
@@ -2297,7 +2142,6 @@ enum Cipher {
     // Cipher C02B
     TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256(
             "ECDHE-ECDSA-AES128-GCM-SHA256",
-            null,
             KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES128GCM,
@@ -2312,7 +2156,6 @@ enum Cipher {
     // Cipher C02C
     TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384(
             "ECDHE-ECDSA-AES256-GCM-SHA384",
-            null,
             KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES256GCM,
@@ -2327,7 +2170,6 @@ enum Cipher {
     // Cipher C02D
     TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256(
             "ECDH-ECDSA-AES128-GCM-SHA256",
-            null,
             KeyExchange.ECDHe,
             Authentication.ECDH,
             Encryption.AES128GCM,
@@ -2342,7 +2184,6 @@ enum Cipher {
     // Cipher C02E
     TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384(
             "ECDH-ECDSA-AES256-GCM-SHA384",
-            null,
             KeyExchange.ECDHe,
             Authentication.ECDH,
             Encryption.AES256GCM,
@@ -2357,7 +2198,6 @@ enum Cipher {
     // Cipher C02F
     TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256(
             "ECDHE-RSA-AES128-GCM-SHA256",
-            null,
             KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.AES128GCM,
@@ -2372,7 +2212,6 @@ enum Cipher {
     // Cipher C030
     TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384(
             "ECDHE-RSA-AES256-GCM-SHA384",
-            null,
             KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.AES256GCM,
@@ -2387,7 +2226,6 @@ enum Cipher {
     // Cipher C031
     TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256(
             "ECDH-RSA-AES128-GCM-SHA256",
-            null,
             KeyExchange.ECDHr,
             Authentication.ECDH,
             Encryption.AES128GCM,
@@ -2402,7 +2240,6 @@ enum Cipher {
     // Cipher C032
     TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384(
             "ECDH-RSA-AES256-GCM-SHA384",
-            null,
             KeyExchange.ECDHr,
             Authentication.ECDH,
             Encryption.AES256GCM,
@@ -2417,7 +2254,6 @@ enum Cipher {
     // RC4_128_WITH_MD5
     SSL_CK_RC4_128_WITH_MD5(
             "RC4-MD5",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC4,
@@ -2432,7 +2268,6 @@ enum Cipher {
     // RC2_128_CBC_WITH_MD5
     SSL_CK_RC2_128_CBC_WITH_MD5(
             "RC2-MD5",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC2,
@@ -2447,7 +2282,6 @@ enum Cipher {
     // RC2_128_CBC_EXPORT40_WITH_MD5
     SSL_CK_RC2_128_CBC_EXPORT40_WITH_MD5(
             "EXP-RC2-CBC-MD5",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC2,
@@ -2459,41 +2293,36 @@ enum Cipher {
             40,
             128
     ),
-
     /* TEMP_GOST_TLS*/
     /*
     // Cipher FF00
-     TLS_GOSTR341094_RSA_WITH_28147_CNT_MD5(
+    TLS_GOSTR341094_RSA_WITH_28147_CNT_MD5(
             "GOST-MD5",
-            null,
-     KeyExchange.RSA,
-     Authentication.RSA,
-     Encryption.eGOST2814789CNT,
-     MessageDigest.MD5,
-     Protocol.TLSv1,
-     false, EncryptionLevel.HIGH,false,
-
-     256,
-     256,
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.eGOST2814789CNT,
+            MessageDigest.MD5,
+            Protocol.TLSv1,
+            false, 
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256
      ),
      TLS_RSA_WITH_28147_CNT_GOST94(
-
-     "GOST-GOST94",
-            null,
-     KeyExchange.RSA,
-     Authentication.RSA,
-     Encryption.eGOST2814789CNT,
-     MessageDigest.GOST94,
-     Protocol.TLSv1,
-     false, EncryptionLevel.HIGH,false,
-
-     256,
-     256
+            "GOST-GOST94",
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.eGOST2814789CNT,
+            MessageDigest.GOST94,
+            Protocol.TLSv1,
+            false, EncryptionLevel.HIGH,false,
+            256,
+            256
      ),
      {
      1,
      "GOST-GOST89MAC",
-            null,
      0x0300ff02,
      KeyExchange.RSA,
      Authentication.RSA,
@@ -2508,7 +2337,6 @@ enum Cipher {
      {
      1,
      "GOST-GOST89STREAM",
-            null,
      0x0300ff03,
      KeyExchange.RSA,
      Authentication.RSA,
@@ -2516,14 +2344,12 @@ enum Cipher {
      MessageDigest.GOST89MAC,
      Protocol.TLSv1,
      false, EncryptionLevel.HIGH,false,
-
      256,
      256
-     };*/
+     },*/
     // Cipher 0x020080
     SSL2_RC4_128_EXPORT40_WITH_MD5(
             "EXP-RC4-MD5",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC4,
@@ -2533,12 +2359,11 @@ enum Cipher {
             EncryptionLevel.EXP40,
             false,
             40,
-            128
+            128, "SSL_RC4_128_EXPORT40_WITH_MD5"
     ),
     // Cipher 0x030080 / 0x040080
     SSL2_RC2_CBC_128_CBC_WITH_MD5(
             "RC2-CBC-MD5",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC2,
@@ -2551,9 +2376,9 @@ enum Cipher {
             128
             ),
     // Cipher 0x050080
+    // IDEA_128_CBC_WITH_MD5
     SSL2_IDEA_128_CBC_WITH_MD5(
             "IDEA-CBC-MD5",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.IDEA,
@@ -2562,12 +2387,12 @@ enum Cipher {
             false, EncryptionLevel.MEDIUM,
             false,
             128,
-            128
+            128, "SSL_CK_IDEA_128_CBC_WITH_MD5"
     ),
     // Cipher 0x060040
+    // DES_64_CBC_WITH_MD5
     SSL2_DES_64_CBC_WITH_MD5(
             "DES-CBC-MD5",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.DES,
@@ -2577,12 +2402,12 @@ enum Cipher {
             EncryptionLevel.LOW,
             false,
             56,
-            56
+            56, "SSL_CK_DES_64_CBC_WITH_MD5"
     ),
     // Cipher 0x0700C0
+    // DES_192_EDE3_CBC_WITH_MD5
     SSL2_DES_192_EDE3_CBC_WITH_MD5(
             "DES-CBC3-MD5",
-            null,
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.TRIPLE_DES,
@@ -2592,7 +2417,7 @@ enum Cipher {
             EncryptionLevel.HIGH,
             false,
             168,
-            168
+            168, "SSL_CK_DES_192_EDE3_CBC_WITH_MD5"
     );
 
 
@@ -2615,16 +2440,13 @@ enum Cipher {
      */
     private final int alg_bits;
 
-    Cipher(String openSSLAlias, String[] jsseAltNames, KeyExchange kx, Authentication au,
-            Encryption enc, MessageDigest mac, Protocol protocol, boolean export,
-            EncryptionLevel level, boolean fipsCompatible, int strength_bits,
-            int alg_bits) {
+    private Cipher(String openSSLAlias, KeyExchange kx, Authentication au, Encryption enc, MessageDigest mac, 
+            Protocol protocol, boolean export, EncryptionLevel level, boolean fipsCompatible, int strength_bits, 
+            int alg_bits, String... jsseAltNames) {
         this.openSSLAlias = openSSLAlias;
-        Set<String> names = new HashSet<>();
+        Set<String> names = new HashSet<String>();
         if (jsseAltNames != null) {
-            for (String jsseAltName : jsseAltNames) {
-                names.add(jsseAltName);
-            }
+            names.addAll(Arrays.asList(jsseAltNames));
         }
         names.add(name());
         this.jsseNames = Collections.unmodifiableSet(names);
