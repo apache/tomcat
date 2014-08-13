@@ -2031,7 +2031,7 @@ enum Cipher {
     TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA(
             "SRP-3DES-EDE-CBC-SHA",
             KeyExchange.SRP,
-            Authentication.aNULL,
+            Authentication.SRP,
             Encryption.TRIPLE_DES,
             MessageDigest.SHA1,
             Protocol.TLSv1,
@@ -2073,7 +2073,7 @@ enum Cipher {
     TLS_SRP_SHA_WITH_AES_128_CBC_SHA(
             "SRP-AES-128-CBC-SHA",
             KeyExchange.SRP,
-            Authentication.aNULL,
+            Authentication.SRP,
             Encryption.AES128,
             MessageDigest.SHA1,
             Protocol.TLSv1,
@@ -2115,7 +2115,7 @@ enum Cipher {
     TLS_SRP_SHA_WITH_AES_256_CBC_SHA(
             "SRP-AES-256-CBC-SHA",
             KeyExchange.SRP,
-            Authentication.aNULL,
+            Authentication.SRP,
             Encryption.AES256,
             MessageDigest.SHA1,
             Protocol.TLSv1,

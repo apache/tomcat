@@ -30,7 +30,7 @@ import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 public class TesterOpenSSL {
 
-    public static final String EXPECTED_VERSION = "1.0.1h";
+    public static final String EXPECTED_VERSION = "1.0.1i";
     public static final boolean IS_EXPECTED_VERSION;
 
     public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS =
