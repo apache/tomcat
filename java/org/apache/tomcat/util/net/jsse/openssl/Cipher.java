@@ -2576,7 +2576,7 @@ enum Cipher {
             Protocol protocol, boolean export, EncryptionLevel level, boolean fipsCompatible, int strength_bits,
             int alg_bits, String... jsseAltNames) {
         this.openSSLAlias = openSSLAlias;
-        Set<String> names = new HashSet<String>();
+        Set<String> names = new HashSet<>();
         if (jsseAltNames != null) {
             names.addAll(Arrays.asList(jsseAltNames));
         }
