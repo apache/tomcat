@@ -145,6 +145,10 @@
         <bug>56848</bug>: Improve handling of <code>accept-language</code>
         headers. (markt)
       </fix>
+      <fix>
+        <bug>56857</bug>: Fix thread safety issue when calling ServletContext
+        methods while running under a security manager. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
