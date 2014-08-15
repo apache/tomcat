@@ -363,8 +363,9 @@ public class HttpParser {
                 } else if (c == delimiter || c == 9 || c == 32 || c == -1) {
                     break;
                 } else {
-                    // Go back so character is available for next read
-                    input.skip(-1);
+                    // Malformed. Use quality of zero so it is dropped and skip until
+                    // EOF or the next delimiter
+                    skipUntil(input, c, delimiter);
                     return 0;
                 }
             }
