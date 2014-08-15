@@ -141,6 +141,10 @@
         than just using the first header to determine the user&apos;s preferred
         Locale. (markt)
       </fix>
+      <fix>
+        <bug>56848</bug>: Improve handling of <code>accept-language</code>
+        headers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

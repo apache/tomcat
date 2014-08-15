@@ -138,7 +138,7 @@ public class MediaType {
             return null;
         }
 
-        if (HttpParser.skipConstant(input, "/") == HttpParser.SkipConstantResult.NOT_FOUND) {
+        if (HttpParser.skipConstant(input, "/") == HttpParser.SkipResult.NOT_FOUND) {
             return null;
         }
 
@@ -150,15 +150,15 @@ public class MediaType {
 
         LinkedHashMap<String,String> parameters = new LinkedHashMap<>();
 
-        HttpParser.SkipConstantResult lookForSemiColon = HttpParser.skipConstant(input, ";");
-        if (lookForSemiColon == HttpParser.SkipConstantResult.NOT_FOUND) {
+        HttpParser.SkipResult lookForSemiColon = HttpParser.skipConstant(input, ";");
+        if (lookForSemiColon == HttpParser.SkipResult.NOT_FOUND) {
             return null;
         }
-        while (lookForSemiColon == HttpParser.SkipConstantResult.FOUND) {
+        while (lookForSemiColon == HttpParser.SkipResult.FOUND) {
             String attribute = HttpParser.readToken(input);
 
             String value = "";
-            if (HttpParser.skipConstant(input, "=") == HttpParser.SkipConstantResult.FOUND) {
+            if (HttpParser.skipConstant(input, "=") == HttpParser.SkipResult.FOUND) {
                 value = HttpParser.readTokenOrQuotedString(input, true);
             }
 
@@ -167,7 +167,7 @@ public class MediaType {
             }
 
             lookForSemiColon = HttpParser.skipConstant(input, ";");
-            if (lookForSemiColon == HttpParser.SkipConstantResult.NOT_FOUND) {
+            if (lookForSemiColon == HttpParser.SkipResult.NOT_FOUND) {
                 return null;
             }
         }

@@ -72,6 +72,10 @@ public class TesterRequest extends Request {
     }
     @Override
     public Enumeration<String> getHeaders(String name) {
+        List<String> values = headers.get(name);
+        if (values == null || values.size() == 0) {
+            return Collections.emptyEnumeration();
+        }
         return Collections.enumeration(headers.get(name));
     }
 
