@@ -118,24 +118,24 @@ public class HttpParser {
         return c;
     }
 
-    static SkipConstantResult skipConstant(StringReader input, String constant) throws IOException {
+    static SkipResult skipConstant(StringReader input, String constant) throws IOException {
         int len = constant.length();
 
         int c = skipLws(input, false);
 
         for (int i = 0; i < len; i++) {
             if (i == 0 && c == -1) {
-                return SkipConstantResult.EOF;
+                return SkipResult.EOF;
             }
             if (c != constant.charAt(i)) {
                 input.skip(-(i + 1));
-                return SkipConstantResult.NOT_FOUND;
+                return SkipResult.NOT_FOUND;
             }
             if (i != (len - 1)) {
                 c = input.read();
             }
         }
-        return SkipConstantResult.FOUND;
+        return SkipResult.FOUND;
     }
 
     /**
@@ -321,7 +321,85 @@ public class HttpParser {
         }
     }
 
-    static enum SkipConstantResult {
+    static double readWeight(StringReader input, char delimiter) throws IOException {
+        int c = skipLws(input, false);
+        if (c == -1 || c == delimiter) {
+            // No q value just whitespace
+            return 1;
+        } else if (c != 'q') {
+            // Malformed. Use quality of zero so it is dropped.
+            skipUntil(input, c, delimiter);
+            return 0;
+        }
+        // RFC 7231 does not allow whitespace here but be tolerant
+        c = skipLws(input, false);
+        if (c != '=') {
+            // Malformed. Use quality of zero so it is dropped.
+            skipUntil(input, c, delimiter);
+            return 0;
+        }
+
+        // RFC 7231 does not allow whitespace here but be tolerant
+        c = skipLws(input, false);
+
+        // Should be no more than 3 decimal places
+        StringBuilder value = new StringBuilder(5);
+        int decimalPlacesRead = 0;
+        if (c == '0' || c == '1') {
+            value.append((char) c);
+            c = input.read();
+            if (c == '.') {
+                value.append('.');
+            } else if (c < '0' || c > '9') {
+                decimalPlacesRead = 3;
+            }
+            while (true) {
+                c = input.read();
+                if (c >= '0' && c <= '9') {
+                    if (decimalPlacesRead < 3) {
+                        value.append((char) c);
+                        decimalPlacesRead++;
+                    }
+                } else if (c == delimiter || c == 9 || c == 32 || c == -1) {
+                    break;
+                } else {
+                    // Go back so character is available for next read
+                    input.skip(-1);
+                    return 0;
+                }
+            }
+        } else {
+            // Malformed. Use quality of zero so it is dropped and skip until
+            // EOF or the next delimiter
+            skipUntil(input, c, delimiter);
+            return 0;
+        }
+
+        double result = Double.parseDouble(value.toString());
+        if (result > 1) {
+            return 0;
+        }
+        return result;
+    }
+
+
+    /**
+     * Skips all characters until EOF or the specified target is found. Normally
+     * used to skip invalid input until the next separator.
+     */
+    static SkipResult skipUntil(StringReader input, int c, char target) throws IOException {
+        while (c != -1 && c != target) {
+            c = input.read();
+        }
+        if (c == -1) {
+            return SkipResult.EOF;
+        } else {
+            return SkipResult.FOUND;
+        }
+    }
+
+
+    static enum SkipResult {
         FOUND,
         NOT_FOUND,
         EOF

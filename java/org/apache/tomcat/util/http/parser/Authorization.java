@@ -78,7 +78,7 @@ public class Authorization {
 
         Map<String,String> result = new HashMap<>();
 
-        if (HttpParser.skipConstant(input, "Digest") != HttpParser.SkipConstantResult.FOUND) {
+        if (HttpParser.skipConstant(input, "Digest") != HttpParser.SkipResult.FOUND) {
             return null;
         }
         // All field names are valid tokens
@@ -87,7 +87,7 @@ public class Authorization {
             return null;
         }
         while (!field.equals("")) {
-            if (HttpParser.skipConstant(input, "=") != HttpParser.SkipConstantResult.FOUND) {
+            if (HttpParser.skipConstant(input, "=") != HttpParser.SkipResult.FOUND) {
                 return null;
             }
             String value;
@@ -127,7 +127,7 @@ public class Authorization {
             }
             result.put(field, value);
 
-            if (HttpParser.skipConstant(input, ",") == HttpParser.SkipConstantResult.NOT_FOUND) {
+            if (HttpParser.skipConstant(input, ",") == HttpParser.SkipResult.NOT_FOUND) {
                 return null;
             }
             field = HttpParser.readToken(input);
