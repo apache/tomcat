@@ -43,6 +43,7 @@ import static org.junit.Assert.fail;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.filters.FailedRequestFilter;
