@@ -28,7 +28,10 @@ package org.apache.catalina.util;
  * method with the appropriate saved offset values.
  *
  * @author Craig R. McClanahan
+ *
+ * @deprecated Unused. Will be removed in Tomcat 9 onwards.
  */
+@Deprecated
 public final class StringParser {
 
 
