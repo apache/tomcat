@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -39,8 +40,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Assert;
 import org.junit.Test;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.filters.FailedRequestFilter;
@@ -795,4 +796,35 @@ public class TestRequest extends TomcatBaseTest {
             resp.getWriter().print(req.getContextPath());
         }
     }
+
+    @Test
+    public void getLocaleMultipleHeaders01() throws Exception {
+        TesterRequest req = new TesterRequest();
+
+        req.addHeader("accept-language", "en;q=0.5");
+        req.addHeader("accept-language", "en-gb");
+
+        Locale actual = req.getLocale();
+        Locale expected = Locale.forLanguageTag("en-gb");
+
+        Assert.assertEquals(expected, actual);
+    }
+
+    /*
+     * Reverse header order of getLocaleMultipleHeaders01() and make sure the
+     * result is the same.
+     */
+    @Test
+    public void getLocaleMultipleHeaders02() throws Exception {
+        TesterRequest req = new TesterRequest();
+
+        req.addHeader("accept-language", "en-gb");
+        req.addHeader("accept-language", "en;q=0.5");
+
+        Locale actual = req.getLocale();
+        Locale expected = Locale.forLanguageTag("en-gb");
+
+        Assert.assertEquals(expected, actual);
+    }
+
 }
