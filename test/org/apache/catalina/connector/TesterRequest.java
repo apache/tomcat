@@ -16,6 +16,13 @@
  */
 package org.apache.catalina.connector;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class TesterRequest extends Request {
     @Override
     public String getScheme() {
@@ -44,5 +51,32 @@ public class TesterRequest extends Request {
     @Override
     public String getMethod() {
         return method;
+    }
+
+    private final Map<String,List<String>> headers = new HashMap<>();
+    protected void addHeader(String name, String value) {
+        List<String> values = headers.get(name);
+        if (values == null) {
+            values = new ArrayList<>();
+            headers.put(name, values);
+        }
+        values.add(value);
+    }
+    @Override
+    public String getHeader(String name) {
+        List<String> values = headers.get(name);
+        if (values == null || values.size() == 0) {
+            return null;
+        }
+        return values.get(0);
+    }
+    @Override
+    public Enumeration<String> getHeaders(String name) {
+        return Collections.enumeration(headers.get(name));
+    }
+
+    @Override
+    public Enumeration<String> getHeaderNames() {
+        return Collections.enumeration(headers.keySet());
     }
 }

@@ -136,6 +136,11 @@
         <bug>56840</bug>: Avoid NPE when the rewrite valve is mapped to
         a context. (remm)
       </fix>
+      <fix>
+        Correctly handle multiple <code>accept-language</code> headers rather
+        than just using the first header to determine the user&apos;s preferred
+        Locale. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
