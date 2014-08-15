@@ -68,7 +68,9 @@ public class AcceptLanguage {
                 quality = HttpParser.readWeight(input, ',');
             }
 
-            result.add(new AcceptLanguage(Locale.forLanguageTag(languageTag), quality));
+            if (quality > 0) {
+                result.add(new AcceptLanguage(Locale.forLanguageTag(languageTag), quality));
+            }
         } while (true);
 
         return result;
