@@ -44,6 +44,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.0.12 (markt)">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Correct a logic error in the <code>JasperElResolver</code>. There was no
+        functional impact but the code was less efficient as a result of the
+        error. Based on a patch by martinschaef. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 8.0.11 (markt)">
   <subsection name="Catalina">
     <changelog>
