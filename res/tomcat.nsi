@@ -184,6 +184,7 @@ Section "Core" SecTomcatCore
   SetOutPath $INSTDIR\bin
   File bin\bootstrap.jar
   File bin\tomcat-juli.jar
+  File bin\*.bat
   SetOutPath $INSTDIR\conf
   File conf\*.*
   SetOutPath $INSTDIR\webapps\ROOT

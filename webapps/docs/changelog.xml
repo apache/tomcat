@@ -54,6 +54,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        <bug>56323</bug>: Include the <code>*.bat</code> files when installing
+        Tomcat via the Windows installer. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.11 (markt)">
   <subsection name="Catalina">
