@@ -62,7 +62,6 @@ public class TestJasperELResolver {
                 ((ELResolver[])getField("resolvers", resolver)).length);
         Assert.assertEquals(Integer.valueOf(9 + count),
                 getField("size", resolver));
-
     }
 
     private static final Object getField(String name, Object target)

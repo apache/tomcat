@@ -69,7 +69,7 @@ public class JasperELResolver extends CompositeELResolver {
     public synchronized void add(ELResolver elResolver) {
         super.add(elResolver);
 
-        if (resolvers.length < size) {
+        if (resolvers.length > size) {
             resolvers[size] = elResolver;
         } else {
             ELResolver[] nr = new ELResolver[size + 1];
