@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -48,8 +49,8 @@ public class PerMessageDeflate implements Transformation {
     private final Inflater inflator = new Inflater(true);
     private final ByteBuffer readBuffer = ByteBuffer.allocate(8192);
 
-    private Transformation next;
-    private boolean skipDecompression = false;
+    private volatile Transformation next;
+    private volatile boolean skipDecompression = false;
 
     static PerMessageDeflate negotiate(List<List<Parameter>> preferences) {
         // Accept the first preference that the server is able to support
@@ -288,11 +289,24 @@ public class PerMessageDeflate implements Transformation {
 
     @Override
     public List<MessagePart> sendMessagePart(List<MessagePart> messageParts) {
-        // TODO: Implement compression of sent messages
+        List<MessagePart> compressedParts = new ArrayList<>(messageParts.size());
+
+        for (MessagePart messagePart : messageParts) {
+            byte opCode = messagePart.getOpCode();
+            if (Util.isControl(opCode)) {
+                // Control messages can appear in the middle of other messages
+                // and must not be compressed. Pass it straight through
+                compressedParts.add(messagePart);
+            } else {
+                // TODO: Implement compression of sent messages
+                compressedParts.add(messagePart);
+            }
+        }
+
         if (next == null) {
-            return messageParts;
+            return compressedParts;
         } else {
-            return next.sendMessagePart(messageParts);
+            return next.sendMessagePart(compressedParts);
         }
     }
 }
