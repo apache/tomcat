@@ -52,8 +52,6 @@ public class PerMessageDeflate implements Transformation {
     private boolean skipDecompression = false;
 
     static PerMessageDeflate negotiate(List<List<Parameter>> preferences) {
-
-
         // Accept the first preference that the server is able to support
         for (List<Parameter> preference : preferences) {
             boolean ok = true;
@@ -144,6 +142,7 @@ public class PerMessageDeflate implements Transformation {
         return null;
     }
 
+
     private PerMessageDeflate(boolean serverContextTakeover, int serverMaxWindowBits,
             boolean clientContextTakeover, int clientMaxWindowBits) {
         this.serverContextTakeover = serverContextTakeover;
@@ -156,7 +155,6 @@ public class PerMessageDeflate implements Transformation {
     @Override
     public TransformationResult getMoreData(byte opCode, boolean fin, int rsv, ByteBuffer dest)
             throws IOException {
-
         // Control frames are never compressed and may appear in the middle of
         // a WebSocket method. Pass them straight through.
         if (Util.isControl(opCode)) {
@@ -239,6 +237,7 @@ public class PerMessageDeflate implements Transformation {
         }
     }
 
+
     @Override
     public Extension getExtensionResponse() {
         Extension result = new WsExtension(NAME);
@@ -263,6 +262,7 @@ public class PerMessageDeflate implements Transformation {
         return result;
     }
 
+
     @Override
     public void setNext(Transformation t) {
         if (next == null) {
@@ -271,6 +271,7 @@ public class PerMessageDeflate implements Transformation {
             next.setNext(t);
         }
     }
+
 
     @Override
     public boolean validateRsvBits(int i) {
