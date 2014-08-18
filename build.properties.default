@@ -238,3 +238,4 @@ cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.0.3-bin.tar.gz
 
 # ----- JVM settings for unit tests
 java.net.preferIPv4Stack=false
+test.entry=org.apache.tomcat.util.net.TestSsl
