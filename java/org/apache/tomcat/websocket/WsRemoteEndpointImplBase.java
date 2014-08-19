@@ -367,11 +367,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                             sm.getString("wsRemoteEndpoint.changeType"));
                 }
                 nextText = text;
-                nextFragmented = !mp.isLast();
+                nextFragmented = !mp.isFin();
                 first = false;
             } else {
                 // Wasn't fragmented. Might be now
-                if (mp.isLast()) {
+                if (mp.isFin()) {
                     nextFragmented = false;
                 } else {
                     nextFragmented = true;
@@ -391,7 +391,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         headerBuffer.clear();
         writeHeader(headerBuffer, mp.getOpCode(), mp.getPayload(), first,
-                mp.isLast(), isMasked(), mask);
+                mp.isFin(), isMasked(), mask);
         headerBuffer.flip();
 
         if (getBatchingAllowed() || isMasked()) {
