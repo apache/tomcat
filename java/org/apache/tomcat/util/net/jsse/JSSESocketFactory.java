@@ -295,8 +295,6 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         String keystoreFile = endpoint.getKeystoreFile();
         if (keystoreFile == null)
             keystoreFile = defaultKeystoreFile;
-        if("Windows-MY".equals(type))
-            keystoreFile = "";
 
         return getStore(type, provider, keystoreFile, pass);
     }
@@ -312,8 +310,6 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         if(truststoreFile == null) {
             truststoreFile = System.getProperty("javax.net.ssl.trustStore");
         }
-        if("Windows-ROOT".equals(keystoreType))
-            truststoreFile = "";
         if(log.isDebugEnabled()) {
             log.debug("Truststore = " + truststoreFile);
         }
