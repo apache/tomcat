@@ -46,7 +46,7 @@ public class PerMessageDeflate implements Transformation {
     private final int serverMaxWindowBits;
     private final boolean clientContextTakeover;
     private final int clientMaxWindowBits;
-    private final Inflater inflator = new Inflater(true);
+    private final Inflater inflater = new Inflater(true);
     private final ByteBuffer readBuffer = ByteBuffer.allocate(8192);
 
     private volatile Transformation next;
@@ -178,26 +178,26 @@ public class PerMessageDeflate implements Transformation {
         while (dest.remaining() > 0) {
             // Space available in destination. Try and fill it.
             try {
-                written = inflator.inflate(
+                written = inflater.inflate(
                         dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
             } catch (DataFormatException e) {
                 throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
             }
             dest.position(dest.position() + written);
 
-            if (inflator.needsInput() && !usedEomBytes ) {
+            if (inflater.needsInput() && !usedEomBytes ) {
                 if (dest.hasRemaining()) {
                     readBuffer.clear();
                     TransformationResult nextResult =
                             next.getMoreData(opCode, fin, (rsv ^ RSV_BITMASK), readBuffer);
-                    inflator.setInput(
+                    inflater.setInput(
                             readBuffer.array(), readBuffer.arrayOffset(), readBuffer.position());
                     if (TransformationResult.UNDERFLOW.equals(nextResult)) {
                         return nextResult;
                     } else if (TransformationResult.END_OF_FRAME.equals(nextResult) &&
                             readBuffer.position() == 0) {
                         if (fin) {
-                            inflator.setInput(EOM_BYTES);
+                            inflater.setInput(EOM_BYTES);
                             usedEomBytes = true;
                         } else {
                             return TransformationResult.END_OF_FRAME;
