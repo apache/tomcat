@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
 
 import javax.websocket.SendHandler;
 
-public class MessagePart {
+class MessagePart {
     private final byte opCode;
     private final ByteBuffer payload;
     private final boolean last;
