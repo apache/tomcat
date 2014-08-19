@@ -390,8 +390,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         headerBuffer.clear();
-        writeHeader(headerBuffer, mp.getOpCode(), mp.getPayload(), first,
-                mp.isFin(), isMasked(), mask);
+        writeHeader(headerBuffer, mp.isFin(), mp.getRsv(), mp.getOpCode(),
+                isMasked(), mp.getPayload(), mask, first);
         headerBuffer.flip();
 
         if (getBatchingAllowed() || isMasked()) {
@@ -549,20 +549,22 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     protected abstract boolean isMasked();
     protected abstract void doClose();
 
-    private static void writeHeader(ByteBuffer headerBuffer, byte opCode,
-            ByteBuffer payload, boolean first, boolean last, boolean masked,
-            byte[] mask) {
+    private static void writeHeader(ByteBuffer headerBuffer, boolean fin,
+            int rsv, byte opCode, boolean masked, ByteBuffer payload,
+            byte[] mask, boolean first) {
 
         byte b = 0;
 
-        if (last) {
+        if (fin) {
             // Set the fin bit
-            b = -128;
+            b -= 128;
         }
+
+        b += (rsv << 4);
 
         if (first) {
             // This is the first fragment of this message
-            b = (byte) (b + opCode);
+            b += opCode;
         }
         // If not the first fragment, it is a continuation with opCode of zero
 
