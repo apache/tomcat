@@ -39,8 +39,10 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
+import org.apache.catalina.SessionIdGenerator;
 import org.apache.catalina.util.LifecycleMBeanBase;
-import org.apache.catalina.util.SessionIdGenerator;
+import org.apache.catalina.util.SessionIdGeneratorBase;
+import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -87,10 +89,14 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     protected int maxInactiveInterval = 30 * 60;
 
 
+    protected static final int SESSION_ID_LENGTH_UNSET = -1;
+
     /**
      * The session id length of Sessions created by this Manager.
+     * The length should be set directly on the SessionIdGenerator.
+     * Setting it here is deprecated.
      */
-    protected int sessionIdLength = 16;
+    protected int sessionIdLength = SESSION_ID_LENGTH_UNSET;
 
 
     /**
@@ -124,6 +130,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     protected String secureRandomProvider = null;
 
     protected SessionIdGenerator sessionIdGenerator = null;
+    protected Class sessionIdGeneratorClass = null;
 
     /**
      * The longest time (in seconds) that an expired session had been alive.
@@ -323,9 +330,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * Gets the session id length (in bytes) of Sessions created by
      * this Manager.
      *
+     * @deprecated Use {@link SessionIdGenerator#getSessionIdLength()}.
+     *             This method will be removed in Tomcat 9 onwards.
+     *
      * @return The session id length
      */
     @Override
+    @Deprecated
     public int getSessionIdLength() {
 
         return (this.sessionIdLength);
@@ -337,9 +348,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * Sets the session id length (in bytes) for Sessions created by this
      * Manager.
      *
+     * @deprecated Use {@link SessionIdGenerator#setSessionIdLength(int)}.
+     *             This method will be removed in Tomcat 9 onwards.
+     *
      * @param idLength The session id length
      */
     @Override
+    @Deprecated
     public void setSessionIdLength(int idLength) {
 
         int oldSessionIdLength = this.sessionIdLength;
@@ -348,6 +363,42 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                                    Integer.valueOf(oldSessionIdLength),
                                    Integer.valueOf(this.sessionIdLength));
 
+    }
+
+
+    /**
+     * Gets the session id generator.
+     *
+     * @return The session id generator
+     */
+    @Override
+    public SessionIdGenerator getSessionIdGenerator() {
+        if (sessionIdGenerator != null) {
+            return sessionIdGenerator;
+        } else if (sessionIdGeneratorClass != null) {
+            try {
+                sessionIdGenerator =
+                    (SessionIdGenerator) sessionIdGeneratorClass.newInstance();
+                return sessionIdGenerator;
+            } catch(IllegalAccessException ex) {
+                // Ignore
+            } catch(InstantiationException ex) {
+                // Ignore
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Sets the session id generator
+     *
+     * @param idGenerator The session id generator
+     */
+    @Override
+    public void setSessionIdGenerator(SessionIdGenerator sessionIdGenerator) {
+        this.sessionIdGenerator = sessionIdGenerator;
+        sessionIdGeneratorClass = sessionIdGenerator.getClass();
     }
 
 
@@ -547,12 +598,23 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             sessionExpirationTiming.add(null);
         }
 
-        sessionIdGenerator = new SessionIdGenerator();
+        /* Create sessionIdGenerator if not explicitly configured */
+        SessionIdGenerator sessionIdGenerator = getSessionIdGenerator();
+        if (sessionIdGenerator == null) {
+            sessionIdGenerator = new StandardSessionIdGenerator();
+            setSessionIdGenerator(sessionIdGenerator);
+        }
+
+        if (sessionIdLength != SESSION_ID_LENGTH_UNSET) {
+            sessionIdGenerator.setSessionIdLength(sessionIdLength);
+        }
         sessionIdGenerator.setJvmRoute(getJvmRoute());
-        sessionIdGenerator.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
-        sessionIdGenerator.setSecureRandomClass(getSecureRandomClass());
-        sessionIdGenerator.setSecureRandomProvider(getSecureRandomProvider());
-        sessionIdGenerator.setSessionIdLength(getSessionIdLength());
+        if (sessionIdGenerator instanceof SessionIdGeneratorBase) {
+            SessionIdGeneratorBase sig = (SessionIdGeneratorBase)sessionIdGenerator;
+            sig.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
+            sig.setSecureRandomClass(getSecureRandomClass());
+            sig.setSecureRandomProvider(getSecureRandomProvider());
+        }
 
         // Force initialization of the random number generator
         if (log.isDebugEnabled())
