@@ -117,11 +117,29 @@ public interface Manager {
 
 
     /**
+     * return the session id generator
+     */
+    public SessionIdGenerator getSessionIdGenerator();
+
+
+    /**
+     * Sets the session id generator
+     *
+     * @param idGenerator The session id generator
+     */
+    public void setSessionIdGenerator(SessionIdGenerator sessionIdGenerator);
+
+
+    /**
      * Gets the session id length (in bytes) of Sessions created by
      * this Manager.
      *
+     * @deprecated Use {@link SessionIdGenerator#getSessionIdLength()}.
+     *             This method will be removed in Tomcat 9 onwards.
+     *
      * @return The session id length
      */
+    @Deprecated
     public int getSessionIdLength();
 
 
@@ -129,8 +147,12 @@ public interface Manager {
      * Sets the session id length (in bytes) for Sessions created by this
      * Manager.
      *
+     * @deprecated Use {@link SessionIdGenerator#setSessionIdLength(int)}.
+     *             This method will be removed in Tomcat 9 onwards.
+     *
      * @param idLength The session id length
      */
+    @Deprecated
     public void setSessionIdLength(int idLength);
 
 

@@ -101,7 +101,8 @@
        <p>The length of session ids created by this Manager, measured in bytes,
         excluding subsequent conversion to a hexadecimal string and
         excluding any JVM route information used for load balancing.
-        The default is 16.</p>
+        This attribute is deprecated. Set the length on a nested
+        <strong>SessionIdGenerator</strong> element instead.</p>
       </attribute>
       <attribute name="processExpiresFrequency" required="false">
         <p>Frequency of the session expiration, and related manager operations.

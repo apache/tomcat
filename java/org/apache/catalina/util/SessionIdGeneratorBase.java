@@ -22,13 +22,14 @@ import java.security.SecureRandom;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.catalina.SessionIdGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-public class SessionIdGenerator {
+public abstract class SessionIdGeneratorBase implements SessionIdGenerator {
 
-    private static final Log log = LogFactory.getLog(SessionIdGenerator.class);
+    private static final Log log = LogFactory.getLog(SessionIdGeneratorBase.class);
 
 
     private static final StringManager sm =
@@ -116,21 +117,40 @@ public class SessionIdGenerator {
 
 
     /**
+     * Return the node identifier associated with this node which will be
+     * included in the generated session ID.
+     */
+    @Override
+    public String getJvmRoute() {
+        return jvmRoute;
+    }
+
+
+    /**
      * Specify the node identifier associated with this node which will be
      * included in the generated session ID.
      *
      * @param jvmRoute  The node identifier
      */
+    @Override
     public void setJvmRoute(String jvmRoute) {
         this.jvmRoute = jvmRoute;
     }
 
 
     /**
+     * Return the number of bytes for a session ID
+     */
+    @Override
+    public int getSessionIdLength() {
+        return sessionIdLength;
+    }
+    /**
      * Specify the number of bytes for a session ID
      *
      * @param sessionIdLength   Number of bytes
      */
+    @Override
     public void setSessionIdLength(int sessionIdLength) {
         this.sessionIdLength = sessionIdLength;
     }
@@ -139,43 +159,12 @@ public class SessionIdGenerator {
     /**
      * Generate and return a new session identifier.
      */
+    @Override
     public String generateSessionId() {
-
-        byte random[] = new byte[16];
-
-        // Render the result as a String of hexadecimal digits
-        StringBuilder buffer = new StringBuilder();
-
-        int resultLenBytes = 0;
-
-        while (resultLenBytes < sessionIdLength) {
-            getRandomBytes(random);
-            for (int j = 0;
-            j < random.length && resultLenBytes < sessionIdLength;
-            j++) {
-                byte b1 = (byte) ((random[j] & 0xf0) >> 4);
-                byte b2 = (byte) (random[j] & 0x0f);
-                if (b1 < 10)
-                    buffer.append((char) ('0' + b1));
-                else
-                    buffer.append((char) ('A' + (b1 - 10)));
-                if (b2 < 10)
-                    buffer.append((char) ('0' + b2));
-                else
-                    buffer.append((char) ('A' + (b2 - 10)));
-                resultLenBytes++;
-            }
-        }
-
-        if (jvmRoute != null && jvmRoute.length() > 0) {
-            buffer.append('.').append(jvmRoute);
-        }
-
-        return buffer.toString();
+        return generateSessionId(jvmRoute);
     }
 
-
-    private void getRandomBytes(byte bytes[]) {
+    protected void getRandomBytes(byte bytes[]) {
 
         SecureRandom random = randoms.poll();
         if (random == null) {
@@ -201,7 +190,7 @@ public class SessionIdGenerator {
                 Class<?> clazz = Class.forName(secureRandomClass);
                 result = (SecureRandom) clazz.newInstance();
             } catch (Exception e) {
-                log.error(sm.getString("sessionIdGenerator.random",
+                log.error(sm.getString("sessionIdGeneratorBase.random",
                         secureRandomClass), e);
             }
         }
@@ -218,10 +207,10 @@ public class SessionIdGenerator {
                     result = SecureRandom.getInstance(secureRandomAlgorithm);
                 }
             } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("sessionIdGenerator.randomAlgorithm",
+                log.error(sm.getString("sessionIdGeneratorBase.randomAlgorithm",
                         secureRandomAlgorithm), e);
             } catch (NoSuchProviderException e) {
-                log.error(sm.getString("sessionIdGenerator.randomProvider",
+                log.error(sm.getString("sessionIdGeneratorBase.randomProvider",
                         secureRandomProvider), e);
             }
         }
@@ -231,7 +220,7 @@ public class SessionIdGenerator {
             try {
                 result = SecureRandom.getInstance("SHA1PRNG");
             } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("sessionIdGenerator.randomAlgorithm",
+                log.error(sm.getString("sessionIdGeneratorBase.randomAlgorithm",
                         secureRandomAlgorithm), e);
             }
         }
@@ -246,7 +235,7 @@ public class SessionIdGenerator {
 
         long t2=System.currentTimeMillis();
         if( (t2-t1) > 100 )
-            log.info(sm.getString("sessionIdGenerator.createRandom",
+            log.info(sm.getString("sessionIdGeneratorBase.createRandom",
                     result.getAlgorithm(), Long.valueOf(t2-t1)));
         return result;
     }
