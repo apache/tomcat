@@ -393,7 +393,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * Sets the session id generator
      *
-     * @param idGenerator The session id generator
+     * @param sessionIdGenerator The session id generator
      */
     @Override
     public void setSessionIdGenerator(SessionIdGenerator sessionIdGenerator) {

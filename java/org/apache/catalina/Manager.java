@@ -125,7 +125,7 @@ public interface Manager {
     /**
      * Sets the session id generator
      *
-     * @param idGenerator The session id generator
+     * @param sessionIdGenerator The session id generator
      */
     public void setSessionIdGenerator(SessionIdGenerator sessionIdGenerator);
 
