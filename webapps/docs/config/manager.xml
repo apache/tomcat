@@ -277,7 +277,7 @@
 
 <section name="Nested Components">
 
-  <h3>All Manager Implementation</h3>
+  <h3>All Manager Implementations</h3>
 
   <p>All Manager implementations allow nesting of a
   <strong>&lt;SessionIdGenerator&gt;</strong> element. It defines
