@@ -130,7 +130,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     protected String secureRandomProvider = null;
 
     protected SessionIdGenerator sessionIdGenerator = null;
-    protected Class sessionIdGeneratorClass = null;
+    protected Class<? extends SessionIdGenerator> sessionIdGeneratorClass = null;
 
     /**
      * The longest time (in seconds) that an expired session had been alive.
@@ -377,8 +377,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             return sessionIdGenerator;
         } else if (sessionIdGeneratorClass != null) {
             try {
-                sessionIdGenerator =
-                    (SessionIdGenerator) sessionIdGeneratorClass.newInstance();
+                sessionIdGenerator = sessionIdGeneratorClass.newInstance();
                 return sessionIdGenerator;
             } catch(IllegalAccessException ex) {
                 // Ignore
