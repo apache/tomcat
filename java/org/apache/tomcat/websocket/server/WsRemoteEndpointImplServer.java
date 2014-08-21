@@ -194,6 +194,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         // message.
         SendHandler sh = handler;
         handler = null;
+        buffers = null;
         if (sh != null) {
             if (useDispatch) {
                 OnResultRunnable r = onResultRunnables.poll();
