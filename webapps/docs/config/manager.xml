@@ -282,7 +282,7 @@
   <p>All Manager implementations allow nesting of a
   <strong>&lt;SessionIdGenerator&gt;</strong> element. It defines
   the behavior of session id generation.  All implementations
-  of the <code>&lt;SessionIdGenerator&gt;</code> element allow the
+  of the <a href="sessionidgenerator.html">SessionIdGenerator</a> allow the
   following attributes:
   </p>
 
