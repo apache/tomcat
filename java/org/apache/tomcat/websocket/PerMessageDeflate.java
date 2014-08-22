@@ -21,10 +21,12 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 import javax.websocket.Extension;
 import javax.websocket.Extension.Parameter;
+import javax.websocket.SendHandler;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -47,10 +49,15 @@ public class PerMessageDeflate implements Transformation {
     private final boolean clientContextTakeover;
     private final int clientMaxWindowBits;
     private final Inflater inflater = new Inflater(true);
-    private final ByteBuffer readBuffer = ByteBuffer.allocate(8192);
+    private final ByteBuffer readBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
+    private final Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
 
     private volatile Transformation next;
     private volatile boolean skipDecompression = false;
+    private volatile ByteBuffer writeBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
+    private volatile boolean deflaterResetRequired = true;
+    private volatile boolean firstCompressedFrameWritten = false;
+    private volatile byte[] EOM_BUFFER = new byte[EOM_BYTES.length + 1];
 
     static PerMessageDeflate negotiate(List<List<Parameter>> preferences) {
         // Accept the first preference that the server is able to support
@@ -288,25 +295,143 @@ public class PerMessageDeflate implements Transformation {
 
 
     @Override
-    public List<MessagePart> sendMessagePart(List<MessagePart> messageParts) {
-        List<MessagePart> compressedParts = new ArrayList<>(messageParts.size());
+    public List<MessagePart> sendMessagePart(List<MessagePart> uncompressedParts) {
+        List<MessagePart> allCompressedParts = new ArrayList<>();
 
-        for (MessagePart messagePart : messageParts) {
-            byte opCode = messagePart.getOpCode();
+        for (MessagePart uncompressedPart : uncompressedParts) {
+            byte opCode = uncompressedPart.getOpCode();
             if (Util.isControl(opCode)) {
                 // Control messages can appear in the middle of other messages
                 // and must not be compressed. Pass it straight through
-                compressedParts.add(messagePart);
+                allCompressedParts.add(uncompressedPart);
             } else {
-                // TODO: Implement compression of sent messages
-                compressedParts.add(messagePart);
+                List<MessagePart> compressedParts = new ArrayList<>();
+                ByteBuffer uncompressedPayload = uncompressedPart.getPayload();
+                SendHandler uncompressedIntermediateHandler =
+                        uncompressedPart.getIntermediateHandler();
+
+                // Need to reset the deflater at the start of every message
+                if (deflaterResetRequired) {
+                    deflater.reset();
+                    deflaterResetRequired = false;
+                    firstCompressedFrameWritten = false;
+                }
+
+                deflater.setInput(uncompressedPayload.array(),
+                        uncompressedPayload.arrayOffset() + uncompressedPayload.position(),
+                        uncompressedPayload.remaining());
+
+                int flush = (uncompressedPart.isFin() ? Deflater.SYNC_FLUSH : Deflater.NO_FLUSH);
+                boolean deflateRequired = true;
+
+                while(deflateRequired) {
+                    ByteBuffer compressedPayload = writeBuffer;
+
+                    int written = deflater.deflate(compressedPayload.array(),
+                            compressedPayload.arrayOffset() + compressedPayload.position(),
+                            compressedPayload.remaining(), flush);
+                    compressedPayload.position(compressedPayload.position() + written);
+
+                    if (!uncompressedPart.isFin() && compressedPayload.hasRemaining() && deflater.needsInput()) {
+                        // This message part has been fully processed by the
+                        // deflater. Fire the send handler for this message part
+                        // and move on to the next message part.
+                        break;
+                    }
+
+                    // If this point is reached, a new compressed message part
+                    // will be created...
+                    MessagePart compressedPart;
+
+                    // .. and a new writeBuffer will be required.
+                    writeBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
+
+                    // Flip the compressed payload ready for writing
+                    compressedPayload.flip();
+
+                    boolean fin = uncompressedPart.isFin();
+                    boolean full = compressedPayload.limit() == compressedPayload.capacity();
+                    boolean needsInput = deflater.needsInput();
+
+                    if (fin && !full && needsInput) {
+                        // End of compressed message. Drop EOM bytes and output.
+                        compressedPayload.limit(compressedPayload.limit() - EOM_BYTES.length);
+                        compressedPart = new MessagePart(true, getRsv(uncompressedPart),
+                                opCode, compressedPayload, uncompressedIntermediateHandler,
+                                uncompressedIntermediateHandler);
+                        deflaterResetRequired = true;
+                        deflateRequired = false;
+                    } else if (full && !needsInput) {
+                        // Write buffer full and input message not fully read.
+                        // Output and start new compressed part.
+                        compressedPart = new MessagePart(false, getRsv(uncompressedPart),
+                                opCode, compressedPayload, uncompressedIntermediateHandler,
+                                uncompressedIntermediateHandler);
+                    } else if (!fin && full && needsInput) {
+                        // Write buffer full and input message not fully read.
+                        // Output and get more data.
+                        compressedPart = new MessagePart(false, getRsv(uncompressedPart),
+                                opCode, compressedPayload, uncompressedIntermediateHandler,
+                                uncompressedIntermediateHandler);
+                        deflateRequired = false;
+                    } else if (fin && full && needsInput) {
+                        // Write buffer full. Input fully read. Deflater may be
+                        // in one of four states:
+                        // - output complete (just happened to align with end of
+                        //   buffer
+                        // - in middle of EOM bytes
+                        // - about to write EOM bytes
+                        // - more data to write
+                        int eomBufferWritten = deflater.deflate(EOM_BUFFER, 0, EOM_BUFFER.length, Deflater.SYNC_FLUSH);
+                        if (eomBufferWritten < EOM_BUFFER.length) {
+                            // EOM has just been completed
+                            compressedPayload.limit(compressedPayload.limit() - EOM_BYTES.length + eomBufferWritten);
+                            compressedPart = new MessagePart(true,
+                                    getRsv(uncompressedPart), opCode, compressedPayload,
+                                    uncompressedIntermediateHandler, uncompressedIntermediateHandler);
+                            deflaterResetRequired = true;
+                            deflateRequired = false;
+                        } else {
+                            // More data to write
+                            // Copy bytes to new write buffer
+                            writeBuffer.put(EOM_BUFFER, 0, eomBufferWritten);
+                            compressedPart = new MessagePart(false,
+                                    getRsv(uncompressedPart), opCode, compressedPayload,
+                                    uncompressedIntermediateHandler, uncompressedIntermediateHandler);
+                        }
+                    } else {
+                        throw new IllegalStateException("Should never happen");
+                    }
+
+                    // Add the newly created compressed part to the set of parts
+                    // to pass on to the next transformation.
+                    compressedParts.add(compressedPart);
+                }
+
+                SendHandler uncompressedEndHandler = uncompressedPart.getEndHandler();
+                int size = compressedParts.size();
+                if (size > 0) {
+                    compressedParts.get(size - 1).setEndHandler(uncompressedEndHandler);
+                }
+
+                allCompressedParts.addAll(compressedParts);
             }
         }
 
         if (next == null) {
-            return compressedParts;
+            return allCompressedParts;
         } else {
-            return next.sendMessagePart(compressedParts);
+            return next.sendMessagePart(allCompressedParts);
         }
+    }
+
+
+    private int getRsv(MessagePart uncompressedMessagePart) {
+        int result = uncompressedMessagePart.getRsv();
+        if (!firstCompressedFrameWritten) {
+            result += RSV_BITMASK;
+            firstCompressedFrameWritten = true;
+        }
+        return result;
     }
 }
