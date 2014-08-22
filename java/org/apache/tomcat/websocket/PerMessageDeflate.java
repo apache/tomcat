@@ -55,7 +55,6 @@ public class PerMessageDeflate implements Transformation {
     private volatile Transformation next;
     private volatile boolean skipDecompression = false;
     private volatile ByteBuffer writeBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
-    private volatile boolean deflaterResetRequired = true;
     private volatile boolean firstCompressedFrameWritten = false;
     private volatile byte[] EOM_BUFFER = new byte[EOM_BYTES.length + 1];
 
@@ -212,6 +211,9 @@ public class PerMessageDeflate implements Transformation {
                     }
                 }
             } else if (written == 0) {
+                if (fin && !serverContextTakeover) {
+                    inflater.reset();
+                }
                 return TransformationResult.END_OF_FRAME;
             }
         }
@@ -310,13 +312,6 @@ public class PerMessageDeflate implements Transformation {
                 SendHandler uncompressedIntermediateHandler =
                         uncompressedPart.getIntermediateHandler();
 
-                // Need to reset the deflater at the start of every message
-                if (deflaterResetRequired) {
-                    deflater.reset();
-                    deflaterResetRequired = false;
-                    firstCompressedFrameWritten = false;
-                }
-
                 deflater.setInput(uncompressedPayload.array(),
                         uncompressedPayload.arrayOffset() + uncompressedPayload.position(),
                         uncompressedPayload.remaining());
@@ -359,8 +354,8 @@ public class PerMessageDeflate implements Transformation {
                         compressedPart = new MessagePart(true, getRsv(uncompressedPart),
                                 opCode, compressedPayload, uncompressedIntermediateHandler,
                                 uncompressedIntermediateHandler);
-                        deflaterResetRequired = true;
                         deflateRequired = false;
+                        startNewMessage();
                     } else if (full && !needsInput) {
                         // Write buffer full and input message not fully read.
                         // Output and start new compressed part.
@@ -389,8 +384,8 @@ public class PerMessageDeflate implements Transformation {
                             compressedPart = new MessagePart(true,
                                     getRsv(uncompressedPart), opCode, compressedPayload,
                                     uncompressedIntermediateHandler, uncompressedIntermediateHandler);
-                            deflaterResetRequired = true;
                             deflateRequired = false;
+                            startNewMessage();
                         } else {
                             // More data to write
                             // Copy bytes to new write buffer
@@ -425,6 +420,13 @@ public class PerMessageDeflate implements Transformation {
         }
     }
 
+
+    private void startNewMessage() {
+        firstCompressedFrameWritten = false;
+        if (!clientContextTakeover) {
+            deflater.reset();
+        }
+    }
 
     private int getRsv(MessagePart uncompressedMessagePart) {
         int result = uncompressedMessagePart.getRsv();
