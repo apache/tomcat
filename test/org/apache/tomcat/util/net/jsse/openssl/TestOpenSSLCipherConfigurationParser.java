@@ -482,7 +482,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    @Ignore("TODO: Figure out why this fails")
     public void testSpecification03() throws Exception {
         // Reported as failing during 8.0.11 release vote by Ognjen Blagojevic
         testSpecification("EECDH+aRSA+SHA384:EECDH:EDH+aRSA:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS");

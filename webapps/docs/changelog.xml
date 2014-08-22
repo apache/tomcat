@@ -52,6 +52,10 @@
         ignore unknown criteria rather than throwing a
         <code>NullPointerException</code>. (markt)
       </fix>
+      <add>
+        Add support for the EECDH alias when using the OpenSSL cipher syntax to
+        define JSSE ciphers. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

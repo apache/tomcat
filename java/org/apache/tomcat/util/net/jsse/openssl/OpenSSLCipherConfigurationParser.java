@@ -164,6 +164,11 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String kEECDH = "kEECDH";
     /**
+     * Cipher suites using ephemeral ECDH key agreement, excluding anonymous cipher suites.
+     * Same as "kEECDH:-AECDH"
+     */
+    private static final String EECDH = "EECDH";
+    /**
      * Cipher suitesusing ECDH key exchange, including anonymous, ephemeral and fixed ECDH.
      */
     private static final String ECDH = "ECDH";
@@ -407,6 +412,9 @@ public class OpenSSLCipherConfigurationParser {
         aliases.put(ECDHE, aliases.get(kECDHE));
         addListAlias(kEECDH, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH)));
         aliases.put(EECDHE, aliases.get(kEECDH));
+        Set<Cipher> eecdh = filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH));
+        eecdh.removeAll(filterByAuthentication(allCiphers, Collections.singleton(Authentication.aNULL)));
+        addListAlias(EECDH, eecdh);
         addListAlias(aDSS, filterByAuthentication(allCiphers, Collections.singleton(Authentication.DSS)));
         aliases.put("DSS", aliases.get(aDSS));
         addListAlias(aDH, filterByAuthentication(allCiphers, Collections.singleton(Authentication.DH)));
