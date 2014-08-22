@@ -45,6 +45,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.12 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When building a list of JSSE ciphers from an OpenSSL cipher defintiion,
+        ignore unknown criteria rather than throwing a
+        <code>NullPointerException</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

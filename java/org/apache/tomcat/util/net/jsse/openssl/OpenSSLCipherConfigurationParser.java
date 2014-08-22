@@ -632,7 +632,7 @@ public class OpenSSLCipherConfigurationParser {
                 add(ciphers, element);
             } else if (element.contains(AND)) {
                 String[] intersections = element.split("\\" + AND);
-                if(intersections.length > 0) {
+                if(intersections.length > 0 && aliases.containsKey(intersections[0])) {
                     List<Cipher> result = new ArrayList<>(aliases.get(intersections[0]));
                     for(int i = 1; i < intersections.length; i++) {
                         if(aliases.containsKey(intersections[i])) {
