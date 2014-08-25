@@ -45,6 +45,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.12 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Make the session id generator extensible by adding a 
+        <code>SessionIdGenerator</code> interface, an abstract
+        base class and a standard implementation. (rjung)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
