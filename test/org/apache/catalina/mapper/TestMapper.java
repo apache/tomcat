@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -103,6 +104,10 @@ public class TestMapper extends LoggingBaseTest {
         mapper.addContextVersion("iowejoiejfoiew", host, "/foo/bar",
                 "0", createContext("context2"), welcomes, null, null);
 
+        mapper.addWrappers("iowejoiejfoiew", "/foo", "0", Arrays
+                .asList(new WrapperMappingInfo[] {
+                        new WrapperMappingInfo("/",
+                                createWrapper("context1-defaultWrapper"), false, false) }));
         mapper.addWrappers("iowejoiejfoiew", "/foo/bar", "0", Arrays
                 .asList(new WrapperMappingInfo[] {
                         new WrapperMappingInfo("/fo/*",
@@ -301,11 +306,19 @@ public class TestMapper extends LoggingBaseTest {
         assertEquals("0", mappedContext.versions[0].name);
         Host oldHost = mappedHost.object;
         Context oldContext = mappedContext.versions[0].object;
+        assertEquals("context2", oldContext.getName());
+
+        Context oldContext1 = mappedHost.contextList.contexts[contextPos - 1].versions[0].object;
+        assertEquals("context1", oldContext1.getName());
 
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
         assertEquals("blah7", mappingData.host.getName());
         assertEquals("context2", mappingData.context.getName());
+        assertEquals("wrapper5", mappingData.wrapper.getName());
+        mappingData.recycle();
+        mapper.map(oldContext, uriMB, mappingData);
+        assertEquals("wrapper5", mappingData.wrapper.getName());
 
         Context newContext = createContext("newContext");
         mapper.addContextVersion(
@@ -317,7 +330,7 @@ public class TestMapper extends LoggingBaseTest {
                 null,
                 null,
                 Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
-                        "/", createWrapper("default"), false, false) }));
+                        "/", createWrapper("newContext-default"), false, false) }));
 
         assertEquals(2, mappedContext.versions.length);
         assertEquals("0", mappedContext.versions[0].name);
@@ -325,6 +338,10 @@ public class TestMapper extends LoggingBaseTest {
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
         assertEquals("newContext", mappingData.context.getName());
+        assertEquals("newContext-default", mappingData.wrapper.getName());
+        mappingData.recycle();
+        mapper.map(newContext, uriMB, mappingData);
+        assertEquals("newContext-default", mappingData.wrapper.getName());
 
         mapper.removeContextVersion(oldContext, hostName, contextPath, "0");
 
@@ -333,6 +350,10 @@ public class TestMapper extends LoggingBaseTest {
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
         assertEquals("newContext", mappingData.context.getName());
+        assertEquals("newContext-default", mappingData.wrapper.getName());
+        mappingData.recycle();
+        mapper.map(newContext, uriMB, mappingData);
+        assertEquals("newContext-default", mappingData.wrapper.getName());
 
         mapper.removeContextVersion(oldContext, hostName, contextPath, "1");
 
@@ -341,6 +362,10 @@ public class TestMapper extends LoggingBaseTest {
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
         assertEquals("context1", mappingData.context.getName());
+        assertEquals("context1-defaultWrapper", mappingData.wrapper.getName());
+        mappingData.recycle();
+        mapper.map(oldContext1, uriMB, mappingData);
+        assertEquals("context1-defaultWrapper", mappingData.wrapper.getName());
 
         mapper.addContextVersion(
                 hostName,
@@ -351,7 +376,7 @@ public class TestMapper extends LoggingBaseTest {
                 null,
                 null,
                 Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
-                        "/", createWrapper("default"), false, false) }));
+                        "/", createWrapper("newContext-defaultWrapper2"), false, false) }));
         mappedContext = mappedHost.contextList.contexts[contextPos];
 
         assertEquals(contextPath, mappedContext.name);
@@ -360,6 +385,89 @@ public class TestMapper extends LoggingBaseTest {
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
         assertEquals("newContext", mappingData.context.getName());
+        assertEquals("newContext-defaultWrapper2", mappingData.wrapper.getName());
+        mappingData.recycle();
+        mapper.map(newContext, uriMB, mappingData);
+        assertEquals("newContext-defaultWrapper2", mappingData.wrapper.getName());
+    }
+
+    @Test
+    public void testReloadContextVersion() throws Exception {
+        final String hostName = "iowejoiejfoiew";
+        final int iowPos = 3;
+        final String contextPath = "/foo/bar";
+        final int contextPos = 2;
+
+        MappingData mappingData = new MappingData();
+        MessageBytes hostMB = MessageBytes.newInstance();
+        MessageBytes uriMB = MessageBytes.newInstance();
+        hostMB.setString(hostName);
+        uriMB.setString("/foo/bar/blah/bobou/foo");
+
+        // Verifying configuration created by setUp()
+        Mapper.MappedHost mappedHost = mapper.hosts[iowPos];
+        assertEquals(hostName, mappedHost.name);
+        Mapper.MappedContext mappedContext = mappedHost.contextList.contexts[contextPos];
+        assertEquals(contextPath, mappedContext.name);
+        assertEquals(1, mappedContext.versions.length);
+        assertEquals("0", mappedContext.versions[0].name);
+        Host oldHost = mappedHost.object;
+        Context oldContext = mappedContext.versions[0].object;
+        assertEquals("context2", oldContext.getName());
+
+        Context oldContext1 = mappedHost.contextList.contexts[contextPos - 1].versions[0].object;
+        assertEquals("context1", oldContext1.getName());
+
+        mappingData.recycle();
+        mapper.map(hostMB, uriMB, null, mappingData);
+        assertEquals("blah7", mappingData.host.getName());
+        assertEquals("context2", mappingData.context.getName());
+        assertEquals("wrapper5", mappingData.wrapper.getName());
+        mappingData.recycle();
+        mapper.map(oldContext, uriMB, mappingData);
+        assertEquals("wrapper5", mappingData.wrapper.getName());
+
+        // Mark context as paused
+        // This is what happens when context reload starts
+        mapper.pauseContextVersion(oldContext, hostName, contextPath, "0");
+
+        mappingData.recycle();
+        mapper.map(hostMB, uriMB, null, mappingData);
+        assertEquals("blah7", mappingData.host.getName());
+        assertEquals("context2", mappingData.context.getName());
+        // Wrapper is not mapped for incoming requests if context is paused
+        assertNull(mappingData.wrapper);
+        mappingData.recycle();
+        mapper.map(oldContext, uriMB, mappingData);
+        // Wrapper is mapped for mapping method used by forward or include dispatch
+        assertEquals("wrapper5", mappingData.wrapper.getName());
+
+        // Re-add the same context, but different list of wrappers
+        // This is what happens when context reload completes
+        mapper.addContextVersion(
+                hostName,
+                oldHost,
+                contextPath,
+                "0",
+                oldContext,
+                null,
+                null,
+                Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
+                        "/", createWrapper("newDefaultWrapper"), false, false) }));
+
+        mappedContext = mappedHost.contextList.contexts[contextPos];
+        assertEquals(contextPath, mappedContext.name);
+        assertEquals(1, mappedContext.versions.length);
+        assertEquals("0", mappedContext.versions[0].name);
+
+        mappingData.recycle();
+        mapper.map(hostMB, uriMB, null, mappingData);
+        assertEquals("blah7", mappingData.host.getName());
+        assertEquals("context2", mappingData.context.getName());
+        assertEquals("newDefaultWrapper", mappingData.wrapper.getName());
+        mappingData.recycle();
+        mapper.map(oldContext, uriMB, mappingData);
+        assertEquals("newDefaultWrapper", mappingData.wrapper.getName());
     }
 
     @Test

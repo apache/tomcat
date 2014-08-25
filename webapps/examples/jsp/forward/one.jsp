@@ -19,5 +19,5 @@
 <body bgcolor="white">
 <font color="red">
 
-VM Memory usage < 50%.
+VM Memory usage &lt; 50%.
 </html>

@@ -305,6 +305,7 @@ public final class Mapper {
                     int pos = find(contextVersions, version);
                     if (pos >= 0 && contextVersions[pos].name.equals(version)) {
                         contextVersions[pos] = newContextVersion;
+                        contextObjectToContextVersionMap.put(context, newContextVersion);
                     }
                 }
             }

@@ -86,7 +86,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
     }
 
     @Test
-    public void testContextReload_Bug56658() throws Exception {
+    public void testContextReload_Bug56658_Bug56882() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
@@ -115,6 +115,24 @@ public class TestMapperWebapps extends TomcatBaseTest{
         text = res.toString();
         Assert.assertTrue(text, text.contains("<title>Apache Tomcat Examples</title>"));
 
+        long timeA = System.currentTimeMillis();
+        res = getUrl("http://localhost:" + getPort()
+                + "/examples/jsp/include/include.jsp");
+        String timestamp = findCommonPrefix(timeA, System.currentTimeMillis());
+        text = res.toString();
+        Assert.assertTrue(text, text.contains(
+                "In place evaluation of another JSP which gives you the current time: " + timestamp));
+        Assert.assertTrue(text, text.contains(
+                "To get the current time in ms"));
+        Assert.assertTrue(text, text.contains(
+                "by including the output of another JSP: " + timestamp));
+        Assert.assertTrue(text, text.contains(":-)"));
+
+        res = getUrl("http://localhost:" + getPort()
+                + "/examples/jsp/forward/forward.jsp");
+        text = res.toString();
+        Assert.assertTrue(text, text.contains("VM Memory usage"));
+
         ctxt.reload();
 
         res = getUrl("http://localhost:" + getPort()
@@ -130,6 +148,24 @@ public class TestMapperWebapps extends TomcatBaseTest{
         res = getUrl("http://localhost:" + getPort() + "/examples/index.html");
         text = res.toString();
         Assert.assertTrue(text, text.contains("<title>Apache Tomcat Examples</title>"));
+
+        timeA = System.currentTimeMillis();
+        res = getUrl("http://localhost:" + getPort()
+                + "/examples/jsp/include/include.jsp");
+        timestamp = findCommonPrefix(timeA, System.currentTimeMillis());
+        text = res.toString();
+        Assert.assertTrue(text, text.contains(
+                "In place evaluation of another JSP which gives you the current time: " + timestamp));
+        Assert.assertTrue(text, text.contains(
+                "To get the current time in ms"));
+        Assert.assertTrue(text, text.contains(
+                "by including the output of another JSP: " + timestamp));
+        Assert.assertTrue(text, text.contains(":-)"));
+
+        res = getUrl("http://localhost:" + getPort()
+                + "/examples/jsp/forward/forward.jsp");
+        text = res.toString();
+        Assert.assertTrue(text, text.contains("VM Memory usage"));
     }
 
     @Test
@@ -188,5 +224,18 @@ public class TestMapperWebapps extends TomcatBaseTest{
                 "/test/welcome-files/sub", bc,
                 new HashMap<String,List<String>>());
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+    }
+
+    /**
+     * Prepare a string to search in messages that contain a timestamp, when it
+     * is known that the timestamp was printed between {@code timeA} and
+     * {@code timeB}.
+     */
+    private static String findCommonPrefix(long timeA, long timeB) {
+        while ((timeA != timeB) && timeA > 0) {
+            timeA /= 10;
+            timeB /= 10;
+        }
+        return String.valueOf(timeA);
     }
 }

@@ -56,6 +56,11 @@
         Add support for the EECDH alias when using the OpenSSL cipher syntax to
         define JSSE ciphers. (markt)
       </add>
+      <fix>
+        <bug>56882</bug>: Fix regression in processing of includes and forwards
+        when Context have been reloaded. Tomcat was responding with HTTP Status
+        503 (Servlet xxx is currently unavailable). (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
