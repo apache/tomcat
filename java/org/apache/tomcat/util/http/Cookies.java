@@ -145,7 +145,7 @@ public final class Cookies {
         while (pos >= 0) {
             MessageBytes cookieValue = headers.getValue(pos);
 
-            if (cookieValue != null && cookieValue.isNull() ) {
+            if (cookieValue != null && !cookieValue.isNull() ) {
                 if (cookieValue.getType() != MessageBytes.T_BYTES ) {
                     Exception e = new Exception();
                     log.warn("Cookies: Parsing cookie as String. Expected bytes.", e);
@@ -252,7 +252,7 @@ public final class Cookies {
      * RFC 2965
      * JVK
      */
-    protected final void processCookieHeader(byte bytes[], int off, int len){
+    final void processCookieHeader(byte bytes[], int off, int len){
         if (len <= 0 || bytes == null) {
             return;
         }
