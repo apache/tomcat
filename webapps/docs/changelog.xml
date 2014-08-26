@@ -48,7 +48,7 @@
   <subsection name="Catalina">
     <changelog>
       <add>
-        Make the session id generator extensible by adding a 
+        Make the session id generator extensible by adding a
         <code>SessionIdGenerator</code> interface, an abstract
         base class and a standard implementation. (rjung)
       </add>
