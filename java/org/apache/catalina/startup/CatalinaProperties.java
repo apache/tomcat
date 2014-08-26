@@ -20,6 +20,7 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
@@ -122,10 +123,17 @@ public class CatalinaProperties {
             try {
                 properties = new Properties();
                 properties.load(is);
-                is.close();
             } catch (Throwable t) {
                 handleThrowable(t);
                 error = t;
+            }
+            finally
+            {
+                try {
+                    is.close();
+                } catch (IOException ioe) {
+                    log.warn("Could not close catalina.properties", ioe);
+                }
             }
         }
 
