@@ -133,7 +133,7 @@ public class AprSocketContext {
     /**
      * SSL context.
      */
-    private long sslCtx = 0;
+    private volatile long sslCtx = 0;
 
     TlsCertVerifier tlsCertVerifier;
 
@@ -608,68 +608,69 @@ public class AprSocketContext {
     long getSslCtx() throws Exception {
         if (sslCtx == 0) {
             synchronized (AprSocketContext.class) {
-
-                boolean serverMode = acceptor != null;
-                sslCtx = SSLContext.make(getRootPool(),
-                        sslProtocol,
-                        serverMode ? SSL.SSL_MODE_SERVER : SSL.SSL_MODE_CLIENT);
-
-
-                // SSL.SSL_OP_NO_SSLv3
-                int opts = SSL.SSL_OP_NO_SSLv2 |
-                    SSL.SSL_OP_SINGLE_DH_USE;
-
-                if (!USE_TICKETS || serverMode && ticketKey == null) {
-                    opts |= SSL.SSL_OP_NO_TICKET;
-                }
-
-                SSLContext.setOptions(sslCtx, opts);
-                // Set revocation
-                //        SSLContext.setCARevocation(sslContext, SSLCARevocationFile, SSLCARevocationPath);
-
-                // Client certificate verification - maybe make it option
-                try {
-                    SSLContext.setCipherSuite(sslCtx, SSLCipherSuite);
+                if (sslCtx == 0) {
+                    boolean serverMode = acceptor != null;
+                    sslCtx = SSLContext.make(getRootPool(),
+                            sslProtocol,
+                            serverMode ? SSL.SSL_MODE_SERVER : SSL.SSL_MODE_CLIENT);
 
 
-                    if (serverMode) {
-                        if (ticketKey != null) {
-                            //SSLExt.setTicketKeys(sslCtx, ticketKey, ticketKey.length);
-                        }
-                        if (certFile != null) {
-                            boolean rc = SSLContext.setCertificate(sslCtx,
-                                    certFile,
-                                    keyFile, null, SSL.SSL_AIDX_DSA);
-                            if (!rc) {
-                                throw new IOException("Can't set keys");
+                    // SSL.SSL_OP_NO_SSLv3
+                    int opts = SSL.SSL_OP_NO_SSLv2 |
+                        SSL.SSL_OP_SINGLE_DH_USE;
+
+                    if (!USE_TICKETS || serverMode && ticketKey == null) {
+                        opts |= SSL.SSL_OP_NO_TICKET;
+                    }
+
+                    SSLContext.setOptions(sslCtx, opts);
+                    // Set revocation
+                    //        SSLContext.setCARevocation(sslContext, SSLCARevocationFile, SSLCARevocationPath);
+
+                    // Client certificate verification - maybe make it option
+                    try {
+                        SSLContext.setCipherSuite(sslCtx, SSLCipherSuite);
+
+
+                        if (serverMode) {
+                            if (ticketKey != null) {
+                                //SSLExt.setTicketKeys(sslCtx, ticketKey, ticketKey.length);
+                            }
+                            if (certFile != null) {
+                                boolean rc = SSLContext.setCertificate(sslCtx,
+                                        certFile,
+                                        keyFile, null, SSL.SSL_AIDX_DSA);
+                                if (!rc) {
+                                    throw new IOException("Can't set keys");
+                                }
+                            }
+                            SSLContext.setVerify(sslCtx, SSL.SSL_CVERIFY_NONE, 10);
+
+                            if (spdyNPN != null) {
+                                SSLExt.setNPN(sslCtx, spdyNPN, spdyNPN.length);
+                            }
+                        } else {
+                            if (tlsCertVerifier != null) {
+                                // NONE ?
+                                SSLContext.setVerify(sslCtx,
+                                        SSL.SSL_CVERIFY_NONE, 10);
+                            } else {
+                                SSLContext.setCACertificate(sslCtx,
+                                        "/etc/ssl/certs/ca-certificates.crt",
+                                        "/etc/ssl/certs");
+                                SSLContext.setVerify(sslCtx,
+                                        SSL.SSL_CVERIFY_REQUIRE, 10);
+                            }
+
+                            if (spdyNPN != null) {
+                                SSLExt.setNPN(sslCtx, spdyNPN, spdyNPN.length);
                             }
                         }
-                        SSLContext.setVerify(sslCtx, SSL.SSL_CVERIFY_NONE, 10);
-
-                        if (spdyNPN != null) {
-                            SSLExt.setNPN(sslCtx, spdyNPN, spdyNPN.length);
-                        }
-                    } else {
-                        if (tlsCertVerifier != null) {
-                            // NONE ?
-                            SSLContext.setVerify(sslCtx,
-                                    SSL.SSL_CVERIFY_NONE, 10);
-                        } else {
-                            SSLContext.setCACertificate(sslCtx,
-                                    "/etc/ssl/certs/ca-certificates.crt",
-                                    "/etc/ssl/certs");
-                            SSLContext.setVerify(sslCtx,
-                                    SSL.SSL_CVERIFY_REQUIRE, 10);
-                        }
-
-                        if (spdyNPN != null) {
-                            SSLExt.setNPN(sslCtx, spdyNPN, spdyNPN.length);
-                        }
+                    } catch (IOException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        throw new IOException(e);
                     }
-                } catch (IOException e) {
-                    throw e;
-                } catch (Exception e) {
-                    throw new IOException(e);
                 }
             // TODO: try release buffers
             }
