@@ -22,7 +22,6 @@ package org.apache.tomcat.util.modeler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -55,7 +54,7 @@ public class ManagedBean implements java.io.Serializable {
     static final Class<?>[] NO_ARGS_PARAM_SIG = new Class[0];
 
 
-    private ReadWriteLock mBeanInfoLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock mBeanInfoLock = new ReentrantReadWriteLock();
     /**
      * The <code>ModelMBeanInfo</code> object that corresponds
      * to this <code>ManagedBean</code> instance.
@@ -107,17 +106,16 @@ public class ManagedBean implements java.io.Serializable {
      * will be utilized.
      */
     public String getClassName() {
-        return (this.className);
+        return this.className;
     }
 
     public void setClassName(String className) {
-        Lock l = mBeanInfoLock.writeLock();
-        l.lock();
+        mBeanInfoLock.writeLock().lock();
         try {
             this.className = className;
             this.info = null;
         } finally {
-            l.unlock();
+            mBeanInfoLock.writeLock().unlock();
         }
     }
 
@@ -126,17 +124,16 @@ public class ManagedBean implements java.io.Serializable {
      * The human-readable description of this MBean.
      */
     public String getDescription() {
-        return (this.description);
+        return this.description;
     }
 
     public void setDescription(String description) {
-        Lock l = mBeanInfoLock.writeLock();
-        l.lock();
+        mBeanInfoLock.writeLock().lock();
         try {
             this.description = description;
             this.info = null;
         } finally {
-            l.unlock();
+            mBeanInfoLock.writeLock().unlock();
         }
     }
 
@@ -146,7 +143,7 @@ public class ManagedBean implements java.io.Serializable {
      * should be registered in the MBeanServer.
      */
     public String getDomain() {
-        return (this.domain);
+        return this.domain;
     }
 
     public void setDomain(String domain) {
@@ -158,7 +155,7 @@ public class ManagedBean implements java.io.Serializable {
      * The (optional) group to which this MBean belongs.
      */
     public String getGroup() {
-        return (this.group);
+        return this.group;
     }
 
     public void setGroup(String group) {
@@ -171,17 +168,16 @@ public class ManagedBean implements java.io.Serializable {
      * MBeans managed by a particular MBeans server.
      */
     public String getName() {
-        return (this.name);
+        return this.name;
     }
 
     public void setName(String name) {
-        Lock l = mBeanInfoLock.writeLock();
-        l.lock();
+        mBeanInfoLock.writeLock().lock();
         try {
             this.name = name;
             this.info = null;
         } finally {
-            l.unlock();
+            mBeanInfoLock.writeLock().unlock();
         }
     }
 
@@ -190,7 +186,7 @@ public class ManagedBean implements java.io.Serializable {
      * The collection of notifications for this MBean.
      */
     public NotificationInfo[] getNotifications() {
-        return (this.notifications);
+        return this.notifications;
     }
 
 
@@ -214,13 +210,12 @@ public class ManagedBean implements java.io.Serializable {
     }
 
     public void setType(String type) {
-        Lock l = mBeanInfoLock.writeLock();
-        l.lock();
+        mBeanInfoLock.writeLock().lock();
         try {
             this.type = type;
             this.info = null;
         } finally {
-            l.unlock();
+            mBeanInfoLock.writeLock().unlock();
         }
     }
 
@@ -244,10 +239,7 @@ public class ManagedBean implements java.io.Serializable {
      * @param notification The new notification descriptor
      */
     public void addNotification(NotificationInfo notification) {
-
-        Lock l = mBeanInfoLock.writeLock();
-
-        l.lock();
+        mBeanInfoLock.writeLock().lock();
         try {
             NotificationInfo results[] =
                 new NotificationInfo[notifications.length + 1];
@@ -257,7 +249,7 @@ public class ManagedBean implements java.io.Serializable {
             notifications = results;
             this.info = null;
         } finally {
-            l.unlock();
+            mBeanInfoLock.writeLock().unlock();
         }
     }
 
@@ -342,8 +334,8 @@ public class ManagedBean implements java.io.Serializable {
         } catch (InstanceNotFoundException e) {
             throw e;
         }
-        return (mbean);
 
+        return mbean;
     }
 
 
@@ -354,18 +346,16 @@ public class ManagedBean implements java.io.Serializable {
     MBeanInfo getMBeanInfo() {
 
         // Return our cached information (if any)
-        Lock l = mBeanInfoLock.readLock();
-        l.lock();
+        mBeanInfoLock.readLock().lock();
         try {
             if (info != null) {
                 return info;
             }
         } finally {
-            l.unlock();
+            mBeanInfoLock.readLock().unlock();
         }
 
-        l = mBeanInfoLock.writeLock();
-        l.lock();
+        mBeanInfoLock.writeLock().lock();
         try {
             if (info == null) {
                 // Create subordinate information descriptors as required
@@ -400,7 +390,7 @@ public class ManagedBean implements java.io.Serializable {
 
             return info;
         } finally {
-            l.unlock();
+            mBeanInfoLock.writeLock().unlock();
         }
     }
 
@@ -425,7 +415,7 @@ public class ManagedBean implements java.io.Serializable {
         sb.append(", type=");
         sb.append(type);
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
 
     }
 
@@ -451,7 +441,7 @@ public class ManagedBean implements java.io.Serializable {
         } catch (NoSuchMethodException e) {
             exception = e;
         }
-        if( m== null && resource != null ) {
+        if (m== null && resource != null) {
             try {
                 object = resource;
                 m = object.getClass().getMethod(getMethod, NO_ARGS_PARAM_SIG);
@@ -460,7 +450,7 @@ public class ManagedBean implements java.io.Serializable {
                 exception = e;
             }
         }
-        if( exception != null )
+        if (exception != null)
             throw new ReflectionException(exception,
                                           "Cannot find getter method " + getMethod);
 
@@ -494,7 +484,7 @@ public class ManagedBean implements java.io.Serializable {
         } catch (NoSuchMethodException e) {
             exception = e;
         }
-        if( m== null && resource != null ) {
+        if (m == null && resource != null) {
             try {
                 object = resource;
                 m = object.getClass().getMethod(setMethod, signature);
@@ -503,7 +493,7 @@ public class ManagedBean implements java.io.Serializable {
                 exception = e;
             }
         }
-        if( exception != null )
+        if (exception != null)
             throw new ReflectionException(exception,
                                           "Cannot find setter method " + setMethod +
                     " " + resource);
