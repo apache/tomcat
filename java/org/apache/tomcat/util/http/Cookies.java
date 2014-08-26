@@ -28,9 +28,9 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A collection of cookies - reusable and tuned for server side performance.
- * Based on RFC2965 ( and 2109 )
+ * Based on RFC2965 (and 2109).
  *
- * This class is not synchronized.
+ * This class is not thread-safe.
  *
  * @author Costin Manolache
  * @author kevin seguin
@@ -41,16 +41,17 @@ public final class Cookies {
 
     private static final UserDataHelper userDataLog = new UserDataHelper(log);
 
-    protected static final StringManager sm =
+    private static final StringManager sm =
             StringManager.getManager("org.apache.tomcat.util.http");
 
     // expected average number of cookies per request
-    public static final int INITIAL_SIZE=4;
-    ServerCookie scookies[]=new ServerCookie[INITIAL_SIZE];
-    int cookieCount=0;
-    boolean unprocessed=true;
+    public static final int INITIAL_SIZE = 4;
+    private ServerCookie scookies[] = new ServerCookie[INITIAL_SIZE];
+    private int cookieCount = 0;
+    private boolean unprocessed = true;
 
     private final MimeHeaders headers;
+
 
     /**
      *  Construct a new cookie collection, that will extract
@@ -60,21 +61,20 @@ public final class Cookies {
      *     information from the provided headers.
      */
     public Cookies(MimeHeaders headers) {
-        this.headers=headers;
+        this.headers = headers;
     }
 
-    /**
-     * Recycle.
-     */
+
     public void recycle() {
-            for( int i=0; i< cookieCount; i++ ) {
-            if( scookies[i]!=null ) {
+        for (int i = 0; i < cookieCount; i++) {
+            if (scookies[i] != null) {
                 scookies[i].recycle();
             }
         }
-        cookieCount=0;
-        unprocessed=true;
+        cookieCount = 0;
+        unprocessed = true;
     }
+
 
     /**
      * EXPENSIVE!!!  only for debugging.
@@ -91,98 +91,90 @@ public final class Cookies {
         return sw.toString();
     }
 
-    // -------------------- Indexed access --------------------
 
-    public ServerCookie getCookie( int idx ) {
-        if( unprocessed ) {
-            getCookieCount(); // will also update the cookies
+    /**
+     * Indexed access.
+     */
+    public ServerCookie getCookie(int idx) {
+        if (unprocessed) {
+            // This will trigger cookie processing
+            getCookieCount();
         }
         return scookies[idx];
     }
 
+
     public int getCookieCount() {
-        if( unprocessed ) {
-            unprocessed=false;
+        if (unprocessed) {
+            unprocessed = false;
             processCookies(headers);
         }
         return cookieCount;
     }
 
-    // -------------------- Adding cookies --------------------
 
-    /** Register a new, initialized cookie. Cookies are recycled, and
-     *  most of the time an existing ServerCookie object is returned.
-     *  The caller can set the name/value and attributes for the cookie
+    /**
+     * Register a new, initialized cookie. Cookies are recycled, and most of the
+     * time an existing ServerCookie object is returned. The caller can set the
+     * name/value and attributes for the cookie.
      */
     private ServerCookie addCookie() {
-        if( cookieCount >= scookies.length  ) {
-            ServerCookie scookiesTmp[]=new ServerCookie[2*cookieCount];
-            System.arraycopy( scookies, 0, scookiesTmp, 0, cookieCount);
-            scookies=scookiesTmp;
+        if (cookieCount >= scookies.length) {
+            ServerCookie scookiesTmp[] = new ServerCookie[2*cookieCount];
+            System.arraycopy(scookies, 0, scookiesTmp, 0, cookieCount);
+            scookies = scookiesTmp;
         }
 
         ServerCookie c = scookies[cookieCount];
-        if( c==null ) {
-            c= new ServerCookie();
-            scookies[cookieCount]=c;
+        if (c == null) {
+            c = new ServerCookie();
+            scookies[cookieCount] = c;
         }
         cookieCount++;
         return c;
     }
 
 
-    // code from CookieTools
-
-    /** Add all Cookie found in the headers of a request.
-     */
-    public  void processCookies( MimeHeaders headers ) {
-        if( headers==null ) {
-            return;// nothing to process
+    private void processCookies(MimeHeaders headers) {
+        if (headers == null) {
+            // nothing to process
+            return;
         }
         // process each "cookie" header
-        int pos=0;
-        while( pos>=0 ) {
-            // Cookie2: version ? not needed
-            pos=headers.findHeader( "Cookie", pos );
-            // no more cookie headers headers
-            if( pos<0 ) {
-                break;
-            }
+        int pos = headers.findHeader("Cookie", 0);
+        while (pos >= 0) {
+            MessageBytes cookieValue = headers.getValue(pos);
 
-            MessageBytes cookieValue=headers.getValue( pos );
-            if( cookieValue==null || cookieValue.isNull() ) {
-                pos++;
-                continue;
-            }
-
-            if( cookieValue.getType() != MessageBytes.T_BYTES ) {
-                Exception e = new Exception();
-                log.warn("Cookies: Parsing cookie as String. Expected bytes.",
-                        e);
-                cookieValue.toBytes();
-            }
-            if(log.isDebugEnabled()) {
-                log.debug("Cookies: Parsing b[]: " + cookieValue.toString());
-            }
-            ByteChunk bc=cookieValue.getByteChunk();
-            if (CookieSupport.PRESERVE_COOKIE_HEADER) {
-                int len = bc.getLength();
-                if (len > 0) {
-                    byte[] buf = new byte[len];
-                    System.arraycopy(bc.getBytes(), bc.getOffset(), buf, 0, len);
-                    processCookieHeader(buf, 0, len);
+            if (cookieValue != null && cookieValue.isNull() ) {
+                if (cookieValue.getType() != MessageBytes.T_BYTES ) {
+                    Exception e = new Exception();
+                    log.warn("Cookies: Parsing cookie as String. Expected bytes.", e);
+                    cookieValue.toBytes();
                 }
-            } else {
-                processCookieHeader( bc.getBytes(),
-                        bc.getOffset(),
-                        bc.getLength());
+                if (log.isDebugEnabled()) {
+                    log.debug("Cookies: Parsing b[]: " + cookieValue.toString());
+                }
+                ByteChunk bc = cookieValue.getByteChunk();
+                if (CookieSupport.PRESERVE_COOKIE_HEADER) {
+                    int len = bc.getLength();
+                    if (len > 0) {
+                        byte[] buf = new byte[len];
+                        System.arraycopy(bc.getBytes(), bc.getOffset(), buf, 0, len);
+                        processCookieHeader(buf, 0, len);
+                    }
+                } else {
+                    processCookieHeader(bc.getBytes(), bc.getOffset(), bc.getLength());
+                }
             }
-            pos++;// search from the next position
+
+            // search from the next position
+            pos = headers.findHeader("Cookie", ++pos);
         }
     }
 
+
     // XXX will be refactored soon!
-    private static boolean equals( String s, byte b[], int start, int end) {
+    private static boolean equals(String s, byte b[], int start, int end) {
         int blen = end-start;
         if (b == null || blen != s.length()) {
             return false;
@@ -225,6 +217,7 @@ public final class Cookies {
         }
     }
 
+
     /**
      * Unescapes any double quotes in the given cookie value.
      *
@@ -252,6 +245,7 @@ public final class Cookies {
         bc.setEnd(dest);
     }
 
+
     /**
      * Parses a cookie header after the initial "Cookie:"
      * [WS][$]token[WS]=[WS](token|QV)[;|,]
@@ -259,17 +253,17 @@ public final class Cookies {
      * JVK
      */
     protected final void processCookieHeader(byte bytes[], int off, int len){
-        if( len<=0 || bytes==null ) {
+        if (len <= 0 || bytes == null) {
             return;
         }
-        int end=off+len;
-        int pos=off;
-        int nameStart=0;
-        int nameEnd=0;
-        int valueStart=0;
-        int valueEnd=0;
+        int end = off + len;
+        int pos = off;
+        int nameStart = 0;
+        int nameEnd = 0;
+        int valueStart = 0;
+        int valueEnd = 0;
         int version = 0;
-        ServerCookie sc=null;
+        ServerCookie sc = null;
         boolean isSpecial;
         boolean isQuoted;
 
@@ -323,12 +317,11 @@ public final class Cookies {
                 switch (bytes[pos]) {
                 case '"': // Quoted Value
                     isQuoted = true;
-                    valueStart=pos + 1; // strip "
+                    valueStart = pos + 1; // strip "
                     // getQuotedValue returns the position before
                     // at the last quote. This must be dealt with
                     // when the bytes are copied into the cookie
-                    valueEnd=getQuotedValueEndPosition(bytes,
-                                                       valueStart, end);
+                    valueEnd = getQuotedValueEndPosition(bytes, valueStart, end);
                     // We need pos to advance
                     pos = valueEnd;
                     // Handles cases where the quoted value is
@@ -352,11 +345,10 @@ public final class Cookies {
                             !CookieSupport.isHttpSeparator((char)bytes[pos]) ||
                             bytes[pos] == '=' && CookieSupport.ALLOW_EQUALS_IN_VALUE) {
                         // Token
-                        valueStart=pos;
+                        valueStart = pos;
                         // getToken returns the position at the delimiter
                         // or other non-token character
-                        valueEnd=getTokenEndPosition(bytes, valueStart, end,
-                                version, false);
+                        valueEnd = getTokenEndPosition(bytes, valueStart, end, version, false);
                         // We need pos to advance
                         pos = valueEnd;
                     } else  {
@@ -500,6 +492,7 @@ public final class Cookies {
         }
     }
 
+
     /**
      * Given the starting position of a token, this gets the end of the
      * token, with no separator characters in between.
@@ -525,6 +518,7 @@ public final class Cookies {
         return pos;
     }
 
+
     /**
      * Given a starting position after an initial quote character, this gets
      * the position of the end quote. This escapes anything after a '\' char
@@ -544,5 +538,4 @@ public final class Cookies {
         // Error, we have reached the end of the header w/o a end quote
         return end;
     }
-
 }
