@@ -79,6 +79,11 @@
         functional impact but the code was less efficient as a result of the
         error. Based on a patch by martinschaef. (markt)
       </fix>
+      <fix>
+        <bug>56568</bug>: Enable any HTTP method to be used to request a JSP
+        page that has the <code>isErrorPage</code> page directive set to
+        <code>true</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
