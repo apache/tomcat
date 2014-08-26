@@ -60,7 +60,7 @@ public class ManagedBean implements java.io.Serializable {
      * The <code>ModelMBeanInfo</code> object that corresponds
      * to this <code>ManagedBean</code> instance.
      */
-    private transient MBeanInfo info = null;
+    private transient volatile MBeanInfo info = null;
 
     private Map<String,AttributeInfo> attributes = new HashMap<>();
 
@@ -357,8 +357,9 @@ public class ManagedBean implements java.io.Serializable {
         Lock l = mBeanInfoLock.readLock();
         l.lock();
         try {
-            if (info != null)
+            if (info != null) {
                 return info;
+            }
         } finally {
             l.unlock();
         }
@@ -366,34 +367,36 @@ public class ManagedBean implements java.io.Serializable {
         l = mBeanInfoLock.writeLock();
         l.lock();
         try {
-            // Create subordinate information descriptors as required
-            AttributeInfo attrs[] = getAttributes();
-            MBeanAttributeInfo attributes[] =
-                new MBeanAttributeInfo[attrs.length];
-            for (int i = 0; i < attrs.length; i++)
-                attributes[i] = attrs[i].createAttributeInfo();
+            if (info == null) {
+                // Create subordinate information descriptors as required
+                AttributeInfo attrs[] = getAttributes();
+                MBeanAttributeInfo attributes[] =
+                    new MBeanAttributeInfo[attrs.length];
+                for (int i = 0; i < attrs.length; i++)
+                    attributes[i] = attrs[i].createAttributeInfo();
 
-            OperationInfo opers[] = getOperations();
-            MBeanOperationInfo operations[] =
-                new MBeanOperationInfo[opers.length];
-            for (int i = 0; i < opers.length; i++)
-                operations[i] = opers[i].createOperationInfo();
-
-
-            NotificationInfo notifs[] = getNotifications();
-            MBeanNotificationInfo notifications[] =
-                new MBeanNotificationInfo[notifs.length];
-            for (int i = 0; i < notifs.length; i++)
-                notifications[i] = notifs[i].createNotificationInfo();
+                OperationInfo opers[] = getOperations();
+                MBeanOperationInfo operations[] =
+                    new MBeanOperationInfo[opers.length];
+                for (int i = 0; i < opers.length; i++)
+                    operations[i] = opers[i].createOperationInfo();
 
 
-            // Construct and return a new ModelMBeanInfo object
-            info = new MBeanInfo(getClassName(),
-                                 getDescription(),
-                                 attributes,
-                                 new MBeanConstructorInfo[] {},
-                                 operations,
-                                 notifications);
+                NotificationInfo notifs[] = getNotifications();
+                MBeanNotificationInfo notifications[] =
+                    new MBeanNotificationInfo[notifs.length];
+                for (int i = 0; i < notifs.length; i++)
+                    notifications[i] = notifs[i].createNotificationInfo();
+
+
+                // Construct and return a new ModelMBeanInfo object
+                info = new MBeanInfo(getClassName(),
+                                     getDescription(),
+                                     attributes,
+                                     new MBeanConstructorInfo[] {},
+                                     operations,
+                                     notifications);
+            }
 
             return info;
         } finally {
