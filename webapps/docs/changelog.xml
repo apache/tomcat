@@ -98,6 +98,10 @@
         <bug>56825</bug>: Enable pre-emptive authentication to work with the
         SSL authenticator. Based on a patch by jlmonteiro. (markt)
       </fix>
+      <scode>
+        <bug>56882</bug>: Add testcase for processing of forwards and includes
+        when Context have been reloaded. (kkolinko)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
