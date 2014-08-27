@@ -643,6 +643,20 @@ class Generator {
         out.pushIndent();
         out.println();
 
+        // Method check
+        if (!pageInfo.isErrorPage()) {
+            out.println("final java.lang.String _jspx_method = request.getMethod();");
+            out.print("if (!\"GET\".equals(_jspx_method) && !\"POST\".equals(_jspx_method) && !\"HEAD\".equals(_jspx_method) && ");
+            out.println("!javax.servlet.DispatcherType.ERROR.equals(request.getDispatcherType())) {");
+            out.pushIndent();
+            out.print("response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, ");
+            out.println("\"" + Localizer.getMessage("jsp.error.servlet.invalid.method") + "\");");
+            out.println("return;");
+            out.popIndent();
+            out.println("}");
+            out.println();
+        }
+
         // Local variable declarations
         out.printil("final javax.servlet.jsp.PageContext pageContext;");
 
