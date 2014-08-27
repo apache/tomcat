@@ -60,7 +60,7 @@ public class CatalinaProperties {
         Throwable error = null;
 
         try {
-            String configUrl = getConfigUrl();
+            String configUrl = System.getProperty("catalina.config");
             if (configUrl != null) {
                 is = (new URL(configUrl)).openStream();
             }
@@ -120,14 +120,6 @@ public class CatalinaProperties {
                 System.setProperty(name, value);
             }
         }
-    }
-
-
-    /**
-     * Get the value of the configuration URL.
-     */
-    private static String getConfigUrl() {
-        return System.getProperty("catalina.config");
     }
 
 
