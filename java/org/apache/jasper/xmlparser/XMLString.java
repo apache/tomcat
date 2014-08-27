@@ -25,8 +25,6 @@
 
 package org.apache.jasper.xmlparser;
 
-import java.util.Arrays;
-
 /**
  * This class is used as a structure to pass text contained in the underlying
  * character buffer of the scanner. The offset and length fields allow the
@@ -140,11 +138,6 @@ public class XMLString {
     //
     // Object methods
     //
-    @Override
-    public int hashCode()
-    {
-        return Arrays.hashCode(ch);
-    }
 
     /** Returns a string representation of this object. */
     @Override
