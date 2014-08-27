@@ -329,11 +329,16 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
     public void breakdown() {
-        finalize();
+        // TODO: Invert the call semantics between between breakdown() and finalize()
+        try {
+            finalize();
+        } catch (Throwable t) {
+            log.error("Call to finalize() failed", t);
+        }
     }
 
     @Override
-    public void finalize() {
+    public void finalize() throws Throwable {
         if (this.rpcChannel != null) {
             this.rpcChannel.breakdown();
         }
@@ -349,6 +354,8 @@ public abstract class AbstractReplicatedMap<K,V>
         innerMap.clear();
         this.stateTransferred = false;
         this.externalLoaders = null;
+
+        super.finalize();
     }
 
     @Override

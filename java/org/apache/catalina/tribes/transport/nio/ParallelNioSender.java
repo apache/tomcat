@@ -302,7 +302,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     }
 
     @Override
-    public void finalize() {
+    public void finalize() throws Throwable {
         try {disconnect(); }catch ( Exception e){/*Ignore*/}
         try {
             selector.close();
@@ -311,6 +311,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 log.debug("Failed to close selector", e);
             }
         }
+        super.finalize();
     }
 
     @Override
