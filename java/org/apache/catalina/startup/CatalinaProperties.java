@@ -95,9 +95,7 @@ public class CatalinaProperties {
             } catch (Throwable t) {
                 handleThrowable(t);
                 error = t;
-            }
-            finally
-            {
+            } finally {
                 try {
                     is.close();
                 } catch (IOException ioe) {
@@ -110,7 +108,7 @@ public class CatalinaProperties {
             // Do something
             log.warn("Failed to load catalina.properties", error);
             // That's fine - we have reasonable defaults.
-            properties=new Properties();
+            properties = new Properties();
         }
 
         // Register the properties as system properties
