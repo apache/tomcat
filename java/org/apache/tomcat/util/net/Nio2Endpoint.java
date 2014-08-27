@@ -1092,8 +1092,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         closeSocket(socket, SocketStatus.ERROR);
                         if (useCaches && running && !paused) {
                             nioChannels.push(socket.getSocket());
-                        }
-                        if (useCaches && running && !paused) {
                             socketWrapperCache.push((Nio2SocketWrapper) socket);
                         }
                     } else if (state == SocketState.UPGRADING) {
@@ -1105,8 +1103,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     closeSocket(socket, SocketStatus.DISCONNECT);
                     if (useCaches && running && !paused) {
                         nioChannels.push(socket.getSocket());
-                    }
-                    if (useCaches && running && !paused) {
                         socketWrapperCache.push(((Nio2SocketWrapper) socket));
                     }
                 }
