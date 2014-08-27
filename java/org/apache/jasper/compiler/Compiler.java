@@ -255,13 +255,6 @@ public abstract class Compiler {
             // to be GC'd and save memory.
             ctxt.setWriter(null);
 
-            if (jsw != null) {
-                // Need to know if the JSP is an error page at runtime to determine
-                // which HTTP methods are permitted. Error pages permit any. Normal
-                // pages only permit GET, POST or HEAD.
-                jsw.setErrorPage(pageInfo.isErrorPage());
-            }
-
             if (log.isDebugEnabled()) {
                 t4 = System.currentTimeMillis();
                 log.debug("Generated " + javaFileName + " total=" + (t4 - t1)

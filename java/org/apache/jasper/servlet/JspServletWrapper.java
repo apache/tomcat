@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -104,7 +103,6 @@ public class JspServletWrapper {
     private final boolean unloadAllowed;
     private final boolean unloadByCount;
     private final boolean unloadByIdle;
-    private boolean errorPage;
 
     /*
      * JspServletWrapper for JSP pages.
@@ -421,20 +419,6 @@ public class JspServletWrapper {
                 }
             }
 
-            String method = request.getMethod();
-
-            if (!"GET".equals(method) && !"POST".equals(method) && !"HEAD".equals(method) &&
-                    !DispatcherType.ERROR.equals(request.getDispatcherType()) &&
-                    !isErrorPage()) {
-                // Specification states behaviour is undefined
-                // Jasper opts to reject any other verbs, partly as they are
-                // unlikely to make sense in a JSP context and partly to protect
-                // against verb tampering
-                response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
-                        Localizer.getMessage("jsp.error.servlet.invalid.method"));
-                return;
-            }
-
             /*
              * (4) Service request
              */
@@ -600,15 +584,5 @@ public class JspServletWrapper {
             }
             return new JasperException(ex);
         }
-    }
-
-
-    public void setErrorPage(boolean errorPage) {
-        this.errorPage = errorPage;
-    }
-
-
-    public boolean isErrorPage() {
-        return errorPage;
     }
 }

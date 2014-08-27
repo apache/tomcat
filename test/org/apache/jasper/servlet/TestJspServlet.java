@@ -67,6 +67,7 @@ public class TestJspServlet  extends TomcatBaseTest {
         Assert.assertEquals(500, rc);
     }
 
+
     @Test
     public void testBug56568b() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -86,6 +87,27 @@ public class TestJspServlet  extends TomcatBaseTest {
         // with the PUT method.
         Assert.assertEquals(200, rc);
     }
+
+
+    @Test
+    public void testBug56568c() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Use the test web application so JSP support is available and the
+        // default JSP error page can be used.
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        int rc = methodUrl("http://localhost:" + getPort() + "/test/jsp/test.jsp",
+                new ByteChunk(), 500000, null, null, "PUT");
+
+        // Make sure we get a 405 response which indicates that test.jsp is
+        // complaining about being called with the PUT method.
+        Assert.assertEquals(405, rc);
+    }
+
 
     private static class Bug56568aServlet extends HttpServlet {
 
