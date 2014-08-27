@@ -175,8 +175,9 @@ public class RpcChannel implements ChannelListener{
     }
 
     @Override
-    public void finalize() {
+    public void finalize() throws Throwable {
         breakdown();
+        super.finalize();
     }
 
     @Override

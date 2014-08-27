@@ -494,7 +494,7 @@ public class AprSocketContext {
      * closed, but this seems simpler and safer.
      */
     @Override
-    protected void finalize() {
+    protected void finalize() throws Throwable {
         if (rootPool != 0) {
             log.warning(this + " GC without stop()");
             try {
@@ -504,6 +504,7 @@ public class AprSocketContext {
                 e.printStackTrace();
             }
         }
+        super.finalize();
     }
 
 
