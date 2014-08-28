@@ -59,7 +59,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     private static final Log log = LogFactory.getLog(TestNonBlockingAPI.class);
 
     private static final int CHUNK_SIZE = 1024 * 1024;
-    private static final int WRITE_SIZE  = CHUNK_SIZE * 5;
+    private static final int WRITE_SIZE  = CHUNK_SIZE * 10;
     private static final byte[] DATA = new byte[WRITE_SIZE];
     private static final int WRITE_PAUSE_MS = 500;
 
@@ -302,7 +302,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int read = 0;
         int readSinceLastPause = 0;
         int readTotal = 0;
-        while (read != -1 && readTotal < WRITE_SIZE / 8) {
+        while (read != -1 && readTotal < WRITE_SIZE / 32) {
             long start = System.currentTimeMillis();
             read = is.read(buffer);
             long end = System.currentTimeMillis();
@@ -313,7 +313,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             }
             readSinceLastPause += read;
             readTotal += read;
-            if (readSinceLastPause > WRITE_SIZE / 16) {
+            if (readSinceLastPause > WRITE_SIZE / 64) {
                 readSinceLastPause = 0;
                 Thread.sleep(WRITE_PAUSE_MS);
             }
