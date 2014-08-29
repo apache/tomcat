@@ -686,7 +686,8 @@
       </fix>
       <add>
         Add a new limit, defaulting to 2MB, for the amount of data Tomcat will
-        swallow for an aborted upload. (markt)
+        swallow for an aborted upload. The limit is configurable by
+        <code>maxSwallowSize</code> attribute of an HTTP connector. (markt)
       </add>
     </changelog>
   </subsection>
