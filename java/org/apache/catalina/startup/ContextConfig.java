@@ -138,20 +138,16 @@ public class ContextConfig implements LifecycleListener {
 
     static {
         // Load our mapping properties for the standard authenticators
-        InputStream is =
-                ContextConfig.class.getClassLoader().getResourceAsStream(
-                    "org/apache/catalina/startup/Authenticators.properties");
-        Properties props = null;
-        props = new Properties();
-        if (is != null) {
-            try {
+        Properties props = new Properties();
+        try (InputStream is = ContextConfig.class.getClassLoader().getResourceAsStream(
+                "org/apache/catalina/startup/Authenticators.properties");) {
+            if (is != null) {
                 props.load(is);
-            } catch (IOException e) {
-                props = null;
             }
+        } catch (IOException ioe) {
+            props = null;
         }
         authenticators = props;
-
     }
 
     /**
