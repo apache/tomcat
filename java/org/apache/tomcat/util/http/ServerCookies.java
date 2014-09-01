@@ -65,9 +65,7 @@ public class ServerCookies {
 
     public void recycle() {
         for (int i = 0; i < cookieCount; i++) {
-            if (serverCookies[i] != null) {
-                serverCookies[i].recycle();
-            }
+            serverCookies[i].recycle();
         }
         cookieCount = 0;
     }
