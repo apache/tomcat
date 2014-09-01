@@ -115,10 +115,17 @@ public class Cookie {
         skipLWS(bb);
 
         ByteBuffer value = readCookieValue(bb);
-        if (value != null && value.remaining() == 1 && value.get() == (byte) 49) {
-            // $Version=1 -> RFC2109
-            parseCookieRfc2109(bb, serverCookies);
-            return;
+        if (value != null && value.remaining() == 1) {
+            if (value.get() == (byte) 49) {
+                // $Version=1 -> RFC2109
+                parseCookieRfc2109(bb, serverCookies);
+                return;
+            } else {
+                // Unrecognised version.
+                // Ignore this header.
+                value.rewind();
+                logInvalidVersion(value);
+            }
         } else {
             // Unrecognised version.
             // Ignore this header.
@@ -350,8 +357,8 @@ public class Cookie {
             if (value == null) {
                 version = sm.getString("cookie.valueNotPresent");
             } else {
-                version = new String(value.bytes, value.position(), value.limit(),
-                        StandardCharsets.UTF_8);
+                version = new String(value.bytes, value.position(),
+                        value.limit() - value.position(), StandardCharsets.UTF_8);
             }
             String message = sm.getString("cookie.invalidCookieVersion", version);
             switch (logMode) {
