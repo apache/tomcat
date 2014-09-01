@@ -44,6 +44,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.0.13 (markt)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>56900</bug>: Fix some potential resource leaks when reading
+        property files reported by Coverity Scan. Based on patches provided by
+        Felix Schumacher. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 8.0.12 (markt)">
   <subsection name="Catalina">
     <changelog>
