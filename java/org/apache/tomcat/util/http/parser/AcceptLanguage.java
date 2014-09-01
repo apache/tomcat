@@ -63,8 +63,8 @@ public class AcceptLanguage {
 
             // See if a quality has been provided
             double quality = 1;
-            HttpParser.SkipResult lookForSemiColon = HttpParser.skipConstant(input, ";");
-            if (lookForSemiColon == HttpParser.SkipResult.FOUND) {
+            SkipResult lookForSemiColon = HttpParser.skipConstant(input, ";");
+            if (lookForSemiColon == SkipResult.FOUND) {
                 quality = HttpParser.readWeight(input, ',');
             }
 
