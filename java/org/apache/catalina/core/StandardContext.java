@@ -918,7 +918,9 @@ public class StandardContext extends ContainerBase
         StringBuilder result = new StringBuilder();
         boolean first = true;
         for (String servletName : resourceOnlyServlets) {
-            if (!first) {
+            if (first) {
+                first = false;
+            } else {
                 result.append(',');
             }
             result.append(servletName);

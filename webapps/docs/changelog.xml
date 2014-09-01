@@ -57,6 +57,12 @@
         reported by Coverity Scan. Based on a patch provided by Felix
         Schumacher. (markt)
       </fix>
+      <fix>
+        <bug>56903</bug>: Correct the return value for
+        <code>StandardContext.getResourceOnlyServlets()</code> so that multiple
+        names are separated by commas. Identified by Coverity Scan and fixed
+        based on a patch by Felix Schumacher. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
