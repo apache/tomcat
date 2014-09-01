@@ -140,7 +140,7 @@ public class WsServerContainer extends WsWebSocketContainer
 
         fr.addMappingForUrlPatterns(types, true, "/*");
 
-        // Use a per web application executor for any threads the the WebSocket
+        // Use a per web application executor for any threads that the WebSocket
         // server code needs to create. Group all of the threads under a single
         // ThreadGroup.
         StringBuffer threadGroupName = new StringBuffer("WebSocketServer-");
