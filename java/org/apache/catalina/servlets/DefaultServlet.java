@@ -2032,27 +2032,24 @@ public class DefaultServlet extends HttpServlet {
         while ( (exception == null) && (ranges.hasNext()) ) {
 
             InputStream resourceInputStream = resource.getInputStream();
-            InputStream istream =
-                new BufferedInputStream(resourceInputStream, input);
+            try (InputStream istream = new BufferedInputStream(resourceInputStream, input)) {
 
-            Range currentRange = ranges.next();
+                Range currentRange = ranges.next();
 
-            // Writing MIME header.
-            ostream.println();
-            ostream.println("--" + mimeSeparation);
-            if (contentType != null)
-                ostream.println("Content-Type: " + contentType);
-            ostream.println("Content-Range: bytes " + currentRange.start
-                           + "-" + currentRange.end + "/"
-                           + currentRange.length);
-            ostream.println();
+                // Writing MIME header.
+                ostream.println();
+                ostream.println("--" + mimeSeparation);
+                if (contentType != null)
+                    ostream.println("Content-Type: " + contentType);
+                ostream.println("Content-Range: bytes " + currentRange.start
+                               + "-" + currentRange.end + "/"
+                               + currentRange.length);
+                ostream.println();
 
-            // Printing content
-            exception = copyRange(istream, ostream, currentRange.start,
-                                  currentRange.end);
-
-            istream.close();
-
+                // Printing content
+                exception = copyRange(istream, ostream, currentRange.start,
+                                      currentRange.end);
+            }
         }
 
         ostream.println();

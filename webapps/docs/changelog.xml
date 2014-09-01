@@ -52,6 +52,11 @@
         property files reported by Coverity Scan. Based on patches provided by
         Felix Schumacher. (markt)
       </fix>
+      <fix>
+        <bug>56902</bug>: Fix a potential resource leak in the Default Servlet
+        reported by Coverity Scan. Based on a patch provided by Felix
+        Schumacher. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
