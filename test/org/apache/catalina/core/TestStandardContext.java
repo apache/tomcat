@@ -71,6 +71,7 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
+
 public class TestStandardContext extends TomcatBaseTest {
 
     private static final String REQUEST =
@@ -944,5 +945,14 @@ public class TestStandardContext extends TomcatBaseTest {
         String realPath = ctx.getRealPath("\\");
 
         Assert.assertNull(realPath);
+    }
+
+    @Test
+    public void testBug56903() {
+        Context context = new StandardContext();
+
+        String list = "a,b,c";
+        context.setResourceOnlyServlets(list);
+        Assert.assertEquals(list, context.getResourceOnlyServlets());
     }
 }
