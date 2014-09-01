@@ -398,11 +398,4 @@ public class HttpParser {
             return SkipResult.FOUND;
         }
     }
-
-
-    static enum SkipResult {
-        FOUND,
-        NOT_FOUND,
-        EOF
-    }
 }
