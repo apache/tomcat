@@ -379,17 +379,14 @@ public class TestCookies {
 
     @Test
     public void rfc2109Version0Old() {
-        doRfc2109Version0(false);
+        // rfc2109 semantically does not allow $Version to be 0 but it is valid syntax
+        test(false, "$Version=0;foo=bar", FOO);
     }
 
     @Test
     public void rfc2109Version0Rfc6265() {
-        doRfc2109Version0(true);
-    }
-
-    private void doRfc2109Version0(boolean useRfc6265) {
-        // rfc2109 semantically does not allow $Version to be 0 but it is valid syntax
-        test(useRfc6265, "$Version=0;foo=bar", FOO);
+        // Neither RFC2109 nor RFc6265 allow version 0
+        test(true, "$Version=0;foo=bar");
     }
 
     private void test(boolean useRfc6265, String header, Cookie... expected) {
