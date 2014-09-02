@@ -76,7 +76,7 @@ public class Cookie {
 
     static {
         // %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E (RFC6265)
-        // %x80 to %xFF                            (UTF-8)
+        // %x80 to %xFF                                 (UTF-8)
         for (int i = 0; i < 256; i++) {
             if (i < 0x21 || i == QUOTE_BYTE || i == COMMA_BYTE ||
                     i == SEMICOLON_BYTE || i == SLASH_BYTE || i == DEL_BYTE) {
@@ -364,6 +364,7 @@ public class Cookie {
         // Invalid cookie value. Skip to the next semi-colon
         skipUntilSemiColonOrComma(bb);
     }
+
 
     private static void skipLWS(ByteBuffer bb) {
         while(bb.hasRemaining()) {
