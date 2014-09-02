@@ -439,7 +439,7 @@ public class TestCookies {
 
     @Test
     public void disallowControlInV1QuotedValue() {
-        // Bug 55917
+        // Bug 55917 / Bug 55918
         test(true, "$Version=1; foo=\"b\010r\"");
     }
 
