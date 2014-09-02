@@ -24,6 +24,8 @@ import javax.servlet.http.Cookie;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tomcat.util.buf.MessageBytes;
+
 public class TestCookies {
     private Cookie FOO = new Cookie("foo", "bar");
     private Cookie BAR = new Cookie("bar", "rab");
@@ -195,9 +197,12 @@ public class TestCookies {
     }
 
     private void test(String header, Cookie... expected) {
-        Cookies cookies = new Cookies(null);
+        MimeHeaders mimeHeaders = new MimeHeaders();
+        Cookies cookies = new Cookies(mimeHeaders);
+        MessageBytes cookieHeaderValue = mimeHeaders.addValue("Cookie");
         byte[] bytes = header.getBytes(StandardCharsets.UTF_8);
-        cookies.processCookieHeader(bytes, 0, bytes.length);
+        cookieHeaderValue.setBytes(bytes, 0, bytes.length);
+        // Calling getCookieCount() triggers parsing
         Assert.assertEquals(expected.length, cookies.getCookieCount());
         for (int i = 0; i < expected.length; i++) {
             Cookie cookie = expected[i];
