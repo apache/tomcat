@@ -41,7 +41,7 @@ public class TestCookies {
     }
 
     @Test
-    public void testBasicCookieNew() {
+    public void testBasicCookieRfc6265() {
         doTestBasicCookie(true);
     }
 
@@ -73,7 +73,7 @@ public class TestCookies {
     }
 
     @Test
-    public void testNameOnlyAreDroppedNew() {
+    public void testNameOnlyAreDroppedRfc6265() {
         // Name only cookies are not dropped in RFC6265
         test(true, "foo=;a=b; ;", FOO_EMPTY, A);
         test(true, "foo;a=b; ;", FOO_NULL, A);
@@ -100,7 +100,7 @@ public class TestCookies {
     }
 
     @Test
-    public void testQuotedValueNew() {
+    public void testQuotedValueRfc6265() {
         doTestQuotedValue(true);
     }
 
@@ -120,7 +120,7 @@ public class TestCookies {
     }
 
     @Test
-    public void testEmptyPairsNew() {
+    public void testEmptyPairsRfc6265() {
         test(true, "foo;a=b; ;bar", FOO_NULL, A, BAR_NULL);
         test(true, "foo;a=b;;bar", FOO_NULL, A, BAR_NULL);
         test(true, "foo;a=b; ;;bar=rab", FOO_NULL, A, BAR);
@@ -135,7 +135,7 @@ public class TestCookies {
     }
 
     @Test
-    public void testSeparatorsInValueNew() {
+    public void testSeparatorsInValueRfc6265() {
         doTestSeparatorsInValue(true);
     }
 
@@ -150,7 +150,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1TokenValueNew() {
+    public void v1TokenValueRfc6265() {
         doV1TokenValue(true);
     }
 
@@ -167,7 +167,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1NameOnlyIsDroppedNew() {
+    public void v1NameOnlyIsDroppedRfc6265() {
         doV1NameOnlyIsDropped(true);
     }
 
@@ -184,7 +184,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1QuotedValueNew() {
+    public void v1QuotedValueRfc6265() {
         doV1QuotedValue(true);
     }
 
@@ -201,7 +201,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1DQuoteInValueNew() {
+    public void v1DQuoteInValueRfc6265() {
         doV1DQuoteInValue(true);
     }
 
@@ -218,7 +218,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1QuoteInValueNew() {
+    public void v1QuoteInValueRfc6265() {
         doV1QuoteInValue(true);
     }
 
@@ -236,7 +236,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1QuoteInQuotedValueNew() {
+    public void v1QuoteInQuotedValueRfc6265() {
         doV1QuoteInQuotedValue(true);
     }
 
@@ -253,7 +253,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1EscapedDQuoteInValueNew() {
+    public void v1EscapedDQuoteInValueRfc6265() {
         doV1EscapedDQuoteInValue(true);
     }
 
@@ -270,7 +270,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1QuotedValueEndsInBackslashNew() {
+    public void v1QuotedValueEndsInBackslashRfc6265() {
         doV1QuotedValueEndsInBackslash(true);
     }
 
@@ -285,7 +285,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1MismatchedQuotesNew() {
+    public void v1MismatchedQuotesRfc6265() {
         doV1MismatchedQuotes(true);
     }
 
@@ -300,7 +300,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1SingleQuotesAreValidTokenCharactersNew() {
+    public void v1SingleQuotesAreValidTokenCharactersRfc6265() {
         doV1SingleQuotesAreValidTokenCharacters(true);
     }
 
@@ -316,7 +316,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1DomainIsParsedNew() {
+    public void v1DomainIsParsedRfc6265() {
         doV1DomainIsParsed(true);
     }
 
@@ -334,7 +334,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1DomainOnlyAffectsPrecedingCookieNew() {
+    public void v1DomainOnlyAffectsPrecedingCookieRfc6265() {
         doV1DomainOnlyAffectsPrecedingCookie(true);
     }
 
@@ -351,7 +351,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1PortIsIgnoredNew() {
+    public void v1PortIsIgnoredRfc6265() {
         doV1PortIsIgnored(true);
     }
 
@@ -368,7 +368,7 @@ public class TestCookies {
     }
 
     @Test
-    public void v1PathAffectsPrecedingCookieNew() {
+    public void v1PathAffectsPrecedingCookieRfc6265() {
         doV1PathAffectsPrecedingCookie(true);
     }
 
@@ -385,7 +385,7 @@ public class TestCookies {
     }
 
     @Test
-    public void rfc2109Version0New() {
+    public void rfc2109Version0Rfc6265() {
         doRfc2109Version0(true);
     }
 
