@@ -33,6 +33,7 @@ public class TestCookies {
     private final Cookie BAR_EMPTY = new Cookie("bar", "");
     private final Cookie A = new Cookie("a", "b");
     private final Cookie HASH_EMPTY = new Cookie("#", "");
+    private final Cookie $PORT = new Cookie("$Port", "8080");
 
     @Test
     public void testBasicCookieOld() {
@@ -342,19 +343,19 @@ public class TestCookies {
 
     @Test
     public void v1PortIsIgnoredOld() {
-        doV1PortIsIgnored(false);
+        FOO.setVersion(1);
+        FOO.setDomain("apache.org");
+        A.setVersion(1);
+        test(false, "$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", FOO, A);
     }
 
     @Test
     public void v1PortIsIgnoredRfc6265() {
-        doV1PortIsIgnored(true);
-    }
-
-    private void doV1PortIsIgnored(boolean useRfc6265) {
         FOO.setVersion(1);
         FOO.setDomain("apache.org");
+        $PORT.setVersion(1);
         A.setVersion(1);
-        test(useRfc6265, "$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", FOO, A);
+        test(true, "$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", FOO, $PORT, A);
     }
 
     @Test
