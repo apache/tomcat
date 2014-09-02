@@ -2865,6 +2865,10 @@ public class Request
                 Cookie cookie = new Cookie(scookie.getName().toString(),null);
                 int version = scookie.getVersion();
                 cookie.setVersion(version);
+                if (getContext().getUseRfc6265()) {
+                    scookie.getValue().getByteChunk().setCharset(
+                            getContext().getCookieEncodingCharset());
+                }
                 cookie.setValue(unescape(scookie.getValue().toString()));
                 cookie.setPath(unescape(scookie.getPath().toString()));
                 String domain = scookie.getDomain().toString();

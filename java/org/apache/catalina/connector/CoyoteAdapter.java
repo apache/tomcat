@@ -900,6 +900,13 @@ public class CoyoteAdapter implements Adapter {
                 }
             }
 
+            if (request.getContext().getUseRfc6265()) {
+                req.getCookies().setUseRfc6265(true);
+            } else {
+                req.getCookies().setUseRfc6265(false);
+            }
+
+
             // Look for session ID in cookies and SSL session
             parseSessionCookiesId(req, request);
             parseSessionSslId(request);
@@ -931,6 +938,9 @@ public class CoyoteAdapter implements Adapter {
                                 // Reset mapping
                                 request.getMappingData().recycle();
                                 mapRequired = true;
+                                // Recycle cookies in case correct context is
+                                // configured with different settings
+                                req.getCookies().recycle();
                             }
                             break;
                         }

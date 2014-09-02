@@ -103,6 +103,10 @@
                type="boolean"
                writeable="false" />
 
+    <attribute name="cookieEncoding"
+               description="If the new cookie parser is used, which encoding should be used to decode the cookie values?"
+               type="java.lang.String"/>
+
     <attribute name="cookies"
                description="Should we attempt to use cookies for session id communication?"
                type="boolean"/>
@@ -329,6 +333,11 @@
     <attribute name="useNaming"
                description="Create a JNDI naming context for this application?"
                is="true"
+               type="boolean"/>
+
+    <attribute name="useNewCookieParser"
+               description="Use the new RFC6265 based cookie parser"
+               is="false"
                type="boolean"/>
 
     <attribute name="webappVersion"

@@ -19,6 +19,8 @@ package org.apache.catalina.core;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -1221,4 +1223,19 @@ public class TesterContext implements Context {
     public Object getNamingToken() {
         return null;
     }
+
+    @Override
+    public void setUseRfc6265(boolean useRfc6265) { /* NO-OP */ }
+
+    @Override
+    public boolean getUseRfc6265() {return false; }
+
+    @Override
+    public void setCookieEncoding(String encoding) { /* NO-OP */ }
+
+    @Override
+    public String getCookieEncoding() { return "UTF-8"; }
+
+    @Override
+    public Charset getCookieEncodingCharset() { return StandardCharsets.UTF_8; }
 }
