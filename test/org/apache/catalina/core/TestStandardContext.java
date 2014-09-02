@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,6 +42,8 @@ import javax.servlet.annotation.ServletSecurity.TransportGuarantee;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.hamcrest.CoreMatchers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -951,8 +954,8 @@ public class TestStandardContext extends TomcatBaseTest {
     public void testBug56903() {
         Context context = new StandardContext();
 
-        String list = "a,b,c";
-        context.setResourceOnlyServlets(list);
-        Assert.assertEquals(list, context.getResourceOnlyServlets());
+        context.setResourceOnlyServlets("a,b,c");
+        Assert.assertThat(Arrays.asList(context.getResourceOnlyServlets().split(",")),
+                CoreMatchers.hasItems("a", "b", "c"));
     }
 }
