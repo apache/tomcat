@@ -263,9 +263,7 @@ public class Cookie {
                 skipLWS(bb);
                 value = readCookieValueRfc2109(bb, false);
                 if (value == null) {
-                    logInvalidHeader(bb);
-                    // Invalid cookie value. Skip to the next semi-colon
-                    skipUntilSemiColon(bb);
+                    skipInvalidCookie(bb);
                     continue;
                 }
                 skipLWS(bb);
@@ -280,10 +278,7 @@ public class Cookie {
                 parseAttributes = false;
                 moreToProcess = false;
             } else if (skipResult == SkipResult.NOT_FOUND) {
-                logInvalidHeader(bb);
-                // Invalid cookie value. Skip to the next semi-colon
-                // TODO Could be a comma
-                skipUntilSemiColon(bb);
+                skipInvalidCookie(bb);
                 continue;
             }
 
@@ -293,18 +288,12 @@ public class Cookie {
                     skipLWS(bb);
                     skipResult = skipByte(bb, EQUALS_BYTE);
                     if (skipResult != SkipResult.FOUND) {
-                        logInvalidHeader(bb);
-                        // Invalid cookie value. Skip to the next semi-colon
-                        // TODO Could be a comma
-                        skipUntilSemiColon(bb);
+                        skipInvalidCookie(bb);
                         continue;
                     }
                     path = readCookieValueRfc2109(bb, true);
                     if (path == null) {
-                        logInvalidHeader(bb);
-                        // Invalid cookie value. Skip to the next semi-colon
-                        // TODO Could be a comma
-                        skipUntilSemiColon(bb);
+                        skipInvalidCookie(bb);
                         continue;
                     }
                     skipLWS(bb);
@@ -318,10 +307,7 @@ public class Cookie {
                         parseAttributes = false;
                         moreToProcess = false;
                     } else if (skipResult == SkipResult.NOT_FOUND) {
-                        logInvalidHeader(bb);
-                        // Invalid cookie value. Skip to the next semi-colon
-                        // TODO Could be a comma
-                        skipUntilSemiColon(bb);
+                        skipInvalidCookie(bb);
                         continue;
                     }
                 }
@@ -333,18 +319,12 @@ public class Cookie {
                     skipLWS(bb);
                     skipResult = skipByte(bb, EQUALS_BYTE);
                     if (skipResult != SkipResult.FOUND) {
-                        logInvalidHeader(bb);
-                        // Invalid cookie value. Skip to the next semi-colon
-                        // TODO Could be a comma
-                        skipUntilSemiColon(bb);
+                        skipInvalidCookie(bb);
                         continue;
                     }
                     domain = readCookieValueRfc2109(bb, false);
                     if (domain == null) {
-                        logInvalidHeader(bb);
-                        // Invalid cookie value. Skip to the next semi-colon
-                        // TODO Could be a comma
-                        skipUntilSemiColon(bb);
+                        skipInvalidCookie(bb);
                         continue;
                     }
 
@@ -357,10 +337,7 @@ public class Cookie {
                         parseAttributes = false;
                         moreToProcess = false;
                     } else if (skipResult == SkipResult.NOT_FOUND) {
-                        logInvalidHeader(bb);
-                        // Invalid cookie value. Skip to the next semi-colon
-                        // TODO Could be a comma
-                        skipUntilSemiColon(bb);
+                        skipInvalidCookie(bb);
                         continue;
                     }
                 }
@@ -381,6 +358,13 @@ public class Cookie {
         }
     }
 
+
+    private static void skipInvalidCookie(ByteBuffer bb) {
+        logInvalidHeader(bb);
+        // Invalid cookie value. Skip to the next semi-colon
+        // TODO Could be a comma
+        skipUntilSemiColon(bb);
+    }
 
     private static void skipLWS(ByteBuffer bb) {
         while(bb.hasRemaining()) {
