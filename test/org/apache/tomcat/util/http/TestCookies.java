@@ -27,13 +27,12 @@ import org.junit.Test;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 public class TestCookies {
-    private Cookie FOO = new Cookie("foo", "bar");
-    private Cookie FOO_NULL = new Cookie("foo", null);
-    private Cookie FOO_EMPTY = new Cookie("foo", "");
-    private Cookie BAR = new Cookie("bar", "rab");
-    private Cookie BAR_NULL = new Cookie("bar", null);
-    private Cookie A = new Cookie("a", "b");
-    private Cookie HASH_NULL = new Cookie("#", null);
+    private final Cookie FOO = new Cookie("foo", "bar");
+    private final Cookie FOO_EMPTY = new Cookie("foo", "");
+    private final Cookie BAR = new Cookie("bar", "rab");
+    private final Cookie BAR_EMPTY = new Cookie("bar", "");
+    private final Cookie A = new Cookie("a", "b");
+    private final Cookie HASH_EMPTY = new Cookie("#", "");
 
     @Test
     public void testBasicCookieOld() {
@@ -76,20 +75,19 @@ public class TestCookies {
     public void testNameOnlyAreDroppedRfc6265() {
         // Name only cookies are not dropped in RFC6265
         test(true, "foo=;a=b; ;", FOO_EMPTY, A);
-        test(true, "foo;a=b; ;", FOO_NULL, A);
-        test(true, "foo;a=b;bar", FOO_NULL, A, BAR_NULL);
-        test(true, "foo;a=b;bar;", FOO_NULL, A, BAR_NULL);
-        test(true, "foo;a=b;bar ", FOO_NULL, A, BAR_NULL);
-        test(true, "foo;a=b;bar ;", FOO_NULL, A, BAR_NULL);
+        test(true, "foo;a=b; ;", FOO_EMPTY, A);
+        test(true, "foo;a=b;bar", FOO_EMPTY, A, BAR_EMPTY);
+        test(true, "foo;a=b;bar;", FOO_EMPTY, A, BAR_EMPTY);
+        test(true, "foo;a=b;bar ", FOO_EMPTY, A, BAR_EMPTY);
+        test(true, "foo;a=b;bar ;", FOO_EMPTY, A, BAR_EMPTY);
 
         // Bug 49000
         Cookie fred = new Cookie("fred", "1");
         Cookie jim = new Cookie("jim", "2");
-        Cookie bobNull = new Cookie("bob", null);
         Cookie bobEmpty = new Cookie("bob", "");
         Cookie george = new Cookie("george", "3");
-        test(true, "fred=1; jim=2; bob", fred, jim, bobNull);
-        test(true, "fred=1; jim=2; bob; george=3", fred, jim, bobNull, george);
+        test(true, "fred=1; jim=2; bob", fred, jim, bobEmpty);
+        test(true, "fred=1; jim=2; bob; george=3", fred, jim, bobEmpty, george);
         test(true, "fred=1; jim=2; bob=; george=3", fred, jim, bobEmpty, george);
         test(true, "fred=1; jim=2; bob=", fred, jim, bobEmpty);
     }
@@ -121,12 +119,12 @@ public class TestCookies {
 
     @Test
     public void testEmptyPairsRfc6265() {
-        test(true, "foo;a=b; ;bar", FOO_NULL, A, BAR_NULL);
-        test(true, "foo;a=b;;bar", FOO_NULL, A, BAR_NULL);
-        test(true, "foo;a=b; ;;bar=rab", FOO_NULL, A, BAR);
-        test(true, "foo;a=b;; ;bar=rab", FOO_NULL, A, BAR);
-        test(true, "foo;a=b;;#;bar=rab", FOO_NULL, A, HASH_NULL, BAR);
-        test(true, "foo;a=b;;\\;bar=rab", FOO_NULL, A, BAR);
+        test(true, "foo;a=b; ;bar", FOO_EMPTY, A, BAR_EMPTY);
+        test(true, "foo;a=b;;bar", FOO_EMPTY, A, BAR_EMPTY);
+        test(true, "foo;a=b; ;;bar=rab", FOO_EMPTY, A, BAR);
+        test(true, "foo;a=b;; ;bar=rab", FOO_EMPTY, A, BAR);
+        test(true, "foo;a=b;;#;bar=rab", FOO_EMPTY, A, HASH_EMPTY, BAR);
+        test(true, "foo;a=b;;\\;bar=rab", FOO_EMPTY, A, BAR);
     }
 
     @Test
