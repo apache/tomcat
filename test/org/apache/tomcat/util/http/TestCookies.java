@@ -195,19 +195,16 @@ public class TestCookies {
 
     @Test
     public void v1DQuoteInValueOld() {
-        doV1DQuoteInValue(false);
+        FOO.setValue("b");
+        FOO.setVersion(1);
+        A.setVersion(1);
+        test(false, "$Version=1;foo=\"b\"ar\";a=b", FOO, A); // Incorrectly escaped.
     }
 
     @Test
     public void v1DQuoteInValueRfc6265() {
-        doV1DQuoteInValue(true);
-    }
-
-    private void doV1DQuoteInValue(boolean useRfc6265) {
-        FOO.setValue("b");
-        FOO.setVersion(1);
         A.setVersion(1);
-        test(useRfc6265, "$Version=1;foo=\"b\"ar\";a=b", FOO, A); // Incorrectly escaped.
+        test(true, "$Version=1;foo=\"b\"ar\";a=b", A); // Incorrectly escaped.
     }
 
     @Test
@@ -403,7 +400,9 @@ public class TestCookies {
             ServerCookie actual = cookies.getCookie(i);
             Assert.assertEquals(cookie.getVersion(), actual.getVersion());
             Assert.assertEquals(cookie.getName(), actual.getName().toString());
-            Assert.assertEquals(cookie.getValue(), actual.getValue().toString());
+            Assert.assertEquals(cookie.getValue(),
+                    org.apache.tomcat.util.http.parser.Cookie.unescapeCookieValueRfc2109(
+                            actual.getValue().toString()));
             if (cookie.getVersion() == 1) {
                 Assert.assertEquals(cookie.getDomain(), actual.getDomain().toString());
                 Assert.assertEquals(cookie.getPath(), actual.getPath().toString());
