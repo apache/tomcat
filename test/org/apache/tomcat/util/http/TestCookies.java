@@ -462,6 +462,14 @@ public class TestCookies {
         test(true, "$Version=1;{\"a\":true, \"b\":false};a=b", A);
     }
 
+    @Test
+    public void testSkipSemicolonOrComma() {
+        // V1 cookies can also use commas to separate cookies
+        FOO.setVersion(1);
+        A.setVersion(1);
+        test(true, "$Version=1;x\tx=yyy,foo=bar;a=b", FOO, A);
+    }
+
     private void test(boolean useRfc6265, String header, Cookie... expected) {
         MimeHeaders mimeHeaders = new MimeHeaders();
         Cookies cookies = new Cookies(mimeHeaders);

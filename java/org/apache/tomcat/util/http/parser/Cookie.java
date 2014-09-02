@@ -362,8 +362,7 @@ public class Cookie {
     private static void skipInvalidCookie(ByteBuffer bb) {
         logInvalidHeader(bb);
         // Invalid cookie value. Skip to the next semi-colon
-        // TODO Could be a comma
-        skipUntilSemiColon(bb);
+        skipUntilSemiColonOrComma(bb);
     }
 
     private static void skipLWS(ByteBuffer bb) {
@@ -380,6 +379,16 @@ public class Cookie {
     private static void skipUntilSemiColon(ByteBuffer bb) {
         while(bb.hasRemaining()) {
             if (bb.get() == SEMICOLON_BYTE) {
+                break;
+            }
+        }
+    }
+
+
+    private static void skipUntilSemiColonOrComma(ByteBuffer bb) {
+        while(bb.hasRemaining()) {
+            byte b = bb.get();
+            if (b == SEMICOLON_BYTE || b == COMMA_BYTE) {
                 break;
             }
         }
