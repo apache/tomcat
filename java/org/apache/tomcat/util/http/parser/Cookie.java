@@ -37,6 +37,12 @@ import org.apache.tomcat.util.res.StringManager;
  *   <li>For cookies without a value, the '=' is not required after the name as
  *       some browsers do not sent it.</li>
  * </ul>
+ *
+ * <p>Implementation note:<br/>
+ * This class has been carefully tuned to ensure that it has equal or better
+ * performance than the original Netscape/RFC2109 cookie parser. Before
+ * committing and changes, ensure that the TesterCookiePerformance unit test
+ * continues to give results within 1% for the old and new parsers.</p>
  */
 public class Cookie {
 
