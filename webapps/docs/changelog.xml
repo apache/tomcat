@@ -48,6 +48,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>55917</bug>: Allow bytes in the range 0x80 to 0xFF to appear in
+        cookie values if the cookie is a V1 (RFC2109) cookie and the value is
+        correctly quoted. The new RFC6265 based cookie parser must be enabled to
+        correctly handle these cookies. (markt)
+      </fix>
+      <fix>
         <bug>56900</bug>: Fix some potential resource leaks when reading
         property files reported by Coverity Scan. Based on patches provided by
         Felix Schumacher. (markt)

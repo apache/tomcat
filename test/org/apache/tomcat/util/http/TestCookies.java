@@ -29,6 +29,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 public class TestCookies {
     private final Cookie FOO = new Cookie("foo", "bar");
     private final Cookie FOO_EMPTY = new Cookie("foo", "");
+    private final Cookie FOO_CONTROL = new Cookie("foo", "b\u00e1r");
     private final Cookie BAR = new Cookie("bar", "rab");
     private final Cookie BAR_EMPTY = new Cookie("bar", "");
     private final Cookie A = new Cookie("a", "b");
@@ -387,6 +388,67 @@ public class TestCookies {
         test(true, "$Version=0;foo=bar");
     }
 
+    @Test
+    public void disallow8bitInName() {
+        // Bug 55917
+        test(true, "f\u00f6o=bar");
+    }
+
+    @Test
+    public void disallowControlInName() {
+        // Bug 55917
+        test(true, "f\010o=bar");
+    }
+
+    @Test
+    public void disallow8BitControlInName() {
+        // Bug 55917
+        test(true, "f\210o=bar");
+    }
+
+    @Test
+    public void allow8BitInV0Value() {
+        // Bug 55917
+        test(true, "foo=b\u00e1r", FOO_CONTROL);
+    }
+
+    @Test
+    public void disallow8bitInV1UnquotedValue() {
+        // Bug 55917
+        test(true, "$Version=1; foo=b\u00e1r");
+    }
+
+    @Test
+    public void allow8bitInV1QuotedValue() {
+        // Bug 55917
+        FOO_CONTROL.setVersion(1);
+        test(true, "$Version=1; foo=\"b\u00e1r\"", FOO_CONTROL);
+    }
+
+    @Test
+    public void disallowControlInV0Value() {
+        // Bug 55917
+        test(true, "foo=b\010r");
+    }
+
+    @Test
+    public void disallowControlInV1UnquotedValue() {
+        // Bug 55917
+        test(true, "$Version=1; foo=b\010r");
+    }
+
+    @Test
+    public void disallowControlInV1QuotedValue() {
+        // Bug 55917
+        test(true, "$Version=1; foo=\"b\010r\"");
+    }
+
+    @Test
+    public void disallow8BitControlInV1UnquotedValue() {
+        // Bug 55917
+        test(true, "$Version=1; foo=b\210r");
+    }
+
     private void test(boolean useRfc6265, String header, Cookie... expected) {
         MimeHeaders mimeHeaders = new MimeHeaders();
         Cookies cookies = new Cookies(mimeHeaders);
@@ -401,6 +463,7 @@ public class TestCookies {
             ServerCookie actual = cookies.getCookie(i);
             Assert.assertEquals(cookie.getVersion(), actual.getVersion());
             Assert.assertEquals(cookie.getName(), actual.getName().toString());
+            actual.getValue().getByteChunk().setCharset(StandardCharsets.UTF_8);
             Assert.assertEquals(cookie.getValue(),
                     org.apache.tomcat.util.http.parser.Cookie.unescapeCookieValueRfc2109(
                             actual.getValue().toString()));
