@@ -63,6 +63,11 @@
         names are separated by commas. Identified by Coverity Scan and fixed
         based on a patch by Felix Schumacher. (markt)
       </fix>
+      <add>
+        Add an additional implementation of a RFC6265 based cookie parser along
+        with new Context options to select and configure it. This parser is
+        currently considered experiemental and is not used by default. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
