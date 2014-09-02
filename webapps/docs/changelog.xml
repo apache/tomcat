@@ -59,6 +59,11 @@
         enabled to correctly handle these cookies. (markt)
       </fix>
       <fix>
+        <bug>55921</bug>: Correctly handle (ignore the cookie) unescaped JSON in
+        a cookie value. The new RFC6265 based cookie parser must be enabled to
+        correctly handle these cookies. (markt)
+      </fix>
+      <fix>
         <bug>56900</bug>: Fix some potential resource leaks when reading
         property files reported by Coverity Scan. Based on patches provided by
         Felix Schumacher. (markt)

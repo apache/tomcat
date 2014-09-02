@@ -449,6 +449,19 @@ public class TestCookies {
         test(true, "$Version=1; foo=b\210r");
     }
 
+    @Test
+    public void testJsonInV0() {
+        // Bug 55921
+        test(true, "{\"a\":true, \"b\":false};a=b", A);
+    }
+
+    @Test
+    public void testJsonInV1() {
+        // Bug 55921
+        A.setVersion(1);
+        test(true, "$Version=1;{\"a\":true, \"b\":false};a=b", A);
+    }
+
     private void test(boolean useRfc6265, String header, Cookie... expected) {
         MimeHeaders mimeHeaders = new MimeHeaders();
         Cookies cookies = new Cookies(mimeHeaders);
