@@ -21,8 +21,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -115,6 +118,7 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
@@ -821,8 +825,48 @@ public class StandardContext extends ContainerBase
 
     private final Object namingToken = new Object();
 
+    private boolean useRfc6265 = false;
+    private Charset cookieEncoding = StandardCharsets.UTF_8;
+
 
     // ----------------------------------------------------- Context Properties
+
+
+    @Override
+    public void setUseRfc6265(boolean useRfc6265) {
+        this.useRfc6265 = useRfc6265;
+    }
+
+
+    @Override
+    public boolean getUseRfc6265() {
+        return useRfc6265;
+    }
+
+
+    @Override
+    public void setCookieEncoding(String encoding) {
+        try {
+            Charset charset = B2CConverter.getCharset(encoding);
+            cookieEncoding = charset;
+        } catch (UnsupportedEncodingException uee) {
+            cookieEncoding = StandardCharsets.UTF_8;
+            log.warn(sm.getString("standardContext.unknownCookieEncoding"), uee);
+        }
+    }
+
+
+    @Override
+    public String getCookieEncoding() {
+        return cookieEncoding.name();
+    }
+
+
+    @Override
+    public Charset getCookieEncodingCharset() {
+        return cookieEncoding;
+    }
+
 
     @Override
     public Object getNamingToken() {

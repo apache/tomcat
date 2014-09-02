@@ -23,12 +23,13 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.parser.Cookie;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A collection of cookies - reusable and tuned for server side performance.
- * Based on RFC2965 (and 2109).
+ * Based on RFC6265 and RFC2109.
  *
  * This class is not thread-safe.
  *
@@ -48,6 +49,7 @@ public final class Cookies {
     public static final int INITIAL_SIZE = 4;
     private ServerCookies scookies = new ServerCookies(INITIAL_SIZE);
     private boolean unprocessed = true;
+    private boolean useRfc6265 = false;
 
     private final MimeHeaders headers;
 
@@ -67,6 +69,7 @@ public final class Cookies {
     public void recycle() {
         scookies.recycle();
         unprocessed = true;
+        useRfc6265 = false;
     }
 
 
@@ -145,6 +148,11 @@ public final class Cookies {
     }
 
 
+    public void setUseRfc6265(boolean useRfc6265) {
+        this.useRfc6265 = useRfc6265;
+    }
+
+
     // XXX will be refactored soon!
     private static boolean equals(String s, byte b[], int start, int end) {
         int blen = end-start;
@@ -218,13 +226,22 @@ public final class Cookies {
     }
 
 
+    final void processCookieHeader(byte bytes[], int off, int len) {
+        if (useRfc6265) {
+            Cookie.parseCookie(bytes, off, len, scookies);
+        } else {
+            doProcessCookieHeaderOriginal(bytes, off, len);
+        }
+    }
+
+
     /**
      * Parses a cookie header after the initial "Cookie:"
      * [WS][$]token[WS]=[WS](token|QV)[;|,]
-     * RFC 2965
+     * RFC 2965 / RFC 2109
      * JVK
      */
-    final void processCookieHeader(byte bytes[], int off, int len){
+    private void doProcessCookieHeaderOriginal(byte bytes[], int off, int len){
         if (len <= 0 || bytes == null) {
             return;
         }

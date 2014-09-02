@@ -300,6 +300,13 @@
         no filtering will be applied.</p>
       </attribute>
 
+      <attribute name="cookieEncoding" required="false">
+        <p>If the RFC6265 based cookie parser is used this attribute determines
+        the encoding to be used to convert the byte values in the HTTP header to
+        strings. If not specified, the default of <code>UTF-8</code> will be
+        used.</p>
+      </attribute>
+
       <attribute name="cookies" required="false">
         <p>Set to <code>true</code> if you want cookies to be used for
         session identifier communication if supported by the client (this
@@ -527,6 +534,12 @@
         <code>true</code>, else the default value will be <code>false</code>.
         Setting this attribute to <code>true</code> will incur a performance
         penalty.</p>
+      </attribute>
+
+      <attribute name="useRfc6265" required="false">
+        <p>Determines if the RFC6265 based cookie parser is used. The default
+        value is <code>false</code> in which case the original parser based on
+        RFC2109 and the Netscape cookie specification will be used.</p>
       </attribute>
 
       <attribute name="useHttpOnly" required="false">

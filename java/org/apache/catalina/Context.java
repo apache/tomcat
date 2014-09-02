@@ -17,6 +17,7 @@
 package org.apache.catalina;
 
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -1637,4 +1638,40 @@ public interface Context extends Container {
      * context.
      */
     public Object getNamingToken();
+
+    /**
+     * Should this context use the new RFC6265 based cookie parser for
+     * processing HTTP cookies? The default value is currently false but that
+     * may change in a future point release.
+     */
+    public void setUseRfc6265(boolean useRfc6265);
+
+    /**
+     * Does this context use the new RFC6265 based cookie parser for
+     * processing HTTP cookies? The default value is currently false but that
+     * may change in a future point release.
+     */
+    public boolean getUseRfc6265();
+
+    /**
+     * Specifies the name of the character encoding to use to convert bytes into
+     * characters when processing cookies using the RFC6265 based cookie parser.
+     * It has no effect if the RFC6265 parser is not used.
+     * If an unrecognised character encoding is specified, a warning will be
+     * logged and the default value of UTF-8 will be used.
+     */
+    public void setCookieEncoding(String encoding);
+
+    /**
+     * Returns the name of the character encoding used to convert bytes into
+     * characters when processing cookies using the RFC6265 based cookie parser.
+     * The default value is UTF-8.
+     */
+    public String getCookieEncoding();
+
+    /**
+     * Returns the character set used to convert bytes into characters when
+     * processing cookies using the RFC6265 based cookie parser.
+     */
+    public Charset getCookieEncodingCharset();
 }
