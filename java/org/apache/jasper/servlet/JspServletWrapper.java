@@ -456,8 +456,8 @@ public class JspServletWrapper {
             }
             throw ex;
         } catch (IOException ex) {
-            if(options.getDevelopment()) {
-                throw handleJspException(ex);
+            if (options.getDevelopment()) {
+                throw new IOException(handleJspException(ex).getMessage(), ex);
             }
             throw ex;
         } catch (IllegalStateException ex) {

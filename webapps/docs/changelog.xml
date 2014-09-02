@@ -124,6 +124,14 @@
         functional impact but the code was less efficient as a result of the
         error. Based on a patch by martinschaef. (markt)
       </fix>
+      <fix>
+        Ensure that the implementation of
+        <code>javax.servlet.jsp.PageContext.include(String)</code>
+        and
+        <code>javax.servlet.jsp.PageContext.include(String, boolean)</code>
+        will throw <code>IOException</code> when an I/O error occur during
+        the operation. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
