@@ -80,6 +80,38 @@ public class TestPageContextImpl extends TomcatBaseTest {
         Assert.assertTrue(result.contains("OK"));
     }
 
+    @Test
+    public void testIncludeThrowsIOException() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/pageContext1.jsp", res, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String body = res.toString();
+        Assert.assertTrue(body.contains("OK"));
+        Assert.assertFalse(body.contains("FAILED"));
+
+        res = new ByteChunk();
+
+        rc = getUrl("http://localhost:" + getPort() + "/test/jsp/pageContext1.jsp?flush=true", res,
+                null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        body = res.toString();
+        Assert.assertTrue(body.contains("Flush"));
+        Assert.assertTrue(body.contains("OK"));
+        Assert.assertFalse(body.contains("FAILED"));
+    }
+
     public static class Bug56010 extends HttpServlet {
 
         private static final long serialVersionUID = 1L;

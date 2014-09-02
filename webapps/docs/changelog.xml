@@ -65,6 +65,18 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Ensure that the implementation of
+        <code>javax.servlet.jsp.PageContext.include(String)</code>
+        and
+        <code>javax.servlet.jsp.PageContext.include(String, boolean)</code>
+        will throw <code>IOException</code> when an I/O error occur during
+        the operation. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.12 (markt)">
   <subsection name="Catalina">
