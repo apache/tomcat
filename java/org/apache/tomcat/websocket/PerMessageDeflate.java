@@ -51,12 +51,12 @@ public class PerMessageDeflate implements Transformation {
     private final Inflater inflater = new Inflater(true);
     private final ByteBuffer readBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
     private final Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+    private final byte[] EOM_BUFFER = new byte[EOM_BYTES.length + 1];
 
     private volatile Transformation next;
     private volatile boolean skipDecompression = false;
     private volatile ByteBuffer writeBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
     private volatile boolean firstCompressedFrameWritten = false;
-    private volatile byte[] EOM_BUFFER = new byte[EOM_BYTES.length + 1];
 
     static PerMessageDeflate negotiate(List<List<Parameter>> preferences) {
         // Accept the first preference that the server is able to support
