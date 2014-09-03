@@ -339,7 +339,9 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                     StringBuilder buffer = new StringBuilder();
                     boolean first = true;
                     while (iter.hasNext()) {
-                        if (!first) {
+                        if (first) {
+                            first = false;
+                        } else {
                             buffer.append(",");
                         }
                         buffer.append(iter.next());
