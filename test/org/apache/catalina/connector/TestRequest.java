@@ -818,7 +818,7 @@ public class TestRequest extends TomcatBaseTest {
         req.addHeader("accept-language", "en-gb");
 
         Locale actual = req.getLocale();
-        Locale expected = Locale.forLanguageTag("en-gb");
+        Locale expected = new Locale("en", "gb");
 
         Assert.assertEquals(expected, actual);
     }
@@ -835,7 +835,7 @@ public class TestRequest extends TomcatBaseTest {
         req.addHeader("accept-language", "en;q=0.5");
 
         Locale actual = req.getLocale();
-        Locale expected = Locale.forLanguageTag("en-gb");
+        Locale expected = new Locale("en", "gb");
 
         Assert.assertEquals(expected, actual);
     }
