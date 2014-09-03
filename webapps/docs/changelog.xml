@@ -115,6 +115,10 @@
   <subsection name="WebSocket">
     <changelog>
       <fix>
+        <bug>56905</bug>: Make destruction on web application stop of thread
+        group used for WebSocket connections more robust. (kkolinko/markt)
+      </fix>
+      <fix>
         <bug>56907</bug>: Ensure that client IO threads are stopped if a secure
         WebSocket client connection fails. (markt)
       </fix>
