@@ -124,6 +124,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>56895</bug>: Correctly compose <code>JAVA_OPTS</code> in
+        <code>catalina.bat</code> so that escape sequences are preserved. Patch
+        by Lucas Theisen. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.12 (markt)" rtext="2014-09-03">
   <subsection name="Catalina">
