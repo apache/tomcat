@@ -484,8 +484,9 @@ public abstract class Compiler {
                     // Assume we constructed this correctly
                     int entryStart = key.lastIndexOf("!/");
                     String entry = key.substring(entryStart + 2);
-                    Jar jar = JarFactory.newInstance(new URL(key.substring(4, entryStart)));
-                    includeLastModified = jar.getLastModified(entry);
+                    try (Jar jar = JarFactory.newInstance(new URL(key.substring(4, entryStart)))) {
+                        includeLastModified = jar.getLastModified(entry);
+                    }
                 } else {
                     if (key.startsWith("jar:") || key.startsWith("file:")) {
                         includeUrl = new URL(key);
