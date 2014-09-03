@@ -58,12 +58,10 @@ public class ServerInfo {
         String built = null;
         String number = null;
 
-        try {
-            InputStream is = ServerInfo.class.getResourceAsStream
-                ("/org/apache/catalina/util/ServerInfo.properties");
-            Properties props = new Properties();
+        Properties props = new Properties();
+        try (InputStream is = ServerInfo.class.getResourceAsStream
+                ("/org/apache/catalina/util/ServerInfo.properties")) {
             props.load(is);
-            is.close();
             info = props.getProperty("server.info");
             built = props.getProperty("server.built");
             number = props.getProperty("server.number");
