@@ -224,13 +224,22 @@ public final class ExtensionValidator {
      * @param jarFile The system JAR whose manifest to add
      */
     public static void addSystemResource(File jarFile) throws IOException {
-        Manifest manifest = getManifest(new FileInputStream(jarFile));
-        if (manifest != null)  {
-            ManifestResource mre
-                = new ManifestResource(jarFile.getAbsolutePath(),
-                                       manifest,
-                                       ManifestResource.SYSTEM);
-            containerManifestResources.add(mre);
+        InputStream is = null;
+        try {
+            is = new FileInputStream(jarFile);
+            Manifest manifest = getManifest(is);
+            if (manifest != null) {
+                ManifestResource mre = new ManifestResource(jarFile.getAbsolutePath(), manifest,
+                        ManifestResource.SYSTEM);
+                containerManifestResources.add(mre);
+            }
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                }
+            }
         }
     }
 
