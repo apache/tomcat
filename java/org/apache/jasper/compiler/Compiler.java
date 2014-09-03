@@ -20,6 +20,7 @@ package org.apache.jasper.compiler;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -493,6 +494,7 @@ public abstract class Compiler {
         Iterator<Entry<String,Long>> it = depends.entrySet().iterator();
         while (it.hasNext()) {
             Entry<String,Long> include = it.next();
+            URLConnection iuc = null;
             try {
                 String key = include.getKey();
                 URL includeUrl;
@@ -505,7 +507,7 @@ public abstract class Compiler {
                     return true;
                 }
 
-                URLConnection iuc = includeUrl.openConnection();
+                iuc = includeUrl.openConnection();
                 long includeLastModified = 0;
                 if (iuc instanceof JarURLConnection) {
                     includeLastModified =
@@ -513,7 +515,6 @@ public abstract class Compiler {
                 } else {
                     includeLastModified = iuc.getLastModified();
                 }
-                iuc.getInputStream().close();
 
                 if (includeLastModified != include.getValue().longValue()) {
                     return true;
@@ -523,6 +524,13 @@ public abstract class Compiler {
                     log.debug("Problem accessing resource. Treat as outdated.",
                             e);
                 return true;
+            } finally {
+                if (iuc != null) {
+                    try {
+                        iuc.getInputStream().close();
+                    } catch (IOException e) {
+                    }
+                }
             }
         }
 
