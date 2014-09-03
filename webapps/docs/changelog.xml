@@ -114,6 +114,11 @@
         will throw <code>IOException</code> when an I/O error occur during
         the operation. (violetagg)
       </fix>
+      <fix>
+        <bug>56908</bug>: Fix some potential resource leaks when reading
+        jar files. Reported by Coverity Scan. Patch provided by Felix
+        Schumacher. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
