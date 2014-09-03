@@ -112,6 +112,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>56907</bug>: Ensure that client IO threads are stopped if a secure
+        WebSocket client connection fails. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.12 (markt)">
   <subsection name="Catalina">
