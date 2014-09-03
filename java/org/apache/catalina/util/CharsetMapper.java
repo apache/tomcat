@@ -18,6 +18,7 @@
 package org.apache.catalina.util;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 import java.util.Properties;
@@ -69,14 +70,20 @@ public class CharsetMapper {
      *  resource could not be loaded for any reason.
      */
     public CharsetMapper(String name) {
+        InputStream stream = null;
         try {
-            InputStream stream =
-              this.getClass().getResourceAsStream(name);
+            stream = this.getClass().getResourceAsStream(name);
             map.load(stream);
-            stream.close();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             throw new IllegalArgumentException(t.toString());
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                }
+            }
         }
     }
 

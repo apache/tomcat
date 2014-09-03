@@ -2677,6 +2677,12 @@ public class ContextConfig implements LifecycleListener {
                     fragment.setDistributable(true);
                 }
             } finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (IOException e) {
+                    }
+                }
                 fragment.setURL(file.toURI().toURL());
                 if (fragment.getName() == null) {
                     fragment.setName(fragment.getURL().toString());
