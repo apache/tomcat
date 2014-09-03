@@ -94,6 +94,10 @@
         used so that multiple values for a header XXX are separated by commas.
         Identified by Coverity Scan. (violetagg)
       </fix>
+      <fix>
+        Fix a potential resource leak when reading MANIFEST.MF file for
+        extension dependencies reported by Coverity Scan. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
