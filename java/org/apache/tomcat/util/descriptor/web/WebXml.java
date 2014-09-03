@@ -2082,7 +2082,7 @@ public class WebXml {
 
         if (dest.getMaxFileSize() == null) {
             dest.setMaxFileSize(src.getMaxFileSize());
-        } else if (src.getLocation() != null) {
+        } else if (src.getMaxFileSize() != null) {
             if (failOnConflict &&
                     !src.getMaxFileSize().equals(dest.getMaxFileSize())) {
                 return false;
