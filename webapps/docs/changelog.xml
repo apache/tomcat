@@ -84,6 +84,10 @@
         with new Context options to select and configure it. This parser is
         currently considered experiemental and is not used by default. (markt)
       </add>
+      <fix>
+        Fixed the multipart elements merge operation performed during web
+        application deployment. Identified by Coverity Scan. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
