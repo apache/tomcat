@@ -164,6 +164,10 @@
         amongst other things, the JNDI resources associated with the web
         application. (markt) 
       </fix>
+      <fix>
+        <bug>56907</bug>: Ensure that client IO threads are stopped if a secure
+        WebSocket client connection fails. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
