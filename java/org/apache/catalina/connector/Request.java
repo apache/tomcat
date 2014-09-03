@@ -3226,26 +3226,33 @@ public class Request
 
         localesParsed = true;
 
+        // Store the accumulated languages that have been requested in
+        // a local collection, sorted by the quality value (so we can
+        // add Locales in descending order).  The values will be ArrayLists
+        // containing the corresponding Locales to be added
+        TreeMap<Double, ArrayList<Locale>> locales = new TreeMap<Double, ArrayList<Locale>>();
+
         Enumeration<String> values = getHeaders("accept-language");
 
         while (values.hasMoreElements()) {
             String value = values.nextElement();
-            parseLocalesHeader(value);
+            parseLocalesHeader(value, locales);
         }
 
+        // Process the quality values in highest->lowest order (due to
+        // negating the Double value when creating the key)
+        for (ArrayList<Locale> list : locales.values()) {
+            for (Locale locale : list) {
+                addLocale(locale);
+            }
+        }
     }
 
 
     /**
      * Parse accept-language header value.
      */
-    protected void parseLocalesHeader(String value) {
-
-        // Store the accumulated languages that have been requested in
-        // a local collection, sorted by the quality value (so we can
-        // add Locales in descending order).  The values will be ArrayLists
-        // containing the corresponding Locales to be added
-        TreeMap<Double, ArrayList<Locale>> locales = new TreeMap<Double, ArrayList<Locale>>();
+    protected void parseLocalesHeader(String value, TreeMap<Double, ArrayList<Locale>> locales) {
 
         // Preprocess the value to remove all whitespace
         int white = value.indexOf(' ');
@@ -3340,17 +3347,7 @@ public class Request
                 locales.put(key, values);
             }
             values.add(locale);
-
         }
-
-        // Process the quality values in highest->lowest order (due to
-        // negating the Double value when creating the key)
-        for (ArrayList<Locale> list : locales.values()) {
-            for (Locale locale : list) {
-                addLocale(locale);
-            }
-        }
-
     }
 
 

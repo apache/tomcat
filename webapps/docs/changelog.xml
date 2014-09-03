@@ -136,6 +136,11 @@
         Fix a potential resource leak when reading MANIFEST.MF file for
         extension dependencies reported by Coverity Scan. (violetagg)
       </fix>
+      <fix>
+        Correctly handle multiple <code>accept-language</code> headers rather
+        than just using the first header to determine the user&apos;s preferred
+        Locale. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
