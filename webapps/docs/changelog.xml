@@ -103,6 +103,12 @@
         when Context have been reloaded. (kkolinko)
       </scode>
       <fix>
+        <bug>56903</bug>: Correct the return value for
+        <code>StandardContext.getResourceOnlyServlets()</code> so that multiple
+        names are separated by commas. Identified by Coverity Scan and fixed
+        based on a patch by Felix Schumacher. (markt)
+      </fix>
+      <fix>
         Fixed the multipart elements merge operation performed during web
         application deployment. Identified by Coverity Scan. (violetagg)
       </fix>

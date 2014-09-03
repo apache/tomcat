@@ -68,6 +68,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+
 public class TestStandardContext extends TomcatBaseTest {
 
     private static final String REQUEST =
@@ -858,5 +859,14 @@ public class TestStandardContext extends TomcatBaseTest {
             throw new ServletException("failing on purpose");
         }
 
+    }
+
+    @Test
+    public void testBug56903() {
+        Context context = new StandardContext();
+
+        String list = "a,b,c";
+        context.setResourceOnlyServlets(list);
+        Assert.assertEquals(list, context.getResourceOnlyServlets());
     }
 }
