@@ -176,7 +176,7 @@ public final class ExtensionValidator {
                         ManifestResource.SYSTEM);
                 containerManifestResources.add(mre);
             }
-        } 
+        }
     }
 
 
