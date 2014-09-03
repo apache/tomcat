@@ -50,6 +50,7 @@ import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Introspection;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
@@ -72,9 +73,9 @@ public class DefaultInstanceManager implements InstanceManager {
     protected final ClassLoader containerClassLoader;
     protected boolean privileged;
     protected boolean ignoreAnnotations;
-    private final Properties restrictedFilters = new Properties();
-    private final Properties restrictedListeners = new Properties();
-    private final Properties restrictedServlets = new Properties();
+    private final Properties restrictedFilters;
+    private final Properties restrictedListeners;
+    private final Properties restrictedServlets;
     private final Map<Class<?>, AnnotationCacheEntry[]> annotationCache =
         new WeakHashMap<Class<?>, AnnotationCacheEntry[]>();
     private final Map<String, String> postConstructMethods;
@@ -86,43 +87,18 @@ public class DefaultInstanceManager implements InstanceManager {
         this.containerClassLoader = containerClassLoader;
         ignoreAnnotations = catalinaContext.getIgnoreAnnotations();
         StringManager sm = StringManager.getManager(Constants.Package);
-        try {
-            InputStream is =
-                this.getClass().getClassLoader().getResourceAsStream
-                    ("org/apache/catalina/core/RestrictedServlets.properties");
-            if (is != null) {
-                restrictedServlets.load(is);
-            } else {
-                catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedServletsResource"));
-            }
-        } catch (IOException e) {
-            catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedServletsResource"), e);
-        }
-
-        try {
-            InputStream is =
-                    this.getClass().getClassLoader().getResourceAsStream
-                            ("org/apache/catalina/core/RestrictedListeners.properties");
-            if (is != null) {
-                restrictedListeners.load(is);
-            } else {
-                catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedListenersResources"));
-            }
-        } catch (IOException e) {
-            catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedListenersResources"), e);
-        }
-        try {
-            InputStream is =
-                    this.getClass().getClassLoader().getResourceAsStream
-                            ("org/apache/catalina/core/RestrictedFilters.properties");
-            if (is != null) {
-                restrictedFilters.load(is);
-            } else {
-                catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedFiltersResource"));
-            }
-        } catch (IOException e) {
-            catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedServletsResources"), e);
-        }
+        restrictedServlets = loadProperties(
+                "org/apache/catalina/core/RestrictedServlets.properties",
+                sm.getString("defaultInstanceManager.restrictedServletsResource"),
+                catalinaContext.getLogger());
+        restrictedListeners = loadProperties(
+                "org/apache/catalina/core/RestrictedListeners.properties",
+                "defaultInstanceManager.restrictedListenersResources",
+                catalinaContext.getLogger());
+        restrictedFilters = loadProperties(
+                "org/apache/catalina/core/RestrictedFilters.properties",
+                "defaultInstanceManager.restrictedFiltersResource",
+                catalinaContext.getLogger());
         this.context = context;
         this.injectionMap = injectionMap;
         this.postConstructMethods = catalinaContext.findPostConstructMethods();
@@ -639,6 +615,30 @@ public class DefaultInstanceManager implements InstanceManager {
         // Note: method signature has already been checked for correctness.
         // The method name always starts with "set".
         return Introspector.decapitalize(setter.getName().substring(3));
+    }
+
+    private static Properties loadProperties(String resourceName, String errorString, Log log) {
+        Properties result = new Properties();
+        ClassLoader cl = DefaultInstanceManager.class.getClassLoader();
+        InputStream is = null;
+        try {
+            is = cl.getResourceAsStream(resourceName);
+            if (is ==null) {
+                log.error(errorString);
+            } else {
+                result.load(is);
+            }
+        } catch (IOException ioe) {
+            log.error(errorString, ioe);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return result;
     }
 
     private static String normalize(String jndiName){
