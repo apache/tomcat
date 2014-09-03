@@ -19,6 +19,7 @@
 package org.apache.catalina.util;
 
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -54,17 +55,24 @@ public class ServerInfo {
 
     static {
 
+        Properties props = new Properties();
+        InputStream is = null;
         try {
-            InputStream is = ServerInfo.class.getResourceAsStream
-                ("/org/apache/catalina/util/ServerInfo.properties");
-            Properties props = new Properties();
+            is = ServerInfo.class.getResourceAsStream
+                    ("/org/apache/catalina/util/ServerInfo.properties");
             props.load(is);
-            is.close();
             serverInfo = props.getProperty("server.info");
             serverBuilt = props.getProperty("server.built");
             serverNumber = props.getProperty("server.number");
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                }
+            }
         }
         if (serverInfo == null)
             serverInfo = "Apache Tomcat 7.0.x-dev";
