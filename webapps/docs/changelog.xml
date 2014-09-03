@@ -98,6 +98,10 @@
         <bug>56825</bug>: Enable pre-emptive authentication to work with the
         SSL authenticator. Based on a patch by jlmonteiro. (markt)
       </fix>
+      <fix>
+        <bug>56857</bug>: Fix thread safety issue when calling ServletContext
+        methods while running under a security manager. (markt)
+      </fix>
       <scode>
         <bug>56882</bug>: Add testcase for processing of forwards and includes
         when Context have been reloaded. (kkolinko)

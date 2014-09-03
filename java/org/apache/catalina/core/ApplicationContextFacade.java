@@ -32,6 +32,7 @@ import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
@@ -62,15 +63,15 @@ public class ApplicationContextFacade implements ServletContext {
     /**
      * Cache Class object used for reflection.
      */
-    private HashMap<String,Class<?>[]> classCache;
-    
-    
+    private final Map<String,Class<?>[]> classCache;
+
+
     /**
      * Cache method object.
      */
-    private HashMap<String,Method> objectCache;
-    
-    
+    private final Map<String,Method> objectCache;
+
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -83,9 +84,9 @@ public class ApplicationContextFacade implements ServletContext {
     public ApplicationContextFacade(ApplicationContext context) {
         super();
         this.context = context;
-        
+
         classCache = new HashMap<String,Class<?>[]>();
-        objectCache = new HashMap<String,Method>();
+        objectCache = new ConcurrentHashMap<String,Method>();
         initClassCache();
     }
     
