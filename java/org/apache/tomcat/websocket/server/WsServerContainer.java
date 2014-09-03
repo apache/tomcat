@@ -273,14 +273,42 @@ public class WsServerContainer extends WsWebSocketContainer
     public void destroy() {
         shutdownExecutor();
         super.destroy();
+        // If the executor hasn't fully shutdown it won't be possible to
+        // destroy this thread group as there will still be threads running.
+        // Mark the thread group as daemon one, so that it destroys itself
+        // when thread count reaches zero.
+        // Synchronization on threadGroup is needed, as there is a race between
+        // destroy() call from termination of the last thread in thread group
+        // marked as daemon versus the explicit destroy() call.
+        int threadCount = threadGroup.activeCount();
+        boolean success = false;
         try {
-            threadGroup.destroy();
-        } catch (IllegalThreadStateException itse) {
-            // If the executor hasn't fully shutdown it won't be possible to
-            // destroy this thread group as there will still be threads running
-            log.warn(sm.getString("serverContainer.threadGroupNotDestroyed",
-                    threadGroup.getName()));
+            while (true) {
+                int oldThreadCount = threadCount;
+                synchronized (threadGroup) {
+                    if (threadCount > 0) {
+                        Thread.yield();
+                        threadCount = threadGroup.activeCount();
+                    }
+                    if (threadCount > 0 && threadCount != oldThreadCount) {
+                        // Value not stabilized. Retry.
+                        continue;
+                    }
+                    if (threadCount > 0) {
+                        threadGroup.setDaemon(true);
+                    } else {
+                        threadGroup.destroy();
+                        success = true;
+                    }
+                    break;
+                }
+            }
+        } catch (IllegalThreadStateException exception) {
+            // Fall-through
         }
+        if (!success) {
+            log.warn(sm.getString("serverContainer.threadGroupNotDestroyed",
+                    threadGroup.getName(), Integer.valueOf(threadCount)));        }
     }
 
 
