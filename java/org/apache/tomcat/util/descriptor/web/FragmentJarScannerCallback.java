@@ -111,15 +111,13 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
     @Override
     public void scan(File file, String webappPath, boolean isWebapp) throws IOException {
 
-        InputStream stream = null;
         WebXml fragment = new WebXml();
         fragment.setWebappJar(isWebapp);
         fragment.setDelegate(delegate);
 
-        try {
-            File fragmentFile = new File(file, FRAGMENT_LOCATION);
+        File fragmentFile = new File(file, FRAGMENT_LOCATION);
+        try (InputStream stream = new FileInputStream(fragmentFile)) {
             if (fragmentFile.isFile()) {
-                stream = new FileInputStream(fragmentFile);
                 InputSource source =
                     new InputSource(fragmentFile.toURI().toURL().toString());
                 source.setByteStream(stream);

@@ -69,11 +69,8 @@ public class CharsetMapper {
      *  resource could not be loaded for any reason.
      */
     public CharsetMapper(String name) {
-        try {
-            InputStream stream =
-              this.getClass().getResourceAsStream(name);
+        try (InputStream stream = this.getClass().getResourceAsStream(name)) {
             map.load(stream);
-            stream.close();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             throw new IllegalArgumentException(t.toString());
