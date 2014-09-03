@@ -102,6 +102,10 @@
         <bug>56882</bug>: Add testcase for processing of forwards and includes
         when Context have been reloaded. (kkolinko)
       </scode>
+      <fix>
+        Fixed the multipart elements merge operation performed during web
+        application deployment. Identified by Coverity Scan. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
