@@ -88,6 +88,12 @@
         Fixed the multipart elements merge operation performed during web
         application deployment. Identified by Coverity Scan. (violetagg)
       </fix>
+      <fix>
+        Correct the information written by
+        <code>ExtendedAccessLogValve</code> when a format token x-O(XXX) is
+        used so that multiple values for a header XXX are separated by commas.
+        Identified by Coverity Scan. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
