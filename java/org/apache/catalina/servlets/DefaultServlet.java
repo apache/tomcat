@@ -2128,27 +2128,32 @@ public class DefaultServlet
         while ( (exception == null) && (ranges.hasNext()) ) {
 
             InputStream resourceInputStream = cacheEntry.resource.streamContent();
-            InputStream istream =
-                new BufferedInputStream(resourceInputStream, input);
+            InputStream istream = null;
+            try {
+                istream = new BufferedInputStream(resourceInputStream, input);
+                Range currentRange = ranges.next();
 
-            Range currentRange = ranges.next();
+                // Writing MIME header.
+                ostream.println();
+                ostream.println("--" + mimeSeparation);
+                if (contentType != null)
+                    ostream.println("Content-Type: " + contentType);
+                ostream.println("Content-Range: bytes " + currentRange.start
+                               + "-" + currentRange.end + "/"
+                               + currentRange.length);
+                ostream.println();
 
-            // Writing MIME header.
-            ostream.println();
-            ostream.println("--" + mimeSeparation);
-            if (contentType != null)
-                ostream.println("Content-Type: " + contentType);
-            ostream.println("Content-Range: bytes " + currentRange.start
-                           + "-" + currentRange.end + "/"
-                           + currentRange.length);
-            ostream.println();
-
-            // Printing content
-            exception = copyRange(istream, ostream, currentRange.start,
-                                  currentRange.end);
-
-            istream.close();
-
+                // Printing content
+                exception = copyRange(istream, ostream, currentRange.start,
+                                      currentRange.end);
+            } finally {
+                if (istream != null) {
+                    try {
+                        istream.close();
+                    } catch (IOException e) {
+                    }
+                }
+            }
         }
 
         ostream.println();

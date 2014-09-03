@@ -107,6 +107,11 @@
         when Context have been reloaded. (kkolinko)
       </scode>
       <fix>
+        <bug>56902</bug>: Fix a potential resource leak in the Default Servlet
+        reported by Coverity Scan. Based on a patch provided by Felix
+        Schumacher. (markt)
+      </fix>
+      <fix>
         <bug>56903</bug>: Correct the return value for
         <code>StandardContext.getResourceOnlyServlets()</code> so that multiple
         names are separated by commas. Identified by Coverity Scan and fixed
