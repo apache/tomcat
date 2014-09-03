@@ -99,8 +99,8 @@
         extension dependencies reported by Coverity Scan. (violetagg)
       </fix>
       <fix>
-        Fix some potential resource leaks when reading property files. Reported
-        by Coverity Scan. (violetagg)
+        Fix some potential resource leaks when reading properties, files and
+        other resources. Reported by Coverity Scan. (violetagg)
       </fix>
     </changelog>
   </subsection>
