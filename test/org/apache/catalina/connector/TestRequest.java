@@ -662,7 +662,7 @@ public class TestRequest extends TomcatBaseTest {
             writer.append("Content-Disposition: form-data; name=\"part\"\r\n");
             writer.append("Content-Type: text/plain; charset=UTF-8\r\n");
             writer.append("\r\n");
-            writer.append("��").append("\r\n");
+            writer.append("äö").append("\r\n");
             writer.flush();
 
             writer.append("\r\n");
@@ -689,7 +689,7 @@ public class TestRequest extends TomcatBaseTest {
                 while ((line = reader.readLine()) != null) {
                     response.add(line);
                 }
-                assertTrue(response.contains("Part ��"));
+                assertTrue(response.contains("Part äö"));
             } finally {
                 if (reader != null) {
                     reader.close();
