@@ -127,7 +127,7 @@ public class SSLAuthenticator
         if (containerLog.isDebugEnabled())
             containerLog.debug(" Looking up certificates");
 
-        X509Certificate certs[] = getRequestCertificates(request, true);
+        X509Certificate certs[] = getRequestCertificates(request);
 
         if ((certs == null) || (certs.length < 1)) {
             if (containerLog.isDebugEnabled())

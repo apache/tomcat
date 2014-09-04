@@ -55,10 +55,6 @@ public class TestClientCert extends TomcatBaseTest {
             Context c = (Context) tomcat.getHost().findChildren()[0];
             // Enable pre-emptive auth
             c.setPreemptiveAuthentication(true);
-
-            // Connector needs to advertise is accepts client certs for
-            // pre-emptive to work
-            tomcat.getConnector().setAttribute("clientAuth", "want");
         }
 
         getTomcatInstance().start();
