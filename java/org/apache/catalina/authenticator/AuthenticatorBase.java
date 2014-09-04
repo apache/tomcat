@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Authenticator;
@@ -567,8 +568,9 @@ public abstract class AuthenticatorBase extends ValveBase
                         "authorization") != null;
         }
 
-        if (!authRequired && context.getPreemptiveAuthentication()) {
-            X509Certificate[] certs = getRequestCertificates(request, false);
+        if (!authRequired && context.getPreemptiveAuthentication() &&
+                HttpServletRequest.CLIENT_CERT_AUTH.equals(getAuthMethod())) {
+            X509Certificate[] certs = getRequestCertificates(request);
             authRequired = certs != null && certs.length > 0;
         }
 
@@ -626,13 +628,11 @@ public abstract class AuthenticatorBase extends ValveBase
      * extracting the certificate chain from the Coyote request.
      *
      * @param request   Request to be processed
-     * @param force     Should a renegotiation be forced to request certificates
-     *                  from the user agent if none have been provided
      *
      * @return          The X509 certificate chain if found, <code>null</code>
      *                  otherwise.
      */
-    protected X509Certificate[] getRequestCertificates(final Request request, boolean force)
+    protected X509Certificate[] getRequestCertificates(final Request request)
             throws IllegalStateException {
 
         X509Certificate certs[] =
@@ -640,7 +640,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
         if ((certs == null) || (certs.length < 1)) {
             try {
-                request.getCoyoteRequest().action(ActionCode.REQ_SSL_CERTIFICATE, Boolean.valueOf(force));
+                request.getCoyoteRequest().action(ActionCode.REQ_SSL_CERTIFICATE, null);
                 certs = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
             } catch (IllegalStateException ise) {
                 // Request body was too large for save buffer

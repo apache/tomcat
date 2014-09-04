@@ -102,6 +102,10 @@
         Fix some potential resource leaks when reading properties, files and
         other resources. Reported by Coverity Scan. (violetagg)
       </fix>
+      <fix>
+        Correct the previous fix for <bug>56825</bug> that enabled pre-emptive
+        authentication to work with the SSL authenticator. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
