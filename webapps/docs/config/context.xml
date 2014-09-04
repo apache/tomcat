@@ -796,6 +796,13 @@
       specified static resource of the web application for updates, and will
       reload the web application if it is updated. The content of this element
       must be a string.</li>
+  <li><a href="jar-scanner.html"><strong>JarScanner</strong></a> -
+      Configure the Jar Scanner that will be used to scan the web application
+      for JAR files and directories of class files. It is typically used during
+      web application start to identify configuration files such as TLDs o
+      web-fragment.xml files that must be processed as part of the web
+      application initialisation..  Normally, the default Jar Scanner
+      configuration will be sufficient.</li>
   </ul>
 
 </section>
