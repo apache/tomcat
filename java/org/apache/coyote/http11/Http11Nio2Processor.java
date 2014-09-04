@@ -465,20 +465,18 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         }
         case REQ_SSL_CERTIFICATE: {
             if (sslSupport != null && socketWrapper.getSocket() != null) {
-                boolean force = ((Boolean) param).booleanValue();
-                if (force) {
-                    /* Forced triggers a handshake so consume and buffer the
-                     * request body, so that it does not interfere with the
-                     * client's handshake messages
-                     */
-                    InputFilter[] inputFilters = inputBuffer.getFilters();
-                    ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
-                            .setLimit(maxSavePostSize);
-                    inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
-                }
+                /*
+                 * Consume and buffer the request body, so that it does not
+                 * interfere with the client's handshake messages
+                 */
+                InputFilter[] inputFilters = inputBuffer.getFilters();
+                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
+                    .setLimit(maxSavePostSize);
+                inputBuffer.addActiveFilter
+                    (inputFilters[Constants.BUFFERED_FILTER]);
                 SecureNio2Channel sslChannel = (SecureNio2Channel) socketWrapper.getSocket();
                 SSLEngine engine = sslChannel.getSslEngine();
-                if (!engine.getNeedClientAuth() && force) {
+                if (!engine.getNeedClientAuth()) {
                     // Need to re-negotiate SSL connection
                     engine.setNeedClientAuth(true);
                     try {
@@ -495,8 +493,9 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                     // use force=false since re-negotiation is handled above
                     // (and it is a NO-OP for NIO anyway)
                     Object sslO = sslSupport.getPeerCertificateChain(false);
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                    if( sslO != null) {
+                        request.setAttribute
+                            (SSLSupport.CERTIFICATE_KEY, sslO);
                     }
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
