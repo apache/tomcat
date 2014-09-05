@@ -116,13 +116,15 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
         fragment.setDelegate(delegate);
 
         File fragmentFile = new File(file, FRAGMENT_LOCATION);
-        try (InputStream stream = new FileInputStream(fragmentFile)) {
+        try {
             if (fragmentFile.isFile()) {
-                InputSource source =
-                    new InputSource(fragmentFile.toURI().toURL().toString());
-                source.setByteStream(stream);
-                if (!webXmlParser.parseWebXml(source, fragment, true)) {
-                    ok = false;
+                try (InputStream stream = new FileInputStream(fragmentFile)) {
+                    InputSource source =
+                        new InputSource(fragmentFile.toURI().toURL().toString());
+                    source.setByteStream(stream);
+                    if (!webXmlParser.parseWebXml(source, fragment, true)) {
+                        ok = false;
+                    }
                 }
             } else {
                 // If there is no web.xml, normal folder no impact on
