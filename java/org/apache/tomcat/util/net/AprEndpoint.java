@@ -355,6 +355,28 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     }
 
 
+    /**
+     * This endpoint does not support <code>-1</code> for unlimited connections,
+     * nor does it support setting this attribute while the endpoint is running.
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public void setMaxConnections(int maxConnections) {
+        if (maxConnections == -1) {
+            log.warn(sm.getString("endpoint.apr.maxConnections.unlimited",
+                    Integer.valueOf(getMaxConnections())));
+            return;
+        }
+        if (running) {
+            log.warn(sm.getString("endpoint.apr.maxConnections.running",
+                    Integer.valueOf(getMaxConnections())));
+            return;
+        }
+        super.setMaxConnections(maxConnections);
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
