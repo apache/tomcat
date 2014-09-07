@@ -267,8 +267,7 @@ public class HttpUtils {
         url.append (scheme);                // http, https
         url.append ("://");
         url.append (req.getServerName ());
-        if ((scheme.equals ("http") && port != 80)
-                || (scheme.equals ("https") && port != 443)) {
+        if ((scheme.equals ("http") && port != 80) || (scheme.equals ("https") && port != 443)) {
             url.append (':');
             url.append (req.getServerPort ());
         }

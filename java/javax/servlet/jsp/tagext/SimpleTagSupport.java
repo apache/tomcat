@@ -184,9 +184,8 @@ public class SimpleTagSupport implements SimpleTag {
     {
         boolean isInterface = false;
 
-        if (from == null || klass == null
-                || (!JspTag.class.isAssignableFrom(klass)
-                    && !(isInterface = klass.isInterface()))) {
+        if (from == null || klass == null || (!JspTag.class.isAssignableFrom(klass) &&
+                !(isInterface = klass.isInterface()))) {
             return null;
         }
 
@@ -206,8 +205,8 @@ public class SimpleTagSupport implements SimpleTag {
                 parent = ((TagAdapter) parent).getAdaptee();
             }
 
-            if ((isInterface && klass.isInstance(parent))
-                    || klass.isAssignableFrom(parent.getClass())) {
+            if ((isInterface && klass.isInstance(parent)) ||
+                    klass.isAssignableFrom(parent.getClass())) {
                 return parent;
             }
 

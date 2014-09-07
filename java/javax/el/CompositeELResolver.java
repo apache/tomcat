@@ -154,8 +154,8 @@ public class CompositeELResolver extends ELResolver {
         Class<?> commonType = null, type = null;
         for (int i = 0; i < sz; i++) {
             type = this.resolvers[i].getCommonPropertyType(context, base);
-            if (type != null
-                    && (commonType == null || commonType.isAssignableFrom(type))) {
+            if (type != null &&
+                    (commonType == null || commonType.isAssignableFrom(type))) {
                 commonType = type;
             }
         }
