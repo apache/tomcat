@@ -82,9 +82,9 @@
     -->
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
-    <!--  ~ 1000 errors
+    <!--  ~ 1200 errors
     <module name="OperatorWrap">
-      <property name="option" value="oel"/>
+      <property name="option" value="eol"/>
     </module>
     -->
   </module>
