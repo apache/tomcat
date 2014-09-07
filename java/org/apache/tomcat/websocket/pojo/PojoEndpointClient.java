@@ -36,7 +36,7 @@ public class PojoEndpointClient extends PojoEndpointBase {
         setPojo(pojo);
         setMethodMapping(
                 new PojoMethodMapping(pojo.getClass(), decoders, null));
-        setPathParameters(Collections.<String, String> emptyMap());
+        setPathParameters(Collections.<String,String>emptyMap());
     }
 
     @Override

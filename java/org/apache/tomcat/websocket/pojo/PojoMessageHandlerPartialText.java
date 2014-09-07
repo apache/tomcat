@@ -24,7 +24,7 @@ import javax.websocket.Session;
  * Text specific concrete implementation for handling partial messages.
  */
 public class PojoMessageHandlerPartialText
-        extends PojoMessageHandlerPartialBase<String>{
+        extends PojoMessageHandlerPartialBase<String> {
 
     public PojoMessageHandlerPartialText(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean convert,

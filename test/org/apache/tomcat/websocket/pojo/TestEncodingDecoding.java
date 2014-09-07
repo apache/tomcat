@@ -69,14 +69,12 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     public void testProgrammaticEndPoints() throws Exception{
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         ctx.addApplicationListener(ProgramaticServerEndpointConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
         tomcat.start();
 
@@ -341,8 +339,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
-    public static class MsgStringMessageHandler
-            implements MessageHandler.Whole<MsgString>{
+    public static class MsgStringMessageHandler implements MessageHandler.Whole<MsgString> {
 
         public static Queue<Object> received = new ConcurrentLinkedQueue<>();
         private final Session session;

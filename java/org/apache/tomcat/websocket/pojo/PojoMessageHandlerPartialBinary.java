@@ -25,7 +25,7 @@ import javax.websocket.Session;
  * ByteBuffer specific concrete implementation for handling partial messages.
  */
 public class PojoMessageHandlerPartialBinary
-        extends PojoMessageHandlerPartialBase<ByteBuffer>{
+        extends PojoMessageHandlerPartialBase<ByteBuffer> {
 
     public PojoMessageHandlerPartialBinary(Object pojo, Method method,
             Session session, Object[] params, int indexPayload, boolean convert,
