@@ -74,8 +74,7 @@ class Util {
             }
             return template;
         } catch (MissingResourceException e) {
-            return "Missing Resource: '" + name + "' for Locale "
-                    + locale.getDisplayName();
+            return "Missing Resource: '" + name + "' for Locale " + locale.getDisplayName();
         }
     }
 

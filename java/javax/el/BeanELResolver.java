@@ -185,8 +185,7 @@ public class BeanELResolver extends ELResolver {
         }
 
         context.setPropertyResolved(base, property);
-        return this.readOnly
-                || this.property(context, base, property).isReadOnly();
+        return this.readOnly || this.property(context, base, property).isReadOnly();
     }
 
     @Override
@@ -281,8 +280,8 @@ public class BeanELResolver extends ELResolver {
         }
 
         public boolean isReadOnly() {
-            return this.write == null
-                && (null == (this.write = Util.getMethod(this.owner, descriptor.getWriteMethod())));
+            return this.write == null &&
+                    (null == (this.write = Util.getMethod(this.owner, descriptor.getWriteMethod())));
         }
 
         public Method getWriteMethod() {
