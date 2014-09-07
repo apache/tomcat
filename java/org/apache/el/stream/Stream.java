@@ -37,7 +37,7 @@ public class Stream {
     private final Iterator<Object> iterator;
 
 
-    public Stream(Iterator<Object > iterator) {
+    public Stream(Iterator<Object> iterator) {
         this.iterator = iterator;
     }
 
@@ -468,7 +468,7 @@ public class Stream {
 
 
     private static class LambdaExpressionComparator
-            implements Comparator<Object>{
+            implements Comparator<Object> {
 
         private final LambdaExpression le;
 

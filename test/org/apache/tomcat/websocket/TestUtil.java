@@ -140,14 +140,11 @@ public class TestUtil {
     }
 
 
-    private abstract static class GenericMessageHandler<T>
-            implements MessageHandler.Whole<T> {
+    private abstract static class GenericMessageHandler<T> implements MessageHandler.Whole<T> {
     }
 
 
-    private static class GenericSubMessageHandler
-            extends GenericMessageHandler<String>{
-
+    private static class GenericSubMessageHandler extends GenericMessageHandler<String> {
         @Override
         public void onMessage(String message) {
             // NO-OP
@@ -242,8 +239,7 @@ public class TestUtil {
     }
 
 
-    private static class GenericSubEncoder
-            extends GenericEncoder<String>{
+    private static class GenericSubEncoder extends GenericEncoder<String> {
 
         @Override
         public String encode(String object) throws EncodeException {
