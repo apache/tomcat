@@ -154,21 +154,17 @@ public class WebAnnotationSet {
         /* Process Resource annotation.
          * Ref JSR 250
          */
-        {
-            Resource annotation = classClass.getAnnotation(Resource.class);
-            if (annotation != null) {
-                addResource(context, annotation);
-            }
+        Resource resourceAnnotation = classClass.getAnnotation(Resource.class);
+        if (resourceAnnotation != null) {
+            addResource(context, resourceAnnotation);
         }
         /* Process Resources annotation.
          * Ref JSR 250
          */
-        {
-            Resources annotation = classClass.getAnnotation(Resources.class);
-            if (annotation != null && annotation.value() != null) {
-                for (Resource resource : annotation.value()) {
-                    addResource(context, resource);
-                }
+        Resources resourcesAnnotation = classClass.getAnnotation(Resources.class);
+        if (resourcesAnnotation != null && resourcesAnnotation.value() != null) {
+            for (Resource resource : resourcesAnnotation.value()) {
+                addResource(context, resource);
             }
         }
         /* Process EJB annotation.
@@ -244,13 +240,11 @@ public class WebAnnotationSet {
          * Ref JSR 250, equivalent to the security-role element in
          * the deployment descriptor
          */
-        {
-            DeclareRoles annotation = classClass
-                    .getAnnotation(DeclareRoles.class);
-            if (annotation != null && annotation.value() != null) {
-                for (String role : annotation.value()) {
-                    context.addSecurityRole(role);
-                }
+        DeclareRoles declareRolesAnnotation = classClass
+                .getAnnotation(DeclareRoles.class);
+        if (declareRolesAnnotation != null && declareRolesAnnotation.value() != null) {
+            for (String role : declareRolesAnnotation.value()) {
+                context.addSecurityRole(role);
             }
         }
     }
