@@ -719,7 +719,7 @@ public class WebappClassLoader extends URLClassLoader
 
         result.resources = this.resources;
         result.delegate = this.delegate;
-        result.state = this.state;
+        result.state = LifecycleState.NEW;
         result.needConvert = this.needConvert;
         result.clearReferencesStatic = this.clearReferencesStatic;
         result.clearReferencesStopThreads = this.clearReferencesStopThreads;
