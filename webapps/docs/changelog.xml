@@ -63,6 +63,10 @@
         a cookie value. The new RFC6265 based cookie parser must be enabled to
         correctly handle these cookies. (markt)
       </fix>
+      <add>
+        <bug>56530</bug>: Add a web application class loader implementation that
+        supports the parallel loading of web application classes. (markt)
+      </add>
       <fix>
         <bug>56900</bug>: Fix some potential resource leaks when reading
         property files reported by Coverity Scan. Based on patches provided by

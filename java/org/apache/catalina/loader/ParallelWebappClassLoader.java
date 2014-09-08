@@ -18,14 +18,24 @@ package org.apache.catalina.loader;
 
 import org.apache.catalina.LifecycleException;
 
-public class WebappClassLoader extends WebappClassLoaderBase {
+public class ParallelWebappClassLoader extends WebappClassLoaderBase {
 
-    public WebappClassLoader() {
+    private static final org.apache.juli.logging.Log log =
+            org.apache.juli.logging.LogFactory.getLog(ParallelWebappClassLoader.class);
+
+    static {
+        boolean result = ClassLoader.registerAsParallelCapable();
+        if (!result) {
+            log.warn(sm.getString("webappClassLoaderParallel.registrationFailed"));
+        }
+    }
+
+    public ParallelWebappClassLoader() {
         super();
     }
 
 
-    public WebappClassLoader(ClassLoader parent) {
+    public ParallelWebappClassLoader(ClassLoader parent) {
         super(parent);
     }
 
@@ -46,9 +56,9 @@ public class WebappClassLoader extends WebappClassLoaderBase {
      * @return the transformer-free copy of this class loader.
      */
     @Override
-    public WebappClassLoader copyWithoutTransformers() {
+    public ParallelWebappClassLoader copyWithoutTransformers() {
 
-        WebappClassLoader result = new WebappClassLoader(getParent());
+        ParallelWebappClassLoader result = new ParallelWebappClassLoader(getParent());
 
         super.copyStateWithoutTransformers(result);
 
@@ -59,15 +69,5 @@ public class WebappClassLoader extends WebappClassLoaderBase {
         }
 
         return result;
-    }
-
-
-    /**
-     * This class loader is not parallel capable so lock on the class loader
-     * rather than a per-class lock.
-     */
-    @Override
-    protected Object getClassLoadingLock(String className) {
-        return this;
     }
 }
