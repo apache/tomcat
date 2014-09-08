@@ -126,6 +126,10 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>43001</bug>: Enable the JspC Ant taks to set the JspC option
+        <code>mappedFile</code>. (markt)
+      </fix>
+      <fix>
         Ensure that the implementation of
         <code>javax.servlet.jsp.PageContext.include(String)</code>
         and

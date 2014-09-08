@@ -505,6 +505,10 @@ public class JspC extends Task implements Options {
         return mappedFile;
     }
 
+    public void setMappedFile(boolean b) {
+        mappedFile = b;
+    }
+
     /**
      * Sets the option to include debug information in compiled class.
      */
