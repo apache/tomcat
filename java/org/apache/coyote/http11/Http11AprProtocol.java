@@ -321,20 +321,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                     proto.getMaxHttpHeaderSize(), (AprEndpoint)proto.endpoint,
                     proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize());
-            processor.setAdapter(proto.getAdapter());
-            processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
-            processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
-            processor.setConnectionUploadTimeout(
-                    proto.getConnectionUploadTimeout());
-            processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
-            processor.setCompressionMinSize(proto.getCompressionMinSize());
-            processor.setCompression(proto.getCompression());
-            processor.setNoCompressionUserAgents(proto.getNoCompressionUserAgents());
-            processor.setCompressableMimeTypes(proto.getCompressableMimeTypes());
-            processor.setRestrictedUserAgents(proto.getRestrictedUserAgents());
-            processor.setSocketBuffer(proto.getSocketBuffer());
-            processor.setMaxSavePostSize(proto.getMaxSavePostSize());
-            processor.setServer(proto.getServer());
+            proto.configureProcessor(processor);
+            // APR specific configuration
             processor.setClientCertProvider(proto.getClientCertProvider());
             register(processor);
             return processor;

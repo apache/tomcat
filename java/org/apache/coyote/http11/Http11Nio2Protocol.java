@@ -250,20 +250,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                     proto.getMaxHttpHeaderSize(), (Nio2Endpoint) proto.endpoint,
                     proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize());
-            processor.setAdapter(proto.getAdapter());
-            processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
-            processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
-            processor.setConnectionUploadTimeout(
-                    proto.getConnectionUploadTimeout());
-            processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());
-            processor.setCompressionMinSize(proto.getCompressionMinSize());
-            processor.setCompression(proto.getCompression());
-            processor.setNoCompressionUserAgents(proto.getNoCompressionUserAgents());
-            processor.setCompressableMimeTypes(proto.getCompressableMimeTypes());
-            processor.setRestrictedUserAgents(proto.getRestrictedUserAgents());
-            processor.setSocketBuffer(proto.getSocketBuffer());
-            processor.setMaxSavePostSize(proto.getMaxSavePostSize());
-            processor.setServer(proto.getServer());
+            proto.configureProcessor(processor);
             register(processor);
             return processor;
         }
