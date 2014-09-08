@@ -1066,7 +1066,9 @@
         that prevents web applications from trying to override J2SE
         implementation classes. As part of this fix, refactor the way a null
         parent class loader is handled which enables a number of null checks and
-        object creation calls to be removed. (markt)
+        object creation calls to be removed. Note that this change means that,
+        by default, the web application class loader is now a higher priority
+        for loading classes than the system class loader.  (markt)
       </fix>
       <fix>
         <bug>55958</bug>: Differentiate between <code>foo.war</code> the WAR
