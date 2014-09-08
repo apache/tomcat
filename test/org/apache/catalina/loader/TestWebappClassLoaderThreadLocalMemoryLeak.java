@@ -60,7 +60,7 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
         LogValidationFilter f = new LogValidationFilter(
                 "The web application [] created a ThreadLocal with key of");
         LogManager.getLogManager().getLogger(
-                "org.apache.catalina.loader.WebappClassLoader").setFilter(f);
+                "org.apache.catalina.loader.WebappClassLoaderBase").setFilter(f);
 
         // Need to force loading of all web application classes via the web
         // application class loader
@@ -114,7 +114,7 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
         LogValidationFilter f = new LogValidationFilter(
                 "The web application [] created a ThreadLocal with key of");
         LogManager.getLogManager().getLogger(
-                "org.apache.catalina.loader.WebappClassLoader").setFilter(f);
+                "org.apache.catalina.loader.WebappClassLoaderBase").setFilter(f);
 
         // Need to force loading of all web application classes via the web
         // application class loader

@@ -39,7 +39,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Valve;
-import org.apache.catalina.loader.WebappClassLoader;
+import org.apache.catalina.loader.WebappClassLoaderBase;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
@@ -749,8 +749,8 @@ public class StandardHost extends ContainerBase implements Host {
         for (Map.Entry<ClassLoader, String> entry :
                 childClassLoaders.entrySet()) {
             ClassLoader cl = entry.getKey();
-            if (cl instanceof WebappClassLoader) {
-                if (!((WebappClassLoader) cl).getState().isAvailable()) {
+            if (cl instanceof WebappClassLoaderBase) {
+                if (!((WebappClassLoaderBase) cl).getState().isAvailable()) {
                     result.add(entry.getValue());
                 }
             }

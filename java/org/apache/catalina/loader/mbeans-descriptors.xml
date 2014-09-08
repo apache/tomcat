@@ -90,4 +90,35 @@
 
   </mbean>
 
+
+  <mbean         name="ParallelWebappClassLoader"
+          description="Classloader implementation which is specialized for handling web applications and is capable of loading classes in parallel"
+               domain="Catalina"
+                group="Loader"
+                 type="org.apache.catalina.loader.ParallelWebappClassLoader">
+
+    <attribute   name="className"
+          description="Fully qualified class name of the managed object"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="contextName"
+          description="Name of the webapp context"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="delegate"
+          description="The 'follow standard delegation model' flag that will be used to configure our ClassLoader"
+                 type="boolean"/>
+
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"
+                 writeable="false"/>
+
+    <attribute   name="URLs"
+          description="The URLs of this loader"
+                 type="[Ljava.net.URL;"/>
+
+  </mbean>
 </mbeans-descriptors>
