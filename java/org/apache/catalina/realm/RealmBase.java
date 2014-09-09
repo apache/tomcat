@@ -55,6 +55,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
@@ -109,7 +110,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     /**
      * MD5 message digest provider.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
      */
+    @Deprecated
     protected static volatile MessageDigest md5Helper;
 
 
@@ -390,11 +394,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             throw new IllegalArgumentException(uee.getMessage());
         }
 
-        String serverDigest = null;
-        // Bugzilla 32137
-        synchronized(md5Helper) {
-            serverDigest = MD5Encoder.encode(md5Helper.digest(valueBytes));
-        }
+        String serverDigest = MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(valueBytes));
 
         if (log.isDebugEnabled()) {
             log.debug("Digest : " + clientDigest + " Username:" + username
@@ -1211,15 +1211,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * Return the digest associated with given principal's user name.
      */
     protected String getDigest(String username, String realmName) {
-        if (md5Helper == null) {
-            try {
-                md5Helper = MessageDigest.getInstance("MD5");
-            } catch (NoSuchAlgorithmException e) {
-                log.error("Couldn't get MD5 digest: ", e);
-                throw new IllegalStateException(e.getMessage());
-            }
-        }
-
         if (hasMessageDigest()) {
             // Use pre-generated digest
             return getPassword(username);
@@ -1236,13 +1227,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             throw new IllegalArgumentException(uee.getMessage());
         }
 
-        byte[] digest;
-        // Bugzilla 32137
-        synchronized(md5Helper) {
-            digest = md5Helper.digest(valueBytes);
-        }
-
-        return MD5Encoder.encode(digest);
+        return MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(valueBytes));
     }
 
 

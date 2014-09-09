@@ -122,7 +122,12 @@
         is not running. (kfujino)
       </fix>
       <fix>
-        Fix threading issue when locking resources via WebDAV. (markt)
+        Fix a rare threading issue when locking resources via WebDAV.
+        (markt)
+      </fix>
+      <fix>
+        Fix a rare threading issue when using HTTP digest authentication.
+        (markt)
       </fix>
     </changelog>
   </subsection>
