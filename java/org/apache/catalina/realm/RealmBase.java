@@ -1200,7 +1200,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     protected boolean hasMessageDigest() {
-        return !(getDigest() == null && getDigest().length() > 0);
+        return getDigest() != null;
     }
 
     /**
