@@ -64,7 +64,8 @@
         correctly handle these cookies. (markt)
       </fix>
       <add>
-        <bug>56401</bug>: Log version information when Tomcat starts. (markt)
+        <bug>56401</bug>: Log version information when Tomcat starts.
+        (markt/kkolinko)
       </add>
       <add>
         <bug>56530</bug>: Add a web application class loader implementation that
