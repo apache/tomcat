@@ -145,6 +145,11 @@
         Fix some potential resource leaks when reading properties, files and
         other resources. Reported by Coverity Scan. (violetagg)
       </fix>
+      <fix>
+        When using parallel deployment, correctly undeploy context of old
+        version. Make sure that never undeploy older Context If current context
+        is not running. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
