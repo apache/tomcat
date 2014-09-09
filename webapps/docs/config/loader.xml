@@ -122,10 +122,12 @@
 
       <attribute name="loaderClass" required="false">
         <p>Java class name of the <code>java.lang.ClassLoader</code>
-        implementation class to use.  If not specified, the default value is
-        <code>org.apache.catalina.loader.WebappClassLoader</code>. Custom
-        <strong>loaderClass</strong> implementations must extend
-        <code>org.apache.catalina.loader.WebappClassLoaderBase</code>. The
+        implementation class to use. Custom implementations must extend
+        <code>org.apache.catalina.loader.WebappClassLoaderBase</code>.
+        </p>
+
+        <p>If not specified, the default value is
+        <code>org.apache.catalina.loader.WebappClassLoader</code>.  The
         default <strong>loaderClass</strong> is not parallel capable. A parallel
         capable <strong>loaderClass</strong> is available and can be used by
         specifying
