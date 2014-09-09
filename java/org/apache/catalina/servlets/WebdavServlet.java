@@ -21,8 +21,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -34,7 +32,6 @@ import java.util.Vector;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
@@ -48,6 +45,7 @@ import org.apache.catalina.util.XMLWriter;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
+import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -191,12 +189,6 @@ public class WebdavServlet
                 TimeZone.getTimeZone("GMT"));
 
 
-     /**
-     * MD5 message digest provider.
-     */
-    protected static MessageDigest md5Helper;
-
-
     // ----------------------------------------------------- Instance Variables
 
     /**
@@ -271,14 +263,6 @@ public class WebdavServlet
         if (getServletConfig().getInitParameter("allowSpecialPaths") != null)
             allowSpecialPaths = Boolean.parseBoolean(
                     getServletConfig().getInitParameter("allowSpecialPaths"));
-
-        // Load the MD5 helper used to calculate signatures.
-        try {
-            md5Helper = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            throw new UnavailableException("No MD5");
-        }
-
     }
 
 
@@ -1076,7 +1060,7 @@ public class WebdavServlet
                 + lock.depth + "-" + lock.owner + "-" + lock.tokens + "-"
                 + lock.expiresAt + "-" + System.currentTimeMillis() + "-"
                 + secret;
-            String lockToken = MD5Encoder.encode(md5Helper.digest(
+            String lockToken = MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(
                     lockTokenStr.getBytes(StandardCharsets.ISO_8859_1)));
 
             if (resource.isDirectory() && lock.depth == maxDepth) {
