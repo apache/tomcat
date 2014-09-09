@@ -116,6 +116,11 @@
       <scode>
         Refactor to reduce code duplication identified by Simian. (markt)
       </scode>
+      <fix>
+        When using parallel deployment, correctly undeploy context of old
+        version. Make sure that never undeploy older Context If current context
+        is not running. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

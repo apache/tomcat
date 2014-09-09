@@ -1520,7 +1520,7 @@ public class HostConfig
                 Context previousContext =
                         (Context) host.findChild(previous.getName());
                 Context currentContext =
-                        (Context) host.findChild(previous.getName());
+                        (Context) host.findChild(current.getName());
                 if (previousContext != null && currentContext != null &&
                         currentContext.getState().isAvailable() &&
                         !isServiced(previous.getName())) {
