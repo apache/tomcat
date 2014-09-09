@@ -787,14 +787,22 @@ public class Catalina {
 
 
     private void logInfo() {
-        log.info("Server version: " + ServerInfo.getServerInfo());
-        log.info("Server built:   " + ServerInfo.getServerBuilt());
-        log.info("Server number:  " + ServerInfo.getServerNumber());
-        log.info("OS Name:        " + System.getProperty("os.name"));
-        log.info("OS Version:     " + System.getProperty("os.version"));
-        log.info("Architecture:   " + System.getProperty("os.arch"));
-        log.info("JVM Version:    " + System.getProperty("java.runtime.version"));
-        log.info("JVM Vendor:     " + System.getProperty("java.vm.vendor"));
+        log.info(sm.getString("catalina.serverInfo.server.version",
+                ServerInfo.getServerInfo()));
+        log.info(sm.getString("catalina.serverInfo.server.built",
+                ServerInfo.getServerBuilt()));
+        log.info(sm.getString("catalina.serverInfo.server.number",
+                ServerInfo.getServerNumber()));
+        log.info(sm.getString("catalina.serverInfo.os.name",
+                System.getProperty("os.name")));
+        log.info(sm.getString("catalina.serverInfo.os.version",
+                System.getProperty("os.version")));
+        log.info(sm.getString("catalina.serverInfo.os.arch",
+                System.getProperty("os.arch")));
+        log.info(sm.getString("catalina.serverInfo.vm.version",
+                System.getProperty("java.runtime.version")));
+        log.info(sm.getString("catalina.serverInfo.vm.vendor",
+                System.getProperty("java.vm.vendor")));
     }
 
 
