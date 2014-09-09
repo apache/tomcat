@@ -128,9 +128,10 @@
 
         <p>If not specified, the default value is
         <code>org.apache.catalina.loader.WebappClassLoader</code>.  The
-        default <strong>loaderClass</strong> is not parallel capable. A parallel
-        capable <strong>loaderClass</strong> is available and can be used by
-        specifying
+        default <strong>loaderClass</strong> is not parallel capable, which
+        means that loading a class from this classloader is performed by one
+        thread at a time. A parallel capable <strong>loaderClass</strong> is
+        available and can be used by specifying
         <code>org.apache.catalina.loader.ParallelWebappClassLoader</code>.</p>
       </attribute>
 
