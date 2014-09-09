@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ConcurrentMessageDigest {
 
     private static final String MD5 = "MD5";
+    private static final String SHA1 = "SHA-1";
 
     private static final Map<String,Queue<MessageDigest>> queues =
             new HashMap<>();
@@ -44,16 +45,21 @@ public class ConcurrentMessageDigest {
         try {
             // Init commonly used algorithms
             init(MD5);
+            init(SHA1);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    public static byte[] digestMD5(byte[] input) {
+    public static byte[] digestMD5(byte[]... input) {
         return digest(MD5, input);
     }
 
-    public static byte[] digest(String algorithm, byte[] input) {
+    public static byte[] digestSHA1(byte[]... input) {
+        return digest(SHA1, input);
+    }
+
+    public static byte[] digest(String algorithm, byte[]... input) {
 
         Queue<MessageDigest> queue = queues.get(algorithm);
         if (queue == null) {
@@ -71,7 +77,10 @@ public class ConcurrentMessageDigest {
             }
         }
 
-        byte[] result = md.digest(input);
+        for (byte[] bytes : input) {
+            md.update(bytes);
+        }
+        byte[] result = md.digest();
 
         queue.add(md);
 
