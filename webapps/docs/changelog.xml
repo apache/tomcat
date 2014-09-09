@@ -121,6 +121,9 @@
         version. Make sure that never undeploy older Context If current context
         is not running. (kfujino)
       </fix>
+      <fix>
+        Fix threading issue when locking resources via WebDAV. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
