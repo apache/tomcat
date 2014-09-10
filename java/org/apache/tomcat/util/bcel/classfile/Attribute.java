@@ -32,7 +32,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * attribute stands for non-standard-attributes.
  *
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
- * @see Deprecated
  */
 public abstract class Attribute implements Cloneable, Serializable
 {
@@ -119,7 +118,8 @@ public abstract class Attribute implements Cloneable, Serializable
             Utility.swallowSynthetic(file, length);
             return null;
         case Constants.ATTR_DEPRECATED:
-            return new Deprecated(name_index, length, file, constant_pool);
+            Utility.swallowDeprecated(file, length);
+            return null;
         case Constants.ATTR_PMG:
             return new PMGClass(name_index, length, file, constant_pool);
         case Constants.ATTR_SIGNATURE:
