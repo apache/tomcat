@@ -56,9 +56,6 @@ public class FieldOrMethod extends AccessFlags {
 
     protected ConstantPool constant_pool;
 
-    FieldOrMethod() {
-    }
-
 
     /**
      * Construct object from file stream.
@@ -68,30 +65,16 @@ public class FieldOrMethod extends AccessFlags {
      */
     protected FieldOrMethod(DataInputStream file, ConstantPool constant_pool) throws IOException,
             ClassFormatException {
-        this(file.readUnsignedShort(), file.readUnsignedShort(), file.readUnsignedShort(), null,
-                constant_pool);
+        this.access_flags = file.readUnsignedShort();
+        this.name_index = file.readUnsignedShort();
+        this.signature_index = file.readUnsignedShort();
+        this.constant_pool = constant_pool;
+
         attributes_count = file.readUnsignedShort();
         attributes = new Attribute[attributes_count];
         for (int i = 0; i < attributes_count; i++) {
             attributes[i] = Attribute.readAttribute(file, constant_pool);
         }
-    }
-
-
-    /**
-     * @param access_flags Access rights of method
-     * @param name_index Points to field name in constant pool
-     * @param signature_index Points to encoded signature
-     * @param attributes Collection of attributes
-     * @param constant_pool Array of constants
-     */
-    protected FieldOrMethod(int access_flags, int name_index, int signature_index,
-            Attribute[] attributes, ConstantPool constant_pool) {
-        this.access_flags = access_flags;
-        this.name_index = name_index;
-        this.signature_index = signature_index;
-        this.constant_pool = constant_pool;
-        setAttributes(attributes);
     }
 
 
