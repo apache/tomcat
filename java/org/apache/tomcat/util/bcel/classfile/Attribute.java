@@ -33,7 +33,7 @@ import org.apache.tomcat.util.bcel.Constants;
  *
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class Attribute implements Cloneable, Serializable
+public abstract class Attribute implements Serializable
 {
     private static final long serialVersionUID = 1514136303496688899L;
 
@@ -173,27 +173,4 @@ public abstract class Attribute implements Cloneable, Serializable
                 Constants.CONSTANT_Utf8);
         return c.getBytes();
     }
-
-
-    /**
-     * Use copy() if you want to have a deep copy(), i.e., with all references
-     * copied correctly.
-     *
-     * @return shallow copy of this attribute
-     */
-    @Override
-    public Attribute clone()
-    {
-        Attribute attr = null;
-        try
-        {
-            attr = (Attribute) super.clone();
-        }
-        catch (CloneNotSupportedException e)
-        {
-            throw new Error("Clone Not Supported"); // never happens
-        }
-        return attr;
-    }
-
 }

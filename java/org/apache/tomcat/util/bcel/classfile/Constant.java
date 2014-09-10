@@ -31,7 +31,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class Constant implements Cloneable, Serializable {
+public abstract class Constant implements Serializable {
 
     private static final long serialVersionUID = 2827409182154809454L;
     private static BCELComparator _cmp = new BCELComparator() {
@@ -72,16 +72,6 @@ public abstract class Constant implements Cloneable, Serializable {
      */
     public final byte getTag() {
         return tag;
-    }
-
-
-    @Override
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new Error("Clone Not Supported"); // never happens
-        }
     }
 
 

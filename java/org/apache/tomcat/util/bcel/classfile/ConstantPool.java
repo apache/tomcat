@@ -34,7 +34,7 @@ import org.apache.tomcat.util.bcel.Constants;
  * @see     Constant
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public class ConstantPool implements Cloneable, Serializable {
+public class ConstantPool implements Serializable {
 
     private static final long serialVersionUID = -6765503791185687014L;
     private int constant_pool_count;
