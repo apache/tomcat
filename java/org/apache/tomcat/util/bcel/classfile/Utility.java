@@ -281,4 +281,9 @@ final class Utility {
     static void swallowConstantString(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused string index
     }
+
+    static void swallowConstantNameAndType(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused name index
+        file.readUnsignedShort();   // Unused signature index
+    }
 }
