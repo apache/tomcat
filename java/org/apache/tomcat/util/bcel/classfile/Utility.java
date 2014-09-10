@@ -239,4 +239,11 @@ final class Utility {
             Utility.swallowLocalVariable(file);
         }
     }
+
+    static void swallowInnerClasses(DataInput file) throws IOException {
+        int number_of_classes = file.readUnsignedShort();
+        for (int i = 0; i < number_of_classes; i++) {
+            Utility.swallowInnerClass(file);
+        }
+    }
 }
