@@ -250,4 +250,9 @@ final class Utility {
             throw new ClassFormatException("Deprecated attribute with length > 0");
         }
     }
+
+    static void swallowPMCClass(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused pmg_index
+        file.readUnsignedShort();   // Unused pmg_class_index
+    }
 }
