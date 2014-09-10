@@ -43,17 +43,8 @@ public final class ConstantClass extends Constant {
      * @throws IOException
      */
     ConstantClass(DataInput file) throws IOException {
-        this(file.readUnsignedShort());
-    }
-
-
-    /**
-     * @param name_index Name index in constant pool.  Should refer to a
-     * ConstantUtf8.
-     */
-    public ConstantClass(int name_index) {
         super(Constants.CONSTANT_Class);
-        this.name_index = name_index;
+        this.name_index = file.readUnsignedShort();
     }
 
 
