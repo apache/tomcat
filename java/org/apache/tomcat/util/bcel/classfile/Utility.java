@@ -225,4 +225,11 @@ final class Utility {
             file.readUnsignedShort(); // Unused exception index
         }
     }
+
+    static void swallowLineNumberTable(DataInput file) throws IOException {
+        int line_number_table_length = (file.readUnsignedShort());
+        for (int i = 0; i < line_number_table_length; i++) {
+            Utility.swallowLineNumber(file);
+        }
+    }
 }
