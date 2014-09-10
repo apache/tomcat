@@ -196,4 +196,27 @@ final class Utility {
     static void swallowConstantValue(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused constantvalue_index
     }
+
+    static void swallowCode(DataInputStream file, ConstantPool constant_pool) throws IOException {
+        file.readUnsignedShort();   // Unused max_stack
+        file.readUnsignedShort();   // Unused max_locals
+        int code_length = file.readInt();
+        byte[] code = new byte[code_length]; // Read byte code
+        file.readFully(code);
+        /* Read exception table that contains all regions where an exception
+         * handler is active, i.e., a try { ... } catch() block.
+         */
+        int exception_table_length = file.readUnsignedShort();
+        for (int i = 0; i < exception_table_length; i++) {
+            Utility.swallowCodeException(file);
+        }
+        /* Read all attributes, currently `LineNumberTable' and
+         * `LocalVariableTable'
+         */
+        int attributes_count = file.readUnsignedShort();
+        for (int i = 0; i < attributes_count; i++) {
+            Attribute.readAttribute(file, constant_pool);
+        }
+
+    }
 }

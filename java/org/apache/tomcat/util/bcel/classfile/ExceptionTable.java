@@ -29,7 +29,6 @@ import java.io.IOException;
  * with the other classes).
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
- * @see     Code
  */
 public final class ExceptionTable extends Attribute {
 
