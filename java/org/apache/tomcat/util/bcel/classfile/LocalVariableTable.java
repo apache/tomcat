@@ -25,7 +25,6 @@ import java.io.IOException;
  * method. This attribute is contained in the <em>Code</em> attribute.
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
- * @see     Code
  */
 public class LocalVariableTable extends Attribute {
 

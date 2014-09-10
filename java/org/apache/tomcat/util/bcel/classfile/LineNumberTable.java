@@ -26,7 +26,6 @@ import java.io.IOException;
  * contains pairs of PCs and line numbers.
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
- * @see     Code
  */
 public final class LineNumberTable extends Attribute {
 
