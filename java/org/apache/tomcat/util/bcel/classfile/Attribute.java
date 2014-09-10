@@ -115,10 +115,10 @@ public abstract class Attribute implements Cloneable, Serializable
             Utility.swallowInnerClasses(file);
             return null;
         case Constants.ATTR_SYNTHETIC:
-            Utility.swallowSynthetic(file, length);
+            Utility.swallowSynthetic(length);
             return null;
         case Constants.ATTR_DEPRECATED:
-            Utility.swallowDeprecated(file, length);
+            Utility.swallowDeprecated(length);
             return null;
         case Constants.ATTR_PMG:
             return new PMGClass(name_index, length, file, constant_pool);
