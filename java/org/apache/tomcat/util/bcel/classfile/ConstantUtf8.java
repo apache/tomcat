@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -71,17 +70,6 @@ public final class ConstantUtf8 extends Constant {
 
     static ConstantUtf8 getInstance(DataInputStream file) throws IOException {
         return getInstance(file.readUTF());
-    }
-
-    /**
-     * Initialize instance from file data.
-     *
-     * @param file Input stream
-     * @throws IOException
-     */
-    ConstantUtf8(DataInput file) throws IOException {
-        super(Constants.CONSTANT_Utf8);
-        bytes = file.readUTF();
     }
 
 
