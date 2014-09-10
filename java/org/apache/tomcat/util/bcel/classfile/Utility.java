@@ -262,4 +262,9 @@ final class Utility {
         file.readUnsignedShort();   // Unused pmg_index
         file.readUnsignedShort();   // Unused pmg_class_index
     }
+
+    static void swallowEnclosingMethod(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused class index
+        file.readUnsignedShort();   // Unused method index
+    }
 }
