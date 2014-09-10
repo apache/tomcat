@@ -238,6 +238,13 @@ final class Utility {
         }
     }
 
+    static void swallowLocalVariableTypeTable(DataInput file) throws IOException {
+        int local_variable_type_table_length = (file.readUnsignedShort());
+        for(int i=0; i < local_variable_type_table_length; i++) {
+            Utility.swallowLocalVariable(file);
+        }
+    }
+
     static void swallowInnerClasses(DataInput file) throws IOException {
         int number_of_classes = file.readUnsignedShort();
         for (int i = 0; i < number_of_classes; i++) {
