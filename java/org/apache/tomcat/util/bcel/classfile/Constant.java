@@ -125,7 +125,8 @@ public abstract class Constant implements Cloneable, Serializable {
                 Utility.swallowConstantMethodType(file);
                 return null;
             case Constants.CONSTANT_InvokeDynamic:
-                return new ConstantInvokeDynamic(file);
+                Utility.swallowConstantInvokeDynamic(file);
+                return null;
             default:
                 throw new ClassFormatException("Invalid byte tag in constant pool: " + b);
         }

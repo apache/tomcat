@@ -290,4 +290,9 @@ final class Utility {
     static void swallowConstantMethodType(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused descriptor_index
     }
+
+    static void swallowConstantInvokeDynamic(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused bootstrap_method_attr_index
+        file.readUnsignedShort();   // Unused name_and_type_index
+    }
 }
