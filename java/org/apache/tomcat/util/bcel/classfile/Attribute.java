@@ -33,7 +33,6 @@ import org.apache.tomcat.util.bcel.Constants;
  *
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see ConstantValue
- * @see SourceFile
  * @see Code
  * @see ExceptionTable
  * @see LineNumberTable
@@ -104,7 +103,8 @@ public abstract class Attribute implements Cloneable, Serializable
         case Constants.ATTR_CONSTANT_VALUE:
             return new ConstantValue(name_index, length, file, constant_pool);
         case Constants.ATTR_SOURCE_FILE:
-            return new SourceFile(name_index, length, file, constant_pool);
+            Utility.swallowSourceFile(file);
+            return null;
         case Constants.ATTR_CODE:
             return new Code(name_index, length, file, constant_pool);
         case Constants.ATTR_EXCEPTIONS:
