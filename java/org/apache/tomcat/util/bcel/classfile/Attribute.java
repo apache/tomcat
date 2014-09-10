@@ -32,7 +32,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * attribute stands for non-standard-attributes.
  *
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
- * @see LocalVariableTable
  * @see InnerClasses
  * @see Deprecated
  */
@@ -112,8 +111,8 @@ public abstract class Attribute implements Cloneable, Serializable
             Utility.swallowLineNumberTable(file);
             return null;
         case Constants.ATTR_LOCAL_VARIABLE_TABLE:
-            return new LocalVariableTable(name_index, length, file,
-                    constant_pool);
+            Utility.swallowLocalVariableTable(file);
+            return null;
         case Constants.ATTR_INNER_CLASSES:
             return new InnerClasses(name_index, length, file, constant_pool);
         case Constants.ATTR_SYNTHETIC:

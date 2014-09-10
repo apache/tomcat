@@ -232,4 +232,11 @@ final class Utility {
             Utility.swallowLineNumber(file);
         }
     }
+
+    static void swallowLocalVariableTable(DataInput file) throws IOException {
+        int local_variable_table_length = (file.readUnsignedShort());
+        for (int i = 0; i < local_variable_table_length; i++) {
+            Utility.swallowLocalVariable(file);
+        }
+    }
 }
