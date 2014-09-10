@@ -103,7 +103,8 @@ public abstract class Constant implements Cloneable, Serializable {
                 Utility.swallowConstantCP(file);
                 return null;
             case Constants.CONSTANT_String:
-                return new ConstantString(file);
+                Utility.swallowConstantString(file);
+                return null;
             case Constants.CONSTANT_Integer:
                 return new ConstantInteger(file);
             case Constants.CONSTANT_Float:

@@ -277,4 +277,8 @@ final class Utility {
         file.readUnsignedByte();    // Unused reference_kind
         file.readUnsignedShort();   // Unused reference_index
     }
+
+    static void swallowConstantString(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused string index
+    }
 }
