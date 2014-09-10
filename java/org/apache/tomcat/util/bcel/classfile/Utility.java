@@ -188,4 +188,8 @@ final class Utility {
             file.readUnsignedShort();   // Unused access_flags
         }
     }
+
+    static void swallowSourceFile(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused sourcefile_index
+    }
 }
