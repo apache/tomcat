@@ -148,7 +148,8 @@ public abstract class Attribute implements Cloneable, Serializable
             Utility.swallowLocalVariableTypeTable(file);
             return null;
         case Constants.ATTR_ENCLOSING_METHOD:
-            return new EnclosingMethod(name_index, length, file, constant_pool);
+            Utility.swallowEnclosingMethod(file);
+            return null;
         case Constants.ATTR_STACK_MAP_TABLE:
             Utility.swallowStackMapTable(file);
             return null;
