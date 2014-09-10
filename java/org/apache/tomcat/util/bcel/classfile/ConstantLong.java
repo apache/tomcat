@@ -37,22 +37,14 @@ public final class ConstantLong extends Constant {
 
 
     /**
-     * @param bytes Data
-     */
-    public ConstantLong(long bytes) {
-        super(Constants.CONSTANT_Long);
-        this.bytes = bytes;
-    }
-
-
-    /**
      * Initialize instance from file data.
      *
      * @param file Input stream
      * @throws IOException
      */
     ConstantLong(DataInput file) throws IOException {
-        this(file.readLong());
+        super(Constants.CONSTANT_Long);
+        this.bytes = file.readLong();
     }
 
 

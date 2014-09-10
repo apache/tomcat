@@ -37,22 +37,14 @@ public final class ConstantDouble extends Constant {
 
 
     /**
-     * @param bytes Data
-     */
-    public ConstantDouble(double bytes) {
-        super(Constants.CONSTANT_Double);
-        this.bytes = bytes;
-    }
-
-
-    /**
      * Initialize instance from file data.
      *
      * @param file Input stream
      * @throws IOException
      */
     ConstantDouble(DataInput file) throws IOException {
-        this(file.readDouble());
+        super(Constants.CONSTANT_Double);
+        this.bytes = file.readDouble();
     }
 
 

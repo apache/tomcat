@@ -37,22 +37,14 @@ public final class ConstantFloat extends Constant {
 
 
     /**
-     * @param bytes Data
-     */
-    public ConstantFloat(float bytes) {
-        super(Constants.CONSTANT_Float);
-        this.bytes = bytes;
-    }
-
-
-    /**
      * Initialize instance from file data.
      *
      * @param file Input stream
      * @throws IOException
      */
     ConstantFloat(DataInput file) throws IOException {
-        this(file.readFloat());
+        super(Constants.CONSTANT_Float);
+        this.bytes = file.readFloat();
     }
 
 

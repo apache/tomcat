@@ -37,22 +37,14 @@ public final class ConstantInteger extends Constant {
 
 
     /**
-     * @param bytes Data
-     */
-    public ConstantInteger(int bytes) {
-        super(Constants.CONSTANT_Integer);
-        this.bytes = bytes;
-    }
-
-
-    /**
      * Initialize instance from file data.
      *
      * @param file Input stream
      * @throws IOException
      */
     ConstantInteger(DataInput file) throws IOException {
-        this(file.readInt());
+        super(Constants.CONSTANT_Integer);
+        this.bytes = file.readInt();
     }
 
 
