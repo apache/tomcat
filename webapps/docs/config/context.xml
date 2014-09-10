@@ -709,12 +709,6 @@
         be used.</p>
       </attribute>
 
-      <attribute name="processTlds" required="false">
-        <p>Whether the context should process TLDs on startup.  The default
-        is true.  The false setting is intended for special cases
-        that know in advance TLDs are not part of the webapp.</p>
-      </attribute>
-
       <attribute name="renewThreadsWhenStoppingContext" required="false">
         <p>If <code>true</code>, when this context is stopped, Tomcat renews all
         the threads from the thread pool that was used to serve this context.
