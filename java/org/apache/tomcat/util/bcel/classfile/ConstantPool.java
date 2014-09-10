@@ -49,7 +49,6 @@ public class ConstantPool implements Cloneable, Serializable {
      * @throws ClassFormatException
      */
     ConstantPool(DataInputStream file) throws IOException, ClassFormatException {
-        byte tag;
         constant_pool_count = file.readUnsignedShort();
         constant_pool = new Constant[constant_pool_count];
         /* constant_pool[0] is unused by the compiler and may be used freely
@@ -64,9 +63,11 @@ public class ConstantPool implements Cloneable, Serializable {
              *
              * Thus we have to increment the index counter.
              */
-            tag = constant_pool[i].getTag();
-            if ((tag == Constants.CONSTANT_Double) || (tag == Constants.CONSTANT_Long)) {
-                i++;
+            if (constant_pool[i] != null) {
+                byte tag = constant_pool[i].getTag();
+                if ((tag == Constants.CONSTANT_Double) || (tag == Constants.CONSTANT_Long)) {
+                    i++;
+                }
             }
         }
     }
