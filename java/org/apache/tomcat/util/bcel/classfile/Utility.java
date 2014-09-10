@@ -246,4 +246,12 @@ final class Utility {
             Utility.swallowInnerClass(file);
         }
     }
+
+    static void swallowDeprecated(DataInput file, int length) throws IOException {
+        if (length > 0) {
+            byte[] bytes = new byte[length];
+            file.readFully(bytes);
+            throw new ClassFormatException("Deprecated attribute with length > 0");
+        }
+    }
 }
