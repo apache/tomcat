@@ -98,11 +98,10 @@ public abstract class Constant implements Cloneable, Serializable {
             case Constants.CONSTANT_Class:
                 return new ConstantClass(file);
             case Constants.CONSTANT_Fieldref:
-                return new ConstantFieldref(file);
             case Constants.CONSTANT_Methodref:
-                return new ConstantMethodref(file);
             case Constants.CONSTANT_InterfaceMethodref:
-                return new ConstantInterfaceMethodref(file);
+                Utility.swallowConstantCP(file);
+                return null;
             case Constants.CONSTANT_String:
                 return new ConstantString(file);
             case Constants.CONSTANT_Integer:

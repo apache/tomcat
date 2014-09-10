@@ -115,13 +115,6 @@ public class ConstantPool implements Cloneable, Serializable {
                         + " " + constantToString(((ConstantNameAndType) c).getSignatureIndex(),
                         Constants.CONSTANT_Utf8));
                 break;
-            case Constants.CONSTANT_InterfaceMethodref:
-            case Constants.CONSTANT_Methodref:
-            case Constants.CONSTANT_Fieldref:
-                str = (constantToString(((ConstantCP) c).getClassIndex(), Constants.CONSTANT_Class)
-                        + "." + constantToString(((ConstantCP) c).getNameAndTypeIndex(),
-                        Constants.CONSTANT_NameAndType));
-                break;
             default: // Never reached
                 throw new RuntimeException("Unknown constant type " + tag);
         }
