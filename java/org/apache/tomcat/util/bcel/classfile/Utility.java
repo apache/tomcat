@@ -192,4 +192,8 @@ final class Utility {
     static void swallowSourceFile(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused sourcefile_index
     }
+
+    static void swallowConstantValue(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused constantvalue_index
+    }
 }

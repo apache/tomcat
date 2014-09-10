@@ -32,7 +32,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * attribute stands for non-standard-attributes.
  *
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
- * @see ConstantValue
  * @see Code
  * @see ExceptionTable
  * @see LineNumberTable
@@ -101,7 +100,8 @@ public abstract class Attribute implements Cloneable, Serializable
             Utility.swallowUnknownAttribute(file, length);
             return null;
         case Constants.ATTR_CONSTANT_VALUE:
-            return new ConstantValue(name_index, length, file, constant_pool);
+            Utility.swallowConstantValue(file);
+            return null;
         case Constants.ATTR_SOURCE_FILE:
             Utility.swallowSourceFile(file);
             return null;
