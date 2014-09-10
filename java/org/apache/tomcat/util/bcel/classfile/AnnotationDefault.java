@@ -44,25 +44,8 @@ public class AnnotationDefault extends Attribute
             DataInputStream file, ConstantPool constant_pool)
             throws IOException
     {
-        this(name_index, length, (ElementValue) null,
-                constant_pool);
+        super(name_index, length, constant_pool);
         // Default value
         ElementValue.readElementValue(file, constant_pool);
-    }
-
-    /**
-     * @param name_index
-     *            Index pointing to the name <em>Code</em>
-     * @param length
-     *            Content length in bytes
-     * @param defaultValue
-     *            the annotation's default value
-     * @param constant_pool
-     *            Array of constants
-     */
-    public AnnotationDefault(int name_index, int length,
-            ElementValue defaultValue, ConstantPool constant_pool)
-    {
-        super(name_index, length, constant_pool);
     }
 }
