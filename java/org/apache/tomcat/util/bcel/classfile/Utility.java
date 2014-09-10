@@ -286,4 +286,8 @@ final class Utility {
         file.readUnsignedShort();   // Unused name index
         file.readUnsignedShort();   // Unused signature index
     }
+
+    static void swallowConstantMethodType(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused descriptor_index
+    }
 }

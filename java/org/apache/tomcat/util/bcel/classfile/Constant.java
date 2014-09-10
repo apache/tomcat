@@ -122,7 +122,8 @@ public abstract class Constant implements Cloneable, Serializable {
                 Utility.swallowConstantMethodHandle(file);
                 return null;
             case Constants.CONSTANT_MethodType:
-                return new ConstantMethodType(file);
+                Utility.swallowConstantMethodType(file);
+                return null;
             case Constants.CONSTANT_InvokeDynamic:
                 return new ConstantInvokeDynamic(file);
             default:
