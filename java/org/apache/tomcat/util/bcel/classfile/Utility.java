@@ -217,6 +217,12 @@ final class Utility {
         for (int i = 0; i < attributes_count; i++) {
             Attribute.readAttribute(file, constant_pool);
         }
+    }
 
+    static void swallowExceptionTable(DataInput file) throws IOException {
+        int number_of_exceptions = file.readUnsignedShort();
+        for (int i = 0; i < number_of_exceptions; i++) {
+            file.readUnsignedShort(); // Unused exception index
+        }
     }
 }
