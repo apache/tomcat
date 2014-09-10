@@ -162,10 +162,8 @@ final class Utility {
         file.readUnsignedShort();   // Unused signature_index
     }
 
-    static void swallowSynthetic(DataInput file, int length) throws IOException {
+    static void swallowSynthetic(int length) {
         if (length > 0) {
-            byte[] bytes = new byte[length];
-            file.readFully(bytes);
             throw new ClassFormatException("Synthetic attribute with length > 0");
         }
     }
@@ -247,10 +245,8 @@ final class Utility {
         }
     }
 
-    static void swallowDeprecated(DataInput file, int length) throws IOException {
+    static void swallowDeprecated(int length) {
         if (length > 0) {
-            byte[] bytes = new byte[length];
-            file.readFully(bytes);
             throw new ClassFormatException("Deprecated attribute with length > 0");
         }
     }
