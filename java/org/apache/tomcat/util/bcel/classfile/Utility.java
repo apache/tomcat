@@ -19,6 +19,7 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -47,32 +48,35 @@ final class Utility {
         return str.replace('/', '.'); // Is `/' on all systems, even DOS
     }
 
-    static void swallowCodeException(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused start_pc
-        file.readUnsignedShort();   // Unused end_pc
-        file.readUnsignedShort();   // Unused handler_pc
-        file.readUnsignedShort();   // Unused catch_type
+    static void skipFully(DataInput file, int length) throws IOException {
+        int total = file.skipBytes(length);
+        if (total != length) {
+            throw new EOFException();
+        }
     }
 
-    static void swallowInnerClass(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused inner_class_index
-        file.readUnsignedShort();   // Unused outer_class_index
-        file.readUnsignedShort();   // Unused inner_name_index
-        file.readUnsignedShort();   // Unused inner_access_flags
-    }
+    // file.readUnsignedShort(); // Unused start_pc
+    // file.readUnsignedShort(); // Unused end_pc
+    // file.readUnsignedShort(); // Unused handler_pc
+    // file.readUnsignedShort(); // Unused catch_type
+    private static final int swallowCodeException_size = 8;
 
-    static void swallowLineNumber(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused start_pc
-        file.readUnsignedShort();   // Unused line_number
-    }
+    // file.readUnsignedShort(); // Unused inner_class_index
+    // file.readUnsignedShort(); // Unused outer_class_index
+    // file.readUnsignedShort(); // Unused inner_name_index
+    // file.readUnsignedShort(); // Unused inner_access_flags
+    private static final int swallowInnerClass_size = 8;
 
-    static void swallowLocalVariable(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused start_pc
-        file.readUnsignedShort();   // Unused length
-        file.readUnsignedShort();   // Unused name_index
-        file.readUnsignedShort();   // Unused signature_index
-        file.readUnsignedShort();   // Unused index
-    }
+    // file.readUnsignedShort(); // Unused start_pc
+    // file.readUnsignedShort(); // Unused line_number
+    private static final int swallowLineNumber_size = 4;
+
+    // file.readUnsignedShort(); // Unused start_pc
+    // file.readUnsignedShort(); // Unused length
+    // file.readUnsignedShort(); // Unused name_index
+    // file.readUnsignedShort(); // Unused signature_index
+    // file.readUnsignedShort(); // Unused index
+    private static final int swallowLocalVariable_size = 10;
 
     static void swallowStackMap(DataInput file) throws IOException {
         int map_length = file.readUnsignedShort();
@@ -95,12 +99,14 @@ final class Utility {
         }
         // Check to see if type has an index
         if ((type == Constants.ITEM_Object) || (type == Constants.ITEM_NewObject)) {
-            file.readShort();   // Unused index
+            // file.readShort(); // Unused index
+            skipFully(file, 2);
         }
     }
 
     static void swallowStackMapEntry(DataInput file) throws IOException {
-        file.readShort();   // Unused byte_code_offset
+        // file.readShort(); // Unused byte_code_offset
+        skipFully(file, 2);
         int number_of_locals = file.readShort();
         for (int i = 0; i < number_of_locals; i++) {
             swallowStackMapType(file);
@@ -120,22 +126,27 @@ final class Utility {
                 frame_type <= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_MAX) {
             swallowStackMapType(file);  // Unused single stack item
         } else if (frame_type == Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED) {
-            file.readShort(); // Unused byte_code_offset_delta
+            // file.readShort(); // Unused byte_code_offset_delta
+            skipFully(file, 2);
             swallowStackMapType(file); // Unused single stack item
         } else if (frame_type >= Constants.CHOP_FRAME &&
                 frame_type <= Constants.CHOP_FRAME_MAX) {
-            file.readShort(); // Unused byte_code_offset_delta
+            // file.readShort(); // Unused byte_code_offset_delta
+            skipFully(file, 2);
         } else if (frame_type == Constants.SAME_FRAME_EXTENDED) {
-            file.readShort(); // Unused byte_code_offset_delta
+            // file.readShort(); // Unused byte_code_offset_delta
+            skipFully(file, 2);
         } else if (frame_type >= Constants.APPEND_FRAME &&
                 frame_type <= Constants.APPEND_FRAME_MAX) {
-            file.readShort(); // Unused byte_code_offset_delta
+            // file.readShort(); // Unused byte_code_offset_delta
+            skipFully(file, 2);
             int number_of_locals = frame_type - 251;
             for (int i = 0; i < number_of_locals; i++) {
                 swallowStackMapType(file);
             }
         } else if (frame_type == Constants.FULL_FRAME) {
-            file.readShort(); // Unused byte_code_offset_delta
+            // file.readShort(); // Unused byte_code_offset_delta
+            skipFully(file, 2);
             int number_of_locals = file.readShort();
             for (int i = 0; i < number_of_locals; i++) {
                 swallowStackMapType(file);
@@ -153,13 +164,13 @@ final class Utility {
 
     static void swallowUnknownAttribute(DataInput file, int length) throws IOException {
         if (length > 0) {
-            byte[] bytes = new byte[length];
-            file.readFully(bytes);
+            skipFully(file, length);
         }
     }
 
     static void swallowSignature(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused signature_index
+        // file.readUnsignedShort(); // Unused signature_index
+        skipFully(file, 2);
     }
 
     static void swallowSynthetic(int length) {
@@ -171,43 +182,46 @@ final class Utility {
     static void swallowBootstrapMethods(DataInput file) throws IOException {
         int num_bootstrap_methods = file.readUnsignedShort();
         for (int i = 0; i < num_bootstrap_methods; i++) {
-            file.readUnsignedShort();   // Unused bootstrap_method_ref
+            // file.readUnsignedShort(); // Unused bootstrap_method_ref
+            skipFully(file, 2);
             int num_bootstrap_args = file.readUnsignedShort();
-            for (int j = 0; j < num_bootstrap_args; j++) {
-                file.readUnsignedShort(); // Unused bootstrap method argument
-            }
+            // for (int j = 0; j < num_bootstrap_args; j++) {
+            // file.readUnsignedShort(); // Unused bootstrap method argument
+            // }
+            skipFully(file, 2 * num_bootstrap_args);
         }
     }
 
     static void swallowMethodParameters(DataInput file) throws IOException {
         int parameters_count = file.readUnsignedByte();
-        for (int i = 0; i < parameters_count; i++) {
-            file.readUnsignedShort();   // Unused name_index
-            file.readUnsignedShort();   // Unused access_flags
-        }
+        // for (int i = 0; i < parameters_count; i++) {
+        // file.readUnsignedShort(); // Unused name_index
+        // file.readUnsignedShort(); // Unused access_flags
+        // }
+        skipFully(file, 4 * parameters_count);
     }
 
     static void swallowSourceFile(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused sourcefile_index
+        // file.readUnsignedShort(); // Unused sourcefile_index
+        skipFully(file, 2);
     }
 
     static void swallowConstantValue(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused constantvalue_index
+        // file.readUnsignedShort(); // Unused constantvalue_index
+        skipFully(file, 2);
     }
 
     static void swallowCode(DataInputStream file, ConstantPool constant_pool) throws IOException {
-        file.readUnsignedShort();   // Unused max_stack
-        file.readUnsignedShort();   // Unused max_locals
+        // file.readUnsignedShort(); // Unused max_stack
+        // file.readUnsignedShort(); // Unused max_locals
+        skipFully(file, 4);
         int code_length = file.readInt();
-        byte[] code = new byte[code_length]; // Read byte code
-        file.readFully(code);
+        skipFully(file, code_length); // Read byte code
         /* Read exception table that contains all regions where an exception
          * handler is active, i.e., a try { ... } catch() block.
          */
         int exception_table_length = file.readUnsignedShort();
-        for (int i = 0; i < exception_table_length; i++) {
-            swallowCodeException(file);
-        }
+        skipFully(file, swallowCodeException_size * exception_table_length);
         /* Read all attributes, currently `LineNumberTable' and
          * `LocalVariableTable'
          */
@@ -219,37 +233,30 @@ final class Utility {
 
     static void swallowExceptionTable(DataInput file) throws IOException {
         int number_of_exceptions = file.readUnsignedShort();
-        for (int i = 0; i < number_of_exceptions; i++) {
-            file.readUnsignedShort(); // Unused exception index
-        }
+        // for (int i = 0; i < number_of_exceptions; i++) {
+        // file.readUnsignedShort(); // Unused exception index
+        // }
+        skipFully(file, 2 * number_of_exceptions);
     }
 
     static void swallowLineNumberTable(DataInput file) throws IOException {
         int line_number_table_length = (file.readUnsignedShort());
-        for (int i = 0; i < line_number_table_length; i++) {
-            swallowLineNumber(file);
-        }
+        skipFully(file, swallowLineNumber_size * line_number_table_length);
     }
 
     static void swallowLocalVariableTable(DataInput file) throws IOException {
         int local_variable_table_length = (file.readUnsignedShort());
-        for (int i = 0; i < local_variable_table_length; i++) {
-            swallowLocalVariable(file);
-        }
+        skipFully(file, swallowLocalVariable_size * local_variable_table_length);
     }
 
     static void swallowLocalVariableTypeTable(DataInput file) throws IOException {
         int local_variable_type_table_length = (file.readUnsignedShort());
-        for(int i=0; i < local_variable_type_table_length; i++) {
-            swallowLocalVariable(file);
-        }
+        skipFully(file, swallowLocalVariable_size * local_variable_type_table_length);
     }
 
     static void swallowInnerClasses(DataInput file) throws IOException {
         int number_of_classes = file.readUnsignedShort();
-        for (int i = 0; i < number_of_classes; i++) {
-            swallowInnerClass(file);
-        }
+        skipFully(file, swallowInnerClass_size * number_of_classes);
     }
 
     static void swallowDeprecated(int length) {
@@ -259,41 +266,49 @@ final class Utility {
     }
 
     static void swallowPMCClass(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused pmg_index
-        file.readUnsignedShort();   // Unused pmg_class_index
+        // file.readUnsignedShort(); // Unused pmg_index
+        // file.readUnsignedShort(); // Unused pmg_class_index
+        skipFully(file, 4);
     }
 
     static void swallowEnclosingMethod(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused class index
-        file.readUnsignedShort();   // Unused method index
+        // file.readUnsignedShort(); // Unused class index
+        // file.readUnsignedShort(); // Unused method index
+        skipFully(file, 4);
     }
 
     static void swallowConstantCP(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused class index
-        file.readUnsignedShort();   // Unused name and type index
+        // file.readUnsignedShort(); // Unused class index
+        // file.readUnsignedShort(); // Unused name and type index
+        skipFully(file, 4);
     }
 
     static void swallowConstantMethodHandle(DataInput file) throws IOException {
-        file.readUnsignedByte();    // Unused reference_kind
-        file.readUnsignedShort();   // Unused reference_index
+        // file.readUnsignedByte();  // Unused reference_kind
+        // file.readUnsignedShort(); // Unused reference_index
+        skipFully(file, 3);
     }
 
     static void swallowConstantString(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused string index
+        // file.readUnsignedShort(); // Unused string index
+        skipFully(file, 2);
     }
 
     static void swallowConstantNameAndType(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused name index
-        file.readUnsignedShort();   // Unused signature index
+        // file.readUnsignedShort(); // Unused name index
+        // file.readUnsignedShort(); // Unused signature index
+        skipFully(file, 4);
     }
 
     static void swallowConstantMethodType(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused descriptor_index
+        // file.readUnsignedShort(); // Unused descriptor_index
+        skipFully(file, 2);
     }
 
     static void swallowConstantInvokeDynamic(DataInput file) throws IOException {
-        file.readUnsignedShort();   // Unused bootstrap_method_attr_index
-        file.readUnsignedShort();   // Unused name_and_type_index
+        // file.readUnsignedShort(); // Unused bootstrap_method_attr_index
+        // file.readUnsignedShort(); // Unused name_and_type_index
+        skipFully(file, 4);
     }
 
     static void swallowAnnotations(DataInput file) throws IOException {
@@ -305,10 +320,12 @@ final class Utility {
 
     static void swallowAnnotationEntry(DataInput file)
             throws IOException {
-        file.readUnsignedShort();   // Unused type index
+        // file.readUnsignedShort(); // Unused type index
+        skipFully(file, 2);
         final int num_element_value_pairs = file.readUnsignedShort();
         for (int i = 0; i < num_element_value_pairs; i++) {
-            file.readUnsignedShort();   // Unused name index
+            // file.readUnsignedShort(); // Unused name index
+            skipFully(file, 2);
             swallowElementValue(file);
         }
     }
@@ -342,19 +359,20 @@ final class Utility {
         case 'Z': // boolean
         case 's': // String
         case 'c': // Class
-            file.readUnsignedShort();   // Unused value index
+            // file.readUnsignedShort(); // Unused value index
+            skipFully(file, 2);
             break;
         case 'e': // Enum constant
-            file.readUnsignedShort();   // Unused type_index
-            file.readUnsignedShort();   // Unused value index
+            // file.readUnsignedShort(); // Unused type_index
+            // file.readUnsignedShort(); // Unused value index
+            skipFully(file, 4);
             break;
         case '@': // Annotation
             swallowAnnotationEntry(file);
             break;
         case '[': // Array
             int numArrayVals = file.readUnsignedShort();
-            for (int j = 0; j < numArrayVals; j++)
-            {
+            for (int j = 0; j < numArrayVals; j++) {
                 swallowElementValue(file);
             }
             break;
@@ -366,9 +384,10 @@ final class Utility {
 
     static void swallowFieldOrMethod(DataInputStream file, ConstantPool constant_pool)
             throws IOException {
-        file.readUnsignedShort();   // Unused access flags
-        file.readUnsignedShort();   // name index
-        file.readUnsignedShort();   // signature index
+        // file.readUnsignedShort(); // Unused access flags
+        // file.readUnsignedShort(); // name index
+        // file.readUnsignedShort(); // signature index
+        skipFully(file, 6);
 
         int attributes_count = file.readUnsignedShort();
         for (int i = 0; i < attributes_count; i++) {
