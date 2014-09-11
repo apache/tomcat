@@ -213,7 +213,7 @@ final class Utility {
          */
         int attributes_count = file.readUnsignedShort();
         for (int i = 0; i < attributes_count; i++) {
-            Attribute.readAttribute(file, constant_pool);
+            swallowAttribute(file, constant_pool);
         }
     }
 
