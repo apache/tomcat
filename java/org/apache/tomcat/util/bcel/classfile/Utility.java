@@ -295,4 +295,12 @@ final class Utility {
         file.readUnsignedShort();   // Unused bootstrap_method_attr_index
         file.readUnsignedShort();   // Unused name_and_type_index
     }
+
+    static void swallowAnnotations(DataInputStream file, ConstantPool constant_pool)
+            throws IOException {
+        final int annotation_table_length = (file.readUnsignedShort());
+        for (int i = 0; i < annotation_table_length; i++) {
+            AnnotationEntry.read(file, constant_pool);
+        }
+    }
 }
