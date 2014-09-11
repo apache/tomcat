@@ -303,4 +303,16 @@ final class Utility {
             AnnotationEntry.read(file, constant_pool);
         }
     }
+
+    static void swallowFieldOrMethod(DataInputStream file, ConstantPool constant_pool)
+            throws IOException {
+        file.readUnsignedShort();   // Unused access flags
+        file.readUnsignedShort();   // name index
+        file.readUnsignedShort();   // signature index
+
+        int attributes_count = file.readUnsignedShort();
+        for (int i = 0; i < attributes_count; i++) {
+            Attribute.readAttribute(file, constant_pool);
+        }
+    }
 }
