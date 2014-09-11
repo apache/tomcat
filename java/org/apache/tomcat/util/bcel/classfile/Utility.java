@@ -296,8 +296,7 @@ final class Utility {
         file.readUnsignedShort();   // Unused name_and_type_index
     }
 
-    static void swallowAnnotations(DataInput file)
-            throws IOException {
+    static void swallowAnnotations(DataInput file) throws IOException {
         final int annotation_table_length = (file.readUnsignedShort());
         for (int i = 0; i < annotation_table_length; i++) {
             swallowAnnotationEntry(file);
@@ -307,10 +306,25 @@ final class Utility {
     static void swallowAnnotationEntry(DataInput file)
             throws IOException {
         file.readUnsignedShort();   // Unused type index
-        final int num_element_value_pairs = (file.readUnsignedShort());
+        final int num_element_value_pairs = file.readUnsignedShort();
         for (int i = 0; i < num_element_value_pairs; i++) {
             file.readUnsignedShort();   // Unused name index
             swallowElementValue(file);
+        }
+    }
+
+    static void swallowParameterAnnotations(DataInput file) throws IOException {
+        final int annotation_table_length = (file.readUnsignedByte());
+        for (int i = 0; i < annotation_table_length; i++) {
+            swallowParameterAnnotationEntry(file);
+        }
+    }
+
+    static void swallowParameterAnnotationEntry(DataInput file)
+            throws IOException {
+        final int annotation_table_length = file.readUnsignedShort();
+        for (int i = 0; i < annotation_table_length; i++) {
+            swallowAnnotationEntry(file);
         }
     }
 
@@ -423,9 +437,11 @@ final class Utility {
             break;
         case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
         case Constants.ATTR_RUNTIME_INVISIBLE_ANNOTATIONS:
+            swallowAnnotations(file);
+            break;
         case Constants.ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS:
         case Constants.ATTR_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS:
-            swallowAnnotations(file);
+            swallowParameterAnnotations(file);
             break;
         case Constants.ATTR_ANNOTATION_DEFAULT:
             swallowAnnotationDefault(file);

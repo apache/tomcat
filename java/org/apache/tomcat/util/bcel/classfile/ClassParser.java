@@ -173,8 +173,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readFields() throws IOException, ClassFormatException {
-        int fields_count;
-        fields_count = file.readUnsignedShort();
+        int fields_count = file.readUnsignedShort();
         for (int i = 0; i < fields_count; i++) {
             Utility.swallowFieldOrMethod(file, constant_pool);
         }
