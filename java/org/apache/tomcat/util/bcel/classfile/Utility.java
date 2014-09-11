@@ -345,7 +345,7 @@ final class Utility {
             }
             break;
         default:
-            throw new RuntimeException(
+            throw new ClassFormatException(
                     "Unexpected element value kind in annotation: " + type);
         }
     }
@@ -446,7 +446,7 @@ final class Utility {
             swallowMethodParameters(file);
             break;
         default: // Never reached
-            throw new IllegalStateException("Unrecognized attribute type tag parsed: " + tag);
+            throw new ClassFormatException("Unrecognized attribute type tag parsed: " + tag);
         }
     }
 
