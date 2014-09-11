@@ -1063,7 +1063,7 @@ public class HostConfig
             if (deployXML && xml.exists() && copyThisXml) {
                 deployedApp.redeployResources.put(xml.getAbsolutePath(),
                         Long.valueOf(xml.lastModified()));
-            } else if (!copyThisXml ) {
+            } else {
                 // In case an XML file is added to the config base later
                 deployedApp.redeployResources.put(
                         (new File(configBase(),

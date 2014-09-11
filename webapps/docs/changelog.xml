@@ -151,6 +151,10 @@
         version. Make sure that Tomcat does not undeploy older Context if
         current context is not running. (kfujino)
       </fix>
+      <fix>
+        When deploying war, make sure that add dummy xml to the config base if
+        war does not have META-INF/context.xml or deployXML is false. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
