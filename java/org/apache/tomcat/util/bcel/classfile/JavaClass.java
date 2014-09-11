@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.util.BCELComparator;
 
 /**
  * Represents a Java class, i.e., the data structures, constant pool,
@@ -33,7 +32,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
 
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public class JavaClass extends AccessFlags implements Comparable<JavaClass> {
+public class JavaClass extends AccessFlags {
 
     private static final long serialVersionUID = 7029227708237523236L;
     private String class_name;
@@ -45,23 +44,6 @@ public class JavaClass extends AccessFlags implements Comparable<JavaClass> {
 
     //  Annotations are collected from certain attributes, don't do it more than necessary!
     private boolean annotationsOutOfDate = true;
-
-    private static BCELComparator _cmp = new BCELComparator() {
-
-        @Override
-        public boolean equals( Object o1, Object o2 ) {
-            JavaClass THIS = (JavaClass) o1;
-            JavaClass THAT = (JavaClass) o2;
-            return THIS.getClassName().equals(THAT.getClassName());
-        }
-
-
-        @Override
-        public int hashCode( Object o ) {
-            JavaClass THIS = (JavaClass) o;
-            return THIS.getClassName().hashCode();
-        }
-    };
 
 
     /**
@@ -153,40 +135,5 @@ public class JavaClass extends AccessFlags implements Comparable<JavaClass> {
      */
     public String getSuperclassName() {
         return superclass_name;
-    }
-
-
-    /**
-     * Return value as defined by given BCELComparator strategy.
-     * By default two JavaClass objects are said to be equal when
-     * their class names are equal.
-     *
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals( Object obj ) {
-        return _cmp.equals(this, obj);
-    }
-
-
-    /**
-     * Return the natural ordering of two JavaClasses.
-     * This ordering is based on the class name
-     */
-    @Override
-    public int compareTo(JavaClass obj) {
-        return getClassName().compareTo(obj.getClassName());
-    }
-
-
-    /**
-     * Return value as defined by given BCELComparator strategy.
-     * By default return the hashcode of the class name.
-     *
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return _cmp.hashCode(this);
     }
 }

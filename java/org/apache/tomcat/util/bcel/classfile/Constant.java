@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.tomcat.util.bcel.Constants;
-import org.apache.tomcat.util.bcel.util.BCELComparator;
 
 /**
  * Abstract superclass for classes to represent the different constant types
@@ -34,22 +33,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
 public abstract class Constant implements Serializable {
 
     private static final long serialVersionUID = 2827409182154809454L;
-    private static BCELComparator _cmp = new BCELComparator() {
 
-        @Override
-        public boolean equals( Object o1, Object o2 ) {
-            Constant THIS = (Constant) o1;
-            Constant THAT = (Constant) o2;
-            return THIS.toString().equals(THAT.toString());
-        }
-
-
-        @Override
-        public int hashCode( Object o ) {
-            Constant THIS = (Constant) o;
-            return THIS.toString().hashCode();
-        }
-    };
     /* In fact this tag is redundant since we can distinguish different
      * `Constant' objects by their type, i.e., via `instanceof'. In some
      * places we will use the tag for switch()es anyway.
@@ -127,30 +111,5 @@ public abstract class Constant implements Serializable {
     @Override
     public String toString() {
         return "[" + tag + "]";
-    }
-
-
-    /**
-     * Return value as defined by given BCELComparator strategy.
-     * By default two Constant objects are said to be equal when
-     * the result of toString() is equal.
-     *
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals( Object obj ) {
-        return _cmp.equals(this, obj);
-    }
-
-
-    /**
-     * Return value as defined by given BCELComparator strategy.
-     * By default return the hashcode of the result of toString().
-     *
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return _cmp.hashCode(this);
     }
 }
