@@ -150,7 +150,7 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
-        <bug>43001</bug>: Enable the JspC Ant taks to set the JspC option
+        <bug>43001</bug>: Enable the JspC Ant task to set the JspC option
         <code>mappedFile</code>. (markt)
       </fix>
       <fix>
