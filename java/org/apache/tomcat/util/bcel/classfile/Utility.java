@@ -77,14 +77,14 @@ final class Utility {
     static void swallowStackMap(DataInput file) throws IOException {
         int map_length = file.readUnsignedShort();
         for (int i = 0; i < map_length; i++) {
-            Utility.swallowStackMapEntry(file);
+            swallowStackMapEntry(file);
         }
     }
 
     static void swallowStackMapTable(DataInputStream file) throws IOException {
         int map_length = file.readUnsignedShort();
         for (int i = 0; i < map_length; i++) {
-            Utility.swallowStackMapTableEntry(file);
+            swallowStackMapTableEntry(file);
         }
     }
 
@@ -103,11 +103,11 @@ final class Utility {
         file.readShort();   // Unused byte_code_offset
         int number_of_locals = file.readShort();
         for (int i = 0; i < number_of_locals; i++) {
-            Utility.swallowStackMapType(file);
+            swallowStackMapType(file);
         }
         int number_of_stack_items = file.readShort();
         for (int i = 0; i < number_of_stack_items; i++) {
-            Utility.swallowStackMapType(file);
+            swallowStackMapType(file);
         }
     }
 
@@ -118,10 +118,10 @@ final class Utility {
             // NO-OP
         } else if (frame_type >= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME &&
                 frame_type <= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_MAX) {
-            Utility.swallowStackMapType(file);  // Unused single stack item
+            swallowStackMapType(file);  // Unused single stack item
         } else if (frame_type == Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED) {
             file.readShort(); // Unused byte_code_offset_delta
-            Utility.swallowStackMapType(file); // Unused single stack item
+            swallowStackMapType(file); // Unused single stack item
         } else if (frame_type >= Constants.CHOP_FRAME &&
                 frame_type <= Constants.CHOP_FRAME_MAX) {
             file.readShort(); // Unused byte_code_offset_delta
@@ -132,17 +132,17 @@ final class Utility {
             file.readShort(); // Unused byte_code_offset_delta
             int number_of_locals = frame_type - 251;
             for (int i = 0; i < number_of_locals; i++) {
-                Utility.swallowStackMapType(file);
+                swallowStackMapType(file);
             }
         } else if (frame_type == Constants.FULL_FRAME) {
             file.readShort(); // Unused byte_code_offset_delta
             int number_of_locals = file.readShort();
             for (int i = 0; i < number_of_locals; i++) {
-                Utility.swallowStackMapType(file);
+                swallowStackMapType(file);
             }
             int number_of_stack_items = file.readShort();
             for (int i = 0; i < number_of_stack_items; i++) {
-                Utility.swallowStackMapType(file);
+                swallowStackMapType(file);
             }
         } else {
             /* Can't happen */
@@ -206,7 +206,7 @@ final class Utility {
          */
         int exception_table_length = file.readUnsignedShort();
         for (int i = 0; i < exception_table_length; i++) {
-            Utility.swallowCodeException(file);
+            swallowCodeException(file);
         }
         /* Read all attributes, currently `LineNumberTable' and
          * `LocalVariableTable'
@@ -227,28 +227,28 @@ final class Utility {
     static void swallowLineNumberTable(DataInput file) throws IOException {
         int line_number_table_length = (file.readUnsignedShort());
         for (int i = 0; i < line_number_table_length; i++) {
-            Utility.swallowLineNumber(file);
+            swallowLineNumber(file);
         }
     }
 
     static void swallowLocalVariableTable(DataInput file) throws IOException {
         int local_variable_table_length = (file.readUnsignedShort());
         for (int i = 0; i < local_variable_table_length; i++) {
-            Utility.swallowLocalVariable(file);
+            swallowLocalVariable(file);
         }
     }
 
     static void swallowLocalVariableTypeTable(DataInput file) throws IOException {
         int local_variable_type_table_length = (file.readUnsignedShort());
         for(int i=0; i < local_variable_type_table_length; i++) {
-            Utility.swallowLocalVariable(file);
+            swallowLocalVariable(file);
         }
     }
 
     static void swallowInnerClasses(DataInput file) throws IOException {
         int number_of_classes = file.readUnsignedShort();
         for (int i = 0; i < number_of_classes; i++) {
-            Utility.swallowInnerClass(file);
+            swallowInnerClass(file);
         }
     }
 
@@ -358,7 +358,99 @@ final class Utility {
 
         int attributes_count = file.readUnsignedShort();
         for (int i = 0; i < attributes_count; i++) {
-            Attribute.readAttribute(file, constant_pool);
+            swallowAttribute(file, constant_pool);
         }
+    }
+
+    static void swallowAttribute(DataInputStream file, ConstantPool constant_pool)
+            throws IOException {
+        byte tag = Constants.ATTR_UNKNOWN;  // Unknown attribute
+        // Get class name from constant pool via `name_index' indirection
+        int name_index = file.readUnsignedShort();
+        ConstantUtf8 c =
+                (ConstantUtf8) constant_pool.getConstant(name_index, Constants.CONSTANT_Utf8);
+        String name = c.getBytes();
+        // Length of data in bytes
+        int length = file.readInt();
+        // Compare strings to find known attribute
+        for (byte i = 0; i < Constants.KNOWN_ATTRIBUTES; i++) {
+            if (name.equals(Constants.ATTRIBUTE_NAMES[i])) {
+                tag = i; // found!
+                break;
+            }
+        }
+        // Call proper constructor, depending on `tag'
+        switch (tag)
+        {
+        case Constants.ATTR_UNKNOWN:
+            swallowUnknownAttribute(file, length);
+            break;
+        case Constants.ATTR_CONSTANT_VALUE:
+            swallowConstantValue(file);
+            break;
+        case Constants.ATTR_SOURCE_FILE:
+            swallowSourceFile(file);
+            break;
+        case Constants.ATTR_CODE:
+            swallowCode(file, constant_pool);
+            break;
+        case Constants.ATTR_EXCEPTIONS:
+            swallowExceptionTable(file);
+            break;
+        case Constants.ATTR_LINE_NUMBER_TABLE:
+            swallowLineNumberTable(file);
+            break;
+        case Constants.ATTR_LOCAL_VARIABLE_TABLE:
+            swallowLocalVariableTable(file);
+            break;
+        case Constants.ATTR_INNER_CLASSES:
+            swallowInnerClasses(file);
+            break;
+        case Constants.ATTR_SYNTHETIC:
+            swallowSynthetic(length);
+            break;
+        case Constants.ATTR_DEPRECATED:
+            swallowDeprecated(length);
+            break;
+        case Constants.ATTR_PMG:
+            swallowPMCClass(file);
+            break;
+        case Constants.ATTR_SIGNATURE:
+            swallowSignature(file);
+            break;
+        case Constants.ATTR_STACK_MAP:
+            swallowStackMap(file);
+            break;
+        case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
+        case Constants.ATTR_RUNTIME_INVISIBLE_ANNOTATIONS:
+        case Constants.ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS:
+        case Constants.ATTR_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS:
+            swallowAnnotations(file);
+            break;
+        case Constants.ATTR_ANNOTATION_DEFAULT:
+            swallowAnnotationDefault(file);
+            break;
+        case Constants.ATTR_LOCAL_VARIABLE_TYPE_TABLE:
+            swallowLocalVariableTypeTable(file);
+            break;
+        case Constants.ATTR_ENCLOSING_METHOD:
+            swallowEnclosingMethod(file);
+            break;
+        case Constants.ATTR_STACK_MAP_TABLE:
+            swallowStackMapTable(file);
+            break;
+        case Constants.ATTR_BOOTSTRAP_METHODS:
+            swallowBootstrapMethods(file);
+            break;
+        case Constants.ATTR_METHOD_PARAMETERS:
+            swallowMethodParameters(file);
+            break;
+        default: // Never reached
+            throw new IllegalStateException("Unrecognized attribute type tag parsed: " + tag);
+        }
+    }
+
+    static void swallowAnnotationDefault(DataInput file) throws IOException {
+        swallowElementValue(file);
     }
 }
