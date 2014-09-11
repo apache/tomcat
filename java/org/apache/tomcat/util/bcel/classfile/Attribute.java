@@ -139,7 +139,7 @@ public abstract class Attribute implements Serializable
             return new RuntimeVisibleParameterAnnotations(name_index, length,
                     file, constant_pool);
         case Constants.ATTR_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS:
-            Utility.swallowAnnotations(file);
+            Utility.swallowParameterAnnotations(file);
             return null;
         case Constants.ATTR_ANNOTATION_DEFAULT:
             return new AnnotationDefault(name_index, length, file,
