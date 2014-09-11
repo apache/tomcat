@@ -132,8 +132,10 @@
         (markt)
       </fix>
       <fix>
-        When deploying war, make sure that add dummy xml to the config base if
-        war does not have META-INF/context.xml or deployXML is false. (kfujino)
+        When deploying war, add XML file in the config base to the redeploy
+        resources if war does not have META-INF/context.xml or
+        <code>deployXML</code> is false. If  XML file is created in the config
+        base, redeploy will occur. (kfujino)
       </fix>
     </changelog>
   </subsection>
