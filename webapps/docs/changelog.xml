@@ -131,6 +131,10 @@
         Fix a rare threading issue when using HTTP digest authentication.
         (markt)
       </fix>
+      <fix>
+        When deploying war, make sure that add dummy xml to the config base if
+        war does not have META-INF/context.xml or deployXML is false. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
