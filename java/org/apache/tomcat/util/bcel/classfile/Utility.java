@@ -296,11 +296,57 @@ final class Utility {
         file.readUnsignedShort();   // Unused name_and_type_index
     }
 
-    static void swallowAnnotations(DataInputStream file, ConstantPool constant_pool)
+    static void swallowAnnotations(DataInput file)
             throws IOException {
         final int annotation_table_length = (file.readUnsignedShort());
         for (int i = 0; i < annotation_table_length; i++) {
-            AnnotationEntry.read(file, constant_pool);
+            swallowAnnotationEntry(file);
+        }
+    }
+
+    static void swallowAnnotationEntry(DataInput file)
+            throws IOException {
+        file.readUnsignedShort();   // Unused type index
+        final int num_element_value_pairs = (file.readUnsignedShort());
+        for (int i = 0; i < num_element_value_pairs; i++) {
+            file.readUnsignedShort();   // Unused name index
+            swallowElementValue(file);
+        }
+    }
+
+    static void swallowElementValue(DataInput file) throws IOException {
+
+        byte type = file.readByte();
+        switch (type) {
+        case 'B': // byte
+        case 'C': // char
+        case 'D': // double
+        case 'F': // float
+        case 'I': // int
+        case 'J': // long
+        case 'S': // short
+        case 'Z': // boolean
+        case 's': // String
+        case 'c': // Class
+            file.readUnsignedShort();   // Unused value index
+            break;
+        case 'e': // Enum constant
+            file.readUnsignedShort();   // Unused type_index
+            file.readUnsignedShort();   // Unused value index
+            break;
+        case '@': // Annotation
+            swallowAnnotationEntry(file);
+            break;
+        case '[': // Array
+            int numArrayVals = file.readUnsignedShort();
+            for (int j = 0; j < numArrayVals; j++)
+            {
+                swallowElementValue(file);
+            }
+            break;
+        default:
+            throw new RuntimeException(
+                    "Unexpected element value kind in annotation: " + type);
         }
     }
 
