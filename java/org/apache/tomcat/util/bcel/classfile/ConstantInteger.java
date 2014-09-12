@@ -62,13 +62,4 @@ public final class ConstantInteger extends Constant {
     public final int getBytes() {
         return bytes;
     }
-
-
-    /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        return super.toString() + "(bytes = " + bytes + ")";
-    }
 }

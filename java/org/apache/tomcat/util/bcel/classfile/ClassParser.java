@@ -48,7 +48,6 @@ public final class ClassParser {
     private String file_name;
     private String zip_file;
     private int class_name_index, superclass_name_index;
-    private int major, minor; // Compiler version
     private int access_flags; // Access rights of parsed class
     private int[] interfaces; // Names of implemented interfaces
     private ConstantPool constant_pool; // collection of constants
@@ -157,8 +156,9 @@ public final class ClassParser {
             }
         }
         // Return the information we have gathered in a new object
-        return new JavaClass(class_name_index, superclass_name_index, file_name, major, minor,
-                access_flags, constant_pool, interfaces, fields, methods, attributes);
+        return new JavaClass(class_name_index, superclass_name_index,
+                access_flags, constant_pool, interfaces, fields, methods,
+                attributes);
     }
 
 
@@ -275,7 +275,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readVersion() throws IOException, ClassFormatException {
-        minor = file.readUnsignedShort();
-        major = file.readUnsignedShort();
+        file.readUnsignedShort();
+        file.readUnsignedShort();
     }
 }

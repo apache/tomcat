@@ -75,15 +75,6 @@ public abstract class Constant implements Cloneable, Serializable {
     }
 
 
-    /**
-     * @return String representation.
-     */
-    @Override
-    public String toString() {
-        return Constants.CONSTANT_NAMES[tag] + "[" + tag + "]";
-    }
-
-
     @Override
     public Object clone() {
         try {

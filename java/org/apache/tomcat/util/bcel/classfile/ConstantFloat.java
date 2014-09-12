@@ -62,13 +62,4 @@ public final class ConstantFloat extends Constant {
     public final float getBytes() {
         return bytes;
     }
-
-
-    /**
-     * @return String representation.
-     */
-    @Override
-    public final String toString() {
-        return super.toString() + "(bytes = " + bytes + ")";
-    }
 }
