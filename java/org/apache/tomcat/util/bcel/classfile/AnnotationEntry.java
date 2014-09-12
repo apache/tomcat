@@ -35,6 +35,7 @@ public class AnnotationEntry implements Constants {
     private final int type_index;
     private final ConstantPool constant_pool;
 
+    // FIXME: add 'final'
     private List<ElementValuePair> element_value_pairs;
 
     /**

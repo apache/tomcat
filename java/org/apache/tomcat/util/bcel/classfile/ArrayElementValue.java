@@ -20,7 +20,7 @@ package org.apache.tomcat.util.bcel.classfile;
 public class ArrayElementValue extends ElementValue
 {
     // For array types, this is the array
-    private ElementValue[] evalues;
+    private final ElementValue[] evalues;
 
     ArrayElementValue(int type, ElementValue[] datums, ConstantPool cpool)
     {

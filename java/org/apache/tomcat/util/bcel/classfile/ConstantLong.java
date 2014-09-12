@@ -32,7 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantLong extends Constant {
 
-    private long bytes;
+    private final long bytes;
 
 
     /**

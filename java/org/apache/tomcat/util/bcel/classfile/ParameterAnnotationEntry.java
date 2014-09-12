@@ -30,8 +30,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class ParameterAnnotationEntry implements Constants {
 
-    private int annotation_table_length;
-    private AnnotationEntry[] annotation_table;
+    private final AnnotationEntry[] annotation_table;
 
 
     /**
@@ -40,7 +39,7 @@ public class ParameterAnnotationEntry implements Constants {
      * @throws IOException
      */
     ParameterAnnotationEntry(DataInputStream file, ConstantPool constant_pool) throws IOException {
-        annotation_table_length = (file.readUnsignedShort());
+        int annotation_table_length = file.readUnsignedShort();
         annotation_table = new AnnotationEntry[annotation_table_length];
         for (int i = 0; i < annotation_table_length; i++) {
             annotation_table[i] = AnnotationEntry.read(file, constant_pool);

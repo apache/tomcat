@@ -42,8 +42,8 @@ public final class ClassParser {
 
     private static final int MAGIC = 0xCAFEBABE;
 
-    private DataInputStream file;
-    private String file_name;
+    private final DataInputStream file;
+    private final String file_name;
     private int class_name_index, superclass_name_index;
     private int access_flags; // Access rights of parsed class
     private int[] interfaces; // Names of implemented interfaces
