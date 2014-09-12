@@ -72,58 +72,6 @@ public class ConstantPool {
 
 
     /**
-     * Resolve constant to a string representation.
-     *
-     * @param  c Constant to be printed
-     * @return String representation
-     */
-    public String constantToString( Constant c ) throws ClassFormatException {
-        String str;
-        int i;
-        byte tag = c.getTag();
-        switch (tag) {
-            case Constants.CONSTANT_Class:
-                i = ((ConstantClass) c).getNameIndex();
-                c = getConstant(i, Constants.CONSTANT_Utf8);
-                str = Utility.compactClassName(((ConstantUtf8) c).getBytes());
-                break;
-            case Constants.CONSTANT_Utf8:
-                str = ((ConstantUtf8) c).getBytes();
-                break;
-            case Constants.CONSTANT_Double:
-                str = String.valueOf(((ConstantDouble) c).getBytes());
-                break;
-            case Constants.CONSTANT_Float:
-                str = String.valueOf(((ConstantFloat) c).getBytes());
-                break;
-            case Constants.CONSTANT_Long:
-                str = String.valueOf(((ConstantLong) c).getBytes());
-                break;
-            case Constants.CONSTANT_Integer:
-                str = String.valueOf(((ConstantInteger) c).getBytes());
-                break;
-            default: // Never reached
-                throw new RuntimeException("Unknown constant type " + tag);
-        }
-        return str;
-    }
-
-
-    /**
-     * Retrieve constant at `index' from constant pool and resolve it to
-     * a string representation.
-     *
-     * @param  index of constant in constant pool
-     * @param  tag expected type
-     * @return String representation
-     */
-    public String constantToString( int index, byte tag ) throws ClassFormatException {
-        Constant c = getConstant(index, tag);
-        return constantToString(c);
-    }
-
-
-    /**
      * Get constant from constant pool.
      *
      * @param  index Index in constant pool
