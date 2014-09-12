@@ -165,7 +165,7 @@
        removeSuspects will be automatically removed after removeSuspectsTimeout.
        If a negative value specified, the removeSuspects members never be
        removed until disappeared really. If the attribute is not provided,
-       a default of 300 milliseconds (5 minutes) is used.
+       a default of 300 seconds (5 minutes) is used.
      </attribute>
    </attributes>
   </subsection>
