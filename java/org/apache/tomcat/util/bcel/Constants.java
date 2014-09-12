@@ -95,28 +95,9 @@ public interface Constants {
   /** Attributes and their corresponding names.
    */
   public static final byte ATTR_UNKNOWN                                 = -1;
-  public static final byte ATTR_SOURCE_FILE                             = 0;
-  public static final byte ATTR_CONSTANT_VALUE                          = 1;
-  public static final byte ATTR_CODE                                    = 2;
-  public static final byte ATTR_EXCEPTIONS                              = 3;
-  public static final byte ATTR_LINE_NUMBER_TABLE                       = 4;
-  public static final byte ATTR_LOCAL_VARIABLE_TABLE                    = 5;
-  public static final byte ATTR_INNER_CLASSES                           = 6;
-  public static final byte ATTR_SYNTHETIC                               = 7;
-  public static final byte ATTR_DEPRECATED                              = 8;
-  public static final byte ATTR_PMG                                     = 9;
-  public static final byte ATTR_SIGNATURE                               = 10;
-  public static final byte ATTR_STACK_MAP                               = 11;
   public static final byte ATTR_RUNTIME_VISIBLE_ANNOTATIONS             = 12;
-  public static final byte ATTR_RUNTIME_INVISIBLE_ANNOTATIONS           = 13;
   public static final byte ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS   = 14;
-  public static final byte ATTR_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS = 15;
   public static final byte ATTR_ANNOTATION_DEFAULT                      = 16;
-  public static final byte ATTR_LOCAL_VARIABLE_TYPE_TABLE               = 17;
-  public static final byte ATTR_ENCLOSING_METHOD                        = 18;
-  public static final byte ATTR_STACK_MAP_TABLE                         = 19;
-  public static final byte ATTR_BOOTSTRAP_METHODS                       = 20;
-  public static final byte ATTR_METHOD_PARAMETERS                       = 21;
 
   public static final short KNOWN_ATTRIBUTES = 22;
 
@@ -131,31 +112,4 @@ public interface Constants {
     "AnnotationDefault", "LocalVariableTypeTable", "EnclosingMethod", "StackMapTable",
     "BootstrapMethods", "MethodParameters"
   };
-
-  /** Constants used in the StackMap attribute.
-   */
-  public static final byte ITEM_Bogus      = 0;
-  public static final byte ITEM_Object     = 7;
-  public static final byte ITEM_NewObject  = 8;
-
-  /** Constants used to identify StackMapEntry types.
-   *
-   * For those types which can specify a range, the
-   * constant names the lowest value.
-   */
-  public static final int SAME_FRAME = 0;
-  public static final int SAME_LOCALS_1_STACK_ITEM_FRAME = 64;
-  public static final int SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED = 247;
-  public static final int CHOP_FRAME = 248;
-  public static final int SAME_FRAME_EXTENDED = 251;
-  public static final int APPEND_FRAME = 252;
-  public static final int FULL_FRAME = 255;
-
-  /** Constants that define the maximum value of
-   * those constants which store ranges. */
-
-  public static final int SAME_FRAME_MAX = 63;
-  public static final int SAME_LOCALS_1_STACK_ITEM_FRAME_MAX = 127;
-  public static final int CHOP_FRAME_MAX = 250;
-  public static final int APPEND_FRAME_MAX = 254;
 }
