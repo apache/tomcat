@@ -91,25 +91,4 @@ public interface Constants {
     "CONSTANT_NameAndType", "", "", "CONSTANT_MethodHandle",
     "CONSTANT_MethodType", "", "CONSTANT_InvokeDynamic" };
 
-
-  /** Attributes and their corresponding names.
-   */
-  public static final byte ATTR_UNKNOWN                                 = -1;
-  public static final byte ATTR_RUNTIME_VISIBLE_ANNOTATIONS             = 12;
-  public static final byte ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS   = 14;
-  public static final byte ATTR_ANNOTATION_DEFAULT                      = 16;
-
-  public static final short KNOWN_ATTRIBUTES = 22;
-
-  // TOFO: FIXXXXX
-  public static final String[] ATTRIBUTE_NAMES = {
-    "SourceFile", "ConstantValue", "Code", "Exceptions",
-    "LineNumberTable", "LocalVariableTable",
-    "InnerClasses", "Synthetic", "Deprecated",
-    "PMGClass", "Signature", "StackMap",
-    "RuntimeVisibleAnnotations", "RuntimeInvisibleAnnotations",
-    "RuntimeVisibleParameterAnnotations", "RuntimeInvisibleParameterAnnotations",
-    "AnnotationDefault", "LocalVariableTypeTable", "EnclosingMethod", "StackMapTable",
-    "BootstrapMethods", "MethodParameters"
-  };
 }
