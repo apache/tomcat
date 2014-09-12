@@ -19,7 +19,6 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 
 import org.apache.tomcat.util.bcel.Constants;
 
@@ -30,9 +29,7 @@ import org.apache.tomcat.util.bcel.Constants;
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class Constant implements Serializable {
-
-    private static final long serialVersionUID = 2827409182154809454L;
+public abstract class Constant {
 
     /* In fact this tag is redundant since we can distinguish different
      * `Constant' objects by their type, i.e., via `instanceof'. In some
