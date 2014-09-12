@@ -26,7 +26,7 @@ import org.apache.tomcat.util.bcel.Constants;
 /**
  * Abstract super class for <em>Attribute</em> objects. Currently the
  * <em>ConstantValue</em>, <em>SourceFile</em>, <em>Code</em>,
- * <em>Exceptiontable</em>, <em>LineNumberTable</em>,
+ * <em>ExceptionTable</em>, <em>LineNumberTable</em>,
  * <em>LocalVariableTable</em>, <em>InnerClasses</em> and
  * <em>Synthetic</em> attributes are supported. The <em>Unknown</em>
  * attribute stands for non-standard-attributes.
@@ -35,14 +35,12 @@ import org.apache.tomcat.util.bcel.Constants;
  * @see ConstantValue
  * @see SourceFile
  * @see Code
- * @see Unknown
  * @see ExceptionTable
  * @see LineNumberTable
  * @see LocalVariableTable
  * @see InnerClasses
  * @see Synthetic
  * @see Deprecated
- * @see Signature
  */
 public abstract class Attribute implements Cloneable, Serializable
 {
@@ -102,7 +100,8 @@ public abstract class Attribute implements Cloneable, Serializable
         switch (tag)
         {
         case Constants.ATTR_UNKNOWN:
-            return new Unknown(name_index, length, file, constant_pool);
+            Utility.swallowUnknownAttribute(file, length);
+            return null;
         case Constants.ATTR_CONSTANT_VALUE:
             return new ConstantValue(name_index, length, file, constant_pool);
         case Constants.ATTR_SOURCE_FILE:
@@ -125,9 +124,11 @@ public abstract class Attribute implements Cloneable, Serializable
         case Constants.ATTR_PMG:
             return new PMGClass(name_index, length, file, constant_pool);
         case Constants.ATTR_SIGNATURE:
-            return new Signature(name_index, length, file, constant_pool);
+            Utility.swallowSignature(file);
+            return null;
         case Constants.ATTR_STACK_MAP:
-            return new StackMap(name_index, length, file, constant_pool);
+            Utility.swallowStackMap(file);
+            return null;
         case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
             return new RuntimeVisibleAnnotations(name_index, length, file,
                     constant_pool);
@@ -149,7 +150,8 @@ public abstract class Attribute implements Cloneable, Serializable
         case Constants.ATTR_ENCLOSING_METHOD:
             return new EnclosingMethod(name_index, length, file, constant_pool);
         case Constants.ATTR_STACK_MAP_TABLE:
-            return new StackMapTable(name_index, length, file, constant_pool);
+            Utility.swallowStackMapTable(file);
+            return null;
         case Constants.ATTR_BOOTSTRAP_METHODS:
             Utility.swallowBootstrapMethods(file);
             return null;

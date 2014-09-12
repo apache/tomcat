@@ -23,13 +23,16 @@ import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
 
-
 /**
  * Utility functions that do not really belong to any class in particular.
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class Utility {
+final class Utility {
+
+    private Utility() {
+        // Hide default constructor
+    }
 
     /**
      * Shorten long class name <em>str</em>, i.e., chop off the <em>prefix</em>,
@@ -38,59 +41,10 @@ public abstract class Utility {
      * Slashes <em>/</em> are converted to dots <em>.</em>.
      *
      * @param str The long class name
-     * @param prefix The prefix the get rid off
-     * @param chopit Flag that determines whether chopping is executed or not
      * @return Compacted class name
      */
-    public static final String compactClassName( String str, String prefix, boolean chopit ) {
-        int len = prefix.length();
-        str = str.replace('/', '.'); // Is `/' on all systems, even DOS
-        if (chopit) {
-            // If string starts with `prefix' and contains no further dots
-            if (str.startsWith(prefix) && (str.substring(len).indexOf('.') == -1)) {
-                str = str.substring(len);
-            }
-        }
-        return str;
-    }
-
-
-    /**
-     * Shorten long class names, <em>java/lang/String</em> becomes 
-     * <em>java.lang.String</em>,
-     * e.g.. If <em>chopit</em> is <em>true</em> the prefix <em>java.lang</em>
-     * is also removed.
-     *
-     * @param str The long class name
-     * @param chopit Flag that determines whether chopping is executed or not
-     * @return Compacted class name
-     */
-    public static final String compactClassName( String str, boolean chopit ) {
-        return compactClassName(str, "java.lang.", chopit);
-    }
-
-
-    // A-Z, g-z, _, $
-    private static final int FREE_CHARS = 48;
-    static int[] CHAR_MAP = new int[FREE_CHARS];
-    static int[] MAP_CHAR = new int[256]; // Reverse map
-    static {
-        int j = 0;
-        for (int i = 'A'; i <= 'Z'; i++) {
-            CHAR_MAP[j] = i;
-            MAP_CHAR[i] = j;
-            j++;
-        }
-        for (int i = 'g'; i <= 'z'; i++) {
-            CHAR_MAP[j] = i;
-            MAP_CHAR[i] = j;
-            j++;
-        }
-        CHAR_MAP[j] = '$';
-        MAP_CHAR['$'] = j;
-        j++;
-        CHAR_MAP[j] = '_';
-        MAP_CHAR['_'] = j;
+    static String compactClassName(String str) {
+        return str.replace('/', '.'); // Is `/' on all systems, even DOS
     }
 
     static void swallowBootstrapMethods(DataInput file) throws IOException {
@@ -112,26 +66,26 @@ public abstract class Utility {
         }
     }
 
-    protected static void swallowCodeException(DataInput file) throws IOException {
+    static void swallowCodeException(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused end_pc
         file.readUnsignedShort();   // Unused handler_pc
         file.readUnsignedShort();   // Unused catch_type
     }
 
-    protected static void swallowInnerClass(DataInput file) throws IOException {
+    static void swallowInnerClass(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused inner_class_index
         file.readUnsignedShort();   // Unused outer_class_index
         file.readUnsignedShort();   // Unused inner_name_index
         file.readUnsignedShort();   // Unused inner_access_flags
     }
 
-    protected static void swallowLineNumber(DataInput file) throws IOException {
+    static void swallowLineNumber(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused line_number
     }
 
-    protected static void swallowLocalVariable(DataInput file) throws IOException {
+    static void swallowLocalVariable(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused length
         file.readUnsignedShort();   // Unused name_index
@@ -139,7 +93,21 @@ public abstract class Utility {
         file.readUnsignedShort();   // Unused index
     }
 
-    protected static void swallowStackMapType(DataInput file) throws IOException {
+    static void swallowStackMap(DataInput file) throws IOException {
+        int map_length = file.readUnsignedShort();
+        for (int i = 0; i < map_length; i++) {
+            Utility.swallowStackMapEntry(file);
+        }
+    }
+
+    static void swallowStackMapTable(DataInputStream file) throws IOException {
+        int map_length = file.readUnsignedShort();
+        for (int i = 0; i < map_length; i++) {
+            Utility.swallowStackMapTableEntry(file);
+        }
+    }
+
+    static void swallowStackMapType(DataInput file) throws IOException {
         byte type = file.readByte();
         if ((type < Constants.ITEM_Bogus) || (type > Constants.ITEM_NewObject)) {
             throw new RuntimeException("Illegal type for StackMapType: " + type);
@@ -150,7 +118,7 @@ public abstract class Utility {
         }
     }
 
-    protected static void swallowStackMapEntry(DataInput file) throws IOException {
+    static void swallowStackMapEntry(DataInput file) throws IOException {
         file.readShort();   // Unused byte_code_offset
         int number_of_locals = file.readShort();
         for (int i = 0; i < number_of_locals; i++) {
@@ -162,7 +130,7 @@ public abstract class Utility {
         }
     }
 
-    protected static void swallowStackMapTableEntry(DataInputStream file) throws IOException {
+    static void swallowStackMapTableEntry(DataInputStream file) throws IOException {
         int frame_type = file.read();
 
         if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
@@ -200,5 +168,16 @@ public abstract class Utility {
             throw new ClassFormatException (
                     "Invalid frame type found while parsing stack map table: " + frame_type);
         }
+    }
+
+    static void swallowUnknownAttribute(DataInput file, int length) throws IOException {
+        if (length > 0) {
+            byte[] bytes = new byte[length];
+            file.readFully(bytes);
+        }
+    }
+
+    static void swallowSignature(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused signature_index
     }
 }
