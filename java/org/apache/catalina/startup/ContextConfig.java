@@ -612,19 +612,20 @@ public class ContextConfig implements LifecycleListener {
             }
         }
 
-        if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory() && unpackWARs) {
-            URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
-            docBase = ExpandWar.expand(host, war, pathName);
-            file = new File(docBase);
-            docBase = file.getCanonicalPath();
-            if (context instanceof StandardContext) {
-                ((StandardContext) context).setOriginalDocBase(origDocBase);
+        if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory()) {
+            if (unpackWARs) {
+                URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
+                docBase = ExpandWar.expand(host, war, pathName);
+                file = new File(docBase);
+                docBase = file.getCanonicalPath();
+                if (context instanceof StandardContext) {
+                    ((StandardContext) context).setOriginalDocBase(origDocBase);
+                }
+            } else {
+                URL war =
+                        new URL("jar:" + (new File (docBase)).toURI().toURL() + "!/");
+                ExpandWar.validate(host, war, pathName);
             }
-        } else if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") &&
-                !file.isDirectory() && !unpackWARs) {
-            URL war =
-                new URL("jar:" + (new File (docBase)).toURI().toURL() + "!/");
-            ExpandWar.validate(host, war, pathName);
         } else {
             File docDir = new File(docBase);
             if (!docDir.exists()) {
