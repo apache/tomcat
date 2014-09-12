@@ -58,7 +58,7 @@ public class TesterPerformance {
                 if (jarEntryName.endsWith(".class")) {
                     InputStream is = jar.getEntryInputStream();
                     long start = System.nanoTime();
-                    ClassParser cp = new ClassParser(is, jarEntryName);
+                    ClassParser cp = new ClassParser(is);
                     cp.parse();
                     duration += System.nanoTime() - start;
                 }
