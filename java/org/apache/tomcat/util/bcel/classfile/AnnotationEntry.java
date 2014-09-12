@@ -35,32 +35,26 @@ public class AnnotationEntry implements Constants {
     private final int type_index;
     private final ConstantPool constant_pool;
 
-    // FIXME: add 'final'
-    private List<ElementValuePair> element_value_pairs;
+    private final List<ElementValuePair> element_value_pairs;
 
     /**
-     * Factory method to create an AnnotionEntry from a DataInputStream
+     * Creates an AnnotationEntry from a DataInputStream
      *
      * @param file
      * @param constant_pool
-     * @return the entry
      * @throws IOException
      */
-    public static AnnotationEntry read(DataInputStream file, ConstantPool constant_pool) throws IOException {
+    AnnotationEntry(DataInputStream file, ConstantPool constant_pool) throws IOException {
 
-        final AnnotationEntry annotationEntry = new AnnotationEntry(file.readUnsignedShort(), constant_pool);
-        final int num_element_value_pairs = (file.readUnsignedShort());
-        annotationEntry.element_value_pairs = new ArrayList<>();
-        for (int i = 0; i < num_element_value_pairs; i++) {
-            annotationEntry.element_value_pairs.add(new ElementValuePair(file.readUnsignedShort(), ElementValue.readElementValue(file, constant_pool),
-                    constant_pool));
-        }
-        return annotationEntry;
-    }
-
-    AnnotationEntry(int type_index, ConstantPool constant_pool) {
-        this.type_index = type_index;
         this.constant_pool = constant_pool;
+
+        type_index = file.readUnsignedShort();
+        int num_element_value_pairs = file.readUnsignedShort();
+
+        element_value_pairs = new ArrayList<>(num_element_value_pairs);
+        for (int i = 0; i < num_element_value_pairs; i++) {
+            element_value_pairs.add(new ElementValuePair(file, constant_pool));
+        }
     }
 
     /**

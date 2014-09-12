@@ -39,7 +39,7 @@ public abstract class Annotations extends Attribute {
         final int annotation_table_length = (file.readUnsignedShort());
         annotation_table = new AnnotationEntry[annotation_table_length];
         for (int i = 0; i < annotation_table_length; i++) {
-            annotation_table[i] = AnnotationEntry.read(file, constant_pool);
+            annotation_table[i] = new AnnotationEntry(file, constant_pool);
         }
     }
 
