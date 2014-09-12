@@ -92,7 +92,6 @@ public interface Constants {
     "CONSTANT_MethodType", "", "CONSTANT_InvokeDynamic" };
   
 
-
   /** Attributes and their corresponding names.
    */
   public static final byte ATTR_UNKNOWN                                 = -1;

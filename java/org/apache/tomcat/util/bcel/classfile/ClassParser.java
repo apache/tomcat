@@ -19,11 +19,8 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.apache.tomcat.util.bcel.Constants;
 
@@ -46,15 +43,12 @@ public final class ClassParser {
     private static final int MAGIC = 0xCAFEBABE;
 
     private DataInputStream file;
-    private boolean fileOwned;
     private String file_name;
-    private String zip_file;
     private int class_name_index, superclass_name_index;
     private int access_flags; // Access rights of parsed class
     private int[] interfaces; // Names of implemented interfaces
     private ConstantPool constant_pool; // collection of constants
     private Attribute[] attributes; // attributes defined in the class
-    private boolean is_zip; // Loaded from zip file
     private static final int BUFSIZE = 8192;
 
 
@@ -66,9 +60,6 @@ public final class ClassParser {
      */
     public ClassParser(InputStream file, String file_name) {
         this.file_name = file_name;
-        fileOwned = false;
-        String clazz = file.getClass().getName(); // Not a very clean solution ...
-        is_zip = clazz.startsWith("java.util.zip.") || clazz.startsWith("java.util.jar.");
         if (file instanceof DataInputStream) {
             this.file = (DataInputStream) file;
         } else {
@@ -89,72 +80,40 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     public JavaClass parse() throws IOException, ClassFormatException {
-        ZipFile zip = null;
-        try {
-            if (fileOwned) {
-                if (is_zip) {
-                    zip = new ZipFile(zip_file);
-                    ZipEntry entry = zip.getEntry(file_name);
-                    
-                    if (entry == null) {
-                        throw new IOException("File " + file_name + " not found");
-                    }
-                    
-                    file = new DataInputStream(new BufferedInputStream(zip.getInputStream(entry),
-                            BUFSIZE));
-                } else {
-                    file = new DataInputStream(new BufferedInputStream(new FileInputStream(
-                            file_name), BUFSIZE));
-                }
-            }
-            /****************** Read headers ********************************/
-            // Check magic tag of class file
-            readID();
-            // Get compiler version
-            readVersion();
-            /****************** Read constant pool and related **************/
-            // Read constant pool entries
-            readConstantPool();
-            // Get class information
-            readClassInfo();
-            // Get interface information, i.e., implemented interfaces
-            readInterfaces();
-            /****************** Read class fields and methods ***************/
-            // Read class fields, i.e., the variables of the class
-            readFields();
-            // Read class methods, i.e., the functions in the class
-            readMethods();
-            // Read class attributes
-            readAttributes();
-            // Check for unknown variables
-            //Unknown[] u = Unknown.getUnknownAttributes();
-            //for(int i=0; i < u.length; i++)
-            //  System.err.println("WARNING: " + u[i]);
-            // Everything should have been read now
-            //      if(file.available() > 0) {
-            //        int bytes = file.available();
-            //        byte[] buf = new byte[bytes];
-            //        file.read(buf);
-            //        if(!(is_zip && (buf.length == 1))) {
-            //          System.err.println("WARNING: Trailing garbage at end of " + file_name);
-            //          System.err.println(bytes + " extra bytes: " + Utility.toHexString(buf));
-            //        }
-            //      }
-        } finally {
-            // Read everything of interest, so close the file
-            if (fileOwned) {
-                try {
-                    if (file != null) {
-                        file.close();
-                    }
-                    if (zip != null) {
-                        zip.close();
-                    }
-                } catch (IOException ioe) {
-                    //ignore close exceptions
-                }
-            }
-        }
+        /****************** Read headers ********************************/
+        // Check magic tag of class file
+        readID();
+        // Get compiler version
+        readVersion();
+        /****************** Read constant pool and related **************/
+        // Read constant pool entries
+        readConstantPool();
+        // Get class information
+        readClassInfo();
+        // Get interface information, i.e., implemented interfaces
+        readInterfaces();
+        /****************** Read class fields and methods ***************/
+        // Read class fields, i.e., the variables of the class
+        readFields();
+        // Read class methods, i.e., the functions in the class
+        readMethods();
+        // Read class attributes
+        readAttributes();
+        // Check for unknown variables
+        //Unknown[] u = Unknown.getUnknownAttributes();
+        //for(int i=0; i < u.length; i++)
+        //  System.err.println("WARNING: " + u[i]);
+        // Everything should have been read now
+        //      if(file.available() > 0) {
+        //        int bytes = file.available();
+        //        byte[] buf = new byte[bytes];
+        //        file.read(buf);
+        //        if(!(is_zip && (buf.length == 1))) {
+        //          System.err.println("WARNING: Trailing garbage at end of " + file_name);
+        //          System.err.println(bytes + " extra bytes: " + Utility.toHexString(buf));
+        //        }
+        //      }
+
         // Return the information we have gathered in a new object
         return new JavaClass(class_name_index, superclass_name_index,
                 access_flags, constant_pool, interfaces, attributes);

@@ -29,7 +29,6 @@ import java.io.IOException;
 public class AnnotationDefault extends Attribute
 {
     private static final long serialVersionUID = 6715933396664171543L;
-    ElementValue default_value;
 
     /**
      * @param name_index
@@ -46,6 +45,7 @@ public class AnnotationDefault extends Attribute
             throws IOException
     {
         super(name_index, length, constant_pool);
-        default_value = ElementValue.readElementValue(file, constant_pool);
+        // Default value
+        ElementValue.readElementValue(file, constant_pool);
     }
 }
