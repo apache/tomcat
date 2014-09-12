@@ -34,7 +34,6 @@ import java.io.IOException;
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Attribute
- * @see     CodeException
  * @see     LineNumberTable
  * @see LocalVariableTable
  */
@@ -44,7 +43,6 @@ public final class Code extends Attribute {
     private int code_length; // Length of code in bytes
     private byte[] code; // Actual byte code
     private int exception_table_length;
-    private CodeException[] exception_table; // Table of handled exceptions
     private int attributes_count; // Attributes of code: LineNumber
     private Attribute[] attributes; // or LocalVariable
 
@@ -58,8 +56,8 @@ public final class Code extends Attribute {
     Code(int name_index, int length, DataInputStream file, ConstantPool constant_pool)
             throws IOException {
         // Initialize with some default values which will be overwritten later
-        this(name_index, length, (byte[]) null,
-                (CodeException[]) null, (Attribute[]) null, constant_pool);
+        this(name_index, length, (byte[]) null, (Attribute[]) null,
+                constant_pool);
         file.readUnsignedShort();   // Unused max_stack
         file.readUnsignedShort();   // Unused max_locals
         code_length = file.readInt();
@@ -69,9 +67,8 @@ public final class Code extends Attribute {
          * handler is active, i.e., a try { ... } catch() block.
          */
         exception_table_length = file.readUnsignedShort();
-        exception_table = new CodeException[exception_table_length];
         for (int i = 0; i < exception_table_length; i++) {
-            exception_table[i] = new CodeException(file);
+            Utility.swallowCodeException(file);
         }
         /* Read all attributes, currently `LineNumberTable' and
          * `LocalVariableTable'
@@ -93,15 +90,13 @@ public final class Code extends Attribute {
      * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes
      * @param code Actual byte code
-     * @param exception_table Table of handled exceptions
      * @param attributes Attributes of code: LineNumber or LocalVariable
      * @param constant_pool Array of constants
      */
     public Code(int name_index, int length, byte[] code,
-            CodeException[] exception_table, Attribute[] attributes, ConstantPool constant_pool) {
+            Attribute[] attributes, ConstantPool constant_pool) {
         super(name_index, length, constant_pool);
         setCode(code);
-        setExceptionTable(exception_table);
         setAttributes(attributes); // Overwrites length!
     }
 
@@ -148,16 +143,6 @@ public final class Code extends Attribute {
     public final void setCode( byte[] code ) {
         this.code = code;
         code_length = (code == null) ? 0 : code.length;
-        length = calculateLength(); // Adjust length
-    }
-
-
-    /**
-     * @param exception_table exception table
-     */
-    public final void setExceptionTable( CodeException[] exception_table ) {
-        this.exception_table = exception_table;
-        exception_table_length = (exception_table == null) ? 0 : exception_table.length;
         length = calculateLength(); // Adjust length
     }
 }

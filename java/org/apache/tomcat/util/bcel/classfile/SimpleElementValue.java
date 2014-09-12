@@ -17,9 +17,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 import org.apache.tomcat.util.bcel.Constants;
 
 public class SimpleElementValue extends ElementValue
@@ -89,30 +86,6 @@ public class SimpleElementValue extends ElementValue
         default:
             throw new RuntimeException(
                     "SimpleElementValue class does not know how to stringify type "
-                            + type);
-        }
-    }
-
-    @Override
-    public void dump(DataOutputStream dos) throws IOException
-    {
-        dos.writeByte(type); // u1 kind of value
-        switch (type)
-        {
-        case PRIMITIVE_INT:
-        case PRIMITIVE_BYTE:
-        case PRIMITIVE_CHAR:
-        case PRIMITIVE_FLOAT:
-        case PRIMITIVE_LONG:
-        case PRIMITIVE_BOOLEAN:
-        case PRIMITIVE_SHORT:
-        case PRIMITIVE_DOUBLE:
-        case STRING:
-            dos.writeShort(getIndex());
-            break;
-        default:
-            throw new RuntimeException(
-                    "SimpleElementValue doesnt know how to write out type "
                             + type);
         }
     }

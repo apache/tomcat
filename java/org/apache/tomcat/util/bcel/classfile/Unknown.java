@@ -36,7 +36,6 @@ import org.apache.tomcat.util.bcel.Constants;
 
  *
  * @see org.apache.tomcat.util.bcel.classfile.Attribute
- * @see org.apache.tomcat.util.bcel.classfile.AttributeReader
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public final class Unknown extends Attribute {

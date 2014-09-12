@@ -17,9 +17,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class ArrayElementValue extends ElementValue
 {
     // For array types, this is the array
@@ -33,17 +30,6 @@ public class ArrayElementValue extends ElementValue
                     "Only element values of type array can be built with this ctor - type specified: " + type);
         }
         this.evalues = datums;
-    }
-
-    @Override
-    public void dump(DataOutputStream dos) throws IOException
-    {
-        dos.writeByte(type); // u1 type of value (ARRAY == '[')
-        dos.writeShort(evalues.length);
-        for (int i = 0; i < evalues.length; i++)
-        {
-            evalues[i].dump(dos);
-        }
     }
 
     @Override
