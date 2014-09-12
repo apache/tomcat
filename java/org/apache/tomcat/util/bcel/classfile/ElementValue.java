@@ -117,7 +117,7 @@ public abstract class ElementValue
             }
             return new ArrayElementValue(ARRAY, evalues, cpool);
         default:
-            throw new RuntimeException(
+            throw new ClassFormatException(
                     "Unexpected element value kind in annotation: " + type);
         }
     }
