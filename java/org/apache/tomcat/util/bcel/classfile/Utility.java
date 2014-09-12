@@ -52,40 +52,6 @@ final class Utility {
         }
     }
 
-    static void swallowConstantCP(DataInput file) throws IOException {
-        // file.readUnsignedShort(); // Unused class index
-        // file.readUnsignedShort(); // Unused name and type index
-        skipFully(file, 4);
-    }
-
-    static void swallowConstantMethodHandle(DataInput file) throws IOException {
-        // file.readUnsignedByte();  // Unused reference_kind
-        // file.readUnsignedShort(); // Unused reference_index
-        skipFully(file, 3);
-    }
-
-    static void swallowConstantString(DataInput file) throws IOException {
-        // file.readUnsignedShort(); // Unused string index
-        skipFully(file, 2);
-    }
-
-    static void swallowConstantNameAndType(DataInput file) throws IOException {
-        // file.readUnsignedShort(); // Unused name index
-        // file.readUnsignedShort(); // Unused signature index
-        skipFully(file, 4);
-    }
-
-    static void swallowConstantMethodType(DataInput file) throws IOException {
-        // file.readUnsignedShort(); // Unused descriptor_index
-        skipFully(file, 2);
-    }
-
-    static void swallowConstantInvokeDynamic(DataInput file) throws IOException {
-        // file.readUnsignedShort(); // Unused bootstrap_method_attr_index
-        // file.readUnsignedShort(); // Unused name_and_type_index
-        skipFully(file, 4);
-    }
-
     static void swallowFieldOrMethod(DataInput file)
             throws IOException {
         // file.readUnsignedShort(); // Unused access flags

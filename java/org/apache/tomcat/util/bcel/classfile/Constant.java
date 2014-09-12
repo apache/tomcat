@@ -68,17 +68,10 @@ public abstract class Constant implements Serializable {
     static Constant readConstant( DataInputStream file ) throws IOException,
             ClassFormatException {
         byte b = file.readByte(); // Read tag byte
+        int skipSize;
         switch (b) {
             case Constants.CONSTANT_Class:
                 return new ConstantClass(file);
-            case Constants.CONSTANT_Fieldref:
-            case Constants.CONSTANT_Methodref:
-            case Constants.CONSTANT_InterfaceMethodref:
-                Utility.swallowConstantCP(file);
-                return null;
-            case Constants.CONSTANT_String:
-                Utility.swallowConstantString(file);
-                return null;
             case Constants.CONSTANT_Integer:
                 return new ConstantInteger(file);
             case Constants.CONSTANT_Float:
@@ -87,23 +80,27 @@ public abstract class Constant implements Serializable {
                 return new ConstantLong(file);
             case Constants.CONSTANT_Double:
                 return new ConstantDouble(file);
-            case Constants.CONSTANT_NameAndType:
-                Utility.swallowConstantNameAndType(file);
-                return null;
             case Constants.CONSTANT_Utf8:
                 return ConstantUtf8.getInstance(file);
-            case Constants.CONSTANT_MethodHandle:
-                Utility.swallowConstantMethodHandle(file);
-                return null;
+            case Constants.CONSTANT_String:
             case Constants.CONSTANT_MethodType:
-                Utility.swallowConstantMethodType(file);
-                return null;
+                skipSize = 2; // unsigned short
+                break;
+            case Constants.CONSTANT_MethodHandle:
+                skipSize = 3; // unsigned byte, unsigned short
+                break;
+            case Constants.CONSTANT_Fieldref:
+            case Constants.CONSTANT_Methodref:
+            case Constants.CONSTANT_InterfaceMethodref:
+            case Constants.CONSTANT_NameAndType:
             case Constants.CONSTANT_InvokeDynamic:
-                Utility.swallowConstantInvokeDynamic(file);
-                return null;
+                skipSize = 4; // unsigned short, unsigned short
+                break;
             default:
                 throw new ClassFormatException("Invalid byte tag in constant pool: " + b);
         }
+        Utility.skipFully(file, skipSize);
+        return null;
     }
 
 
