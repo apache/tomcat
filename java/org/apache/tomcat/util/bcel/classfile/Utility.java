@@ -181,11 +181,78 @@ final class Utility {
         file.readUnsignedShort();   // Unused signature_index
     }
 
-    static void swallowSynthetic(DataInput file, int length) throws IOException {
+    static void swallowSynthetic(int length) {
         if (length > 0) {
-            byte[] bytes = new byte[length];
-            file.readFully(bytes);
             throw new ClassFormatException("Synthetic attribute with length > 0");
         }
+    }
+
+    static void swallowSourceFile(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused sourcefile_index
+    }
+
+    static void swallowConstantValue(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused constantvalue_index
+    }
+
+    static void swallowCode(DataInputStream file, ConstantPool constant_pool) throws IOException {
+        file.readUnsignedShort();   // Unused max_stack
+        file.readUnsignedShort();   // Unused max_locals
+        int code_length = file.readInt();
+        byte[] code = new byte[code_length]; // Read byte code
+        file.readFully(code);
+        /* Read exception table that contains all regions where an exception
+         * handler is active, i.e., a try { ... } catch() block.
+         */
+        int exception_table_length = file.readUnsignedShort();
+        for (int i = 0; i < exception_table_length; i++) {
+            Utility.swallowCodeException(file);
+        }
+        /* Read all attributes, currently `LineNumberTable' and
+         * `LocalVariableTable'
+         */
+        int attributes_count = file.readUnsignedShort();
+        for (int i = 0; i < attributes_count; i++) {
+            Attribute.readAttribute(file, constant_pool);
+        }
+    }
+
+    static void swallowExceptionTable(DataInput file) throws IOException {
+        int number_of_exceptions = file.readUnsignedShort();
+        for (int i = 0; i < number_of_exceptions; i++) {
+            file.readUnsignedShort(); // Unused exception index
+        }
+    }
+
+    static void swallowLineNumberTable(DataInput file) throws IOException {
+        int line_number_table_length = (file.readUnsignedShort());
+        for (int i = 0; i < line_number_table_length; i++) {
+            Utility.swallowLineNumber(file);
+        }
+    }
+
+    static void swallowLocalVariableTable(DataInput file) throws IOException {
+        int local_variable_table_length = (file.readUnsignedShort());
+        for (int i = 0; i < local_variable_table_length; i++) {
+            Utility.swallowLocalVariable(file);
+        }
+    }
+
+    static void swallowInnerClasses(DataInput file) throws IOException {
+        int number_of_classes = file.readUnsignedShort();
+        for (int i = 0; i < number_of_classes; i++) {
+            Utility.swallowInnerClass(file);
+        }
+    }
+
+    static void swallowDeprecated(int length) {
+        if (length > 0) {
+            throw new ClassFormatException("Deprecated attribute with length > 0");
+        }
+    }
+
+    static void swallowPMCClass(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused pmg_index
+        file.readUnsignedShort();   // Unused pmg_class_index
     }
 }

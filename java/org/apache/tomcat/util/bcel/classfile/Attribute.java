@@ -32,14 +32,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * attribute stands for non-standard-attributes.
  * 
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
- * @see ConstantValue
- * @see SourceFile
- * @see Code
- * @see ExceptionTable
- * @see LineNumberTable
- * @see LocalVariableTable
- * @see InnerClasses
- * @see Deprecated
  */
 public abstract class Attribute implements Cloneable, Serializable
 {
@@ -102,27 +94,35 @@ public abstract class Attribute implements Cloneable, Serializable
             Utility.swallowUnknownAttribute(file, length);
             return null;
         case Constants.ATTR_CONSTANT_VALUE:
-            return new ConstantValue(name_index, length, file, constant_pool);
+            Utility.swallowConstantValue(file);
+            return null;
         case Constants.ATTR_SOURCE_FILE:
-            return new SourceFile(name_index, length, file, constant_pool);
+            Utility.swallowSourceFile(file);
+            return null;
         case Constants.ATTR_CODE:
-            return new Code(name_index, length, file, constant_pool);
+            Utility.swallowCode(file, constant_pool);
+            return null;
         case Constants.ATTR_EXCEPTIONS:
-            return new ExceptionTable(name_index, length, file, constant_pool);
+            Utility.swallowExceptionTable(file);
+            return null;
         case Constants.ATTR_LINE_NUMBER_TABLE:
-            return new LineNumberTable(name_index, length, file, constant_pool);
+            Utility.swallowLineNumberTable(file);
+            return null;
         case Constants.ATTR_LOCAL_VARIABLE_TABLE:
-            return new LocalVariableTable(name_index, length, file,
-                    constant_pool);
+            Utility.swallowLocalVariableTable(file);
+            return null;
         case Constants.ATTR_INNER_CLASSES:
-            return new InnerClasses(name_index, length, file, constant_pool);
+            Utility.swallowInnerClasses(file);
+            return null;
         case Constants.ATTR_SYNTHETIC:
-            Utility.swallowSynthetic(file, length);
+            Utility.swallowSynthetic(length);
             return null;
         case Constants.ATTR_DEPRECATED:
-            return new Deprecated(name_index, length, file, constant_pool);
+            Utility.swallowDeprecated(length);
+            return null;
         case Constants.ATTR_PMG:
-            return new PMGClass(name_index, length, file, constant_pool);
+            Utility.swallowPMCClass(file);
+            return null;
         case Constants.ATTR_SIGNATURE:
             Utility.swallowSignature(file);
             return null;
