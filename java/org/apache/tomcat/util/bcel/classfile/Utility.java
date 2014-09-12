@@ -211,7 +211,7 @@ final class Utility {
         skipFully(file, 2);
     }
 
-    static void swallowCode(DataInputStream file, ConstantPool constant_pool) throws IOException {
+    static void swallowCode(DataInputStream file) throws IOException {
         // file.readUnsignedShort(); // Unused max_stack
         // file.readUnsignedShort(); // Unused max_locals
         skipFully(file, 4);
@@ -227,7 +227,7 @@ final class Utility {
          */
         int attributes_count = file.readUnsignedShort();
         for (int i = 0; i < attributes_count; i++) {
-            swallowAttribute(file, constant_pool);
+            swallowAttribute(file);
         }
     }
 
@@ -382,7 +382,7 @@ final class Utility {
         }
     }
 
-    static void swallowFieldOrMethod(DataInputStream file, ConstantPool constant_pool)
+    static void swallowFieldOrMethod(DataInputStream file)
             throws IOException {
         // file.readUnsignedShort(); // Unused access flags
         // file.readUnsignedShort(); // name index
@@ -391,98 +391,17 @@ final class Utility {
 
         int attributes_count = file.readUnsignedShort();
         for (int i = 0; i < attributes_count; i++) {
-            swallowAttribute(file, constant_pool);
+            swallowAttribute(file);
         }
     }
 
-    static void swallowAttribute(DataInputStream file, ConstantPool constant_pool)
+    static void swallowAttribute(DataInputStream file)
             throws IOException {
-        byte tag = Constants.ATTR_UNKNOWN;  // Unknown attribute
-        // Get class name from constant pool via `name_index' indirection
-        int name_index = file.readUnsignedShort();
-        ConstantUtf8 c =
-                (ConstantUtf8) constant_pool.getConstant(name_index, Constants.CONSTANT_Utf8);
-        String name = c.getBytes();
+        //file.readUnsignedShort();   // Unused name index
+        skipFully(file, 2);
         // Length of data in bytes
         int length = file.readInt();
-        // Compare strings to find known attribute
-        for (byte i = 0; i < Constants.KNOWN_ATTRIBUTES; i++) {
-            if (name.equals(Constants.ATTRIBUTE_NAMES[i])) {
-                tag = i; // found!
-                break;
-            }
-        }
-        // Call proper constructor, depending on `tag'
-        switch (tag)
-        {
-        case Constants.ATTR_UNKNOWN:
-            swallowUnknownAttribute(file, length);
-            break;
-        case Constants.ATTR_CONSTANT_VALUE:
-            swallowConstantValue(file);
-            break;
-        case Constants.ATTR_SOURCE_FILE:
-            swallowSourceFile(file);
-            break;
-        case Constants.ATTR_CODE:
-            swallowCode(file, constant_pool);
-            break;
-        case Constants.ATTR_EXCEPTIONS:
-            swallowExceptionTable(file);
-            break;
-        case Constants.ATTR_LINE_NUMBER_TABLE:
-            swallowLineNumberTable(file);
-            break;
-        case Constants.ATTR_LOCAL_VARIABLE_TABLE:
-            swallowLocalVariableTable(file);
-            break;
-        case Constants.ATTR_INNER_CLASSES:
-            swallowInnerClasses(file);
-            break;
-        case Constants.ATTR_SYNTHETIC:
-            swallowSynthetic(length);
-            break;
-        case Constants.ATTR_DEPRECATED:
-            swallowDeprecated(length);
-            break;
-        case Constants.ATTR_PMG:
-            swallowPMCClass(file);
-            break;
-        case Constants.ATTR_SIGNATURE:
-            swallowSignature(file);
-            break;
-        case Constants.ATTR_STACK_MAP:
-            swallowStackMap(file);
-            break;
-        case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
-        case Constants.ATTR_RUNTIME_INVISIBLE_ANNOTATIONS:
-            swallowAnnotations(file);
-            break;
-        case Constants.ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS:
-        case Constants.ATTR_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS:
-            swallowParameterAnnotations(file);
-            break;
-        case Constants.ATTR_ANNOTATION_DEFAULT:
-            swallowAnnotationDefault(file);
-            break;
-        case Constants.ATTR_LOCAL_VARIABLE_TYPE_TABLE:
-            swallowLocalVariableTypeTable(file);
-            break;
-        case Constants.ATTR_ENCLOSING_METHOD:
-            swallowEnclosingMethod(file);
-            break;
-        case Constants.ATTR_STACK_MAP_TABLE:
-            swallowStackMapTable(file);
-            break;
-        case Constants.ATTR_BOOTSTRAP_METHODS:
-            swallowBootstrapMethods(file);
-            break;
-        case Constants.ATTR_METHOD_PARAMETERS:
-            swallowMethodParameters(file);
-            break;
-        default: // Never reached
-            throw new ClassFormatException("Unrecognized attribute type tag parsed: " + tag);
-        }
+        skipFully(file, length);
     }
 
     static void swallowAnnotationDefault(DataInput file) throws IOException {
