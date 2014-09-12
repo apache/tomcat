@@ -1993,17 +1993,18 @@ public class ContextConfig implements LifecycleListener {
         String className = clazz.getClassName();
 
         AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
-
-        for (AnnotationEntry ae : annotationsEntries) {
-            String type = ae.getAnnotationType();
-            if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
-                processAnnotationWebServlet(className, ae, fragment);
-            }else if ("Ljavax/servlet/annotation/WebFilter;".equals(type)) {
-                processAnnotationWebFilter(className, ae, fragment);
-            }else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
-                fragment.addListener(className);
-            } else {
-                // Unknown annotation - ignore
+        if (annotationsEntries != null) {
+            for (AnnotationEntry ae : annotationsEntries) {
+                String type = ae.getAnnotationType();
+                if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
+                    processAnnotationWebServlet(className, ae, fragment);
+                }else if ("Ljavax/servlet/annotation/WebFilter;".equals(type)) {
+                    processAnnotationWebFilter(className, ae, fragment);
+                }else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
+                    fragment.addListener(className);
+                } else {
+                    // Unknown annotation - ignore
+                }
             }
         }
     }
@@ -2068,24 +2069,25 @@ public class ContextConfig implements LifecycleListener {
             for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
                     typeInitializerMap.entrySet()) {
                 if (entry.getKey().isAnnotation()) {
-                    AnnotationEntry[] annotationEntries =
-                            javaClass.getAnnotationEntries();
-                    for (AnnotationEntry annotationEntry : annotationEntries) {
-                        if (entry.getKey().getName().equals(
-                                getClassName(annotationEntry.getAnnotationType()))) {
-                            if (clazz == null) {
-                                clazz = Introspection.loadClass(
-                                        context, className);
+                    AnnotationEntry[] annotationEntries = javaClass.getAnnotationEntries();
+                    if (annotationEntries != null) {
+                        for (AnnotationEntry annotationEntry : annotationEntries) {
+                            if (entry.getKey().getName().equals(
+                                    getClassName(annotationEntry.getAnnotationType()))) {
                                 if (clazz == null) {
-                                    // Can't load the class so no point
-                                    // continuing
-                                    return;
+                                    clazz = Introspection.loadClass(
+                                            context, className);
+                                    if (clazz == null) {
+                                        // Can't load the class so no point
+                                        // continuing
+                                        return;
+                                    }
                                 }
+                                for (ServletContainerInitializer sci : entry.getValue()) {
+                                    initializerClassMap.get(sci).add(clazz);
+                                }
+                                break;
                             }
-                            for (ServletContainerInitializer sci : entry.getValue()) {
-                                initializerClassMap.get(sci).add(clazz);
-                            }
-                            break;
                         }
                     }
                 }
