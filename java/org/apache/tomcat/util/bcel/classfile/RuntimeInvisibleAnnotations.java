@@ -44,8 +44,8 @@ public class RuntimeInvisibleAnnotations extends Annotations
      *            Array of constants
      */
     RuntimeInvisibleAnnotations(int name_index, int length,
-                                DataInputStream file, ConstantPool constant_pool)
-                                throws IOException
+            DataInputStream file, ConstantPool constant_pool)
+            throws IOException
     {
         super(Constants.ATTR_RUNTIME_INVISIBLE_ANNOTATIONS, name_index, length,
                 file, constant_pool);

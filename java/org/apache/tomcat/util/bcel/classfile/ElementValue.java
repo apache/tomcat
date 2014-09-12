@@ -43,7 +43,6 @@ public abstract class ElementValue
         this.cpool = cpool;
     }
 
-
     public abstract String stringifyValue();
 
     public abstract void dump(DataOutputStream dos) throws IOException;
