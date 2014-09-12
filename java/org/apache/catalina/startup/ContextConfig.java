@@ -2314,7 +2314,7 @@ public class ContextConfig implements LifecycleListener {
             AnnotationEntry ae, WebXml fragment) {
         String servletName = null;
         // must search for name s. Spec Servlet API 3.0 - 8.2.3.3.n.ii page 81
-        ElementValuePair[] evps = ae.getElementValuePairs();
+        List<ElementValuePair> evps = ae.getElementValuePairs();
         for (ElementValuePair evp : evps) {
             String name = evp.getNameString();
             if ("name".equals(name)) {
@@ -2341,7 +2341,7 @@ public class ContextConfig implements LifecycleListener {
         boolean urlPatternsSet = false;
         String[] urlPatterns = null;
 
-        // ElementValuePair[] evps = ae.getElementValuePairs();
+        // List<ElementValuePair> evps = ae.getElementValuePairs();
         for (ElementValuePair evp : evps) {
             String name = evp.getNameString();
             if ("value".equals(name) || "urlPatterns".equals(name)) {
@@ -2424,7 +2424,7 @@ public class ContextConfig implements LifecycleListener {
             AnnotationEntry ae, WebXml fragment) {
         String filterName = null;
         // must search for name s. Spec Servlet API 3.0 - 8.2.3.3.n.ii page 81
-        ElementValuePair[] evps = ae.getElementValuePairs();
+        List<ElementValuePair> evps = ae.getElementValuePairs();
         for (ElementValuePair evp : evps) {
             String name = evp.getNameString();
             if ("filterName".equals(name)) {
@@ -2583,8 +2583,8 @@ public class ContextConfig implements LifecycleListener {
                 ((ArrayElementValue) ev).getElementValuesArray();
             for (ElementValue value : arrayValues) {
                 if (value instanceof AnnotationElementValue) {
-                    ElementValuePair[] evps = ((AnnotationElementValue)
-                            value).getAnnotationEntry().getElementValuePairs();
+                    List<ElementValuePair> evps = ((AnnotationElementValue) value)
+                            .getAnnotationEntry().getElementValuePairs();
                     String initParamName = null;
                     String initParamValue = null;
                     for (ElementValuePair evp : evps) {
