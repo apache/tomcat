@@ -100,7 +100,7 @@ public abstract class Attribute implements Serializable
             Utility.swallowSourceFile(file);
             return null;
         case Constants.ATTR_CODE:
-            Utility.swallowCode(file, constant_pool);
+            Utility.swallowCode(file);
             return null;
         case Constants.ATTR_EXCEPTIONS:
             Utility.swallowExceptionTable(file);
