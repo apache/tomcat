@@ -216,7 +216,7 @@ public final class ClassParser {
     private void readFields() throws IOException, ClassFormatException {
         int fields_count = file.readUnsignedShort();
         for (int i = 0; i < fields_count; i++) {
-            Utility.swallowFieldOrMethod(file, constant_pool);
+            Utility.swallowFieldOrMethod(file);
         }
     }
 
@@ -259,7 +259,7 @@ public final class ClassParser {
         int methods_count;
         methods_count = file.readUnsignedShort();
         for (int i = 0; i < methods_count; i++) {
-            Utility.swallowFieldOrMethod(file, constant_pool);
+            Utility.swallowFieldOrMethod(file);
         }
     }
 
@@ -270,7 +270,8 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readVersion() throws IOException, ClassFormatException {
-        file.readUnsignedShort();   // Unused minor
-        file.readUnsignedShort();   // Unused major
+        // file.readUnsignedShort(); // Unused minor
+        // file.readUnsignedShort(); // Unused major
+        Utility.skipFully(file, 4);
     }
 }
