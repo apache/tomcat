@@ -34,7 +34,7 @@ public abstract class Annotations extends Attribute {
      * @param file Input stream
      * @param constant_pool Array of constants
      */
-    public Annotations(DataInputStream file, ConstantPool constant_pool)
+    Annotations(DataInputStream file, ConstantPool constant_pool)
             throws IOException {
         final int annotation_table_length = (file.readUnsignedShort());
         annotation_table = new AnnotationEntry[annotation_table_length];

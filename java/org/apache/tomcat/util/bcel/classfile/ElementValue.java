@@ -31,8 +31,7 @@ public abstract class ElementValue
     protected ConstantPool cpool;
 
 
-    protected ElementValue(int type, ConstantPool cpool)
-    {
+    ElementValue(int type, ConstantPool cpool) {
         this.type = type;
         this.cpool = cpool;
     }

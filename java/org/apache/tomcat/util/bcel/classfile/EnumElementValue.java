@@ -23,8 +23,7 @@ public class EnumElementValue extends ElementValue
 {
     private int valueIdx;
 
-    public EnumElementValue(int type, int valueIdx, ConstantPool cpool)
-    {
+    EnumElementValue(int type, int valueIdx, ConstantPool cpool) {
         super(type, cpool);
         if (type != ENUM_CONSTANT)
             throw new RuntimeException(

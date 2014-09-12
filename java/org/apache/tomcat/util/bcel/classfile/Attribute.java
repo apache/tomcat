@@ -34,6 +34,9 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public abstract class Attribute {
 
+    Attribute() {
+    }
+
     /*
      * Class method reads one attribute from the input data stream. This method
      * must not be accessible from the outside. It is called by the Field and
