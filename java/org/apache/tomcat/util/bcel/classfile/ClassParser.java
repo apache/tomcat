@@ -58,11 +58,7 @@ public final class ClassParser {
      * @param file Input stream
      */
     public ClassParser(InputStream file) {
-        if (file instanceof DataInputStream) {
-            this.file = (DataInputStream) file;
-        } else {
-            this.file = new DataInputStream(new BufferedInputStream(file, BUFSIZE));
-        }
+        this.file = new DataInputStream(new BufferedInputStream(file, BUFSIZE));
     }
 
 
