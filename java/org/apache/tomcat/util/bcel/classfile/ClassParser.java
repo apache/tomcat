@@ -43,7 +43,6 @@ public final class ClassParser {
     private static final int MAGIC = 0xCAFEBABE;
 
     private final DataInputStream file;
-    private final String file_name;
     private String class_name, superclass_name;
     private int access_flags; // Access rights of parsed class
     private String[] interface_names; // Names of implemented interfaces
@@ -57,10 +56,8 @@ public final class ClassParser {
      * Parse class from the given stream.
      *
      * @param file Input stream
-     * @param file_name File name
      */
-    public ClassParser(InputStream file, String file_name) {
-        this.file_name = file_name;
+    public ClassParser(InputStream file) {
         if (file instanceof DataInputStream) {
             this.file = (DataInputStream) file;
         } else {
@@ -158,7 +155,7 @@ public final class ClassParser {
         }
         if (((access_flags & Constants.ACC_ABSTRACT) != 0)
                 && ((access_flags & Constants.ACC_FINAL) != 0)) {
-            throw new ClassFormatException("Class " + file_name + " can't be both final and abstract");
+            throw new ClassFormatException("Class can't be both final and abstract");
         }
 
         int class_name_index = file.readUnsignedShort();
@@ -206,7 +203,7 @@ public final class ClassParser {
      */
     private void readID() throws IOException, ClassFormatException {
         if (file.readInt() != MAGIC) {
-            throw new ClassFormatException(file_name + " is not a Java .class file");
+            throw new ClassFormatException("It is not a Java .class file");
         }
     }
 
