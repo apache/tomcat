@@ -90,77 +90,18 @@ public abstract class Attribute implements Serializable
         // Call proper constructor, depending on `tag'
         switch (tag)
         {
-        case Constants.ATTR_UNKNOWN:
-            Utility.swallowUnknownAttribute(file, length);
-            return null;
-        case Constants.ATTR_CONSTANT_VALUE:
-            Utility.swallowConstantValue(file);
-            return null;
-        case Constants.ATTR_SOURCE_FILE:
-            Utility.swallowSourceFile(file);
-            return null;
-        case Constants.ATTR_CODE:
-            Utility.swallowCode(file);
-            return null;
-        case Constants.ATTR_EXCEPTIONS:
-            Utility.swallowExceptionTable(file);
-            return null;
-        case Constants.ATTR_LINE_NUMBER_TABLE:
-            Utility.swallowLineNumberTable(file);
-            return null;
-        case Constants.ATTR_LOCAL_VARIABLE_TABLE:
-            Utility.swallowLocalVariableTable(file);
-            return null;
-        case Constants.ATTR_INNER_CLASSES:
-            Utility.swallowInnerClasses(file);
-            return null;
-        case Constants.ATTR_SYNTHETIC:
-            Utility.swallowSynthetic(length);
-            return null;
-        case Constants.ATTR_DEPRECATED:
-            Utility.swallowDeprecated(length);
-            return null;
-        case Constants.ATTR_PMG:
-            Utility.swallowPMCClass(file);
-            return null;
-        case Constants.ATTR_SIGNATURE:
-            Utility.swallowSignature(file);
-            return null;
-        case Constants.ATTR_STACK_MAP:
-            Utility.swallowStackMap(file);
-            return null;
         case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
             return new RuntimeVisibleAnnotations(name_index, length, file,
                     constant_pool);
-        case Constants.ATTR_RUNTIME_INVISIBLE_ANNOTATIONS:
-            Utility.swallowAnnotations(file);
-            return null;
         case Constants.ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS:
             return new RuntimeVisibleParameterAnnotations(name_index, length,
                     file, constant_pool);
-        case Constants.ATTR_RUNTIME_INVISIBLE_PARAMETER_ANNOTATIONS:
-            Utility.swallowParameterAnnotations(file);
-            return null;
         case Constants.ATTR_ANNOTATION_DEFAULT:
             return new AnnotationDefault(name_index, length, file,
                     constant_pool);
-        case Constants.ATTR_LOCAL_VARIABLE_TYPE_TABLE:
-            Utility.swallowLocalVariableTypeTable(file);
+        default: // All other attributes are skipped
+            Utility.skipFully(file, length);
             return null;
-        case Constants.ATTR_ENCLOSING_METHOD:
-            Utility.swallowEnclosingMethod(file);
-            return null;
-        case Constants.ATTR_STACK_MAP_TABLE:
-            Utility.swallowStackMapTable(file);
-            return null;
-        case Constants.ATTR_BOOTSTRAP_METHODS:
-            Utility.swallowBootstrapMethods(file);
-            return null;
-        case Constants.ATTR_METHOD_PARAMETERS:
-            Utility.swallowMethodParameters(file);
-            return null;
-        default: // Never reached
-            throw new IllegalStateException("Unrecognized attribute type tag parsed: " + tag);
         }
     }
 
