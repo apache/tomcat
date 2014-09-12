@@ -137,6 +137,12 @@
         <code>deployXML</code> is false. If  XML file is created in the config
         base, redeploy will occur. (kfujino)
       </fix>
+      <scode>
+        Various changes to reduce unnecessary code in Tomcat&apos;s copy of
+        Apache Commons BCEL to reduce the time taken for annotation scanning
+        when web applications start. Includes contributions from kkolinko and
+        hzhang9. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
