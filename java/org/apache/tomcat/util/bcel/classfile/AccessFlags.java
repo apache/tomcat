@@ -27,7 +27,7 @@ public abstract class AccessFlags {
 
     protected int access_flags;
 
-    public AccessFlags() {
+    AccessFlags() {
     }
 
     /**

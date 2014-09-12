@@ -57,7 +57,7 @@ public class AnnotationEntry implements Constants {
         return annotationEntry;
     }
 
-    public AnnotationEntry(int type_index, ConstantPool constant_pool) {
+    AnnotationEntry(int type_index, ConstantPool constant_pool) {
         this.type_index = type_index;
         this.constant_pool = constant_pool;
     }

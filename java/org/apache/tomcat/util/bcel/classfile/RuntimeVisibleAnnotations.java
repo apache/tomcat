@@ -35,7 +35,7 @@ public class RuntimeVisibleAnnotations extends Annotations {
      * @param constant_pool
      *            Array of constants
      */
-    public RuntimeVisibleAnnotations(DataInputStream file,
+    RuntimeVisibleAnnotations(DataInputStream file,
             ConstantPool constant_pool) throws IOException {
         super(file, constant_pool);
     }

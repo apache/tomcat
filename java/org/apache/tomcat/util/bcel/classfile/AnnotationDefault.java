@@ -34,7 +34,7 @@ public class AnnotationDefault extends Attribute {
      * @param constant_pool
      *            Array of constants
      */
-    public AnnotationDefault(DataInputStream file, ConstantPool constant_pool)
+    AnnotationDefault(DataInputStream file, ConstantPool constant_pool)
             throws IOException {
         // Default value
         ElementValue.readElementValue(file, constant_pool);

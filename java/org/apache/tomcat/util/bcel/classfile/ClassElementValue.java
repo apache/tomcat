@@ -26,8 +26,7 @@ public class ClassElementValue extends ElementValue
     // For 'class' this points to the class entry in the cpool
     private int idx;
 
-    public ClassElementValue(int type, int idx, ConstantPool cpool)
-    {
+    ClassElementValue(int type, int idx, ConstantPool cpool) {
         super(type, cpool);
         this.idx = idx;
     }

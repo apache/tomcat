@@ -33,9 +33,8 @@ public class ElementValuePair
 
     private int elementNameIndex;
 
-    public ElementValuePair(int elementNameIndex, ElementValue elementValue,
-            ConstantPool constantPool)
-    {
+    ElementValuePair(int elementNameIndex, ElementValue elementValue,
+            ConstantPool constantPool) {
         this.elementValue = elementValue;
         this.elementNameIndex = elementNameIndex;
         this.constantPool = constantPool;
