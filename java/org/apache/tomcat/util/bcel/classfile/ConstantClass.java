@@ -32,7 +32,6 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantClass extends Constant {
 
-    private static final long serialVersionUID = -6603658849582876642L;
     private int name_index; // Identical to ConstantString except for the name
 
 

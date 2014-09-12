@@ -28,7 +28,6 @@ import java.io.IOException;
  */
 public abstract class ParameterAnnotations extends Attribute {
 
-    private static final long serialVersionUID = -8831779739803248091L;
     private int num_parameters;
     private ParameterAnnotationEntry[] parameter_annotation_table; // Table of parameter annotations
 

@@ -19,7 +19,6 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 
 import org.apache.tomcat.util.bcel.Constants;
 
@@ -33,9 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  *
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class Attribute implements Serializable
-{
-    private static final long serialVersionUID = 1514136303496688899L;
+public abstract class Attribute {
 
     protected int name_index; // Points to attribute name in constant pool
 

@@ -34,7 +34,6 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class JavaClass extends AccessFlags {
 
-    private static final long serialVersionUID = 7029227708237523236L;
     private String class_name;
     private String superclass_name;
     private String[] interface_names;

@@ -23,11 +23,9 @@ package org.apache.tomcat.util.bcel.classfile;
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class AccessFlags implements java.io.Serializable {
+public abstract class AccessFlags {
 
-    private static final long serialVersionUID = 2548932939969293935L;
     protected int access_flags;
-
 
     public AccessFlags() {
     }
