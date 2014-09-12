@@ -203,9 +203,4 @@ public abstract class Attribute implements Cloneable, Serializable
         }
         return attr;
     }
-
-    /**
-     * @return deep copy of this attribute
-     */
-    public abstract Attribute copy(ConstantPool _constant_pool);
 }

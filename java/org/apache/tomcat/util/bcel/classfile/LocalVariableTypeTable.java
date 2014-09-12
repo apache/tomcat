@@ -75,20 +75,4 @@ private int             local_variable_type_table_length; // Table of local
     local_variable_type_table_length = (local_variable_table == null)? 0 :
       local_variable_table.length;
   }
-
-
-  /**
-   * @return deep copy of this attribute
-   */
-  @Override
-  public Attribute copy(ConstantPool constant_pool) {
-    LocalVariableTypeTable c = (LocalVariableTypeTable)clone();
-
-    c.local_variable_type_table = new LocalVariable[local_variable_type_table_length];
-    for(int i=0; i < local_variable_type_table_length; i++)
-      c.local_variable_type_table[i] = local_variable_type_table[i].copy();
-
-    c.constant_pool = constant_pool;
-    return c;
-  }
 }
