@@ -30,13 +30,12 @@ import java.io.IOException;
 public class RuntimeVisibleParameterAnnotations extends ParameterAnnotations {
 
     /**
-     * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes
      * @param file Input stream
      * @param constant_pool Array of constants
      */
-    RuntimeVisibleParameterAnnotations(int name_index, int length, DataInputStream file,
+    RuntimeVisibleParameterAnnotations(int length, DataInputStream file,
             ConstantPool constant_pool) throws IOException {
-        super(name_index, length, file, constant_pool);
+        super(length, file, constant_pool);
     }
 }

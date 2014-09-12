@@ -34,16 +34,11 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public abstract class Attribute {
 
-    protected int name_index; // Points to attribute name in constant pool
-
     protected int length; // Content length of attribute field
 
     protected ConstantPool constant_pool;
 
-    protected Attribute(int name_index, int length,
-            ConstantPool constant_pool)
-    {
-        this.name_index = name_index;
+    protected Attribute(int length, ConstantPool constant_pool) {
         this.length = length;
         this.constant_pool = constant_pool;
     }
@@ -88,27 +83,15 @@ public abstract class Attribute {
         switch (tag)
         {
         case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
-            return new RuntimeVisibleAnnotations(name_index, length, file,
-                    constant_pool);
+            return new RuntimeVisibleAnnotations(length, file, constant_pool);
         case Constants.ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS:
-            return new RuntimeVisibleParameterAnnotations(name_index, length,
-                    file, constant_pool);
-        case Constants.ATTR_ANNOTATION_DEFAULT:
-            return new AnnotationDefault(name_index, length, file,
+            return new RuntimeVisibleParameterAnnotations(length, file,
                     constant_pool);
+        case Constants.ATTR_ANNOTATION_DEFAULT:
+            return new AnnotationDefault(length, file, constant_pool);
         default: // All other attributes are skipped
             Utility.skipFully(file, length);
             return null;
         }
-    }
-
-    /**
-     * @return Name of attribute
-     */
-    public String getName()
-    {
-        ConstantUtf8 c = (ConstantUtf8) constant_pool.getConstant(name_index,
-                Constants.CONSTANT_Utf8);
-        return c.getBytes();
     }
 }

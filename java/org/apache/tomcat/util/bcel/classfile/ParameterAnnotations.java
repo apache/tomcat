@@ -33,14 +33,13 @@ public abstract class ParameterAnnotations extends Attribute {
 
 
     /**
-     * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes
      * @param file Input stream
      * @param constant_pool Array of constants
      */
-    ParameterAnnotations(int name_index, int length,
-            DataInputStream file, ConstantPool constant_pool) throws IOException {
-        super(name_index, length, constant_pool);
+    ParameterAnnotations(int length, DataInputStream file,
+            ConstantPool constant_pool) throws IOException {
+        super(length, constant_pool);
         num_parameters = (file.readUnsignedByte());
         parameter_annotation_table = new ParameterAnnotationEntry[num_parameters];
         for (int i = 0; i < num_parameters; i++) {
