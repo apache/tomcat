@@ -39,7 +39,7 @@ public abstract class Constant {
      * need the tag as an index to select the corresponding class name from the
      * `CONSTANT_NAMES' array.
      */
-    protected byte tag;
+    protected final byte tag;
 
 
     Constant(byte tag) {

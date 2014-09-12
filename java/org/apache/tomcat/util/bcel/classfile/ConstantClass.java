@@ -32,7 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantClass extends Constant {
 
-    private int name_index; // Identical to ConstantString except for the name
+    private final int name_index; // Identical to ConstantString except for the name
 
 
     /**

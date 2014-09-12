@@ -21,7 +21,7 @@ import org.apache.tomcat.util.bcel.Constants;
 
 public class EnumElementValue extends ElementValue
 {
-    private int valueIdx;
+    private final int valueIdx;
 
     EnumElementValue(int type, int valueIdx, ConstantPool cpool) {
         super(type, cpool);

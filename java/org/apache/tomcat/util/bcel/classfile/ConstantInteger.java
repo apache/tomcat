@@ -32,7 +32,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ConstantInteger extends Constant {
 
-    private int bytes;
+    private final int bytes;
 
 
     /**
