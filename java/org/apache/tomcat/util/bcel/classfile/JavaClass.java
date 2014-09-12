@@ -57,7 +57,7 @@ public class JavaClass extends AccessFlags {
      * @param interfaces Implemented interfaces
      * @param attributes Class attributes
      */
-    public JavaClass(int class_name_index, int superclass_name_index,
+    JavaClass(int class_name_index, int superclass_name_index,
             int access_flags, ConstantPool constant_pool, int[] interfaces,
             Attribute[] attributes) {
         if (interfaces == null) {
