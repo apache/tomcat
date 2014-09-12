@@ -17,8 +17,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * Represents a Java class, i.e., the data structures, constant pool,
  * fields, methods and commands contained in a Java .class file.
@@ -36,50 +34,24 @@ public class JavaClass extends AccessFlags {
     private String[] interface_names;
     private Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
 
-    private static final String[] INTERFACES_EMPTY_ARRAY = new String[0];
-
     /**
      * Constructor gets all contents as arguments.
      *
-     * @param class_name_index Index into constant pool referencing a
-     * ConstantClass that represents this class.
-     * @param superclass_name_index Index into constant pool referencing a
-     * ConstantClass that represents this class's superclass.
+     * @param class_name Name of this class.
+     * @param superclass_name Name of this class's superclass.
      * @param access_flags Access rights defined by bit flags
      * @param constant_pool Array of constants
      * @param interfaces Implemented interfaces
      * @param runtimeVisibleAnnotations "RuntimeVisibleAnnotations" attribute defined on the Class, or null
      */
-    JavaClass(int class_name_index, int superclass_name_index,
-            int access_flags, ConstantPool constant_pool, int[] interfaces,
+    JavaClass(String class_name, String superclass_name,
+            int access_flags, ConstantPool constant_pool, String[] interface_names,
             Annotations runtimeVisibleAnnotations) {
         this.access_flags = access_flags;
         this.runtimeVisibleAnnotations = runtimeVisibleAnnotations;
-
-        /* According to the specification the following entries must be of type
-         * `ConstantClass' but we check that anyway via the
-         * `ConstPool.getConstant' method.
-         */
-        class_name = constant_pool.getConstantString(class_name_index, Constants.CONSTANT_Class);
-        class_name = Utility.compactClassName(class_name);
-        if (superclass_name_index > 0) {
-            // May be zero -> class is java.lang.Object
-            superclass_name = constant_pool.getConstantString(superclass_name_index,
-                    Constants.CONSTANT_Class);
-            superclass_name = Utility.compactClassName(superclass_name);
-        } else {
-            superclass_name = "java.lang.Object";
-        }
-
-        if (interfaces == null) {
-            interface_names = INTERFACES_EMPTY_ARRAY;
-        } else {
-            interface_names = new String[interfaces.length];
-            for (int i = 0; i < interfaces.length; i++) {
-                String str = constant_pool.getConstantString(interfaces[i], Constants.CONSTANT_Class);
-                interface_names[i] = Utility.compactClassName(str);
-            }
-        }
+        this.class_name = class_name;
+        this.superclass_name = superclass_name;
+        this.interface_names = interface_names;
     }
 
     /**
