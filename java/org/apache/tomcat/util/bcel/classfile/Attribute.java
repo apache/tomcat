@@ -80,8 +80,6 @@ public abstract class Attribute {
             return new RuntimeVisibleAnnotations(file, constant_pool);
         case Constants.ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS:
             return new RuntimeVisibleParameterAnnotations(file, constant_pool);
-        case Constants.ATTR_ANNOTATION_DEFAULT:
-            return new AnnotationDefault(file, constant_pool);
         default: // All other attributes are skipped
             Utility.skipFully(file, length);
             return null;
