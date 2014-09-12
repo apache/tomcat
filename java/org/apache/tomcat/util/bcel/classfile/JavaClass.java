@@ -112,19 +112,12 @@ public class JavaClass extends AccessFlags
     }
 
 
-    /**
-     * @return Attributes of the class.
-     */
-    public Attribute[] getAttributes() {
-        return attributes;
-    }
-    
     public AnnotationEntry[] getAnnotationEntries() {
         if (annotationsOutOfDate) { 
             // Find attributes that contain annotation data
-            Attribute[] attrs = getAttributes();
             List<AnnotationEntry> accumulatedAnnotations = new ArrayList<AnnotationEntry>();
-            for (Attribute attribute : attrs) {
+            for (int i = 0; i < attributes.length; i++) {
+                Attribute attribute = attributes[i];
                 if (attribute instanceof Annotations) {
                     Annotations runtimeAnnotations = (Annotations)attribute;
                     for(int j = 0; j < runtimeAnnotations.getAnnotationEntries().length; j++)

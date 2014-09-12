@@ -18,7 +18,10 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
+
+import org.apache.tomcat.util.bcel.Constants;
 
 
 /**
@@ -109,16 +112,14 @@ public abstract class Utility {
         }
     }
 
-    protected static void swallowCodeException(DataInput file)
-            throws IOException {
+    protected static void swallowCodeException(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused end_pc
         file.readUnsignedShort();   // Unused handler_pc
         file.readUnsignedShort();   // Unused catch_type
     }
 
-    protected static void swallowInnerClass(DataInput file)
-            throws IOException {
+    protected static void swallowInnerClass(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused inner_class_index
         file.readUnsignedShort();   // Unused outer_class_index
         file.readUnsignedShort();   // Unused inner_name_index
@@ -130,12 +131,74 @@ public abstract class Utility {
         file.readUnsignedShort();   // Unused line_number
     }
 
-    protected static void swallowLocalVariable(DataInput file)
-            throws IOException {
+    protected static void swallowLocalVariable(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused start_pc
         file.readUnsignedShort();   // Unused length
         file.readUnsignedShort();   // Unused name_index
         file.readUnsignedShort();   // Unused signature_index
         file.readUnsignedShort();   // Unused index
+    }
+
+    protected static void swallowStackMapType(DataInput file) throws IOException {
+        byte type = file.readByte();
+        if ((type < Constants.ITEM_Bogus) || (type > Constants.ITEM_NewObject)) {
+            throw new RuntimeException("Illegal type for StackMapType: " + type);
+        }
+        // Check to see if type has an index
+        if ((type == Constants.ITEM_Object) || (type == Constants.ITEM_NewObject)) {
+            file.readShort();   // Unused index
+        }
+    }
+
+    protected static void swallowStackMapEntry(DataInput file) throws IOException {
+        file.readShort();   // Unused byte_code_offset
+        int number_of_locals = file.readShort();
+        for (int i = 0; i < number_of_locals; i++) {
+            Utility.swallowStackMapType(file);
+        }
+        int number_of_stack_items = file.readShort();
+        for (int i = 0; i < number_of_stack_items; i++) {
+            Utility.swallowStackMapType(file);
+        }
+    }
+
+    protected static void swallowStackMapTableEntry(DataInputStream file) throws IOException {
+        int frame_type = file.read();
+
+        if (frame_type >= Constants.SAME_FRAME && frame_type <= Constants.SAME_FRAME_MAX) {
+            // NO-OP
+        } else if (frame_type >= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME &&
+                frame_type <= Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_MAX) {
+            Utility.swallowStackMapType(file);  // Unused single stack item
+        } else if (frame_type == Constants.SAME_LOCALS_1_STACK_ITEM_FRAME_EXTENDED) {
+            file.readShort(); // Unused byte_code_offset_delta
+            Utility.swallowStackMapType(file); // Unused single stack item
+        } else if (frame_type >= Constants.CHOP_FRAME &&
+                frame_type <= Constants.CHOP_FRAME_MAX) {
+            file.readShort(); // Unused byte_code_offset_delta
+        } else if (frame_type == Constants.SAME_FRAME_EXTENDED) {
+            file.readShort(); // Unused byte_code_offset_delta
+        } else if (frame_type >= Constants.APPEND_FRAME &&
+                frame_type <= Constants.APPEND_FRAME_MAX) {
+            file.readShort(); // Unused byte_code_offset_delta
+            int number_of_locals = frame_type - 251;
+            for (int i = 0; i < number_of_locals; i++) {
+                Utility.swallowStackMapType(file);
+            }
+        } else if (frame_type == Constants.FULL_FRAME) {
+            file.readShort(); // Unused byte_code_offset_delta
+            int number_of_locals = file.readShort();
+            for (int i = 0; i < number_of_locals; i++) {
+                Utility.swallowStackMapType(file);
+            }
+            int number_of_stack_items = file.readShort();
+            for (int i = 0; i < number_of_stack_items; i++) {
+                Utility.swallowStackMapType(file);
+            }
+        } else {
+            /* Can't happen */
+            throw new ClassFormatException (
+                    "Invalid frame type found while parsing stack map table: " + frame_type);
+        }
     }
 }
