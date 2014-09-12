@@ -29,8 +29,6 @@ import java.io.IOException;
 public class AnnotationDefault extends Attribute {
 
     /**
-     * @param name_index
-     *            Index pointing to the name <em>Code</em>
      * @param length
      *            Content length in bytes
      * @param file
@@ -38,11 +36,9 @@ public class AnnotationDefault extends Attribute {
      * @param constant_pool
      *            Array of constants
      */
-    public AnnotationDefault(int name_index, int length,
-            DataInputStream file, ConstantPool constant_pool)
-            throws IOException
-    {
-        super(name_index, length, constant_pool);
+    public AnnotationDefault(int length, DataInputStream file,
+            ConstantPool constant_pool) throws IOException {
+        super(length, constant_pool);
         // Default value
         ElementValue.readElementValue(file, constant_pool);
     }
