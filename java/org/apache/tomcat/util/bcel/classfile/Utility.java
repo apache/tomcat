@@ -211,7 +211,7 @@ final class Utility {
         skipFully(file, 2);
     }
 
-    static void swallowCode(DataInputStream file) throws IOException {
+    static void swallowCode(DataInput file) throws IOException {
         // file.readUnsignedShort(); // Unused max_stack
         // file.readUnsignedShort(); // Unused max_locals
         skipFully(file, 4);
@@ -382,7 +382,7 @@ final class Utility {
         }
     }
 
-    static void swallowFieldOrMethod(DataInputStream file)
+    static void swallowFieldOrMethod(DataInput file)
             throws IOException {
         // file.readUnsignedShort(); // Unused access flags
         // file.readUnsignedShort(); // name index
@@ -395,7 +395,7 @@ final class Utility {
         }
     }
 
-    static void swallowAttribute(DataInputStream file)
+    static void swallowAttribute(DataInput file)
             throws IOException {
         //file.readUnsignedShort();   // Unused name index
         skipFully(file, 2);
