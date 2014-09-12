@@ -43,6 +43,8 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public final class ClassParser {
 
+    private static final int MAGIC = 0xCAFEBABE;
+
     private DataInputStream file;
     private boolean fileOwned;
     private String file_name;
@@ -231,8 +233,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readID() throws IOException, ClassFormatException {
-        int magic = 0xCAFEBABE;
-        if (file.readInt() != magic) {
+        if (file.readInt() != MAGIC) {
             throw new ClassFormatException(file_name + " is not a Java .class file");
         }
     }
