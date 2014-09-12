@@ -44,13 +44,14 @@ public final class ClassParser {
 
     private final DataInputStream file;
     private final String file_name;
-    private int class_name_index, superclass_name_index;
+    private String class_name, superclass_name;
     private int access_flags; // Access rights of parsed class
-    private int[] interfaces; // Names of implemented interfaces
+    private String[] interface_names; // Names of implemented interfaces
     private ConstantPool constant_pool; // collection of constants
     private Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
     private static final int BUFSIZE = 8192;
 
+    private static final String[] INTERFACES_EMPTY_ARRAY = new String[0];
 
     /**
      * Parse class from the given stream.
@@ -101,8 +102,8 @@ public final class ClassParser {
         readAttributes();
 
         // Return the information we have gathered in a new object
-        return new JavaClass(class_name_index, superclass_name_index,
-                access_flags, constant_pool, interfaces,
+        return new JavaClass(class_name, superclass_name,
+                access_flags, constant_pool, interface_names,
                 runtimeVisibleAnnotations);
     }
 
@@ -159,8 +160,17 @@ public final class ClassParser {
                 && ((access_flags & Constants.ACC_FINAL) != 0)) {
             throw new ClassFormatException("Class " + file_name + " can't be both final and abstract");
         }
-        class_name_index = file.readUnsignedShort();
-        superclass_name_index = file.readUnsignedShort();
+
+        int class_name_index = file.readUnsignedShort();
+        class_name = Utility.getClassName(constant_pool, class_name_index);
+
+        int superclass_name_index = file.readUnsignedShort();
+        if (superclass_name_index > 0) {
+            // May be zero -> class is java.lang.Object
+            superclass_name = Utility.getClassName(constant_pool, superclass_name_index);
+        } else {
+            superclass_name = "java.lang.Object";
+        }
     }
 
 
@@ -210,10 +220,13 @@ public final class ClassParser {
         int interfaces_count;
         interfaces_count = file.readUnsignedShort();
         if (interfaces_count > 0) {
-            interfaces = new int[interfaces_count];
+            interface_names = new String[interfaces_count];
             for (int i = 0; i < interfaces_count; i++) {
-                interfaces[i] = file.readUnsignedShort();
+                int index = file.readUnsignedShort();
+                interface_names[i] = Utility.getClassName(constant_pool, index);
             }
+        } else {
+            interface_names = INTERFACES_EMPTY_ARRAY;
         }
     }
 
