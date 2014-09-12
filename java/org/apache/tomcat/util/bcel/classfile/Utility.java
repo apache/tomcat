@@ -238,6 +238,13 @@ final class Utility {
         }
     }
 
+    static void swallowLocalVariableTypeTable(DataInput file) throws IOException {
+        int local_variable_type_table_length = (file.readUnsignedShort());
+        for(int i=0; i < local_variable_type_table_length; i++) {
+            Utility.swallowLocalVariable(file);
+        }
+    }
+
     static void swallowInnerClasses(DataInput file) throws IOException {
         int number_of_classes = file.readUnsignedShort();
         for (int i = 0; i < number_of_classes; i++) {
@@ -254,5 +261,38 @@ final class Utility {
     static void swallowPMCClass(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused pmg_index
         file.readUnsignedShort();   // Unused pmg_class_index
+    }
+
+    static void swallowEnclosingMethod(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused class index
+        file.readUnsignedShort();   // Unused method index
+    }
+
+    static void swallowConstantCP(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused class index
+        file.readUnsignedShort();   // Unused name and type index
+    }
+
+    static void swallowConstantMethodHandle(DataInput file) throws IOException {
+        file.readUnsignedByte();    // Unused reference_kind
+        file.readUnsignedShort();   // Unused reference_index
+    }
+
+    static void swallowConstantString(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused string index
+    }
+
+    static void swallowConstantNameAndType(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused name index
+        file.readUnsignedShort();   // Unused signature index
+    }
+
+    static void swallowConstantMethodType(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused descriptor_index
+    }
+
+    static void swallowConstantInvokeDynamic(DataInput file) throws IOException {
+        file.readUnsignedShort();   // Unused bootstrap_method_attr_index
+        file.readUnsignedShort();   // Unused name_and_type_index
     }
 }

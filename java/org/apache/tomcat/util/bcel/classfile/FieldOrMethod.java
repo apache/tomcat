@@ -28,7 +28,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public class FieldOrMethod extends AccessFlags implements Cloneable {
+public class FieldOrMethod extends AccessFlags {
 
     private static final long serialVersionUID = -3383525930205542157L;
     private static BCELComparator _cmp = new BCELComparator() {

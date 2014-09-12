@@ -33,8 +33,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
 
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public class JavaClass extends AccessFlags
-        implements Cloneable, Comparable<JavaClass> {
+public class JavaClass extends AccessFlags implements Comparable<JavaClass> {
 
     private static final long serialVersionUID = 7029227708237523236L;
     private String class_name;

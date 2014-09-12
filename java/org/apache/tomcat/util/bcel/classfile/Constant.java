@@ -31,7 +31,7 @@ import org.apache.tomcat.util.bcel.util.BCELComparator;
  *
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public abstract class Constant implements Cloneable, Serializable {
+public abstract class Constant implements Serializable {
 
     private static final long serialVersionUID = 2827409182154809454L;
     private static BCELComparator _cmp = new BCELComparator() {
@@ -75,16 +75,6 @@ public abstract class Constant implements Cloneable, Serializable {
     }
 
 
-    @Override
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new Error("Clone Not Supported"); // never happens
-        }
-    }
-
-
     /**
      * Read one constant from the given file, the type depends on a tag byte.
      *
@@ -98,13 +88,13 @@ public abstract class Constant implements Cloneable, Serializable {
             case Constants.CONSTANT_Class:
                 return new ConstantClass(file);
             case Constants.CONSTANT_Fieldref:
-                return new ConstantFieldref(file);
             case Constants.CONSTANT_Methodref:
-                return new ConstantMethodref(file);
             case Constants.CONSTANT_InterfaceMethodref:
-                return new ConstantInterfaceMethodref(file);
+                Utility.swallowConstantCP(file);
+                return null;
             case Constants.CONSTANT_String:
-                return new ConstantString(file);
+                Utility.swallowConstantString(file);
+                return null;
             case Constants.CONSTANT_Integer:
                 return new ConstantInteger(file);
             case Constants.CONSTANT_Float:
@@ -114,15 +104,19 @@ public abstract class Constant implements Cloneable, Serializable {
             case Constants.CONSTANT_Double:
                 return new ConstantDouble(file);
             case Constants.CONSTANT_NameAndType:
-                return new ConstantNameAndType(file);
+                Utility.swallowConstantNameAndType(file);
+                return null;
             case Constants.CONSTANT_Utf8:
                 return ConstantUtf8.getInstance(file);
             case Constants.CONSTANT_MethodHandle:
-                return new ConstantMethodHandle(file);
+                Utility.swallowConstantMethodHandle(file);
+                return null;
             case Constants.CONSTANT_MethodType:
-                return new ConstantMethodType(file);
+                Utility.swallowConstantMethodType(file);
+                return null;
             case Constants.CONSTANT_InvokeDynamic:
-                return new ConstantInvokeDynamic(file);
+                Utility.swallowConstantInvokeDynamic(file);
+                return null;
             default:
                 throw new ClassFormatException("Invalid byte tag in constant pool: " + b);
         }
