@@ -1990,10 +1990,9 @@ public class ContextConfig implements LifecycleListener {
             return;
         }
 
-        String className = clazz.getClassName();
-
         AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
         if (annotationsEntries != null) {
+            String className = clazz.getClassName();
             for (AnnotationEntry ae : annotationsEntries) {
                 String type = ae.getAnnotationType();
                 if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
@@ -2066,13 +2065,14 @@ public class ContextConfig implements LifecycleListener {
         }
 
         if (handlesTypesAnnotations) {
-            for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
-                    typeInitializerMap.entrySet()) {
-                if (entry.getKey().isAnnotation()) {
-                    AnnotationEntry[] annotationEntries = javaClass.getAnnotationEntries();
-                    if (annotationEntries != null) {
+            AnnotationEntry[] annotationEntries = javaClass.getAnnotationEntries();
+            if (annotationEntries != null) {
+                for (Map.Entry<Class<?>, Set<ServletContainerInitializer>> entry :
+                        typeInitializerMap.entrySet()) {
+                    if (entry.getKey().isAnnotation()) {
+                        String entryClassName = entry.getKey().getName();
                         for (AnnotationEntry annotationEntry : annotationEntries) {
-                            if (entry.getKey().getName().equals(
+                            if (entryClassName.equals(
                                     getClassName(annotationEntry.getAnnotationType()))) {
                                 if (clazz == null) {
                                     clazz = Introspection.loadClass(
