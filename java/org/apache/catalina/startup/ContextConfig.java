@@ -2232,7 +2232,7 @@ public class ContextConfig implements LifecycleListener {
         String servletName = null;
         // must search for name s. Spec Servlet API 3.0 - 8.2.3.3.n.ii page 81
         List<ElementValuePair> evps = ae.getElementValuePairs();
-        for (ElementValuePair evp : ae.getElementValuePairs()) {
+        for (ElementValuePair evp : evps) {
             String name = evp.getNameString();
             if ("name".equals(name)) {
                 servletName = evp.getValue().stringifyValue();
