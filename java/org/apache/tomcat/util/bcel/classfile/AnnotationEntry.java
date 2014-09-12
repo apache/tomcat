@@ -73,8 +73,7 @@ public class AnnotationEntry implements Constants {
     /**
      * @return the element value pairs in this annotation entry
      */
-    public ElementValuePair[] getElementValuePairs() {
-        // TODO return List
-        return element_value_pairs.toArray(new ElementValuePair[element_value_pairs.size()]);
+    public List<ElementValuePair> getElementValuePairs() {
+        return element_value_pairs;
     }
 }
