@@ -30,8 +30,6 @@ import java.io.IOException;
 public class RuntimeVisibleAnnotations extends Annotations {
 
     /**
-     * @param name_index
-     *            Index pointing to the name <em>Code</em>
      * @param length
      *            Content length in bytes
      * @param file
@@ -39,10 +37,8 @@ public class RuntimeVisibleAnnotations extends Annotations {
      * @param constant_pool
      *            Array of constants
      */
-    public RuntimeVisibleAnnotations(int name_index, int length,
-            DataInputStream file, ConstantPool constant_pool)
-            throws IOException
-    {
-        super(name_index, length, file, constant_pool);
+    public RuntimeVisibleAnnotations(int length, DataInputStream file,
+            ConstantPool constant_pool) throws IOException {
+        super(length, file, constant_pool);
     }
 }

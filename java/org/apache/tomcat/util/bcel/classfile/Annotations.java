@@ -31,14 +31,13 @@ public abstract class Annotations extends Attribute {
     private final AnnotationEntry[] annotation_table;
 
     /**
-     * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes
      * @param file Input stream
      * @param constant_pool Array of constants
      */
-    public Annotations(int name_index, int length, DataInputStream file,
+    public Annotations(int length, DataInputStream file,
             ConstantPool constant_pool) throws IOException {
-        super(name_index, length, constant_pool);
+        super(length, constant_pool);
         final int annotation_table_length = (file.readUnsignedShort());
         annotation_table = new AnnotationEntry[annotation_table_length];
         for (int i = 0; i < annotation_table_length; i++) {
