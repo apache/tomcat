@@ -34,15 +34,6 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public abstract class Attribute {
 
-    protected int length; // Content length of attribute field
-
-    protected ConstantPool constant_pool;
-
-    protected Attribute(int length, ConstantPool constant_pool) {
-        this.length = length;
-        this.constant_pool = constant_pool;
-    }
-
     /*
      * Class method reads one attribute from the input data stream. This method
      * must not be accessible from the outside. It is called by the Field and
@@ -83,12 +74,11 @@ public abstract class Attribute {
         switch (tag)
         {
         case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
-            return new RuntimeVisibleAnnotations(length, file, constant_pool);
+            return new RuntimeVisibleAnnotations(file, constant_pool);
         case Constants.ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS:
-            return new RuntimeVisibleParameterAnnotations(length, file,
-                    constant_pool);
+            return new RuntimeVisibleParameterAnnotations(file, constant_pool);
         case Constants.ATTR_ANNOTATION_DEFAULT:
-            return new AnnotationDefault(length, file, constant_pool);
+            return new AnnotationDefault(file, constant_pool);
         default: // All other attributes are skipped
             Utility.skipFully(file, length);
             return null;
