@@ -41,26 +41,12 @@ public abstract class ParameterAnnotations extends Attribute {
      */
     ParameterAnnotations(int name_index, int length,
             DataInputStream file, ConstantPool constant_pool) throws IOException {
-        this(name_index, length, (ParameterAnnotationEntry[]) null,
-                constant_pool);
+        super(name_index, length, constant_pool);
         num_parameters = (file.readUnsignedByte());
         parameter_annotation_table = new ParameterAnnotationEntry[num_parameters];
         for (int i = 0; i < num_parameters; i++) {
             parameter_annotation_table[i] = new ParameterAnnotationEntry(file, constant_pool);
         }
-    }
-
-
-    /**
-     * @param name_index Index pointing to the name <em>Code</em>
-     * @param length Content length in bytes
-     * @param parameter_annotation_table the actual parameter annotations
-     * @param constant_pool Array of constants
-     */
-    public ParameterAnnotations(int name_index, int length,
-            ParameterAnnotationEntry[] parameter_annotation_table, ConstantPool constant_pool) {
-        super(name_index, length, constant_pool);
-        setParameterAnnotationTable(parameter_annotation_table);
     }
 
 
