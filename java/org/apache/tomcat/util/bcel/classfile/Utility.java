@@ -110,7 +110,7 @@ final class Utility {
     static void swallowStackMapType(DataInput file) throws IOException {
         byte type = file.readByte();
         if ((type < Constants.ITEM_Bogus) || (type > Constants.ITEM_NewObject)) {
-            throw new RuntimeException("Illegal type for StackMapType: " + type);
+            throw new ClassFormatException("Illegal type for StackMapType: " + type);
         }
         // Check to see if type has an index
         if ((type == Constants.ITEM_Object) || (type == Constants.ITEM_NewObject)) {
@@ -179,5 +179,13 @@ final class Utility {
 
     static void swallowSignature(DataInput file) throws IOException {
         file.readUnsignedShort();   // Unused signature_index
+    }
+
+    static void swallowSynthetic(DataInput file, int length) throws IOException {
+        if (length > 0) {
+            byte[] bytes = new byte[length];
+            file.readFully(bytes);
+            throw new ClassFormatException("Synthetic attribute with length > 0");
+        }
     }
 }
