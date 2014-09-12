@@ -48,7 +48,13 @@ final class Utility {
     }
 
     static String getClassName(ConstantPool constant_pool, int index) {
-        String name = constant_pool.getConstantString(index, Constants.CONSTANT_Class);
+        Constant c = constant_pool.getConstant(index, Constants.CONSTANT_Class);
+        int i = ((ConstantClass) c).getNameIndex();
+
+        // Finally get the string from the constant pool
+        c = constant_pool.getConstant(i, Constants.CONSTANT_Utf8);
+        String name = ((ConstantUtf8) c).getBytes();
+
         return compactClassName(name);
     }
 

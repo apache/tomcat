@@ -108,31 +108,4 @@ public class ConstantPool {
         }
         return c;
     }
-
-
-    /**
-     * Get string from constant pool and bypass the indirection of
-     * `ConstantClass' and `ConstantString' objects. I.e. these classes have
-     * an index field that points to another entry of the constant pool of
-     * type `ConstantUtf8' which contains the real data.
-     *
-     * @param  index Index in constant pool
-     * @param  tag Tag of expected constant, either ConstantClass or ConstantString
-     * @return Contents of string reference
-     * @see    ConstantClass
-     * @throws  ClassFormatException
-     */
-    public String getConstantString( int index, byte tag ) throws ClassFormatException {
-        Constant c = getConstant(index, tag);
-
-        if (Constants.CONSTANT_Class != tag) {
-            throw new RuntimeException("getConstantString called with illegal tag " + tag);
-        }
-
-        int i = ((ConstantClass) c).getNameIndex();
-
-        // Finally get the string from the constant pool
-        c = getConstant(i, Constants.CONSTANT_Utf8);
-        return ((ConstantUtf8) c).getBytes();
-    }
 }
