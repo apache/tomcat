@@ -143,6 +143,11 @@
         when web applications start. Includes contributions from kkolinko and
         hzhang9. (markt)
       </scode>
+      <fix>
+        <bug>56938</bug>: Ensure web applications that have mixed case context
+        paths and are deployed as directories are correctly removed on undeploy
+        when running on a case sensitive file system. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
