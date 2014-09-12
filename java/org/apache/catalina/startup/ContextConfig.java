@@ -194,6 +194,13 @@ public class ContextConfig implements LifecycleListener {
         new ConcurrentHashMap<Host,DefaultWebXmlCacheEntry>();
 
 
+    /**
+     * Set used as the value for {@code JavaClassCacheEntry.sciSet} when there
+     * are no SCIs associated with a class.
+     */
+    private static final Set<ServletContainerInitializer> EMPTY_SCI_SET = Collections.emptySet();
+
+
     // ----------------------------------------------------- Instance Variables
     /**
      * Custom mappings of login methods to authenticators
@@ -2121,7 +2128,7 @@ public class ContextConfig implements LifecycleListener {
                             classHierarchyToString(className, entry)));
                 }
             }
-            if (entry.getSciSet().size() > 0) {
+            if (!entry.getSciSet().isEmpty()) {
                 // Need to try and load the class
                 clazz = Introspection.loadClass(context, className);
                 if (clazz == null) {
@@ -2129,8 +2136,7 @@ public class ContextConfig implements LifecycleListener {
                     return;
                 }
 
-                for (ServletContainerInitializer sci :
-                        entry.getSciSet()) {
+                for (ServletContainerInitializer sci : entry.getSciSet()) {
                     Set<Class<?>> classes = initializerClassMap.get(sci);
                     if (classes == null) {
                         classes = new HashSet<Class<?>>();
@@ -2249,7 +2255,7 @@ public class ContextConfig implements LifecycleListener {
 
         // Avoid an infinite loop with java.lang.Object
         if (cacheEntry.equals(superClassCacheEntry)) {
-            cacheEntry.setSciSet(new HashSet<ServletContainerInitializer>());
+            cacheEntry.setSciSet(EMPTY_SCI_SET);
             return;
         }
 
@@ -2278,7 +2284,7 @@ public class ContextConfig implements LifecycleListener {
             result.addAll(getSCIsForClass(interfaceName));
         }
 
-        cacheEntry.setSciSet(result);
+        cacheEntry.setSciSet(result.isEmpty() ? EMPTY_SCI_SET : result);
     }
 
     private Set<ServletContainerInitializer> getSCIsForClass(String className) {
@@ -2291,7 +2297,7 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
         }
-        return Collections.emptySet();
+        return EMPTY_SCI_SET;
     }
 
     private static final String getClassName(String internalForm) {
