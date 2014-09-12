@@ -17,9 +17,6 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.tomcat.util.bcel.Constants;
 
 /**
@@ -37,12 +34,7 @@ public class JavaClass extends AccessFlags {
     private String class_name;
     private String superclass_name;
     private String[] interface_names;
-    private Attribute[] attributes; // attributes defined in the class
-    private AnnotationEntry[] annotations;   // annotations defined on the class
-
-
-    //  Annotations are collected from certain attributes, don't do it more than necessary!
-    private boolean annotationsOutOfDate = true;
+    private Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
 
 
     /**
@@ -55,20 +47,16 @@ public class JavaClass extends AccessFlags {
      * @param access_flags Access rights defined by bit flags
      * @param constant_pool Array of constants
      * @param interfaces Implemented interfaces
-     * @param attributes Class attributes
+     * @param runtimeVisibleAnnotations "RuntimeVisibleAnnotations" attribute defined on the Class, or null
      */
     JavaClass(int class_name_index, int superclass_name_index,
             int access_flags, ConstantPool constant_pool, int[] interfaces,
-            Attribute[] attributes) {
+            Annotations runtimeVisibleAnnotations) {
         if (interfaces == null) {
             interfaces = new int[0];
         }
-        if (attributes == null) {
-            attributes = new Attribute[0];
-        }
         this.access_flags = access_flags;
-        this.attributes = attributes;
-        annotationsOutOfDate = true;
+        this.runtimeVisibleAnnotations = runtimeVisibleAnnotations;
 
         /* According to the specification the following entries must be of type
          * `ConstantClass' but we check that anyway via the
@@ -91,22 +79,17 @@ public class JavaClass extends AccessFlags {
         }
     }
 
-
+    /**
+     * Return annotations entries from "RuntimeVisibleAnnotations" attribute on
+     * the class, if there is any.
+     *
+     * @return An array of entries or {@code null}
+     */
     public AnnotationEntry[] getAnnotationEntries() {
-        if (annotationsOutOfDate) {
-            // Find attributes that contain annotation data
-            List<AnnotationEntry> accumulatedAnnotations = new ArrayList<>();
-            for (Attribute attribute : attributes) {
-                if (attribute instanceof Annotations) {
-                    Annotations runtimeAnnotations = (Annotations)attribute;
-                    for(int j = 0; j < runtimeAnnotations.getAnnotationEntries().length; j++)
-                        accumulatedAnnotations.add(runtimeAnnotations.getAnnotationEntries()[j]);
-                }
-            }
-            annotations = accumulatedAnnotations.toArray(new AnnotationEntry[accumulatedAnnotations.size()]);
-            annotationsOutOfDate = false;
+        if (runtimeVisibleAnnotations != null) {
+            return runtimeVisibleAnnotations.getAnnotationEntries();
         }
-        return annotations;
+        return null;
     }
 
     /**
