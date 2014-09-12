@@ -26,9 +26,7 @@ import java.io.IOException;
  * @author <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
  * @since 6.0
  */
-public class AnnotationDefault extends Attribute
-{
-    private static final long serialVersionUID = 6715933396664171543L;
+public class AnnotationDefault extends Attribute {
 
     /**
      * @param name_index

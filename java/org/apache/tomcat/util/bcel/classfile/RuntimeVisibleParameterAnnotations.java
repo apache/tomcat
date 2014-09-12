@@ -29,9 +29,6 @@ import java.io.IOException;
  */
 public class RuntimeVisibleParameterAnnotations extends ParameterAnnotations {
 
-    private static final long serialVersionUID = 7633756460868573992L;
-
-
     /**
      * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes

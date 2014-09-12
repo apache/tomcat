@@ -19,7 +19,6 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.Serializable;
 
 import org.apache.tomcat.util.bcel.Constants;
 
@@ -34,9 +33,8 @@ import org.apache.tomcat.util.bcel.Constants;
  * @see     Constant
  * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public class ConstantPool implements Serializable {
+public class ConstantPool {
 
-    private static final long serialVersionUID = -6765503791185687014L;
     private int constant_pool_count;
     private Constant[] constant_pool;
 
