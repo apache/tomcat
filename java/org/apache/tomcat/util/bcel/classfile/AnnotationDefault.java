@@ -29,16 +29,13 @@ import java.io.IOException;
 public class AnnotationDefault extends Attribute {
 
     /**
-     * @param length
-     *            Content length in bytes
      * @param file
      *            Input stream
      * @param constant_pool
      *            Array of constants
      */
-    public AnnotationDefault(int length, DataInputStream file,
-            ConstantPool constant_pool) throws IOException {
-        super(length, constant_pool);
+    public AnnotationDefault(DataInputStream file, ConstantPool constant_pool)
+            throws IOException {
         // Default value
         ElementValue.readElementValue(file, constant_pool);
     }

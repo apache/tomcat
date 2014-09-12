@@ -30,12 +30,11 @@ import java.io.IOException;
 public class RuntimeVisibleParameterAnnotations extends ParameterAnnotations {
 
     /**
-     * @param length Content length in bytes
      * @param file Input stream
      * @param constant_pool Array of constants
      */
-    RuntimeVisibleParameterAnnotations(int length, DataInputStream file,
+    RuntimeVisibleParameterAnnotations(DataInputStream file,
             ConstantPool constant_pool) throws IOException {
-        super(length, file, constant_pool);
+        super(file, constant_pool);
     }
 }
