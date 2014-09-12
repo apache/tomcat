@@ -209,9 +209,11 @@ public final class ClassParser {
     private void readInterfaces() throws IOException, ClassFormatException {
         int interfaces_count;
         interfaces_count = file.readUnsignedShort();
-        interfaces = new int[interfaces_count];
-        for (int i = 0; i < interfaces_count; i++) {
-            interfaces[i] = file.readUnsignedShort();
+        if (interfaces_count > 0) {
+            interfaces = new int[interfaces_count];
+            for (int i = 0; i < interfaces_count; i++) {
+                interfaces[i] = file.readUnsignedShort();
+            }
         }
     }
 
