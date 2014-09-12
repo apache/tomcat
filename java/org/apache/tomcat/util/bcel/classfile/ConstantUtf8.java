@@ -18,9 +18,6 @@ package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.apache.tomcat.util.bcel.Constants;
 
@@ -37,39 +34,9 @@ public final class ConstantUtf8 extends Constant {
     private static final long serialVersionUID = 8119001312020421976L;
     private final String bytes;
 
-    private static final int MAX_CACHE_ENTRIES = 20000;
-    private static final int INITIAL_CACHE_CAPACITY = (int)(MAX_CACHE_ENTRIES/0.75);
-    private static HashMap<String, ConstantUtf8> cache;
-
-    private static synchronized ConstantUtf8 getCachedInstance(String s) {
-        if (s.length() > 200) {
-            return  new ConstantUtf8(s);
-        }
-        if (cache == null)  {
-            cache = new LinkedHashMap<String, ConstantUtf8>(INITIAL_CACHE_CAPACITY, 0.75f, true) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                protected boolean removeEldestEntry(Map.Entry<String, ConstantUtf8> eldest) {
-                     return size() > MAX_CACHE_ENTRIES;
-                }
-            };
-        }
-        ConstantUtf8 result = cache.get(s);
-        if (result != null) {
-                return result;
-            }
-        result = new ConstantUtf8(s);
-        cache.put(s, result);
-        return result;
-    }
-
-    private static ConstantUtf8 getInstance(String s) {
-        return getCachedInstance(s);
-    }
 
     static ConstantUtf8 getInstance(DataInputStream file) throws IOException {
-        return getInstance(file.readUTF());
+        return new ConstantUtf8(file.readUTF());
     }
 
 
