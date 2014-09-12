@@ -18,6 +18,7 @@ package org.apache.tomcat.util.bcel;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Locale;
@@ -47,7 +48,7 @@ public class TesterPerformance {
             jarURLs.add(new URL("jar:" + new File (libDir, lib).toURI().toURL().toExternalForm() + "!/"));
         }
 
-        long start = System.nanoTime();
+        long duration = 0;
 
         for (URL jarURL : jarURLs) {
             Jar jar = JarFactory.newInstance(jarURL);
@@ -55,15 +56,16 @@ public class TesterPerformance {
             String jarEntryName = jar.getEntryName();
             while (jarEntryName != null) {
                 if (jarEntryName.endsWith(".class")) {
-                    ClassParser cp = new ClassParser(jar.getEntryInputStream(), jarEntryName);
+                    InputStream is = jar.getEntryInputStream();
+                    long start = System.nanoTime();
+                    ClassParser cp = new ClassParser(is, jarEntryName);
                     cp.parse();
+                    duration += System.nanoTime() - start;
                 }
                 jar.nextEntry();
                 jarEntryName = jar.getEntryName();
             }
         }
-
-        long duration = System.nanoTime() - start;
 
         System.out.println("ClassParser performance test took: " + duration + "ns");
     }
