@@ -1399,8 +1399,7 @@ public class HostConfig
                         // expanded WAR (if any)
                         Context context = (Context) host.findChild(app.name);
                         String docBase = context.getDocBase();
-                        docBase = docBase.toLowerCase(Locale.ENGLISH);
-                        if (!docBase.endsWith(".war")) {
+                        if (!docBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                             // This is an expanded directory
                             File docBaseFile = new File(docBase);
                             if (!docBaseFile.isAbsolute()) {
