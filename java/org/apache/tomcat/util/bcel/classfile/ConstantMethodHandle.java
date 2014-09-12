@@ -32,16 +32,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class ConstantMethodHandle extends Constant {
 
     private static final long serialVersionUID = -7875124116920198044L;
-    private int reference_kind;
-    private int reference_index;
-
-
-    /**
-     * Initialize from another object.
-     */
-    public ConstantMethodHandle(ConstantMethodHandle c) {
-        this(c.getReferenceKind(), c.getReferenceIndex());
-    }
 
 
     /**
@@ -51,33 +41,13 @@ public final class ConstantMethodHandle extends Constant {
      * @throws IOException
      */
     ConstantMethodHandle(DataInput file) throws IOException {
-        this(file.readUnsignedByte(), file.readUnsignedShort());
+        this();
+        file.readUnsignedByte();
+        file.readUnsignedShort();
     }
 
 
-    public ConstantMethodHandle(int reference_kind, int reference_index) {
+    public ConstantMethodHandle() {
         super(Constants.CONSTANT_MethodHandle);
-        this.reference_kind = reference_kind;
-        this.reference_index = reference_index;
-    }
-
-
-    public int getReferenceKind() {
-        return reference_kind;
-    }
-
-
-    public void setReferenceKind(int reference_kind) {
-        this.reference_kind = reference_kind;
-    }
-
-
-    public int getReferenceIndex() {
-        return reference_index;
-    }
-
-
-    public void setReferenceIndex(int reference_index) {
-        this.reference_index = reference_index;
     }
 }

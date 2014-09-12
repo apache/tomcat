@@ -20,8 +20,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 /**
  * This class represents colection of local variables in a
  * method. This attribute is contained in the <em>Code</em> attribute.
@@ -45,7 +43,7 @@ public class LocalVariableTable extends Attribute {
      */
     public LocalVariableTable(int name_index, int length, LocalVariable[] local_variable_table,
             ConstantPool constant_pool) {
-        super(Constants.ATTR_LOCAL_VARIABLE_TABLE, name_index, length, constant_pool);
+        super(name_index, length, constant_pool);
         setLocalVariableTable(local_variable_table);
     }
 
@@ -64,29 +62,10 @@ public class LocalVariableTable extends Attribute {
         local_variable_table_length = (file.readUnsignedShort());
         local_variable_table = new LocalVariable[local_variable_table_length];
         for (int i = 0; i < local_variable_table_length; i++) {
-            local_variable_table[i] = new LocalVariable(file, constant_pool);
+            local_variable_table[i] = new LocalVariable(file);
         }
     }
 
-
-    /**
-     *
-     * @param index the variable slot
-     * 
-     * @return the first LocalVariable that matches the slot or null if not found
-     * 
-     * @deprecated since 5.2 because multiple variables can share the
-     *             same slot, use getLocalVariable(int index, int pc) instead.
-     */
-    @java.lang.Deprecated
-    public final LocalVariable getLocalVariable( int index ) {
-        for (int i = 0; i < local_variable_table_length; i++) {
-            if (local_variable_table[i].getIndex() == index) {
-                return local_variable_table[i];
-            }
-        }
-        return null;
-    }
 
     public final void setLocalVariableTable( LocalVariable[] local_variable_table ) {
         this.local_variable_table = local_variable_table;

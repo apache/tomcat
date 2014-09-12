@@ -36,8 +36,4 @@ public class ClassFormatException extends RuntimeException {
     public ClassFormatException(String s) {
         super(s);
     }
-    
-    public ClassFormatException(String s, Throwable initCause) {
-        super(s, initCause);
-    }
 }

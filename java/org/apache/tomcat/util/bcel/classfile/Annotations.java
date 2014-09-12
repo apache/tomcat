@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
@@ -34,14 +33,13 @@ public abstract class Annotations extends Attribute {
     private AnnotationEntry[] annotation_table;
     
     /**
-     * @param annotation_type the subclass type of the annotation
      * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes
      * @param file Input stream
      * @param constant_pool Array of constants
      */
-    public Annotations(byte annotation_type, int name_index, int length, DataInputStream file, ConstantPool constant_pool) throws IOException {
-        this(annotation_type, name_index, length, (AnnotationEntry[]) null, constant_pool);
+    public Annotations(int name_index, int length, DataInputStream file, ConstantPool constant_pool) throws IOException {
+        this(name_index, length, (AnnotationEntry[]) null, constant_pool);
         final int annotation_table_length = (file.readUnsignedShort());
         annotation_table = new AnnotationEntry[annotation_table_length];
         for (int i = 0; i < annotation_table_length; i++) {
@@ -51,14 +49,13 @@ public abstract class Annotations extends Attribute {
 
 
     /**
-     * @param annotation_type the subclass type of the annotation
      * @param name_index Index pointing to the name <em>Code</em>
      * @param length Content length in bytes
      * @param annotation_table the actual annotations
      * @param constant_pool Array of constants
      */
-    public Annotations(byte annotation_type, int name_index, int length, AnnotationEntry[] annotation_table, ConstantPool constant_pool) {
-        super(annotation_type, name_index, length, constant_pool);
+    public Annotations(int name_index, int length, AnnotationEntry[] annotation_table, ConstantPool constant_pool) {
+        super(name_index, length, constant_pool);
         setAnnotationTable(annotation_table);
     }
 
@@ -74,15 +71,5 @@ public abstract class Annotations extends Attribute {
      */
     public AnnotationEntry[] getAnnotationEntries() {
         return annotation_table;
-    }
-
-    protected void writeAnnotations(DataOutputStream dos) throws IOException {
-        if (annotation_table == null) {
-            return;
-        }
-        dos.writeShort(annotation_table.length);
-        for (int i = 0; i < annotation_table.length; i++) {
-            annotation_table[i].dump(dos);
-        }
     }
 }

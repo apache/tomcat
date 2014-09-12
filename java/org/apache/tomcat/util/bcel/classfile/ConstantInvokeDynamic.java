@@ -32,16 +32,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class ConstantInvokeDynamic extends Constant {
 
     private static final long serialVersionUID = 4310367359017396174L;
-    private int bootstrap_method_attr_index;
-    private int name_and_type_index;
-
-
-    /**
-     * Initialize from another object.
-     */
-    public ConstantInvokeDynamic(ConstantInvokeDynamic c) {
-        this(c.getBootstrapMethodAttrIndex(), c.getNameAndTypeIndex());
-    }
 
 
     /**
@@ -51,34 +41,13 @@ public final class ConstantInvokeDynamic extends Constant {
      * @throws IOException
      */
     ConstantInvokeDynamic(DataInput file) throws IOException {
-        this(file.readUnsignedShort(), file.readUnsignedShort());
+        this();
+        file.readUnsignedShort();
+        file.readUnsignedShort();
     }
 
 
-    public ConstantInvokeDynamic(int bootstrap_method_attr_index,
-            int name_and_type_index) {
+    public ConstantInvokeDynamic() {
         super(Constants.CONSTANT_InvokeDynamic);
-        this.bootstrap_method_attr_index = bootstrap_method_attr_index;
-        this.name_and_type_index = name_and_type_index;
-    }
-
-
-    public int getBootstrapMethodAttrIndex() {
-        return bootstrap_method_attr_index;
-    }
-
-
-    public void setBootstrapMethodAttrIndex(int bootstrap_method_attr_index) {
-        this.bootstrap_method_attr_index = bootstrap_method_attr_index;
-    }
-
-
-    public int getNameAndTypeIndex() {
-        return name_and_type_index;
-    }
-
-
-    public void setNameAndTypeIndex(int name_and_type_index) {
-        this.name_and_type_index = name_and_type_index;
     }
 }

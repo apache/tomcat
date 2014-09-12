@@ -19,8 +19,6 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
-
 // The new table is used when generic types are about...
 
 //LocalVariableTable_attribute {
@@ -57,7 +55,7 @@ private int             local_variable_type_table_length; // Table of local
                                 LocalVariable[] local_variable_table,
                                 ConstantPool    constant_pool)
   {
-    super(Constants.ATTR_LOCAL_VARIABLE_TYPE_TABLE, name_index, length, constant_pool);
+    super(name_index, length, constant_pool);
     setLocalVariableTable(local_variable_table);
   }    
 
@@ -68,7 +66,7 @@ private int             local_variable_type_table_length; // Table of local
     local_variable_type_table = new LocalVariable[local_variable_type_table_length];
 
     for(int i=0; i < local_variable_type_table_length; i++)
-      local_variable_type_table[i] = new LocalVariable(dis, cpool);
+      local_variable_type_table[i] = new LocalVariable(dis);
   }
 
   public final void setLocalVariableTable(LocalVariable[] local_variable_table)

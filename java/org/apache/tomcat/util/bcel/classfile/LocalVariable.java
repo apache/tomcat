@@ -18,7 +18,6 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.DataInput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -34,14 +33,6 @@ import org.apache.tomcat.util.bcel.Constants;
 public final class LocalVariable implements Constants, Cloneable, Serializable {
 
     private static final long serialVersionUID = -914189896372081589L;
-    private int start_pc; // Range in which the variable is valid
-    private int length;
-    private int name_index; // Index in constant pool of variable name
-    private int signature_index; // Index of variable signature
-    private int index; /* Variable is `index'th local variable on
-     * this method's frame.
-     */
-    private ConstantPool constant_pool;
 
 
     /**
@@ -49,71 +40,12 @@ public final class LocalVariable implements Constants, Cloneable, Serializable {
      * @param file Input stream
      * @throws IOException
      */
-    LocalVariable(DataInput file, ConstantPool constant_pool) throws IOException {
-        this(file.readUnsignedShort(), file.readUnsignedShort(), file.readUnsignedShort(), file
-                .readUnsignedShort(), file.readUnsignedShort(), constant_pool);
-    }
-
-
-    /**
-     * @param start_pc Range in which the variable
-     * @param length ... is valid
-     * @param name_index Index in constant pool of variable name
-     * @param signature_index Index of variable's signature
-     * @param index Variable is `index'th local variable on the method's frame
-     * @param constant_pool Array of constants
-     */
-    public LocalVariable(int start_pc, int length, int name_index, int signature_index, int index,
-            ConstantPool constant_pool) {
-        this.start_pc = start_pc;
-        this.length = length;
-        this.name_index = name_index;
-        this.signature_index = signature_index;
-        this.index = index;
-        this.constant_pool = constant_pool;
-    }
-
-
-    /**
-     * Dump local variable to file stream in binary format.
-     *
-     * @param file Output file stream
-     * @throws IOException
-     */
-    public final void dump( DataOutputStream file ) throws IOException {
-        file.writeShort(start_pc);
-        file.writeShort(length);
-        file.writeShort(name_index);
-        file.writeShort(signature_index);
-        file.writeShort(index);
-    }
-
-
-    /**
-     * @return Variable name.
-     */
-    public final String getName() {
-        ConstantUtf8 c;
-        c = (ConstantUtf8) constant_pool.getConstant(name_index, CONSTANT_Utf8);
-        return c.getBytes();
-    }
-
-
-    /**
-     * @return Signature.
-     */
-    public final String getSignature() {
-        ConstantUtf8 c;
-        c = (ConstantUtf8) constant_pool.getConstant(signature_index, CONSTANT_Utf8);
-        return c.getBytes();
-    }
-
-
-    /**
-     * @return index of register where variable is stored
-     */
-    public final int getIndex() {
-        return index;
+    LocalVariable(DataInput file) throws IOException {
+        file.readUnsignedShort();
+        file.readUnsignedShort();
+        file.readUnsignedShort();
+        file.readUnsignedShort();
+        file.readUnsignedShort();
     }
 
 
