@@ -236,6 +236,11 @@
         <bug>56907</bug>: Ensure that client IO threads are stopped if a secure
         WebSocket client connection fails. (markt)
       </fix>
+      <fix>
+        When a WebSocket client attempts to write to a closed connection, handle
+        the resulting <code>IllegalStateException</code> in a manner consistent
+        with the handling of an <code>IOException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
