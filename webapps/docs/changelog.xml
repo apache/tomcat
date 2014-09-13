@@ -215,6 +215,11 @@
   </subsection>
   <subsection name="WebSocket">
     <changelog>
+      <scode>
+        <bug>56446</bug>: Clearer handling of exceptions when calling a method
+        on a POJO based WebSocket endpoint. Based on a suggestion by Eugene
+        Chung. (markt)
+      </scode>
       <fix>
         <bug>56746</bug>: Allow secure WebSocket client threads to use the
         current context class loader rather than explicitly setting it to the

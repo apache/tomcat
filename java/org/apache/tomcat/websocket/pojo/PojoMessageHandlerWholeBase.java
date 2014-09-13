@@ -75,13 +75,13 @@ public abstract class PojoMessageHandlerWholeBase<T>
         }
         parameters[indexPayload] = payload;
 
-        Object result;
+        Object result = null;
         try {
             result = method.invoke(pojo, parameters);
         } catch (IllegalAccessException e) {
-            throw new IllegalArgumentException(e);
+            handlePojoMethodException(e);
         } catch (InvocationTargetException e) {
-            throw new IllegalArgumentException(e);
+            handlePojoMethodException(e);
         }
         processResult(result);
     }
