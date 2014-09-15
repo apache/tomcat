@@ -27,12 +27,13 @@ package org.apache.tomcat.util.bcel.classfile;
 
  * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
-public class JavaClass extends AccessFlags {
+public class JavaClass {
 
-    private String class_name;
-    private String superclass_name;
-    private String[] interface_names;
-    private Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
+    private final int access_flags;
+    private final String class_name;
+    private final String superclass_name;
+    private final String[] interface_names;
+    private final Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
 
     /**
      * Constructor gets all contents as arguments.
@@ -52,6 +53,13 @@ public class JavaClass extends AccessFlags {
         this.class_name = class_name;
         this.superclass_name = superclass_name;
         this.interface_names = interface_names;
+    }
+
+    /**
+     * @return Access flags of the object aka. "modifiers".
+     */
+    public final int getAccessFlags() {
+        return access_flags;
     }
 
     /**
