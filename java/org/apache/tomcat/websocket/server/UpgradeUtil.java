@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket.server;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -122,11 +123,27 @@ public class UpgradeUtil {
         while (extHeaders.hasMoreElements()) {
             Util.parseExtensionHeader(extensionsRequested, extHeaders.nextElement());
         }
-        List<Extension> negotiatedExtensions = sec.getConfigurator().getNegotiatedExtensions(
+        // Negotiation phase 1. By default this simply filters out the
+        // extensions that the server does not support but applications could
+        // use a custom configurator to do more than this.
+        List<Extension> negotiatedExtensionsPhase1 = sec.getConfigurator().getNegotiatedExtensions(
                 Constants.INSTALLED_EXTENSIONS, extensionsRequested);
 
-        // Create the Transformations that will be applied to this connection
-        List<Transformation> transformations = createTransformations(negotiatedExtensions);
+        // Negotiation phase 2. Create the Transformations that will be applied
+        // to this connection. Note than an extension may be dropped at this
+        // point if the client has requested a configuration that the server is
+        // unable to support.
+        List<Transformation> transformations = createTransformations(negotiatedExtensionsPhase1);
+
+        List<Extension> negotiatedExtensionsPhase2;
+        if (transformations.isEmpty()) {
+            negotiatedExtensionsPhase2 = Collections.emptyList();
+        } else {
+            negotiatedExtensionsPhase2 = new ArrayList<>(transformations.size());
+            for (Transformation t : transformations) {
+                negotiatedExtensionsPhase2.add(t.getExtensionResponse());
+            }
+        }
 
         // Build the transformation pipeline
         Transformation transformation = null;
@@ -199,7 +216,8 @@ public class UpgradeUtil {
         WsHttpUpgradeHandler wsHandler =
                 req.upgrade(WsHttpUpgradeHandler.class);
         wsHandler.preInit(ep, perSessionServerEndpointConfig, sc, wsRequest,
-                subProtocol, transformation, pathParams, req.isSecure());
+                negotiatedExtensionsPhase2, subProtocol, transformation, pathParams,
+                req.isSecure());
 
     }
 

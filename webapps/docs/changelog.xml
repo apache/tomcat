@@ -189,6 +189,10 @@
         <bug>56907</bug>: Ensure that client IO threads are stopped if a secure
         WebSocket client connection fails. (markt)
       </fix>
+      <fix>
+        <bug>56982</bug>: Return the actual negotiated extensions rather than an
+        empty list for <code>Session.getNegotiatedExtensions()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket.server;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ReadListener;
@@ -32,6 +33,7 @@ import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
+import javax.websocket.Extension;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -56,6 +58,7 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
     private EndpointConfig endpointConfig;
     private WsServerContainer webSocketContainer;
     private WsHandshakeRequest handshakeRequest;
+    private List<Extension> negotiatedExtensions;
     private String subProtocol;
     private Transformation transformation;
     private Map<String,String> pathParameters;
@@ -72,12 +75,14 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
 
     public void preInit(Endpoint ep, EndpointConfig endpointConfig,
             WsServerContainer wsc, WsHandshakeRequest handshakeRequest,
-            String subProtocol, Transformation transformation,
-            Map<String,String> pathParameters, boolean secure) {
+            List<Extension> negotiatedExtensionsPhase2, String subProtocol,
+            Transformation transformation, Map<String,String> pathParameters,
+            boolean secure) {
         this.ep = ep;
         this.endpointConfig = endpointConfig;
         this.webSocketContainer = wsc;
         this.handshakeRequest = handshakeRequest;
+        this.negotiatedExtensions = negotiatedExtensionsPhase2;
         this.subProtocol = subProtocol;
         this.transformation = transformation;
         this.pathParameters = pathParameters;
@@ -123,7 +128,8 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
                     handshakeRequest.getParameterMap(),
                     handshakeRequest.getQueryString(),
                     handshakeRequest.getUserPrincipal(), httpSessionId,
-                    subProtocol, pathParameters, secure, endpointConfig);
+                    negotiatedExtensions, subProtocol, pathParameters, secure,
+                    endpointConfig);
             WsFrameServer wsFrame = new WsFrameServer(sis, wsSession, transformation);
             sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpointServer));
             // WsFrame adds the necessary final transformations. Copy the
