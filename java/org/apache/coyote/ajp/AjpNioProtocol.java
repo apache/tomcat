@@ -173,6 +173,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
             processor.setAdapter(proto.adapter);
             processor.setTomcatAuthentication(proto.tomcatAuthentication);
             processor.setRequiredSecret(proto.requiredSecret);
+            processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
             processor.setClientCertProvider(proto.getClientCertProvider());
             register(processor);
             return processor;
