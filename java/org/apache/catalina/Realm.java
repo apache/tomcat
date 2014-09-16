@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 import java.beans.PropertyChangeListener;
@@ -27,6 +25,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.ietf.jgss.GSSContext;
+
 /**
  * A <b>Realm</b> is a read-only facade for an underlying security realm
  * used to authenticate individual users, and identify the security roles
@@ -40,7 +39,6 @@ public interface Realm {
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Return the Container with which this Realm has been associated.
@@ -57,6 +55,7 @@ public interface Realm {
 
 
     // --------------------------------------------------------- Public Methods
+
     /**
      * Add a property change listener to this component.
      *
@@ -164,7 +163,8 @@ public interface Realm {
      */
     public boolean hasRole(Wrapper wrapper, Principal principal, String role);
 
-        /**
+
+    /**
      * Enforce any user data constraint required by the security constraint
      * guarding this request URI.  Return <code>true</code> if this constraint
      * was not violated and processing should continue, or <code>false</code>
@@ -181,12 +181,11 @@ public interface Realm {
                                          SecurityConstraint []constraint)
         throws IOException;
 
+
     /**
      * Remove a property change listener from this component.
      *
      * @param listener The listener to remove
      */
     public void removePropertyChangeListener(PropertyChangeListener listener);
-
-
 }
