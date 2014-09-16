@@ -20,6 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 
 import org.apache.coyote.http11.upgrade.AbstractServletInputStream;
+import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsFrameBase;
 import org.apache.tomcat.websocket.WsSession;
 
@@ -29,8 +30,9 @@ public class WsFrameServer extends WsFrameBase {
     private final Object connectionReadLock = new Object();
 
 
-    public WsFrameServer(AbstractServletInputStream sis, WsSession wsSession) {
-        super(wsSession);
+    public WsFrameServer(AbstractServletInputStream sis, WsSession wsSession,
+            Transformation transformation) {
+        super(wsSession, transformation);
         this.sis = sis;
     }
 
