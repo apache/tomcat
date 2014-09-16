@@ -245,6 +245,12 @@
         the resulting <code>IllegalStateException</code> in a manner consistent
         with the handling of an <code>IOException</code>. (markt)
       </fix>
+      <add>
+        Add support for the <code>permessage-deflate</code> extension. This is
+        currently limited to decompressing incoming messages on the server side.
+        It is expected that support will be extended to outgoing messages and to
+        the client side shortly. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

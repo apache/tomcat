@@ -41,53 +41,117 @@ public class PerMessageDeflate implements Transformation {
 
     public static final String NAME = "permessage-deflate";
 
-    private boolean serverContextTakeover = true;
-    private boolean clientContextTakeover = true;
-
-    private final Inflater inflator;
+    private final boolean serverContextTakeover;
+    private final int serverMaxWindowBits;
+    private final boolean clientContextTakeover;
+    private final int clientMaxWindowBits;
+    private final Inflater inflator = new Inflater(true);
     private final ByteBuffer readBuffer = ByteBuffer.allocate(8192);
 
     private Transformation next;
     private boolean skipDecompression = false;
 
-    PerMessageDeflate(List<Parameter> params) {
+    static PerMessageDeflate negotiate(List<List<Parameter>> preferences) {
 
-        for (Parameter param : params) {
-            if (SERVER_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
-                serverContextTakeover = false;
-            } else if (CLIENT_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
-                clientContextTakeover = false;
-            } else if (SERVER_MAX_WINDOW_BITS.equals(param.getName())) {
-                int bits = Integer.parseInt(param.getValue());
-                if (bits < 8 || bits > 15) {
-                    throw new IllegalArgumentException(sm.getString(
-                            "perMessageDeflate.invalidWindowSize",
-                            SERVER_MAX_WINDOW_BITS, Integer.valueOf(bits)));
-                }
-                // Java SE API (as of Java 8) does not expose the API to control
-                // the Window size so decline this option by not including it in
-                // the response
-            } else if (CLIENT_MAX_WINDOW_BITS.equals(param.getName())) {
-                if (param.getValue() != null) {
-                    int bits = Integer.parseInt(param.getValue());
-                    if (bits < 8 || bits > 15) {
+
+        // Accept the first preference that the server is able to support
+        for (List<Parameter> preference : preferences) {
+            boolean ok = true;
+            boolean serverContextTakeover = true;
+            int serverMaxWindowBits = -1;
+            boolean clientContextTakeover = true;
+            int clientMaxWindowBits = -1;
+
+            for (Parameter param : preference) {
+                if (SERVER_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
+                    if (serverContextTakeover) {
+                        serverContextTakeover = false;
+                    } else {
+                        // Duplicate definition
                         throw new IllegalArgumentException(sm.getString(
-                                "perMessageDeflate.invalidWindowSize",
-                                CLIENT_MAX_WINDOW_BITS, Integer.valueOf(bits)));
+                                "perMessageDeflate.duplicateParameter",
+                                SERVER_NO_CONTEXT_TAKEOVER ));
                     }
+                } else if (CLIENT_NO_CONTEXT_TAKEOVER.equals(param.getName())) {
+                    if (clientContextTakeover) {
+                        clientContextTakeover = false;
+                    } else {
+                        // Duplicate definition
+                        throw new IllegalArgumentException(sm.getString(
+                                "perMessageDeflate.duplicateParameter",
+                                CLIENT_NO_CONTEXT_TAKEOVER ));
+                    }
+                } else if (SERVER_MAX_WINDOW_BITS.equals(param.getName())) {
+                    if (serverMaxWindowBits == -1) {
+                        serverMaxWindowBits = Integer.parseInt(param.getValue());
+                        if (serverMaxWindowBits < 8 || serverMaxWindowBits > 15) {
+                            throw new IllegalArgumentException(sm.getString(
+                                    "perMessageDeflate.invalidWindowSize",
+                                    SERVER_MAX_WINDOW_BITS,
+                                    Integer.valueOf(serverMaxWindowBits)));
+                        }
+                        // Java SE API (as of Java 8) does not expose the API to
+                        // control the Window size. It is effectively hard-coded
+                        // to 15
+                        if (serverMaxWindowBits != 15) {
+                            ok = false;
+                            break;
+                        }
+                    } else {
+                        // Duplicate definition
+                        throw new IllegalArgumentException(sm.getString(
+                                "perMessageDeflate.duplicateParameter",
+                                SERVER_MAX_WINDOW_BITS ));
+                    }
+                } else if (CLIENT_MAX_WINDOW_BITS.equals(param.getName())) {
+                    if (clientMaxWindowBits == -1) {
+                        if (param.getValue() == null) {
+                            // Hint to server that the client supports this
+                            // option. Java SE API (as of Java 8) does not
+                            // expose the API to control the Window size. It is
+                            // effectively hard-coded to 15
+                            clientMaxWindowBits = 15;
+                        } else {
+                            clientMaxWindowBits = Integer.parseInt(param.getValue());
+                            if (clientMaxWindowBits < 8 || clientMaxWindowBits > 15) {
+                                throw new IllegalArgumentException(sm.getString(
+                                        "perMessageDeflate.invalidWindowSize",
+                                        CLIENT_MAX_WINDOW_BITS,
+                                        Integer.valueOf(clientMaxWindowBits)));
+                            }
+                        }
+                        // Not a problem is client specified a window size less
+                        // than 15 since the server will always use a larger
+                        // window it will still work.
+                    } else {
+                        // Duplicate definition
+                        throw new IllegalArgumentException(sm.getString(
+                                "perMessageDeflate.duplicateParameter",
+                                CLIENT_MAX_WINDOW_BITS ));
+                    }
+                } else {
+                    // Unknown parameter
+                    throw new IllegalArgumentException(sm.getString(
+                            "perMessageDeflate.unknownParameter", param.getName()));
                 }
-                // Java SE API (as of Java 8) does not expose the API to control
-                // the Window size so decline this option by not including it in
-                // the response
-            } else {
-                // Unknown parameter
-                throw new IllegalArgumentException(sm.getString(
-                        "perMessageDeflate.unknownParameter", param.getName()));
+            }
+            if (ok) {
+                return new PerMessageDeflate(serverContextTakeover, serverMaxWindowBits,
+                        clientContextTakeover, clientMaxWindowBits);
             }
         }
-
-        inflator = new Inflater(true);
+        // Failed to negotiate agreeable terms
+        return null;
     }
+
+    private PerMessageDeflate(boolean serverContextTakeover, int serverMaxWindowBits,
+            boolean clientContextTakeover, int clientMaxWindowBits) {
+        this.serverContextTakeover = serverContextTakeover;
+        this.serverMaxWindowBits = serverMaxWindowBits;
+        this.clientContextTakeover = clientContextTakeover;
+        this.clientMaxWindowBits = clientMaxWindowBits;
+    }
+
 
     @Override
     public TransformationResult getMoreData(byte opCode, boolean fin, int rsv, ByteBuffer dest)
@@ -184,8 +248,16 @@ public class PerMessageDeflate implements Transformation {
         if (!serverContextTakeover) {
             params.add(new WsExtensionParameter(SERVER_NO_CONTEXT_TAKEOVER, null));
         }
+        if (serverMaxWindowBits != -1) {
+            params.add(new WsExtensionParameter(SERVER_MAX_WINDOW_BITS,
+                    Integer.toString(serverMaxWindowBits)));
+        }
         if (!clientContextTakeover) {
             params.add(new WsExtensionParameter(CLIENT_NO_CONTEXT_TAKEOVER, null));
+        }
+        if (clientMaxWindowBits != -1) {
+            params.add(new WsExtensionParameter(CLIENT_MAX_WINDOW_BITS,
+                    Integer.toString(clientMaxWindowBits)));
         }
 
         return result;
