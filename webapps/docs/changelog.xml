@@ -156,6 +156,10 @@
         <bug>56910</bug>: Prevent the invalid value of <code>-1</code> being
         used for <code>maxConnections</code> with APR connectors. (markt)
       </fix>
+      <fix>
+        Ensure that <code>AjpNioProtocol</code> enable the
+        <code>KeepAliveTimeout</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
