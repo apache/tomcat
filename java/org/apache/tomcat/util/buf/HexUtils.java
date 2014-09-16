@@ -65,9 +65,11 @@ public final class HexUtils {
         }
     }
 
+
     public static byte getHex(int index) {
         return HEX[index];
     }
+
 
     public static String toHexString(byte[] bytes) {
         if (null == bytes) {
@@ -83,5 +85,19 @@ public final class HexUtils {
         }
 
         return sb.toString();
+    }
+
+
+    public static byte[] fromHexString(String input) {
+        if (input == null) {
+            return null;
+        }
+
+        char[] inputChars = input.toCharArray();
+        byte[] result = new byte[input.length() >> 1];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = (byte) ((getDec(inputChars[2*i]) << 4) + getDec(inputChars[2*i + 1]));
+        }
+        return result;
     }
 }
