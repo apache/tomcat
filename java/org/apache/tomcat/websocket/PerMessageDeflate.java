@@ -48,6 +48,7 @@ public class PerMessageDeflate implements Transformation {
     private final ByteBuffer readBuffer = ByteBuffer.allocate(8192);
 
     private Transformation next;
+    private boolean skipDecompression = false;
 
     PerMessageDeflate(List<Parameter> params) {
 
@@ -89,12 +90,23 @@ public class PerMessageDeflate implements Transformation {
     }
 
     @Override
-    public TransformationResult getMoreData(byte opCode, int rsv, ByteBuffer dest) throws IOException {
+    public TransformationResult getMoreData(byte opCode, boolean fin, int rsv, ByteBuffer dest)
+            throws IOException {
 
-        // Control frames are never compressed. Pass control frames and
-        // uncompressed frames straight through.
-        if (Util.isControl(opCode) || (rsv & RSV_BITMASK) == 0) {
-            return next.getMoreData(opCode, rsv, dest);
+        // Control frames are never compressed and may appear in the middle of
+        // a WebSocket method. Pass them straight through.
+        if (Util.isControl(opCode)) {
+            return next.getMoreData(opCode, fin, rsv, dest);
+        }
+
+        if (!Util.isContinuation(opCode)) {
+            // First frame in new message
+            skipDecompression = (rsv & RSV_BITMASK) == 0;
+        }
+
+        // Pass uncompressed frames straight through.
+        if (skipDecompression) {
+            return next.getMoreData(opCode, fin, rsv, dest);
         }
 
         int written;
@@ -114,15 +126,19 @@ public class PerMessageDeflate implements Transformation {
                 if (dest.hasRemaining()) {
                     readBuffer.clear();
                     TransformationResult nextResult =
-                            next.getMoreData(opCode, (rsv ^ RSV_BITMASK), readBuffer);
+                            next.getMoreData(opCode, fin, (rsv ^ RSV_BITMASK), readBuffer);
                     inflator.setInput(
                             readBuffer.array(), readBuffer.arrayOffset(), readBuffer.position());
                     if (TransformationResult.UNDERFLOW.equals(nextResult)) {
                         return nextResult;
                     } else if (TransformationResult.END_OF_FRAME.equals(nextResult) &&
                             readBuffer.position() == 0) {
-                        inflator.setInput(EOM_BYTES);
-                        usedEomBytes = true;
+                        if (fin) {
+                            inflator.setInput(EOM_BYTES);
+                            usedEomBytes = true;
+                        } else {
+                            return TransformationResult.END_OF_FRAME;
+                        }
                     }
                 }
             } else if (written == 0) {
