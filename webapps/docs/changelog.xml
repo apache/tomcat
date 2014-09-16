@@ -157,8 +157,8 @@
         used for <code>maxConnections</code> with APR connectors. (markt)
       </fix>
       <fix>
-        Ensure that <code>AjpNioProtocol</code> enable the
-        <code>KeepAliveTimeout</code>. (kfujino)
+        Ensure that AJP connectors enable the <code>KeepAliveTimeout</code>.
+        (kfujino)
       </fix>
     </changelog>
   </subsection>
