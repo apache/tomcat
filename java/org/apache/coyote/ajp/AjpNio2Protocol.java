@@ -144,11 +144,7 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
         @Override
         protected AjpNio2Processor createProcessor() {
             AjpNio2Processor processor = new AjpNio2Processor(proto.packetSize, (Nio2Endpoint) proto.endpoint);
-            processor.setAdapter(proto.getAdapter());
-            processor.setTomcatAuthentication(proto.tomcatAuthentication);
-            processor.setRequiredSecret(proto.requiredSecret);
-            processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
-            processor.setClientCertProvider(proto.getClientCertProvider());
+            proto.configureProcessor(processor);
             register(processor);
             return processor;
         }

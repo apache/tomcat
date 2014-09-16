@@ -160,6 +160,10 @@
         Ensure that AJP connectors enable the <code>KeepAliveTimeout</code>.
         (kfujino)
       </fix>
+      <fix>
+        Reduce duplicated code. All AJP connectors use common method to
+        configuration of processor. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
