@@ -75,6 +75,14 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         }
     }
 
+    protected void configureProcessor(AbstractAjpProcessor<S> processor) {
+        processor.setAdapter(getAdapter());
+        processor.setTomcatAuthentication(getTomcatAuthentication());
+        processor.setRequiredSecret(requiredSecret);
+        processor.setKeepAliveTimeout(getKeepAliveTimeout());
+        processor.setClientCertProvider(getClientCertProvider());
+    }
+
     protected abstract static class AbstractAjpConnectionHandler<S,P extends AbstractAjpProcessor<S>>
             extends AbstractConnectionHandler<S, P> {
 
