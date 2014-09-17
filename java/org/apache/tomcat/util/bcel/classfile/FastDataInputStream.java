@@ -109,7 +109,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
         }
         int ch1 = this.buf[pos++] & 0xff;
         int ch2 = this.buf[pos++] & 0xff;
-        return (short)((ch1 << 8) + (ch2 << 0));
+        return (short)((ch1 << 8) + ch2);
     }
 
 
@@ -122,7 +122,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
 
         int ch1 = this.buf[pos++] & 0xff;
         int ch2 = this.buf[pos++] & 0xff;
-        return (ch1 << 8) + (ch2 << 0);
+        return (ch1 << 8) + ch2;
     }
 
 
@@ -134,7 +134,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
         }
         int ch1 = this.buf[pos++] & 0xff;
         int ch2 = this.buf[pos++] & 0xff;
-        return (char)((ch1 << 8) + (ch2 << 0));
+        return (char)((ch1 << 8) + ch2);
     }
 
 
@@ -148,7 +148,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
         int ch2 = this.buf[pos++] & 0xff;
         int ch3 = this.buf[pos++] & 0xff;
         int ch4 = this.buf[pos++] & 0xff;
-        return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
+        return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + ch4);
     }
 
 
@@ -162,7 +162,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
                 ((long)(readBuffer[4] & 255) << 24) +
                 ((readBuffer[5] & 255) << 16) +
                 ((readBuffer[6] & 255) <<  8) +
-                ((readBuffer[7] & 255) <<  0));
+                (readBuffer[7] & 255));
     }
 
 
@@ -208,7 +208,6 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
             while (sum < n && (cur = (int) in.skip(n - sum)) > 0) {
                 sum += cur;
             }
-            fillNew();
             return sum;
         }
         // Data in the buffer is not enough
@@ -220,7 +219,6 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
             while (sum < n && (cur = (int) in.skip(n - sum)) > 0) {
                 sum += cur;
             }
-            fillNew();
             return sum;
         }
         pos += n;
@@ -231,6 +229,6 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     @Override
     public String readLine() throws IOException {
         // Unimplemented
-        throw new IOException();
+        throw new UnsupportedOperationException();
     }
 }
