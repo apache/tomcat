@@ -55,7 +55,6 @@ public abstract class Attribute {
         String name;
         int name_index;
         int length;
-        byte tag = Constants.ATTR_UNKNOWN; // Unknown attribute
         // Get class name from constant pool via `name_index' indirection
         name_index = file.readUnsignedShort();
         c = (ConstantUtf8) constant_pool.getConstant(name_index,
@@ -63,24 +62,14 @@ public abstract class Attribute {
         name = c.getBytes();
         // Length of data in bytes
         length = file.readInt();
-        // Compare strings to find known attribute
-        // System.out.println(name);
-        for (byte i = 0; i < Constants.KNOWN_ATTRIBUTES; i++)
-        {
-            if (name.equals(Constants.ATTRIBUTE_NAMES[i]))
-            {
-                tag = i; // found!
-                break;
-            }
-        }
-        // Call proper constructor, depending on `tag'
-        switch (tag)
-        {
-        case Constants.ATTR_RUNTIME_VISIBLE_ANNOTATIONS:
+
+        // Call proper constructor, depending on `name'
+        if (name.equals("RuntimeVisibleAnnotations")) {
             return new RuntimeVisibleAnnotations(file, constant_pool);
-        case Constants.ATTR_RUNTIME_VISIBLE_PARAMETER_ANNOTATIONS:
+        } else if (name.equals("RuntimeVisibleParameterAnnotations")) {
             return new RuntimeVisibleParameterAnnotations(file, constant_pool);
-        default: // All other attributes are skipped
+        } else {
+            // All other attributes are skipped
             Utility.skipFully(file, length);
             return null;
         }
