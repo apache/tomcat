@@ -218,6 +218,10 @@
         <code>catalina.bat</code> so that escape sequences are preserved. Patch
         by Lucas Theisen. (markt)
       </fix>
+      <update>
+        <bug>56988</bug>: Allow to use relative path in <code>base.path</code>
+        setting when building Tomcat. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
