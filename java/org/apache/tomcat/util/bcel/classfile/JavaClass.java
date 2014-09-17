@@ -36,6 +36,7 @@ public class JavaClass extends AccessFlags {
     private String[] interface_names;
     private Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
 
+    private static final String[] INTERFACES_EMPTY_ARRAY = new String[0];
 
     /**
      * Constructor gets all contents as arguments.
@@ -52,9 +53,6 @@ public class JavaClass extends AccessFlags {
     JavaClass(int class_name_index, int superclass_name_index,
             int access_flags, ConstantPool constant_pool, int[] interfaces,
             Annotations runtimeVisibleAnnotations) {
-        if (interfaces == null) {
-            interfaces = new int[0];
-        }
         this.access_flags = access_flags;
         this.runtimeVisibleAnnotations = runtimeVisibleAnnotations;
 
@@ -72,10 +70,15 @@ public class JavaClass extends AccessFlags {
         } else {
             superclass_name = "java.lang.Object";
         }
-        interface_names = new String[interfaces.length];
-        for (int i = 0; i < interfaces.length; i++) {
-            String str = constant_pool.getConstantString(interfaces[i], Constants.CONSTANT_Class);
-            interface_names[i] = Utility.compactClassName(str);
+
+        if (interfaces == null) {
+            interface_names = INTERFACES_EMPTY_ARRAY;
+        } else {
+            interface_names = new String[interfaces.length];
+            for (int i = 0; i < interfaces.length; i++) {
+                String str = constant_pool.getConstantString(interfaces[i], Constants.CONSTANT_Class);
+                interface_names[i] = Utility.compactClassName(str);
+            }
         }
     }
 
