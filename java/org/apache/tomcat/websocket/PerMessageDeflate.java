@@ -18,6 +18,7 @@ package org.apache.tomcat.websocket;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -45,15 +46,13 @@ public class PerMessageDeflate implements Transformation {
     private final int serverMaxWindowBits;
     private final boolean clientContextTakeover;
     private final int clientMaxWindowBits;
-    private final Inflater inflator = new Inflater(true);
+    private final Inflater inflater = new Inflater(true);
     private final ByteBuffer readBuffer = ByteBuffer.allocate(8192);
 
-    private Transformation next;
-    private boolean skipDecompression = false;
+    private volatile Transformation next;
+    private volatile boolean skipDecompression = false;
 
     static PerMessageDeflate negotiate(List<List<Parameter>> preferences) {
-
-
         // Accept the first preference that the server is able to support
         for (List<Parameter> preference : preferences) {
             boolean ok = true;
@@ -144,6 +143,7 @@ public class PerMessageDeflate implements Transformation {
         return null;
     }
 
+
     private PerMessageDeflate(boolean serverContextTakeover, int serverMaxWindowBits,
             boolean clientContextTakeover, int clientMaxWindowBits) {
         this.serverContextTakeover = serverContextTakeover;
@@ -156,7 +156,6 @@ public class PerMessageDeflate implements Transformation {
     @Override
     public TransformationResult getMoreData(byte opCode, boolean fin, int rsv, ByteBuffer dest)
             throws IOException {
-
         // Control frames are never compressed and may appear in the middle of
         // a WebSocket method. Pass them straight through.
         if (Util.isControl(opCode)) {
@@ -179,26 +178,26 @@ public class PerMessageDeflate implements Transformation {
         while (dest.remaining() > 0) {
             // Space available in destination. Try and fill it.
             try {
-                written = inflator.inflate(
+                written = inflater.inflate(
                         dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
             } catch (DataFormatException e) {
                 throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
             }
             dest.position(dest.position() + written);
 
-            if (inflator.needsInput() && !usedEomBytes ) {
+            if (inflater.needsInput() && !usedEomBytes ) {
                 if (dest.hasRemaining()) {
                     readBuffer.clear();
                     TransformationResult nextResult =
                             next.getMoreData(opCode, fin, (rsv ^ RSV_BITMASK), readBuffer);
-                    inflator.setInput(
+                    inflater.setInput(
                             readBuffer.array(), readBuffer.arrayOffset(), readBuffer.position());
                     if (TransformationResult.UNDERFLOW.equals(nextResult)) {
                         return nextResult;
                     } else if (TransformationResult.END_OF_FRAME.equals(nextResult) &&
                             readBuffer.position() == 0) {
                         if (fin) {
-                            inflator.setInput(EOM_BYTES);
+                            inflater.setInput(EOM_BYTES);
                             usedEomBytes = true;
                         } else {
                             return TransformationResult.END_OF_FRAME;
@@ -239,6 +238,7 @@ public class PerMessageDeflate implements Transformation {
         }
     }
 
+
     @Override
     public Extension getExtensionResponse() {
         Extension result = new WsExtension(NAME);
@@ -263,6 +263,7 @@ public class PerMessageDeflate implements Transformation {
         return result;
     }
 
+
     @Override
     public void setNext(Transformation t) {
         if (next == null) {
@@ -271,6 +272,7 @@ public class PerMessageDeflate implements Transformation {
             next.setNext(t);
         }
     }
+
 
     @Override
     public boolean validateRsvBits(int i) {
@@ -287,11 +289,24 @@ public class PerMessageDeflate implements Transformation {
 
     @Override
     public List<MessagePart> sendMessagePart(List<MessagePart> messageParts) {
-        // TODO: Implement compression of sent messages
+        List<MessagePart> compressedParts = new ArrayList<MessagePart>(messageParts.size());
+
+        for (MessagePart messagePart : messageParts) {
+            byte opCode = messagePart.getOpCode();
+            if (Util.isControl(opCode)) {
+                // Control messages can appear in the middle of other messages
+                // and must not be compressed. Pass it straight through
+                compressedParts.add(messagePart);
+            } else {
+                // TODO: Implement compression of sent messages
+                compressedParts.add(messagePart);
+            }
+        }
+
         if (next == null) {
-            return messageParts;
+            return compressedParts;
         } else {
-            return next.sendMessagePart(messageParts);
+            return next.sendMessagePart(compressedParts);
         }
     }
 }
