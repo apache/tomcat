@@ -64,9 +64,7 @@ debug logs in this case.</li>
 intranet.</li>
 <li>The SPN does not have to start with HTTP but the SPN must be the same in all
 the files it is used.</li>
-<li>If you want multiple SPNs mapped to the same domain user then each SPN must
-use a unique prefix such as <code>HTTP01/...</code>, <code>HTTP02/...</code>,
-etc.</li>
+<li>No more than one SPN may be mapped to a domain user.</li>
 </ul>
 <p>The areas where further testing is required include:</p>
 <ul>
