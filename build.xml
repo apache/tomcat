@@ -1094,7 +1094,7 @@
     <!-- build the jdbc-pool jar and source jar-->
     <echo message="Building Tomcat JDBC pool libraries"/>
     <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}"
-         inheritall="false" target="build">
+         inheritAll="false" target="build">
       <property name="tomcat.pool" value="${tomcat.pool}" />
       <property name="tomcat.juli.jar" value="${tomcat-juli.jar}" />
       <property name="skip.download" value="set"/>
@@ -1106,7 +1106,7 @@
     <!-- build the jdbc-pool source jar-->
     <echo message="Building Tomcat JDBC pool src JAR"/>
     <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}"
-         inheritall="false" target="build-src">
+         inheritAll="false" target="build-src">
       <property name="tomcat.pool" value="${tomcat.pool}" />
       <property name="tomcat.juli.jar" value="${tomcat-juli.jar}" />
       <property name="skip.download" value="set"/>
@@ -1586,7 +1586,7 @@
 
     <ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/build2.xml"
          dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src"
-         target="compile" />
+         inheritAll="false" target="compile" />
 
     <jar jarfile="${tomcat-juli-extras.jar}"
          manifest="${tomcat.manifests}/default.manifest">
@@ -2643,7 +2643,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <delete dir="${tomcat.output}" />
     <!-- Remove the copied catalina.properties -->
     <delete file="java/org/apache/catalina/startup/catalina.properties" />
-    <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}" inheritall="false" target="clean">
+    <ant antfile="${tomcat.jdbc.dir}/build.xml" dir="${tomcat.jdbc.dir}" inheritAll="false" target="clean">
       <property name="tomcat.pool" value="${tomcat.pool}" />
     </ant>
     <!-- remove jdbc-pool documentation -->
