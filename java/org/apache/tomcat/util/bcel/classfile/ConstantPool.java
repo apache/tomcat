@@ -35,8 +35,7 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class ConstantPool {
 
-    private int constant_pool_count;
-    private Constant[] constant_pool;
+    private final Constant[] constant_pool;
 
 
     /**
@@ -47,7 +46,7 @@ public class ConstantPool {
      * @throws ClassFormatException
      */
     ConstantPool(DataInputStream file) throws IOException, ClassFormatException {
-        constant_pool_count = file.readUnsignedShort();
+        int constant_pool_count = file.readUnsignedShort();
         constant_pool = new Constant[constant_pool_count];
         /* constant_pool[0] is unused by the compiler and may be used freely
          * by the implementation.
