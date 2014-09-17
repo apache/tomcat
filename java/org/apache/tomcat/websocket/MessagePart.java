@@ -25,15 +25,17 @@ class MessagePart {
     private final int rsv;
     private final byte opCode;
     private final ByteBuffer payload;
-    private final SendHandler handler;
+    private final SendHandler intermediateHandler;
+    private volatile SendHandler endHandler;
 
     public MessagePart( boolean fin, int rsv, byte opCode, ByteBuffer payload,
-            SendHandler handler) {
+            SendHandler intermediateHandler, SendHandler endHandler) {
         this.fin = fin;
         this.rsv = rsv;
         this.opCode = opCode;
         this.payload = payload;
-        this.handler = handler;
+        this.intermediateHandler = intermediateHandler;
+        this.endHandler = endHandler;
     }
 
 
@@ -57,8 +59,17 @@ class MessagePart {
     }
 
 
-    public SendHandler getHandler() {
-        return handler;
+    public SendHandler getIntermediateHandler() {
+        return intermediateHandler;
+    }
+
+
+    public SendHandler getEndHandler() {
+        return endHandler;
+    }
+
+    public void setEndHandler(SendHandler endHandler) {
+        this.endHandler = endHandler;
     }
 }
 
