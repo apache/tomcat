@@ -21,6 +21,8 @@ import java.io.DataInput;
 import java.io.EOFException;
 import java.io.IOException;
 
+import org.apache.tomcat.util.bcel.Constants;
+
 /**
  * Utility functions that do not really belong to any class in particular.
  *
@@ -43,6 +45,11 @@ final class Utility {
      */
     static String compactClassName(String str) {
         return str.replace('/', '.'); // Is `/' on all systems, even DOS
+    }
+
+    static String getClassName(ConstantPool constant_pool, int index) {
+        String name = constant_pool.getConstantString(index, Constants.CONSTANT_Class);
+        return compactClassName(name);
     }
 
     static void skipFully(DataInput file, int length) throws IOException {
