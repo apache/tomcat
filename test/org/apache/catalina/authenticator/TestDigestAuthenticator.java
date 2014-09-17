@@ -40,9 +40,9 @@ import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.util.ConcurrentMessageDigest;
-import org.apache.catalina.util.MD5Encoder;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.security.ConcurrentMessageDigest;
+import org.apache.tomcat.util.security.MD5Encoder;
 
 public class TestDigestAuthenticator extends TomcatBaseTest {
 
