@@ -252,7 +252,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         wsSession.updateLastActive();
 
-        MessagePart mp = new MessagePart(opCode, payload, last, handler, this);
+        MessagePart mp = new MessagePart(opCode, payload, last,
+                new EndMessageHandler(this, handler));
 
         boolean doWrite = false;
         synchronized (messagePartLock) {
@@ -407,42 +408,6 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             return DEFAULT_BLOCKING_SEND_TIMEOUT;
         } else {
             return userTimeout.longValue();
-        }
-    }
-
-
-    private static class MessagePart {
-        private final byte opCode;
-        private final ByteBuffer payload;
-        private final boolean last;
-        private final SendHandler handler;
-
-        public MessagePart(byte opCode, ByteBuffer payload, boolean last,
-                SendHandler handler, WsRemoteEndpointImplBase endpoint) {
-            this.opCode = opCode;
-            this.payload = payload;
-            this.last = last;
-            this.handler = new EndMessageHandler(endpoint, handler);
-        }
-
-
-        public byte getOpCode() {
-            return opCode;
-        }
-
-
-        public ByteBuffer getPayload() {
-            return payload;
-        }
-
-
-        public boolean isLast() {
-            return last;
-        }
-
-
-        public SendHandler getHandler() {
-            return handler;
         }
     }
 
