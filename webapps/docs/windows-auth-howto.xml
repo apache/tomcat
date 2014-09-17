@@ -62,11 +62,15 @@ exactly else authentication will fail. A checksum error may be reported in the
 debug logs in this case.</li>
 <li>The client must be of the view that the server is part of the local trusted
 intranet.</li>
+<li>The SPN does not have to start with HTTP but the SPN must be the same in all
+the files it is used.</li>
+<li>If you want multiple SPNs mapped to the same domain user then each SPN must
+use a unique prefix such as <code>HTTP01/...</code>, <code>HTTP02/...</code>,
+etc.</li>
 </ul>
 <p>The areas where further testing is required include:</p>
 <ul>
 <li>Does the domain name have to be in upper case?</li>
-<li>Does the SPN have to start with HTTP/...?</li>
 <li>Can a port number be appended to the end of the host in the SPN?</li>
 <li>Can the domain be left off the user in the ktpass command?</li>
 <li>What are the limitations on the account that Tomcat can run as? SPN
