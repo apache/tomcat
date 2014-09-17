@@ -20,17 +20,17 @@ import java.nio.ByteBuffer;
 
 import javax.websocket.SendHandler;
 
-public class MessagePart {
+class MessagePart {
     private final byte opCode;
     private final ByteBuffer payload;
-    private final boolean last;
+    private final boolean fin;
     private final SendHandler handler;
 
-    public MessagePart(byte opCode, ByteBuffer payload, boolean last,
+    public MessagePart(byte opCode, ByteBuffer payload, boolean fin,
             SendHandler handler) {
         this.opCode = opCode;
         this.payload = payload;
-        this.last = last;
+        this.fin = fin;
         this.handler = handler;
     }
 
@@ -45,8 +45,8 @@ public class MessagePart {
     }
 
 
-    public boolean isLast() {
-        return last;
+    public boolean isFin() {
+        return fin;
     }
 
 
