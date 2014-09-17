@@ -31,6 +31,7 @@ import org.apache.coyote.http11.upgrade.AbstractServletOutputStream;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
 
 /**
@@ -162,6 +163,13 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             clearHandler(new SocketTimeoutException(), useDispatch);
         }
         close();
+    }
+
+
+    @Override
+    protected void setTransformation(Transformation transformation) {
+        // Overridden purely so it is visible to other classes in this package
+        super.setTransformation(transformation);
     }
 
 

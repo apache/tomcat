@@ -22,6 +22,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
+import java.util.List;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -691,6 +692,11 @@ public abstract class WsFrameBase {
     }
 
 
+    protected Transformation getTransformation() {
+        return transformation;
+    }
+
+
     private static enum State {
         NEW_FRAME, PARTIAL_HEADER, DATA
     }
@@ -757,6 +763,14 @@ public abstract class WsFrameBase {
                 return TransformationResult.OVERFLOW;
             }
         }
+
+
+        @Override
+        public List<MessagePart> sendMessagePart(List<MessagePart> messageParts) {
+            // TODO Masking should move to this method
+            // NO-OP send so simply return the message unchanged.
+            return messageParts;
+        }
     }
 
 
@@ -791,6 +805,12 @@ public abstract class WsFrameBase {
                 // !dest.hasRemaining()
                 return TransformationResult.OVERFLOW;
             }
+        }
+
+        @Override
+        public List<MessagePart> sendMessagePart(List<MessagePart> messageParts) {
+            // NO-OP send so simply return the message unchanged.
+            return messageParts;
         }
     }
 }

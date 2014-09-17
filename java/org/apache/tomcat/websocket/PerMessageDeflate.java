@@ -283,4 +283,15 @@ public class PerMessageDeflate implements Transformation {
             return next.validateRsvBits(i | RSV_BITMASK);
         }
     }
+
+
+    @Override
+    public List<MessagePart> sendMessagePart(List<MessagePart> messageParts) {
+        // TODO: Implement compression of sent messages
+        if (next == null) {
+            return messageParts;
+        } else {
+            return next.sendMessagePart(messageParts);
+        }
+    }
 }

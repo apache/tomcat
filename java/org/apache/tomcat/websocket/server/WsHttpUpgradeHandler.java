@@ -123,9 +123,12 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
                     handshakeRequest.getParameterMap(),
                     handshakeRequest.getQueryString(),
                     handshakeRequest.getUserPrincipal(), httpSessionId,
-                    subProtocol, pathParameters, secure, endpointConfig, transformation);
+                    subProtocol, pathParameters, secure, endpointConfig);
             WsFrameServer wsFrame = new WsFrameServer(sis, wsSession, transformation);
             sos.setWriteListener(new WsWriteListener(this, wsRemoteEndpointServer));
+            // WsFrame adds the necessary final transformations. Copy the
+            // completed transformation chain to the remote end point.
+            wsRemoteEndpointServer.setTransformation(wsFrame.getTransformation());
             ep.onOpen(wsSession, endpointConfig);
             webSocketContainer.registerSession(ep, wsSession);
             sis.setReadListener(new WsReadListener(this, wsFrame));
