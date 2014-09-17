@@ -338,6 +338,7 @@
   <patternset id="files.tomcat-api">
     <include name="org/apache/tomcat/*" />
     <exclude name="org/apache/tomcat/buildutil" />
+    <exclude name="org/apache/tomcat/dbcp" />
     <exclude name="org/apache/tomcat/jni" />
     <exclude name="org/apache/tomcat/spdy" />
     <exclude name="org/apache/tomcat/util" />
