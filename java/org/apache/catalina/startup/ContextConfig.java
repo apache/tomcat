@@ -2067,7 +2067,7 @@ public class ContextConfig implements LifecycleListener {
             boolean handlesTypesOnly)
             throws ClassFormatException, IOException {
 
-        ClassParser parser = new ClassParser(is, null);
+        ClassParser parser = new ClassParser(is);
         JavaClass clazz = parser.parse();
         checkHandlesTypes(clazz);
 
@@ -2226,7 +2226,7 @@ public class ContextConfig implements LifecycleListener {
             if (is == null) {
                 return;
             }
-            ClassParser parser = new ClassParser(is, null);
+            ClassParser parser = new ClassParser(is);
             try {
                 JavaClass clazz = parser.parse();
                 populateJavaClassCache(clazz.getClassName(), clazz);
