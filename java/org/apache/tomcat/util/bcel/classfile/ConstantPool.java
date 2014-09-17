@@ -17,7 +17,7 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -45,7 +45,7 @@ public class ConstantPool {
      * @throws IOException
      * @throws ClassFormatException
      */
-    ConstantPool(DataInputStream file) throws IOException, ClassFormatException {
+    ConstantPool(DataInput file) throws IOException, ClassFormatException {
         int constant_pool_count = file.readUnsignedShort();
         constant_pool = new Constant[constant_pool_count];
         /* constant_pool[0] is unused by the compiler and may be used freely

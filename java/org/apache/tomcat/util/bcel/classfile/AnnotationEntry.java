@@ -17,7 +17,7 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public class AnnotationEntry implements Constants {
      * @param constant_pool
      * @throws IOException
      */
-    AnnotationEntry(DataInputStream file, ConstantPool constant_pool) throws IOException {
+    AnnotationEntry(DataInput file, ConstantPool constant_pool) throws IOException {
 
         this.constant_pool = constant_pool;
 

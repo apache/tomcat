@@ -17,7 +17,7 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 /**
@@ -34,7 +34,7 @@ public class Annotations {
      * @param file Input stream
      * @param constant_pool Array of constants
      */
-    Annotations(DataInputStream file, ConstantPool constant_pool)
+    Annotations(DataInput file, ConstantPool constant_pool)
             throws IOException {
         final int annotation_table_length = (file.readUnsignedShort());
         annotation_table = new AnnotationEntry[annotation_table_length];

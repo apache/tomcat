@@ -17,7 +17,7 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -36,7 +36,7 @@ public class ElementValuePair
 
     private final int elementNameIndex;
 
-    ElementValuePair(DataInputStream file, ConstantPool constantPool) throws IOException {
+    ElementValuePair(DataInput file, ConstantPool constantPool) throws IOException {
         this.constantPool = constantPool;
         this.elementNameIndex = file.readUnsignedShort();
         this.elementValue = ElementValue.readElementValue(file, constantPool);
