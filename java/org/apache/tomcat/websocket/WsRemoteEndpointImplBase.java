@@ -260,7 +260,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         wsSession.updateLastActive();
 
         List<MessagePart> messageParts = new ArrayList<MessagePart>();
-        messageParts.add(new MessagePart(opCode, payload, last,
+        messageParts.add(new MessagePart(last, 0, opCode, payload,
                 new EndMessageHandler(this, handler)));
 
         messageParts = transformation.sendMessagePart(messageParts);
