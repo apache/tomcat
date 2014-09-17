@@ -66,8 +66,6 @@ public abstract class Attribute {
         // Call proper constructor, depending on `name'
         if (name.equals("RuntimeVisibleAnnotations")) {
             return new RuntimeVisibleAnnotations(file, constant_pool);
-        } else if (name.equals("RuntimeVisibleParameterAnnotations")) {
-            return new RuntimeVisibleParameterAnnotations(file, constant_pool);
         } else {
             // All other attributes are skipped
             Utility.skipFully(file, length);
