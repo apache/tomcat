@@ -17,7 +17,7 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 import org.apache.tomcat.util.bcel.Constants;
@@ -62,7 +62,7 @@ public abstract class Constant {
      * @param file Input stream
      * @return Constant object
      */
-    static Constant readConstant( DataInputStream file ) throws IOException,
+    static Constant readConstant(DataInput file ) throws IOException,
             ClassFormatException {
         byte b = file.readByte(); // Read tag byte
         int skipSize;

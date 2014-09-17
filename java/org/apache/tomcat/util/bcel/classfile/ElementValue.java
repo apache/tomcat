@@ -17,7 +17,7 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import java.io.DataInputStream;
+import java.io.DataInput;
 import java.io.IOException;
 
 /**
@@ -64,7 +64,7 @@ public abstract class ElementValue
 
     public static final int PRIMITIVE_BOOLEAN = 'Z';
 
-    public static ElementValue readElementValue(DataInputStream dis,
+    public static ElementValue readElementValue(DataInput dis,
             ConstantPool cpool) throws IOException
     {
         byte type = dis.readByte();
@@ -105,7 +105,7 @@ public abstract class ElementValue
             return new ClassElementValue(CLASS, dis.readUnsignedShort(), cpool);
         case '@': // Annotation
             // TODO isRuntimeVisible
-            return new AnnotationElementValue(ANNOTATION, AnnotationEntry.read(
+            return new AnnotationElementValue(ANNOTATION, new AnnotationEntry(
                     dis, cpool), cpool);
         case '[': // Array
             int numArrayVals = dis.readUnsignedShort();

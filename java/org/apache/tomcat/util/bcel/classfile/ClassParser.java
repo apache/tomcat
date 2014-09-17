@@ -18,6 +18,7 @@
 package org.apache.tomcat.util.bcel.classfile;
 
 import java.io.BufferedInputStream;
+import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +43,7 @@ public final class ClassParser {
 
     private static final int MAGIC = 0xCAFEBABE;
 
-    private final DataInputStream file;
+    private final DataInput file;
     private String class_name, superclass_name;
     private int access_flags; // Access rights of parsed class
     private String[] interface_names; // Names of implemented interfaces
