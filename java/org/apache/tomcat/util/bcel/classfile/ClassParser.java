@@ -48,7 +48,7 @@ public final class ClassParser {
     private int access_flags; // Access rights of parsed class
     private int[] interfaces; // Names of implemented interfaces
     private ConstantPool constant_pool; // collection of constants
-    private Attribute[] attributes; // attributes defined in the class
+    private Annotations runtimeVisibleAnnotations; // "RuntimeVisibleAnnotations" attribute defined in the class
     private static final int BUFSIZE = 8192;
 
 
@@ -99,24 +99,11 @@ public final class ClassParser {
         readMethods();
         // Read class attributes
         readAttributes();
-        // Check for unknown variables
-        //Unknown[] u = Unknown.getUnknownAttributes();
-        //for(int i=0; i < u.length; i++)
-        //  System.err.println("WARNING: " + u[i]);
-        // Everything should have been read now
-        //      if(file.available() > 0) {
-        //        int bytes = file.available();
-        //        byte[] buf = new byte[bytes];
-        //        file.read(buf);
-        //        if(!(is_zip && (buf.length == 1))) {
-        //          System.err.println("WARNING: Trailing garbage at end of " + file_name);
-        //          System.err.println(bytes + " extra bytes: " + Utility.toHexString(buf));
-        //        }
-        //      }
 
         // Return the information we have gathered in a new object
         return new JavaClass(class_name_index, superclass_name_index,
-                access_flags, constant_pool, interfaces, attributes);
+                access_flags, constant_pool, interfaces,
+                runtimeVisibleAnnotations);
     }
 
 
@@ -128,9 +115,29 @@ public final class ClassParser {
     private void readAttributes() throws IOException, ClassFormatException {
         int attributes_count;
         attributes_count = file.readUnsignedShort();
-        attributes = new Attribute[attributes_count];
         for (int i = 0; i < attributes_count; i++) {
-            attributes[i] = Attribute.readAttribute(file, constant_pool);
+            ConstantUtf8 c;
+            String name;
+            int name_index;
+            int length;
+            // Get class name from constant pool via `name_index' indirection
+            name_index = file.readUnsignedShort();
+            c = (ConstantUtf8) constant_pool.getConstant(name_index,
+                    Constants.CONSTANT_Utf8);
+            name = c.getBytes();
+            // Length of data in bytes
+            length = file.readInt();
+
+            if (name.equals("RuntimeVisibleAnnotations")) {
+                if (runtimeVisibleAnnotations != null) {
+                    throw new ClassFormatException(
+                            "RuntimeVisibleAnnotations attribute is not allowed more than once in a class file");
+                }
+                runtimeVisibleAnnotations = new Annotations(file, constant_pool);
+            } else {
+                // All other attributes are skipped
+                Utility.skipFully(file, length);
+            }
         }
     }
 
