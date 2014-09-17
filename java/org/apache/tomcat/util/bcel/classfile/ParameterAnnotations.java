@@ -28,8 +28,7 @@ import java.io.IOException;
  */
 public abstract class ParameterAnnotations extends Attribute {
 
-    private int num_parameters;
-    private ParameterAnnotationEntry[] parameter_annotation_table; // Table of parameter annotations
+    private final ParameterAnnotationEntry[] parameter_annotation_table; // Table of parameter annotations
 
 
     /**
@@ -38,22 +37,11 @@ public abstract class ParameterAnnotations extends Attribute {
      */
     ParameterAnnotations(DataInputStream file, ConstantPool constant_pool)
             throws IOException {
-        num_parameters = (file.readUnsignedByte());
+        int num_parameters = file.readUnsignedByte();
         parameter_annotation_table = new ParameterAnnotationEntry[num_parameters];
         for (int i = 0; i < num_parameters; i++) {
             parameter_annotation_table[i] = new ParameterAnnotationEntry(file, constant_pool);
         }
     }
 
-
-    /**
-     * @param parameter_annotation_table the entries to set in this parameter annotation
-     */
-    public final void setParameterAnnotationTable(
-            ParameterAnnotationEntry[] parameter_annotation_table ) {
-        this.parameter_annotation_table = parameter_annotation_table;
-        num_parameters = (parameter_annotation_table == null)
-                ? 0
-                : parameter_annotation_table.length;
-    }
 }

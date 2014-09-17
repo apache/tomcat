@@ -26,9 +26,9 @@ import java.io.IOException;
  */
 public abstract class ElementValue
 {
-    protected int type;
+    protected final int type;
 
-    protected ConstantPool cpool;
+    protected final ConstantPool cpool;
 
 
     ElementValue(int type, ConstantPool cpool) {

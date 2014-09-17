@@ -27,11 +27,11 @@ import org.apache.tomcat.util.bcel.Constants;
  */
 public class ElementValuePair
 {
-    private ElementValue elementValue;
+    private final ElementValue elementValue;
 
-    private ConstantPool constantPool;
+    private final ConstantPool constantPool;
 
-    private int elementNameIndex;
+    private final int elementNameIndex;
 
     ElementValuePair(int elementNameIndex, ElementValue elementValue,
             ConstantPool constantPool) {
