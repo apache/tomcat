@@ -50,6 +50,14 @@ public abstract class PojoMessageHandlerBase<T>
             int indexSession, long maxMessageSize) {
         this.pojo = pojo;
         this.method = method;
+        // TODO: The method should already be accessible here but the following
+        // code seems to be necessary in some as yet not fully understood cases.
+        try {
+            this.method.setAccessible(true);
+        } catch (Exception e) {
+            // It is better to make sure the method is accessible, but
+            // ignore exceptions and hope for the best
+        }
         this.session = session;
         this.params = params;
         this.indexPayload = indexPayload;
