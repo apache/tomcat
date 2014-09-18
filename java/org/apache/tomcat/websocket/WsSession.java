@@ -75,6 +75,7 @@ public class WsSession implements Session {
     private final Principal userPrincipal;
     private final EndpointConfig endpointConfig;
 
+    private final List<Extension> negotiatedExtensions;
     private final String subProtocol;
     private final Map<String,String> pathParameters;
     private final boolean secure;
@@ -106,6 +107,7 @@ public class WsSession implements Session {
      *
      * @param localEndpoint
      * @param wsRemoteEndpoint
+     * @param negotiatedExtensions
      * @throws DeploymentException
      */
     public WsSession(Endpoint localEndpoint,
@@ -113,7 +115,7 @@ public class WsSession implements Session {
             WsWebSocketContainer wsWebSocketContainer,
             URI requestUri, Map<String,List<String>> requestParameterMap,
             String queryString, Principal userPrincipal, String httpSessionId,
-            String subProtocol, Map<String,String> pathParameters,
+            List<Extension> negotiatedExtensions, String subProtocol, Map<String,String> pathParameters,
             boolean secure, EndpointConfig endpointConfig) throws DeploymentException {
         this.localEndpoint = localEndpoint;
         this.wsRemoteEndpoint = wsRemoteEndpoint;
@@ -139,6 +141,7 @@ public class WsSession implements Session {
         this.queryString = queryString;
         this.userPrincipal = userPrincipal;
         this.httpSessionId = httpSessionId;
+        this.negotiatedExtensions = negotiatedExtensions;
         if (subProtocol == null) {
             this.subProtocol = "";
         } else {
@@ -303,7 +306,7 @@ public class WsSession implements Session {
     @Override
     public List<Extension> getNegotiatedExtensions() {
         checkState();
-        return Collections.emptyList();
+        return negotiatedExtensions;
     }
 
 

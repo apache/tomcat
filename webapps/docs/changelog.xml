@@ -255,6 +255,10 @@
         Extend support for the <code>permessage-deflate</code> extension to
         compression of outgoing messages on the server side. (markt)
       </add>
+      <fix>
+        <bug>56982</bug>: Return the actual negotiated extensions rather than an
+        empty list for <code>Session.getNegotiatedExtensions()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
