@@ -185,6 +185,10 @@
         jar files. Reported by Coverity Scan. Patch provided by Felix
         Schumacher. (violetagg)
       </fix>
+      <fix>
+        Fix a potential resource leak in JDTCompiler when checking wether
+        a resource is a package. Reported by Coverity Scan. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
