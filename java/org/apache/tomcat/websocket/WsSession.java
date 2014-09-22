@@ -37,6 +37,8 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
+import javax.websocket.MessageHandler.Partial;
+import javax.websocket.MessageHandler.Whole;
 import javax.websocket.PongMessage;
 import javax.websocket.RemoteEndpoint;
 import javax.websocket.SendResult;
@@ -163,10 +165,29 @@ public class WsSession implements Session {
     }
 
 
-    @SuppressWarnings("unchecked")
     @Override
     public void addMessageHandler(MessageHandler listener) {
+        Class<?> target = Util.getMessageType(listener);
+        doAddMessageHandler(target, listener);
+    }
 
+
+    @Override
+    public <T> void addMessageHandler(Class<T> clazz, Partial<T> handler)
+            throws IllegalStateException {
+        doAddMessageHandler(clazz, handler);
+    }
+
+
+    @Override
+    public <T> void addMessageHandler(Class<T> clazz, Whole<T> handler)
+            throws IllegalStateException {
+        doAddMessageHandler(clazz, handler);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private void doAddMessageHandler(Class<?> target, MessageHandler listener) {
         checkState();
 
         // Message handlers that require decoders may map to text messages,
@@ -180,7 +201,7 @@ public class WsSession implements Session {
         // just as easily.
 
         Set<MessageHandlerResult> mhResults =
-                Util.getMessageHandlers(listener, endpointConfig, this);
+                Util.getMessageHandlers(target, listener, endpointConfig, this);
 
         for (MessageHandlerResult mhResult : mhResults) {
             switch (mhResult.getType()) {

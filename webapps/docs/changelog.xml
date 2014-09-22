@@ -210,6 +210,10 @@
         <bug>56982</bug>: Return the actual negotiated extensions rather than an
         empty list for <code>Session.getNegotiatedExtensions()</code>. (markt)
       </fix>
+      <update>
+        Update the WebSocket implementation to support the Java WebSocket
+        specification version 1.1. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">

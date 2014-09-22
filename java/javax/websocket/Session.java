@@ -31,8 +31,22 @@ public interface Session extends Closeable {
      */
     WebSocketContainer getContainer();
 
-    void addMessageHandler(MessageHandler listener)
-            throws IllegalStateException;
+    /**
+     * Registers a {@link MessageHandler} for incoming messages. Only one
+     * {@link MessageHandler} may be registered for each message type (text,
+     * binary, pong). The message type will be derived at runtime from the
+     * provided {@link MessageHandler} instance. It is not always possible to do
+     * this so it is better to use
+     * {@link #addMessageHandler(Class, javax.websocket.MessageHandler.Partial)}
+     * or
+     * {@link #addMessageHandler(Class, javax.websocket.MessageHandler.Whole)}.
+     *
+     * @param listener  The message handler for a incoming message
+     *
+     * @throws IllegalStateException  If a message handler has already been
+     *                                registered for the associated message type
+     */
+    void addMessageHandler(MessageHandler listener) throws IllegalStateException;
 
     Set<MessageHandler> getMessageHandlers();
 
@@ -126,4 +140,34 @@ public interface Session extends Closeable {
      * this session is associated with.
      */
     Set<Session> getOpenSessions();
+
+    /**
+     * Registers a {@link MessageHandler} for partial incoming messages. Only
+     * one {@link MessageHandler} may be registered for each message type (text
+     * or binary, pong messages are never presented as partial messages).
+     *
+     * @param clazz     The type of message that the given handler is intended
+     *                  for
+     * @param listener  The message handler for a incoming message
+     *
+     * @throws IllegalStateException  If a message handler has already been
+     *                                registered for the associated message type
+     */
+    <T> void addMessageHandler(Class<T> clazz, MessageHandler.Partial<T> handler)
+            throws IllegalStateException;
+
+    /**
+     * Registers a {@link MessageHandler} for whole incoming messages. Only
+     * one {@link MessageHandler} may be registered for each message type (text,
+     * binary, pong).
+     *
+     * @param clazz     The type of message that the given handler is intended
+     *                  for
+     * @param listener  The message handler for a incoming message
+     *
+     * @throws IllegalStateException  If a message handler has already been
+     *                                registered for the associated message type
+     */
+    <T> void addMessageHandler(Class<T> clazz, MessageHandler.Whole<T> handler)
+            throws IllegalStateException;
 }
