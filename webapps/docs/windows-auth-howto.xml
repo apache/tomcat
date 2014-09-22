@@ -146,7 +146,7 @@ DEV.LOCAL = {
 dev.local= DEV.LOCAL
 .dev.local= DEV.LOCAL</source>
   The location of this file can be changed by setting the
-  <code>java.security.krb5.conf</code> systm property.</li>
+  <code>java.security.krb5.conf</code> system property.</li>
   <li>Create the JAAS login configuration file
   <code>$CATALINA_BASE/conf/jaas.conf</code>. The file used in this how-to
   contained:<source>com.sun.security.jgss.krb5.initiate {
