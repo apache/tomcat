@@ -222,6 +222,10 @@
         Add <code>JarScanner</code> to the nested components listed for a
         Context. (markt)
       </add>
+      <update>
+        Update the Windows authentication documentation after some additional
+        testing to answer the remaining questions. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
