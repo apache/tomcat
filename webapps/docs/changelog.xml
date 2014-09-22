@@ -215,6 +215,11 @@
         files. Reported by Coverity Scan. Based on patch provided by Felix
         Schumacher. (violetagg)
       </fix>
+      <fix>
+        <bug>56991</bug>: Deprecate the use of a request attribute to pass a
+        &lt;jsp-file&gt; declaration to Jasper and prevent an infinite loop
+        if this technique is used in conjunction with an include. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
