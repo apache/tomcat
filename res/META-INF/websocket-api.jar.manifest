@@ -6,6 +6,6 @@ Name: javax/websocket/
 Specification-Title: WebSocket
 Specification-Version: 1.0
 Specification-Vendor: Oracle, Inc.
-Implementation-Title: javax.net.websocket
+Implementation-Title: javax.websocket
 Implementation-Version: 1.0.@websocket.revision@
 Implementation-Vendor: Apache Software Foundation
