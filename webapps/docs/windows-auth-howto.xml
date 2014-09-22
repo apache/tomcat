@@ -53,27 +53,25 @@ sections.</p>
 <section name="Built-in Tomcat support">
 <p>Kerberos (the basis for integrated Windows authentication) requires careful
 configuration. If the steps in this guide are followed exactly, then a working
-configuration will result. There may be some flexibility in some of the steps
-below but further testing is required to explore this. From the testing to date
-it is known that:</p>
+configuration will result. It is important that the steps below are followed
+exactly. There is very little scope for flexibility in the configuration. From
+the testing to date it is known that:</p>
 <ul>
-<li>The host name of the Tomcat server must match the host name in the SPN
-exactly else authentication will fail. A checksum error may be reported in the
-debug logs in this case.</li>
+<li>The host name used to access the Tomcat server must match the host name in
+the SPN exactly else authentication will fail. A checksum error may be reported
+in the debug logs in this case.</li>
 <li>The client must be of the view that the server is part of the local trusted
 intranet.</li>
-<li>The SPN does not have to start with HTTP but the SPN must be the same in all
-the files it is used.</li>
+<li>The SPN must be HTTP/&lt;hostname&gt; and it must be exactly the same in all
+the places it is used.</li>
+<li>The port number must not be included in the SPN.</li>
 <li>No more than one SPN may be mapped to a domain user.</li>
-</ul>
-<p>The areas where further testing is required include:</p>
-<ul>
-<li>Does the domain name have to be in upper case?</li>
-<li>Can a port number be appended to the end of the host in the SPN?</li>
-<li>Can the domain be left off the user in the ktpass command?</li>
-<li>What are the limitations on the account that Tomcat can run as? SPN
-    associated account works, domain admin works, local admin doesn't
-    work</li>
+<li>Tomcat must run as the domain account with which the SPN has been associated
+or as domain admin. It is <strong>NOT</strong> recommended to run Tomcat under a
+domain admin user.</li>
+<li>The domain name (<code>DEV.LOCAL</code>) is not case sensitive when used in
+the ktpass command, nor when used in jaas.conf</li>
+<li>The domain must be specified when using the ktpass command</li>
 </ul>
 <p>There are four components to the configuration of the built-in Tomcat
 support for Windows authentication. The domain controller, the server hosting

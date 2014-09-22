@@ -273,6 +273,10 @@
         represents the idle time immediately below the maximum permitted idle
         time when using the expire command of the Manager application. (markt) 
       </fix>
+      <update>
+        Update the Windows authentication documentation after some additional
+        testing to answer the remaining questions. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
