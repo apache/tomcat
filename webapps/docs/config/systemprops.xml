@@ -198,6 +198,9 @@
       JSP page to be executed.</p>
       <p>If not specified, the default value of
       <code>org.apache.catalina.jsp_file</code> will be used.</p>
+      <p><strong>Deprecated:</strong> This will be removed in Tomcat 9.0.x
+      onwards. It is replaced by the use of the jspFile servlet initialisation
+      parameter</p>
     </property>
 
     <property name="org.apache.jasper.Constants. PRECOMPILE">

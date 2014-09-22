@@ -189,6 +189,11 @@
         Fix a potential resource leak in JDTCompiler when checking wether
         a resource is a package. Reported by Coverity Scan. (fschumacher)
       </fix>
+      <fix>
+        <bug>56991</bug>: Deprecate the use of a request attribute to pass a
+        &lt;jsp-file&gt; declaration to Jasper and prevent an infinite loop
+        if this technique is used in conjunction with an include. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
