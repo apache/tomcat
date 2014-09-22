@@ -2888,7 +2888,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <!-- ============================ Eclipse ================================ -->
 
-  <target name="ide-eclipse" depends="deploy, extras-webservices-prepare"
+  <target name="ide-eclipse"
+          depends="download-compile, extras-webservices-prepare, download-test-compile"
           description="Prepares the source tree to be built in Eclipse">
 
     <!-- Copy the sample project files into the root directory -->
