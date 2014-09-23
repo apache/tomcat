@@ -44,7 +44,7 @@ public class AbandonedConfig {
      * @return true if abandoned objects are to be removed by borrowObject
      */
     public boolean getRemoveAbandonedOnBorrow() {
-        return (this.removeAbandonedOnBorrow);
+        return this.removeAbandonedOnBorrow;
     }
 
     /**
@@ -81,7 +81,7 @@ public class AbandonedConfig {
      * @return true if abandoned objects are to be removed by the evictor
      */
     public boolean getRemoveAbandonedOnMaintenance() {
-        return (this.removeAbandonedOnMaintenance);
+        return this.removeAbandonedOnMaintenance;
     }
 
     /**
@@ -114,7 +114,7 @@ public class AbandonedConfig {
      * @return the abandoned object timeout in seconds
      */
     public int getRemoveAbandonedTimeout() {
-        return (this.removeAbandonedTimeout);
+        return this.removeAbandonedTimeout;
     }
 
     /**
@@ -152,7 +152,7 @@ public class AbandonedConfig {
      *
      */
     public boolean getLogAbandoned() {
-        return (this.logAbandoned);
+        return this.logAbandoned;
     }
 
     /**
