@@ -162,17 +162,17 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
 
     /**
      * If my underlying {@link Connection} is not a
-     * <tt>DelegatingConnection</tt>, returns it,
+     * {@code DelegatingConnection}, returns it,
      * otherwise recursively invokes this method on
      * my delegate.
      * <p>
      * Hence this method will return the first
-     * delegate that is not a <tt>DelegatingConnection</tt>,
-     * or <tt>null</tt> when no non-<tt>DelegatingConnection</tt>
+     * delegate that is not a {@code DelegatingConnection},
+     * or {@code null} when no non-{@code DelegatingConnection}
      * delegate can be found by traversing this chain.
      * <p>
      * This method is useful when you may have nested
-     * <tt>DelegatingConnection</tt>s, and you want to make
+     * {@code DelegatingConnection}s, and you want to make
      * sure to obtain a "genuine" {@link Connection}.
      */
     public Connection getInnermostDelegate() {
