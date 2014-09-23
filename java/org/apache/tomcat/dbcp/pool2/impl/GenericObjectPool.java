@@ -429,8 +429,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             if (blockWhenExhausted) {
                 p = idleObjects.pollFirst();
                 if (p == null) {
-                    create = true;
                     p = create();
+                    if (p != null) {
+                        create = true;
+                    }
                 }
                 if (p == null) {
                     if (borrowMaxWaitMillis < 0) {
@@ -450,8 +452,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             } else {
                 p = idleObjects.pollFirst();
                 if (p == null) {
-                    create = true;
                     p = create();
+                    if (p != null) {
+                        create = true;
+                    }
                 }
                 if (p == null) {
                     throw new NoSuchElementException("Pool exhausted");
@@ -775,8 +779,23 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                         continue;
                     }
 
-                    if (evictionPolicy.evict(evictionConfig, underTest,
-                            idleObjects.size())) {
+                    // User provided eviction policy could throw all sorts of crazy
+                    // exceptions. Protect against such an exception killing the
+                    // eviction thread.
+                    boolean evict;
+                    try {
+                        evict = evictionPolicy.evict(evictionConfig, underTest,
+                                idleObjects.size());
+                    } catch (Throwable t) {
+                        // Slightly convoluted as SwallowedExceptionListener uses
+                        // Exception rather than Throwable
+                        PoolUtils.checkRethrow(t);
+                        swallowException(new Exception(t));
+                        // Don't evict on error conditions
+                        evict = false;
+                    }
+
+                    if (evict) {
                         destroy(underTest);
                         destroyedByEvictorCount.incrementAndGet();
                     } else {
