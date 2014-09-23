@@ -39,10 +39,10 @@ import java.util.TimerTask;
 class EvictionTimer {
 
     /** Timer instance */
-    private static Timer _timer; //@GuardedBy("this")
+    private static Timer _timer; //@GuardedBy("EvictionTimer.class")
 
     /** Static usage count tracker */
-    private static int _usageCount; //@GuardedBy("this")
+    private static int _usageCount; //@GuardedBy("EvictionTimer.class")
 
     /** Prevent instantiation */
     private EvictionTimer() {
@@ -67,7 +67,7 @@ class EvictionTimer {
             try {
                 AccessController.doPrivileged(new PrivilegedSetTccl(
                         EvictionTimer.class.getClassLoader()));
-                _timer = new Timer("commons-pool-EvictionTimer", true);
+                _timer = AccessController.doPrivileged(new PrivilegedNewEvictionTimer());
             } finally {
                 AccessController.doPrivileged(new PrivilegedSetTccl(ccl));
             }
@@ -129,4 +129,22 @@ class EvictionTimer {
         }
     }
 
+    /**
+     * {@link PrivilegedAction} used to create a new Timer. Creating the timer
+     * with a privileged action means the associated Thread does not inherit the
+     * current access control context. In a container environment, inheriting
+     * the current access control context is likely to result in retaining a
+     * reference to the thread context class loader which would be a memory
+     * leak.
+     */
+    private static class PrivilegedNewEvictionTimer implements PrivilegedAction<Timer> {
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Timer run() {
+            return new Timer("commons-pool-EvictionTimer", true);
+        }
+    }
 }
