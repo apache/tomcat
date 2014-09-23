@@ -53,10 +53,11 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     private int numActive = 0; // @GuardedBy("this")
 
     /** Total number of instances that have been destroyed */
-    private long destroyCount = 0;
+    private long destroyCount = 0; // @GuardedBy("this")
+
 
     /** Total number of instances that have been created */
-    private long createCount = 0;
+    private long createCount = 0; // @GuardedBy("this")
 
     /** Idle references - waiting to be borrowed */
     private final LinkedBlockingDeque<PooledSoftReference<T>> idleReferences =
