@@ -517,6 +517,11 @@
                type="java.lang.String"
                writeable="false"/>
 
+    <attribute name="stuckThreadCount"
+               description="Count of the threads currently considered stuck"
+               type="int"
+               writeable="false"/>
+
     <attribute name="stuckThreadIds"
                description="IDs of the threads currently considered stuck. Each ID can then be used with the Threading MBean to retrieve data about it."
                type="long[]"
