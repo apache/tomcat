@@ -75,10 +75,12 @@ public final class HexUtils {
         if (null == bytes) {
             return null;
         }
+        final char[] hex = HexUtils.hex;
+        final int length = bytes.length;
 
-        StringBuilder sb = new StringBuilder(bytes.length << 1);
+        StringBuilder sb = new StringBuilder(length << 1);
 
-        for(int i = 0; i < bytes.length; ++i) {
+        for(int i = 0; i < length; ++i) {
             sb.append(hex[(bytes[i] & 0xf0) >> 4])
                 .append(hex[(bytes[i] & 0x0f)])
                 ;
@@ -94,8 +96,9 @@ public final class HexUtils {
         }
 
         char[] inputChars = input.toCharArray();
-        byte[] result = new byte[input.length() >> 1];
-        for (int i = 0; i < result.length; i++) {
+        final int length = input.length() >> 1;
+        byte[] result = new byte[length];
+        for (int i = 0; i < length; i++) {
             result[i] = (byte) ((getDec(inputChars[2*i]) << 4) + getDec(inputChars[2*i + 1]));
         }
         return result;
