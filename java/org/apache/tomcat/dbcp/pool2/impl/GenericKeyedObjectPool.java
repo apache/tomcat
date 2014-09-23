@@ -107,7 +107,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
 
         setConfig(config);
 
-        startEvictor(getMinEvictableIdleTimeMillis());
+        startEvictor(getTimeBetweenEvictionRunsMillis());
     }
 
     /**
@@ -350,8 +350,10 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                 if (blockWhenExhausted) {
                     p = objectDeque.getIdleObjects().pollFirst();
                     if (p == null) {
-                        create = true;
                         p = create(key);
+                        if (p != null) {
+                            create = true;
+                        }
                     }
                     if (p == null) {
                         if (borrowMaxWaitMillis < 0) {
@@ -371,8 +373,10 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                 } else {
                     p = objectDeque.getIdleObjects().pollFirst();
                     if (p == null) {
-                        create = true;
                         p = create(key);
+                        if (p != null) {
+                            create = true;
+                        }
                     }
                     if (p == null) {
                         throw new NoSuchElementException("Pool exhausted");
@@ -930,8 +934,23 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                     continue;
                 }
 
-                if (evictionPolicy.evict(evictionConfig, underTest,
-                        poolMap.get(evictionKey).getIdleObjects().size())) {
+                // User provided eviction policy could throw all sorts of crazy
+                // exceptions. Protect against such an exception killing the
+                // eviction thread.
+                boolean evict;
+                try {
+                    evict = evictionPolicy.evict(evictionConfig, underTest,
+                            poolMap.get(evictionKey).getIdleObjects().size());
+                } catch (Throwable t) {
+                    // Slightly convoluted as SwallowedExceptionListener uses
+                    // Exception rather than Throwable
+                    PoolUtils.checkRethrow(t);
+                    swallowException(new Exception(t));
+                    // Don't evict on error conditions
+                    evict = false;
+                }
+
+                if (evict) {
                     destroy(evictionKey, underTest, true);
                     destroyedByEvictorCount.incrementAndGet();
                 } else {
