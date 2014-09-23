@@ -52,7 +52,7 @@ public class PoolableConnectionFactory
             LogFactory.getLog(PoolableConnectionFactory.class);
 
     /**
-     * Create a new <tt>PoolableConnectionFactory</tt>.
+     * Create a new {@code PoolableConnectionFactory}.
      * @param connFactory the {@link ConnectionFactory} from which to obtain
      * base {@link Connection}s
      */
@@ -87,7 +87,7 @@ public class PoolableConnectionFactory
 
     /**
      * Sets the SQL statements I use to initialize newly created {@link Connection}s.
-     * Using <tt>null</tt> turns off connection initialization.
+     * Using {@code null} turns off connection initialization.
      * @param connectionInitSqls SQL statement to initialize {@link Connection}s.
      */
     public void setConnectionInitSql(Collection<String> connectionInitSqls) {

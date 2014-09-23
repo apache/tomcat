@@ -75,13 +75,13 @@ class CPDSConnectionFactory
         new ConcurrentHashMap<>();
 
     /**
-     * Create a new <tt>PoolableConnectionFactory</tt>.
+     * Create a new {@code PoolableConnectionFactory}.
      *
      * @param cpds the ConnectionPoolDataSource from which to obtain
      * PooledConnection's
      * @param validationQuery a query to use to {@link #validateObject
      * validate} {@link Connection}s. Should return at least one row.
-     * May be <tt>null</tt> in which case {@link Connection#isValid(int)} will
+     * May be {@code null} in which case {@link Connection#isValid(int)} will
      * be used to validate connections.
      * @param validationQueryTimeout Timeout in seconds before validation fails
      * @param rollbackAfterValidation whether a rollback should be issued

@@ -38,8 +38,8 @@ import org.apache.tomcat.dbcp.pool2.PooledObject;
 import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
 
 /**
- * A {*link PoolableObjectFactory} that creates
- * {*link PoolableConnection}s.
+ * A {@link KeyedPooledObjectFactory} that creates
+ * {@link PoolableConnection}s.
  *
  * @author John D. McNally
  * @since 2.0
@@ -74,12 +74,12 @@ class KeyedCPDSConnectionFactory
 
 
     /**
-     * Create a new <tt>KeyedPoolableConnectionFactory</tt>.
+     * Create a new {@code KeyedPoolableConnectionFactory}.
      * @param cpds the ConnectionPoolDataSource from which to obtain
      * PooledConnections
      * @param validationQuery a query to use to {@link #validateObject validate}
      * {@link Connection}s.  Should return at least one row. May be
-     * <tt>null</tt> in which case3 {@link Connection#isValid(int)} will be used
+     * {@code null} in which case3 {@link Connection#isValid(int)} will be used
      * to validate connections.
      * @param rollbackAfterValidation whether a rollback should be issued after
      * {@link #validateObject validating} {@link Connection}s.

@@ -113,7 +113,7 @@
  *    To create a {@link org.apache.tomcat.dbcp.dbcp2.PoolingDriver}, we do the same thing,
  *    except that instead of creating a {@link javax.sql.DataSource} on the last line,
  *    we create a {@link org.apache.tomcat.dbcp.dbcp2.PoolingDriver}, and register the
- *    <tt>connectionPool</tt> with it.  E.g.,:
+ *    {@code connectionPool} with it.  E.g.,:
  * <pre>GenericObjectPool connectionPool = new GenericObjectPool(null);
  * ConnectionFactory connectionFactory = new DriverManagerConnectionFactory("jdbc:some:connect:string", "username", "password");
  * PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,connectionPool,null,null,false,true);
