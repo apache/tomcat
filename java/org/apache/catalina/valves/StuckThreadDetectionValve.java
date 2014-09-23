@@ -260,6 +260,10 @@ public class StuckThreadDetectionValve extends ValveBase {
         }
     }
 
+    public int getStuckThreadCount() {
+        return stuckCount.get();
+    }
+
     public long[] getStuckThreadIds() {
         List<Long> idList = new ArrayList<Long>();
         for (MonitoredThread monitoredThread : activeThreads.values()) {
