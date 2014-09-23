@@ -148,6 +148,11 @@
         paths and are deployed as directories are correctly removed on undeploy
         when running on a case sensitive file system. (markt)
       </fix>
+      <add>
+          <bug>57004</bug>: Add <code>stuckThreadCount</code> property to
+          <code>StuckThreadDetectionValve</code>'s JMX bean. Patch provided by
+          Ji&#x159;&#xED; Pejchal. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
