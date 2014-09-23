@@ -248,6 +248,17 @@
         <bug>Ensure that the <code>ide-eclipse</code> build target downloads all
         the libraries required by the default Eclipse configuration files.</bug>
       </fix>
+      <fix>
+        Update the package renamed copy of Apache Commons DBCP 2 to revision
+        1626988 to pick up the fixes since the 2.0.1 release including support
+        for custom eviction policies. (markt)
+      </fix>
+      <fix>
+        Update the package renamed copy of Apache Commons Pool 2 to revision
+        1627022 to pick up the fixes since the 2.2 release including some memory
+        leak fixes and support for application provided eviction policies.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
