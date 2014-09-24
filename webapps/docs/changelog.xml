@@ -309,7 +309,8 @@
       <fix>
         <bug>56990</bug>: Ensure that the <code>ide-eclipse</code> build target
         downloads all the libraries required by the default Eclipse
-        configuration files. (kkolinko)
+        configuration files and configures Eclipse to use Java 6 for the
+        project. (kkolinko)
       </fix>
     </changelog>
   </subsection>
