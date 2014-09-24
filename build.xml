@@ -2940,6 +2940,23 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workplace.</echo>
   </target>
 
+  <target name="ide-eclipse-websocket"
+          depends="download-compile, extras-webservices-prepare, download-test-compile"
+          description="Prepares the source tree to be built in Eclipse - separate project to build classes that require Java 7">
+
+    <!-- Create directory "../tomcat-7.0.x-java7" and configure Eclipse project there -->
+    <property name="projectLocation" location="${tomcat.home}/../tomcat-7.0.x-java7" />
+    <mkdir dir="${projectLocation}" />
+    <mkdir dir="${projectLocation}/.settings" />
+
+    <copy file="${tomcat.home}/res/ide-support/eclipse/eclipse-websocket.project" tofile="${projectLocation}/.project"/>
+    <copy file="${tomcat.home}/res/ide-support/eclipse/eclipse-websocket.classpath" tofile="${projectLocation}/.classpath"/>
+    <copy file="${tomcat.home}/res/ide-support/eclipse/org.eclipse.jdt.core.prefs-websocket.properties" tofile="${projectLocation}/.settings/org.eclipse.jdt.core.prefs"/>
+
+    <echo>Eclipse project files created at "${projectLocation}".
+Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workplace.</echo>
+  </target>
+
   <!-- ======================= Macros, Taskdefs etc ======================== -->
 
   <macrodef name="jarIt" description="utility macro for standard JAR packaging">

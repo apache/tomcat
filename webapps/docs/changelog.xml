@@ -310,7 +310,9 @@
         <bug>56990</bug>: Ensure that the <code>ide-eclipse</code> build target
         downloads all the libraries required by the default Eclipse
         configuration files and configures Eclipse to use Java 6 for the
-        project. (kkolinko)
+        project. Add build target <code>ide-eclipse-websocket</code> that
+        creates a separate linked project that compiles websocket classes
+        of Tomcat 7 with Java 7 compiler. (kkolinko)
       </fix>
     </changelog>
   </subsection>
