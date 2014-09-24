@@ -240,6 +240,11 @@
   <subsection name="Other">
     <changelog>
       <fix>
+        <bug>56079</bug>: The Apache Tomcat Windows installer, the Apache Tomcat
+        Windows service and the Apache Tomcat Windows service monitor
+        application are now digitally signed. (markt)  
+      </fix>
+      <fix>
         <bug>56895</bug>: Correctly compose <code>JAVA_OPTS</code> in
         <code>catalina.bat</code> so that escape sequences are preserved. Patch
         by Lucas Theisen. (markt)
