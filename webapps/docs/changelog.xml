@@ -306,6 +306,11 @@
         <bug>56988</bug>: Allow to use relative path in <code>base.path</code>
         setting when building Tomcat. (kkolinko)
       </update>
+      <fix>
+        <bug>56990</bug>: Ensure that the <code>ide-eclipse</code> build target
+        downloads all the libraries required by the default Eclipse
+        configuration files. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
