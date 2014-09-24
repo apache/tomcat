@@ -172,7 +172,7 @@ public class Util {
     }
 
 
-    public static Class<?> getDecoderType(Class<? extends Decoder> decoder) {
+    private static Class<?> getDecoderType(Class<? extends Decoder> decoder) {
         return Util.getGenericType(Decoder.class, decoder).getClazz();
     }
 
@@ -358,7 +358,7 @@ public class Util {
     }
 
 
-    public static Set<MessageHandlerResult> getMessageHandlers(
+    static Set<MessageHandlerResult> getMessageHandlers(
             MessageHandler listener, EndpointConfig endpointConfig,
             Session session) {
 
