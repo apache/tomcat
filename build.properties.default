@@ -53,6 +53,7 @@ do.codesigning=false
 codesigning.user=request-via-pmc
 codesigning.pwd=request-via-pmc
 codesigning.partnercode=request-via-pmc
+codesigning.service=Microsoft Signing
 
 # ----- Settings to use when downloading files -----
 trydownload.httpusecaches=true

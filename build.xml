@@ -2130,7 +2130,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
               partnerCode="${codesigning.partnercode}"
               applicationName="Apache Tomcat ${version.major.minor}"
               applicationversion="${version}"
-              signingService="Microsoft Signing">
+              signingService="${codesigning.service}">
       <fileset dir="${tomcat.release}">
         <filename name="v${version}/bin/${final.name}.exe"/>
       </fileset>
