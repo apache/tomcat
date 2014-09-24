@@ -331,8 +331,8 @@ public class SignCode extends Task {
      * @param files Files to be signed
      */
     private static String getApplicationString(List<File> files) throws IOException {
-        // 10 MB should be more than enough for Tomcat
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(10 * 1024 * 1024);
+        // 16 MB should be more than enough for Tomcat
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(16 * 1024 * 1024);
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
             byte[] buf = new byte[32 * 1024];
             for (int i = 0; i < files.size(); i++) {
