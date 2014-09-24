@@ -162,7 +162,7 @@ public class SignCode extends Task {
 
         SOAPElement commaDelimitedFileNames =
                 requestSigningRequest.addChildElement("commaDelimitedFileNames", NS);
-        commaDelimitedFileNames.addTextNode(getFileNames(filesToSign.size()));
+        commaDelimitedFileNames.addTextNode(getFileNames(filesToSign));
 
         SOAPElement application =
                 requestSigningRequest.addChildElement("application", NS);
@@ -290,20 +290,34 @@ public class SignCode extends Task {
 
     /**
      * Signing service requires unique files names. Since files will be returned
-     * in order, use dummy names that we know are unique.
+     * in order, use dummy names that we know are unique but retain the file
+     * extension since the signing service appears to use it to figure out what
+     * to sign and how to sign it.
      */
-    private static String getFileNames(int fileCount) {
+    private static String getFileNames(List<File> filesToSign) {
         StringBuilder sb = new StringBuilder();
 
         boolean first = true;
 
-        for (int i = 0; i < fileCount; i++) {
+        for (int i = 0; i < filesToSign.size(); i++) {
             if (first) {
                 first = false;
             } else {
                 sb.append(',');
             }
+            File f = filesToSign.get(i);
+            String fileName = f.getName();
+            int extIndex = fileName.lastIndexOf('.');
+            String ext;
+            if (extIndex < 0) {
+                ext = null;
+            } else {
+                ext = fileName.substring(extIndex);
+            }
             sb.append(Integer.toString(i));
+            if (ext != null) {
+                sb.append(ext);
+            }
         }
         return sb.toString();
     }
