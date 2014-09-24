@@ -153,6 +153,10 @@
           <code>StuckThreadDetectionValve</code>'s JMX bean. Patch provided by
           Ji&#x159;&#xED; Pejchal. (schultz)
       </add>
+      <fix>
+        <bug>57011</bug>: Ensure that the request and response are correctly
+        recycled when processing errors during async processing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
