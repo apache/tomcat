@@ -306,7 +306,6 @@ public class CoyoteAdapter implements Adapter {
             }
 
             if (status==SocketStatus.TIMEOUT) {
-                success = true;
                 if (!asyncConImpl.timeout()) {
                     asyncConImpl.setErrorState(null, false);
                 }
@@ -373,7 +372,6 @@ public class CoyoteAdapter implements Adapter {
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
-                    success = true;
                 } else if (readListener != null && status == SocketStatus.OPEN_READ) {
                     ClassLoader oldCL = null;
                     try {
@@ -396,7 +394,6 @@ public class CoyoteAdapter implements Adapter {
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
-                    success = true;
                 }
             }
 
@@ -409,7 +406,6 @@ public class CoyoteAdapter implements Adapter {
             }
 
             if (request.isAsyncDispatching()) {
-                success = true;
                 connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
                 Throwable t = (Throwable) request.getAttribute(
                         RequestDispatcher.ERROR_EXCEPTION);
