@@ -446,6 +446,13 @@ public class CoyoteAdapter implements Adapter {
                 }
             }
 
+            // Check to see if the processor is in an error state. If it is,
+            // bail out now.
+            AtomicBoolean error = new AtomicBoolean(false);
+            res.action(ActionCode.IS_ERROR, error);
+            if (error.get()) {
+                success = false;
+            }
         } catch (IOException e) {
             success = false;
             // Ignore
