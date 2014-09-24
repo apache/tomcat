@@ -35,7 +35,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.security.SecurityConfig;
-import org.apache.catalina.util.ServerInfo;
 import org.apache.juli.ClassLoaderLogManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.digester.Digester;
@@ -124,7 +123,6 @@ public class Catalina {
 
     public Catalina() {
         setSecurityProtection();
-        logInfo();
     }
 
 
@@ -783,26 +781,6 @@ public class Catalina {
         SecurityConfig securityConfig = SecurityConfig.newInstance();
         securityConfig.setPackageDefinition();
         securityConfig.setPackageAccess();
-    }
-
-
-    private void logInfo() {
-        log.info(sm.getString("catalina.serverInfo.server.version",
-                ServerInfo.getServerInfo()));
-        log.info(sm.getString("catalina.serverInfo.server.built",
-                ServerInfo.getServerBuilt()));
-        log.info(sm.getString("catalina.serverInfo.server.number",
-                ServerInfo.getServerNumber()));
-        log.info(sm.getString("catalina.serverInfo.os.name",
-                System.getProperty("os.name")));
-        log.info(sm.getString("catalina.serverInfo.os.version",
-                System.getProperty("os.version")));
-        log.info(sm.getString("catalina.serverInfo.os.arch",
-                System.getProperty("os.arch")));
-        log.info(sm.getString("catalina.serverInfo.vm.version",
-                System.getProperty("java.runtime.version")));
-        log.info(sm.getString("catalina.serverInfo.vm.vendor",
-                System.getProperty("java.vm.vendor")));
     }
 
 
