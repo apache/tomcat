@@ -245,9 +245,9 @@
         setting when building Tomcat. (kkolinko)
       </update>
       <fix>
-        <bug>56990</bug>Ensure that the <code>ide-eclipse</code> build target
+        <bug>56990</bug>: Ensure that the <code>ide-eclipse</code> build target
         downloads all the libraries required by the default Eclipse
-        configuration files.
+        configuration files. (markt)
       </fix>
       <fix>
         Update the package renamed copy of Apache Commons DBCP 2 to revision
