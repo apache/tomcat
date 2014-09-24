@@ -2136,6 +2136,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </fileset>
     </signcode>
 
+    <!-- .exe has changed so need to redo MD5 and OpenPGP signature -->
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.md5" />
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
+    <antcall target="md5sum">
+      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+    </antcall>
+
   </target>
 
   <target name="release"
