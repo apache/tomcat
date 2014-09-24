@@ -160,13 +160,15 @@ public class SignCode extends Task {
                 requestSigningRequest.addChildElement("signingServiceName", NS);
         signingServiceName.addTextNode(this.signingService);
 
+        List<String> fileNames = getFileNames(filesToSign);
+
         SOAPElement commaDelimitedFileNames =
                 requestSigningRequest.addChildElement("commaDelimitedFileNames", NS);
-        commaDelimitedFileNames.addTextNode(getFileNames(filesToSign));
+        commaDelimitedFileNames.addTextNode(listToString(fileNames));
 
         SOAPElement application =
                 requestSigningRequest.addChildElement("application", NS);
-        application.addTextNode(getApplicationString(filesToSign));
+        application.addTextNode(getApplicationString(fileNames, filesToSign));
 
         // Send the message
         SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
@@ -201,6 +203,21 @@ public class SignCode extends Task {
         }
 
         return signingSetID;
+    }
+
+
+    private String listToString(List<String> list) {
+        StringBuilder sb = new StringBuilder(list.size() * 6);
+        boolean doneFirst = false;
+        for (String s : list) {
+            if (doneFirst) {
+                sb.append(',');
+            } else {
+                doneFirst = true;
+            }
+            sb.append(s);
+        }
+        return sb.toString();
     }
 
 
@@ -294,33 +311,24 @@ public class SignCode extends Task {
      * extension since the signing service appears to use it to figure out what
      * to sign and how to sign it.
      */
-    private static String getFileNames(List<File> filesToSign) {
-        StringBuilder sb = new StringBuilder();
-
-        boolean first = true;
+    private static List<String> getFileNames(List<File> filesToSign) {
+        List<String> result = new ArrayList<>(filesToSign.size());
 
         for (int i = 0; i < filesToSign.size(); i++) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(',');
-            }
             File f = filesToSign.get(i);
             String fileName = f.getName();
             int extIndex = fileName.lastIndexOf('.');
-            String ext;
+            String newName;
             if (extIndex < 0) {
-                ext = null;
+                newName = Integer.toString(i);
             } else {
-                ext = fileName.substring(extIndex);
+                newName = Integer.toString(i) + fileName.substring(extIndex);
             }
-            sb.append(Integer.toString(i));
-            if (ext != null) {
-                sb.append(ext);
-            }
+            result.add(newName);
         }
-        return sb.toString();
+        return result;
     }
+
 
     /**
      * Zips the files, base 64 encodes the resulting zip and then returns the
@@ -328,16 +336,18 @@ public class SignCode extends Task {
      * signing server but the files that need to be signed are relatively small
      * and this simpler to write.
      *
-     * @param files Files to be signed
+     * @param fileNames Modified names of files
+     * @param files     Files to be signed
      */
-    private static String getApplicationString(List<File> files) throws IOException {
+    private static String getApplicationString(List<String> fileNames, List<File> files)
+            throws IOException {
         // 16 MB should be more than enough for Tomcat
         ByteArrayOutputStream baos = new ByteArrayOutputStream(16 * 1024 * 1024);
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
             byte[] buf = new byte[32 * 1024];
             for (int i = 0; i < files.size(); i++) {
                 try (FileInputStream fis = new FileInputStream(files.get(i))) {
-                    ZipEntry zipEntry = new ZipEntry(Integer.toString(i));
+                    ZipEntry zipEntry = new ZipEntry(fileNames.get(i));
                     zos.putNextEntry(zipEntry);
                     int numRead;
                     while ( (numRead = fis.read(buf)) >= 0) {
