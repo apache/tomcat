@@ -21,7 +21,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -188,13 +187,6 @@ public class WebdavServlet
     protected static final ConcurrentDateFormat creationDateFormat =
         new ConcurrentDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US,
                 TimeZone.getTimeZone("GMT"));
-
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
-     */
-    @Deprecated
-    protected static MessageDigest md5Helper;
 
 
     // ----------------------------------------------------- Instance Variables
