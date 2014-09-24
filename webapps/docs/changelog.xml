@@ -252,7 +252,7 @@
       </fix>
       <fix>
         Update the package renamed copy of Apache Commons Pool 2 to revision
-        1627022 to pick up the fixes since the 2.2 release including some memory
+        1627271 to pick up the fixes since the 2.2 release including some memory
         leak fixes and support for application provided eviction policies.
         (markt)
       </fix>

@@ -91,8 +91,8 @@ public abstract class BaseGenericObjectPool<T> {
     private Evictor evictor = null; // @GuardedBy("evictionLock")
     Iterator<PooledObject<T>> evictionIterator = null; // @GuardedBy("evictionLock")
     /*
-     * Class loader for evictor thread to use since in a J2EE or similar
-     * environment the context class loader for the evictor thread may have
+     * Class loader for evictor thread to use since, in a JavaEE or similar
+     * environment, the context class loader for the evictor thread may not have
      * visibility of the correct factory. See POOL-161. Uses a weak reference to
      * avoid potential memory leaks if the Pool is discarded rather than closed.
      */
@@ -136,9 +136,14 @@ public abstract class BaseGenericObjectPool<T> {
         // Populate the creation stack trace
         this.creationStackTrace = getStackTrace(new Exception());
 
-        // save the current CCL to be used later by the evictor Thread
-        factoryClassLoader =
-                new WeakReference<>(Thread.currentThread().getContextClassLoader());
+        // save the current TCCL (if any) to be used later by the evictor Thread
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl == null) {
+            factoryClassLoader = null;
+        } else {
+            factoryClassLoader = new WeakReference<>(cl);
+        }
+
         fairness = config.getFairness();
     }
 
@@ -998,15 +1003,18 @@ public abstract class BaseGenericObjectPool<T> {
             ClassLoader savedClassLoader =
                     Thread.currentThread().getContextClassLoader();
             try {
-                // Set the class loader for the factory
-                ClassLoader cl = factoryClassLoader.get();
-                if (cl == null) {
-                    // The pool has been dereferenced and the class loader GC'd.
-                    // Cancel this timer so the pool can be GC'd as well.
-                    cancel();
-                    return;
+                if (factoryClassLoader != null) {
+                    // Set the class loader for the factory
+                    ClassLoader cl = factoryClassLoader.get();
+                    if (cl == null) {
+                        // The pool has been dereferenced and the class loader
+                        // GC'd. Cancel this timer so the pool can be GC'd as
+                        // well.
+                        cancel();
+                        return;
+                    }
+                    Thread.currentThread().setContextClassLoader(cl);
                 }
-                Thread.currentThread().setContextClassLoader(cl);
 
                 // Evict from the pool
                 try {
