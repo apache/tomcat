@@ -157,10 +157,8 @@ final class StandardHostValve extends ValveBase {
             request.setAsyncSupported(context.getPipeline().isAsyncSupported());
         }
 
-        // Don't fire listeners during async processing
-        // If a request init listener throws an exception, the request is
-        // aborted
         boolean asyncAtStart = request.isAsync(); 
+        boolean asyncDispatching = request.isAsyncDispatching();
         // An async error page may dispatch to another resource. This flag helps
         // ensure an infinite error handling loop is not entered
         boolean errorAtStart = response.isError();
@@ -168,7 +166,13 @@ final class StandardHostValve extends ValveBase {
 
             // Ask this Context to process this request
             try {
-                context.getPipeline().getFirst().invoke(request, response);
+                if (!asyncAtStart || asyncDispatching) {
+                    context.getPipeline().getFirst().invoke(request, response);
+                } else {
+                    if (!errorAtStart) {
+                        throw new IllegalStateException(sm.getString("standardHost.asyncStateError"));
+                    }
+                }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (errorAtStart) {
@@ -314,7 +318,7 @@ final class StandardHostValve extends ValveBase {
             // Look for a default error page
             errorPage = context.findErrorPage(0);
         }
-        if (errorPage != null) {
+        if (errorPage != null && response.setErrorReported()) {
             response.setAppCommitted(false);
             request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
                               Integer.valueOf(statusCode));
@@ -390,30 +394,32 @@ final class StandardHostValve extends ValveBase {
         }
 
         if (errorPage != null) {
-            response.setAppCommitted(false);
-            request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
-                    errorPage.getLocation());
-            request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
-                    DispatcherType.ERROR);
-            request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
-                    new Integer(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
-            request.setAttribute(RequestDispatcher.ERROR_MESSAGE,
-                              throwable.getMessage());
-            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION,
-                              realError);
-            Wrapper wrapper = request.getWrapper();
-            if (wrapper != null)
-                request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
-                                  wrapper.getName());
-            request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
-                                 request.getRequestURI());
-            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE,
-                              realError.getClass());
-            if (custom(request, response, errorPage)) {
-                try {
-                    response.finishResponse();
-                } catch (IOException e) {
-                    container.getLogger().warn("Exception Processing " + errorPage, e);
+            if (response.setErrorReported()) {
+                response.setAppCommitted(false);
+                request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
+                        errorPage.getLocation());
+                request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
+                        DispatcherType.ERROR);
+                request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
+                        new Integer(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
+                request.setAttribute(RequestDispatcher.ERROR_MESSAGE,
+                                  throwable.getMessage());
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION,
+                                  realError);
+                Wrapper wrapper = request.getWrapper();
+                if (wrapper != null)
+                    request.setAttribute(RequestDispatcher.ERROR_SERVLET_NAME,
+                                      wrapper.getName());
+                request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
+                                     request.getRequestURI());
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE,
+                                  realError.getClass());
+                if (custom(request, response, errorPage)) {
+                    try {
+                        response.finishResponse();
+                    } catch (IOException e) {
+                        container.getLogger().warn("Exception Processing " + errorPage, e);
+                    }
                 }
             }
         } else {

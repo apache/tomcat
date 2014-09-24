@@ -77,6 +77,13 @@
         starts processing the dispatch. (markt)
       </fix>
       <fix>
+        <bug>56739</bug>: If an application handles an error on an application
+        thread during asynchronous processing by calling
+        <code>HttpServletResponse.sendError()</code>, then ensure that the
+        application is given an opportunity to report that error via an
+        appropriate application defined error page if one is configured. (markt)
+      </fix>
+      <fix>
         <bug>56771</bug>: When lookup for a resource in all the alternate or
         backup <code>javax.naming.directory.DirContext</code>,
         <code>javax.naming.NameNotFoundException</code> will be thrown at the
