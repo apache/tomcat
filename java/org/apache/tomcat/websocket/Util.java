@@ -358,11 +358,9 @@ public class Util {
     }
 
 
-    static Set<MessageHandlerResult> getMessageHandlers(
+    static Set<MessageHandlerResult> getMessageHandlers(Class<?> target,
             MessageHandler listener, EndpointConfig endpointConfig,
             Session session) {
-
-        Class<?> target = Util.getMessageType(listener);
 
         // Will never be more than 2 types
         Set<MessageHandlerResult> results = new HashSet<MessageHandlerResult>(2);
