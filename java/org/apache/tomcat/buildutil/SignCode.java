@@ -171,7 +171,7 @@ public class SignCode extends Task {
         // Send the message
         SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
         SOAPConnection connection = soapConnectionFactory.createConnection();
-        URL endpoint = new URL("https://test-api.ws.symantec.com:443/webtrust/SigningService");
+        URL endpoint = new URL("https://api.ws.symantec.com/webtrust/SigningService");
 
         log("Sending siging request to server and waiting for response");
         SOAPMessage response = connection.call(message, endpoint);
