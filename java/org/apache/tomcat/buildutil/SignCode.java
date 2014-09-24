@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,11 +54,18 @@ import org.w3c.dom.NodeList;
  */
 public class SignCode extends Task {
 
+    private static final URL SIGNING_SERVICE_URL;
+
     private static final String NS = "cod";
 
     private static final MessageFactory SOAP_MSG_FACTORY;
 
     static {
+        try {
+            SIGNING_SERVICE_URL = new URL("https://api.ws.symantec.com/webtrust/SigningService");
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(e);
+        }
         try {
             SOAP_MSG_FACTORY = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
         } catch (SOAPException e) {
@@ -173,10 +181,9 @@ public class SignCode extends Task {
         // Send the message
         SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
         SOAPConnection connection = soapConnectionFactory.createConnection();
-        URL endpoint = new URL("https://api.ws.symantec.com/webtrust/SigningService");
 
         log("Sending siging request to server and waiting for response");
-        SOAPMessage response = connection.call(message, endpoint);
+        SOAPMessage response = connection.call(message, SIGNING_SERVICE_URL);
 
         log("Processing response");
         SOAPElement responseBody = response.getSOAPBody();
@@ -246,10 +253,9 @@ public class SignCode extends Task {
         // Send the message
         SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
         SOAPConnection connection = soapConnectionFactory.createConnection();
-        URL endpoint = new URL("https://test-api.ws.symantec.com:443/webtrust/SigningService");
 
         log("Requesting signed files from server and waiting for response");
-        SOAPMessage response = connection.call(message, endpoint);
+        SOAPMessage response = connection.call(message, SIGNING_SERVICE_URL);
 
         log("Processing response");
         SOAPElement responseBody = response.getSOAPBody();
