@@ -54,6 +54,17 @@ public interface Realm {
     public void setContainer(Container container);
 
 
+    /**
+     * Return the CredentialHandler configured for this Realm.
+     */
+    public CredentialHandler getCredentialHandler();
+
+    /**
+     * Set the CredentialHandler to be used by this Realm.
+     */
+    public void setCredentialHandler(CredentialHandler credentialHandler);
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -188,9 +199,4 @@ public interface Realm {
      * @param listener The listener to remove
      */
     public void removePropertyChangeListener(PropertyChangeListener listener);
-
-
-    public CredentialHandler getCredentialHandler();
-
-    public void setCredentialHandler(CredentialHandler credentialHandler);
 }
