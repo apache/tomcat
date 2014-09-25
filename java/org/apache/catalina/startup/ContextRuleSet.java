@@ -242,6 +242,13 @@ public class ContextRuleSet extends RuleSetBase {
                             "setJarScanFilter",
                             "org.apache.tomcat.JarScanFilter");
 
+        digester.addObjectCreate(prefix + "Context/CookieProcessor",
+                                 "org.apache.tomcat.util.http.Cookies",
+                                 "className");
+        digester.addSetProperties(prefix + "Context/CookieProcessor");
+        digester.addSetNext(prefix + "Context/CookieProcessor",
+                            "setCookieProcessor",
+                            "org.apache.tomcat.util.http.CookieProcessor");
     }
 
 }

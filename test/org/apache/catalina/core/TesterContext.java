@@ -19,8 +19,6 @@ package org.apache.catalina.core;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -64,6 +62,7 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.CookieProcessor;
 
 /**
  * Minimal implementation for use in unit tests.
@@ -1220,22 +1219,11 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public Object getNamingToken() {
-        return null;
-    }
+    public Object getNamingToken() { return null; }
 
     @Override
-    public void setUseRfc6265(boolean useRfc6265) { /* NO-OP */ }
+    public void setCookieProcessor(CookieProcessor cookieProcessor) { /* NO-OP */ }
 
     @Override
-    public boolean getUseRfc6265() {return false; }
-
-    @Override
-    public void setCookieEncoding(String encoding) { /* NO-OP */ }
-
-    @Override
-    public String getCookieEncoding() { return "UTF-8"; }
-
-    @Override
-    public Charset getCookieEncodingCharset() { return StandardCharsets.UTF_8; }
+    public CookieProcessor getCookieProcessor() { return null; }
 }

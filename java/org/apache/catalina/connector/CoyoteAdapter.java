@@ -46,8 +46,8 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.ServerCookie;
+import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.res.StringManager;
@@ -903,15 +903,8 @@ public class CoyoteAdapter implements Adapter {
                 }
             }
 
-            if (request.getContext().getUseRfc6265()) {
-                req.getCookies().setUseRfc6265(true);
-            } else {
-                req.getCookies().setUseRfc6265(false);
-            }
-
-
             // Look for session ID in cookies and SSL session
-            parseSessionCookiesId(req, request);
+            parseSessionCookiesId(request);
             parseSessionSslId(request);
 
             sessionID = request.getRequestedSessionId();
@@ -1145,7 +1138,7 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Parse session id in URL.
      */
-    protected void parseSessionCookiesId(org.apache.coyote.Request req, Request request) {
+    protected void parseSessionCookiesId(Request request) {
 
         // If session tracking via cookies has been disabled for the current
         // context, don't go looking for a session ID in a cookie as a cookie
@@ -1159,7 +1152,7 @@ public class CoyoteAdapter implements Adapter {
         }
 
         // Parse session id from cookies
-        Cookies serverCookies = req.getCookies();
+        ServerCookies serverCookies = request.getServerCookies();
         int count = serverCookies.getCookieCount();
         if (count <= 0) {
             return;
