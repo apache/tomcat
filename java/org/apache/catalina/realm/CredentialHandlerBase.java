@@ -45,7 +45,9 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
     public String generate(int saltLength, String userCredential) {
         byte[] salt = null;
         int iterations = getIterations();
-        if (saltLength > 0) {
+        if (saltLength == 0) {
+            salt = new byte[0];
+        } else if (saltLength > 0) {
             if (random == null) {
                 random = new SecureRandom();
             }
@@ -62,7 +64,7 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
     protected boolean matchesSaltIterationsEncoded(String inputCredentials, String storedCredentials) {
 
         int sep1 = storedCredentials.indexOf('$');
-        int sep2 = storedCredentials.indexOf('$', sep1);
+        int sep2 = storedCredentials.indexOf('$', sep1 + 1);
 
         String hexSalt = storedCredentials.substring(0,  sep1);
 
