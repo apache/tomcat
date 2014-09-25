@@ -77,7 +77,7 @@ public class PBECredentialHandler extends CredentialHandlerBase {
         try {
             return HexUtils.toHexString(secretKeyFactory.generateSecret(spec).getEncoded());
         } catch (InvalidKeySpecException e) {
-            // TODO Log a warning
+            log.warn("pbeCredentialHandler.invalidKeySpec", e);
             return null;
         }
     }
