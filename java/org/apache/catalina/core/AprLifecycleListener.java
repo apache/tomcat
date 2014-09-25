@@ -20,6 +20,8 @@ package org.apache.catalina.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -45,6 +47,13 @@ public class AprLifecycleListener
 
     private static final Log log = LogFactory.getLog(AprLifecycleListener.class);
     private static boolean instanceCreated = false;
+    /**
+     * Info messages during init() are cached until Lifecycle.BEFORE_INIT_EVENT
+     * so that, in normal (non-error) cases, init() releated log messages appear
+     * at the expected point in the lifecycle.
+     */
+    private static final List<String> initInfoLogMessages = new ArrayList<>(3);
+
     /**
      * The string manager for this package.
      */
@@ -116,6 +125,10 @@ public class AprLifecycleListener
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
             synchronized (lock) {
                 init();
+                for (String msg : initInfoLogMessages) {
+                    log.info(msg);
+                }
+                initInfoLogMessages.clear();
                 if (aprAvailable) {
                     try {
                         initializeSSL();
@@ -195,7 +208,7 @@ public class AprLifecycleListener
         } catch (Throwable t) {
             t = ExceptionUtils.unwrapInvocationTargetException(t);
             ExceptionUtils.handleThrowable(t);
-            log.info(sm.getString("aprListener.aprInit",
+            initInfoLogMessages.add(sm.getString("aprListener.aprInit",
                     System.getProperty("java.library.path")));
             return;
         }
@@ -216,21 +229,21 @@ public class AprLifecycleListener
             return;
         }
         if (apver < rcver) {
-            log.info(sm.getString("aprListener.tcnVersion", major + "."
-                    + minor + "." + patch,
+            initInfoLogMessages.add(sm.getString("aprListener.tcnVersion",
+                    major + "." + minor + "." + patch,
                     TCN_REQUIRED_MAJOR + "." +
                     TCN_RECOMMENDED_MINOR + "." +
                     TCN_RECOMMENDED_PV));
         }
 
-        log.info(sm.getString("aprListener.tcnValid", major + "."
-                    + minor + "." + patch,
-                    Library.APR_MAJOR_VERSION + "."
-                    + Library.APR_MINOR_VERSION + "."
-                    + Library.APR_PATCH_VERSION));
+        initInfoLogMessages.add(sm.getString("aprListener.tcnValid",
+                major + "." + minor + "." + patch,
+                Library.APR_MAJOR_VERSION + "." +
+                Library.APR_MINOR_VERSION + "." +
+                Library.APR_PATCH_VERSION));
 
         // Log APR flags
-        log.info(sm.getString("aprListener.flags",
+        initInfoLogMessages.add(sm.getString("aprListener.flags",
                 Boolean.valueOf(Library.APR_HAVE_IPV6),
                 Boolean.valueOf(Library.APR_HAS_SENDFILE),
                 Boolean.valueOf(Library.APR_HAS_SO_ACCEPTFILTER),

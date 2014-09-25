@@ -45,7 +45,16 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.15 (markt)">
-  <subsection name="We applications">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Improve the previous fix for <bug>56401</bug>. Avoid logging version
+        information in the constructor since it then gets logged at undesirable
+        times such as when using <code>StoreConfig</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
     <changelog>
       <fix>
         Correct a couple of broken links in the Javadoc. (markt)
