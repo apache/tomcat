@@ -106,7 +106,7 @@ public interface Lifecycle {
 
 
     /**
-     * The LifecycleEvent type for the "component after init" event.
+     * The LifecycleEvent type for the "component before init" event.
      */
     public static final String BEFORE_INIT_EVENT = "before_init";
 
