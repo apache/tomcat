@@ -264,7 +264,7 @@ public class Response
      *   |----<----REPORTED
      * </pre>
      */
-    private AtomicInteger errorState = new AtomicInteger(0);
+    private final AtomicInteger errorState = new AtomicInteger(0);
 
 
     /**
