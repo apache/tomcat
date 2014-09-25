@@ -52,7 +52,7 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
  * <p>
  * If the stored password form does not include salt then no salt is used.
  */
-public class MessageDigestCredentialHandler extends CredentialHandlerBase {
+public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase {
 
     private static final Log log = LogFactory.getLog(MessageDigestCredentialHandler.class);
 
@@ -157,7 +157,7 @@ public class MessageDigestCredentialHandler extends CredentialHandlerBase {
 
 
     @Override
-    public String mutate(String inputCredentials, byte[] salt, int iterations) {
+    protected String mutate(String inputCredentials, byte[] salt, int iterations) {
         if (algorithm == null) {
             return inputCredentials;
         } else {

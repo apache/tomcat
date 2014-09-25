@@ -51,6 +51,7 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -75,7 +76,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     private static final Log log = LogFactory.getLog(RealmBase.class);
 
-    private static final List<Class<? extends CredentialHandlerBase>> credentialHandlerClasses =
+    private static final List<Class<? extends DigestCredentialHandlerBase>> credentialHandlerClasses =
             new ArrayList<>();
 
     static {
@@ -1437,11 +1438,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *                 stored credential. If not specified, the default for the
      *                 CredentialHandler will be used.</li>
      * <li><b>-s</b> - The length (in bytes) of salt to generate and store as
-     *                 part of the credential. If not specified, a default of 32
-     *                 will be used.</li>
+     *                 part of the credential. If not specified, the default for
+     *                 the CredentialHandler will be used.</li>
      * <li><b>-k</b> - The length (in bits) of the key(s), if any, created while
-     *                 generating the credential. If not specified, a default of
-     *                 160 will be used.</li>
+     *                 generating the credential. If not specified, the default
+     *                 for the CredentialHandler will be used.</li>
      * <li><b>-h</b> - The fully qualified class name of the CredentialHandler
      *                 to use. If not specified, the built-in handlers will be
      *                 tested in turn and the first one to accept the specified
@@ -1459,9 +1460,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         String algorithm = "SHA-512";
         String encoding = "UTF-8";
-        int saltLength = 32;
-        int iterations = 0;
-        int keyLength = 160;
+        int saltLength = -1;
+        int iterations = -1;
+        int keyLength = -1;
         String handlerClassName = null;
 
         int argIndex = 0;
@@ -1495,22 +1496,23 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
             default: {
                 System.out.println("Usage: RealmBase [-a <algorithm>] [-e <encoding>] " +
-                        "[-s <salt-length>] [-k <key-length>] <credentials>");
+                        "[-i <iterations>] [-s <salt-length>] [-k <key-length>] " +
+                        "[-h <handler-class-name>] <credentials>");
                 return;
             }
             }
             argIndex += 2;
         }
 
-        CredentialHandlerBase handler = null;
+        CredentialHandler handler = null;
 
         if (handlerClassName == null) {
-            for (Class<? extends CredentialHandlerBase> clazz : credentialHandlerClasses) {
+            for (Class<? extends DigestCredentialHandlerBase> clazz : credentialHandlerClasses) {
                 try {
                     handler = clazz.newInstance();
-                    handler.setAlgorithm(algorithm);
-                } catch (NoSuchAlgorithmException e) {
-                    // Ignore - Algorithm is for a different CredentialHandler
+                    if (IntrospectionUtils.setProperty(handler, "algorithm", algorithm)) {
+                        break;
+                    }
                 } catch (InstantiationException | IllegalAccessException e) {
                     // This isn't good.
                     throw new RuntimeException(e);
@@ -1519,10 +1521,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         } else {
             try {
                 Class<?> clazz = Class.forName(handlerClassName);
-                handler = (CredentialHandlerBase) clazz.newInstance();
-                handler.setAlgorithm(algorithm);
+                handler = (DigestCredentialHandlerBase) clazz.newInstance();
+                IntrospectionUtils.setProperty(handler, "algorithm", algorithm);
             } catch (InstantiationException | IllegalAccessException
-                    | ClassNotFoundException | NoSuchAlgorithmException e) {
+                    | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -1531,20 +1533,21 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             throw new RuntimeException(new NoSuchAlgorithmException(algorithm));
         }
 
+        IntrospectionUtils.setProperty(handler, "encoding", encoding);
         if (iterations > 0) {
-            handler.setIterations(iterations);
+            IntrospectionUtils.setProperty(handler, "iterations", Integer.toString(iterations));
         }
-
-        if (handler instanceof MessageDigestCredentialHandler) {
-            ((MessageDigestCredentialHandler) handler).setEncoding(encoding);
-        } else if (handler instanceof PBECredentialHandler) {
-            ((PBECredentialHandler) handler).setKeyLength(keyLength);
+        if (saltLength > -1) {
+            IntrospectionUtils.setProperty(handler, "saltLength", Integer.toString(saltLength));
+        }
+        if (keyLength > 0) {
+            IntrospectionUtils.setProperty(handler, "keyLength", Integer.toString(keyLength));
         }
 
         for (; argIndex < args.length; argIndex++) {
             String credential = args[argIndex];
-            System.out.println(credential);
-            handler.generate(saltLength, credential);
+            System.out.print(credential + ":");
+            System.out.println(handler.mutate(credential));
         }
     }
 

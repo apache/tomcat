@@ -38,13 +38,9 @@ public interface CredentialHandler {
      * credentials.
      *
      * @param inputCredentials  User provided credentials
-     * @param salt              Salt, if any
-     * @param iterations        Number of iterations of the algorithm associated
-     *                          with this CredentialHandler applied to the
-     *                          inputCredentials to generate the equivalent
-     *                          stored credentials
+     *
      * @return  The equivalent stored credentials for the given input
      *          credentials
      */
-    String mutate(String inputCredentials, byte[] salt, int iterations);
+    String mutate(String inputCredentials);
 }
