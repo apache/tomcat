@@ -39,7 +39,7 @@ public class TestPBECredentialHandler {
     }
 
     private void doTest(String digest, int saltLength, int iterations) throws NoSuchAlgorithmException {
-        PBECredentialHandler pbech = new PBECredentialHandler();
+        SecretKeyCredentialHandler pbech = new SecretKeyCredentialHandler();
         pbech.setAlgorithm(digest);
         pbech.setIterations(iterations);
         pbech.setSaltLength(saltLength);

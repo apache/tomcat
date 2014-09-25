@@ -27,9 +27,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.HexUtils;
 
-public class PBECredentialHandler extends DigestCredentialHandlerBase {
+public class SecretKeyCredentialHandler extends DigestCredentialHandlerBase {
 
-    private static final Log log = LogFactory.getLog(PBECredentialHandler.class);
+    private static final Log log = LogFactory.getLog(SecretKeyCredentialHandler.class);
 
     public static final String DEFAULT_ALGORITHM = "PBKDF2WithHmacSHA1";
     public static final int DEFAULT_KEY_LENGTH = 160;
@@ -40,7 +40,7 @@ public class PBECredentialHandler extends DigestCredentialHandlerBase {
     private int keyLength = DEFAULT_KEY_LENGTH;
 
 
-    public PBECredentialHandler() throws NoSuchAlgorithmException {
+    public SecretKeyCredentialHandler() throws NoSuchAlgorithmException {
         setAlgorithm(DEFAULT_ALGORITHM);
     }
 
