@@ -117,7 +117,7 @@ public class MemoryRealm  extends RealmBase {
         if (principal == null) {
             validated = false;
         } else {
-            validated = compareCredentials(credentials, principal.getPassword());
+            validated = getCredentialHandler().matches(credentials, principal.getPassword());
         }
 
         if (validated) {
