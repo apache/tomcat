@@ -52,6 +52,10 @@
         information in the constructor since it then gets logged at undesirable
         times such as when using <code>StoreConfig</code>. (markt)
       </fix>
+      <fix>
+        <bug>57016</bug>: When using the <code>PersistentValve</code> do not
+        remove sessions from the store when persisting them. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
