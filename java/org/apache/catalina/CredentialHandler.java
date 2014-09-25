@@ -20,5 +20,5 @@ public interface CredentialHandler {
 
     boolean matches(String inputCredentials, String storedCredentials);
 
-    String mutate(String inputCredentials);
+    String mutate(String inputCredentials, byte[] salt, int iterations);
 }

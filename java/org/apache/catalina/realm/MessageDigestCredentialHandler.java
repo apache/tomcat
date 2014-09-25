@@ -32,6 +32,28 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
+/**
+ * This credential handler supports the following forms of stored passwords:
+ * <ul>
+ * <li><b>encodedCredential</b> - a hex encoded digest of the password digested
+ *     using the configured digest</li>
+ * <li><b>{MD5}encodedCredential</b> - a Base64 encoded MD5 digest of the
+ *     password</li>
+ * <li><b>{SHA}encodedCredential</b> - a Base64 encoded SHA1 digest of the
+ *     password</li>
+ * <li><b>{SSHA}encodedCredential</b> - 20 character salt followed by the salted
+ *     SHA1 digest Base64 encoded</li>
+ * <li><b>salt$iterationCount$encodedCredential</b> - a hex encoded salt,
+ *     iteration code and a hex encoded credential, each separated by $</li>
+ * </ul>
+ *
+ * Prefixes of {MD5} and {SHA}
+ * <p>
+ * If the stored password form does not included an iteration count then an
+ * iteration count of 1 is used.
+ * <p>
+ * If the stored password form does not include salt then no salt is used.
+ */
 public class MessageDigestCredentialHandler implements CredentialHandler {
 
     private static final Log log = LogFactory.getLog(MessageDigestCredentialHandler.class);
@@ -126,9 +148,20 @@ public class MessageDigestCredentialHandler implements CredentialHandler {
 
                 return Arrays.equals(userDigestBytes, serverDigestBytes);
 
+            } else if (storedCredentials.indexOf('$') > -1) {
+                int sep1 = storedCredentials.indexOf('$');
+                int sep2 = storedCredentials.indexOf('$', sep1);
+                String hexSalt = storedCredentials.substring(0,  sep1);
+                int iterations = Integer.parseInt(storedCredentials.substring(sep1 + 1, sep2));
+                String hexEncoded = storedCredentials.substring(sep2 + 1);
+                byte[] salt = HexUtils.fromHexString(hexSalt);
+
+                String userDigest = mutate(inputCredentials, salt, iterations);
+
+                return hexEncoded.equalsIgnoreCase(userDigest);
             } else {
                 // Hex hashes should be compared case-insensitively
-                String userDigest = mutate(inputCredentials);
+                String userDigest = mutate(inputCredentials, null, 1);
                 return storedCredentials.equalsIgnoreCase(userDigest);
             }
         }
@@ -136,12 +169,19 @@ public class MessageDigestCredentialHandler implements CredentialHandler {
 
 
     @Override
-    public String mutate(String inputCredentials) {
+    public String mutate(String inputCredentials, byte[] salt, int iterations) {
         if (digest == null) {
             return inputCredentials;
         } else {
-            return HexUtils.toHexString(ConcurrentMessageDigest.digest(digest,
-                    inputCredentials.getBytes(encoding)));
+            byte[] userDigest;
+            if (salt == null) {
+                userDigest = ConcurrentMessageDigest.digest(digest, iterations,
+                        inputCredentials.getBytes(encoding));
+            } else {
+                userDigest = ConcurrentMessageDigest.digest(digest, iterations,
+                        salt, inputCredentials.getBytes(encoding));
+            }
+            return HexUtils.toHexString(userDigest);
         }
     }
 }
