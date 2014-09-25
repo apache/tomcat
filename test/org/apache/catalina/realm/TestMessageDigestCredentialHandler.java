@@ -51,7 +51,8 @@ public class TestMessageDigestCredentialHandler {
         MessageDigestCredentialHandler mdch = new MessageDigestCredentialHandler();
         mdch.setAlgorithm(digest);
         mdch.setIterations(iterations);
-        String storedCredential = mdch.generate(saltLength, PWD);
+        mdch.setSaltLength(saltLength);
+        String storedCredential = mdch.mutate(PWD);
         Assert.assertTrue(mdch.matches(PWD, storedCredential));
     }
 }

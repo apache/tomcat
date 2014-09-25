@@ -39,10 +39,11 @@ public class TestPBECredentialHandler {
     }
 
     private void doTest(String digest, int saltLength, int iterations) throws NoSuchAlgorithmException {
-        PBECredentialHandler mdch = new PBECredentialHandler();
-        mdch.setAlgorithm(digest);
-        mdch.setIterations(iterations);
-        String storedCredential = mdch.generate(saltLength, PWD);
-        Assert.assertTrue(mdch.matches(PWD, storedCredential));
+        PBECredentialHandler pbech = new PBECredentialHandler();
+        pbech.setAlgorithm(digest);
+        pbech.setIterations(iterations);
+        pbech.setSaltLength(saltLength);
+        String storedCredential = pbech.mutate(PWD);
+        Assert.assertTrue(pbech.matches(PWD, storedCredential));
     }
 }
