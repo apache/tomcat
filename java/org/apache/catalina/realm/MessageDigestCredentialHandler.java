@@ -23,13 +23,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
-import org.apache.catalina.CredentialHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 /**
@@ -54,11 +52,9 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
  * <p>
  * If the stored password form does not include salt then no salt is used.
  */
-public class MessageDigestCredentialHandler implements CredentialHandler {
+public class MessageDigestCredentialHandler extends CredentialHandlerBase {
 
     private static final Log log = LogFactory.getLog(MessageDigestCredentialHandler.class);
-
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     private Charset encoding = StandardCharsets.UTF_8;
     private String digest = null;
@@ -149,16 +145,8 @@ public class MessageDigestCredentialHandler implements CredentialHandler {
                 return Arrays.equals(userDigestBytes, serverDigestBytes);
 
             } else if (storedCredentials.indexOf('$') > -1) {
-                int sep1 = storedCredentials.indexOf('$');
-                int sep2 = storedCredentials.indexOf('$', sep1);
-                String hexSalt = storedCredentials.substring(0,  sep1);
-                int iterations = Integer.parseInt(storedCredentials.substring(sep1 + 1, sep2));
-                String hexEncoded = storedCredentials.substring(sep2 + 1);
-                byte[] salt = HexUtils.fromHexString(hexSalt);
+                return matchesSaltIterationsEncoded(inputCredentials, storedCredentials);
 
-                String userDigest = mutate(inputCredentials, salt, iterations);
-
-                return hexEncoded.equalsIgnoreCase(userDigest);
             } else {
                 // Hex hashes should be compared case-insensitively
                 String userDigest = mutate(inputCredentials, null, 1);

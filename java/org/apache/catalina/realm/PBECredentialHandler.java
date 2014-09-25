@@ -23,17 +23,13 @@ import java.security.spec.KeySpec;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-import org.apache.catalina.CredentialHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.HexUtils;
-import org.apache.tomcat.util.res.StringManager;
 
-public class PBECredentialHandler implements CredentialHandler {
+public class PBECredentialHandler extends CredentialHandlerBase {
 
     private static final Log log = LogFactory.getLog(PBECredentialHandler.class);
-
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     public static final String DEFAULT_ALGORITHM = "PBKDF2WithHmacSHA1";
     public static final int DEFAULT_KEYLENGTH = 160;
@@ -70,16 +66,7 @@ public class PBECredentialHandler implements CredentialHandler {
 
     @Override
     public boolean matches(String inputCredentials, String storedCredentials) {
-        int sep1 = storedCredentials.indexOf('$');
-        int sep2 = storedCredentials.indexOf('$', sep1);
-        String hexSalt = storedCredentials.substring(0,  sep1);
-        int iterations = Integer.parseInt(storedCredentials.substring(sep1 + 1, sep2));
-        String hexEncoded = storedCredentials.substring(sep2 + 1);
-        byte[] salt = HexUtils.fromHexString(hexSalt);
-
-        String userDigest = mutate(inputCredentials, salt, iterations);
-
-        return hexEncoded.equalsIgnoreCase(userDigest);
+        return matchesSaltIterationsEncoded(inputCredentials, storedCredentials);
     }
 
 
