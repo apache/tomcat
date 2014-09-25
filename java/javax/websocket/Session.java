@@ -41,12 +41,12 @@ public interface Session extends Closeable {
      * or
      * {@link #addMessageHandler(Class, javax.websocket.MessageHandler.Whole)}.
      *
-     * @param listener  The message handler for a incoming message
+     * @param handler   The message handler for a incoming message
      *
      * @throws IllegalStateException  If a message handler has already been
      *                                registered for the associated message type
      */
-    void addMessageHandler(MessageHandler listener) throws IllegalStateException;
+    void addMessageHandler(MessageHandler handler) throws IllegalStateException;
 
     Set<MessageHandler> getMessageHandlers();
 
@@ -148,7 +148,7 @@ public interface Session extends Closeable {
      *
      * @param clazz     The type of message that the given handler is intended
      *                  for
-     * @param listener  The message handler for a incoming message
+     * @param handler   The message handler for a incoming message
      *
      * @throws IllegalStateException  If a message handler has already been
      *                                registered for the associated message type
@@ -163,7 +163,7 @@ public interface Session extends Closeable {
      *
      * @param clazz     The type of message that the given handler is intended
      *                  for
-     * @param listener  The message handler for a incoming message
+     * @param handler   The message handler for a incoming message
      *
      * @throws IllegalStateException  If a message handler has already been
      *                                registered for the associated message type
