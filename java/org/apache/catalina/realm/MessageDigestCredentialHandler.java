@@ -57,8 +57,8 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 public class MessageDigestCredentialHandler implements CredentialHandler {
 
     private static final Log log = LogFactory.getLog(MessageDigestCredentialHandler.class);
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     private Charset encoding = StandardCharsets.UTF_8;
     private String digest = null;
@@ -76,7 +76,7 @@ public class MessageDigestCredentialHandler implements CredentialHandler {
             try {
                 this.encoding = B2CConverter.getCharset(encodingName);
             } catch (UnsupportedEncodingException e) {
-                log.warn(sm.getString("mdCredentialHandler.unknownEncoding=.unknownEncoding",
+                log.warn(sm.getString("mdCredentialHandler.unknownEncoding",
                         encodingName, encoding.name()));
             }
         }

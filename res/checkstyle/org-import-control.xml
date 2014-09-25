@@ -23,6 +23,7 @@
   <!-- Anything in J2SE is OK but need to list javax by package as not
        all javax packages are in J2SE -->
   <allow pkg="java"/>
+  <allow pkg="javax.crypto"/>
   <allow class="javax.imageio.ImageIO"/>
   <allow pkg="javax.management"/>
   <allow pkg="javax.naming"/>
