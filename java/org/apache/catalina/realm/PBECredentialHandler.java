@@ -44,6 +44,7 @@ public class PBECredentialHandler extends CredentialHandlerBase {
     }
 
 
+    @Override
     public String getAlgorithm() {
         return secretKeyFactory.getAlgorithm();
     }
