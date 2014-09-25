@@ -16,14 +16,13 @@
  */
 package org.apache.tomcat.util.http;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.http.parser.Cookie;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -36,7 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Costin Manolache
  * @author kevin seguin
  */
-public final class Cookies {
+public final class Cookies implements CookieProcessor {
 
     private static final Log log = LogFactory.getLog(Cookies.class);
 
@@ -45,72 +44,16 @@ public final class Cookies {
     private static final StringManager sm =
             StringManager.getManager("org.apache.tomcat.util.http");
 
-    // expected average number of cookies per request
-    public static final int INITIAL_SIZE = 4;
-    private ServerCookies scookies = new ServerCookies(INITIAL_SIZE);
-    private boolean unprocessed = true;
-    private boolean useRfc6265 = false;
 
-    private final MimeHeaders headers;
-
-
-    /**
-     *  Construct a new cookie collection, that will extract
-     *  the information from headers.
-     *
-     * @param headers Cookies are lazy-evaluated and will extract the
-     *     information from the provided headers.
-     */
-    public Cookies(MimeHeaders headers) {
-        this.headers = headers;
-    }
-
-
-    public void recycle() {
-        scookies.recycle();
-        unprocessed = true;
-        useRfc6265 = false;
-    }
-
-
-    /**
-     * EXPENSIVE!!!  only for debugging.
-     */
     @Override
-    public String toString() {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        pw.println("=== Cookies ===");
-        int count = getCookieCount();
-        for (int i = 0; i < count; ++i) {
-            pw.println(getCookie(i).toString());
-        }
-        return sw.toString();
+    public Charset getCharset() {
+        return StandardCharsets.ISO_8859_1;
     }
 
 
-    /**
-     * Indexed access.
-     */
-    public ServerCookie getCookie(int idx) {
-        if (unprocessed) {
-            // This will trigger cookie processing
-            getCookieCount();
-        }
-        return scookies.getCookie(idx);
-    }
+    @Override
+    public void parseCookieHeader(MimeHeaders headers, ServerCookies serverCookies) {
 
-
-    public int getCookieCount() {
-        if (unprocessed) {
-            unprocessed = false;
-            processCookies(headers);
-        }
-        return scookies.getCookieCount();
-    }
-
-
-    private void processCookies(MimeHeaders headers) {
         if (headers == null) {
             // nothing to process
             return;
@@ -135,102 +78,16 @@ public final class Cookies {
                     if (len > 0) {
                         byte[] buf = new byte[len];
                         System.arraycopy(bc.getBytes(), bc.getOffset(), buf, 0, len);
-                        processCookieHeader(buf, 0, len);
+                        processCookieHeader(buf, 0, len, serverCookies);
                     }
                 } else {
-                    processCookieHeader(bc.getBytes(), bc.getOffset(), bc.getLength());
+                    processCookieHeader(bc.getBytes(), bc.getOffset(), bc.getLength(),
+                            serverCookies);
                 }
             }
 
             // search from the next position
             pos = headers.findHeader("Cookie", ++pos);
-        }
-    }
-
-
-    public void setUseRfc6265(boolean useRfc6265) {
-        this.useRfc6265 = useRfc6265;
-    }
-
-
-    // XXX will be refactored soon!
-    private static boolean equals(String s, byte b[], int start, int end) {
-        int blen = end-start;
-        if (b == null || blen != s.length()) {
-            return false;
-        }
-        int boff = start;
-        for (int i = 0; i < blen; i++) {
-            if (b[boff++] != s.charAt(i)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    /**
-     * Returns true if the byte is a whitespace character as
-     * defined in RFC2619
-     * JVK
-     */
-    private static final boolean isWhiteSpace(final byte c) {
-        // This switch statement is slightly slower
-        // for my vm than the if statement.
-        // Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-164)
-        /*
-        switch (c) {
-        case ' ':;
-        case '\t':;
-        case '\n':;
-        case '\r':;
-        case '\f':;
-            return true;
-        default:;
-            return false;
-        }
-        */
-        if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f') {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    /**
-     * Unescapes any double quotes in the given cookie value.
-     *
-     * @param bc The cookie value to modify
-     */
-    private static void unescapeDoubleQuotes(ByteChunk bc) {
-
-        if (bc == null || bc.getLength() == 0 || bc.indexOf('"', 0) == -1) {
-            return;
-        }
-
-        int src = bc.getStart();
-        int end = bc.getEnd();
-        int dest = src;
-        byte[] buffer = bc.getBuffer();
-
-        while (src < end) {
-            if (buffer[src] == '\\' && src < end && buffer[src+1]  == '"') {
-                src++;
-            }
-            buffer[dest] = buffer[src];
-            dest ++;
-            src ++;
-        }
-        bc.setEnd(dest);
-    }
-
-
-    final void processCookieHeader(byte bytes[], int off, int len) {
-        if (useRfc6265) {
-            Cookie.parseCookie(bytes, off, len, scookies);
-        } else {
-            doProcessCookieHeaderOriginal(bytes, off, len);
         }
     }
 
@@ -241,7 +98,9 @@ public final class Cookies {
      * RFC 2965 / RFC 2109
      * JVK
      */
-    private void doProcessCookieHeaderOriginal(byte bytes[], int off, int len){
+    private static final void processCookieHeader(byte bytes[], int off, int len,
+            ServerCookies serverCookies) {
+
         if (len <= 0 || bytes == null) {
             return;
         }
@@ -460,7 +319,7 @@ public final class Cookies {
                     continue;
                 }
 
-                sc = scookies.addCookie();
+                sc = serverCookies.addCookie();
                 sc.setVersion( version );
                 sc.getName().setBytes( bytes, nameStart,
                                        nameEnd-nameStart);
@@ -526,5 +385,77 @@ public final class Cookies {
         }
         // Error, we have reached the end of the header w/o a end quote
         return end;
+    }
+
+
+    private static final boolean equals(String s, byte b[], int start, int end) {
+        int blen = end-start;
+        if (b == null || blen != s.length()) {
+            return false;
+        }
+        int boff = start;
+        for (int i = 0; i < blen; i++) {
+            if (b[boff++] != s.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Returns true if the byte is a whitespace character as
+     * defined in RFC2619
+     * JVK
+     */
+    private static final boolean isWhiteSpace(final byte c) {
+        // This switch statement is slightly slower
+        // for my vm than the if statement.
+        // Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-164)
+        /*
+        switch (c) {
+        case ' ':;
+        case '\t':;
+        case '\n':;
+        case '\r':;
+        case '\f':;
+            return true;
+        default:;
+            return false;
+        }
+        */
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Unescapes any double quotes in the given cookie value.
+     *
+     * @param bc The cookie value to modify
+     */
+    private static final void unescapeDoubleQuotes(ByteChunk bc) {
+
+        if (bc == null || bc.getLength() == 0 || bc.indexOf('"', 0) == -1) {
+            return;
+        }
+
+        int src = bc.getStart();
+        int end = bc.getEnd();
+        int dest = src;
+        byte[] buffer = bc.getBuffer();
+
+        while (src < end) {
+            if (buffer[src] == '\\' && src < end && buffer[src+1]  == '"') {
+                src++;
+            }
+            buffer[dest] = buffer[src];
+            dest ++;
+            src ++;
+        }
+        bc.setEnd(dest);
     }
 }

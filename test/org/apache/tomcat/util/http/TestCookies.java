@@ -472,16 +472,22 @@ public class TestCookies {
 
     private void test(boolean useRfc6265, String header, Cookie... expected) {
         MimeHeaders mimeHeaders = new MimeHeaders();
-        Cookies cookies = new Cookies(mimeHeaders);
-        cookies.setUseRfc6265(useRfc6265);
+        ServerCookies serverCookies = new ServerCookies(4);
+        CookieProcessor cookieProcessor;
+
+        if (useRfc6265) {
+            cookieProcessor = new Rfc6265CookieProcessor();
+        } else {
+            cookieProcessor = new Cookies();
+        }
         MessageBytes cookieHeaderValue = mimeHeaders.addValue("Cookie");
         byte[] bytes = header.getBytes(StandardCharsets.UTF_8);
         cookieHeaderValue.setBytes(bytes, 0, bytes.length);
-        // Calling getCookieCount() triggers parsing
-        Assert.assertEquals(expected.length, cookies.getCookieCount());
+        cookieProcessor.parseCookieHeader(mimeHeaders, serverCookies);
+        Assert.assertEquals(expected.length, serverCookies.getCookieCount());
         for (int i = 0; i < expected.length; i++) {
             Cookie cookie = expected[i];
-            ServerCookie actual = cookies.getCookie(i);
+            ServerCookie actual = serverCookies.getCookie(i);
             Assert.assertEquals(cookie.getVersion(), actual.getVersion());
             Assert.assertEquals(cookie.getName(), actual.getName().toString());
             actual.getValue().getByteChunk().setCharset(StandardCharsets.UTF_8);

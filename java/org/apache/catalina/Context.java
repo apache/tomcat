@@ -17,7 +17,6 @@
 package org.apache.catalina;
 
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +37,7 @@ import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.CookieProcessor;
 
 /**
  * A <b>Context</b> is a Container that represents a servlet context, and
@@ -1640,38 +1640,16 @@ public interface Context extends Container {
     public Object getNamingToken();
 
     /**
-     * Should this context use the new RFC6265 based cookie parser for
-     * processing HTTP cookies? The default value is currently false but that
-     * may change in a future point release.
+     * Sets the {@link CookieProcessor} that will be used to process cookies
+     * for this Context.
+     *
+     * @param cookieProcessor   The new cookie processor
      */
-    public void setUseRfc6265(boolean useRfc6265);
+    public void setCookieProcessor(CookieProcessor cookieProcessor);
 
     /**
-     * Does this context use the new RFC6265 based cookie parser for
-     * processing HTTP cookies? The default value is currently false but that
-     * may change in a future point release.
+     * Obtains the {@link CookieProcessor} that will be used to process cookies
+     * for this Context.
      */
-    public boolean getUseRfc6265();
-
-    /**
-     * Specifies the name of the character encoding to use to convert bytes into
-     * characters when processing cookies using the RFC6265 based cookie parser.
-     * It has no effect if the RFC6265 parser is not used.
-     * If an unrecognised character encoding is specified, a warning will be
-     * logged and the default value of UTF-8 will be used.
-     */
-    public void setCookieEncoding(String encoding);
-
-    /**
-     * Returns the name of the character encoding used to convert bytes into
-     * characters when processing cookies using the RFC6265 based cookie parser.
-     * The default value is UTF-8.
-     */
-    public String getCookieEncoding();
-
-    /**
-     * Returns the character set used to convert bytes into characters when
-     * processing cookies using the RFC6265 based cookie parser.
-     */
-    public Charset getCookieEncodingCharset();
+    public CookieProcessor getCookieProcessor();
 }

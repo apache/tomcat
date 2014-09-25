@@ -45,31 +45,35 @@ public class TesterCookiesPerformance {
 
         MessageBytes headerValue = mimeHeaders.addValue("Cookie");
         headerValue.setBytes(cookieHeaderBytes, 0, cookieHeaderBytes.length);
+        ServerCookies serverCookies = new ServerCookies(4);
 
-        Cookies cookies = new Cookies(mimeHeaders);
+        Cookies originalCookieProcessor = new Cookies();
+        Rfc6265CookieProcessor rfc6265CookieProcessor = new Rfc6265CookieProcessor();
+
         // warm up
         for (int i = 0; i < parsingLoops; i++) {
-            Assert.assertEquals(cookieCount, cookies.getCookieCount());
-            cookies.recycle();
+            originalCookieProcessor.parseCookieHeader(mimeHeaders, serverCookies);
+            Assert.assertEquals(cookieCount, serverCookies.getCookieCount());
+            serverCookies.recycle();
         }
 
         long oldStart = System.nanoTime();
         for (int i = 0; i < parsingLoops; i++) {
-            cookies.setUseRfc6265(false);
-            Assert.assertEquals(cookieCount, cookies.getCookieCount());
-            cookies.recycle();
+            originalCookieProcessor.parseCookieHeader(mimeHeaders, serverCookies);
+            Assert.assertEquals(cookieCount, serverCookies.getCookieCount());
+            serverCookies.recycle();
         }
         long oldDuration = System.nanoTime() - oldStart;
 
         long newStart = System.nanoTime();
         for (int i = 0; i < parsingLoops; i++) {
-            cookies.setUseRfc6265(true);
-            Assert.assertEquals(cookieCount, cookies.getCookieCount());
-            cookies.recycle();
+            rfc6265CookieProcessor.parseCookieHeader(mimeHeaders, serverCookies);
+            Assert.assertEquals(cookieCount, serverCookies.getCookieCount());
+            serverCookies.recycle();
         }
         long newDuration = System.nanoTime() - newStart;
 
-        System.out.println("Old duration: " + oldDuration);
-        System.out.println("New duration: " + newDuration);
+        System.out.println("Original duration: " + oldDuration);
+        System.out.println("RFC6265 duration:  " + newDuration);
     }
 }

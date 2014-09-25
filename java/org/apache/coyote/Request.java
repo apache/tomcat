@@ -25,9 +25,9 @@ import javax.servlet.ReadListener;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
-import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
+import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -62,6 +62,8 @@ public final class Request {
     private static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
+    // Expected maximum typica number of cookies per request.
+    private static final int INITIAL_COOKIE_SIZE = 4;
 
     // ----------------------------------------------------------- Constructors
 
@@ -121,7 +123,8 @@ public final class Request {
     private long contentLength = -1;
     private MessageBytes contentTypeMB = null;
     private String charEncoding = null;
-    private final Cookies cookies = new Cookies(headers);
+
+    private final ServerCookies serverCookies = new ServerCookies(INITIAL_COOKIE_SIZE);
     private final Parameters parameters = new Parameters();
 
     private final MessageBytes remoteUser=MessageBytes.newInstance();
@@ -381,14 +384,12 @@ public final class Request {
 
     // -------------------- Cookies --------------------
 
-
-    public Cookies getCookies() {
-        return cookies;
+    public ServerCookies getCookies() {
+        return serverCookies;
     }
 
 
     // -------------------- Parameters --------------------
-
 
     public Parameters getParameters() {
         return parameters;
@@ -528,7 +529,7 @@ public final class Request {
         remotePort = -1;
         available = 0;
 
-        cookies.recycle();
+        serverCookies.recycle();
         parameters.recycle();
 
         uriMB.recycle();
