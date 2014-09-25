@@ -28,17 +28,22 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Base implementation for the Tomcat provided {@link CredentialHandler}s.
  */
-public abstract class CredentialHandlerBase implements CredentialHandler {
+public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
+    public static final int DEFAULT_SALT_LENGTH = 32;
+
     private int iterations = getDefaultIterations();
-    private Random random = null;
+    private int saltLength = getDefaultSaltLength();
+    private final Object randomLock = new Object();
+    private volatile Random random = null;
+    private boolean logInvalidStoredCredentials = false;
 
 
     /**
      * Return the number of iterations of the associated algorithm that will be
-     * used to convert the plain text credential into the stored credential.
+     * used when creating a new stored credential for a given input credential.
      */
     public int getIterations() {
         return iterations;
@@ -47,7 +52,7 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
 
     /**
      * Set the number of iterations of the associated algorithm that will be
-     * used to convert the plain text credential into the stored credential.
+     * used when creating a new stored credential for a given input credential.
      */
     public void setIterations(int iterations) {
         this.iterations = iterations;
@@ -55,24 +60,61 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
 
 
     /**
-     * Generate a stored credential from the given plain text credential.
-     *
-     * @param saltLength        Length of random salt to be generated and used
-     *                          as part of the transformation
-     * @param userCredential    The plain text credential
-     *
-     * @return  The credential to be stored
+     * Return the salt length that will be used when creating a new stored
+     * credential for a given input credential.
      */
-    public String generate(int saltLength, String userCredential) {
+    public int getSaltLength() {
+        return saltLength;
+    }
+
+
+    /**
+     * Set the salt length that will be used when creating a new stored
+     * credential for a given input credential.
+     */
+    public void setSaltLength(int saltLength) {
+        this.saltLength = saltLength;
+    }
+
+
+    /**
+     * When checking input credentials against stored credentials will a warning
+     * message be logged if invalid stored credentials are discovered?
+     */
+    public boolean getLogInvalidStoredCredentials() {
+        return logInvalidStoredCredentials;
+    }
+
+
+    /**
+     * Set whether a warning message will be logged if invalid stored
+     * credentials are discovered while checking input credentials against
+     * stored credentials?
+     */
+    public void setLogInvalidStoredCredentials(boolean logInvalidStoredCredentials) {
+        this.logInvalidStoredCredentials = logInvalidStoredCredentials;
+    }
+
+
+    @Override
+    public String mutate(String userCredential) {
         byte[] salt = null;
         int iterations = getIterations();
+        int saltLength = getSaltLength();
         if (saltLength == 0) {
             salt = new byte[0];
         } else if (saltLength > 0) {
+            // Double checked locking. OK since random is volatile.
             if (random == null) {
-                random = new SecureRandom();
+                synchronized (randomLock) {
+                    if (random == null) {
+                        random = new SecureRandom();
+                    }
+                }
             }
             salt = new byte[saltLength];
+            // Concurrent use of this random is unlikely to be a performance
+            // issue as it is only used during stored password generation.
             random.nextBytes(salt);
         }
 
@@ -107,10 +149,13 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
 
         if (sep1 < 0 || sep2 < 0) {
             // Stored credentials are invalid
-            // Logging credentials could be a security concern but they are
-            // invalid and that is a bigger problem
-            getLog().warn(sm.getString("credentialHandler.invalidStoredCredential",
-                    storedCredentials));
+            // This may be expected if nested credential handlers are being used
+            if (logInvalidStoredCredentials) {
+                // Logging credentials could be a security concern but they are
+                // invalid and that is probably a bigger problem
+                getLog().warn(sm.getString("credentialHandler.invalidStoredCredential",
+                        storedCredentials));
+            }
             return false;
         }
 
@@ -126,6 +171,30 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
         return storedHexEncoded.equalsIgnoreCase(inputHexEncoded);
     }
 
+
+    /**
+     * Get the default salt length used by the {@link CredentialHandler}.
+     */
+    protected int getDefaultSaltLength() {
+        return DEFAULT_SALT_LENGTH;
+    }
+
+
+    /**
+     * Generates the equivalent stored credentials for the given input
+     * credentials, salt and iterations.
+     *
+     * @param inputCredentials  User provided credentials
+     * @param salt              Salt, if any
+     * @param iterations        Number of iterations of the algorithm associated
+     *                          with this CredentialHandler applied to the
+     *                          inputCredentials to generate the equivalent
+     *                          stored credentials
+     *
+     * @return  The equivalent stored credentials for the given input
+     *          credentials
+     */
+    protected abstract String mutate(String inputCredentials, byte[] salt, int iterations);
 
     /**
      * Set the algorithm used to convert input credentials to stored
