@@ -1442,6 +1442,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * <li><b>-k</b> - The length (in bits) of the key(s), if any, created while
      *                 generating the credential. If not specified, a default of
      *                 160 will be used.</li>
+     * <li><b>-h</b> - The fully qualified class name of the CredentialHandler
+     *                 to use. If not specified, the built-in handlers will be
+     *                 tested in turn and the first one to accept the specified
+     *                 algorithm will be used.</li>
      * </ul>
      * This generation process currently supports the following
      * CredentialHandlers, the correct one being selected based on the algorithm
@@ -1458,6 +1462,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         int saltLength = 32;
         int iterations = 0;
         int keyLength = 160;
+        String handlerClassName = null;
 
         int argIndex = 0;
 
@@ -1484,6 +1489,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 keyLength = Integer.parseInt(args[argIndex + 1]);
                 break;
             }
+            case 'h': {
+                handlerClassName = args[argIndex + 1];
+                break;
+            }
             default: {
                 System.out.println("Usage: RealmBase [-a <algorithm>] [-e <encoding>] " +
                         "[-s <salt-length>] [-k <key-length>] <credentials>");
@@ -1495,14 +1504,25 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         CredentialHandlerBase handler = null;
 
-        for (Class<? extends CredentialHandlerBase> clazz : credentialHandlerClasses) {
+        if (handlerClassName == null) {
+            for (Class<? extends CredentialHandlerBase> clazz : credentialHandlerClasses) {
+                try {
+                    handler = clazz.newInstance();
+                    handler.setAlgorithm(algorithm);
+                } catch (NoSuchAlgorithmException e) {
+                    // Ignore - Algorithm is for a different CredentialHandler
+                } catch (InstantiationException | IllegalAccessException e) {
+                    // This isn't good.
+                    throw new RuntimeException(e);
+                }
+            }
+        } else {
             try {
-                handler = clazz.newInstance();
+                Class<?> clazz = Class.forName(handlerClassName);
+                handler = (CredentialHandlerBase) clazz.newInstance();
                 handler.setAlgorithm(algorithm);
-            } catch (NoSuchAlgorithmException e) {
-                // Ignore - Algorithm is for a different CredentialHandler
-            } catch (InstantiationException | IllegalAccessException e) {
-                // This isn't good.
+            } catch (InstantiationException | IllegalAccessException
+                    | ClassNotFoundException | NoSuchAlgorithmException e) {
                 throw new RuntimeException(e);
             }
         }
