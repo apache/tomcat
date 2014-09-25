@@ -32,10 +32,11 @@ public class PBECredentialHandler extends CredentialHandlerBase {
     private static final Log log = LogFactory.getLog(PBECredentialHandler.class);
 
     public static final String DEFAULT_ALGORITHM = "PBKDF2WithHmacSHA1";
-    public static final int DEFAULT_KEYLENGTH = 160;
+    public static final int DEFAULT_KEY_LENGTH = 160;
+    public static final int DEFAULT_ITERATIONS = 20000;
 
     private SecretKeyFactory secretKeyFactory;
-    private int keyLength = 160;
+    private int keyLength = DEFAULT_KEY_LENGTH;
 
 
     public PBECredentialHandler() throws NoSuchAlgorithmException {
@@ -48,6 +49,7 @@ public class PBECredentialHandler extends CredentialHandlerBase {
     }
 
 
+    @Override
     public void setAlgorithm(String algorithm) throws NoSuchAlgorithmException {
         SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
         this.secretKeyFactory = secretKeyFactory;
@@ -80,5 +82,11 @@ public class PBECredentialHandler extends CredentialHandlerBase {
             log.warn("pbeCredentialHandler.invalidKeySpec", e);
             return null;
         }
+    }
+
+
+    @Override
+    protected int getDefaultIterations() {
+        return DEFAULT_ITERATIONS;
     }
 }

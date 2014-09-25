@@ -16,6 +16,10 @@
  */
 package org.apache.catalina.realm;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Random;
+
 import org.apache.catalina.CredentialHandler;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.res.StringManager;
@@ -23,6 +27,37 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class CredentialHandlerBase implements CredentialHandler {
 
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
+
+    private int iterations = getDefaultIterations();
+    private Random random = null;
+
+
+    public int getIterations() {
+        return iterations;
+    }
+
+
+    public void setIterations(int iterations) {
+        this.iterations = iterations;
+    }
+
+
+    public String generate(int saltLength, String userCredential) {
+        byte[] salt = null;
+        int iterations = getIterations();
+        if (saltLength > 0) {
+            if (random == null) {
+                random = new SecureRandom();
+            }
+            salt = new byte[saltLength];
+            random.nextBytes(salt);
+        }
+
+        String serverCredential = mutate(userCredential, salt, iterations);
+
+        return HexUtils.toHexString(salt) + "$" + iterations + "$" + serverCredential;
+    }
+
 
     protected boolean matchesSaltIterationsEncoded(String inputCredentials, String storedCredentials) {
 
@@ -40,4 +75,9 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
 
         return storedHexEncoded.equalsIgnoreCase(inputHexEncoded);
     }
+
+
+    protected abstract void setAlgorithm(String algorithm) throws NoSuchAlgorithmException;
+
+    protected abstract int getDefaultIterations();
 }

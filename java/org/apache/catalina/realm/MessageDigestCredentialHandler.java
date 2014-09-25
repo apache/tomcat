@@ -56,8 +56,10 @@ public class MessageDigestCredentialHandler extends CredentialHandlerBase {
 
     private static final Log log = LogFactory.getLog(MessageDigestCredentialHandler.class);
 
+    public static final int DEFAULT_ITERATIONS = 1;
+
     private Charset encoding = StandardCharsets.UTF_8;
-    private String digest = null;
+    private String algorithm = null;
 
 
     public String getEncoding() {
@@ -79,18 +81,15 @@ public class MessageDigestCredentialHandler extends CredentialHandlerBase {
     }
 
 
-    public String getDigest() {
-        return digest;
+    public String getAlgorithm() {
+        return algorithm;
     }
 
 
-    public void setDigest(String digest) {
-        try {
-            MessageDigest.getInstance(digest);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        }
-        this.digest = digest;
+    @Override
+    public void setAlgorithm(String algorithm) throws NoSuchAlgorithmException {
+        MessageDigest.getInstance(algorithm);
+        this.algorithm = algorithm;
     }
 
 
@@ -101,7 +100,7 @@ public class MessageDigestCredentialHandler extends CredentialHandlerBase {
             return false;
         }
 
-        if (getDigest() == null) {
+        if (getAlgorithm() == null) {
             // No digests, compare directly
             return storedCredentials.equals(inputCredentials);
         } else {
@@ -114,7 +113,7 @@ public class MessageDigestCredentialHandler extends CredentialHandlerBase {
                 // the digest type
                 String serverDigest = storedCredentials.substring(5);
                 String userDigest = Base64.encodeBase64String(ConcurrentMessageDigest.digest(
-                        getDigest(), inputCredentials.getBytes(StandardCharsets.ISO_8859_1)));
+                        getAlgorithm(), inputCredentials.getBytes(StandardCharsets.ISO_8859_1)));
                 return userDigest.equals(serverDigest);
 
             } else if (storedCredentials.startsWith("{SSHA}")) {
@@ -138,7 +137,7 @@ public class MessageDigestCredentialHandler extends CredentialHandlerBase {
 
                 // Generate the digested form of the user provided password
                 // using the salt
-                byte[] userDigestBytes = ConcurrentMessageDigest.digest(getDigest(),
+                byte[] userDigestBytes = ConcurrentMessageDigest.digest(getAlgorithm(),
                         inputCredentials.getBytes(StandardCharsets.ISO_8859_1),
                         serverSaltBytes);
 
@@ -158,18 +157,24 @@ public class MessageDigestCredentialHandler extends CredentialHandlerBase {
 
     @Override
     public String mutate(String inputCredentials, byte[] salt, int iterations) {
-        if (digest == null) {
+        if (algorithm == null) {
             return inputCredentials;
         } else {
             byte[] userDigest;
             if (salt == null) {
-                userDigest = ConcurrentMessageDigest.digest(digest, iterations,
+                userDigest = ConcurrentMessageDigest.digest(algorithm, iterations,
                         inputCredentials.getBytes(encoding));
             } else {
-                userDigest = ConcurrentMessageDigest.digest(digest, iterations,
+                userDigest = ConcurrentMessageDigest.digest(algorithm, iterations,
                         salt, inputCredentials.getBytes(encoding));
             }
             return HexUtils.toHexString(userDigest);
         }
+    }
+
+
+    @Override
+    protected int getDefaultIterations() {
+        return DEFAULT_ITERATIONS;
     }
 }

@@ -90,7 +90,7 @@ public class TestRealmBase {
         TesterMapRealm realm = new TesterMapRealm();
         realm.setContainer(context);
         MessageDigestCredentialHandler ch = new MessageDigestCredentialHandler();
-        ch.setDigest(digest);
+        ch.setAlgorithm(digest);
         realm.setCredentialHandler(ch);
         realm.start();
 
