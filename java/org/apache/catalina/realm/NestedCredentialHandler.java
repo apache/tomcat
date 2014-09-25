@@ -52,4 +52,9 @@ public class NestedCredentialHandler implements CredentialHandler {
 
         return credentialHandlers.get(0).mutate(inputCredentials);
     }
+
+
+    public void addCredentialHandler(CredentialHandler handler) {
+        credentialHandlers.add(handler);
+    }
 }

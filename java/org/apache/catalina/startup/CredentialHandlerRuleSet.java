@@ -14,25 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
-
 
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSetBase;
 
-
 /**
- * <p><strong>RuleSet</strong> for processing the contents of a Realm definition
- * element.  This <code>RuleSet</code> supports Realms such as the
- * <code>CombinedRealm</code> that used nested Realms.</p>
+ * <p><strong>RuleSet</strong> for processing the contents of a
+ * CredentialHandler definition element.  This <code>RuleSet</code> supports
+ * CredentialHandler such as the <code>NestedCredentialHandler</code> that used
+ * nested CredentialHandlers.</p>
  */
-public class RealmRuleSet extends RuleSetBase {
+public class CredentialHandlerRuleSet extends RuleSetBase {
 
 
-    private static final int MAX_NESTED_REALM_LEVELS = Integer.getInteger(
-            "org.apache.catalina.startup.RealmRuleSet.MAX_NESTED_REALM_LEVELS",
+    private static final int MAX_NESTED_LEVELS = Integer.getInteger(
+            "org.apache.catalina.startup.CredentialHandlerRuleSet.MAX_NESTED_LEVELS",
             3).intValue();
 
     // ----------------------------------------------------- Instance Variables
@@ -51,7 +48,7 @@ public class RealmRuleSet extends RuleSetBase {
      * Construct an instance of this <code>RuleSet</code> with the default
      * matching pattern prefix.
      */
-    public RealmRuleSet() {
+    public CredentialHandlerRuleSet() {
         this("");
     }
 
@@ -63,7 +60,7 @@ public class RealmRuleSet extends RuleSetBase {
      * @param prefix Prefix for matching pattern rules (including the
      *  trailing slash character)
      */
-    public RealmRuleSet(String prefix) {
+    public CredentialHandlerRuleSet(String prefix) {
         this.namespaceURI = null;
         this.prefix = prefix;
     }
@@ -86,12 +83,12 @@ public class RealmRuleSet extends RuleSetBase {
 
         String pattern = prefix;
 
-        for (int i = 0; i < MAX_NESTED_REALM_LEVELS; i++) {
+        for (int i = 0; i < MAX_NESTED_LEVELS; i++) {
 
             if (i > 0) {
                 pattern += "/";
             }
-            pattern += "Realm";
+            pattern += "CredentialHandler";
 
             digester.addObjectCreate(pattern,
                                      null, // MUST be specified in the element,
@@ -99,14 +96,13 @@ public class RealmRuleSet extends RuleSetBase {
             digester.addSetProperties(pattern);
             if (i == 0) {
                 digester.addSetNext(pattern,
-                                    "setRealm",
-                                    "org.apache.catalina.Realm");
+                                    "setCredentialHandler",
+                                    "org.apache.catalina.CredentialHandler");
             } else {
                 digester.addSetNext(pattern,
-                                    "addRealm",
-                                    "org.apache.catalina.Realm");
+                                    "addCredentialHandler",
+                                    "org.apache.catalina.CredentialHandler");
             }
-            digester.addRuleSet(new CredentialHandlerRuleSet(pattern + "/"));
         }
     }
 }
