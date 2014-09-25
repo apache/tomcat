@@ -89,9 +89,9 @@ public class ConcurrentMessageDigest {
 
 
     /**
-     * Ensures that {@link #digest(String, byte[])} will support the specified
+     * Ensures that {@link #digest(String, byte[][])} will support the specified
      * algorithm. This method <b>must</b> be called and return successfully
-     * before using {@link #digest(String, byte[])}.
+     * before using {@link #digest(String, byte[][])}.
      *
      * @param algorithm The message digest algorithm to be supported
      *
