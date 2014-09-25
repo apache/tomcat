@@ -81,6 +81,7 @@ public class MessageDigestCredentialHandler extends CredentialHandlerBase {
     }
 
 
+    @Override
     public String getAlgorithm() {
         return algorithm;
     }

@@ -24,6 +24,9 @@ import org.apache.catalina.CredentialHandler;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Base implementation for the Tomcat provided {@link CredentialHandler}s.
+ */
 public abstract class CredentialHandlerBase implements CredentialHandler {
 
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
@@ -32,16 +35,33 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
     private Random random = null;
 
 
+    /**
+     * Return the number of iterations of the associated algorithm that will be
+     * used to convert the plain text credential into the stored credential.
+     */
     public int getIterations() {
         return iterations;
     }
 
 
+    /**
+     * Set the number of iterations of the associated algorithm that will be
+     * used to convert the plain text credential into the stored credential.
+     */
     public void setIterations(int iterations) {
         this.iterations = iterations;
     }
 
 
+    /**
+     * Generate a stored credential from the given plain text credential.
+     *
+     * @param saltLength        Length of random salt to be generated and used
+     *                          as part of the transformation
+     * @param userCredential    The plain text credential
+     *
+     * @return  The credential to be stored
+     */
     public String generate(int saltLength, String userCredential) {
         byte[] salt = null;
         int iterations = getIterations();
@@ -61,7 +81,17 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
     }
 
 
-    protected boolean matchesSaltIterationsEncoded(String inputCredentials, String storedCredentials) {
+    /**
+     * Checks whether the provided credential matches the stored credential when
+     * the stored credential is in the form salt$iteration-count$credential
+     *
+     * @param inputCredentials  The input credential
+     * @param storedCredentials The stored credential
+     *
+     * @return <code>true</code> if they match, otherwise <code>false</code>
+     */
+    protected boolean matchesSaltIterationsEncoded(String inputCredentials,
+            String storedCredentials) {
 
         int sep1 = storedCredentials.indexOf('$');
         int sep2 = storedCredentials.indexOf('$', sep1 + 1);
@@ -79,7 +109,23 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
     }
 
 
-    protected abstract void setAlgorithm(String algorithm) throws NoSuchAlgorithmException;
+    /**
+     * Set the algorithm used to convert input credentials to stored
+     * credentials.
+     */
+    public abstract void setAlgorithm(String algorithm) throws NoSuchAlgorithmException;
 
+
+    /**
+     * Get the algorithm used to convert input credentials to stored
+     * credentials.
+     */
+    public abstract String getAlgorithm();
+
+
+    /**
+     * Get the default number of iterations used by the
+     * {@link CredentialHandler}.
+     */
     protected abstract int getDefaultIterations();
 }
