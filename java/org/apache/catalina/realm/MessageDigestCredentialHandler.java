@@ -178,4 +178,10 @@ public class MessageDigestCredentialHandler extends CredentialHandlerBase {
     protected int getDefaultIterations() {
         return DEFAULT_ITERATIONS;
     }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
+    }
 }

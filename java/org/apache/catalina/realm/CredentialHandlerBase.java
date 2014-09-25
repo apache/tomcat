@@ -21,6 +21,7 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 import org.apache.catalina.CredentialHandler;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -96,6 +97,15 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
         int sep1 = storedCredentials.indexOf('$');
         int sep2 = storedCredentials.indexOf('$', sep1 + 1);
 
+        if (sep1 < 0 || sep2 < 0) {
+            // Stored credentials are invalid
+            // Logging credentials could be a security concern but they are
+            // invalid and that is a bigger problem
+            getLog().warn(sm.getString("credentialHandler.invalidStoredCredential",
+                    storedCredentials));
+            return false;
+        }
+
         String hexSalt = storedCredentials.substring(0,  sep1);
 
         int iterations = Integer.parseInt(storedCredentials.substring(sep1 + 1, sep2));
@@ -128,4 +138,10 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
      * {@link CredentialHandler}.
      */
     protected abstract int getDefaultIterations();
+
+
+    /**
+     * Obtain the logger for the CredentialHandler instance.
+     */
+    protected abstract Log getLog();
 }
