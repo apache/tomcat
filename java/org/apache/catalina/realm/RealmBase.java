@@ -81,7 +81,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     static {
         credentialHandlerClasses.add(MessageDigestCredentialHandler.class);
-        credentialHandlerClasses.add(PBECredentialHandler.class);
+        credentialHandlerClasses.add(SecretKeyCredentialHandler.class);
     }
 
     // ----------------------------------------------------- Instance Variables
