@@ -45,7 +45,6 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
  *     iteration code and a hex encoded credential, each separated by $</li>
  * </ul>
  *
- * Prefixes of {MD5} and {SHA}
  * <p>
  * If the stored password form does not included an iteration count then an
  * iteration count of 1 is used.

@@ -143,11 +143,15 @@
         <p>The name of the <code>MessageDigest</code> algorithm used
         to encode user passwords stored in the database.  If not specified,
         user passwords are assumed to be stored in clear-text.</p>
+        <p>This attribute is deprecated. Set the algorithm on a nested
+        <strong>CredentialHandler</strong> element instead.</p>
       </attribute>
 
       <attribute name="digestEncoding" required="false">
         <p>The charset for encoding digests.  If not specified, the platform
         default will be used.</p>
+        <p>This attribute is deprecated. Set the encoding on a nested
+        <strong>CredentialHandler</strong> element instead.</p>
       </attribute>
 
       <attribute name="driverName" required="true">
@@ -265,6 +269,8 @@
         <p>The name of the <code>MessageDigest</code> algorithm used
         to encode user passwords stored in the database.  If not specified,
         user passwords are assumed to be stored in clear-text.</p>
+        <p>This attribute is deprecated. Set the algorithm on a nested
+        <strong>CredentialHandler</strong> element instead.</p>
       </attribute>
 
       <attribute name="localDataSource" required="false">
@@ -458,6 +464,8 @@
         by the <code>java.security.MessageDigest</code> class. If not
         specified the plaintext password is assumed to be retrieved. Not
         required unless <code>userPassword</code> is specified</p>
+        <p>This attribute is deprecated. Set the algorithm on a nested
+        <strong>CredentialHandler</strong> element instead.</p>
       </attribute>
 
       <attribute name="protocol" required="false">
@@ -763,6 +771,8 @@
         formats. Valid values are those accepted for the algorithm name by the
         <code>java.security.MessageDigest</code> class. If not specified,
         passwords are stored in clear text.</p>
+        <p>This attribute is deprecated. Set the algorithm on a nested
+        <strong>CredentialHandler</strong> element instead.</p>
       </attribute>
 
       <attribute name="pathname" required="false">
@@ -1031,15 +1041,18 @@
 
 <section name="Nested Components">
 
-  <h3>CombinedRealm Implementation</h3>
-
-  <p>If you are using the <em>CombinedRealm Implementation</em> or a Realm
-  that extends the CombinedRealm, e.g. the LockOutRealm,
-  <strong>&lt;Realm&gt;</strong> elements may be nested inside it.</p>
-
-  <h3>Other Realm Implementations</h3>
-
-  <p>No other Realm implementation supports nested components.</p>
+  <p>You can nest at most one instance of the following components by nesting a
+  corresponding element inside your <strong>Realm</strong> element:</p>
+  <ul>
+  <li><strong>CombinedRealm Implementation</strong> - If you are using the
+    <em>CombinedRealm Implementation</em> or a Realm
+    that extends the CombinedRealm, e.g. the LockOutRealm, one or more
+    <strong>&lt;Realm&gt;</strong> elements may be nested inside it.</li>
+  <li><a href="crdentialhandler.html"><strong>CredentialHandler</strong></a> -
+      Configure the credential handler that will be used to validate provided
+      credentials with those stored by the Realm. If not specified a default
+      <em>MessageDigestCredentialHandler</em> will configured.</li>
+  </ul>
 
 </section>
 
