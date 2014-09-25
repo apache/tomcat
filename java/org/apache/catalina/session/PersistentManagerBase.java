@@ -520,7 +520,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      * @param session Session to be removed
      */
     public void removeSuper(Session session) {
-        super.remove (session);
+        super.remove(session, false);
     }
 
     /**
