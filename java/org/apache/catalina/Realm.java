@@ -188,4 +188,9 @@ public interface Realm {
      * @param listener The listener to remove
      */
     public void removePropertyChangeListener(PropertyChangeListener listener);
+
+
+    public CredentialHandler getCredentialHandler();
+
+    public void setCredentialHandler(CredentialHandler credentialHandler);
 }

@@ -89,7 +89,9 @@ public class TestRealmBase {
         Context context = new TesterContext();
         TesterMapRealm realm = new TesterMapRealm();
         realm.setContainer(context);
-        realm.setDigest(digest);
+        MessageDigestCredentialHandler ch = new MessageDigestCredentialHandler();
+        ch.setDigest(digest);
+        realm.setCredentialHandler(ch);
         realm.start();
 
         realm.addUser(USER1, digestedPassword);

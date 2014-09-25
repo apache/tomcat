@@ -1551,7 +1551,7 @@ public class JNDIRealm extends RealmBase {
 
         String password = info.getPassword();
 
-        return compareCredentials(credentials, password);
+        return getCredentialHandler().matches(credentials, password);
     }
 
 

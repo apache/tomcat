@@ -60,6 +60,11 @@ public class ConcurrentMessageDigest {
     }
 
     public static byte[] digest(String algorithm, byte[]... input) {
+        return digest(algorithm, 1, input);
+    }
+
+
+    public static byte[] digest(String algorithm, int rounds, byte[]... input) {
 
         Queue<MessageDigest> queue = queues.get(algorithm);
         if (queue == null) {
@@ -77,10 +82,19 @@ public class ConcurrentMessageDigest {
             }
         }
 
+        // Round 1
         for (byte[] bytes : input) {
             md.update(bytes);
         }
         byte[] result = md.digest();
+
+        // Subsequent rounds
+        if (rounds > 1) {
+            for (int i = 1; i < rounds; i++) {
+                md.update(result);
+                result = md.digest();
+            }
+        }
 
         queue.add(md);
 

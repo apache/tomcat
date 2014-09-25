@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.CredentialHandler;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
@@ -93,13 +94,22 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * Valid values are those accepted for the algorithm name by the
      * MessageDigest class, or <code>null</code> if no digesting should
      * be performed.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
      */
+    @Deprecated
     protected String digest = null;
 
     /**
      * The encoding charset for the digest.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
      */
+    @Deprecated
     protected String digestEncoding = null;
+
+
+    private CredentialHandler credentialHandler;
 
 
     /**
@@ -164,6 +174,17 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     // ------------------------------------------------------------- Properties
 
+    @Override
+    public CredentialHandler getCredentialHandler() {
+        return credentialHandler;
+    }
+
+
+    @Override
+    public void setCredentialHandler(CredentialHandler credentialHandler) {
+        this.credentialHandler = credentialHandler;
+    }
+
 
     /**
      * Return the Container with which this Realm has been associated.
@@ -211,11 +232,17 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     /**
      * Return the digest algorithm  used for storing credentials.
+     *
+     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
+     *              by the CredentialHandler
      */
+    @Deprecated
     public String getDigest() {
-
-        return digest;
-
+        CredentialHandler ch = credentialHandler;
+        if (ch instanceof MessageDigestCredentialHandler) {
+            return ((MessageDigestCredentialHandler) ch).getDigest();
+        }
+        return null;
     }
 
 
@@ -223,36 +250,79 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * Set the digest algorithm used for storing credentials.
      *
      * @param digest The new digest algorithm
+     *
+     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
+     *              by the CredentialHandler
      */
+    @Deprecated
     public void setDigest(String digest) {
-
+        CredentialHandler ch = credentialHandler;
+        if (ch == null) {
+            ch = new MessageDigestCredentialHandler();
+            credentialHandler = ch;
+        }
+        if (ch instanceof MessageDigestCredentialHandler) {
+            ((MessageDigestCredentialHandler) ch).setDigest(digest);
+        } else {
+            log.warn(sm.getString("realmBase.credentialHandler.customCredentialHandler",
+                    "digest", digest));
+        }
         this.digest = digest;
-
     }
 
     /**
      * Returns the digest encoding charset.
      *
      * @return The charset (may be null) for platform default
+     *
+     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
+     *              by the CredentialHandler
      */
+    @Deprecated
     public String getDigestEncoding() {
-        return digestEncoding;
+        CredentialHandler ch = credentialHandler;
+        if (ch instanceof MessageDigestCredentialHandler) {
+            return ((MessageDigestCredentialHandler) ch).getEncoding();
+        }
+        return null;
     }
 
     /**
      * Sets the digest encoding charset.
      *
      * @param charset The charset (null for platform default)
+     *
+     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
+     *              by the CredentialHandler
      */
+    @Deprecated
     public void setDigestEncoding(String charset) {
-        digestEncoding = charset;
+        CredentialHandler ch = credentialHandler;
+        if (ch == null) {
+            ch = new MessageDigestCredentialHandler();
+            credentialHandler = ch;
+        }
+        if (ch instanceof MessageDigestCredentialHandler) {
+            ((MessageDigestCredentialHandler) ch).setEncoding(charset);
+        } else {
+            log.warn(sm.getString("realmBase.credentialHandler.customCredentialHandler",
+                    "digestEncoding", charset));
+        }
+        this.digestEncoding = charset;
     }
 
+
+    /**
+     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
+     *              by the CredentialHandler
+     */
+    @Deprecated
     protected Charset getDigestCharset() throws UnsupportedEncodingException {
-        if (digestEncoding == null) {
+        String charset = getDigestEncoding();
+        if (charset == null) {
             return StandardCharsets.ISO_8859_1;
         } else {
-            return B2CConverter.getCharset(getDigestEncoding());
+            return B2CConverter.getCharset(charset);
         }
     }
 
@@ -340,7 +410,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         String serverCredentials = getPassword(username);
 
-        boolean validated = compareCredentials(credentials, serverCredentials);
+        boolean validated = getCredentialHandler().matches(credentials, serverCredentials);
         if (!validated) {
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("realmBase.authenticateFailure",
@@ -496,6 +566,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
+     */
+    @Deprecated
     protected boolean compareCredentials(String userCredentials,
             String serverCredentials) {
 
@@ -1116,7 +1190,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected void startInternal() throws LifecycleException {
 
         // Create a MessageDigest instance for credentials, if desired
-
         if (getDigest() != null) {
             try {
                 md = MessageDigest.getInstance(getDigest());
@@ -1126,6 +1199,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     (sm.getString("realmBase.algorithm", getDigest()), e);
             }
 
+        }
+
+        if (credentialHandler == null) {
+            credentialHandler = new MessageDigestCredentialHandler();
         }
 
         setState(LifecycleState.STARTING);

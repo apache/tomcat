@@ -387,7 +387,7 @@ public class JDBCRealm
         String dbCredentials = getPassword(username);
 
         // Validate the user's credentials
-        boolean validated = compareCredentials(credentials, dbCredentials);
+        boolean validated = getCredentialHandler().matches(credentials, dbCredentials);
 
         if (validated) {
             if (containerLog.isTraceEnabled())
