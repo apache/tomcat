@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.startup;
 
+import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.util.ServerInfo;
@@ -36,18 +37,11 @@ public class VersionLoggerListener implements LifecycleListener {
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
-    public VersionLoggerListener() {
-        // The log message is generated here to ensure that it appears before
-        // any log messages from the APRLifecycleListener. This won't be logged
-        // on shutdown because only the Server element in server.xml is
-        // processed on shutdown.
-        log();
-    }
-
-
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
-        // NO-OP
+        if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
+            log();
+        }
     }
 
 
