@@ -79,7 +79,7 @@ public abstract class CredentialHandlerBase implements CredentialHandler {
         String serverCredential = mutate(userCredential, salt, iterations);
 
         StringBuilder result =
-                new StringBuilder(saltLength << 1 + 10 + serverCredential.length() + 2);
+                new StringBuilder((saltLength << 1) + 10 + serverCredential.length() + 2);
         result.append(HexUtils.toHexString(salt));
         result.append('$');
         result.append(iterations);
