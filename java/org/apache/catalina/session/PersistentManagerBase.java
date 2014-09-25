@@ -500,7 +500,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     @Override
     public void removeSuper(Session session) {
-        super.remove (session);
+        super.remove(session, false);
     }
 
     /**
