@@ -1025,7 +1025,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             } catch (InterruptedException e) {
                 throw new ServletException(e);
             }
-            throw new ServletException("Opps.");
+            throw new ServletException("Oops.");
         }
     }
 
