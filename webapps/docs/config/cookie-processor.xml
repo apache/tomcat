@@ -92,9 +92,19 @@
         '<code>=</code>' is encountered and the remainder of the cookie value
         will be dropped.</p>
         <p>If not set the specification compliant default value of
-        <code>false</code> will be used. This  default may be changed by setting
+        <code>false</code> will be used. This default may be changed by setting
         the
         <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_EQUALS_IN_VALUE</code>
+        <a href="systemprops.html">system property</a>.</p>
+      </attribute>
+
+      <attribute name="allowHttpSepsInV0" required="false">
+        <p>If this is <code>true</code> Tomcat will allow HTTP separators in
+        cookie names and values.</p>
+        <p>If not specified, the default specification compliant value of
+        <code>false</code> will be used. This default may be changed by setting
+        the
+        <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0</code>
         <a href="systemprops.html">system property</a>.</p>
       </attribute>
 
@@ -103,7 +113,7 @@
         (with or without trailing '<code>=</code>') when parsing cookie headers.
         If <code>false</code>, name only cookies will be dropped.</p>
         <p>If not set the specification compliant default value of
-        <code>false</code> will be used. This  default may be changed by setting
+        <code>false</code> will be used. This default may be changed by setting
         the
         <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_NAME_ONLY</code>
         <a href="systemprops.html">system property</a>.</p>

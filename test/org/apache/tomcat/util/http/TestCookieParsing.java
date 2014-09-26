@@ -37,15 +37,22 @@ public class TestCookieParsing extends TomcatBaseTest {
 
     private static final String[] COOKIES_WITH_EQUALS = new String[] {
             "name=equals=middle", "name==equalsstart", "name=equalsend=" };
+    private static final String COOKIES_WITH_EQUALS_TRUNC = "name=equalsname=name=equalsend";
 
-    private static final String[] COOKIEs_WITH_NAME_ONLY = new String[] {
+    private static final String[] COOKIES_WITH_NAME_ONLY = new String[] {
             "bob", "bob=" };
+    private static final String COOKIES_WITH_NAME_ONLY_CONCAT = "bob=bob=";
+
+    private static final String[] COOKIES_WITH_SEPS = new String[] {
+        "name=val(ue" };
+    private static final String COOKIES_WITH_SEPS_TRUNC = "name=val";
 
 
     @Test
     public void testLegacyWithEquals() throws Exception {
         doTestLegacyEquals(true);
     }
+
 
     @Test
     public void testLegacyWithoutEquals() throws Exception {
@@ -64,12 +71,7 @@ public class TestCookieParsing extends TomcatBaseTest {
         if (allowEquals) {
             expected = concat(COOKIES_WITH_EQUALS);
         } else {
-            StringBuilder sb = new StringBuilder();
-            for (String cookie : COOKIES_WITH_EQUALS) {
-                int end = cookie.indexOf('=', cookie.indexOf('=') + 1);
-                sb.append(cookie.substring(0, end));
-            }
-            expected = sb.toString();
+            expected = COOKIES_WITH_EQUALS_TRUNC;
         }
         TestCookieParsingClient client = new TestCookieParsingClient(
                 legacyCookieProcessor, COOKIES_WITH_EQUALS, expected);
@@ -91,6 +93,7 @@ public class TestCookieParsing extends TomcatBaseTest {
         doTestLegacyNameOnly(true);
     }
 
+
     @Test
     public void testLegacyWithoutNameOnly() throws Exception {
         doTestLegacyNameOnly(false);
@@ -103,12 +106,12 @@ public class TestCookieParsing extends TomcatBaseTest {
 
         String expected;
         if (nameOnly) {
-            expected = concat(COOKIEs_WITH_NAME_ONLY, true);
+            expected = COOKIES_WITH_NAME_ONLY_CONCAT;
         } else {
             expected = "";
         }
         TestCookieParsingClient client = new TestCookieParsingClient(
-                legacyCookieProcessor, COOKIEs_WITH_NAME_ONLY, expected);
+                legacyCookieProcessor, COOKIES_WITH_NAME_ONLY, expected);
         client.doRequest();
     }
 
@@ -117,23 +120,53 @@ public class TestCookieParsing extends TomcatBaseTest {
     public void testRfc6265NameOnly() throws Exception {
         // Always allows equals
         TestCookieParsingClient client = new TestCookieParsingClient(
-                new Rfc6265CookieProcessor(), COOKIEs_WITH_NAME_ONLY,
-                concat(COOKIEs_WITH_NAME_ONLY, true));
+                new Rfc6265CookieProcessor(), COOKIES_WITH_NAME_ONLY,
+                COOKIES_WITH_NAME_ONLY_CONCAT);
+        client.doRequest();
+    }
+
+
+    @Test
+    public void testLegacyWithSeps() throws Exception {
+        doTestLegacySeps(true);
+    }
+
+
+    @Test
+    public void testLegacyWithoutSeps() throws Exception {
+        doTestLegacySeps(false);
+    }
+
+
+    private void doTestLegacySeps(boolean seps) throws Exception {
+        LegacyCookieProcessor legacyCookieProcessor = new LegacyCookieProcessor();
+        legacyCookieProcessor.setAllowHttpSepsInV0(seps);
+
+        String expected;
+        if (seps) {
+            expected = concat(COOKIES_WITH_SEPS);
+        } else {
+            expected = COOKIES_WITH_SEPS_TRUNC;
+        }
+        TestCookieParsingClient client = new TestCookieParsingClient(
+                legacyCookieProcessor, COOKIES_WITH_SEPS, expected);
+        client.doRequest();
+    }
+
+
+    @Test
+    public void testRfc6265Seps() throws Exception {
+        // Always allows equals
+        TestCookieParsingClient client = new TestCookieParsingClient(
+                new Rfc6265CookieProcessor(), COOKIES_WITH_SEPS, concat(COOKIES_WITH_SEPS));
         client.doRequest();
     }
 
 
     private static String concat(String[] input) {
-        return concat(input, false);
-    }
-
-    private static String concat(String[] input, boolean mustEndInEquals) {
         StringBuilder result = new StringBuilder();
         for (String s : input) {
             result.append(s);
-            if (!s.endsWith("=") && mustEndInEquals) {
-                result.append('=');
-            }
         }
         return result.toString();
     }

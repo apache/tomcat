@@ -51,6 +51,8 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
     private boolean allowNameOnly = CookieSupport.ALLOW_NAME_ONLY;
 
+    @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
+    private boolean allowHttpSepsInV0 = CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0;
 
 
     public boolean getAllowEqualsInValue() {
@@ -70,6 +72,16 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
     public void setAllowNameOnly(boolean allowNameOnly) {
         this.allowNameOnly = allowNameOnly;
+    }
+
+
+    public boolean getAllowHttpSepsInV0() {
+        return allowHttpSepsInV0;
+    }
+
+
+    public void setAllowHttpSepsInV0(boolean allowHttpSepsInV0) {
+        this.allowHttpSepsInV0 = allowHttpSepsInV0;
     }
 
 
@@ -150,7 +162,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             // Skip whitespace and non-token characters (separators)
             while (pos < end &&
                    (CookieSupport.isHttpSeparator((char) bytes[pos]) &&
-                           !CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 ||
+                           !getAllowHttpSepsInV0() ||
                     CookieSupport.isV0Separator((char) bytes[pos]) ||
                     isWhiteSpace(bytes[pos])))
                 {pos++; }
@@ -217,7 +229,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                 default:
                     if (version == 0 &&
                                 !CookieSupport.isV0Separator((char)bytes[pos]) &&
-                                CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 ||
+                                getAllowHttpSepsInV0() ||
                             !CookieSupport.isHttpSeparator((char)bytes[pos]) ||
                             bytes[pos] == '=') {
                         // Token
@@ -386,9 +398,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
         int pos = off;
         while (pos < end &&
                 (!CookieSupport.isHttpSeparator((char)bytes[pos]) ||
-                 version == 0 &&
-                        CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
-                        bytes[pos] != '=' &&
+                 version == 0 && getAllowHttpSepsInV0() && bytes[pos] != '=' &&
                         !CookieSupport.isV0Separator((char)bytes[pos]) ||
                  !isName && bytes[pos] == '=' && getAllowEqualsInValue())) {
             pos++;

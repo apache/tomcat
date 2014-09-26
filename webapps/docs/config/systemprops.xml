@@ -375,6 +375,10 @@
 
     <property
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0">
+      <p>Deprecated. This will be removed in Tomcat 9. Specify the
+      <code>allowHttpSepsInV0</code> attribute on the
+      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code> instead.
+      </p>
       <p>If this is <code>true</code> Tomcat will allow HTTP separators in
       cookie names and values.</p>
       <p>If not specified, the default specification compliant value of
@@ -415,6 +419,10 @@
     </property>
 
     <property name="org.apache.tomcat.util.http. ServerCookie.ALLOW_NAME_ONLY">
+      <p>Deprecated. This will be removed in Tomcat 9. Specify the
+      <code>allowNameOnly</code> attribute on the
+      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code> instead.
+      </p>
       <p> If this is true then the requirements of the cookie specifications
       that cookies must have values will be enforced and cookies consisting only
       of a name but no value will be ignored.</p>
