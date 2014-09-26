@@ -40,21 +40,54 @@ public class TestCookiesAllowEquals extends TomcatBaseTest {
     private static final String COOKIE_WITH_EQUALS_3 = "name=equalsend=";
 
     @Test
-    public void testWithEquals() throws Exception {
-        System.setProperty(
-                "org.apache.tomcat.util.http.ServerCookie.ALLOW_EQUALS_IN_VALUE",
-                "true");
+    public void testLegacyWithEquals() throws Exception {
+        TestCookieEqualsClient client = new TestCookieEqualsClient(true, false, false);
+        client.doRequest();
+    }
 
-        TestCookieEqualsClient client = new TestCookieEqualsClient();
+    @Test
+    public void testLegacyWithoutEquals() throws Exception {
+        TestCookieEqualsClient client = new TestCookieEqualsClient(false, false, true);
+        client.doRequest();
+    }
+
+    @Test
+    public void testRfc6265() throws Exception {
+        // Always allows equals
+        TestCookieEqualsClient client = new TestCookieEqualsClient(false, true, false);
         client.doRequest();
     }
 
     private class TestCookieEqualsClient extends SimpleHttpClient {
 
+        private final boolean allowEquals;
+        private final boolean useRfc6265;
+        private final boolean expectTruncated;
+
+        public TestCookieEqualsClient(boolean allowEquals, boolean useRfc6265,
+                boolean expectTruncated) {
+            this.allowEquals = allowEquals;
+            this.useRfc6265 = useRfc6265;
+            this.expectTruncated = expectTruncated;
+        }
+
 
         private void doRequest() throws Exception {
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
+            CookieProcessor cookieProcessor;
+            if (useRfc6265) {
+                cookieProcessor = new Rfc6265CookieProcessor();
+            } else {
+                LegacyCookieProcessor legacyCookieProcessor = new LegacyCookieProcessor();
+                legacyCookieProcessor.setAllowEqualsInValue(allowEquals);
+                // Need to allow name only cookies to handle equals at the start of
+                // the value
+                legacyCookieProcessor.setAllowNameOnly(true);
+                cookieProcessor = legacyCookieProcessor;
+            }
+            root.setCookieProcessor(cookieProcessor);
+
             Tomcat.addServlet(root, "Simple", new SimpleServlet());
             root.addServletMapping("/test", "Simple");
 
@@ -77,9 +110,23 @@ public class TestCookiesAllowEquals extends TomcatBaseTest {
             disconnect();
             reset();
             tomcat.stop();
-            assertEquals(COOKIE_WITH_EQUALS_1 + COOKIE_WITH_EQUALS_2 +
-                    COOKIE_WITH_EQUALS_3, response);
+
+            StringBuilder expected = new StringBuilder();
+            expected.append(truncate(COOKIE_WITH_EQUALS_1, expectTruncated));
+            expected.append(truncate(COOKIE_WITH_EQUALS_2, expectTruncated));
+            expected.append(truncate(COOKIE_WITH_EQUALS_3, expectTruncated));
+            assertEquals(expected.toString(), response);
         }
+
+        private final String truncate(String input, boolean doIt) {
+            if (doIt) {
+                int end = input.indexOf('=', input.indexOf('=') + 1);
+                return input.substring(0, end);
+            } else {
+                return input;
+            }
+        }
+
 
         @Override
         public boolean isResponseBodyOK() {
