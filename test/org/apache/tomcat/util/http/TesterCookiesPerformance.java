@@ -47,7 +47,7 @@ public class TesterCookiesPerformance {
         headerValue.setBytes(cookieHeaderBytes, 0, cookieHeaderBytes.length);
         ServerCookies serverCookies = new ServerCookies(4);
 
-        Cookies originalCookieProcessor = new Cookies();
+        LegacyCookieProcessor originalCookieProcessor = new LegacyCookieProcessor();
         Rfc6265CookieProcessor rfc6265CookieProcessor = new Rfc6265CookieProcessor();
 
         // warm up

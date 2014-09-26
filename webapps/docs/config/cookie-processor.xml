@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="cookie-processor.html">
+
+  &project;
+
+  <properties>
+    <title>The Cookie Processor Component</title>
+  </properties>
+
+<body>
+
+<section name="Table of Contents">
+<toc />
+</section>
+
+<section name="Introduction">
+
+  <p>The <strong>CookieProcessor</strong> element represents the component that
+  parses received cookie headers into <code>javax.servlet.http.Cookie</code>
+  objects accessible through <code>HttpServletRequest.getCookies()</code> and
+  converts <code>javax.servlet.http.Cookie</code> objects added to the response
+  hrough <code>HttpServletResponse.addCookie</code> to the HTTP headers returned
+  to the client.</p>
+
+  <p>A CookieProcessor element MAY be nested inside a
+  <a href="context.html">Context</a> component. If it is not included, a default
+  implementation will be created automatically.</p>
+
+</section>
+
+
+<section name="Attributes">
+
+  <subsection name="Common Attributes">
+
+    <p>All implementations of <strong>CookieProcessor</strong> support the
+    following attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="false">
+        <p>Java class name of the implementation to use. This class must
+        implement the <code>org.apache.tomcat.util.http.CookieProcessor</code>
+        interface. If not specified, the standard value (defined below) will be
+        used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+
+  <subsection name="Standard Implementation">
+
+    <p>The standard implementation of <strong>CookieProcessor</strong> is
+    <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code>. Note
+    that it is anticipated that this will change to
+    <code>org.apache.tomcat.util.http.Rfc6265CookieProcessor</code> in a future
+    Tomcat 8 release.</p>
+
+    <p>This is the legacy  cookie parser based on RFC6265, RFC2109 and RFC2616.
+    It implements a strict interpretation of the cookie specifications. Due to
+    various interoperability issues with browsers not all strict behaviours
+    are enabled by default and additional options are available to further
+    relax the behaviour of this cookie processor if required.</p>
+
+    <attributes>
+
+      <attribute name="allowEqualsInValue" required="false">
+        <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'
+        characters when parsing unquoted cookie values. If <code>false</code>,
+        cookie values containing '<code>=</code>' will be terminated when the
+        '<code>=</code>' is encountered and the remainder of the cookie value
+        will be dropped.</p>
+        <p>If not set the specification compliant default value of
+        <code>false</code> will be used. This  default may be changed by setting
+        the
+        <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_EQUALS_IN_VALUE</code>
+        <a href="systemprops.html">system property</a>.</p>
+      
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="RFC 6265 Cookie Processor - org.apache.tomcat.util.http.Rfc6265CookieProcessor">
+
+    <p>This cookie processor is based on RFC6265 with the following changes to
+    support better interoperability:</p>
+
+    <ul>
+      <li>Values 0x80 to 0xFF are permitted in cookie-octet to support the use
+      of UTF-8 in cookie values as used by HTML 5.</li>
+      <li>For cookies without a value, the '=' is not required after the name as
+      some browsers do not sent it.</li>
+    </ul>
+
+    <p>The RFC 6265 cookie processor is generally more lenient than the legacy
+    cookie parser. In particular:</p>
+
+    <ul>
+      <li>The '<code>=</code>' is always permitted in a cookie value.</li>
+    </ul>
+
+    <p>No additional attributes are supported by the <strong>RFC 6265 Cookie
+    Processor</strong>.</p>
+
+  </subsection>
+
+</section>
+
+
+<section name="Nested Components">
+
+  <p>No element may be nested inside a <strong>CookieProcessor</strong>.</p>
+
+</section>
+
+
+<section name="Special Features">
+
+  <p>No special features are associated with a <strong>Resources</strong>
+  element.</p>
+
+</section>
+
+</body>
+
+</document>
