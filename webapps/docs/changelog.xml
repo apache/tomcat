@@ -305,6 +305,9 @@
         Update the Windows authentication documentation after some additional
         testing to answer the remaining questions. (markt)
       </update>
+      <fix>
+        Correct a couple of broken links in the Javadoc. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
