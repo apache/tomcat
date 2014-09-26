@@ -38,8 +38,8 @@
   parses received cookie headers into <code>javax.servlet.http.Cookie</code>
   objects accessible through <code>HttpServletRequest.getCookies()</code> and
   converts <code>javax.servlet.http.Cookie</code> objects added to the response
-  hrough <code>HttpServletResponse.addCookie</code> to the HTTP headers returned
-  to the client.</p>
+  through <code>HttpServletResponse.addCookie()</code> to the HTTP headers
+  returned to the client.</p>
 
   <p>A CookieProcessor element MAY be nested inside a
   <a href="context.html">Context</a> component. If it is not included, a default
@@ -160,7 +160,7 @@
 
 <section name="Special Features">
 
-  <p>No special features are associated with a <strong>Resources</strong>
+  <p>No special features are associated with a <strong>CookieProcessor</strong>
   element.</p>
 
 </section>

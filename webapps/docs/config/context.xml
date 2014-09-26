@@ -754,7 +754,8 @@
   by nesting a corresponding element inside your <strong>Context</strong>
   element:</p>
   <ul>
-  <li><a href="cookie-processor.html">Cookie Processor</a></li>
+  <li><a href="cookie-processor.html"><strong>Cookie Processor</strong></a> -
+      Configure parsing and generation of HTTP cookie headers.</li>
   <li><a href="loader.html"><strong>Loader</strong></a> -
       Configure the web application class loader that will be used to load
       servlet and bean classes for this web application.  Normally, the
