@@ -56,6 +56,7 @@
     </menu>
 
     <menu name="Nested Components">
+        <item name="CookieProcessor"       href="cookie-processor.html"/>
         <item name="CredentialHandler"     href="credentialhandler.html"/>
         <item name="Global Resources"      href="globalresources.html"/>
         <item name="JarScanner"            href="jar-scanner.html"/>
