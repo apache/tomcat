@@ -478,7 +478,7 @@ public class TestCookies {
         if (useRfc6265) {
             cookieProcessor = new Rfc6265CookieProcessor();
         } else {
-            cookieProcessor = new Cookies();
+            cookieProcessor = new LegacyCookieProcessor();
         }
         MessageBytes cookieHeaderValue = mimeHeaders.addValue("Cookie");
         byte[] bytes = header.getBytes(StandardCharsets.UTF_8);

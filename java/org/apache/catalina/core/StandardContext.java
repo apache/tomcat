@@ -129,7 +129,7 @@ import org.apache.tomcat.util.descriptor.web.MessageDestinationRef;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
-import org.apache.tomcat.util.http.Cookies;
+import org.apache.tomcat.util.http.LegacyCookieProcessor;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
@@ -837,7 +837,7 @@ public class StandardContext extends ContainerBase
     @Override
     public CookieProcessor getCookieProcessor() {
         if (cookieProcessor == null) {
-            cookieProcessor = new Cookies();
+            cookieProcessor = new LegacyCookieProcessor();
         }
         return cookieProcessor;
     }

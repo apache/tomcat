@@ -29,10 +29,11 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
 /**
- * Base Test case for {@link Cookies}. <b>Note</b> because of the use of
- * <code>static final</code> constants in {@link Cookies}, each of these tests
- * must be executed in a new JVM instance. The tests have been place in separate
- * classes to facilitate this when running the unit tests via Ant.
+ * Base Test case for {@link LegacyCookieProcessor}. <b>Note</b> because of the
+ * use of <code>static final</code> constants in {@link LegacyCookieProcessor},
+ * each of these tests  must be executed in a new JVM instance. The tests have
+ * been place in separate classes to facilitate this when running the unit tests
+ * via Ant.
  */
 public abstract class CookiesBaseTest extends TomcatBaseTest {
 

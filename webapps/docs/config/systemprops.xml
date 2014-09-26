@@ -357,7 +357,14 @@
 
     <property
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_EQUALS_IN_VALUE">
-      <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'
+      <p>Deprecated. This will be removed in Tomcat 9. Specify the
+      <code>allowEqualsInValue</code> attribute on the
+      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code> instead.
+      </p>
+      <p>This sets the default value for <code>allowEqualsInValue</code>
+      attribute on the
+      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code>.
+      the If this is <code>true</code> Tomcat will allow '<code>=</code>'
       characters when parsing unquoted cookie values. If <code>false</code>,
       cookie values containing '<code>=</code>' will be terminated when the
       '<code>=</code>' is encountered and the remainder of the cookie value will

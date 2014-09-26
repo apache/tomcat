@@ -32,7 +32,10 @@ public final class CookieSupport {
     /**
      * If true, cookie values are allowed to contain an equals character without
      * being quoted.
+     *
+     * @deprecated  Will be removed in Tomcat 9.
      */
+    @Deprecated
     public static final boolean ALLOW_EQUALS_IN_VALUE;
 
     /**

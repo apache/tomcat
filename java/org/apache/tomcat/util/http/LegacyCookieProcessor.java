@@ -27,22 +27,26 @@ import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * A collection of cookies - reusable and tuned for server side performance.
- * Based on RFC6265 and RFC2109.
+ * The legacy (up to early Tomcat 8 releases) cookie parser based on RFC6265,
+ * RFC2109 and RFC2616.
  *
  * This class is not thread-safe.
  *
  * @author Costin Manolache
  * @author kevin seguin
  */
-public final class Cookies implements CookieProcessor {
+public final class LegacyCookieProcessor implements CookieProcessor {
 
-    private static final Log log = LogFactory.getLog(Cookies.class);
+    private static final Log log = LogFactory.getLog(LegacyCookieProcessor.class);
 
     private static final UserDataHelper userDataLog = new UserDataHelper(log);
 
     private static final StringManager sm =
             StringManager.getManager("org.apache.tomcat.util.http");
+
+
+    @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
+    private boolean allowEqualsInValue = CookieSupport.ALLOW_EQUALS_IN_VALUE;
 
 
     @Override
@@ -98,7 +102,7 @@ public final class Cookies implements CookieProcessor {
      * RFC 2965 / RFC 2109
      * JVK
      */
-    private static final void processCookieHeader(byte bytes[], int off, int len,
+    private final void processCookieHeader(byte bytes[], int off, int len,
             ServerCookies serverCookies) {
 
         if (len <= 0 || bytes == null) {
@@ -191,7 +195,7 @@ public final class Cookies implements CookieProcessor {
                                 !CookieSupport.isV0Separator((char)bytes[pos]) &&
                                 CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 ||
                             !CookieSupport.isHttpSeparator((char)bytes[pos]) ||
-                            bytes[pos] == '=' && CookieSupport.ALLOW_EQUALS_IN_VALUE) {
+                            bytes[pos] == '=' && allowEqualsInValue) {
                         // Token
                         valueStart = pos;
                         // getToken returns the position at the delimiter
@@ -346,7 +350,7 @@ public final class Cookies implements CookieProcessor {
      * token, with no separator characters in between.
      * JVK
      */
-    private static final int getTokenEndPosition(byte bytes[], int off, int end,
+    private final int getTokenEndPosition(byte bytes[], int off, int end,
             int version, boolean isName){
         int pos = off;
         while (pos < end &&
@@ -355,8 +359,7 @@ public final class Cookies implements CookieProcessor {
                         CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
                         bytes[pos] != '=' &&
                         !CookieSupport.isV0Separator((char)bytes[pos]) ||
-                 !isName && bytes[pos] == '=' &&
-                         CookieSupport.ALLOW_EQUALS_IN_VALUE)) {
+                 !isName && bytes[pos] == '=' && allowEqualsInValue)) {
             pos++;
         }
 
@@ -457,5 +460,15 @@ public final class Cookies implements CookieProcessor {
             src ++;
         }
         bc.setEnd(dest);
+    }
+
+
+    public boolean getAllowEqualsInValue() {
+        return allowEqualsInValue;
+    }
+
+
+    public void setAllowEqualsInValue(boolean allowEqualsInValue) {
+        this.allowEqualsInValue = allowEqualsInValue;
     }
 }
