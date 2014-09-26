@@ -45,6 +45,34 @@
   <a href="context.html">Context</a> component. If it is not included, a default
   implementation will be created automatically.</p>
 
+  <p><strong>Note:</strong> <strong>CookieProcessor</strong> is a new
+  configuration element, introduced in Tomcat 8.0.15.
+  <strong>This is work in progress.</strong>
+  The goal is to review the current implementation of HTTP Cookie headers
+  processing in Tomcat to provide better compliance with RFC6265 specification.
+  The ideas are summarized on a
+  <a href="https://wiki.apache.org/tomcat/Cookies">Wiki page</a> and discussed
+  on <a href="http://tomcat.apache.org/lists.html">mailing lists</a>.
+  Notable points:</p>
+
+  <ul>
+    <li><strong>CookieProcessor</strong> element allows to configure cookie
+    parsing separately in each web application, or globally in the default
+    <code>conf/context.xml</code> file. The legacy cookie parsing algorithm
+    supported only limited global configuration via several
+    <a href="systemprops.html#Specifications">system properties</a>. Those
+    system properties are still supported, but are going to be deprecated in
+    favor of this new configuration element.
+    </li>
+    <li>The new RFC6265-compliant (<em>work in progress</em>) implementation
+    is a stand-in replacement for the original legacy one. Until the new code
+    is stabilized, the legacy implementation remains the default one.
+    You can select the implementation by setting <code>className</code>
+    attribute on <strong>CookieProcessor</strong> element.</li>
+    <li>This is work in progress. Configuration attributes may change in a
+    future release.</li>
+  </ul>
+
 </section>
 
 
