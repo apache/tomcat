@@ -21,10 +21,10 @@ import java.security.NoSuchAlgorithmException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestPBECredentialHandler {
+public class TestSecretKeyCredentialHandler {
 
     private static final String[] ALGORITHMS =
-            new String[] {"PBKDF2WithHmacSHA1", "PBKDF2WithHmacSHA512", "PBEWithMD5AndDES"};
+            new String[] {"PBKDF2WithHmacSHA1", "PBEWithMD5AndDES"};
 
     private static final String PWD = "password";
 
