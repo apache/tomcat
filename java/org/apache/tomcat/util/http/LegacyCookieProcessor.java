@@ -48,6 +48,30 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
     private boolean allowEqualsInValue = CookieSupport.ALLOW_EQUALS_IN_VALUE;
 
+    @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
+    private boolean allowNameOnly = CookieSupport.ALLOW_NAME_ONLY;
+
+
+
+    public boolean getAllowEqualsInValue() {
+        return allowEqualsInValue;
+    }
+
+
+    public void setAllowEqualsInValue(boolean allowEqualsInValue) {
+        this.allowEqualsInValue = allowEqualsInValue;
+    }
+
+
+    public boolean getAllowNameOnly() {
+        return allowNameOnly;
+    }
+
+
+    public void setAllowNameOnly(boolean allowNameOnly) {
+        this.allowNameOnly = allowNameOnly;
+    }
+
 
     @Override
     public Charset getCharset() {
@@ -195,7 +219,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                                 !CookieSupport.isV0Separator((char)bytes[pos]) &&
                                 CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 ||
                             !CookieSupport.isHttpSeparator((char)bytes[pos]) ||
-                            bytes[pos] == '=' && allowEqualsInValue) {
+                            bytes[pos] == '=') {
                         // Token
                         valueStart = pos;
                         // getToken returns the position at the delimiter
@@ -203,6 +227,13 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                         valueEnd = getTokenEndPosition(bytes, valueStart, end, version, false);
                         // We need pos to advance
                         pos = valueEnd;
+                        // Edge case. If value starts with '=' but this is not
+                        // allowed in a value make sure we treat this as no
+                        // value being present
+                        if (valueStart == valueEnd) {
+                            valueStart = -1;
+                            valueEnd = -1;
+                        }
                     } else  {
                         // INVALID COOKIE, advance to next delimiter
                         // The starting character of the cookie value was
@@ -318,7 +349,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                     }
                 }
             } else { // Normal Cookie
-                if (valueStart == -1 && !CookieSupport.ALLOW_NAME_ONLY) {
+                if (valueStart == -1 && !getAllowNameOnly()) {
                     // Skip name only cookies if not supported
                     continue;
                 }
@@ -359,7 +390,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                         CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0 &&
                         bytes[pos] != '=' &&
                         !CookieSupport.isV0Separator((char)bytes[pos]) ||
-                 !isName && bytes[pos] == '=' && allowEqualsInValue)) {
+                 !isName && bytes[pos] == '=' && getAllowEqualsInValue())) {
             pos++;
         }
 
@@ -460,15 +491,5 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             src ++;
         }
         bc.setEnd(dest);
-    }
-
-
-    public boolean getAllowEqualsInValue() {
-        return allowEqualsInValue;
-    }
-
-
-    public void setAllowEqualsInValue(boolean allowEqualsInValue) {
-        this.allowEqualsInValue = allowEqualsInValue;
     }
 }

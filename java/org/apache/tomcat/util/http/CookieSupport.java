@@ -55,7 +55,10 @@ public final class CookieSupport {
 
     /**
      * If true, name only cookies will be permitted.
+     *
+     * @deprecated  Will be removed in Tomcat 9.
      */
+    @Deprecated
     public static final boolean ALLOW_NAME_ONLY;
 
     /**
