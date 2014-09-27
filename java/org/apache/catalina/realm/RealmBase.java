@@ -1426,7 +1426,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     /**
      * Generate a stored credential string for the given password and associated
-     * parameters. The following parameters are supported:
+     * parameters.
+     * <p>The following parameters are supported:</p>
      * <ul>
      * <li><b>-a</b> - The algorithm to use to generate the stored
      *                 credential. If not specified a default of SHA-512 will be
@@ -1448,13 +1449,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *                 tested in turn and the first one to accept the specified
      *                 algorithm will be used.</li>
      * </ul>
-     * This generation process currently supports the following
+     * <p>This generation process currently supports the following
      * CredentialHandlers, the correct one being selected based on the algorithm
-     * specified:
+     * specified:</p>
      * <ul>
-     * <li>MessageDigestCredentialHandler</li>
-     * <li>PBECredentialHandler</li>
-     * </li>
+     * <li>{@link MessageDigestCredentialHandler}</li>
+     * <li>{@link SecretKeyCredentialHandler}</li>
+     * </ul>
      */
     public static void main(String args[]) {
 
