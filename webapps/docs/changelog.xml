@@ -55,6 +55,16 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.57 (violetagg)">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct documentation for <code>ServerCookie.ALLOW_NAME_ONLY</code>
+        system property. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.56 (violetagg)">
   <subsection name="Catalina">
     <changelog>

@@ -357,6 +357,14 @@
       <code>false</code> will be used.</p>
     </property>
 
+    <property name="org.apache.tomcat.util.http. ServerCookie.ALLOW_NAME_ONLY">
+      <p>If this is <code>false</code> then the requirements of the cookie
+      specifications that cookies must have values will be enforced and cookies
+      consisting only of a name but no value will be ignored.</p>
+      <p>If not specified, the default specification compliant value of
+      <code>false</code> will be used.</p>
+    </property>
+
     <property
     name="org.apache.tomcat.util.http. ServerCookie.ALWAYS_ADD_EXPIRES">
       <p>If this is <code>true</code> Tomcat will always add an expires
@@ -388,14 +396,6 @@
       <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
-    </property>
-
-    <property name="org.apache.tomcat.util.http. ServerCookie.ALLOW_NAME_ONLY">
-      <p> If this is true then the requirements of the cookie specifications
-      that cookies must have values will be enforced and cookies consisting only
-      of a name but no value will be ignored.</p>
-      <p>If not specified, the default specification compliant value of
-      <code>false</code> will be used.</p>
     </property>
 
   </properties>
