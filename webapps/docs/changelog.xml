@@ -60,7 +60,8 @@
         Introduce new configuration element CookieProcessor in Context to allow
         context-specific configuration of cookie processing options. Attributes
         of Context element that were added in Tomcat 8.0.13 to allow
-        configuration of a new experimental RFC6265 based cookie parser are
+        configuration of a new experimental RFC6265 based cookie parser
+        (<code>useRfc6265</code> and <code>cookieEncoding</code>) are
         replaced by this new configuration element. (markt)
       </add>
     </changelog>
