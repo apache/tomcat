@@ -70,6 +70,10 @@
       <fix>
         Correct a couple of broken links in the Javadoc. (markt)
       </fix>
+      <fix>
+        Correct documentation for <code>ServerCookie.ALLOW_NAME_ONLY</code>
+        system property. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>

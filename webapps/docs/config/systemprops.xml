@@ -359,17 +359,17 @@
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_EQUALS_IN_VALUE">
       <p>Deprecated. This will be removed in Tomcat 9. Specify the
       <code>allowEqualsInValue</code> attribute on the
-      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code> instead.
-      </p>
+      <a href="cookie-processor.html">org.apache.tomcat.util.http.LegacyCookieProcessor</a>
+      instead.</p>
       <p>This sets the default value for <code>allowEqualsInValue</code>
       attribute on the
       <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code>.
-      the If this is <code>true</code> Tomcat will allow '<code>=</code>'
+      If this is <code>true</code> Tomcat will allow '<code>=</code>'
       characters when parsing unquoted cookie values. If <code>false</code>,
       cookie values containing '<code>=</code>' will be terminated when the
       '<code>=</code>' is encountered and the remainder of the cookie value will
       be dropped.</p>
-      <p>If not specified, the default value specification compliant value of
+      <p>If not specified, the default specification compliant value of
       <code>false</code> will be used.</p>
     </property>
 
@@ -377,10 +377,25 @@
     name="org.apache.tomcat.util.http. ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0">
       <p>Deprecated. This will be removed in Tomcat 9. Specify the
       <code>allowHttpSepsInV0</code> attribute on the
-      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code> instead.
-      </p>
-      <p>If this is <code>true</code> Tomcat will allow HTTP separators in
+      <a href="cookie-processor.html">org.apache.tomcat.util.http.LegacyCookieProcessor</a>
+      instead.</p>
+      <p>This sets the default value for <code>allowHttpSepsInV0</code>
+      attribute on the
+      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code>.
+      If this is <code>true</code> Tomcat will allow HTTP separators in
       cookie names and values.</p>
+      <p>If not specified, the default specification compliant value of
+      <code>false</code> will be used.</p>
+    </property>
+
+    <property name="org.apache.tomcat.util.http. ServerCookie.ALLOW_NAME_ONLY">
+      <p>Deprecated. This will be removed in Tomcat 9. Specify the
+      <code>allowNameOnly</code> attribute on the
+      <a href="cookie-processor.html">org.apache.tomcat.util.http.LegacyCookieProcessor</a>
+      instead.</p>
+      <p>If this is <code>false</code> then the requirements of the cookie specifications
+      that cookies must have values will be enforced and cookies consisting only
+      of a name but no value will be ignored.</p>
       <p>If not specified, the default specification compliant value of
       <code>false</code> will be used.</p>
     </property>
@@ -416,18 +431,6 @@
       <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
-    </property>
-
-    <property name="org.apache.tomcat.util.http. ServerCookie.ALLOW_NAME_ONLY">
-      <p>Deprecated. This will be removed in Tomcat 9. Specify the
-      <code>allowNameOnly</code> attribute on the
-      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code> instead.
-      </p>
-      <p> If this is true then the requirements of the cookie specifications
-      that cookies must have values will be enforced and cookies consisting only
-      of a name but no value will be ignored.</p>
-      <p>If not specified, the default specification compliant value of
-      <code>false</code> will be used.</p>
     </property>
 
   </properties>
