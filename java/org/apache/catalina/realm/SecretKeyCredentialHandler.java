@@ -75,7 +75,7 @@ public class SecretKeyCredentialHandler extends DigestCredentialHandlerBase {
 
 
     @Override
-    public String mutate(String inputCredentials, byte[] salt, int iterations) {
+    protected String mutate(String inputCredentials, byte[] salt, int iterations) {
         KeySpec spec = new PBEKeySpec(inputCredentials.toCharArray(), salt, iterations, getKeyLength());
 
         try {
