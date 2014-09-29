@@ -57,4 +57,15 @@ public class TestHexUtils {
         Assert.assertArrayEquals(TEST02_STRING, TEST02_BYTES,
                 HexUtils.fromHexString(HexUtils.toHexString(TEST02_BYTES)));
     }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testFromHex01() {
+        HexUtils.fromHexString("Not a hex string");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testFromHex02() {
+        // Odd number of hex characters
+        HexUtils.fromHexString("aaa");
+    }
 }

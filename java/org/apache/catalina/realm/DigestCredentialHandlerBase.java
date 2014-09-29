@@ -150,12 +150,7 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
         if (sep1 < 0 || sep2 < 0) {
             // Stored credentials are invalid
             // This may be expected if nested credential handlers are being used
-            if (logInvalidStoredCredentials) {
-                // Logging credentials could be a security concern but they are
-                // invalid and that is probably a bigger problem
-                getLog().warn(sm.getString("credentialHandler.invalidStoredCredential",
-                        storedCredentials));
-            }
+            logInvalidStoredCredentials(storedCredentials);
             return false;
         }
 
@@ -164,11 +159,27 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
         int iterations = Integer.parseInt(storedCredentials.substring(sep1 + 1, sep2));
 
         String storedHexEncoded = storedCredentials.substring(sep2 + 1);
-        byte[] salt = HexUtils.fromHexString(hexSalt);
+        byte[] salt;
+        try {
+            salt = HexUtils.fromHexString(hexSalt);
+        } catch (IllegalArgumentException iae) {
+            logInvalidStoredCredentials(storedCredentials);
+            return false;
+        }
 
         String inputHexEncoded = mutate(inputCredentials, salt, iterations);
 
         return storedHexEncoded.equalsIgnoreCase(inputHexEncoded);
+    }
+
+
+    private void logInvalidStoredCredentials(String storedCredentials) {
+        if (logInvalidStoredCredentials) {
+            // Logging credentials could be a security concern but they are
+            // invalid and that is probably a bigger problem
+            getLog().warn(sm.getString("credentialHandler.invalidStoredCredential",
+                    storedCredentials));
+        }
     }
 
 

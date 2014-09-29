@@ -76,6 +76,10 @@
         name only cookies. (markt)
       </fix>
       <fix>
+        <bug>57027</bug>: Add additional validation for stored credentials used
+        by Realms when the credential is stored using hex encoding. (markt)
+      </fix>
+      <fix>
         <bug>57038</bug>: Add a <code>WebResource.getCoseBase()</code> method,
         implement for all <code>WebResource</code> implementations and then use
         it in the web application class loader to set the correct code base for
