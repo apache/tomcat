@@ -67,7 +67,10 @@ public final class CookieSupport {
     /**
      * If set to true, the cookie header will be preserved. In most cases
      * except debugging, this is not useful.
+     *
+     * @deprecated  Will be removed in Tomcat 9.
      */
+    @Deprecated
     public static final boolean PRESERVE_COOKIE_HEADER;
 
     /**
