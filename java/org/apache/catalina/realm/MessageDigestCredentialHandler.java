@@ -46,7 +46,7 @@ import org.apache.tomcat.util.security.ConcurrentMessageDigest;
  * </ul>
  *
  * <p>
- * If the stored password form does not included an iteration count then an
+ * If the stored password form does not include an iteration count then an
  * iteration count of 1 is used.
  * <p>
  * If the stored password form does not include salt then no salt is used.
