@@ -19,7 +19,6 @@ package org.apache.catalina.realm;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
@@ -88,7 +87,7 @@ public class MessageDigestCredentialHandler extends DigestCredentialHandlerBase 
 
     @Override
     public void setAlgorithm(String algorithm) throws NoSuchAlgorithmException {
-        MessageDigest.getInstance(algorithm);
+        ConcurrentMessageDigest.init(algorithm);
         this.algorithm = algorithm;
     }
 
