@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.buf;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Tables useful when converting byte arrays to and from strings of hexadecimal
  * digits.
@@ -25,6 +27,8 @@ package org.apache.tomcat.util.buf;
  */
 public final class HexUtils {
 
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
     // -------------------------------------------------------------- Constants
 
@@ -93,10 +97,21 @@ public final class HexUtils {
             return null;
         }
 
+        if (input.length() % 2 == 1) {
+            // Odd number of characters
+            throw new IllegalArgumentException(sm.getString("hexUtils.fromHex.oddDigits"));
+        }
+
         char[] inputChars = input.toCharArray();
         byte[] result = new byte[input.length() >> 1];
         for (int i = 0; i < result.length; i++) {
-            result[i] = (byte) ((getDec(inputChars[2*i]) << 4) + getDec(inputChars[2*i + 1]));
+            int upperNibble = getDec(inputChars[2*i]);
+            int lowerNibble =  getDec(inputChars[2*i + 1]);
+            if (upperNibble < 0 || lowerNibble < 0) {
+                // Non hex character
+                throw new IllegalArgumentException(sm.getString("hexUtils.fromHex.nonHex"));
+            }
+            result[i] = (byte) ((upperNibble << 4) + lowerNibble);
         }
         return result;
     }
