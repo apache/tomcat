@@ -682,6 +682,12 @@
       <p>If not specified, the default value of <code>3</code> will be used.</p>
     </property>
 
+    <property name="org.apache.catalina.startup. CredentialHandlerRuleSet.MAX_NESTED_LEVELS">
+      <p>The NestedCredentialHandler allows nested CredentialHandlers. This
+      property controls the maximum permitted number of levels of nesting.</p>
+      <p>If not specified, the default value of <code>3</code> will be used.</p>
+    </property>
+
   </properties>
 
 </section>
