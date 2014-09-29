@@ -38,7 +38,7 @@ public class JarResource extends AbstractArchiveResource {
             String baseUrl, JarEntry jarEntry, String internalPath,
             Manifest manifest) {
         super(root, webAppPath, base, "jar:" + baseUrl, jarEntry, internalPath,
-                manifest);
+                manifest, baseUrl);
     }
 
     @Override

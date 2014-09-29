@@ -207,6 +207,11 @@ public class FileResource extends AbstractResource {
     }
 
     @Override
+    public URL getCodeBase() {
+        return getURL();
+    }
+
+    @Override
     public Certificate[] getCertificates() {
         return null;
     }

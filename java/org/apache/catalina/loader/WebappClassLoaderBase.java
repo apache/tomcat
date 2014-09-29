@@ -2534,7 +2534,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         entry = new ResourceEntry();
         entry.source = resource.getURL();
-        entry.codeBase = entry.source;
+        entry.codeBase = resource.getCodeBase();
         entry.lastModified = resource.getLastModified();
 
         if (needConvert && path.endsWith(".properties")) {
