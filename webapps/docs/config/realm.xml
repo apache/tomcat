@@ -1041,15 +1041,16 @@
 
 <section name="Nested Components">
 
-  <p>You can nest at most one instance of the following components by nesting a
-  corresponding element inside your <strong>Realm</strong> element:</p>
+  <p>You can nest the following components by nesting the corresponding element
+  inside your <strong>Realm</strong> element:</p>
   <ul>
   <li><strong>CombinedRealm Implementation</strong> - If you are using the
     <em>CombinedRealm Implementation</em> or a Realm
     that extends the CombinedRealm, e.g. the LockOutRealm, one or more
     <strong>&lt;Realm&gt;</strong> elements may be nested inside it.</li>
-  <li><a href="crdentialhandler.html"><strong>CredentialHandler</strong></a> -
-      Configure the credential handler that will be used to validate provided
+  <li><a href="credentialhandler.html"><strong>CredentialHandler</strong></a> -
+      You may next at most one instance of this element inside a Realm. This
+      configures the credential handler that will be used to validate provided
       credentials with those stored by the Realm. If not specified a default
       <em>MessageDigestCredentialHandler</em> will configured.</li>
   </ul>
