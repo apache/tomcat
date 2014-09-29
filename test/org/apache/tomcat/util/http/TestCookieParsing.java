@@ -44,9 +44,12 @@ public class TestCookieParsing extends TomcatBaseTest {
     private static final String COOKIES_WITH_NAME_ONLY_CONCAT = "bob=bob=";
 
     private static final String[] COOKIES_WITH_SEPS = new String[] {
-        "name=val(ue" };
+            "name=val(ue" };
     private static final String COOKIES_WITH_SEPS_TRUNC = "name=val";
 
+    private static final String[] COOKIES_WITH_QUOTES = new String[] {
+            "name=\"val\\\"ue\"" };
+    private static final String COOKIES_WITH_QUOTES_TRUNC = "name=\"val\"uee\"";
 
     @Test
     public void testLegacyWithEquals() throws Exception {
@@ -163,6 +166,43 @@ public class TestCookieParsing extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testLegacyPreserveHeader() throws Exception {
+        doTestLegacyPreserveHeader(true);
+    }
+
+
+    @Test
+    public void testLegacyNoPreserveHeader() throws Exception {
+        doTestLegacyPreserveHeader(false);
+    }
+
+
+    private void doTestLegacyPreserveHeader(boolean preserveHeader) throws Exception {
+        LegacyCookieProcessor legacyCookieProcessor = new LegacyCookieProcessor();
+        legacyCookieProcessor.setPreserveCookieHeader(preserveHeader);
+
+        String expected;
+        if (preserveHeader) {
+            expected = concat(COOKIES_WITH_QUOTES);
+        } else {
+            expected = COOKIES_WITH_QUOTES_TRUNC;
+        }
+        TestCookieParsingClient client = new TestCookieParsingClient(
+                legacyCookieProcessor, true, COOKIES_WITH_QUOTES, expected);
+        client.doRequest();
+    }
+
+
+    @Test
+    public void testRfc6265PreserveHeader() throws Exception {
+        // Always allows equals
+        TestCookieParsingClient client = new TestCookieParsingClient(new Rfc6265CookieProcessor(),
+                true, COOKIES_WITH_QUOTES, concat(COOKIES_WITH_QUOTES));
+        client.doRequest();
+    }
+
+
     private static String concat(String[] input) {
         StringBuilder result = new StringBuilder();
         for (String s : input) {
@@ -177,11 +217,18 @@ public class TestCookieParsing extends TomcatBaseTest {
         private final CookieProcessor cookieProcessor;
         private final String[] cookies;
         private final String expected;
+        private final boolean echoHeader;
 
 
         public TestCookieParsingClient(CookieProcessor cookieProcessor,
                 String[] cookies, String expected) {
+            this(cookieProcessor, false, cookies, expected);
+        }
+
+        public TestCookieParsingClient(CookieProcessor cookieProcessor,
+                boolean echoHeader, String[] cookies, String expected) {
             this.cookieProcessor = cookieProcessor;
+            this.echoHeader = echoHeader;
             this.cookies = cookies;
             this.expected = expected;
         }
@@ -192,8 +239,12 @@ public class TestCookieParsing extends TomcatBaseTest {
             Context root = tomcat.addContext("", TEMP_DIR);
             root.setCookieProcessor(cookieProcessor);
 
-            Tomcat.addServlet(root, "Simple", new SimpleServlet());
-            root.addServletMapping("/test", "Simple");
+            if (echoHeader) {
+                Tomcat.addServlet(root, "Cookies", new EchoCookieHeader());
+            } else {
+                Tomcat.addServlet(root, "Cookies", new EchoCookies());
+            }
+            root.addServletMapping("/test", "Cookies");
 
             tomcat.start();
             // Open connection
@@ -229,7 +280,7 @@ public class TestCookieParsing extends TomcatBaseTest {
     }
 
 
-    private static class SimpleServlet extends HttpServlet {
+    private static class EchoCookies extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
@@ -246,4 +297,21 @@ public class TestCookieParsing extends TomcatBaseTest {
             resp.flushBuffer();
         }
     }
+
+
+
+
+    private static class EchoCookieHeader extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+            req.getCookies();
+            resp.getWriter().write(req.getHeader("Cookie"));
+            resp.flushBuffer();
+        }
+    }
+
 }

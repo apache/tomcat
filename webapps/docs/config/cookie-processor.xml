@@ -147,6 +147,18 @@
         <a href="systemprops.html">system property</a>.</p>
       </attribute>
 
+      <attribute name="preserveCookieHeader" required="false">
+        <p>If this is <code>true</code> Tomcat will ensure that cookie
+        processing does not modify cookie header returned by
+        <code>HttpServletRequest.getHeader()</code>. If
+        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+        <code>true</code>, the default of this setting will be
+        <code>true</code>, else the default value will be <code>false</code>.
+        This default may be overridden by setting the
+        <code>org.apache.tomcat.util.http.ServerCookie.PRESERVE_COOKIE_HEADER</code>
+        system property.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -169,6 +181,7 @@
     <ul>
       <li>The '<code>=</code>' is always permitted in a cookie value.</li>
       <li>Name only cookies are always permitted.</li>
+      <li>The cookie header is always preserved.</li>
     </ul>
 
     <p>No additional attributes are supported by the <strong>RFC 6265 Cookie

@@ -54,6 +54,10 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
     private boolean allowHttpSepsInV0 = CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0;
 
+    @SuppressWarnings("deprecation") // Default to STRICT_SERVLET_COMPLIANCE
+                                     // when deprecated code is removed
+    private boolean presserveCookieHeader = CookieSupport.PRESERVE_COOKIE_HEADER;
+
 
     public boolean getAllowEqualsInValue() {
         return allowEqualsInValue;
@@ -85,6 +89,16 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     }
 
 
+    public boolean getPreserveCookieHeader() {
+        return presserveCookieHeader;
+    }
+
+
+    public void setPreserveCookieHeader(boolean presserveCookieHeader) {
+        this.presserveCookieHeader = presserveCookieHeader;
+    }
+
+
     @Override
     public Charset getCharset() {
         return StandardCharsets.ISO_8859_1;
@@ -113,7 +127,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                     log.debug("Cookies: Parsing b[]: " + cookieValue.toString());
                 }
                 ByteChunk bc = cookieValue.getByteChunk();
-                if (CookieSupport.PRESERVE_COOKIE_HEADER) {
+                if (getPreserveCookieHeader()) {
                     int len = bc.getLength();
                     if (len > 0) {
                         byte[] buf = new byte[len];
