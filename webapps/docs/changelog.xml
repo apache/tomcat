@@ -64,6 +64,17 @@
         (<code>useRfc6265</code> and <code>cookieEncoding</code>) are
         replaced by this new configuration element. (markt)
       </add>
+      <add>
+        Deprecate the use of system proprties to control cookie parsing and
+        replace them with attributes on the new <code>CookieProcessor</code>
+        that may be configured on a per context basis. (markt)
+      </add>
+      <fix>
+        Correct an edge case and allow a cookie if the value starts with an
+        equals character and the <code>CookieProcessor</code> is not configured
+        to allow equals characters in cookie values but is configured to allow
+        name only cookies. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -78,7 +89,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 8.0.14 (markt)">
+<section name="Tomcat 8.0.14 (markt)" rtext="2014-09-29">
   <subsection name="Other">
     <changelog>
       <fix>
