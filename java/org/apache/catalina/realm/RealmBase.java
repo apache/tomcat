@@ -1466,6 +1466,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         int keyLength = -1;
         String handlerClassName = null;
 
+        if (args.length == 0) {
+            usage();
+            return;
+        }
+
         int argIndex = 0;
 
         while (args.length > argIndex + 2 && args[argIndex].length() == 2 &&
@@ -1496,9 +1501,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 break;
             }
             default: {
-                System.out.println("Usage: RealmBase [-a <algorithm>] [-e <encoding>] " +
-                        "[-i <iterations>] [-s <salt-length>] [-k <key-length>] " +
-                        "[-h <handler-class-name>] <credentials>");
+                usage();
                 return;
             }
             }
@@ -1550,6 +1553,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             System.out.print(credential + ":");
             System.out.println(handler.mutate(credential));
         }
+    }
+
+
+    private static void usage() {
+        System.out.println("Usage: RealmBase [-a <algorithm>] [-e <encoding>] " +
+                "[-i <iterations>] [-s <salt-length>] [-k <key-length>] " +
+                "[-h <handler-class-name>] <credentials>");
     }
 
 
