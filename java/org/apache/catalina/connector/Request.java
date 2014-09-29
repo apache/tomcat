@@ -1677,7 +1677,7 @@ public class Request
      */
     public void addCookie(Cookie cookie) {
 
-        if (!cookiesParsed) {
+        if (!cookiesConverted) {
             convertCookies();
         }
 
