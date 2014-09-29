@@ -33,18 +33,20 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private final String baseUrl;
     private final JarEntry resource;
     private final Manifest manifest;
+    private final String codeBaseUrl;
     private final String name;
     private boolean readCerts = false;
     private Certificate[] certificates;
 
     protected AbstractArchiveResource(WebResourceRoot root, String webAppPath,
             String base, String baseUrl, JarEntry jarEntry,
-            String internalPath, Manifest manifest) {
+            String internalPath, Manifest manifest, String codeBaseUrl) {
         super(root, webAppPath);
         this.base = base;
         this.baseUrl = baseUrl;
         this.resource = jarEntry;
         this.manifest = manifest;
+        this.codeBaseUrl = codeBaseUrl;
 
         String resourceName = resource.getName();
         if (resourceName.charAt(resourceName.length() - 1) == '/') {
@@ -132,12 +134,24 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     @Override
     public URL getURL() {
+        String url = baseUrl + "!/" + resource.getName();
         try {
-            return new URL(baseUrl + "!/" + resource.getName());
+            return new URL(url);
         } catch (MalformedURLException e) {
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("fileResource.getUrlFail",
-                        resource.getName(), baseUrl), e);
+                getLog().debug(sm.getString("fileResource.getUrlFail", url), e);
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public URL getCodeBase() {
+        try {
+            return new URL(codeBaseUrl);
+        } catch (MalformedURLException e) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("fileResource.getUrlFail", codeBaseUrl), e);
             }
             return null;
         }

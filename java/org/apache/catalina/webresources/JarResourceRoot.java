@@ -122,17 +122,28 @@ public class JarResourceRoot extends AbstractResource {
 
     @Override
     public URL getURL() {
+        String url = baseUrl + "!/";
         try {
-            return new URL(baseUrl + "!/");
+            return new URL(url);
         } catch (MalformedURLException e) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getUrlFail",
-                        "", baseUrl), e);
+                log.debug(sm.getString("fileResource.getUrlFail", url), e);
             }
             return null;
         }
     }
 
+    @Override
+    public URL getCodeBase() {
+        try {
+            return new URL(baseUrl);
+        } catch (MalformedURLException e) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("fileResource.getUrlFail", baseUrl), e);
+            }
+            return null;
+        }
+    }
     @Override
     protected Log getLog() {
         return log;
