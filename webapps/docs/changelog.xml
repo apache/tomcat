@@ -76,6 +76,11 @@
         name only cookies. (markt)
       </fix>
       <fix>
+        <bug>57022</bug>: Ensure SPNEGO authentication continues to work with
+        the JNDI Realm using delegated credentials with recent Oracle JREs.
+        (markt)
+      </fix>
+      <fix>
         <bug>57027</bug>: Add additional validation for stored credentials used
         by Realms when the credential is stored using hex encoding. (markt)
       </fix>

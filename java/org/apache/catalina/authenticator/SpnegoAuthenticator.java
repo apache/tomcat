@@ -19,6 +19,7 @@ package org.apache.catalina.authenticator;
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.regex.Pattern;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -213,6 +215,9 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return false;
             }
+
+            Subject subject = lc.getSubject();
+
             // Assume the GSSContext is stateless
             // TODO: Confirm this assumption
             final GSSManager manager = GSSManager.getInstance();
@@ -233,7 +238,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                                 GSSCredential.ACCEPT_ONLY);
                     }
                 };
-            gssContext = manager.createContext(Subject.doAs(lc.getSubject(), action));
+            gssContext = manager.createContext(Subject.doAs(subject, action));
 
             outToken = Subject.doAs(lc.getSubject(), new AcceptAction(gssContext, decoded));
 
@@ -248,8 +253,9 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 return false;
             }
 
-            principal = context.getRealm().authenticate(gssContext,
-                    isStoreDelegatedCredential());
+            principal = Subject.doAs(subject, new AuthenticateAction(
+                    context.getRealm(), gssContext, storeDelegatedCredential));
+
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"), e);
@@ -329,6 +335,26 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         public byte[] run() throws GSSException {
             return gssContext.acceptSecContext(decoded,
                     0, decoded.length);
+        }
+    }
+
+
+    private static class AuthenticateAction implements PrivilegedAction<Principal> {
+
+        private final Realm realm;
+        private final GSSContext gssContext;
+        private final boolean storeDelegatedCredential;
+
+        public AuthenticateAction(Realm realm, GSSContext gssContext,
+                boolean storeDelegatedCredential) {
+            this.realm = realm;
+            this.gssContext = gssContext;
+            this.storeDelegatedCredential = storeDelegatedCredential;
+        }
+
+        @Override
+        public Principal run() {
+            return realm.authenticate(gssContext, storeDelegatedCredential);
         }
     }
 }
