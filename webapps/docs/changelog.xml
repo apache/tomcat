@@ -90,6 +90,10 @@
         it in the web application class loader to set the correct code base for
         resources loaded from JARs and WARs. (markt)
       </fix>
+      <fix>
+        Correct a couple of NPEs in the JNDI Realm that could be triggered with
+        when not specifying a roleBase and enabling roleSearchAsUser. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
