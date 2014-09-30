@@ -44,11 +44,21 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     private static final StringManager sm =
             StringManager.getManager("org.apache.tomcat.util.http");
 
+    private static final char[] V0_SEPARATORS = {',', ';', ' ', '\t'};
+    private static final boolean[] V0_SEPARATOR_FLAGS = new boolean[128];
+
     // Excludes '/' since configuration controls whether or not to treat '/' as
     // a separator
     private static final char[] HTTP_SEPARATORS = new char[] {
             '\t', ' ', '\"', '(', ')', ',', ':', ';', '<', '=', '>', '?', '@',
             '[', '\\', ']', '{', '}' };
+
+    static {
+        for (char c : V0_SEPARATORS) {
+            V0_SEPARATOR_FLAGS[c] = true;
+        }
+    }
+
 
     @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
     private boolean allowEqualsInValue = CookieSupport.ALLOW_EQUALS_IN_VALUE;
@@ -206,7 +216,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             while (pos < end &&
                    (isHttpSeparator((char) bytes[pos]) &&
                            !getAllowHttpSepsInV0() ||
-                    CookieSupport.isV0Separator((char) bytes[pos]) ||
+                    isV0Separator((char) bytes[pos]) ||
                     isWhiteSpace(bytes[pos])))
                 {pos++; }
 
@@ -271,7 +281,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                     break;
                 default:
                     if (version == 0 &&
-                                !CookieSupport.isV0Separator((char)bytes[pos]) &&
+                                isV0Separator((char)bytes[pos]) &&
                                 getAllowHttpSepsInV0() ||
                             !isHttpSeparator((char)bytes[pos]) ||
                             bytes[pos] == '=') {
@@ -442,7 +452,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
         while (pos < end &&
                 (!isHttpSeparator((char)bytes[pos]) ||
                  version == 0 && getAllowHttpSepsInV0() && bytes[pos] != '=' &&
-                        !CookieSupport.isV0Separator((char)bytes[pos]) ||
+                        !isV0Separator((char)bytes[pos]) ||
                  !isName && bytes[pos] == '=' && getAllowEqualsInValue())) {
             pos++;
         }
@@ -464,6 +474,23 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
         return httpSeparatorFlags[c];
     }
+
+
+    /**
+     * Returns true if the byte is a separator as defined by V0 of the cookie
+     * spec.
+     */
+    private static boolean isV0Separator(final char c) {
+        if (c < 0x20 || c >= 0x7f) {
+            if (c != 0x09) {
+                throw new IllegalArgumentException(
+                        "Control character in cookie value or attribute.");
+            }
+        }
+
+        return V0_SEPARATOR_FLAGS[c];
+    }
+
 
     /**
      * Given a starting position after an initial quote character, this gets

@@ -19,7 +19,10 @@ package org.apache.tomcat.util.http;
 
 /**
  * Static constants for this package.
+ *
+ * @deprecated  Will be removed in Tomcat 9.
  */
+@Deprecated
 public final class CookieSupport {
 
     // --------------------------------------------------------------- Constants
@@ -32,10 +35,7 @@ public final class CookieSupport {
     /**
      * If true, cookie values are allowed to contain an equals character without
      * being quoted.
-     *
-     * @deprecated  Will be removed in Tomcat 9.
      */
-    @Deprecated
     public static final boolean ALLOW_EQUALS_IN_VALUE;
 
     /**
@@ -43,37 +43,25 @@ public final class CookieSupport {
      * spec but are disallowed by the HTTP spec will be allowed in v0 cookie
      * names and values. These characters are: \"()/:<=>?@[\\]{} Note that the
      * inclusion of / depends on the value of {@link #FWD_SLASH_IS_SEPARATOR}.
-     *
-     * @deprecated  Will be removed in Tomcat 9.
      */
-    @Deprecated
     public static final boolean ALLOW_HTTP_SEPARATORS_IN_V0;
 
     /**
      * If set to true, the <code>/</code> character will be treated as a
      * separator. Default is usually false. If STRICT_SERVLET_COMPLIANCE==true
      * then default is true. Explicitly setting always takes priority.
-     *
-     * @deprecated  Will be removed in Tomcat 9.
      */
-    @Deprecated
     public static final boolean FWD_SLASH_IS_SEPARATOR;
 
     /**
      * If true, name only cookies will be permitted.
-     *
-     * @deprecated  Will be removed in Tomcat 9.
      */
-    @Deprecated
     public static final boolean ALLOW_NAME_ONLY;
 
     /**
      * If set to true, the cookie header will be preserved. In most cases
      * except debugging, this is not useful.
-     *
-     * @deprecated  Will be removed in Tomcat 9.
      */
-    @Deprecated
     public static final boolean PRESERVE_COOKIE_HEADER;
 
     /**
@@ -177,10 +165,7 @@ public final class CookieSupport {
      * spec, RFC2109.
      * @throws IllegalArgumentException if a control character was supplied as
      *         input
-     *
-     * @deprecated  Will be removed in Tomcat 9.
      */
-    @Deprecated
     public static final boolean isHttpSeparator(final char c) {
         if (c < 0x20 || c >= 0x7f) {
             if (c != 0x09) {
