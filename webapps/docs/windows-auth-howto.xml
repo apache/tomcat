@@ -172,9 +172,6 @@ com.sun.security.jgss.krb5.accept {
   the JVM being used. The name of the login configuration must match the
   value used by the <a href="config/valve.html#SPNEGO_Valve">authentication
   valve</a>.</li>
-  <li>The system property <code>javax.security.auth.useSubjectCredsOnly</code>
-  is automatically set to the required value of false if a web application is
-  configured to use the SPNEGO authentication method.</li>
   </ul>
   <p>The SPNEGO authenticator will work with any <a href="config/realm.html">
   Realm</a> but if used with the JNDI Realm, by default the JNDI Realm will use
