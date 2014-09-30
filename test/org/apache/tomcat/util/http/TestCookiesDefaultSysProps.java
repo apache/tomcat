@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.http;
 
 import java.util.HashMap;
@@ -29,11 +28,12 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Test case for {@link LegacyCookieProcessor}. <b>Note</b> because of the use of <code>final
- * static</code> constants in {@link LegacyCookieProcessor}, each of these tests must be
- * executed in a new JVM instance. The tests have been place in separate classes
- * to facilitate this when running the unit tests via Ant.
+ * Test case for {@link LegacyCookieProcessor}. <b>Note</b> because of the use
+ * of <code>final static</code> constants in {@link CookieSupport}, each of
+ * these tests must be executed in a new JVM instance. The tests have been place
+ * in separate classes to facilitate this when running the unit tests via Ant.
  */
+@SuppressWarnings("javadoc")
 public class TestCookiesDefaultSysProps extends CookiesBaseTest {
 
     @Override
