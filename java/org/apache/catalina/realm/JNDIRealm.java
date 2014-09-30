@@ -1297,6 +1297,13 @@ public class JNDIRealm extends RealmBase {
             user = getUserBySearch(context, username, attrIds);
         }
 
+        if (userPassword == null && credentials != null) {
+            // The password is available. Insert it since it may be required for
+            // role searches.
+            return new User(user.getUserName(), user.getDN(), credentials,
+                    user.getRoles(), user.getUserRoleId());
+        }
+
         return user;
     }
 
@@ -1725,6 +1732,8 @@ public class JNDIRealm extends RealmBase {
                 nameParts[i] = name.get(i);
             }
             base = roleBaseFormat.format(nameParts);
+        } else {
+            base = "";
         }
 
         // Perform the configured search and process the results

@@ -63,6 +63,10 @@
         the JNDI Realm using delegated credentials with recent Oracle JREs.
         (markt)
       </fix>
+      <fix>
+        Correct a couple of NPEs in the JNDI Realm that could be triggered with
+        when not specifying a roleBase and enabling roleSearchAsUser. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
