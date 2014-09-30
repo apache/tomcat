@@ -204,7 +204,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
             // Skip whitespace and non-token characters (separators)
             while (pos < end &&
-                   (httpSeparatorFlags[(char) bytes[pos]] &&
+                   (isHttpSeparator((char) bytes[pos]) &&
                            !getAllowHttpSepsInV0() ||
                     CookieSupport.isV0Separator((char) bytes[pos]) ||
                     isWhiteSpace(bytes[pos])))
@@ -273,7 +273,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                     if (version == 0 &&
                                 !CookieSupport.isV0Separator((char)bytes[pos]) &&
                                 getAllowHttpSepsInV0() ||
-                            !httpSeparatorFlags[(char)bytes[pos]] ||
+                            !isHttpSeparator((char)bytes[pos]) ||
                             bytes[pos] == '=') {
                         // Token
                         valueStart = pos;
@@ -440,7 +440,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             int version, boolean isName){
         int pos = off;
         while (pos < end &&
-                (!httpSeparatorFlags[(char)bytes[pos]] ||
+                (!isHttpSeparator((char)bytes[pos]) ||
                  version == 0 && getAllowHttpSepsInV0() && bytes[pos] != '=' &&
                         !CookieSupport.isV0Separator((char)bytes[pos]) ||
                  !isName && bytes[pos] == '=' && getAllowEqualsInValue())) {
@@ -453,6 +453,17 @@ public final class LegacyCookieProcessor implements CookieProcessor {
         return pos;
     }
 
+
+    private boolean isHttpSeparator(final char c) {
+        if (c < 0x20 || c >= 0x7f) {
+            if (c != 0x09) {
+                throw new IllegalArgumentException(
+                        "Control character in cookie value or attribute.");
+            }
+        }
+
+        return httpSeparatorFlags[c];
+    }
 
     /**
      * Given a starting position after an initial quote character, this gets
