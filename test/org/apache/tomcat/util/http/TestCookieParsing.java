@@ -44,7 +44,7 @@ public class TestCookieParsing extends TomcatBaseTest {
     private static final String COOKIES_WITH_NAME_ONLY_CONCAT = "bob=bob=";
 
     private static final String[] COOKIES_WITH_SEPS = new String[] {
-            "name=val(ue" };
+            "name=val/ue" };
     private static final String COOKIES_WITH_SEPS_TRUNC = "name=val";
 
     private static final String[] COOKIES_WITH_QUOTES = new String[] {
@@ -131,25 +131,38 @@ public class TestCookieParsing extends TomcatBaseTest {
 
     @Test
     public void testLegacyWithSeps() throws Exception {
-        doTestLegacySeps(true);
+        doTestLegacySeps(true, true);
     }
 
 
     @Test
     public void testLegacyWithoutSeps() throws Exception {
-        doTestLegacySeps(false);
+        doTestLegacySeps(false, true);
     }
 
 
-    private void doTestLegacySeps(boolean seps) throws Exception {
+    @Test
+    public void testLegacyWithFwdSlash() throws Exception {
+        doTestLegacySeps(true, false);
+    }
+
+
+    @Test
+    public void testLegacyWithoutFwdSlash() throws Exception {
+        doTestLegacySeps(false, false);
+    }
+
+
+    private void doTestLegacySeps(boolean seps, boolean fwdSlash) throws Exception {
         LegacyCookieProcessor legacyCookieProcessor = new LegacyCookieProcessor();
         legacyCookieProcessor.setAllowHttpSepsInV0(seps);
+        legacyCookieProcessor.setForwardSlashIsSeparator(fwdSlash);
 
         String expected;
-        if (seps) {
-            expected = concat(COOKIES_WITH_SEPS);
-        } else {
+        if (!seps && fwdSlash) {
             expected = COOKIES_WITH_SEPS_TRUNC;
+        } else {
+            expected = concat(COOKIES_WITH_SEPS);
         }
         TestCookieParsingClient client = new TestCookieParsingClient(
                 legacyCookieProcessor, COOKIES_WITH_SEPS, expected);

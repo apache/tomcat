@@ -53,7 +53,10 @@ public final class CookieSupport {
      * If set to true, the <code>/</code> character will be treated as a
      * separator. Default is usually false. If STRICT_SERVLET_COMPLIANCE==true
      * then default is true. Explicitly setting always takes priority.
+     *
+     * @deprecated  Will be removed in Tomcat 9.
      */
+    @Deprecated
     public static final boolean FWD_SLASH_IS_SEPARATOR;
 
     /**
@@ -174,7 +177,10 @@ public final class CookieSupport {
      * spec, RFC2109.
      * @throws IllegalArgumentException if a control character was supplied as
      *         input
+     *
+     * @deprecated  Will be removed in Tomcat 9.
      */
+    @Deprecated
     public static final boolean isHttpSeparator(final char c) {
         if (c < 0x20 || c >= 0x7f) {
             if (c != 0x09) {
