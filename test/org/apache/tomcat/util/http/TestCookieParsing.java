@@ -49,7 +49,7 @@ public class TestCookieParsing extends TomcatBaseTest {
 
     private static final String[] COOKIES_WITH_QUOTES = new String[] {
             "name=\"val\\\"ue\"" };
-    private static final String COOKIES_WITH_QUOTES_TRUNC = "name=\"val\"uee\"";
+    private static final String COOKIES_WITH_QUOTES_MODIFIED = "name=\"val\"uee\"";
 
     @Test
     public void testLegacyWithEquals() throws Exception {
@@ -186,7 +186,7 @@ public class TestCookieParsing extends TomcatBaseTest {
         if (preserveHeader) {
             expected = concat(COOKIES_WITH_QUOTES);
         } else {
-            expected = COOKIES_WITH_QUOTES_TRUNC;
+            expected = COOKIES_WITH_QUOTES_MODIFIED;
         }
         TestCookieParsingClient client = new TestCookieParsingClient(
                 legacyCookieProcessor, true, COOKIES_WITH_QUOTES, expected);
