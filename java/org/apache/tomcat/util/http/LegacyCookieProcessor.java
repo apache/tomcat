@@ -44,6 +44,11 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     private static final StringManager sm =
             StringManager.getManager("org.apache.tomcat.util.http");
 
+    // Excludes '/' since configuration controls whether or not to treat '/' as
+    // a separator
+    private static final char[] HTTP_SEPARATORS = new char[] {
+            '\t', ' ', '\"', '(', ')', ',', ':', ';', '<', '=', '>', '?', '@',
+            '[', '\\', ']', '{', '}' };
 
     @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
     private boolean allowEqualsInValue = CookieSupport.ALLOW_EQUALS_IN_VALUE;
@@ -57,6 +62,20 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     @SuppressWarnings("deprecation") // Default to STRICT_SERVLET_COMPLIANCE
                                      // when deprecated code is removed
     private boolean presserveCookieHeader = CookieSupport.PRESERVE_COOKIE_HEADER;
+
+    private boolean[] httpSeparatorFlags = new boolean[128];
+
+
+    public LegacyCookieProcessor() {
+        // Array elements will default to false
+        for (char c : HTTP_SEPARATORS) {
+            httpSeparatorFlags[c] = true;
+        }
+        @SuppressWarnings("deprecation") // Default to STRICT_SERVLET_COMPLIANCE
+                                         // when deprecated code is removed
+        boolean b = CookieSupport.FWD_SLASH_IS_SEPARATOR;
+        httpSeparatorFlags['/'] = b;
+    }
 
 
     public boolean getAllowEqualsInValue() {
@@ -96,6 +115,16 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
     public void setPreserveCookieHeader(boolean presserveCookieHeader) {
         this.presserveCookieHeader = presserveCookieHeader;
+    }
+
+
+    public boolean getForwardSlashIsSeparator() {
+        return httpSeparatorFlags['/'];
+    }
+
+
+    public void setForwardSlashIsSeparator(boolean forwardSlashIsSeparator) {
+        httpSeparatorFlags['/'] = forwardSlashIsSeparator;
     }
 
 
@@ -175,7 +204,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
             // Skip whitespace and non-token characters (separators)
             while (pos < end &&
-                   (CookieSupport.isHttpSeparator((char) bytes[pos]) &&
+                   (httpSeparatorFlags[(char) bytes[pos]] &&
                            !getAllowHttpSepsInV0() ||
                     CookieSupport.isV0Separator((char) bytes[pos]) ||
                     isWhiteSpace(bytes[pos])))
@@ -244,7 +273,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                     if (version == 0 &&
                                 !CookieSupport.isV0Separator((char)bytes[pos]) &&
                                 getAllowHttpSepsInV0() ||
-                            !CookieSupport.isHttpSeparator((char)bytes[pos]) ||
+                            !httpSeparatorFlags[(char)bytes[pos]] ||
                             bytes[pos] == '=') {
                         // Token
                         valueStart = pos;
@@ -411,7 +440,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             int version, boolean isName){
         int pos = off;
         while (pos < end &&
-                (!CookieSupport.isHttpSeparator((char)bytes[pos]) ||
+                (!httpSeparatorFlags[(char)bytes[pos]] ||
                  version == 0 && getAllowHttpSepsInV0() && bytes[pos] != '=' &&
                         !CookieSupport.isV0Separator((char)bytes[pos]) ||
                  !isName && bytes[pos] == '=' && getAllowEqualsInValue())) {
