@@ -81,12 +81,37 @@ public class Rfc6265CookieProcessor implements CookieProcessor {
         //       generation.
         header.append(cookie.getName());
         header.append('=');
-        // TODO: Value also needs validation that varies depending on the spec
-        //       being used. This is currently delayed until the header is
-        //       generated.
-        header.append(cookie.getValue());
+        String value = cookie.getValue();
+        if (value != null) {
+            validateCookieValue(value);
+            header.append(value);
+        }
 
         // TODO add support for the attributes.
         return header.toString();
+    }
+
+
+    private void validateCookieValue(String value) {
+        if (value == null || value.length() == 0) {
+            return;
+        }
+
+        int start = 0;
+        int end = value.length();
+
+        if (end > 1 && value.charAt(0) == '"' && value.charAt(end - 1) == '"') {
+            start = 1;
+            end--;
+        }
+
+        char[] chars = value.toCharArray();
+        for (int i = start; i < end; i++) {
+            char c = chars[i];
+            if (c < 0x21 || c == 0x22 || c == 0x2c || c == 0x3b || c == 0x5c || c == 0x7f) {
+                // TODO i18n
+                throw new IllegalArgumentException();
+            }
+        }
     }
 }
