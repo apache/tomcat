@@ -768,7 +768,7 @@ public class Catalina {
                     (javax.naming.Context.INITIAL_CONTEXT_FACTORY,
                      "org.apache.naming.java.javaURLContextFactory");
             } else {
-                log.debug( "INITIAL_CONTEXT_FACTORY alread set " + value );
+                log.debug( "INITIAL_CONTEXT_FACTORY already set " + value );
             }
         }
     }
