@@ -18,7 +18,15 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.SimpleDateFormat;
 import java.util.BitSet;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import javax.servlet.http.Cookie;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -54,10 +62,26 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             '\t', ' ', '\"', '(', ')', ',', ':', ';', '<', '=', '>', '?', '@',
             '[', '\\', ']', '{', '}' };
 
+    private static final String COOKIE_DATE_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss z";
+    private static final ThreadLocal<DateFormat> COOKIE_DATE_FORMAT =
+        new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            DateFormat df =
+                new SimpleDateFormat(COOKIE_DATE_PATTERN, Locale.US);
+            df.setTimeZone(TimeZone.getTimeZone("GMT"));
+            return df;
+        }
+    };
+
+    private static final String ANCIENT_DATE;
+
     static {
         for (char c : V0_SEPARATORS) {
             V0_SEPARATOR_FLAGS.set(c);
         }
+
+        ANCIENT_DATE = COOKIE_DATE_FORMAT.get().format(new Date(10000));
     }
 
 
@@ -74,7 +98,13 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                                      // when deprecated code is removed
     private boolean presserveCookieHeader = CookieSupport.PRESERVE_COOKIE_HEADER;
 
-    private BitSet httpSeparatorFlags = new BitSet(128);
+    @SuppressWarnings("deprecation") // Default to STRICT_SERVLET_COMPLIANCE
+                                     // when deprecated code is removed
+    private boolean alwaysAddExpires = SetCookieSupport.ALWAYS_ADD_EXPIRES;
+
+    private final BitSet httpSeparatorFlags = new BitSet(128);
+
+    private final BitSet allowedWithoutQuotes = new BitSet(128);
 
 
     public LegacyCookieProcessor() {
@@ -87,6 +117,34 @@ public final class LegacyCookieProcessor implements CookieProcessor {
         boolean b = CookieSupport.FWD_SLASH_IS_SEPARATOR;
         if (b) {
             httpSeparatorFlags.set('/');
+        }
+
+        String separators;
+        if (getAllowHttpSepsInV0()) {
+            // comma, semi-colon and space as defined by netscape
+            separators = ",; ";
+        } else {
+            // separators as defined by RFC2616
+            separators = "()<>@,;:\\\"/[]?={} \t";
+        }
+
+        // all CHARs except CTLs or separators are allowed without quoting
+        allowedWithoutQuotes.set(0x20, 0x7f);
+        for (char ch : separators.toCharArray()) {
+            allowedWithoutQuotes.clear(ch);
+        }
+
+        /**
+         * Some browsers (e.g. IE6 and IE7) do not handle quoted Path values even
+         * when Version is set to 1. To allow for this, we support a property
+         * FWD_SLASH_IS_SEPARATOR which, when false, means a '/' character will not
+         * be treated as a separator, potentially avoiding quoting and the ensuing
+         * side effect of having the cookie upgraded to version 1.
+         *
+         * For now, we apply this rule globally rather than just to the Path attribute.
+         */
+        if (!getAllowHttpSepsInV0() && !getForwardSlashIsSeparator()) {
+            allowedWithoutQuotes.set('/');
         }
     }
 
@@ -118,6 +176,22 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
     public void setAllowHttpSepsInV0(boolean allowHttpSepsInV0) {
         this.allowHttpSepsInV0 = allowHttpSepsInV0;
+        // HTTP separators less comma, semicolon and space since the Netscape
+        // spec defines those as separators too.
+        // '/' is also treated as a special case
+        char[] seps = "()<>@:\\\"[]?={}\t".toCharArray();
+        for (char sep : seps) {
+            if (allowHttpSepsInV0) {
+                allowedWithoutQuotes.set(sep);
+            } else {
+                allowedWithoutQuotes.clear();
+            }
+        }
+        if (getForwardSlashIsSeparator() && !allowHttpSepsInV0) {
+            allowedWithoutQuotes.set('/');
+        } else {
+            allowedWithoutQuotes.clear('/');
+        }
     }
 
 
@@ -142,6 +216,21 @@ public final class LegacyCookieProcessor implements CookieProcessor {
         } else {
             httpSeparatorFlags.clear('/');
         }
+        if (forwardSlashIsSeparator && !getAllowHttpSepsInV0()) {
+            allowedWithoutQuotes.set('/');
+        } else {
+            allowedWithoutQuotes.clear('/');
+        }
+    }
+
+
+    public boolean getAlwaysAddExpires() {
+        return alwaysAddExpires;
+    }
+
+
+    public void setAlwaysAddExpires(boolean alwaysAddExpires) {
+        this.alwaysAddExpires = alwaysAddExpires;
     }
 
 
@@ -193,8 +282,167 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
 
     @Override
-    public String generateHeader(javax.servlet.http.Cookie cookie) {
-        return SetCookieSupport.generateHeader(cookie);
+    public String generateHeader(Cookie cookie) {
+        /*
+         * The spec allows some latitude on when to send the version attribute
+         * with a Set-Cookie header. To be nice to clients, we'll make sure the
+         * version attribute is first. That means checking the various things
+         * that can cause us to switch to a v1 cookie first.
+         *
+         * Note that by checking for tokens we will also throw an exception if a
+         * control character is encountered.
+         */
+        int version = cookie.getVersion();
+        String value = cookie.getValue();
+        String path = cookie.getPath();
+        String domain = cookie.getDomain();
+        String comment = cookie.getComment();
+
+        if (version == 0) {
+            // Check for the things that require a v1 cookie
+            if (needsQuotes(value) || comment != null || needsQuotes(path) || needsQuotes(domain)) {
+                version = 1;
+            }
+        }
+
+        // Now build the cookie header
+        StringBuffer buf = new StringBuffer(); // can't use StringBuilder due to DateFormat
+
+        // Just use the name supplied in the Cookie
+        buf.append(cookie.getName());
+        buf.append("=");
+
+        // Value
+        maybeQuote(buf, value);
+
+        // Add version 1 specific information
+        if (version == 1) {
+            // Version=1 ... required
+            buf.append ("; Version=1");
+
+            // Comment=comment
+            if (comment != null) {
+                buf.append ("; Comment=");
+                maybeQuote(buf, comment);
+            }
+        }
+
+        // Add domain information, if present
+        if (domain != null) {
+            buf.append("; Domain=");
+            maybeQuote(buf, domain);
+        }
+
+        // Max-Age=secs ... or use old "Expires" format
+        int maxAge = cookie.getMaxAge();
+        if (maxAge >= 0) {
+            if (version > 0) {
+                buf.append ("; Max-Age=");
+                buf.append (maxAge);
+            }
+            // IE6, IE7 and possibly other browsers don't understand Max-Age.
+            // They do understand Expires, even with V1 cookies!
+            if (version == 0 || getAlwaysAddExpires()) {
+                // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
+                buf.append ("; Expires=");
+                // To expire immediately we need to set the time in past
+                if (maxAge == 0) {
+                    buf.append( ANCIENT_DATE );
+                } else {
+                    COOKIE_DATE_FORMAT.get().format(
+                            new Date(System.currentTimeMillis() + maxAge * 1000L),
+                            buf,
+                            new FieldPosition(0));
+                }
+            }
+        }
+
+        // Path=path
+        if (path!=null) {
+            buf.append ("; Path=");
+            maybeQuote(buf, path);
+        }
+
+        // Secure
+        if (cookie.getSecure()) {
+          buf.append ("; Secure");
+        }
+
+        // HttpOnly
+        if (cookie.isHttpOnly()) {
+            buf.append("; HttpOnly");
+        }
+        return buf.toString();
+    }
+
+
+    private void maybeQuote(StringBuffer buf, String value) {
+        if (value == null || value.length() == 0) {
+            buf.append("\"\"");
+        } else if (alreadyQuoted(value)) {
+            buf.append('"');
+            escapeDoubleQuotes(buf, value,1,value.length()-1);
+            buf.append('"');
+        } else if (needsQuotes(value)) {
+            buf.append('"');
+            escapeDoubleQuotes(buf, value,0,value.length());
+            buf.append('"');
+        } else {
+            buf.append(value);
+        }
+    }
+
+
+    private static void escapeDoubleQuotes(StringBuffer b, String s, int beginIndex, int endIndex) {
+        if (s.indexOf('"') == -1 && s.indexOf('\\') == -1) {
+            b.append(s);
+            return;
+        }
+
+        for (int i = beginIndex; i < endIndex; i++) {
+            char c = s.charAt(i);
+            if (c == '\\' ) {
+                b.append('\\').append('\\');
+            } else if (c == '"') {
+                b.append('\\').append('"');
+            } else {
+                b.append(c);
+            }
+        }
+    }
+
+
+    private boolean needsQuotes(String value) {
+        if (value == null) {
+            return false;
+        }
+
+        int i = 0;
+        int len = value.length();
+
+        if (alreadyQuoted(value)) {
+            i++;
+            len--;
+        }
+
+        for (; i < len; i++) {
+            char c = value.charAt(i);
+            if ((c < 0x20 && c != '\t') || c >= 0x7f) {
+                throw new IllegalArgumentException(
+                        "Control character in cookie value or attribute.");
+            }
+            if (!allowedWithoutQuotes.get(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    private static boolean alreadyQuoted (String value) {
+        return value.length() >= 2 &&
+                value.charAt(0) == '\"' &&
+                value.charAt(value.length() - 1) == '\"';
     }
 
 
