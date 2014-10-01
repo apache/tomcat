@@ -18,6 +18,7 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.BitSet;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -45,7 +46,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             StringManager.getManager("org.apache.tomcat.util.http");
 
     private static final char[] V0_SEPARATORS = {',', ';', ' ', '\t'};
-    private static final boolean[] V0_SEPARATOR_FLAGS = new boolean[128];
+    private static final BitSet V0_SEPARATOR_FLAGS = new BitSet(128);
 
     // Excludes '/' since configuration controls whether or not to treat '/' as
     // a separator
@@ -55,7 +56,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
     static {
         for (char c : V0_SEPARATORS) {
-            V0_SEPARATOR_FLAGS[c] = true;
+            V0_SEPARATOR_FLAGS.set(c);
         }
     }
 
@@ -73,18 +74,20 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                                      // when deprecated code is removed
     private boolean presserveCookieHeader = CookieSupport.PRESERVE_COOKIE_HEADER;
 
-    private boolean[] httpSeparatorFlags = new boolean[128];
+    private BitSet httpSeparatorFlags = new BitSet(128);
 
 
     public LegacyCookieProcessor() {
-        // Array elements will default to false
+        // BitSet elements will default to false
         for (char c : HTTP_SEPARATORS) {
-            httpSeparatorFlags[c] = true;
+            httpSeparatorFlags.set(c);
         }
         @SuppressWarnings("deprecation") // Default to STRICT_SERVLET_COMPLIANCE
                                          // when deprecated code is removed
         boolean b = CookieSupport.FWD_SLASH_IS_SEPARATOR;
-        httpSeparatorFlags['/'] = b;
+        if (b) {
+            httpSeparatorFlags.set('/');
+        }
     }
 
 
@@ -129,12 +132,16 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
 
     public boolean getForwardSlashIsSeparator() {
-        return httpSeparatorFlags['/'];
+        return httpSeparatorFlags.get('/');
     }
 
 
     public void setForwardSlashIsSeparator(boolean forwardSlashIsSeparator) {
-        httpSeparatorFlags['/'] = forwardSlashIsSeparator;
+        if (forwardSlashIsSeparator) {
+            httpSeparatorFlags.set('/');
+        } else {
+            httpSeparatorFlags.clear('/');
+        }
     }
 
 
@@ -478,7 +485,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             }
         }
 
-        return httpSeparatorFlags[c];
+        return httpSeparatorFlags.get(c);
     }
 
 
@@ -494,7 +501,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             }
         }
 
-        return V0_SEPARATOR_FLAGS[c];
+        return V0_SEPARATOR_FLAGS.get(c);
     }
 
 
