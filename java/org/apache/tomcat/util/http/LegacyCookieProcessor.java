@@ -185,6 +185,12 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     }
 
 
+    @Override
+    public String generateHeader(javax.servlet.http.Cookie cookie) {
+        return SetCookieSupport.generateHeader(cookie);
+    }
+
+
     /**
      * Parses a cookie header after the initial "Cookie:"
      * [WS][$]token[WS]=[WS](token|QV)[;|,]
