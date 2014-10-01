@@ -47,6 +47,14 @@
 <section name="Tomcat 8.0.15 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>56394</bug>: Introduce new configuration element CookieProcessor in
+        Context to allow context-specific configuration of cookie processing
+        options. Attributes of Context element that were added in Tomcat 8.0.13
+        to allow configuration of a new experimental RFC6265 based cookie parser
+        (<code>useRfc6265</code> and <code>cookieEncoding</code>) are
+        replaced by this new configuration element. (markt)
+      </add>
       <fix>
         Improve the previous fix for <bug>56401</bug>. Avoid logging version
         information in the constructor since it then gets logged at undesirable
@@ -56,14 +64,6 @@
         <bug>57016</bug>: When using the <code>PersistentValve</code> do not
         remove sessions from the store when persisting them. (markt)
       </fix>
-      <add>
-        Introduce new configuration element CookieProcessor in Context to allow
-        context-specific configuration of cookie processing options. Attributes
-        of Context element that were added in Tomcat 8.0.13 to allow
-        configuration of a new experimental RFC6265 based cookie parser
-        (<code>useRfc6265</code> and <code>cookieEncoding</code>) are
-        replaced by this new configuration element. (markt)
-      </add>
       <add>
         Deprecate the use of system proprties to control cookie parsing and
         replace them with attributes on the new <code>CookieProcessor</code>
