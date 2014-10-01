@@ -68,4 +68,25 @@ public class Rfc6265CookieProcessor implements CookieProcessor {
             pos = headers.findHeader("Cookie", ++pos);
         }
     }
+
+
+    @Override
+    public String generateHeader(javax.servlet.http.Cookie cookie) {
+
+        StringBuilder header = new StringBuilder();
+        // TODO: Name validation takes place in Cookie and can not be configured
+        //       per Context. Moving it to here would allow per Context config
+        //       but delay validation until the header is generated. However,
+        //       the spec requires an IllegalArgumentException on Cookie
+        //       generation.
+        header.append(cookie.getName());
+        header.append('=');
+        // TODO: Value also needs validation that varies depending on the spec
+        //       being used. This is currently delayed until the header is
+        //       generated.
+        header.append(cookie.getValue());
+
+        // TODO add support for the attributes.
+        return header.toString();
+    }
 }

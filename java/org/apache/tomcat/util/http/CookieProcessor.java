@@ -18,6 +18,8 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.Charset;
 
+import javax.servlet.http.Cookie;
+
 public interface CookieProcessor {
 
     /**
@@ -26,8 +28,13 @@ public interface CookieProcessor {
     void parseCookieHeader(MimeHeaders headers, ServerCookies serverCookies);
 
     /**
-     * The character set that is to be used to turn the bytes provided in the
-     * cookie header into characters for the cookie value.
+     * Generate the HTTP header value for the given Cookie.
+     */
+    String generateHeader(Cookie cookie);
+
+    /**
+     * The character set that will be used when converting between bytes and
+     * characters when parsing and/or generating HTTP headers for cookies.
      */
     Charset getCharset();
 }

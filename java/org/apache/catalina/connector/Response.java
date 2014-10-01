@@ -51,7 +51,6 @@ import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.http.SetCookieSupport;
 import org.apache.tomcat.util.http.parser.MediaTypeCache;
 import org.apache.tomcat.util.net.URL;
 import org.apache.tomcat.util.res.StringManager;
@@ -945,17 +944,17 @@ public class Response
     }
 
     public String generateCookieString(final Cookie cookie) {
-        //web application code can receive a IllegalArgumentException
-        //from the appendCookieValue invocation
+        // Web application code can receive a IllegalArgumentException
+        // from the generateHeader() invocation
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return AccessController.doPrivileged(new PrivilegedAction<String>() {
                 @Override
                 public String run(){
-                    return SetCookieSupport.generateHeader(cookie);
+                    return getContext().getCookieProcessor().generateHeader(cookie);
                 }
             });
         } else {
-            return SetCookieSupport.generateHeader(cookie);
+            return getContext().getCookieProcessor().generateHeader(cookie);
         }
     }
 
