@@ -98,7 +98,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                                      // when deprecated code is removed
     private boolean presserveCookieHeader = CookieSupport.PRESERVE_COOKIE_HEADER;
 
-    @SuppressWarnings("deprecation") // Default to STRICT_SERVLET_COMPLIANCE
+    @SuppressWarnings("deprecation") // Default to !STRICT_SERVLET_COMPLIANCE
                                      // when deprecated code is removed
     private boolean alwaysAddExpires = SetCookieSupport.ALWAYS_ADD_EXPIRES;
 
