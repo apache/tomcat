@@ -84,7 +84,84 @@ public class TestCookieProcessorGeneration {
         doTest(new Cookie("foo", "a\"b\\c"), "foo=\"a\\\"b\\\\c\"; Version=1", null);
     }
 
+    @Test
+    public void v1simpleCookie() {
+        Cookie cookie = new Cookie("foo", "bar");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=bar; Version=1", "foo=bar");
+    }
 
+    @Test
+    public void v1NullValue() {
+        Cookie cookie = new Cookie("foo", null);
+        cookie.setVersion(1);
+        // should this throw an IAE?
+        doTest(cookie, "foo=\"\"; Version=1", "foo=");
+    }
+
+    @Test
+    public void v1QuotedValue() {
+        Cookie cookie = new Cookie("foo", "\"bar\"");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=\"bar\"; Version=1", "foo=\"bar\"");
+    }
+
+    @Test
+    public void v1ValueContainsSemicolon() {
+        Cookie cookie = new Cookie("foo", "a;b");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=\"a;b\"; Version=1", null);
+    }
+
+    @Test
+    public void v1ValueContainsComma() {
+        Cookie cookie = new Cookie("foo", "a,b");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=\"a,b\"; Version=1", null);
+    }
+
+    @Test
+    public void v1ValueContainsSpace() {
+        Cookie cookie = new Cookie("foo", "a b");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=\"a b\"; Version=1", null);
+    }
+
+    @Test
+    public void v1ValueContainsEquals() {
+        Cookie cookie = new Cookie("foo", "a=b");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=\"a=b\"; Version=1", "foo=a=b");
+    }
+
+    @Test
+    public void v1ValueContainsQuote() {
+        Cookie cookie = new Cookie("foo", "a\"b");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=\"a\\\"b\"; Version=1", null);
+    }
+
+    @Test
+    public void v1ValueContainsNonV0Separator() {
+        Cookie cookie = new Cookie("foo", "a()<>@,;:\\\"/[]?={}b");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=\"a()<>@,;:\\\\\\\"/[]?={}b\"; Version=1", null);
+    }
+
+    @Test
+    public void v1ValueContainsBackslash() {
+        Cookie cookie = new Cookie("foo", "a\\b");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=\"a\\\\b\"; Version=1", null);
+    }
+
+
+    @Test
+    public void v1ValueContainsBackslashAndQuote() {
+        Cookie cookie = new Cookie("foo", "a\"b\\c");
+        cookie.setVersion(1);
+        doTest(cookie, "foo=\"a\\\"b\\\\c\"; Version=1", null);
+    }
 
     private void doTest(Cookie cookie, String expected) {
         doTest(cookie, expected, expected);
