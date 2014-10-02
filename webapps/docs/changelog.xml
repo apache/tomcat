@@ -61,6 +61,10 @@
         times such as when using <code>StoreConfig</code>. (markt)
       </fix>
       <fix>
+        <bug>56403</bug>: Add pluggable password derivation support to the
+        Realms via the new <code>CredentialHandler</code> interface. (markt)
+      </fix>
+      <fix>
         <bug>57016</bug>: When using the <code>PersistentValve</code> do not
         remove sessions from the store when persisting them. (markt)
       </fix>
