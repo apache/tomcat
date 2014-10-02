@@ -167,7 +167,6 @@ public class TestCookieProcessorGeneration {
         doTestAllowSeparators(cookie, "foo=a\\b; Version=1", null);
     }
 
-
     @Test
     public void v1ValueContainsBackslashAndQuote() {
         Cookie cookie = new Cookie("foo", "a\"b\\c");
@@ -175,6 +174,22 @@ public class TestCookieProcessorGeneration {
         doTestDefaults(cookie, "foo=\"a\\\"b\\\\c\"; Version=1", null);
         doTestAllowSeparators(cookie, "foo=a\"b\\c; Version=1", null);
     }
+
+    @Test
+    public void v1TestMaxAgePositive() {
+        doV1TestMaxAge(100, "foo=bar; Version=1; Max-Age=100", "foo=bar;Max-Age=100");
+    }
+
+    @Test
+    public void v1TestMaxAgeZero() {
+        doV1TestMaxAge(0, "foo=bar; Version=1; Max-Age=0", "foo=bar;Max-Age=0");
+    }
+
+    @Test
+    public void v1TestMaxAgeNegative() {
+        doV1TestMaxAge(-100, "foo=bar; Version=1", "foo=bar");
+    }
+
 
     private void doTest(Cookie cookie, String expected) {
         doTest(cookie, expected, expected);
@@ -221,5 +236,15 @@ public class TestCookieProcessorGeneration {
         } else {
             Assert.assertEquals(expectedRfc6265, rfc6265.generateHeader(cookie));
         }
+    }
+
+
+    private void doV1TestMaxAge(int age, String expectedLegacy, String expectedRfc6265) {
+        LegacyCookieProcessor legacy = new LegacyCookieProcessor();
+        legacy.setAlwaysAddExpires(false);
+        Cookie cookie = new Cookie("foo", "bar");
+        cookie.setVersion(1);
+        cookie.setMaxAge(age);
+        doTest(cookie, legacy, expectedLegacy, new Rfc6265CookieProcessor(), expectedRfc6265);
     }
 }

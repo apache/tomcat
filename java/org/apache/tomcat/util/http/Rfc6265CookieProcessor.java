@@ -87,7 +87,15 @@ public class Rfc6265CookieProcessor implements CookieProcessor {
             header.append(value);
         }
 
-        // TODO add support for the attributes.
+        // RFC 6265 prefers Max-Age to Expires so use Max-Age
+        int maxAge = cookie.getMaxAge();
+        if (maxAge > -1) {
+            // Negative Max-Age is equivalent to no Max-Age
+            header.append(";Max-Age=");
+            header.append(maxAge);
+        }
+
+        // TODO add support for the remaining attributes.
         return header.toString();
     }
 
