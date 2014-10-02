@@ -176,6 +176,14 @@ public class TestCookieProcessorGeneration {
     }
 
     @Test
+    public void v1ValueUTF8() {
+        String value = "\u2300";
+        Cookie cookie = new Cookie("foo", value);
+        cookie.setVersion(1);
+        doTest(cookie, (String) null, "foo=" + value);
+    }
+
+    @Test
     public void v1TestMaxAgePositive() {
         doV1TestMaxAge(100, "foo=bar; Version=1; Max-Age=100", "foo=bar;Max-Age=100");
     }
@@ -282,17 +290,22 @@ public class TestCookieProcessorGeneration {
     private void doTest(Cookie cookie,
             CookieProcessor legacy, String expectedLegacy,
             CookieProcessor rfc6265, String expectedRfc6265) {
-        Assert.assertEquals(expectedLegacy, legacy.generateHeader(cookie));
-        if (expectedRfc6265 == null) {
+        doTest(cookie, legacy, expectedLegacy);
+        doTest(cookie, rfc6265, expectedRfc6265);
+    }
+
+
+    private void doTest(Cookie cookie, CookieProcessor cookieProcessor, String expected) {
+        if (expected == null) {
             IllegalArgumentException e = null;
             try {
-                rfc6265.generateHeader(cookie);
+                cookieProcessor.generateHeader(cookie);
             } catch (IllegalArgumentException iae) {
                 e = iae;
             }
             Assert.assertNotNull("Failed to throw IAE", e);
         } else {
-            Assert.assertEquals(expectedRfc6265, rfc6265.generateHeader(cookie));
+            Assert.assertEquals(expected, cookieProcessor.generateHeader(cookie));
         }
     }
 
