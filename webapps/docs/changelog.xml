@@ -48,6 +48,12 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>56393</bug>: Add support for RFC6265 cookie parsing and generation.
+        This is currently disabled by default and may be enabled via the
+        <strong>CookieProcessor</strong> element of a <strong>Context</strong>.
+        (markt)
+      </add>
+      <add>
         <bug>56394</bug>: Introduce new configuration element CookieProcessor in
         Context to allow context-specific configuration of cookie processing
         options. Attributes of Context element that were added in Tomcat 8.0.13
