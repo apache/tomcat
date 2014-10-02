@@ -109,7 +109,12 @@
         Correct documentation for <code>ServerCookie.ALLOW_NAME_ONLY</code>
         system property. (kkolinko)
       </fix>
-    </changelog>
+      <fix>
+        <bug>57049</bug>: Clarified that <code>jvmRoute</code> can be set in
+        <code>&lt;Engine&gt;</code>'s <code>jvmRoute</code> or in a system
+        property. (schultz)
+      </fix>
+      </changelog>
   </subsection>
 </section>
 <section name="Tomcat 8.0.14 (markt)" rtext="2014-09-29">
