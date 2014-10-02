@@ -190,6 +190,64 @@ public class TestCookieProcessorGeneration {
         doV1TestMaxAge(-100, "foo=bar; Version=1", "foo=bar");
     }
 
+    @Test
+    public void v1TestDomainValid01() {
+        doV1TestDomain("example.com", "foo=bar; Version=1; Domain=example.com",
+                "foo=bar;domain=example.com");
+    }
+
+    @Test
+    public void v1TestDomainValid02() {
+        doV1TestDomain("exa-mple.com", "foo=bar; Version=1; Domain=exa-mple.com",
+                "foo=bar;domain=exa-mple.com");
+    }
+
+    @Test
+    public void v1TestDomainInvalid01() {
+        doV1TestDomain("example.com.", "foo=bar; Version=1; Domain=example.com.", null);
+    }
+
+    @Test
+    public void v1TestDomainInvalid02() {
+        doV1TestDomain("example.com-", "foo=bar; Version=1; Domain=example.com-", null);
+    }
+
+    @Test
+    public void v1TestDomainInvalid03() {
+        doV1TestDomain(".example.com.", "foo=bar; Version=1; Domain=.example.com.", null);
+    }
+
+    @Test
+    public void v1TestDomainInvalid04() {
+        doV1TestDomain("-example.com.", "foo=bar; Version=1; Domain=-example.com.", null);
+    }
+
+    @Test
+    public void v1TestDomainInvalid05() {
+        doV1TestDomain("example..com.", "foo=bar; Version=1; Domain=example..com.", null);
+    }
+
+    @Test
+    public void v1TestDomainInvalid06() {
+        doV1TestDomain("example-.com.", "foo=bar; Version=1; Domain=example-.com.", null);
+    }
+
+    @Test
+    public void v1TestDomainInvalid07() {
+        doV1TestDomain("exam$ple.com.", "foo=bar; Version=1; Domain=exam$ple.com.", null);
+    }
+
+    @Test
+    public void v1TestPathValid() {
+        doV1TestPath("/example", "foo=bar; Version=1; Path=/example",
+                "foo=bar;path=/example");
+    }
+
+    @Test
+    public void v1TestPathInvalid01() {
+        doV1TestPath("exa\tmple", "foo=bar; Version=1; Path=\"exa\tmple\"", null);
+    }
+
 
     private void doTest(Cookie cookie, String expected) {
         doTest(cookie, expected, expected);
@@ -245,6 +303,26 @@ public class TestCookieProcessorGeneration {
         Cookie cookie = new Cookie("foo", "bar");
         cookie.setVersion(1);
         cookie.setMaxAge(age);
+        doTest(cookie, legacy, expectedLegacy, new Rfc6265CookieProcessor(), expectedRfc6265);
+    }
+
+
+    private void doV1TestDomain(String domain, String expectedLegacy, String expectedRfc6265) {
+        LegacyCookieProcessor legacy = new LegacyCookieProcessor();
+        legacy.setAlwaysAddExpires(false);
+        Cookie cookie = new Cookie("foo", "bar");
+        cookie.setVersion(1);
+        cookie.setDomain(domain);
+        doTest(cookie, legacy, expectedLegacy, new Rfc6265CookieProcessor(), expectedRfc6265);
+    }
+
+
+    private void doV1TestPath(String path, String expectedLegacy, String expectedRfc6265) {
+        LegacyCookieProcessor legacy = new LegacyCookieProcessor();
+        legacy.setAlwaysAddExpires(false);
+        Cookie cookie = new Cookie("foo", "bar");
+        cookie.setVersion(1);
+        cookie.setPath(path);
         doTest(cookie, legacy, expectedLegacy, new Rfc6265CookieProcessor(), expectedRfc6265);
     }
 }
