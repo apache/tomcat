@@ -104,6 +104,10 @@
         Correct a couple of NPEs in the JNDI Realm that could be triggered with
         when not specifying a roleBase and enabling roleSearchAsUser. (markt)
       </fix>
+      <fix>
+        Correctly handle relative values for the docBase attribute of a Context.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
