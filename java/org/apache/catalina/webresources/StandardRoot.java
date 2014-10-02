@@ -655,7 +655,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
         File f = new File(docBase);
         if (!f.isAbsolute()) {
-            f = new File(((Host)context.getParent()).getAppBaseFile(), f.getName());
+            f = new File(((Host)context.getParent()).getAppBaseFile(), f.getPath());
         }
         if (f.isDirectory()) {
             main = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
