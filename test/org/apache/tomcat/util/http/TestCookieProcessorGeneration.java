@@ -140,16 +140,14 @@ public class TestCookieProcessorGeneration {
     public void v1ValueContainsEquals() {
         Cookie cookie = new Cookie("foo", "a=b");
         cookie.setVersion(1);
-        doTestDefaults(cookie, "foo=\"a=b\"; Version=1", "foo=a=b");
-        doTestAllowSeparators(cookie, "foo=a=b; Version=1", "foo=a=b");
+        doTest(cookie, "foo=\"a=b\"; Version=1", "foo=a=b");
     }
 
     @Test
     public void v1ValueContainsQuote() {
         Cookie cookie = new Cookie("foo", "a\"b");
         cookie.setVersion(1);
-        doTestDefaults(cookie, "foo=\"a\\\"b\"; Version=1", null);
-        doTestAllowSeparators(cookie, "foo=a\"b; Version=1", null);
+        doTest(cookie, "foo=\"a\\\"b\"; Version=1", null);
     }
 
     @Test
@@ -163,16 +161,14 @@ public class TestCookieProcessorGeneration {
     public void v1ValueContainsBackslash() {
         Cookie cookie = new Cookie("foo", "a\\b");
         cookie.setVersion(1);
-        doTestDefaults(cookie, "foo=\"a\\\\b\"; Version=1", null);
-        doTestAllowSeparators(cookie, "foo=a\\b; Version=1", null);
+        doTest(cookie, "foo=\"a\\\\b\"; Version=1", null);
     }
 
     @Test
     public void v1ValueContainsBackslashAndQuote() {
         Cookie cookie = new Cookie("foo", "a\"b\\c");
         cookie.setVersion(1);
-        doTestDefaults(cookie, "foo=\"a\\\"b\\\\c\"; Version=1", null);
-        doTestAllowSeparators(cookie, "foo=a\"b\\c; Version=1", null);
+        doTest(cookie, "foo=\"a\\\"b\\\\c\"; Version=1", null);
     }
 
     @Test

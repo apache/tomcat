@@ -300,7 +300,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
 
         if (version == 0) {
             // Check for the things that require a v1 cookie
-            if (needsQuotes(value) || comment != null || needsQuotes(path) || needsQuotes(domain)) {
+            if (needsQuotes(value, 0) || comment != null || needsQuotes(path, 0) || needsQuotes(domain, 0)) {
                 version = 1;
             }
         }
@@ -313,7 +313,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
         buf.append("=");
 
         // Value
-        maybeQuote(buf, value);
+        maybeQuote(buf, value, version);
 
         // Add version 1 specific information
         if (version == 1) {
@@ -323,14 +323,14 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             // Comment=comment
             if (comment != null) {
                 buf.append ("; Comment=");
-                maybeQuote(buf, comment);
+                maybeQuote(buf, comment, version);
             }
         }
 
         // Add domain information, if present
         if (domain != null) {
             buf.append("; Domain=");
-            maybeQuote(buf, domain);
+            maybeQuote(buf, domain, version);
         }
 
         // Max-Age=secs ... or use old "Expires" format
@@ -360,7 +360,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
         // Path=path
         if (path!=null) {
             buf.append ("; Path=");
-            maybeQuote(buf, path);
+            maybeQuote(buf, path, version);
         }
 
         // Secure
@@ -376,14 +376,14 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     }
 
 
-    private void maybeQuote(StringBuffer buf, String value) {
+    private void maybeQuote(StringBuffer buf, String value, int version) {
         if (value == null || value.length() == 0) {
             buf.append("\"\"");
         } else if (alreadyQuoted(value)) {
             buf.append('"');
             escapeDoubleQuotes(buf, value,1,value.length()-1);
             buf.append('"');
-        } else if (needsQuotes(value)) {
+        } else if (needsQuotes(value, version)) {
             buf.append('"');
             escapeDoubleQuotes(buf, value,0,value.length());
             buf.append('"');
@@ -412,7 +412,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     }
 
 
-    private boolean needsQuotes(String value) {
+    private boolean needsQuotes(String value, int version) {
         if (value == null) {
             return false;
         }
@@ -431,7 +431,8 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                 throw new IllegalArgumentException(
                         "Control character in cookie value or attribute.");
             }
-            if (!allowedWithoutQuotes.get(c)) {
+            if (version == 0 && !allowedWithoutQuotes.get(c) ||
+                    version == 1 && isHttpSeparator(c)) {
                 return true;
             }
         }
