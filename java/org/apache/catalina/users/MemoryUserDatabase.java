@@ -544,7 +544,10 @@ public class MemoryUserDatabase implements UserDatabase {
 
             // Print the file prolog
             writer.println("<?xml version='1.0' encoding='utf-8'?>");
-            writer.println("<tomcat-users>");
+            writer.println("<tomcat-users xmlns=\"http://tomcat.apache.org/xml\"");
+            writer.println("              xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+            writer.println("              xsi:schemaLocation=\"http://tomcat.apache.org tomcat-users.xsd\"");
+            writer.println("              version=\"1.0\">");
 
             // Print entries for each defined role, group, and user
             Iterator<?> values = null;

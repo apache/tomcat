@@ -47,6 +47,10 @@
 <section name="Tomcat 8.0.15 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>43548</bug>: Add an XML schema for the tomcat-users.xml file.
+        (markt)
+      </add>
       <fix>
         <bug>55984</bug>: Using the allow separators in version 0 cookies option
         with the legacy cookie processor should only apply to version 0 cookies.
