@@ -545,6 +545,9 @@ public class WsWebSocketContainer
         boolean readHeaders = false;
         String line = null;
         while (!readHeaders) {
+            // On entering loop buffer will be empty and at the start of a new
+            // loop the buffer will have been fully read.
+            response.clear();
             // Blocking read
             Future<Integer> read = channel.read(response);
             Integer bytesRead = read.get(timeout, TimeUnit.MILLISECONDS);
