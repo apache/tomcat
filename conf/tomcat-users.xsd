@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="http://tomcat.apache.org"
-           xmlns:users="http://tomcat.apache.org"
+           targetNamespace="http://tomcat.apache.org/xml"
+           xmlns:users="http://tomcat.apache.org/xml"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified"
