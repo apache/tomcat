@@ -17,7 +17,7 @@
 -->
 <tomcat-users xmlns="http://tomcat.apache.org/xml"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:schemaLocation="http://tomcat.apache.org tomcat-users.xsd"
+              xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
               version="1.0">
 <!--
   NOTE:  By default, no user is included in the "manager-gui" role required
@@ -36,5 +36,4 @@
   <user username="both" password="tomcat" roles="tomcat,role1"/>
   <user username="role1" password="tomcat" roles="role1"/>
 -->
-
 </tomcat-users>
