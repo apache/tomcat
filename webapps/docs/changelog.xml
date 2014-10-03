@@ -47,6 +47,12 @@
 <section name="Tomcat 8.0.15 (markt)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>55984</bug>: Using the allow separators in version 0 cookies option
+        with the legacy cookie processor should only apply to version 0 cookies.
+        Version 1 cookies with values that contain separators should not be
+        affected and should continue to be quoted. (markt)
+      </fix>
       <add>
         <bug>56393</bug>: Add support for RFC6265 cookie parsing and generation.
         This is currently disabled by default and may be enabled via the
