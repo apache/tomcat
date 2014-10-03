@@ -68,7 +68,8 @@
       </fix>
       <fix>
         <bug>56403</bug>: Add pluggable password derivation support to the
-        Realms via the new <code>CredentialHandler</code> interface. (markt)
+        Realms via the new <code>CredentialHandler</code> interface.
+        (markt/schultz)
       </fix>
       <fix>
         <bug>57016</bug>: When using the <code>PersistentValve</code> do not
