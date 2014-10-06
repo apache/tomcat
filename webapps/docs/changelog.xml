@@ -147,6 +147,14 @@
       </fix>
       </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        <bug>45282</bug>: Improve shutdown of NIO receiver so that sockets are
+        closed cleanly. (fhanik/markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.14 (markt)" rtext="2014-09-29">
   <subsection name="Other">

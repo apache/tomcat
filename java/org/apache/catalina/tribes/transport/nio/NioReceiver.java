@@ -37,6 +37,7 @@ import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
+import org.apache.catalina.tribes.util.ExceptionUtils;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -315,12 +316,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             } catch (java.nio.channels.CancelledKeyException nx) {
                 log.warn(sm.getString("NioReceiver.clientDisconnect"));
             } catch (Throwable t) {
-                if (t instanceof ThreadDeath) {
-                    throw (ThreadDeath) t;
-                }
-                if (t instanceof VirtualMachineError) {
-                    throw (VirtualMachineError) t;
-                }
+                ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString("NioReceiver.requestError"), t);
             }
 
@@ -387,6 +383,12 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             }
         } catch (ClosedSelectorException ignore){
             // Ignore
+        }
+        try {
+            selector.selectNow();
+        } catch (Throwable t){
+            ExceptionUtils.handleThrowable(t);
+            // Ignore everything else
         }
         selector.close();
     }
