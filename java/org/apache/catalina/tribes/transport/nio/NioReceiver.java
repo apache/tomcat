@@ -371,7 +371,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
 
     private void closeSelector() throws IOException {
         Selector selector = this.selector.getAndSet(null);
-        if (selector==null) return;
+        if (selector == null) return;
         try {
             Iterator<SelectionKey> it = selector.keys().iterator();
             // look at each key in the selected set
@@ -381,11 +381,13 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                 key.attach(null);
                 key.cancel();
             }
-        }catch ( IOException ignore ){
+        } catch (IOException ignore){
             if (log.isWarnEnabled()) {
                 log.warn(sm.getString("NioReceiver.cleanup.fail"), ignore);
             }
-        }catch ( ClosedSelectorException ignore){}
+        } catch (ClosedSelectorException ignore){
+            // Ignore
+        }
         selector.close();
     }
 
