@@ -1062,16 +1062,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                             }
                             break;
                         }
-                    } catch ( NullPointerException x ) {
-                        //sun bug 5076772 on windows JDK 1.5
-                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
-                        if ( wakeupCounter == null || selector == null ) throw x;
-                        continue;
-                    } catch ( CancelledKeyException x ) {
-                        //sun bug 5076772 on windows JDK 1.5
-                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
-                        if ( wakeupCounter == null || selector == null ) throw x;
-                        continue;
                     } catch (Throwable x) {
                         ExceptionUtils.handleThrowable(x);
                         log.error("",x);
