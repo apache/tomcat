@@ -65,6 +65,7 @@ import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -73,6 +74,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
+import org.apache.juli.WebappProperties;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -123,7 +125,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  */
 public abstract class WebappClassLoaderBase extends URLClassLoader
-        implements Lifecycle, InstrumentableClassLoader {
+        implements Lifecycle, InstrumentableClassLoader, WebappProperties {
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(WebappClassLoaderBase.class);
@@ -2784,5 +2786,38 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     protected void addURL(URL url) {
         super.addURL(url);
         hasExternalRepositories = true;
+    }
+
+
+    @Override
+    public String getWebappName() {
+        return getContextName();
+    }
+
+
+    @Override
+    public String getHostName() {
+        if (resources != null) {
+            Container host = resources.getContext().getParent();
+            if (host != null) {
+                return host.getName();
+            }
+        }
+        return null;
+    }
+
+
+    @Override
+    public String getServiceName() {
+        if (resources != null) {
+            Container host = resources.getContext().getParent();
+            if (host != null) {
+                Container engine = host.getParent();
+                if (engine != null) {
+                    return engine.getName();
+                }
+            }
+        }
+        return null;
     }
 }

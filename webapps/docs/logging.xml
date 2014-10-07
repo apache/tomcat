@@ -274,6 +274,14 @@ java.util.logging.ConsoleHandler.level=ALL</source>
       prefix.</li>
       <li>System property replacement is performed for property values which
       contain ${systemPropertyName}.</li>
+      <li>If using a class loader that implements the
+      <code>org.apache.juli.WebappProperties</code> interface (Tomcat&apos;s
+      web application class loader does) then property replacement is also
+      performed for <code>${classloader.webappName}</code>,
+      <code>${classloader.hostName}</code> and
+      <code>${classloader.serviceName}</code> which are replaced with the
+      web application name, the host name and the service name respectively.
+      </li>
       <li>By default, loggers will not delegate to their parent if they have
       associated handlers. This may be changed per logger using the
       <code>loggerName.useParentHandlers</code> property, which accepts a
@@ -358,7 +366,7 @@ org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].handler
 
 org.apache.juli.FileHandler.level = FINE
 org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-org.apache.juli.FileHandler.prefix = servlet-examples.
+org.apache.juli.FileHandler.prefix = ${classloader.webappName}.
 
 java.util.logging.ConsoleHandler.level = FINE
 java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter]]></source>

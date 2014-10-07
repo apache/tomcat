@@ -51,6 +51,13 @@
         <bug>43548</bug>: Add an XML schema for the tomcat-users.xml file.
         (markt)
       </add>
+      <add>
+        <bug>43682</bug>: Add support for referring to the current context, host
+        and service name in per Context logging.properties files by using the
+        properties <code>${classloader.webappName}</code>,
+        <code>${classloader.hostName}</code> and
+        <code>${classloader.serviceName}</code>. (markt)
+      </add>
       <fix>
         <bug>55984</bug>: Using the allow separators in version 0 cookies option
         with the legacy cookie processor should only apply to version 0 cookies.
