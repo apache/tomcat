@@ -111,7 +111,7 @@ public class UpgradeUtil {
         }
         // Sub-protocols
         List<String> subProtocols = getTokensFromHeader(req,
-                "Sec-WebSocket-Protocol");
+                Constants.WS_PROTOCOL_HEADER_NAME);
         subProtocol = sec.getConfigurator().getNegotiatedSubprotocol(
                 sec.getSubprotocols(), subProtocols);
 
@@ -119,7 +119,7 @@ public class UpgradeUtil {
         // Should normally only be one header but handle the case of multiple
         // headers
         List<Extension> extensionsRequested = new ArrayList<>();
-        Enumeration<String> extHeaders = req.getHeaders("Sec-WebSocket-Extensions");
+        Enumeration<String> extHeaders = req.getHeaders(Constants.WS_EXTENSIONS_HEADER_NAME);
         while (extHeaders.hasMoreElements()) {
             Util.parseExtensionHeader(extensionsRequested, extHeaders.nextElement());
         }
