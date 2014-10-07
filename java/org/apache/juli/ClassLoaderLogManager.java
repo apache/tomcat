@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.juli;
 
 import java.io.File;
@@ -618,8 +617,11 @@ public class ClassLoaderLogManager extends LogManager {
                     break;
                 }
                 String propName = str.substring(pos_start + 2, pos_end);
-                String replacement = propName.length() > 0 ? System
-                        .getProperty(propName) : null;
+
+                String replacement = replaceWebApplicationProperties(propName);
+                if (replacement == null) {
+                    replacement = propName.length() > 0 ? System.getProperty(propName) : null;
+                }
                 if (replacement != null) {
                     builder.append(replacement);
                 } else {
@@ -632,6 +634,26 @@ public class ClassLoaderLogManager extends LogManager {
         }
         return result;
     }
+
+
+    private String replaceWebApplicationProperties(String propName) {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl instanceof WebappProperties) {
+            WebappProperties wProps = (WebappProperties) cl;
+            if ("classloader.webappName".equals(propName)) {
+                return wProps.getWebappName();
+            } else if ("classloader.hostName".equals(propName)) {
+                return wProps.getHostName();
+            } else if ("classloader.serviceName".equals(propName)) {
+                return wProps.getServiceName();
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
 
     // ---------------------------------------------------- LogNode Inner Class
 
