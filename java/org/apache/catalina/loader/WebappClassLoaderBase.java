@@ -457,7 +457,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (resources == null) {
             return "Unknown";
         } else {
-            return resources.getContext().getName();
+            return resources.getContext().getBaseName();
         }
     }
 
