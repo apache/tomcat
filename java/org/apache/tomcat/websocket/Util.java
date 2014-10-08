@@ -332,21 +332,23 @@ public class Util {
                     throws DeploymentException{
 
         List<DecoderEntry> result = new ArrayList<>();
-        for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
-            // Need to instantiate decoder to ensure it is valid and that
-            // deployment can be failed if it is not
-            @SuppressWarnings("unused")
-            Decoder instance;
-            try {
-                instance = decoderClazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new DeploymentException(
-                        sm.getString("pojoMethodMapping.invalidDecoder",
-                                decoderClazz.getName()), e);
+        if (decoderClazzes != null) {
+            for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
+                // Need to instantiate decoder to ensure it is valid and that
+                // deployment can be failed if it is not
+                @SuppressWarnings("unused")
+                Decoder instance;
+                try {
+                    instance = decoderClazz.newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new DeploymentException(
+                            sm.getString("pojoMethodMapping.invalidDecoder",
+                                    decoderClazz.getName()), e);
+                }
+                DecoderEntry entry = new DecoderEntry(
+                        Util.getDecoderType(decoderClazz), decoderClazz);
+                result.add(entry);
             }
-            DecoderEntry entry = new DecoderEntry(
-                    Util.getDecoderType(decoderClazz), decoderClazz);
-            result.add(entry);
         }
 
         return result;
