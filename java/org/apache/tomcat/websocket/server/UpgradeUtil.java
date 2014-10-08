@@ -37,6 +37,7 @@ import javax.websocket.HandshakeResponse;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.websocket.Constants;
 import org.apache.tomcat.websocket.Transformation;
@@ -47,6 +48,8 @@ import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 
 public class UpgradeUtil {
 
+    private static final StringManager sm =
+            StringManager.getManager(UpgradeUtil.class.getPackage().getName());
     private static final byte[] WS_ACCEPT =
             "258EAFA5-E914-47DA-95CA-C5AB0DC85B11".getBytes(
                     StandardCharsets.ISO_8859_1);
@@ -165,8 +168,7 @@ public class UpgradeUtil {
 
         // Now we have the full pipeline, validate the use of the RSV bits.
         if (transformation != null && !transformation.validateRsvBits(0)) {
-            // TODO i18n
-            throw new ServletException("Incompatible RSV bit usage");
+            throw new ServletException(sm.getString("upgradeUtil.incompatibleRsv"));
         }
 
         // If we got this far, all is good. Accept the connection.
