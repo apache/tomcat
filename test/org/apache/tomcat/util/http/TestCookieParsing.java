@@ -322,6 +322,7 @@ public class TestCookieParsing extends TomcatBaseTest {
         protected void service(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
             req.getCookies();
+            // Never do this in production code. It triggers an XSS.
             resp.getWriter().write(req.getHeader("Cookie"));
             resp.flushBuffer();
         }
