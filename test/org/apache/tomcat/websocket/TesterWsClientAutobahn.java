@@ -19,10 +19,15 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import javax.websocket.ClientEndpoint;
+import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
+import javax.websocket.Endpoint;
+import javax.websocket.Extension;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -30,6 +35,7 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 /**
  * Runs the Autobahn test suite in client mode for testing the WebSocket client
@@ -37,7 +43,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  */
 public class TesterWsClientAutobahn {
 
-    private static final String HOST = "localhost";
+    private static final String HOST = "linux6405.dev.local";
     private static final int PORT = 9001;
     private static final String USER_AGENT = "ApacheTomcat8WebSocketClient";
 
@@ -82,7 +88,19 @@ public class TesterWsClientAutobahn {
         URI uri = new URI("ws://" + HOST + ":" + PORT + "/runCase?case=" +
                 testCase + "&agent=" + USER_AGENT);
         TestCaseClient testCaseClient = new TestCaseClient();
-        wsc.connectToServer(testCaseClient, uri);
+
+        // TODO: Need to add ability to specify extensions when using
+        //       annotations
+        Extension permessageDeflate = new WsExtension("permessage-deflate");
+        List<Extension> extensions = new ArrayList<>(1);
+        extensions.add(permessageDeflate);
+
+        Endpoint ep = new PojoEndpointClient(testCaseClient, null);
+        ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
+        ClientEndpointConfig config = builder.extensions(extensions).build();
+
+
+        wsc.connectToServer(ep, config, uri);
         testCaseClient.waitForClose();
     }
 
