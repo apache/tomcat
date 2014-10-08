@@ -97,7 +97,7 @@ public final class HexUtils {
             return null;
         }
 
-        if (input.length() % 2 == 1) {
+        if ((input.length() & 1) == 1) {
             // Odd number of characters
             throw new IllegalArgumentException(sm.getString("hexUtils.fromHex.oddDigits"));
         }
