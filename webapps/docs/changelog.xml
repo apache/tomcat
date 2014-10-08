@@ -58,6 +58,11 @@
         <code>${classloader.hostName}</code> and
         <code>${classloader.serviceName}</code>. (markt)
       </add>
+      <add>
+        <bug>47919</bug>: Extend the information logged when Tomcat starts to
+        optionally include (enabled by default) the values of key environment
+        variables. (markt)  
+      </add>
       <fix>
         <bug>55984</bug>: Using the allow separators in version 0 cookies option
         with the legacy cookie processor should only apply to version 0 cookies.

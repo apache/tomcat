@@ -37,6 +37,19 @@ public class VersionLoggerListener implements LifecycleListener {
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
+    private boolean logEnv = true;
+
+
+    public boolean getLogEnv() {
+        return logEnv;
+    }
+
+
+    public void setLogEnv(boolean logEnv) {
+        this.logEnv = logEnv;
+    }
+
+
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
@@ -62,5 +75,28 @@ public class VersionLoggerListener implements LifecycleListener {
                 System.getProperty("java.runtime.version")));
         log.info(sm.getString("versionLoggerListener.serverInfo.vm.vendor",
                 System.getProperty("java.vm.vendor")));
+
+        if (logEnv) {
+            log.info(sm.getString("versionLoggerListener.env.catalina.base",
+                    System.getenv("CATALINA_BASE")));
+            log.info(sm.getString("versionLoggerListener.env.catalina.home",
+                    System.getenv("CATALINA_HOME")));
+            log.info(sm.getString("versionLoggerListener.env.catalina.tmpdir",
+                    System.getenv("CATALINA_TMPDIR")));
+            log.info(sm.getString("versionLoggerListener.env.java.home",
+                    System.getenv("JAVA_HOME")));
+            log.info(sm.getString("versionLoggerListener.env.jre.home",
+                    System.getenv("JRE_HOME")));
+            log.info(sm.getString("versionLoggerListener.env.runjava",
+                    System.getenv("_RUNJAVA")));
+            log.info(sm.getString("versionLoggerListener.env.java.opts",
+                    System.getenv("JAVA_OPTS")));
+            log.info(sm.getString("versionLoggerListener.env.catalina.opts",
+                    System.getenv("CATALINA_OPTS")));
+            log.info(sm.getString("versionLoggerListener.env.java.endorsed",
+                    System.getenv("JAVA_ENDORSED_DIRS")));
+            log.info(sm.getString("versionLoggerListener.env.classpath",
+                    System.getenv("CLASSPATH")));
+        }
     }
 }
