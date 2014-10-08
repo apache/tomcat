@@ -632,7 +632,8 @@ public class WsWebSocketContainer
         }
         // Header names are case insensitive so always use lower case
         String headerName = line.substring(0, index).trim().toLowerCase();
-        // TODO handle known multi-value headers
+        // Multi-value headers are stored as a single header and the client is
+        // expected to handle splitting into individual values
         String headerValue = line.substring(index + 1).trim();
 
         List<String> values = headers.get(headerName);
