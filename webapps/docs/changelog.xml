@@ -141,6 +141,10 @@
         single pass; either because the buffer is too small or the server sent
         the response in multiple packets. (markt)
       </fix>
+      <add>
+        Extend support for the <code>permessage-deflate</code> extension to the
+        client implementation. 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

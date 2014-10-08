@@ -274,6 +274,9 @@ public class WsWebSocketContainer
         ByteBuffer response;
         String subProtocol;
         boolean success = false;
+        List<Extension> extensionsAgreed = new ArrayList<>();
+        Transformation transformation = null;
+
         try {
             fConnect.get(timeout, TimeUnit.MILLISECONDS);
 
@@ -301,16 +304,45 @@ public class WsWebSocketContainer
 
             // Sub-protocol
             // Header names are always stored in lower case
-            List<String> values = handshakeResponse.getHeaders().get(
+            List<String> protocolHeaders = handshakeResponse.getHeaders().get(
                     Constants.WS_PROTOCOL_HEADER_NAME_LOWER);
-            if (values == null || values.size() == 0) {
+            if (protocolHeaders == null || protocolHeaders.size() == 0) {
                 subProtocol = null;
-            } else if (values.size() == 1) {
-                subProtocol = values.get(0);
+            } else if (protocolHeaders.size() == 1) {
+                subProtocol = protocolHeaders.get(0);
             } else {
                 throw new DeploymentException(
                         sm.getString("Sec-WebSocket-Protocol"));
             }
+
+            // Extensions
+            // Should normally only be one header but handle the case of
+            // multiple headers
+            List<String> extHeaders = handshakeResponse.getHeaders().get(
+                    Constants.WS_EXTENSIONS_HEADER_NAME_LOWER);
+            if (extHeaders != null) {
+                for (String extHeader : extHeaders) {
+                    Util.parseExtensionHeader(extensionsAgreed, extHeader);
+                }
+            }
+
+            // Build the transformations
+            TransformationFactory factory = TransformationFactory.getInstance();
+            for (Extension extension : extensionsAgreed) {
+                List<List<Extension.Parameter>> wrapper = new ArrayList<>(1);
+                wrapper.add(extension.getParameters());
+                Transformation t = factory.create(extension.getName(), wrapper, false);
+                if (t == null) {
+                    // TODO i18n
+                    throw new DeploymentException("Client requested parameters it could not support");
+                }
+                if (transformation == null) {
+                    transformation = t;
+                } else {
+                    transformation.setNext(t);
+                }
+            }
+
             success = true;
         } catch (ExecutionException | InterruptedException | SSLException |
                 EOFException | TimeoutException e) {
@@ -326,12 +358,12 @@ public class WsWebSocketContainer
         WsRemoteEndpointImplClient wsRemoteEndpointClient = new WsRemoteEndpointImplClient(channel);
 
         WsSession wsSession = new WsSession(endpoint, wsRemoteEndpointClient,
-                this, null, null, null, null, null, Collections.<Extension>emptyList(),
+                this, null, null, null, null, null, extensionsAgreed,
                 subProtocol, Collections.<String,String>emptyMap(), secure,
                 clientEndpointConfiguration);
 
         WsFrameClient wsFrameClient = new WsFrameClient(response, channel,
-                wsSession);
+                wsSession, transformation);
         // WsFrame adds the necessary final transformations. Copy the
         // completed transformation chain to the remote end point.
         wsRemoteEndpointClient.setTransformation(wsFrameClient.getTransformation());
@@ -463,6 +495,7 @@ public class WsWebSocketContainer
                     header.append(value);
                 }
             }
+            result.add(header.toString());
         }
         return result;
     }
