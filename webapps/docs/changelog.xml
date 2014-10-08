@@ -61,7 +61,7 @@
       <add>
         <bug>47919</bug>: Extend the information logged when Tomcat starts to
         optionally include (enabled by default) the values of key environment
-        variables. (markt)  
+        variables. (markt)
       </add>
       <fix>
         <bug>55984</bug>: Using the allow separators in version 0 cookies option
@@ -148,7 +148,7 @@
       </fix>
       <add>
         Extend support for the <code>permessage-deflate</code> extension to the
-        client implementation. 
+        client implementation. (markt)
       </add>
     </changelog>
   </subsection>

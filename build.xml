@@ -221,10 +221,9 @@
     </fileset>
   </path>
 
-
   <!-- Version info filter set -->
   <tstamp>
-  	<format property="year" pattern="yyyy" locale="en" timezone="UTC"/>
+    <format property="year" pattern="yyyy" locale="en" timezone="UTC"/>
     <format property="today" pattern="MMM d yyyy" locale="en" timezone="UTC"/>
     <format property="today-iso-8601" pattern="yyyy-MM-dd" locale="en" timezone="UTC"/>
     <format property="tstamp" pattern="HH:mm:ss" locale="en" timezone="UTC"/>
