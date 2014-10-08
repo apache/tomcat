@@ -43,7 +43,7 @@ import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
  */
 public class TesterWsClientAutobahn {
 
-    private static final String HOST = "linux6405.dev.local";
+    private static final String HOST = "localhost";
     private static final int PORT = 9001;
     private static final String USER_AGENT = "ApacheTomcat8WebSocketClient";
 
