@@ -333,8 +333,8 @@ public class WsWebSocketContainer
                 wrapper.add(extension.getParameters());
                 Transformation t = factory.create(extension.getName(), wrapper, false);
                 if (t == null) {
-                    // TODO i18n
-                    throw new DeploymentException("Client requested parameters it could not support");
+                    throw new DeploymentException(sm.getString(
+                            "wsWebSocketContainer.invalidExtensionParameters"));
                 }
                 if (transformation == null) {
                     transformation = t;
