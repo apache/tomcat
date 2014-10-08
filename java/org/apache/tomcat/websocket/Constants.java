@@ -61,7 +61,7 @@ public class Constants {
             WS_PROTOCOL_HEADER_NAME.toLowerCase(Locale.ENGLISH);
     public static final String WS_EXTENSIONS_HEADER_NAME =
             "Sec-WebSocket-Extensions";
-    public static final Object WS_EXTENSIONS_HEADER_NAME_LOWER =
+    public static final String WS_EXTENSIONS_HEADER_NAME_LOWER =
             WS_EXTENSIONS_HEADER_NAME.toLowerCase(Locale.ENGLISH);
 
     public static final boolean STRICT_SPEC_COMPLIANCE =
