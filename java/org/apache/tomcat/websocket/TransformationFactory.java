@@ -36,9 +36,10 @@ public class TransformationFactory {
         return factory;
     }
 
-    public Transformation create(String name, List<List<Extension.Parameter>> preferences) {
+    public Transformation create(String name, List<List<Extension.Parameter>> preferences,
+            boolean isServer) {
         if (PerMessageDeflate.NAME.equals(name)) {
-            return PerMessageDeflate.negotiate(preferences);
+            return PerMessageDeflate.negotiate(preferences, isServer);
         }
         throw new IllegalArgumentException(
                 sm.getString("transformerFactory.unsupportedExtension", name));
