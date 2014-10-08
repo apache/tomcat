@@ -395,8 +395,20 @@
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements and should be the first listener defined.</p>
 
-    <p>No additional attributes are supported by the <strong>Version Logging
-    Lifecycle Listener</strong>.</p>
+    <p>The following additional attributes are supported by the <strong>Version
+    Logging Lifecycle Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="logEnv" required="false">
+        <p>If <code>true</code>, a number of environment variables will be
+        logged after the version information including
+        <code>CATALINA_BASE</code>, <code>CATALINA_HOME</code> and
+        <code>JAVA_HOME</code>. If not specified, the default value of
+        <code>true</code> is used.</p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 
