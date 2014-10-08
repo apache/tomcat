@@ -227,7 +227,7 @@
     <format property="year" pattern="yyyy" locale="en"/>
     <format property="today" pattern="MMM d yyyy" locale="en"/>
     <format property="today-iso-8601" pattern="yyyy-MM-dd" locale="en"/>
-    <format property="tstamp" pattern="hh:mm:ss"/>
+    <format property="tstamp" pattern="HH:mm:ss"/>
   </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
