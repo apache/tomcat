@@ -99,9 +99,13 @@ public class PerMessageDeflate implements Transformation {
                         // Java SE API (as of Java 8) does not expose the API to
                         // control the Window size. It is effectively hard-coded
                         // to 15
-                        if (serverMaxWindowBits != 15) {
+                        if (isServer && serverMaxWindowBits != 15) {
                             ok = false;
                             break;
+                            // Note server window size is not an issue for the
+                            // client since the client will assume 15 and if the
+                            // server uses a smaller window everything will
+                            // still work
                         }
                     } else {
                         // Duplicate definition
@@ -126,9 +130,17 @@ public class PerMessageDeflate implements Transformation {
                                         Integer.valueOf(clientMaxWindowBits)));
                             }
                         }
-                        // Not a problem is client specified a window size less
-                        // than 15 since the server will always use a larger
-                        // window it will still work.
+                        // Java SE API (as of Java 8) does not expose the API to
+                        // control the Window size. It is effectively hard-coded
+                        // to 15
+                        if (!isServer && clientMaxWindowBits != 15) {
+                            ok = false;
+                            break;
+                            // Note client window size is not an issue for the
+                            // server since the server will assume 15 and if the
+                            // client uses a smaller window everything will
+                            // still work
+                        }
                     } else {
                         // Duplicate definition
                         throw new IllegalArgumentException(sm.getString(
