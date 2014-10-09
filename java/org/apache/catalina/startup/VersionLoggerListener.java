@@ -16,6 +16,12 @@
  */
 package org.apache.catalina.startup;
 
+import java.lang.management.ManagementFactory;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
@@ -36,8 +42,18 @@ public class VersionLoggerListener implements LifecycleListener {
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
+    private boolean logArgs = true;
+    private boolean logEnv = false;
 
-    private boolean logEnv = true;
+
+    public boolean getLogArgs() {
+        return logArgs;
+    }
+
+
+    public void setLogArgs(boolean logArgs) {
+        this.logArgs = logArgs;
+    }
 
 
     public boolean getLogEnv() {
@@ -65,38 +81,36 @@ public class VersionLoggerListener implements LifecycleListener {
                 ServerInfo.getServerBuilt()));
         log.info(sm.getString("versionLoggerListener.serverInfo.server.number",
                 ServerInfo.getServerNumber()));
-        log.info(sm.getString("versionLoggerListener.serverInfo.os.name",
+        log.info(sm.getString("versionLoggerListener.os.name",
                 System.getProperty("os.name")));
-        log.info(sm.getString("versionLoggerListener.serverInfo.os.version",
+        log.info(sm.getString("versionLoggerListener.os.version",
                 System.getProperty("os.version")));
-        log.info(sm.getString("versionLoggerListener.serverInfo.os.arch",
+        log.info(sm.getString("versionLoggerListener.os.arch",
                 System.getProperty("os.arch")));
-        log.info(sm.getString("versionLoggerListener.serverInfo.vm.version",
+        log.info(sm.getString("versionLoggerListener.java.home",
+                System.getProperty("java.home")));
+        log.info(sm.getString("versionLoggerListener.vm.version",
                 System.getProperty("java.runtime.version")));
-        log.info(sm.getString("versionLoggerListener.serverInfo.vm.vendor",
+        log.info(sm.getString("versionLoggerListener.vm.vendor",
                 System.getProperty("java.vm.vendor")));
+        log.info(sm.getString("versionLoggerListener.catalina.base",
+                System.getProperty("catalina.base")));
+        log.info(sm.getString("versionLoggerListener.catalina.home",
+                System.getProperty("catalina.home")));
+
+        if (logArgs) {
+            List<String> args = ManagementFactory.getRuntimeMXBean().getInputArguments();
+            for (String arg : args) {
+                log.info(sm.getString("versionLoggerListener.arg", arg));
+            }
+        }
 
         if (logEnv) {
-            log.info(sm.getString("versionLoggerListener.env.catalina.base",
-                    System.getenv("CATALINA_BASE")));
-            log.info(sm.getString("versionLoggerListener.env.catalina.home",
-                    System.getenv("CATALINA_HOME")));
-            log.info(sm.getString("versionLoggerListener.env.catalina.tmpdir",
-                    System.getenv("CATALINA_TMPDIR")));
-            log.info(sm.getString("versionLoggerListener.env.java.home",
-                    System.getenv("JAVA_HOME")));
-            log.info(sm.getString("versionLoggerListener.env.jre.home",
-                    System.getenv("JRE_HOME")));
-            log.info(sm.getString("versionLoggerListener.env.runjava",
-                    System.getenv("_RUNJAVA")));
-            log.info(sm.getString("versionLoggerListener.env.java.opts",
-                    System.getenv("JAVA_OPTS")));
-            log.info(sm.getString("versionLoggerListener.env.catalina.opts",
-                    System.getenv("CATALINA_OPTS")));
-            log.info(sm.getString("versionLoggerListener.env.java.endorsed",
-                    System.getenv("JAVA_ENDORSED_DIRS")));
-            log.info(sm.getString("versionLoggerListener.env.classpath",
-                    System.getenv("CLASSPATH")));
+            Map<String,String> envs = System.getenv();
+            SortedSet<String> keys = new TreeSet<>(envs.keySet());
+            for (String key : keys) {
+                log.info(sm.getString("versionLoggerListener.env", key, envs.get(key)));
+            }
         }
     }
 }
