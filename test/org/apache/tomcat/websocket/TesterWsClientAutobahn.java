@@ -89,16 +89,19 @@ public class TesterWsClientAutobahn {
                 testCase + "&agent=" + USER_AGENT);
         TestCaseClient testCaseClient = new TestCaseClient();
 
-        // TODO: Need to add ability to specify extensions when using
-        //       annotations
         Extension permessageDeflate = new WsExtension("permessage-deflate");
+        // Advertise support for client_max_window_bits
+        // Client only supports some values so there will be some failures here
+        // Note Autobahn returns a 400 response if you provide a value for
+        // client_max_window_bits
+        permessageDeflate.getParameters().add(
+                new WsExtensionParameter("client_max_window_bits", null));
         List<Extension> extensions = new ArrayList<>(1);
         extensions.add(permessageDeflate);
 
         Endpoint ep = new PojoEndpointClient(testCaseClient, null);
         ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
         ClientEndpointConfig config = builder.extensions(extensions).build();
-
 
         wsc.connectToServer(ep, config, uri);
         testCaseClient.waitForClose();
