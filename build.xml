@@ -31,6 +31,7 @@
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
   <property file="build.properties.default"/>
+  <property environment="env"/>
 
   <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
@@ -2142,6 +2143,25 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <antcall target="md5sum">
       <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.exe" />
     </antcall>
+
+  </target>
+
+  <!-- Called by the Windows installer to sign the uninstaller -->
+  <target name="sign-windows-uninstaller">
+
+    <taskdef name="signcode"
+             classname="org.apache.tomcat.buildutil.SignCode"
+             classpath="${tomcat.classes}" />
+
+    <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
+              partnerCode="${codesigning.partnercode}"
+              applicationName="Apache Tomcat ${version.major.minor} Uninstaller"
+              applicationversion="${version}"
+              signingService="${codesigning.service}">
+      <fileset dir="${env.TEMP}">
+        <filename name="uninstall.exe"/>
+      </fileset>
+    </signcode>
 
   </target>
 

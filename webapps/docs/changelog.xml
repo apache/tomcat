@@ -176,6 +176,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>56079</bug>: The uninstaller packaged with the Apache Tomcat
+        Windows installer is now digitally signed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.14 (markt)" rtext="2014-09-29">
   <subsection name="Other">
