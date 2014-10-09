@@ -441,25 +441,29 @@ public class WebappLoader extends LifecycleMBeanBase
         ServletContext servletContext = context.getServletContext();
         servletContext.removeAttribute(Globals.CLASS_PATH_ATTR);
 
-        // Throw away our current class loader
-        try {
-            classLoader.stop();
-        } finally {
-            classLoader.destroy();
+        // Throw away our current class loader if any
+        if (classLoader != null) {
+            try {
+                classLoader.stop();
+            } finally {
+                classLoader.destroy();
+            }
+
+            // classLoader must be non-null to have been registered
+            try {
+                String contextName = context.getName();
+                if (!contextName.startsWith("/")) {
+                    contextName = "/" + contextName;
+                }
+                ObjectName cloname = new ObjectName(context.getDomain() + ":type=" +
+                        classLoader.getClass().getSimpleName() + ",host=" +
+                        context.getParent().getName() + ",context=" + contextName);
+                Registry.getRegistry(null, null).unregisterComponent(cloname);
+            } catch (Exception e) {
+                log.error("LifecycleException ", e);
+            }
         }
 
-        try {
-            String contextName = context.getName();
-            if (!contextName.startsWith("/")) {
-                contextName = "/" + contextName;
-            }
-            ObjectName cloname = new ObjectName(context.getDomain() + ":type=" +
-                    classLoader.getClass().getSimpleName() + ",host=" +
-                    context.getParent().getName() + ",context=" + contextName);
-            Registry.getRegistry(null, null).unregisterComponent(cloname);
-        } catch (Exception e) {
-            log.error("LifecycleException ", e);
-        }
 
         classLoader = null;
     }
