@@ -205,7 +205,8 @@ public class SignCode extends Task {
             }
         }
 
-        if (!"SIGNED".equals(signingSetStatus)) {
+        if (!signingService.contains("TEST") && !"SIGNED".equals(signingSetStatus) ||
+                signingService.contains("TEST") && !"INITIALIZED".equals(signingSetStatus) ) {
             throw new BuildException("Signing failed. Status was: " + signingSetStatus);
         }
 
