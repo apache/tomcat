@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.ajp;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,6 +114,11 @@ public class TesterAjpMessage extends AjpMessage {
         headers.clear();
     }
 
+
+    public void appendString(String string) {
+        byte[] bytes = string.getBytes(StandardCharsets.ISO_8859_1);
+        appendBytes(bytes, 0, bytes.length);
+    }
 
 
 

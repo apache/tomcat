@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -1000,6 +1001,11 @@ public class Response
      */
     @Override
     public void addHeader(String name, String value) {
+        addHeader(name, value, null);
+    }
+
+
+    private void addHeader(String name, String value, Charset charset) {
 
         if (name == null || name.length() == 0 || value == null) {
             return;
@@ -1020,7 +1026,7 @@ public class Response
             return;
         }
 
-        coyoteResponse.addHeader(name, value);
+        coyoteResponse.addHeader(name, value, charset);
     }
 
 
