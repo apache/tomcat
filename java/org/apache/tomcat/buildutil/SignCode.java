@@ -62,7 +62,7 @@ public class SignCode extends Task {
 
     static {
         try {
-            SIGNING_SERVICE_URL = new URL("https://api.ws.symantec.com/webtrust/SigningService");
+            SIGNING_SERVICE_URL = new URL("https://test-api.ws.symantec.com/webtrust/SigningService");
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }
