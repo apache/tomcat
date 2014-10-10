@@ -31,7 +31,6 @@
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
   <property file="build.properties.default"/>
-  <property environment="env"/>
 
   <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
@@ -2079,9 +2078,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
   </target>
 
-  <target name="installer" description="Create Windows installer"
-      unless="skip.installer" depends="dist-static">
-    <echo message="Builds a Windows installer based on Nullsoft Installer"/>
+  <target name="-installer-prep"
+      description="Prepares file structure required to buidl installer"
+      depends="dist-static">
     <copy todir="${tomcat.dist}">
       <fileset dir="res">
         <include name="INSTALLLICENSE" />
@@ -2096,12 +2095,62 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
-
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
       <patternset refid="text.files" />
     </fixcrlf>
+  </target>
 
+  <target name="-installer-create-tempinstaller"
+      description="Creates the temporary installer"
+      depends="-installer-prep">
+    <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
+      <arg value="/DUNINSTALLONLY" />
+      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="/V2" />
+      <arg value="tomcat.nsi" />
+    </exec>
+    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${nsis.exe}" />
+      <arg value="/DUNINSTALLONLY" />
+      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="/V2" />
+      <arg value="tomcat.nsi" />
+    </exec>
+  </target>
+
+  <target name="-installer-create-uninstaller"
+    description="Execute the temporary installer to create the uninstaller"
+    depends="-installer-create-tempinstaller">
+    <!-- Execute the temporary installer to create the uninstaller -->
+    <exec dir="${tomcat.dist}" executable="${tomcat.dist}/tempinstaller.exe"
+        osfamily="windows"  />
+    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${tomcat.dist}/tempinstaller.exe" />
+    </exec>
+
+  </target>
+
+  <target name="-installer-sign-uninstaller"
+      description="Sign the uninstaller executable"
+      depends="-installer-create-uninstaller"
+      if="${do.codesigning}">
+    <taskdef name="signcode"
+        classname="org.apache.tomcat.buildutil.SignCode"
+        classpath="${tomcat.classes}" />
+    <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
+        partnerCode="${codesigning.partnercode}"
+        applicationName="Apache Tomcat ${version.major.minor} Uninstaller"
+        applicationversion="${version}"
+        signingService="${codesigning.service}">
+      <fileset dir="${tomcat.dist}">
+        <filename name="Uninstall.exe"/>
+      </fileset>
+    </signcode>
+  </target>
+
+  <target name="-installer" description="Builds Windows installer"
+      unless="skip.installer" depends="-installer-sign-uninstaller">
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
       <arg value="/DNSISDIR=${nsis.home}" />
       <arg value="/V2" />
@@ -2113,20 +2162,16 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <arg value="/V2" />
       <arg value="tomcat.nsi" />
     </exec>
-
     <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
-
     <antcall target="md5sum">
       <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.exe" />
     </antcall>
   </target>
 
-  <target name="sign-windows-binaries" depends="installer" if="${do.codesigning}" >
-
+  <target name="installer-sign" depends="-installer" if="${do.codesigning}" >
     <taskdef name="signcode"
-             classname="org.apache.tomcat.buildutil.SignCode"
-             classpath="${tomcat.classes}" />
-
+        classname="org.apache.tomcat.buildutil.SignCode"
+        classpath="${tomcat.classes}" />
     <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
               partnerCode="${codesigning.partnercode}"
               applicationName="Apache Tomcat ${version.major.minor}"
@@ -2136,37 +2181,16 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <filename name="v${version}/bin/${final.name}.exe"/>
       </fileset>
     </signcode>
-
     <!-- .exe has changed so need to redo MD5 and OpenPGP signature -->
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.md5" />
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
     <antcall target="md5sum">
       <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.exe" />
     </antcall>
-
-  </target>
-
-  <!-- Called by the Windows installer to sign the uninstaller -->
-  <target name="sign-windows-uninstaller">
-
-    <taskdef name="signcode"
-             classname="org.apache.tomcat.buildutil.SignCode"
-             classpath="${tomcat.classes}" />
-
-    <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
-              partnerCode="${codesigning.partnercode}"
-              applicationName="Apache Tomcat ${version.major.minor} Uninstaller"
-              applicationversion="${version}"
-              signingService="${codesigning.service}">
-      <fileset dir="${env.TEMP}">
-        <filename name="uninstall.exe"/>
-      </fileset>
-    </signcode>
-
   </target>
 
   <target name="release"
-    depends="clean,release-init,dist-deployer,sign-windows-binaries,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
+    depends="clean,release-init,dist-deployer,installer-sign,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
     description="Create a Tomcat packaged distribution">
 
     <copy file="KEYS"

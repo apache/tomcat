@@ -15,29 +15,10 @@
 
 ; Tomcat script for Nullsoft Installer
 
-!ifdef INNER
+!ifdef UNINSTALLONLY
   OutFile "tempinstaller.exe"
-  SetCompressor /SOLID lzma
 !else
-  ; Call makensis again, defining INNER.  This writes an installer for us which, when
-  ; it is invoked, will just write the uninstaller to some location, and then exit.
-  ; Be sure to substitute the name of this script here.
-
-  !system "$\"${NSISDIR}\makensis$\" /DINNER tomcat.nsi" = 0
-
-  ; So now run that installer we just created as tempinstaller.exe.  Since it
-  ; calls quit the return value isn't zero.
-
-  !system "tempinstaller.exe" = 2
-
-  ; That will have written an uninstaller binary for us.  Now we sign it with your
-  ; favourite code signing tool.
-  !system "ant -f ..\..\build.xml sign-windows-uninstaller" = 0
-
-  ; Good.  Now we can carry on writing the real installer.
-
   OutFile tomcat-installer.exe
-  SetCompressor /SOLID lzma
 !endif
 
   ;Compression options
@@ -151,9 +132,11 @@ Var ServiceInstallLog
   Page custom CheckUserType
   !insertmacro MUI_PAGE_FINISH
 
-  ;Uninstall Page order
-  !insertmacro MUI_UNPAGE_CONFIRM
-  !insertmacro MUI_UNPAGE_INSTFILES
+  !ifdef UNINSTALLONLY
+    ;Uninstall Page order
+    !insertmacro MUI_UNPAGE_CONFIRM
+    !insertmacro MUI_UNPAGE_INSTFILES
+  !endif
 
   ;Component-selection page
     ;Descriptions
@@ -361,10 +344,10 @@ Section -post
     Call createShortcuts
   ${EndIf}
 
-  !ifndef INNER
+  !ifndef UNINSTALLONLY
     SetOutPath $INSTDIR
     ; this packages the signed uninstaller
-    File $%TEMP%\uninstall.exe
+    File Uninstall.exe
   !endif
 
   WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName" "InstallPath" $INSTDIR
@@ -381,11 +364,11 @@ Section -post
 SectionEnd
 
 Function .onInit
-  !ifdef INNER
-    ; If INNER is defined, then we aren't supposed to do anything except write out
+  !ifdef UNINSTALLONLY
+    ; If UNINSTALLONLY is defined, then we aren't supposed to do anything except write out
     ; the installer.  This is better than processing a command line option as it means
     ; this entire code path is not present in the final (real) installer.
-    WriteUninstaller "$%TEMP%\uninstall.exe"
+    WriteUninstaller "$EXEDIR\Uninstall.exe"
     Quit
   !endif
 
@@ -1119,7 +1102,7 @@ FunctionEnd
 ;--------------------------------
 ;Uninstaller Section
 
-!ifdef INNER
+!ifdef UNINSTALLONLY
   Section Uninstall
 
     ${If} $TomcatServiceName == ""
