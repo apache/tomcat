@@ -909,7 +909,7 @@ public class Response
         // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
         // RFC2965 is not supported by browsers and the Servlet spec
         // asks for 2109.
-        addHeader("Set-Cookie", header);
+        addHeader("Set-Cookie", header, getContext().getCookieProcessor().getCharset());
     }
 
     /**
