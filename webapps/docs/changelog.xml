@@ -64,6 +64,11 @@
         variables. (markt)
       </add>
       <fix>
+        <bug>55951</bug>: Allow cookies to use UTF-8 encoded values in HTTP
+        headers. This requires the use of the RFC6265
+        <strong>CookieProcessor</strong>. (markt)
+      </fix>
+      <fix>
         <bug>55984</bug>: Using the allow separators in version 0 cookies option
         with the legacy cookie processor should only apply to version 0 cookies.
         Version 1 cookies with values that contain separators should not be
