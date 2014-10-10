@@ -20,7 +20,6 @@ package org.apache.coyote.ajp;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.res.StringManager;
@@ -159,15 +158,21 @@ public class AjpMessage {
             appendByte(0);
             return;
         }
-        if (mb.getType() == MessageBytes.T_BYTES) {
+        if (mb.getType() != MessageBytes.T_BYTES) {
+            mb.toBytes();
             ByteChunk bc = mb.getByteChunk();
-            appendByteChunk(bc);
-        } else if (mb.getType() == MessageBytes.T_CHARS) {
-            CharChunk cc = mb.getCharChunk();
-            appendCharChunk(cc);
-        } else {
-            appendString(mb.toString());
+            // Need to filter out CTLs excluding TAB. ISO-8859-1 and UTF-8
+            // values will be OK. Strings using other encodings may be
+            // corrupted.
+            byte[] buffer = bc.getBuffer();
+            for (int i = bc.getOffset(); i < bc.getLength(); i++) {
+                if (((buffer[i] <= 31) && (buffer[i] != 9)) ||
+                        buffer[i] == 127 || buffer[i] > 255) {
+                    buffer[i] = ' ';
+                }
+            }
         }
+        appendByteChunk(mb.getByteChunk());
     }
 
 
@@ -184,70 +189,6 @@ public class AjpMessage {
             return;
         }
         appendBytes(bc.getBytes(), bc.getStart(), bc.getLength());
-    }
-
-
-    /**
-     * Write a CharChunk out at the current write position.
-     * A null CharChunk is encoded as a string with length 0.
-     */
-    public void appendCharChunk(CharChunk cc) {
-        if (cc == null) {
-            log.error(sm.getString("ajpmessage.null"),
-                    new NullPointerException());
-            appendInt(0);
-            appendByte(0);
-            return;
-        }
-        int start = cc.getStart();
-        int end = cc.getEnd();
-        appendInt(end - start);
-        char[] cbuf = cc.getBuffer();
-        for (int i = start; i < end; i++) {
-            char c = cbuf[i];
-            // Note:  This is clearly incorrect for many strings,
-            // but is the only consistent approach within the current
-            // servlet framework.  It must suffice until servlet output
-            // streams properly encode their output.
-            if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
-                c = ' ';
-            }
-            appendByte(c);
-        }
-        appendByte(0);
-    }
-
-
-    /**
-     * Write a String out at the current write position.  Strings are
-     * encoded with the length in two bytes first, then the string, and
-     * then a terminating \0 (which is <B>not</B> included in the
-     * encoded length).  The terminator is for the convenience of the C
-     * code, where it saves a round of copying.  A null string is
-     * encoded as a string with length 0.
-     */
-    public void appendString(String str) {
-        if (str == null) {
-            log.error(sm.getString("ajpmessage.null"),
-                    new NullPointerException());
-            appendInt(0);
-            appendByte(0);
-            return;
-        }
-        int len = str.length();
-        appendInt(len);
-        for (int i = 0; i < len; i++) {
-            char c = str.charAt (i);
-            // Note:  This is clearly incorrect for many strings,
-            // but is the only consistent approach within the current
-            // servlet framework.  It must suffice until servlet output
-            // streams properly encode their output.
-            if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
-                c = ' ';
-            }
-            appendByte(c);
-        }
-        appendByte(0);
     }
 
 

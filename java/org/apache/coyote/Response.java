@@ -18,12 +18,14 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.WriteListener;
 
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.res.StringManager;
@@ -297,12 +299,21 @@ public final class Response {
 
 
     public void addHeader(String name, String value) {
+        addHeader(name, value, null);
+    }
+
+
+    public void addHeader(String name, String value, Charset charset) {
         char cc=name.charAt(0);
         if( cc=='C' || cc=='c' ) {
             if( checkSpecialHeader(name, value) )
             return;
         }
-        headers.addValue(name).setString( value );
+        MessageBytes mb = headers.addValue(name);
+        if (charset != null) {
+            mb.getByteChunk().setCharset(charset);
+        }
+        mb.setString(value);
     }
 
 
