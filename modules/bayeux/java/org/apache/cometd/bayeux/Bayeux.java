@@ -18,27 +18,27 @@ package org.apache.cometd.bayeux;
 
 import java.util.List;
 
-/** Bayeux Interface.<br/>
+/** Bayeux Interface.<br>
  * This interface represents the server side API for the Bayeux messaging protocol.
- * Bayeux is a simple subscribe/publish/receive methodology, not far from JMS, but much simplified.<br/>
- * It is used both by the actual implementation and by server side clients.<br/>
+ * Bayeux is a simple subscribe/publish/receive methodology, not far from JMS, but much simplified.<br>
+ * It is used both by the actual implementation and by server side clients.<br>
  * Server side clients use this to create, retrieve and subscribe to channels.
  * Server side clients are represented, just like remote clients, through the Client interface.
- * <br/>
+ * <br>
  * The Bayeux implementations is intended to be thread safe and multiple threads may simultaneously call Bayeux methods.
- * <br/>
+ * <br>
  * The Bayeux object, is the starting point for any cometd application relying on the Bayeux object.
  * Dependent on the container, the Bayeux object will be stored in the <code>javax.servlet.ServletContext</code> object
- * as an attribute under the name <code>Bayeux.DOJOX_COMETD_BAYEUX</code><br/>
- * To retrieve this object, one would simply call<br/>
+ * as an attribute under the name <code>Bayeux.DOJOX_COMETD_BAYEUX</code><br>
+ * To retrieve this object, one would simply call<br>
  * <code>Bayeux bx = (Bayeux)getServletContext().getAttribute(Bayeux.DOJOX_COMETD_BAYEUX);
- * <br/><br/>
+ * <br><br>
  * The Bayeux protocol is pretty straight forward and includes a bunch of messaging that is not needed to be known to clients,
  * both server side and remote clients.
  * This object gets initialized by a container dependent servlet, and the servlet then handles all Bayeux communication from the client.
- * Remote messsages are delivered to channels, and to server side clients using the <code>Listener</code> interface.<br/>
- * <br/>
- * A <code>Bayeux session</code> is active as long as the webapp hosting the Bayeux object is active.<br/>
+ * Remote messsages are delivered to channels, and to server side clients using the <code>Listener</code> interface.<br>
+ * <br>
+ * A <code>Bayeux session</code> is active as long as the webapp hosting the Bayeux object is active.<br>
  * When the webapplication shuts down, the Bayeux object will unsubscribe all clients and remove all the active channels.
  *
  * @author Greg Wilkins
@@ -164,7 +164,7 @@ public interface Bayeux {
     public List<Client> getClients();
 
     /**
-     * Returns true if a client with the given id exists.<br/>
+     * Returns true if a client with the given id exists.<br>
      * Same as executing <code>getClient(id)!=null</code>.
      * @param clientId String
      * @return boolean - true if the client exists
@@ -185,7 +185,7 @@ public interface Bayeux {
     /**
      * Returns the channel for a given channel id.
      * If the channel doesn't exist, and the <code>create</code> parameter is set to true,
-     * the channel will be created and added to the list of active channels.<br/>
+     * the channel will be created and added to the list of active channels.<br>
      * if <code>create</code> is set to false, and the channel doesn't exist, null will be returned.
      * @param channelId String - the id of the channel to be retrieved or created
      * @param create boolean - true if the Bayeux impl should create the channel
@@ -211,7 +211,7 @@ public interface Bayeux {
 
     /**
      * returns true if a channel with the given channelId exists.
-     * <br/>Same as executing <code>Bayeux.getChannel(channelId,false)!=null</code>
+     * <br>Same as executing <code>Bayeux.getChannel(channelId,false)!=null</code>
      * @param channelId String
      * @return boolean - true if the channel exists.
      */

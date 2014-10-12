@@ -29,8 +29,8 @@ import org.apache.juli.logging.LogFactory;
 /**
  * A smart implementation of a stateful replicated map. uses primary/secondary backup strategy.
  * One node is always the primary and one node is always the backup.
- * This map is synchronized across a cluster, and only has one backup member.<br/>
- * A perfect usage for this map would be a session map for a session manager in a clustered environment.<br/>
+ * This map is synchronized across a cluster, and only has one backup member.<br>
+ * A perfect usage for this map would be a session map for a session manager in a clustered environment.<br>
  * The only way to modify this list is to use the <code>put, putAll, remove</code> methods.
  * entrySet, entrySetFull, keySet, keySetFull, returns all non modifiable sets.<br><br>
  * If objects (values) in the map change without invoking <code>put()</code> or <code>remove()</code>

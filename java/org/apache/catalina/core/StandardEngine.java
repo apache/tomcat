@@ -46,7 +46,7 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Standard implementation of the <b>Engine</b> interface.  Each
  * child container must be a Host implementation to process the specific
- * fully qualified host name of that virtual host. <br/>
+ * fully qualified host name of that virtual host. <br>
  * You can set the jvmRoute direct or with the System.property <b>jvmRoute</b>.
  *
  * @author Craig R. McClanahan

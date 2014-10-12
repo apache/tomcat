@@ -19,7 +19,7 @@ package org.apache.cometd.bayeux;
 import java.util.Map;
 
 /**
- * A Bayeux Message<br/>
+ * A Bayeux Message<br>
  * A Bayeux message is a Map of String/Object key value pairs representing the data in the message.
  * The message contains information about the channel it was published through and who the sender was
  *

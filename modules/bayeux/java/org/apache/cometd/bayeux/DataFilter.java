@@ -17,10 +17,10 @@
 package org.apache.cometd.bayeux;
 
 /**
- * Data Filter<br/>
+ * Data Filter<br>
  * Data filters are used to transform data as it is sent to a Channel.
  * Messages are filtered as the message is published to a channel, invoking the
- * {@link Channel#publish(Message)} method.<br/>
+ * {@link Channel#publish(Message)} method.<br>
  * This method gets invoked in two different scenarios, the first being when a message is received from
  * a remote client, and the Bayeux implementation invokes the publish method directly.
  * The second scenario is when a local client invokes {@link Channel#publish(Message)} directly in the local JVM.

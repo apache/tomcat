@@ -73,7 +73,7 @@ import org.apache.tools.ant.BuildException;
  * <li>&lt; lesser than (&amp;lt;)</li>
  * <li>&lt;= lesser than or equals (&amp;lt;=)</li>
  * </ul>
- * <b>NOTE</b>:  For numeric expressions the type must be set and use xml entities as operations.<br/>
+ * <b>NOTE</b>:  For numeric expressions the type must be set and use xml entities as operations.<br>
  * As type we currently support <em>long</em> and <em>double</em>.
  * @author Peter Rossbach
  * @since 5.5.10

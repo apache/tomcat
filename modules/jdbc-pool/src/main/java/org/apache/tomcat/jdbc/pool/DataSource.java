@@ -63,7 +63,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     protected volatile ObjectName oname = null;
 
     /**
-     * Unregisters the underlying connection pool mbean.<br/>
+     * Unregisters the underlying connection pool mbean.<br>
      * {@inheritDoc}
      */
     @Override
@@ -72,7 +72,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
-     * no-op<br/>
+     * no-op<br>
      * {@inheritDoc}
      */
     @Override
@@ -82,7 +82,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
 
 
     /**
-     * no-op<br/>
+     * no-op<br>
      * {@inheritDoc}
      */
     @Override
@@ -91,7 +91,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
-     * If the connection pool MBean exists, it will be registered during this operation.<br/>
+     * If the connection pool MBean exists, it will be registered during this operation.<br>
      * {@inheritDoc}
      */
     @Override

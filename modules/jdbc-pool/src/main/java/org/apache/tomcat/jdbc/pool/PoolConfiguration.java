@@ -86,7 +86,7 @@ public interface PoolConfiguration {
 
     /**
      * The connection properties that will be sent to the JDBC driver when establishing new connections.
-     * Format of the string is [propertyName=property;] <br/>
+     * Format of the string is [propertyName=property;] <br>
      * NOTE - The "user" and "password" properties will be passed explicitly, so they do not need to be included here.
      * The default value is null.
      */

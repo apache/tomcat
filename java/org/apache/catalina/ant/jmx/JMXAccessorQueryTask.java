@@ -39,7 +39,7 @@ import org.apache.tools.ant.BuildException;
  * <li>Show query result as Ant console log</li>
  * <li>Bind query result as Ant properties</li>
  * </ul>
- * <br/>
+ * <br>
  * Query a list of Mbeans.
  * <pre>
  *   &lt;jmxQuery
@@ -49,7 +49,7 @@ import org.apache.tools.ant.BuildException;
  *           resultproperty="manager" /&gt;
  * </pre>
  * with attribute <em>attributebinding="true"</em> you can get
- * all attributes also from result objects.<br/>
+ * all attributes also from result objects.<br>
  * The property manager.lenght show the size of the result
  * and with manager.[0..length].name the
  * resulted ObjectNames are saved.

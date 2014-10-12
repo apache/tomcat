@@ -64,7 +64,7 @@ public class Time {
 
     /**
      * Sleep for the specified number of micro-seconds.
-     * <br /><b>Warning :</b> May sleep for longer than the specified time.
+     * <br><b>Warning :</b> May sleep for longer than the specified time.
      * @param t desired amount of time to sleep.
      */
     public static native void sleep(long t);

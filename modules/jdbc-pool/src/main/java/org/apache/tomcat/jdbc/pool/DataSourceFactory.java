@@ -40,9 +40,9 @@ import org.apache.juli.logging.LogFactory;
  * <code>RefAddr</code> values of the specified <code>Reference</code>,
  * which must match the names and data types of the
  * <code>BasicDataSource</code> bean properties.</p>
- * <br/>
- * Properties available for configuration:<br/>
- * <a href="http://commons.apache.org/dbcp/configuration.html">Commons DBCP properties</a><br/>
+ * <br>
+ * Properties available for configuration:<br>
+ * <a href="http://commons.apache.org/dbcp/configuration.html">Commons DBCP properties</a><br>
  *<ol>
  *  <li>initSQL - A query that gets executed once, right after the connection is established.</li>
  *  <li>testOnConnect - run validationQuery after connection has been established.</li>

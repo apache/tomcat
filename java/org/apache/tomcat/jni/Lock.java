@@ -25,7 +25,7 @@ public class Lock {
 
     /**
      * Enumerated potential types for APR process locking methods
-     * <br /><b>Warning :</b> Check APR_HAS_foo_SERIALIZE defines to see if the platform supports
+     * <br><b>Warning :</b> Check APR_HAS_foo_SERIALIZE defines to see if the platform supports
      *          APR_LOCK_foo.  Only APR_LOCK_DEFAULT is portable.
      */
 
@@ -38,7 +38,7 @@ public class Lock {
 
     /**
      * Create and initialize a mutex that can be used to synchronize processes.
-     * <br /><b>Warning :</b> Check APR_HAS_foo_SERIALIZE defines to see if the platform supports
+     * <br><b>Warning :</b> Check APR_HAS_foo_SERIALIZE defines to see if the platform supports
      *          APR_LOCK_foo.  Only APR_LOCK_DEFAULT is portable.
      * @param fname A file name to use if the lock mechanism requires one.  This
      *        argument should always be provided.  The lock code itself will

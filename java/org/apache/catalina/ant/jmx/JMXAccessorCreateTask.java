@@ -33,7 +33,7 @@ import org.apache.tools.ant.BuildException;
  * </ul>
  * <p>
  * Examples:
- * <br/>
+ * <br>
  * create a new Mbean at jmx.server connection
  * <pre>
  *   &lt;jmx:create

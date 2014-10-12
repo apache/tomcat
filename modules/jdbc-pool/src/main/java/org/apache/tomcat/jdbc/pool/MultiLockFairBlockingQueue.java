@@ -38,7 +38,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * invocations to method poll(...) will get handed out in the order they were received.
  * Locking is fine grained, a shared lock is only used during the first level of contention, waiting is done in a
  * lock per thread basis so that order is guaranteed once the thread goes into a suspended monitor state.
- * <br/>
+ * <br>
  * Not all of the methods of the {@link java.util.concurrent.BlockingQueue} are implemented.
  *
  */

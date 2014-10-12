@@ -43,7 +43,7 @@ import org.apache.tomcat.util.res.StringManager;
  *       be quoted even though / is not permitted in a token.</li>
  * </ul>
  *
- * <p>Implementation note:<br/>
+ * <p>Implementation note:<br>
  * This class has been carefully tuned to ensure that it has equal or better
  * performance than the original Netscape/RFC2109 cookie parser. Before
  * committing and changes, ensure that the TesterCookiePerformance unit test

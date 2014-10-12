@@ -35,7 +35,7 @@ public interface BayeuxRequest {
      * Validates a specific request.
      * This method must be called prior to process()
      * as a request can do pre processing in the validate method.
-     * <br/>
+     * <br>
      * Should the validation fail, an error object is returned
      * containing an error message, and potentially a stack trace
      * if an exception was generated

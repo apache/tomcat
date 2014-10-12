@@ -83,9 +83,9 @@ public class TestMain {
 
         mCtx.addWrapper("/", new StaticContentService()
             .setContentType("text/html")
-            .setData("<a href='/proc/cpool/client'>Client pool</a><br/>" +
-                    "<a href='/proc/cpool/server'>Server pool</a><br/>" +
-                    "<a href='/proc/cpool/proxy'>Proxy pool</a><br/>" +
+            .setData("<a href='/proc/cpool/client'>Client pool</a><br>" +
+                    "<a href='/proc/cpool/server'>Server pool</a><br>" +
+                    "<a href='/proc/cpool/proxy'>Proxy pool</a><br>" +
                     ""));
 
         mCtx.addWrapper("/favicon.ico",

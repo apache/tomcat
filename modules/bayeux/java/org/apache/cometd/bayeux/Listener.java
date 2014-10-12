@@ -17,7 +17,7 @@
 package org.apache.cometd.bayeux;
 
 /**
- * Cometd Listener interface.<br/>
+ * Cometd Listener interface.<br>
  * For local clients, in order to receive messages, they pass in a callback object
  * when the local client is created using the {@link Bayeux#newClient(String,Listener)} method.
  * This callback object, implementing the Listener interface, is used to deliver messages to local, in JVM, clients.
