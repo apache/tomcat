@@ -202,14 +202,14 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     /**
-     * Get the Charset used for string<->byte conversions.
+     * Get the Charset used for string&lt;-&gt;byte conversions.
      */
     public Charset getCharset() {
         return byteC.getCharset();
     }
 
     /**
-     * Set the Charset used for string<->byte conversions.
+     * Set the Charset used for string&lt;-&gt;byte conversions.
      */
     public void setCharset(Charset charset) {
         byteC.setCharset(charset);
