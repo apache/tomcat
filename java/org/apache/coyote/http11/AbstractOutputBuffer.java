@@ -495,8 +495,13 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
             // corrupted.
             byte[] buffer = bc.getBuffer();
             for (int i = bc.getOffset(); i < bc.getLength(); i++) {
-                if (((buffer[i] <= 31) && (buffer[i] != 9)) ||
-                        buffer[i] == 127 || buffer[i] > 255) {
+                // byte values are signed i.e. -128 to 127
+                // The values are used unsigned. 0 to 31 are CTLs so they are
+                // filtered (apart from TAB which is 9). 127 is a control (DEL).
+                // The values 128 to 255 are all OK. Converting those to signed
+                // gives -128 to -1.
+                if ((buffer[i] > -1 && buffer[i] <= 31 && buffer[i] != 9) ||
+                        buffer[i] == 127) {
                     buffer[i] = ' ';
                 }
             }
