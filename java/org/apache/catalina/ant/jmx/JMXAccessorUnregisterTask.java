@@ -28,7 +28,7 @@ import org.apache.tools.ant.BuildException;
  * </ul>
  * <p>
  * Examples:
- * <br/>
+ * <br>
  * unregister an existing Mbean at jmx.server connection
  * <pre>
  *   &lt;jmx:unregister

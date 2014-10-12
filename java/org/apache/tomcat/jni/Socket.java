@@ -117,7 +117,7 @@ public class Socket {
 
     /**
      * Shutdown either reading, writing, or both sides of a socket.
-     * <br />
+     * <br>
      * This does not actually close the socket descriptor, it just
      *      controls which calls are still valid on the socket.
      * @param thesocket The socket to close
@@ -499,7 +499,7 @@ public class Socket {
     /**
      * Send a file from an open file descriptor to a socket, along with
      * optional headers and trailers.
-     * <br />
+     * <br>
      * This functions acts like a blocking write by default.  To change
      *         this behavior, use apr_socket_timeout_set() or the
      *         APR_SO_NONBLOCK socket option.

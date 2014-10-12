@@ -123,13 +123,13 @@ public interface CometEvent {
 
     /**
      * Sets the timeout for this Comet connection. Please NOTE, that the implementation
-     * of a per connection timeout is OPTIONAL and MAY NOT be implemented.<br/>
+     * of a per connection timeout is OPTIONAL and MAY NOT be implemented.<br>
      * This method sets the timeout in milliseconds of idle time on the connection.
      * The timeout is reset every time data is received from the connection or data is flushed
      * using <code>response.flushBuffer()</code>. If a timeout occurs, the
      * <code>error(HttpServletRequest, HttpServletResponse)</code> method is invoked. The
      * web application SHOULD NOT attempt to reuse the request and response objects after a timeout
-     * as the <code>error(HttpServletRequest, HttpServletResponse)</code> method indicates.<br/>
+     * as the <code>error(HttpServletRequest, HttpServletResponse)</code> method indicates.<br>
      * This method should not be called asynchronously, as that will have no effect.
      *
      * @param timeout The timeout in milliseconds for this connection, must be a positive value, larger than 0

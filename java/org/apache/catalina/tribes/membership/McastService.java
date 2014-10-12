@@ -92,7 +92,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      *
      * @param properties
-     * <BR/>All are required<BR />
+     * <br>All are required<br>
      * 1. mcastPort - the port to listen to<BR>
      * 2. mcastAddress - the mcast group address<BR>
      * 4. bindAddress - the bind address if any - only one that can be null<BR>

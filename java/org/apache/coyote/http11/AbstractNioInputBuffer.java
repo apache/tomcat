@@ -38,7 +38,7 @@ public abstract class AbstractNioInputBuffer<S> extends AbstractInputBuffer<S> {
         HEADER_START,
         /**
          * Reading a header name. All characters of header are HTTP_TOKEN_CHAR.
-         * Header name is followed by ':'. No whitespace is allowed.<br />
+         * Header name is followed by ':'. No whitespace is allowed.<br>
          * Any non-HTTP_TOKEN_CHAR (this includes any whitespace) encountered
          * before ':' will result in the whole line being ignored.
          */
@@ -627,25 +627,25 @@ public abstract class AbstractNioInputBuffer<S> extends AbstractInputBuffer<S> {
     private final HeaderParseData headerData = new HeaderParseData();
     public static class HeaderParseData {
         /**
-         * When parsing header name: first character of the header.<br />
-         * When skipping broken header line: first character of the header.<br />
+         * When parsing header name: first character of the header.<br>
+         * When skipping broken header line: first character of the header.<br>
          * When parsing header value: first character after ':'.
          */
         int start = 0;
         /**
-         * When parsing header name: not used (stays as 0).<br />
-         * When skipping broken header line: not used (stays as 0).<br />
+         * When parsing header name: not used (stays as 0).<br>
+         * When skipping broken header line: not used (stays as 0).<br>
          * When parsing header value: starts as the first character after ':'.
          * Then is increased as far as more bytes of the header are harvested.
          * Bytes from buf[pos] are copied to buf[realPos]. Thus the string from
          * [start] to [realPos-1] is the prepared value of the header, with
-         * whitespaces removed as needed.<br />
+         * whitespaces removed as needed.<br>
          */
         int realPos = 0;
         /**
-         * When parsing header name: not used (stays as 0).<br />
-         * When skipping broken header line: last non-CR/non-LF character.<br />
-         * When parsing header value: position after the last not-LWS character.<br />
+         * When parsing header name: not used (stays as 0).<br>
+         * When skipping broken header line: last non-CR/non-LF character.<br>
+         * When parsing header value: position after the last not-LWS character.<br>
          */
         int lastSignificantChar = 0;
         /**

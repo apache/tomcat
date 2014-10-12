@@ -322,8 +322,8 @@ public class ChunkedInputFilter implements InputFilter {
 
     /**
      * Parse the header of a chunk.
-     * A chunk header can look like one of the following:<br />
-     * A10CRLF<br />
+     * A chunk header can look like one of the following:<br>
+     * A10CRLF<br>
      * F23;chunk-extension to be ignoredCRLF
      *
      * <p>

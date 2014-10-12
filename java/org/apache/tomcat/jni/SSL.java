@@ -317,7 +317,7 @@ public final class SSL {
 
     /**
      * Generate temporary RSA key.
-     * <br />
+     * <br>
      * Index can be one of:
      * <PRE>
      * SSL_TMP_KEY_RSA_512
@@ -333,7 +333,7 @@ public final class SSL {
 
     /**
      * Load temporary DSA key from file
-     * <br />
+     * <br>
      * Index can be one of:
      * <PRE>
      * SSL_TMP_KEY_DH_512

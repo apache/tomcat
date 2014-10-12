@@ -52,7 +52,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * Add this Valve to your host definition at conf/server.xml .
  *
- * Since 5.5.10 as direct cluster valve:<br/>
+ * Since 5.5.10 as direct cluster valve:<br>
  *
  * <pre>
  *  &lt;Cluster&gt;
@@ -60,8 +60,8 @@ import org.apache.tomcat.util.res.StringManager;
  *  &lt;/Cluster&gt;
  * </pre>
  *
- * <br />
- * Before 5.5.10 as Host element:<br/>
+ * <br>
+ * Before 5.5.10 as Host element:<br>
  *
  * <pre>
  *  &lt;Host&gt;
@@ -69,7 +69,7 @@ import org.apache.tomcat.util.res.StringManager;
  *  &lt;/Host&gt;
  * </pre>
  *
- * <em>A Trick:</em><br/>
+ * <em>A Trick:</em><br>
  * You can enable this mod_jk turnover mode via JMX before you drop a node to
  * all backup nodes! Set enable true on all JvmRouteBinderValve backups, disable
  * worker at mod_jk and then drop node and restart it! Then enable mod_jk worker

@@ -94,7 +94,7 @@ import org.xml.sax.ext.EntityResolver2;
  * <p>It can be mapped to sub-paths, however in all cases resources are served
  * from the web appplication resource root using the full path from the root
  * of the web application context.
- * <br/>e.g. given a web application structure:
+ * <br>e.g. given a web application structure:
  *</p>
  * <pre>
  * /context

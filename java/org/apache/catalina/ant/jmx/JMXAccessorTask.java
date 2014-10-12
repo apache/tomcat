@@ -81,7 +81,7 @@ import org.apache.tools.ant.Project;
  * </p>
  * All JMXAccessorXXXTask support the attribute <em>if</em> and
  * <em>unless</em>. With <em>if</em> the task is only execute when property
- * exist and with <em>unless</em> when property not exists. <br/><b>NOTE
+ * exist and with <em>unless</em> when property not exists. <br><b>NOTE
  * </b>: These tasks require Ant 1.6 or later interface.
  *
  * @author Peter Rossbach

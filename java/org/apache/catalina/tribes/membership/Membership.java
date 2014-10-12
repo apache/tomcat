@@ -111,7 +111,7 @@ public class Membership implements Cloneable {
      * Notify the membership that this member has announced itself.
      *
      * @param member - the member that just pinged us
-     * @return - true if this member is new to the cluster, false otherwise.<br/>
+     * @return - true if this member is new to the cluster, false otherwise.<br>
      * - false if this member is the local member or updated.
      */
     public synchronized boolean memberAlive(Member member) {

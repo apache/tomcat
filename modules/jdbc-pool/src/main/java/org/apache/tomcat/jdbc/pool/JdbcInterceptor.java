@@ -26,7 +26,7 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
  * Abstract class that is to be extended for implementations of interceptors.
  * Everytime an operation is called on the {@link java.sql.Connection} object the
  * {@link #invoke(Object, Method, Object[])} method on the interceptor will be called.
- * Interceptors are useful to change or improve behavior of the connection pool.<br/>
+ * Interceptors are useful to change or improve behavior of the connection pool.<br>
  * Interceptors can receive a set of properties. Each sub class is responsible for parsing the properties during runtime when they
  * are needed or simply override the {@link #setProperties(Map)} method.
  * Properties arrive in a key-value pair of Strings as they were received through the configuration.
@@ -155,7 +155,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * Gets called each time the connection is borrowed from the pool
      * This means that if an interceptor holds a reference to the connection
      * the interceptor can be reused for another connection.
-     * <br/>
+     * <br>
      * This method may be called with null as both arguments when we are closing down the connection.
      * @param parent - the connection pool owning the connection
      * @param con - the pooled connection
