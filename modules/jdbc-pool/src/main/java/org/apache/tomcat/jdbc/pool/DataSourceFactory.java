@@ -583,7 +583,6 @@ public class DataSourceFactory implements ObjectFactory {
      * <p>Parse properties from the string. Format of the string must be [propertyName=property;]*<p>
      * @param propText
      * @return Properties
-     * @throws Exception
      */
     protected static Properties getProperties(String propText) {
         return PoolProperties.getProperties(propText,null);

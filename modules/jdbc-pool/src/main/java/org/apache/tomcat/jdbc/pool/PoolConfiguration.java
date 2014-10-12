@@ -665,12 +665,12 @@ public interface PoolConfiguration {
     /**
      * Returns true if the pool sweeper is enabled for the connection pool.
      * The pool sweeper is enabled if any settings that require async intervention in the pool are turned on
-     * <source>
-        boolean result = getTimeBetweenEvictionRunsMillis()>0;
-        result = result && (isRemoveAbandoned() && getRemoveAbandonedTimeout()>0);
-        result = result || (isTestWhileIdle() && getValidationQuery()!=null);
+     * <code>
+        boolean result = getTimeBetweenEvictionRunsMillis()&gt;0;
+        result = result &amp;&amp; (isRemoveAbandoned() &amp;&amp; getRemoveAbandonedTimeout()&gt;0);
+        result = result || (isTestWhileIdle() &amp;amp;& getValidationQuery()!=null);
         return result;
-       </source>
+       </code>
      *
      * @return true if a background thread is or will be enabled for this pool
      */
@@ -698,7 +698,7 @@ public interface PoolConfiguration {
     /**
      * Time in milliseconds to keep this connection alive even when used.
      * When a connection is returned to the pool, the pool will check to see if the
-     * ((now - time-when-connected) > maxAge) has been reached, and if so,
+     * ((now - time-when-connected) &gt; maxAge) has been reached, and if so,
      * it closes the connection rather than returning it to the pool.
      * The default value is 0, which implies that connections will be left open and no
      * age check will be done upon returning the connection to the pool.
@@ -711,7 +711,7 @@ public interface PoolConfiguration {
     /**
      * Time in milliseconds to keep this connection alive even when used.
      * When a connection is returned to the pool, the pool will check to see if the
-     * ((now - time-when-connected) > maxAge) has been reached, and if so,
+     * ((now - time-when-connected) &gt; maxAge) has been reached, and if so,
      * it closes the connection rather than returning it to the pool.
      * The default value is 0, which implies that connections will be left open and no
      * age check will be done upon returning the connection to the pool.
