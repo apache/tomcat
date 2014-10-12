@@ -311,7 +311,7 @@ public final class Response {
         }
         MessageBytes mb = headers.addValue(name);
         if (charset != null) {
-            mb.getByteChunk().setCharset(charset);
+            mb.setCharset(charset);
         }
         mb.setString(value);
     }
