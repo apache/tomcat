@@ -526,7 +526,7 @@ public class PooledConnection {
     }
 
     /**
-     * This method is called if (Now - timeCheckedIn > getReleaseTime())
+     * This method is called if (Now - timeCheckedIn &gt; getReleaseTime())
      * This method disconnects the connection, logs an error in debug mode if it happens
      * then sets the {@link #released} flag to false. Any attempts to connect this cached object again
      * will fail per {@link #connect()}
