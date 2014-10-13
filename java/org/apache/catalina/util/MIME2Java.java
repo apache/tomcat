@@ -32,6 +32,7 @@ import java.util.Map;
  * methods such as <code>TXDocument#printWithFormat</code> and <code>DTD#printExternal</code>.
  * <P>
  * <TABLE BORDER="0" WIDTH="100%">
+ *  <caption>MIME charset name to Java encoding name mapping</caption>
  *  <TR>
  *      <TD WIDTH="33%">
  *          <P ALIGN="CENTER"><B>Common Name</B>

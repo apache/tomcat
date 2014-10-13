@@ -45,9 +45,9 @@ public class RewriteCond {
 
     public static class LexicalCondition extends Condition {
         /**
-         * -1: <
+         * -1: &lt;
          * 0: =
-         * 1: >
+         * 1: &gt;
          */
         public int type = 0;
         public String condition;

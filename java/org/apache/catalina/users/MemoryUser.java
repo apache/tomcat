@@ -252,7 +252,7 @@ public class MemoryUser extends AbstractUser {
      *
      * <p><strong>IMPLEMENTATION NOTE</strong> - For backwards compatibility,
      * the reader that processes this entry will accept either
-     * <code>username</code> or </code>name</code> for the username
+     * <code>username</code> or <code>name</code> for the username
      * property.</p>
      */
     public String toXml() {
