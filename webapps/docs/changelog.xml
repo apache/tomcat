@@ -185,7 +185,7 @@
     <changelog>
       <fix>
         <bug>57005</bug>: Fix javadoc errors when building with Java 8. Patch
-        provided by Pierre Viret. (markt) 
+        provided by Pierre Viret. (markt)
       </fix>
     </changelog>
   </subsection>
