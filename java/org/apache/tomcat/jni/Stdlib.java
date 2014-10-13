@@ -75,13 +75,13 @@ public class Stdlib {
 
     /**
      * Get current process pid.
-     * @return current pid or < 1 in case of error.
+     * @return current pid or &lt; 1 in case of error.
      */
     public static native int getpid();
 
     /**
      * Get current process parent pid.
-     * @return parent pid or < 1 in case of error.
+     * @return parent pid or &lt; 1 in case of error.
      */
     public static native int getppid();
 

@@ -100,7 +100,7 @@ public final class SSLContext {
      * <b>mode</b> valid at the time and may be 0 or 1.
      * <br>
      * Normally when a SSL connection is finished, the parties must send out
-     * "close notify" alert messages using L<SSL_shutdown(3)|SSL_shutdown(3)>
+     * "close notify" alert messages using L&lt;SSL_shutdown(3)|SSL_shutdown(3)&gt;
      * for a clean shutdown.
      * <br>
      * When setting the "quiet shutdown" flag to 1, <b>SSL.shutdown</b>
