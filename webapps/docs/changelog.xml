@@ -199,6 +199,11 @@
         Fix timestamps in Tomcat build and jdbc-pool to use 24-hour format
         instead of 12-hour one and use UTC timezone. (markt/kkolinko)
       </fix>
+      <fix>
+        Update the package renamed copy of Apache Commons DBCP 2 to revision
+        1631450 to pick up additional fixes since the 2.0.1 release including
+        Javadoc corrections to fix errors when compiling with Java 8. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

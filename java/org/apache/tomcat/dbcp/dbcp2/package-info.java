@@ -87,7 +87,7 @@
  *    {@link org.apache.tomcat.dbcp.dbcp2.PoolableConnectionFactory} is for.
  * </p><p>
  *    To create the {@link org.apache.tomcat.dbcp.dbcp2.PoolableConnectionFactory},
- *    you'll need at least two things:
+ *    you'll need at least two things:</p>
  *    <ol>
  *     <li>
  * A {@link org.apache.tomcat.dbcp.dbcp2.ConnectionFactory} from which
@@ -96,35 +96,35 @@
  *     <li>
  * An empty and factory-less {@link org.apache.tomcat.dbcp.pool2.ObjectPool}
  * in which the {@link java.sql.Connection}s will be stored.
- * <br></br>
+ * <br>
  * When you pass an {@link org.apache.tomcat.dbcp.pool2.ObjectPool} into the
  * {@link org.apache.tomcat.dbcp.dbcp2.PoolableConnectionFactory}, it will
  * automatically register itself as the {@link org.apache.tomcat.dbcp.pool2.PooledObjectFactory}
  * for that pool.
  *     </li>
  *    </ol>
- * </p><p>
+ * <p>
  *    In code, that might look like this:
+ * </p>
  * <pre>GenericObjectPool connectionPool = new GenericObjectPool(null);
  * ConnectionFactory connectionFactory = new DriverManagerConnectionFactory("jdbc:some:connect:string", "username", "password");
  * PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,connectionPool,null,null,false,true);
  * PoolingDataSource dataSource = new PoolingDataSource(connectionPool);</pre>
- * </p><p>
+ * <p>
  *    To create a {@link org.apache.tomcat.dbcp.dbcp2.PoolingDriver}, we do the same thing,
  *    except that instead of creating a {@link javax.sql.DataSource} on the last line,
  *    we create a {@link org.apache.tomcat.dbcp.dbcp2.PoolingDriver}, and register the
- *    {@code connectionPool} with it.  E.g.,:
+ *    {@code connectionPool} with it.  E.g.,:</p>
  * <pre>GenericObjectPool connectionPool = new GenericObjectPool(null);
  * ConnectionFactory connectionFactory = new DriverManagerConnectionFactory("jdbc:some:connect:string", "username", "password");
  * PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,connectionPool,null,null,false,true);
  * PoolingDriver driver = new PoolingDriver();
  * driver.registerPool("example",connectionPool);</pre>
- * </p><p>
+ * <p>
  *    Since the {@link org.apache.tomcat.dbcp.dbcp2.PoolingDriver} registers itself
  *    with the {@link java.sql.DriverManager} when it is created, now you can just
  *    go to the {@link java.sql.DriverManager} to create your {@link java.sql.Connection}s,
- *    like you normally would:
+ *    like you normally would:</p>
  * <pre>Connection conn = DriverManager.getConnection("jdbc:apache:commons:dbcp:example");</pre>
- * </p>
  */
 package org.apache.tomcat.dbcp.dbcp2;
