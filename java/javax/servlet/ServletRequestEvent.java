@@ -43,14 +43,16 @@ public class ServletRequestEvent extends java.util.EventObject {
     }
 
     /**
-     * Returns the ServletRequest that is changing.
+     * Get the associated ServletRequest.
+     * @return the ServletRequest that is changing.
      */
     public ServletRequest getServletRequest() {
         return this.request;
     }
 
     /**
-     * Returns the ServletContext of this web application.
+     * Get the associated ServletContext.
+     * @return the ServletContext that is changing.
      */
     public ServletContext getServletContext() {
         return (ServletContext) super.getSource();

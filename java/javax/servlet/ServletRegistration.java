@@ -26,8 +26,8 @@ import java.util.Set;
 public interface ServletRegistration extends Registration {
 
     /**
-     *
-     * @param urlPatterns
+     * TODO
+     * @param urlPatterns The URL patterns that this Servlet should be mapped to
      * @return TODO
      * @throws IllegalArgumentException if urlPattern is null or empty
      * @throws IllegalStateException if the associated ServletContext has

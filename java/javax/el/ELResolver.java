@@ -29,6 +29,10 @@ public abstract class ELResolver {
     public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
 
     /**
+     * @param context The EL context for this evaluation
+     * @param base The base object on which the property is to be found
+     * @param property The property whose value is to be returned
+     * @return the value of the provided property
      * @throws NullPointerException
      *              If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException
@@ -53,6 +57,10 @@ public abstract class ELResolver {
     }
 
     /**
+     * @param context The EL context for this evaluation
+     * @param base The base object on which the property is to be found
+     * @param property The property whose type is to be returned
+     * @return the type of the provided property
      * @throws NullPointerException
      *              If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException
@@ -66,6 +74,10 @@ public abstract class ELResolver {
             Object property);
 
     /**
+     * @param context  The EL context for this evaluation
+     * @param base     The base object on which the property is to be found
+     * @param property The property whose value is to be set
+     * @param value    The value to set the property to
      * @throws NullPointerException
      *              If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException
@@ -82,6 +94,11 @@ public abstract class ELResolver {
             Object property, Object value);
 
     /**
+     * @param context The EL context for this evaluation
+     * @param base The base object on which the property is to be found
+     * @param property The property to be checked for read only status
+     * @return <code>true</code> if the identified property is read only,
+     *         otherwise <code>false</code>
      * @throws NullPointerException
      *              If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException
