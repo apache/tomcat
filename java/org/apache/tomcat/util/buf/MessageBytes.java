@@ -18,8 +18,16 @@ package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class is used to represent a subarray of bytes in an HTTP message.
@@ -35,6 +43,9 @@ import java.util.Locale;
  */
 public final class MessageBytes implements Cloneable, Serializable {
     private static final long serialVersionUID = 1L;
+
+    private static final StringManager sm = StringManager.getManager(
+            Constants.Package);
 
     // primary type ( whatever is set as original value )
     private int type = T_NULL;
@@ -63,6 +74,8 @@ public final class MessageBytes implements Cloneable, Serializable {
     // true if a String value was computed. Probably not needed,
     // strValue!=null is the same
     private boolean hasStrValue=false;
+
+    private Map<Charset,CharsetEncoder> encoders = new HashMap<>();
 
     /**
      * Creates a new, uninitialized MessageBytes object.
@@ -215,17 +228,29 @@ public final class MessageBytes implements Cloneable, Serializable {
         byteC.setCharset(charset);
     }
 
-    /** Do a char->byte conversion.
+    /** Do a char-&gt;byte conversion.
      */
     public void toBytes() {
-        if( ! byteC.isNull() ) {
+        if (!byteC.isNull()) {
             type=T_BYTES;
             return;
         }
         toString();
         type=T_BYTES;
-        byte bb[] = strValue.getBytes(byteC.getCharset());
-        byteC.setBytes(bb, 0, bb.length);
+        Charset charset = byteC.getCharset();
+        CharsetEncoder encoder = encoders.get(charset);
+        if (encoder == null) {
+            encoder = charset.newEncoder();
+            encoders.put(charset, encoder);
+        }
+        ByteBuffer result;
+        try {
+             result = encoder.encode(CharBuffer.wrap(strValue));
+        } catch (CharacterCodingException e) {
+            throw new IllegalArgumentException(sm.getString(
+                    "messageBytes.toBytesFailed", strValue, charset), e);
+        }
+        byteC.setBytes(result.array(), result.arrayOffset(), result.limit());
     }
 
     /** Convert to char[] and fill the CharChunk.

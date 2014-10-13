@@ -143,6 +143,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Cache the <code>Encoder</code> instances used to convert Strings to byte
+        arrays in the Connectors (e.g. when writing HTTP headers) to improve
+        throughput. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
