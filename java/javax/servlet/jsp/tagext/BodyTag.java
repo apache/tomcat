@@ -70,7 +70,7 @@ import javax.servlet.jsp.JspException;
  * TryCatchFinally interface; see that interface for details.
  * <p>
  * <IMG src="doc-files/BodyTagProtocol.gif"
- * alt="Lifecycle Details Transition Diagram for BodyTag"/>
+ * alt="Lifecycle Details Transition Diagram for BodyTag">
  * <p>
  * <B>Empty and Non-Empty Action</B>
  * <p>

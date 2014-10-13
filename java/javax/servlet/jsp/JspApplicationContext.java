@@ -51,6 +51,7 @@ public interface JspApplicationContext {
      * </p>
      * <p>
      * JSP has a default set of ELResolvers to chain for all EL evaluation:
+     * </p>
      * <ul>
      * <li><code>ImplicitObjectELResolver</code></li>
      * <li><code>ELResolver</code> instances registered with this method</li>
@@ -60,7 +61,6 @@ public interface JspApplicationContext {
      * <li><code>BeanELResolver</code></li>
      * <li><code>ScopedAttributeELResolver</code></li>
      * </ul>
-     * </p>
      *
      * @param resolver
      *            an additional resolver

@@ -48,7 +48,7 @@ import javax.servlet.jsp.PageContext;
  * <p><B>Lifecycle</B></p>
  *
  * <p>Lifecycle details are described by the transition diagram below,
- * with the following comments:
+ * with the following comments:</p>
  * <ul>
  * <li> [1] This transition is intended to be for releasing long-term data.
  * no guarantees are assumed on whether any properties have been retained
@@ -63,10 +63,10 @@ import javax.servlet.jsp.PageContext;
  * as request-time attribute values.
  * <li> Check the TryCatchFinally interface for additional details related
  * to exception handling and resource management.
- * </ul></p>
+ * </ul>
  *
  * <IMG src="doc-files/TagProtocol.gif"
- *      alt="Lifecycle Details Transition Diagram for Tag"/>
+ *      alt="Lifecycle Details Transition Diagram for Tag">
  *
  * <p>Once all invocations on the tag handler
  * are completed, the release method is invoked on it.  Once a release
