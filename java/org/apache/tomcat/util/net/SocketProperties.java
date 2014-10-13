@@ -54,7 +54,7 @@ public class SocketProperties {
      * Default is 500
      * -1 is unlimited
      * 0 is disabled
-     * >0 the max number of objects to keep in cache.
+     * &gt;0 the max number of objects to keep in cache.
      */
     protected int eventCache = 500;
 

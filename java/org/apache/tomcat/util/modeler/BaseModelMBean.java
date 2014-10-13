@@ -523,11 +523,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * Set the instance handle of the object against which we will execute
      * all methods in this ModelMBean management interface.
      *
-     * <strike>This method will detect and call "setModelMbean" method. A resource
-     * can implement this method to get a reference to the model mbean.
-     * The reference can be used to send notification and access the
-     * registry.
-     * </strike> The caller can provide the mbean instance or the object name to
+     * The caller can provide the mbean instance or the object name to
      * the resource, if needed.
      *
      * @param resource The resource object to be managed

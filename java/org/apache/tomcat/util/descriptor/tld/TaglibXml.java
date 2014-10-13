@@ -23,7 +23,7 @@ import javax.servlet.jsp.tagext.FunctionInfo;
 
 /**
  * Common representation of a Tag Library Descriptor (TLD) XML file.
- * <p/>
+ * <p>
  * This stores the raw result of parsing an TLD XML file, flattening different
  * version of the descriptors to a common format. This is different to a
  * TagLibraryInfo instance that would be passed to a tag validator in that it

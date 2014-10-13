@@ -14,28 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.digester;
-
 
 import org.xml.sax.Attributes;
 
-
 /**
  * <p>Rule implementation that saves a parameter for use by a surrounding
- * <code>CallMethodRule<code>.</p>
+ * <code>CallMethodRule</code>.</p>
  *
- * <p>This parameter may be:
+ * <p>This parameter may be:</p>
  * <ul>
  * <li>from an attribute of the current element
  * See {@link #CallParamRule(int paramIndex, String attributeName)}
  * <li>from current the element body
  * See {@link #CallParamRule(int paramIndex)}
  * </ul>
- * </p>
  */
-
 public class CallParamRule extends Rule {
 
     // ----------------------------------------------------------- Constructors

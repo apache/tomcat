@@ -33,10 +33,10 @@ import java.util.Locale;
  *
  * <p><strong>WARNING</strong> - This class assumes that the string
  * representation of a URL conforms to the <code>spec</code> argument
- * as described in RFC 2396 "Uniform Resource Identifiers: Generic Syntax":
+ * as described in RFC 2396 "Uniform Resource Identifiers: Generic Syntax":</p>
  * <pre>
  *   &lt;scheme&gt;//&lt;authority&gt;&lt;path&gt;?&lt;query&gt;#&lt;fragment&gt;
- * </pre></p>
+ * </pre>
  *
  * <p><strong>FIXME</strong> - This class really ought to end up in a Commons
  * package someplace.</p>

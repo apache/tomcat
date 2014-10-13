@@ -442,7 +442,7 @@ public class Digester extends DefaultHandler2 {
     /**
      * Sets a flag indicating whether the requested feature is supported
      * by the underlying implementation of <code>org.xml.sax.XMLReader</code>.
-     * See <a href="http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description"
+     * See <a href="http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description">
      * http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description</a>
      * for information about the standard SAX2 feature flags.  In order to be
      * effective, this method must be called <strong>before</strong> the
@@ -616,7 +616,7 @@ public class Digester extends DefaultHandler2 {
     /**
      * Return the current value of the specified property for the underlying
      * <code>XMLReader</code> implementation.
-     * See <a href="http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description"
+     * See <a href="http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description">
      * http://www.saxproject.org/apidoc/xml/sax/package-summary.html#package-description</a>
      * for information about the standard SAX2 properties.
      *
