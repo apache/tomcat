@@ -128,7 +128,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     protected final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     /**
-     * The context name <->manager association for distributed contexts.
+     * The context name &lt;-&gt; manager association for distributed contexts.
      */
     protected final Map<String, ClusterManager> managers = new HashMap<>();
 

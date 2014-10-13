@@ -84,6 +84,7 @@ import org.apache.tomcat.util.res.StringManager;
  * following <code>ContainerEvent</code> events to listeners who register
  * themselves with <code>addContainerListener()</code>:
  * <table border=1>
+ *   <caption>ContainerEvents fired by this implementation</caption>
  *   <tr>
  *     <th>Type</th>
  *     <th>Data</th>

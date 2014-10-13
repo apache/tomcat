@@ -829,7 +829,7 @@ public class Connector extends LifecycleMBeanBase  {
      * Enable the use of IP-based virtual hosting.
      *
      * @param useIPVHosts <code>true</code> if Hosts are identified by IP,
-     *                    <code>false/code> if Hosts are identified by name.
+     *                    <code>false</code> if Hosts are identified by name.
      */
     public void setUseIPVHosts(boolean useIPVHosts) {
         this.useIPVHosts = useIPVHosts;

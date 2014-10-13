@@ -81,7 +81,7 @@ import org.apache.juli.logging.LogFactory;
  * <tt>Expires</tt>&#x27; and &#x27; <tt>Cache-Control: max-age=</tt>&#x27;
  * headers to images, css and javascript</h2>
  *
- * <code><pre>
+ * <code>
  * &lt;web-app ...&gt;
  *    ...
  *    &lt;filter&gt;
@@ -108,7 +108,7 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;/filter-mapping&gt;
  *    ...
  * &lt;/web-app&gt;
- * </pre></code>
+ * </code>
  *
  * <h2>Configuration Parameters</h2>
  *
@@ -147,7 +147,7 @@ import org.apache.juli.logging.LogFactory;
  * <strong>Example:</strong>
  * </p>
  *
- * <code><pre>
+ * <code>
  * &lt;init-param&gt;
  *    &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;&lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
  * &lt;/init-param&gt;
@@ -156,7 +156,7 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;!-- 2592000 seconds = 30 days --&gt;
  *    &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;&lt;param-value&gt;A2592000&lt;/param-value&gt;
  * &lt;/init-param&gt;
- * </pre></code>
+ * </code>
  * <p>
  * Note that this directive only has effect if <tt>ExpiresActive On</tt> has
  * been specified. It overrides, for the specified MIME type <i>only</i>, any
@@ -185,11 +185,11 @@ import org.apache.juli.logging.LogFactory;
  * Configuration sample :
  * </p>
  *
- * <code><pre>
+ * <code>
  * &lt;init-param&gt;
  *    &lt;param-name&gt;ExpiresExcludedResponseStatusCodes&lt;/param-name&gt;&lt;param-value&gt;302, 500, 503&lt;/param-value&gt;
  * &lt;/init-param&gt;
- * </pre></code>
+ * </code>
  *
  * <h3>ExpiresDefault</h3>
  * <p>
@@ -205,7 +205,7 @@ import org.apache.juli.logging.LogFactory;
  * defined in a more readable syntax of the form:
  * </p>
  *
- * <code><pre>
+ * <code>
  * &lt;init-param&gt;
  *    &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;&lt;param-value&gt;&lt;base&gt; [plus] {&lt;num&gt;   &lt;type&gt;}*&lt;/param-value&gt;
  * &lt;/init-param&gt;
@@ -213,19 +213,20 @@ import org.apache.juli.logging.LogFactory;
  * &lt;init-param&gt;
  *    &lt;param-name&gt;ExpiresByType type/encoding&lt;/param-name&gt;&lt;param-value&gt;&lt;base&gt; [plus]   {&lt;num&gt; &lt;type&gt;}*&lt;/param-value&gt;
  * &lt;/init-param&gt;
- * </pre></code>
+ * </code>
  * <p>
  * where <tt>&lt;base&gt;</tt> is one of:
+ * </p>
  * <ul>
  * <li><tt>access</tt></li>
  * <li><tt>now</tt> (equivalent to &#x27;<tt>access</tt>&#x27;)</li>
  * <li><tt>modification</tt></li>
  * </ul>
- * </p>
  * <p>
  * The <tt>plus</tt> keyword is optional. <tt>&lt;num&gt;</tt> should be an
  * integer value (acceptable to <tt>Integer.parseInt()</tt>), and
  * <tt>&lt;type&gt;</tt> is one of:
+ * </p>
  * <ul>
  * <li><tt>years</tt></li>
  * <li><tt>months</tt></li>
@@ -235,11 +236,12 @@ import org.apache.juli.logging.LogFactory;
  * <li><tt>minutes</tt></li>
  * <li><tt>seconds</tt></li>
  * </ul>
+ * <p>
  * For example, any of the following directives can be used to make documents
  * expire 1 month after being accessed, by default:
  * </p>
  *
- * <code><pre>
+ * <code>
  * &lt;init-param&gt;
  *    &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;&lt;param-value&gt;access plus 1 month&lt;/param-value&gt;
  * &lt;/init-param&gt;
@@ -251,13 +253,13 @@ import org.apache.juli.logging.LogFactory;
  * &lt;init-param&gt;
  *    &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;&lt;param-value&gt;access plus 30 days&lt;/param-value&gt;
  * &lt;/init-param&gt;
- * </pre></code>
+ * </code>
  * <p>
  * The expiry time can be fine-tuned by adding several &#x27;
  * <tt>&lt;num&gt; &lt;type&gt;</tt>&#x27; clauses:
  * </p>
  *
- * <code><pre>
+ * <code>
  * &lt;init-param&gt;
  *    &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;&lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
  * &lt;/init-param&gt;
@@ -265,7 +267,7 @@ import org.apache.juli.logging.LogFactory;
  * &lt;init-param&gt;
  *    &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;&lt;param-value&gt;modification plus 5 hours 3   minutes&lt;/param-value&gt;
  * &lt;/init-param&gt;
- * </pre></code>
+ * </code>
  * <p>
  * Note that if you use a modification date based setting, the <tt>Expires</tt>
  * header will <strong>not</strong> be added to content that does not come from
@@ -275,6 +277,7 @@ import org.apache.juli.logging.LogFactory;
  * <h1>Expiration headers generation eligibility</h1>
  * <p>
  * A response is eligible to be enriched by <tt>ExpiresFilter</tt> if :
+ * </p>
  * <ol>
  * <li>no expiration header is defined (<tt>Expires</tt> header or the
  * <tt>max-age</tt> directive of the <tt>Cache-Control</tt> header),</li>
@@ -284,18 +287,18 @@ import org.apache.juli.logging.LogFactory;
  * defined the in <tt>ExpiresByType</tt> directives or the
  * <tt>ExpiresDefault</tt> directive is defined.</li>
  * </ol>
- * </p>
  * <p>
  * Note :
+ * </p>
  * <ul>
  * <li>If <tt>Cache-Control</tt> header contains other directives than
  * <tt>max-age</tt>, they are concatenated with the <tt>max-age</tt> directive
  * that is added by the <tt>ExpiresFilter</tt>.</li>
  * </ul>
- * </p>
  * <h1>Expiration configuration selection</h1>
  * <p>
  * The expiration configuration if elected according to the following algorithm:
+ * </p>
  * <ol>
  * <li><tt>ExpiresByType</tt> matching the exact content-type returned by
  * <tt>HttpServletResponse.getContentType()</tt> possibly including the charset
@@ -309,7 +312,6 @@ import org.apache.juli.logging.LogFactory;
  * &#x27;),</li>
  * <li><tt>ExpiresDefault</tt></li>
  * </ol>
- * </p>
  * <h1>Implementation Details</h1><h2>When to write the expiration headers ?</h2>
  * <p>
  * The <tt>ExpiresFilter</tt> traps the &#x27;on before write response
@@ -349,6 +351,7 @@ import org.apache.juli.logging.LogFactory;
  * </p>
  * <p>
  * Key methods to override for extension are :
+ * </p>
  * <ul>
  * <li>
  * {@link #isEligibleToExpirationHeaderGeneration(HttpServletRequest, XHttpServletResponse)}
@@ -356,7 +359,6 @@ import org.apache.juli.logging.LogFactory;
  * <li>
  * {@link #getExpirationDate(XHttpServletResponse)}</li>
  * </ul>
- * </p>
  * <h1>Troubleshooting</h1>
  * <p>
  * To troubleshoot, enable logging on the
@@ -366,14 +368,14 @@ import org.apache.juli.logging.LogFactory;
  * Extract of logging.properties
  * </p>
  *
- * <code><pre>
+ * <code>
  * org.apache.catalina.filters.ExpiresFilter.level = FINE
- * </pre></code>
+ * </code>
  * <p>
  * Sample of initialization log message :
  * </p>
  *
- * <code><pre>
+ * <code>
  * Mar 26, 2010 2:01:41 PM org.apache.catalina.filters.ExpiresFilter init
  * FINE: Filter initialized with configuration ExpiresFilter[
  *    excludedResponseStatusCode=[304],
@@ -382,26 +384,25 @@ import org.apache.juli.logging.LogFactory;
  *       image=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
  *       text/css=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]],
  *       application/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
- * </pre></code>
+ * </code>
  * <p>
  * Sample of per-request log message where <tt>ExpiresFilter</tt> adds an
  * expiration date
  * </p>
  *
- * <code><pre>
+ * <code>
  * Mar 26, 2010 2:09:47 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
  * FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif", set expiration date 3/26/10 2:19 PM
- * </pre></code>
+ * </code>
  * <p>
  * Sample of per-request log message where <tt>ExpiresFilter</tt> does not add
  * an expiration date
  * </p>
  *
- * <code><pre>
+ * <code>
  * Mar 26, 2010 2:10:27 PM org.apache.catalina.filters.ExpiresFilter onBeforeWriteResponseBody
  * FINE: Request "/docs/config/manager.html" with response status "200" content-type "text/html", no expiration configured
- * </pre></code>
- *
+ * </code>
  */
 public class ExpiresFilter extends FilterBase {
 

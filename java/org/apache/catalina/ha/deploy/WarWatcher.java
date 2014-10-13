@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ha.deploy;
 
 import java.io.File;
@@ -26,16 +25,13 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * <p>
  * The <b>WarWatcher </b> watches the deployDir for changes made to the
- * directory (adding new WAR files->deploy or remove WAR files->undeploy) And
- * notifies a listener of the changes made
- * </p>
+ * directory (adding new WAR files-&gt;deploy or remove WAR files-&gt;undeploy)
+ * and notifies a listener of the changes made.
  *
  * @author Peter Rossbach
  * @version 1.1
  */
-
 public class WarWatcher {
 
     /*--Static Variables----------------------------------------*/
