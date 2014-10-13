@@ -65,6 +65,7 @@ import org.apache.juli.logging.LogFactory;
  * </p>
  * <p>
  * If the incoming <code>request.getRemoteAddr()</code> matches the servlet filter's list of internal proxies :
+ * </p>
  * <ul>
  * <li>Loop on the comma delimited list of IPs and hostnames passed by the preceding load balancer or proxy in the given request's Http
  * header named <code>$remoteIpHeader</code> (default value <code>x-forwarded-for</code>). Values are processed in right-to-left order.</li>
@@ -80,10 +81,8 @@ import org.apache.juli.logging.LogFactory;
  * <code>request.scheme = https</code> and <code>request.serverPort = 443</code>. Note that 443 can be overwritten with the
  * <code>$httpsServerPort</code> configuration parameter.</li>
  * </ul>
- * </p>
- * <p>
- * <strong>Configuration parameters:</strong>
  * <table border="1">
+ * <caption>Configuration parameters</caption>
  * <tr>
  * <th>XForwardedFilter property</th>
  * <th>Description</th>
@@ -114,7 +113,6 @@ import org.apache.juli.logging.LogFactory;
  *     172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}
  *     <br>
  * By default, 10/8, 192.168/16, 169.254/16, 127/8 and 172.16/12 are allowed.</td>
- * </tr>
  * </tr>
  * <tr>
  * <td>proxiesHeader</td>
@@ -163,7 +161,6 @@ import org.apache.juli.logging.LogFactory;
  * <td>443</td>
  * </tr>
  * </table>
- * </p>
  * <p>
  * <p>
  * <strong>Regular expression vs. IP address blocks:</strong> <code>mod_remoteip</code> allows to use address blocks (e.g.
@@ -172,14 +169,14 @@ import org.apache.juli.logging.LogFactory;
  * href="http://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>, we rely on
  * regular expressions.
  * </p>
- * <hr/>
+ * <hr>
  * <p>
  * <strong>Sample with internal proxies</strong>
  * </p>
  * <p>
  * XForwardedFilter configuration:
  * </p>
- * <code><pre>
+ * <code>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -205,10 +202,9 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre></code>
- * <p>
- * Request values:
+ * &lt;/filter-mapping&gt;</code>
  * <table border="1">
+ * <caption>Request Values</caption>
  * <tr>
  * <th>property</th>
  * <th>Value Before RemoteIpFilter</th>
@@ -252,15 +248,14 @@ import org.apache.juli.logging.LogFactory;
  * </table>
  * Note : <code>x-forwarded-by</code> header is null because only internal proxies as been traversed by the request.
  * <code>x-forwarded-by</code> is null because all the proxies are trusted or internal.
- * </p>
- * <hr/>
+ * <hr>
  * <p>
  * <strong>Sample with trusted proxies</strong>
  * </p>
  * <p>
  * RemoteIpFilter configuration:
  * </p>
- * <code><pre>
+ * <code>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -286,10 +281,9 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre></code>
- * <p>
- * Request values:
+ * &lt;/filter-mapping&gt;</code>
  * <table border="1">
+ * <caption>Request Values</caption>
  * <tr>
  * <th>property</th>
  * <th>Value Before RemoteIpFilter</th>
@@ -311,17 +305,18 @@ import org.apache.juli.logging.LogFactory;
  * <td>proxy1, proxy2</td>
  * </tr>
  * </table>
+ * <p>
  * Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that come in <code>x-forwarded-for</code> header, they both
  * are migrated in <code>x-forwarded-by</code> header. <code>x-forwarded-by</code> is null because all the proxies are trusted or internal.
  * </p>
- * <hr/>
+ * <hr>
  * <p>
  * <strong>Sample with internal and trusted proxies</strong>
  * </p>
  * <p>
  * RemoteIpFilter configuration:
  * </p>
- * <code><pre>
+ * <code>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -347,10 +342,9 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre></code>
- * <p>
- * Request values:
+ * &lt;/filter-mapping&gt;</code>
  * <table border="1">
+ * <caption>Request Values</caption>
  * <tr>
  * <th>property</th>
  * <th>Value Before RemoteIpFilter</th>
@@ -372,18 +366,19 @@ import org.apache.juli.logging.LogFactory;
  * <td>proxy1, proxy2</td>
  * </tr>
  * </table>
+ * <p>
  * Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that come in <code>x-forwarded-for</code> header, they both
  * are migrated in <code>x-forwarded-by</code> header. As <code>192.168.0.10</code> is an internal proxy, it does not appear in
  * <code>x-forwarded-by</code>. <code>x-forwarded-by</code> is null because all the proxies are trusted or internal.
  * </p>
- * <hr/>
+ * <hr>
  * <p>
  * <strong>Sample with an untrusted proxy</strong>
  * </p>
  * <p>
  * RemoteIpFilter configuration:
  * </p>
- * <code><pre>
+ * <code>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -409,10 +404,9 @@ import org.apache.juli.logging.LogFactory;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre></code>
- * <p>
- * Request values:
+ * &lt;/filter-mapping&gt;</code>
  * <table border="1">
+ * <caption>Request Values</caption>
  * <tr>
  * <th>property</th>
  * <th>Value Before RemoteIpFilter</th>
@@ -434,12 +428,13 @@ import org.apache.juli.logging.LogFactory;
  * <td>proxy1</td>
  * </tr>
  * </table>
+ * <p>
  * Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>. <code>x-forwarded-by</code> holds
  * <code>140.211.11.130</code> because <code>untrusted-proxy</code> is not trusted and thus, we can not trust that
  * <code>untrusted-proxy</code> is the actual remote ip. <code>request.remoteAddr</code> is <code>untrusted-proxy</code> that is an IP
  * verified by <code>proxy1</code>.
  * </p>
- * <hr/>
+ * <hr>
  */
 public class RemoteIpFilter implements Filter {
     public static class XForwardedRequest extends HttpServletRequestWrapper {

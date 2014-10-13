@@ -27,15 +27,15 @@ import java.util.Set;
  * a Resource, the ResourceSets are processed in the following order:
  * <ol>
  * <li>Pre  - Resources defined by the &lt;PreResource&gt; element in the web
- *            application&apos;s context.xml. Resources will be searched in the
- *            order they were specified.</li>
+ *            application's context.xml. Resources will be searched in the order
+ *            they were specified.</li>
  * <li>Main - The main resources for the web application - i.e. the WAR or the
  *            directory containing the expanded WAR</li>
  * <li>JARs - Resource JARs as defined by the Servlet specification. JARs will
  *            be searched in the order they were added to the ResourceRoot.</li>
  * <li>Post - Resources defined by the &lt;PostResource&gt; element in the web
- *            application&apos;s context.xml. Resources will be searched in the
- *            order they were specified.</li>
+ *            application's context.xml. Resources will be searched in the order
+ *            they were specified.</li>
  * </ol>
  * The following conventions should be noted:
  * <ul>
@@ -378,14 +378,15 @@ public interface WebResourceRoot extends Lifecycle {
      *       logged and then closed.</li>
      * </ul>
      *
-     * @param trackLockedFiles @true to enable it, @false to disable it
+     * @param trackLockedFiles {@code true} to enable it, {@code false} to
+     *                         disable it
      */
     void setTrackLockedFiles(boolean trackLockedFiles);
 
     /**
      * Has the track locked files feature been enabled?
      *
-     * @return @true if it has been enabled, otherwise @false
+     * @return {@code true} if it has been enabled, otherwise {@code false}
      */
     boolean getTrackLockedFiles();
 

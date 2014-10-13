@@ -51,6 +51,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * By default, it also sets following request attributes, that help to
  * determine the nature of the request downstream.
+ * </p>
  * <ul>
  * <li><b>cors.isCorsRequest:</b> Flag to determine if the request is a CORS
  * request. Set to <code>true</code> if a CORS request; <code>false</code>
@@ -70,7 +71,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li><b>cors.request.headers:</b> Request headers sent as
  * 'Access-Control-Request-Headers' header, for pre-flight request.</li>
  * </ul>
- * </p>
  *
  * @see <a href="http://www.w3.org/TR/cors/">CORS specification</a>
  *
