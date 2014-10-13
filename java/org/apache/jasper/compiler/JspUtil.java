@@ -910,9 +910,9 @@ public class JspUtil {
     }
 
     /**
-     * Handles taking input from TLDs 'java.lang.Object' ->
-     * 'java.lang.Object.class' 'int' -> 'int.class' 'void' -> 'Void.TYPE'
-     * 'int[]' -> 'int[].class'
+     * Handles taking input from TLDs 'java.lang.Object' -&gt;
+     * 'java.lang.Object.class' 'int' -&gt; 'int.class' 'void' -&gt; 'Void.TYPE'
+     * 'int[]' -&gt; 'int[].class'
      *
      * @param type
      */

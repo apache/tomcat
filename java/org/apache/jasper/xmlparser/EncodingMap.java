@@ -33,8 +33,8 @@ import java.util.Hashtable;
  * encoding names used in XML instance documents <strong>must</strong>
  * be the IANA encoding names specified or one of the aliases for those names
  * which IANA defines.
- * <p>
  * <TABLE BORDER="0" WIDTH="100%">
+ *  <caption>Mapping of IANA encoding names and Java encoding names</caption>
  *  <TR>
  *      <TD WIDTH="33%">
  *          <P ALIGN="CENTER"><B>Common Name</B>

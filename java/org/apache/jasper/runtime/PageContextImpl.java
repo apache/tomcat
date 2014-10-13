@@ -599,7 +599,8 @@ public class PageContextImpl extends PageContext {
     }
 
     /**
-     * Returns the exception associated with this page context, if any. <p/>
+     * Returns the exception associated with this page context, if any.
+     * <p>
      * Added wrapping for Throwables to avoid ClassCastException: see Bugzilla
      * 31171 for details.
      *
