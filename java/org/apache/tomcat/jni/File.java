@@ -173,7 +173,7 @@ public class File {
     public static final int APR_FINFO_GPROT  = 0x00200000; /** Group protection bits */
     public static final int APR_FINFO_WPROT  = 0x00400000; /** World protection bits */
     public static final int APR_FINFO_ICASE  = 0x01000000; /** if dev is case insensitive */
-    public static final int APR_FINFO_NAME   = 0x02000000; /** ->name in proper case */
+    public static final int APR_FINFO_NAME   = 0x02000000; /** -&gt;name in proper case */
 
     public static final int APR_FINFO_MIN    = 0x00008170; /** type, mtime, ctime, atime, size */
     public static final int APR_FINFO_IDENT  = 0x00003000; /** dev and inode */
@@ -654,8 +654,8 @@ public class File {
     /**
      * Set the timeout value for a pipe or manipulate the blocking state.
      * @param thepipe The pipe we are setting a timeout on.
-     * @param timeout The timeout value in microseconds.  Values < 0 mean wait
-     *        forever, 0 means do not wait at all.
+     * @param timeout The timeout value in microseconds.  Values &lt; 0 mean
+     *        wait forever, 0 means do not wait at all.
      */
     public static native int pipeTimeoutSet(long thepipe, long timeout);
 

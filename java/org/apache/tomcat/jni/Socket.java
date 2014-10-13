@@ -480,10 +480,10 @@ public class Socket {
      * @param sock The socket to set up.
      * @param t Value for the timeout in microseconds.
      * <PRE>
-     * t > 0  -- read and write calls return APR_TIMEUP if specified time
+     * t &gt; 0  -- read and write calls return APR_TIMEUP if specified time
      *           elapses with no data read or written
      * t == 0 -- read and write calls never block
-     * t < 0  -- read and write calls block
+     * t &lt; 0  -- read and write calls block
      * </PRE>
      */
     public static native int timeoutSet(long sock, long t);
