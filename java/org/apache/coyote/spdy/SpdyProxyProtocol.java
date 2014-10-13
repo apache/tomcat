@@ -40,13 +40,13 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * a reverse proxy ( apache, etc ).
  *
  * To configure:
- * <Connector port="8011" protocol="org.apache.coyote.spdy.SpdyProxyProtocol"/>
+ * &lt;Connector port="8011" protocol="org.apache.coyote.spdy.SpdyProxyProtocol"/&gt;
  *
  * To test, use
  *   chrome  --use-spdy=no-compress,no-ssl [--enable-websocket-over-spdy]
  *
  * TODO: Remote information (client ip, certs, etc ) will be sent in X- headers.
- * TODO: if spdy->spdy proxy, info about original spdy stream for pushes.
+ * TODO: if spdy-&gt;spdy proxy, info about original spdy stream for pushes.
  *
  */
 public class SpdyProxyProtocol extends AbstractProtocol<Socket> {

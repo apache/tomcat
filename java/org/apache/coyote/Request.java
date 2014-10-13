@@ -451,7 +451,7 @@ public final class Request {
      *
      * The buffer is owned by the protocol implementation - it will be reused on the next read.
      * The Adapter must either process the data in place or copy it to a separate buffer if it needs
-     * to hold it. In most cases this is done during byte->char conversions or via InputStream. Unlike
+     * to hold it. In most cases this is done during byte-&gt;char conversions or via InputStream. Unlike
      * InputStream, this interface allows the app to process data in place, without copy.
      *
      */

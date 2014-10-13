@@ -38,7 +38,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * Plugin for APR connector providing SPDY support via NPN negotiation.
  *
  * Example:
- * <Connector port="9443"
+ * &lt;Connector port="9443"
  *            npnHandler="org.apache.coyote.spdy.SpdyAprNpnHandler"
  *            protocol="HTTP/1.1"
  *            SSLEnabled="true"
@@ -47,7 +47,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  *            secure="true"
  *            sslProtocol="TLS"
  *            SSLCertificateFile="conf/localhost-cert.pem"
- *            SSLCertificateKeyFile="conf/localhost-key.pem"/>
+ *            SSLCertificateKeyFile="conf/localhost-key.pem"/&gt;
  *
  * This requires APR library ( libtcnative-1 ) to be present and compiled
  * with a recent openssl or a openssl patched with npn support.
