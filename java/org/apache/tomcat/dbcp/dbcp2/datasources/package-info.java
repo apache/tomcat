@@ -36,7 +36,7 @@
  * webapp:
  * </p>
  *
- * <code><pre>
+ * <code>
  *  &lt;Resource name="jdbc/bookstore" auth="Container"
  *             type="org.apache.tomcat.dbcp.dbcp2.datasources.PerUserPoolPoolDataSource"/&gt;
  *   &lt;ResourceParams name="jdbc/bookstore"&gt;
@@ -51,14 +51,14 @@
  *       &lt;name&gt;defaultMaxTotal&lt;/name&gt;&lt;value&gt;30&lt;/value&gt;
  *     &lt;/parameter&gt;
  *   &lt;/ResourceParams&gt;
- * </pre></code>
+ * </code>
  *
  * <p>
  * In web.xml.  Note that elements must be given in the order of the dtd
  * described in the servlet specification:
  * </p>
  *
- * <code><pre>
+ * <code>
  * &lt;resource-ref&gt;
  *   &lt;description&gt;
  *     Resource reference to a factory for java.sql.Connection
@@ -75,7 +75,7 @@
  *     Container
  *   &lt;/res-auth&gt;
  * &lt;/resource-ref&gt;
- * </pre></code>
+ * </code>
  *
  * <p>
  * Apache Tomcat deploys all objects configured similarly to above within the
@@ -90,7 +90,7 @@
  * below:
  * </p>
  *
- * <code><pre>
+ * <code>
  *
  *     Context ctx = new InitialContext();
  *     DataSource ds = (DataSource)
@@ -109,7 +109,7 @@
  *             con.close();
  *     }
  *
- * </pre></code>
+ * </code>
  *
  * <p>
  * The reference to the <code>DataSource</code> could be maintained, for
@@ -130,7 +130,7 @@
  * DriverAdapterCPDS as the backend source, though any CPDS is applicable.
  * </p>
  *
- * <code><pre>
+ * <code>
  *
  * public class Pool
  * {
@@ -158,13 +158,13 @@
  *     }
  * }
  *
- * </pre></code>
+ * </code>
  *
  * <p>
  * This class can then be used wherever a connection is needed:
  * </p>
  *
- * <code><pre>
+ * <code>
  *     Connection con = null;
  *     try
  *     {
@@ -178,6 +178,6 @@
  *         if (con != null)
  *             con.close();
  *     }
- * </pre></code>
+ * </code>
  */
 package org.apache.tomcat.dbcp.dbcp2.datasources;
