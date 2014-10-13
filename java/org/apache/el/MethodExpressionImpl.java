@@ -41,7 +41,7 @@ import org.apache.el.util.ReflectionUtil;
  * An <code>Expression</code> that refers to a method on an object.
  *
  * <p>
- * <code>The {@link javax.el.ExpressionFactory#createMethodExpression} method
+ * The {@link javax.el.ExpressionFactory#createMethodExpression} method
  * can be used to parse an expression string and return a concrete instance
  * of <code>MethodExpression</code> that encapsulates the parsed expression.
  * The {@link FunctionMapper} is used at parse time, not evaluation time,
