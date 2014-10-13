@@ -436,10 +436,14 @@ public interface ServletContext {
     public Enumeration<String> getInitParameterNames();
 
     /**
-     * @param name
-     * @param value
-     * @return TODO
-     * @throws IllegalStateException
+     * Set the given initialisation parameter to the given value.
+     * @param name  Name of initialisation parameter
+     * @param value Value for initialisation parameter
+     * @return <code>true</code> if the call succeeds or <code>false</code> if
+     *         the call fails because an initialisation parameter with the same
+     *         name has already been set
+     * @throws IllegalStateException If initialisation of this ServletContext
+     *         has already completed
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -447,7 +451,7 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public boolean setInitParameter(String name, String value);
 
@@ -530,9 +534,10 @@ public interface ServletContext {
     public String getServletContextName();
 
     /**
-     * @param servletName
-     * @param className
-     * @return TODO
+     * Register a servlet implementation for use in this ServletContext.
+     * @param servletName The name of the servlet to register
+     * @param className   The implementation class for the servlet
+     * @return The registration object that enables further configuration
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @throws UnsupportedOperationException    If called from a
@@ -542,15 +547,16 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
             String className);
 
     /**
-     * @param servletName
-     * @param servlet
-     * @return TODO
+     * Register a servlet instance for use in this ServletContext.
+     * @param servletName The name of the servlet to register
+     * @param servlet     The Servlet instance to register
+     * @return The registration object that enables further configuration
      * @throws IllegalStateException
      *             If the context has already been initialised
      * @throws UnsupportedOperationException    If called from a
@@ -560,7 +566,7 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     * @since Servlet 3.0
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet);
