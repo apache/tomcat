@@ -112,7 +112,7 @@ public final class ExtensionValidator {
      * file in the /META-INF/ directory of the application and all
      * MANIFEST.MF files in each JAR file located in the WEB-INF/lib
      * directory and creates an <code>ArrayList</code> of
-     * <code>ManifestResorce<code> objects. These objects are then passed
+     * <code>ManifestResorce</code> objects. These objects are then passed
      * to the validateManifestResources method for validation.
      *
      * @param resources The resources configured for this Web Application

@@ -41,6 +41,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * AccessLogValve.
  * To use, copy into the server/classes directory of the Tomcat installation
  * and configure in server.xml as:
+ * </p>
  * <pre>
  *      &lt;Valve className="org.apache.catalina.valves.JDBCAccessLogValve"
  *          driverName="<i>your_jdbc_driver</i>"
@@ -48,7 +49,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  *          pattern="combined" resolveHosts="false"
  *      /&gt;
  * </pre>
- * </p>
  * <p>
  * Many parameters can be configured, such as the database connection (with
  * <code>driverName</code> and <code>connectionURL</code>),
