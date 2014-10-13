@@ -195,6 +195,10 @@
         <bug>56079</bug>: The uninstaller packaged with the Apache Tomcat
         Windows installer is now digitally signed. (markt)
       </fix>
+      <fix>
+        Fix timestamps in Tomcat build and jdbc-pool to use 24-hour format
+        instead of 12-hour one and use UTC timezone. (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
