@@ -62,7 +62,7 @@ public class JspWriterImpl extends JspWriter {
      * @param  response A Servlet Response
      * @param  sz       Output-buffer size, a positive integer
      *
-     * @exception  IllegalArgumentException  If sz is <= 0
+     * @exception  IllegalArgumentException  If sz is &lt;= 0
      */
     public JspWriterImpl(ServletResponse response, int sz,
             boolean autoFlush) {

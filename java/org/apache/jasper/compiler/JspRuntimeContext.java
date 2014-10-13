@@ -47,7 +47,7 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Class for tracking JSP compile time file dependencies when the
- * &060;%@include file="..."%&062; directive is used.
+ * &gt;%@include file="..."%&lt; directive is used.
  *
  * A background thread periodically checks the files a JSP page
  * is dependent upon.  If a dependent file changes the JSP page

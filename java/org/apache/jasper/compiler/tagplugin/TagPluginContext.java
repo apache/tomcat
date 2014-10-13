@@ -112,7 +112,7 @@ public interface TagPluginContext {
     /**
      * Associate the attribute with a value in the current tagplugin context.
      * The plugin attributes can be used for communication among tags that
-     * must work together as a group.  See <c:when> for an example.
+     * must work together as a group.  See &lt;c:when&gt; for an example.
      */
     void setPluginAttribute(String attr, Object value);
 
