@@ -668,7 +668,7 @@ public interface PoolConfiguration {
      * <code>
         boolean result = getTimeBetweenEvictionRunsMillis()&gt;0;
         result = result &amp;&amp; (isRemoveAbandoned() &amp;&amp; getRemoveAbandonedTimeout()&gt;0);
-        result = result || (isTestWhileIdle() &amp;amp;& getValidationQuery()!=null);
+        result = result || (isTestWhileIdle() &amp;&amp; getValidationQuery()!=null);
         return result;
        </code>
      *
