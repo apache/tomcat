@@ -95,8 +95,8 @@ public class TagData implements Cloneable {
      * The value of the attribute.
      * If a static value is specified for an attribute that accepts a
      * request-time attribute expression then that static value is returned,
-     * even if the value is provided in the body of a <jsp:attribute> action.
-     * The distinguished object REQUEST_TIME_VALUE is only returned if
+     * even if the value is provided in the body of a &lt;jsp:attribute&gt;
+     * action. The distinguished object REQUEST_TIME_VALUE is only returned if
      * the value is specified as a request-time attribute expression
      * or via the &lt;jsp:attribute&gt; action with a body that contains
      * dynamic content (scriptlets, scripting expressions, EL expressions,
