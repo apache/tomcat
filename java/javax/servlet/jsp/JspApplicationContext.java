@@ -30,17 +30,14 @@ import javax.el.ExpressionFactory;
 public interface JspApplicationContext {
 
     /**
-     * <p>
-     * Registers an <code>ELContextListener</code> that will notified whenever a
-     * new <code>ELContext</code> is created.
-     * </p>
+     * Registers an <code>ELContextListener</code> that will be notified
+     * whenever a new <code>ELContext</code> is created.
      * <p>
      * At the very least, any <code>ELContext</code> instantiated will have
      * reference to the <code>JspContext</code> under
      * <code>JspContext.class</code>.
-     * </p>
      *
-     * @param listener
+     * @param listener The listener to add
      */
     public void addELContextListener(ELContextListener listener);
 

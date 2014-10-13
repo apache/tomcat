@@ -48,7 +48,6 @@ public class TagAttributeInfo {
      * @param reqTime
      *            Whether this attribute holds a request-time Attribute.
      */
-
     public TagAttributeInfo(String name, boolean required, String type,
             boolean reqTime) {
         this(name, required, type, reqTime, false);
@@ -72,13 +71,41 @@ public class TagAttributeInfo {
      *
      * @since 2.0
      */
-
     public TagAttributeInfo(String name, boolean required, String type,
             boolean reqTime, boolean fragment) {
         this(name, required, type, reqTime, fragment, null, false, false, null, null);
     }
 
     /**
+     * JSP 2.1 Constructor for TagAttributeInfo. This class is to be
+     * instantiated only from the TagLibrary code under request from some JSP
+     * code that is parsing a TLD (Tag Library Descriptor).
+     *
+     * @param name
+     *            The name of the attribute.
+     * @param required
+     *            If this attribute is required in tag instances.
+     * @param type
+     *            The name of the type of the attribute.
+     * @param reqTime
+     *            Whether this attribute holds a request-time Attribute.
+     * @param fragment
+     *            Whether this attribute is of type JspFragment
+     * @param description
+     *            Description of this attribute
+     * @param deferredValue
+     *            Does this attribute accept value expressions (written as
+     *            Strings) as attribute values the evaluation of which is
+     *            deferred until calculated by the tag
+     * @param deferredMethod
+     *            Does this attribute accept method expressions (written as
+     *            Strings) as attribute values the evaluation of which is
+     *            deferred until calculated by the tag
+     * @param expectedTypeName
+     *            The expected type when the deferred value is evaluated
+     * @param methodSignature
+     *            The expected method signature if a deferred method
+     *
      * @since JSP 2.1
      */
     public TagAttributeInfo(String name, boolean required, String type,
