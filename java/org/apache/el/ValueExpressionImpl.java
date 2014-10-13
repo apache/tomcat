@@ -54,7 +54,7 @@ import org.apache.el.util.ReflectionUtil;
  * </p>
  *
  * <p>
- * <code>The {@link javax.el.ExpressionFactory#createValueExpression} method
+ * The {@link javax.el.ExpressionFactory#createValueExpression} method
  * can be used to parse an expression string and return a concrete instance
  * of <code>ValueExpression</code> that encapsulates the parsed expression.
  * The {@link FunctionMapper} is used at parse time, not evaluation time,
