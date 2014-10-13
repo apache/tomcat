@@ -41,8 +41,8 @@ public final class CookieSupport {
     /**
      * If true, separators that are not explicitly dis-allowed by the v0 cookie
      * spec but are disallowed by the HTTP spec will be allowed in v0 cookie
-     * names and values. These characters are: \"()/:<=>?@[\\]{} Note that the
-     * inclusion of / depends on the value of {@link #FWD_SLASH_IS_SEPARATOR}.
+     * names and values. These characters are: \"()/:&lt;=&gt;?@[\\]{} Note that
+     * the inclusion of / depends on the value of {@link #FWD_SLASH_IS_SEPARATOR}.
      */
     public static final boolean ALLOW_HTTP_SEPARATORS_IN_V0;
 

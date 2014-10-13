@@ -26,7 +26,7 @@ import org.apache.tomcat.util.scan.JarFactory;
 
 /**
  * A TLD Resource Path as defined in JSP 7.3.2.
- * <p/>
+ * <p>
  * This encapsulates references to Tag Library Descriptors that can be located
  * in different places:
  * <ul>
