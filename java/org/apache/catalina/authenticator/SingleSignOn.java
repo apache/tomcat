@@ -120,7 +120,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * Authenticator downstream in the pipeline) to the security
      * <code>Realm</code>, or if this Valve can itself bind security info
      * to the request based on the presence of a valid SSO entry without
-     * rechecking with the <code>Realm</code..
+     * rechecking with the <code>Realm</code>.
      *
      * @return  <code>true</code> if it is required that a downstream
      *          Authenticator reauthenticate each request before calls to
@@ -143,7 +143,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * Authenticator downstream in the pipeline) to the security
      * <code>Realm</code>, or if this Valve can itself bind security info
      * to the request, based on the presence of a valid SSO entry, without
-     * rechecking with the <code>Realm</code.
+     * rechecking with the <code>Realm</code>.
      * <p>
      * If this property is <code>false</code> (the default), this
      * <code>Valve</code> will bind a UserPrincipal and AuthType to the request

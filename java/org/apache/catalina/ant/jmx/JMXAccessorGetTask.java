@@ -36,6 +36,7 @@ import org.apache.tools.ant.BuildException;
  * Examples:
  * <br>
  * Get a Mbean IDataSender attribute nrOfRequests and create a new ant property <em>IDataSender.9025.nrOfRequests</em>
+ * </p>
  * <pre>
  *   &lt;jmx:get
  *           ref="jmx.server"
@@ -45,7 +46,6 @@ import org.apache.tools.ant.BuildException;
  *           echo="false"&gt;
  *       /&gt;
  * </pre>
- * </p>
  * <p>
  * First call to a remote MBeanserver save the JMXConnection a referenz <em>jmx.server</em>
  * </p>

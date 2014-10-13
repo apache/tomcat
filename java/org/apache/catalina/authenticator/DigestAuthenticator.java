@@ -351,7 +351,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      *
      *      realm               = "realm" "=" realm-value
      *      realm-value         = quoted-string
-     *      domain              = "domain" "=" <"> 1#URI <">
+     *      domain              = "domain" "=" &lt;"&gt; 1#URI &lt;"&gt;
      *      nonce               = "nonce" "=" nonce-value
      *      nonce-value         = quoted-string
      *      opaque              = "opaque" "=" quoted-string
