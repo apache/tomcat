@@ -120,9 +120,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * <code>channel.addInterceptor(C);</code><br>
      * <code>channel.addInterceptor(B);</code><br>
      * Will result in a interceptor stack like this:<br>
-     * <code>A -> C -> B</code><br>
+     * <code>A -&gt; C -&gt; B</code><br>
      * The complete stack will look like this:<br>
-     * <code>Channel -> A -> C -> B -> ChannelCoordinator</code><br>
+     * <code>Channel -&gt; A -&gt; C -&gt; B -&gt; ChannelCoordinator</code><br>
      * @param interceptor ChannelInterceptorBase
      */
     @Override
@@ -168,7 +168,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     /**
      * Send a message to the destinations specified
-     * @param destination Member[] - destination.length > 0
+     * @param destination Member[] - destination.length &gt; 0
      * @param msg Serializable - the message to send
      * @param options sender options, options can trigger guarantee levels and different
      *                interceptors to react to the message see class documentation for the
@@ -185,7 +185,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     /**
      *
-     * @param destination Member[] - destination.length > 0
+     * @param destination Member[] - destination.length &gt; 0
      * @param msg Serializable - the message to send
      * @param options sender options, options can trigger guarantee levels and different
      *                interceptors to react to the message see class documentation for the

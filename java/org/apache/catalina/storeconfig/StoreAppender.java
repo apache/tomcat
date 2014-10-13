@@ -346,8 +346,8 @@ public class StoreAppender {
     }
 
     /**
-     * Given a string, this method replaces all occurrences of ' <', '>', '&',
-     * and '"'.
+     * Given a string, this method replaces all occurrences of '&lt;', '&gt;',
+     * '&amp;', and '"'.
      */
     public String convertStr(String input) {
 

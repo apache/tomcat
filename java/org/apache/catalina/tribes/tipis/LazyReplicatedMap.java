@@ -57,7 +57,7 @@ import org.apache.juli.logging.LogFactory;
  * each time the object gets replicated the entire object gets serialized, hence a call to <code>replicate(true)</code>
  * will replicate all objects in this map that are using this node as primary.
  *
- * <br><br><b>REMBER TO CALL <code>breakdown()</code> or <code>finalize()</code> when you are done with the map to
+ * <br><br><b>REMBER TO CALL</b> <code>breakdown()</code> or <code>finalize()</code> when you are done with the map to
  * avoid memory leaks.<br><br>
  * TODO implement periodic sync/transfer thread
  * @version 1.0

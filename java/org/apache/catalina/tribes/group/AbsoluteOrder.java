@@ -31,15 +31,14 @@ import org.apache.catalina.tribes.Member;
  *    Ordering members can serve as a basis for electing a leader or coordinating efforts.<br>
  *    This is stinky simple, it works on the basis of the <code>Member</code> interface
  *    and orders members in the following format:
- *
- *  <ol>
+ * </p>
+ * <ol>
  *     <li>IP comparison - byte by byte, lower byte higher rank</li>
  *     <li>IPv4 addresses rank higher than IPv6, ie the lesser number of bytes, the higher rank</li>
  *     <li>Port comparison - lower port, higher rank</li>
  *     <li>UniqueId comparison- byte by byte, lower byte higher rank</li>
- *  </ol>
+ * </ol>
  *
- * </p>
  *
  * @version 1.0
  * @see org.apache.catalina.tribes.Member

@@ -147,7 +147,7 @@ public class StoreFileMover {
     }
 
     /**
-     * Shuffle old->save and new->old
+     * Shuffle old-&gt;save and new-&gt;old
      *
      * @throws IOException
      */

@@ -36,17 +36,17 @@ import javax.servlet.ServletContext;
 /**
  * A variation of Java's JAR ServiceLoader that respects exclusion rules for
  * web applications.
- * <p/>
+ * <p>
  * Primarily intended for use loading ServletContainerInitializers as defined
  * by Servlet 8.2.4. This implementation does not attempt lazy loading as the
  * container is required to introspect all implementations discovered.
- * <p/>
+ * <p>
  * If the ServletContext defines ORDERED_LIBS, then only JARs in WEB-INF/lib
  * that are named in that set will be included in the search for
  * provider configuration files; if ORDERED_LIBS is not defined then
  * all JARs will be searched for provider configuration files. Providers
  * defined by resources in the parent ClassLoader will always be returned.
- * <p/>
+ * <p>
  * Provider classes will be loaded using the context's ClassLoader.
  *
  * @see javax.servlet.ServletContainerInitializer

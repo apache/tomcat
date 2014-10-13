@@ -37,10 +37,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <br>
  * Transfer package:
  * <ul>
- * <li><b>START_DATA/b> - 7 bytes - <i>FLT2002</i></li>
+ * <li><b>START_DATA</b>- 7 bytes - <i>FLT2002</i></li>
  * <li><b>SIZE</b>      - 4 bytes - size of the data package</li>
  * <li><b>DATA</b>      - should be as many bytes as the prev SIZE</li>
- * <li><b>END_DATA</b>  - 7 bytes - <i>TLF2003</i></lI>
+ * <li><b>END_DATA</b>  - 7 bytes - <i>TLF2003</i></li>
  * </ul>
  */
 public class XByteBuffer
