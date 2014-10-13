@@ -22,20 +22,20 @@ import org.apache.tools.ant.BuildException;
  *
  * <b>Definition</b>:
  * <pre>
- *   &lt;path id="catalina_ant">
- *       &lt;fileset dir="${catalina.home}/server/lib">
- *           &lt;include name="catalina-ant.jar"/>
- *       &lt;/fileset>
- *   &lt;/path>
+ *   &lt;path id="catalina_ant"&gt;
+ *       &lt;fileset dir="${catalina.home}/server/lib"&gt;
+ *           &lt;include name="catalina-ant.jar"/&gt;
+ *       &lt;/fileset&gt;
+ *   &lt;/path&gt;
  *
  *   &lt;typedef
  *       name="jmxCondition"
  *       classname="org.apache.catalina.ant.jmx.JMXAccessorCondition"
- *       classpathref="catalina_ant"/>
+ *       classpathref="catalina_ant"/&gt;
  *   &lt;taskdef
  *       name="jmxOpen"
  *       classname="org.apache.catalina.ant.jmx.JMXAccessorTask"
- *       classpathref="catalina_ant"/>
+ *       classpathref="catalina_ant"/&gt;
  * </pre>
  *
  * <b>Usage</b>: Wait for start backup node
@@ -170,7 +170,7 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
 
     /**
      * This method evaluates the condition
-     * It support for operation ">,>=,<,<=" the types <code>long</code> and <code>double</code>.
+     * It support for operation "&gt;,&gt;=,&lt;,&lt;=" the types <code>long</code> and <code>double</code>.
      * @return expression <em>jmxValue</em> <em>operation</em> <em>value</em>
      */
     @Override

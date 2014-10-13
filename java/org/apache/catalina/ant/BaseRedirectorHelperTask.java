@@ -75,6 +75,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * This flag does not control parameters checking. If the task is called
      * with wrong or invalid parameters, it will throw BuildException
      * independently from the setting of this flag.
+     * </b>
      */
     protected boolean failOnError = true;
 
