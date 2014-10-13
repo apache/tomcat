@@ -39,23 +39,41 @@ public interface AsyncContext {
     boolean hasOriginalRequestAndResponse();
 
     /**
-     *
-     * @throws IllegalStateException
+     * @throws IllegalStateException if this method is called when the request
+     * is not in asynchronous mode. The request is in asynchronous mode after
+     * {@link javax.servlet.http.HttpServletRequest#startAsync()} or
+     * {@link javax.servlet.http.HttpServletRequest#startAsync(ServletRequest,
+     * ServletResponse)} has been called and before {@link #complete()} or any
+     * other dispatch() method has been called.
      */
     void dispatch();
 
     /**
+     * @param path The path to which the request/response should be dispatched
+     *             relative to the {@link ServletContext} from which this async
+     *             request was started.
      *
-     * @param path
-     * @throws IllegalStateException
+     * @throws IllegalStateException if this method is called when the request
+     * is not in asynchronous mode. The request is in asynchronous mode after
+     * {@link javax.servlet.http.HttpServletRequest#startAsync()} or
+     * {@link javax.servlet.http.HttpServletRequest#startAsync(ServletRequest,
+     * ServletResponse)} has been called and before {@link #complete()} or any
+     * other dispatch() method has been called.
      */
     void dispatch(String path);
 
     /**
+     * @param path The path to which the request/response should be dispatched
+     *             relative to the specified {@link ServletContext}.
+     * @param context The {@link ServletContext} to which the request/response
+     *                should be dispatched.
      *
-     * @param context
-     * @param path
-     * @throws IllegalStateException
+     * @throws IllegalStateException if this method is called when the request
+     * is not in asynchronous mode. The request is in asynchronous mode after
+     * {@link javax.servlet.http.HttpServletRequest#startAsync()} or
+     * {@link javax.servlet.http.HttpServletRequest#startAsync(ServletRequest,
+     * ServletResponse)} has been called and before {@link #complete()} or any
+     * other dispatch() method has been called.
      */
     void dispatch(ServletContext context, String path);
 
@@ -72,12 +90,17 @@ public interface AsyncContext {
     throws ServletException;
 
     /**
-     * Set timeout in milliseconds. 0 or less indicates no timeout.
+     * Set the timeout.
+     *
+     * @param timeout The timeout in milliseconds. 0 or less indicates no
+     *                timeout.
      */
     void setTimeout(long timeout);
 
     /**
-     * Get timeout in milliseconds. 0 or less indicates no timeout.
+     * Get the current.
+     *
+     * @return The timeout in milliseconds. 0 or less indicates no timeout.
      */
     long getTimeout();
 }
