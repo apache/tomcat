@@ -49,12 +49,20 @@ public interface Filter {
      * Called by the web container to indicate to a filter that it is being
      * placed into service. The servlet container calls the init method exactly
      * once after instantiating the filter. The init method must complete
-     * successfully before the filter is asked to do any filtering work. <br>
-     * <br>
+     * successfully before the filter is asked to do any filtering work.
+     * <p>
      * The web container cannot place the filter into service if the init method
-     * either<br>
-     * 1.Throws a ServletException <br>
-     * 2.Does not return within a time period defined by the web container
+     * either:
+     * <ul>
+     * <li>Throws a ServletException</li>
+     * <li>Does not return within a time period defined by the web
+     *     container</li>
+     * </ul>
+     *
+     * @param filterConfig The configuration information associated with the
+     *                     filter instance being initialised
+     *
+     * @throws ServletException if the initialisation fails
      */
     public void init(FilterConfig filterConfig) throws ServletException;
 
@@ -78,7 +86,17 @@ public interface Filter {
      * next entity in the filter chain to block the request processing<br>
      * 5. Directly set headers on the response after invocation of the next
      * entity in the filter chain.
-     **/
+     *
+     * @param request  The request to process
+     * @param response The response associated with the request
+     * @param chain    Provides access to the next filter in the chain for this
+     *                 filter to pass the request and response to for further
+     *                 processing
+     *
+     * @throws IOException if an I/O error occurs during this filter's
+     *                     processing of the request
+     * @throws ServletException if the processing fails for any other reason
+     */
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException;
 
