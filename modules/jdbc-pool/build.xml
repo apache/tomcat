@@ -39,7 +39,9 @@
   <!-- Project Properties -->
   <property name="name"                  value="Apache Tomcat JDBC Pool" />
   <tstamp>
-    <format property="year" pattern="yyyy" locale="en"/>
+    <format property="year" pattern="yyyy" locale="en" timezone="UTC" />
+    <format property="TODAY" pattern="MMM d yyyy" locale="en" timezone="UTC" />
+    <format property="TSTAMP" pattern="HH:mm:ss" locale="en" timezone="UTC" />
   </tstamp>
 
   <property name="project"               value="apache-tomcat-jdbc-pool" />
@@ -83,16 +85,12 @@
   </fileset>
 
   <!-- Version info filter set -->
-  <tstamp>
-    <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
-    <format property="TSTAMP" pattern="hh:mm:ss"/>
-  </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
     <filter token="VERSION" value="${version}"/>
     <filter token="VERSION_MAJOR" value="${version.major}"/>
     <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
-    <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
+    <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP} UTC"/>
     <filter token="TOMCAT_PROJECT_DEST" value="${tomcat.project.dest}"/>
   </filterset>
 
