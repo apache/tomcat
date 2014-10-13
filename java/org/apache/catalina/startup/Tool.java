@@ -56,7 +56,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *         to corresponding to the value of <code>catalina.home</code>
  *         (useful when your command line tool runs Ant).</li>
  *     <li><em>-common</em> : Add <code>common/classes</code> and
- *         <code>common/lib</codE) to the class loader repositories.</li>
+ *         <code>common/lib</code> to the class loader repositories.</li>
  *     <li><em>-server</em> : Add <code>server/classes</code> and
  *         <code>server/lib</code> to the class loader repositories.</li>
  *     <li><em>-shared</em> : Add <code>shared/classes</code> and

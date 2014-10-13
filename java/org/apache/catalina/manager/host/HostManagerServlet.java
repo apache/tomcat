@@ -54,7 +54,7 @@ import org.apache.tomcat.util.res.StringManager;
  * The following actions and parameters (starting after the servlet path)
  * are supported:
  * <ul>
- * <li><b>/add?name={host-name}&aliases={host-aliases}&manager={manager}</b> -
+ * <li><b>/add?name={host-name}&amp;aliases={host-aliases}&amp;manager={manager}</b> -
  *     Create and add a new virtual host. The <code>host-name</code> attribute
  *     indicates the name of the new host. The <code>host-aliases</code>
  *     attribute is a comma separated list of the host alias names.

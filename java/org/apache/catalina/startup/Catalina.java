@@ -54,13 +54,13 @@ import org.xml.sax.SAXParseException;
  * <li><b>-config {pathname}</b> - Set the pathname of the configuration file
  *     to be processed.  If a relative path is specified, it will be
  *     interpreted as relative to the directory pathname specified by the
- *     "catalina.base" system property.   [conf/server.xml]
- * <li><b>-help</b>      - Display usage information.
- * <li><b>-nonaming</b>  - Disable naming support.
- * <li><b>configtest</b> - Try to test the config
- * <li><b>start</b>      - Start an instance of Catalina.
- * <li><b>stop</b>       - Stop the currently running instance of Catalina.
- * </u>
+ *     "catalina.base" system property.   [conf/server.xml]</li>
+ * <li><b>-help</b>      - Display usage information.</li>
+ * <li><b>-nonaming</b>  - Disable naming support.</li>
+ * <li><b>configtest</b> - Try to test the config</li>
+ * <li><b>start</b>      - Start an instance of Catalina.</li>
+ * <li><b>stop</b>       - Stop the currently running instance of Catalina.</li>
+ * </ul>
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat

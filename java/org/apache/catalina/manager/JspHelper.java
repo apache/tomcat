@@ -192,11 +192,11 @@ public class JspHelper {
      * Performs the following substring replacements
      * (to facilitate output to XML/HTML pages):
      *
-     *    & -> &amp;
-     *    < -> &lt;
-     *    > -> &gt;
-     *    " -> &#034;
-     *    ' -> &#039;
+     *    &amp; -&gt; &amp;amp;
+     *    &lt; -&gt; &amp;lt;
+     *    &gt; -&gt; &amp;gt;
+     *    " -&gt; &amp;#034;
+     *    ' -&gt; &amp;#039;
      *
      * See also OutSupport.writeEscapedXml().
      */

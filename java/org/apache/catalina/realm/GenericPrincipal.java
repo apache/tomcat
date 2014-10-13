@@ -99,7 +99,7 @@ public class GenericPrincipal implements TomcatPrincipal {
      *        getUserPrincipal call if not null; if null, this will be returned
      * @param loginContext  - If provided, this will be used to log out the user
      *        at the appropriate time
-     * @param gssCredential - If provided, the user&apos;s delegated credentials
+     * @param gssCredential - If provided, the user's delegated credentials
      */
     public GenericPrincipal(String name, String password, List<String> roles,
             Principal userPrincipal, LoginContext loginContext,
@@ -178,7 +178,7 @@ public class GenericPrincipal implements TomcatPrincipal {
 
 
     /**
-     * The user&apos;s delegated credentials.
+     * The user's delegated credentials.
      */
     protected GSSCredential gssCredential = null;
 

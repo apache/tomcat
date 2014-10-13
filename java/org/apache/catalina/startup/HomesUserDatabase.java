@@ -25,7 +25,7 @@ import java.util.Hashtable;
 
 
 /**
- * Concrete implementation of the <strong>UserDatabase</code> interface
+ * Concrete implementation of the <code>UserDatabase</code> interface
  * considers all directories in a directory whose pathname is specified
  * to our constructor to be "home" directories for those users.
  *

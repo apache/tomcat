@@ -38,11 +38,11 @@ import org.apache.juli.logging.LogFactory;
  *
  * This is a state machine, handled by the process method
  * States are:
- * - NOT_CONNECTED -> connect() -> CONNECTED
- * - CONNECTED -> setMessage() -> READY TO WRITE
- * - READY_TO_WRITE -> write() -> READY TO WRITE | READY TO READ
- * - READY_TO_READ -> read() -> READY_TO_READ | TRANSFER_COMPLETE
- * - TRANSFER_COMPLETE -> CONNECTED
+ * - NOT_CONNECTED -&gt; connect() -&gt; CONNECTED
+ * - CONNECTED -&gt; setMessage() -&gt; READY TO WRITE
+ * - READY_TO_WRITE -&gt; write() -&gt; READY TO WRITE | READY TO READ
+ * - READY_TO_READ -&gt; read() -&gt; READY_TO_READ | TRANSFER_COMPLETE
+ * - TRANSFER_COMPLETE -&gt; CONNECTED
  *
  * @version 1.0
  */

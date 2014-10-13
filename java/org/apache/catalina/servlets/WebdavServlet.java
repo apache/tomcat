@@ -59,12 +59,12 @@ import org.xml.sax.SAXException;
  * Servlet which adds support for WebDAV level 2. All the basic HTTP requests
  * are handled by the DefaultServlet. The WebDAVServlet must not be used as the
  * default servlet (ie mapped to '/') as it will not work in this configuration.
- * <p/>
+ * <p>
  * Mapping a subpath (e.g. <code>/webdav/*</code> to this servlet has the effect
  * of re-mounting the entire web application under that sub-path, with WebDAV
  * access to all the resources. This <code>WEB-INF</code> and <code>META-INF</code>
  * directories are protected in this re-mounted resource tree.
- * <p/>
+ * <p>
  * To enable WebDAV for a context add the following to web.xml:
  * <pre>
  * &lt;servlet&gt;

@@ -117,7 +117,7 @@ import org.apache.catalina.util.IOTools;
  *
  * <B>CGI Specification</B>:<br> derived from
  * <a href="http://cgi-spec.golux.com">http://cgi-spec.golux.com</a>.
- * A work-in-progress & expired Internet Draft.  Note no actual RFC describing
+ * A work-in-progress &amp; expired Internet Draft.  Note no actual RFC describing
  * the CGI specification exists.  Where the behavior of this servlet differs
  * from the specification cited above, it is either documented here, a bug,
  * or an instance where the specification cited differs from Best
@@ -160,7 +160,6 @@ import org.apache.catalina.util.IOTools;
  * </p>
  * [end excerpt]
  *
- * </p>
  * <h2> Implementation notes</h2>
  * <p>
  *
@@ -229,7 +228,6 @@ import org.apache.catalina.util.IOTools;
  *      not needed
  * <li> [add more to this TODO list]
  * </ul>
- * </p>
  *
  * @author Martin T Dengler [root@martindengler.com]
  * @author Amy Roh
@@ -785,6 +783,7 @@ public final class CGIServlet extends HttpServlet {
          *
          * <p>
          * Example URI:
+         * </p>
          * <PRE> /servlet/cgigateway/dir1/realCGIscript/pathinfo1 </PRE>
          * <ul>
          * <LI><b>path</b> = $CATALINA_HOME/mywebapp/dir1/realCGIscript
@@ -792,7 +791,6 @@ public final class CGIServlet extends HttpServlet {
          * <LI><b>cgiName</b> = /dir1/realCGIscript
          * <LI><b>name</b> = realCGIscript
          * </ul>
-         * </p>
          * <p>
          * CGI search algorithm: search the real path below
          *    &lt;my-webapp-root&gt; and find the first non-directory in
@@ -1422,7 +1420,7 @@ public final class CGIServlet extends HttpServlet {
 
 
         /**
-         * Checks & sets ready status
+         * Checks and sets ready status
          */
         protected void updateReadyStatus() {
             if (command != null
@@ -1505,6 +1503,7 @@ public final class CGIServlet extends HttpServlet {
          *
          * <p>
          * This implements the following CGI specification recommedations:
+         * </p>
          * <UL>
          * <LI> Servers SHOULD provide the "<code>query</code>" component of
          *      the script-URI as command-line arguments to scripts if it
@@ -1544,7 +1543,6 @@ public final class CGIServlet extends HttpServlet {
          *             container's implementation of the Servlet API methods.
          *     </ul>
          * </UL>
-         * </p>
          *
          * @exception IOException if problems during reading/writing occur
          *

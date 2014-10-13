@@ -87,7 +87,7 @@ public final class SecurityUtil{
 
 
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject.
      *
      * @param methodName the method to apply the security restriction
@@ -101,7 +101,7 @@ public final class SecurityUtil{
 
 
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject.
      *
      * @param methodName the method to apply the security restriction
@@ -127,7 +127,7 @@ public final class SecurityUtil{
 
 
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject.
      *
      * @param methodName the method to apply the security restriction
@@ -169,7 +169,7 @@ public final class SecurityUtil{
 
 
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject.
      *
      * @param methodName the method to apply the security restriction
@@ -249,7 +249,7 @@ public final class SecurityUtil{
 
 
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject.
      *
      * @param methodName the method to apply the security restriction

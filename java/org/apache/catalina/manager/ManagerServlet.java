@@ -81,12 +81,12 @@ import org.apache.tomcat.util.res.StringManager;
  *     file found at the specified URL.  The <code>docBase</code> attribute
  *     of the context configuration file is used to locate the actual
  *     WAR or directory containing the application.</li>
- * <li><b>/deploy?config={config-url}&war={war-url}/</b> - Install and start
+ * <li><b>/deploy?config={config-url}&amp;war={war-url}/</b> - Install and start
  *     a new web application, based on the contents of the context
  *     configuration file found at <code>{config-url}</code>, overriding the
  *     <code>docBase</code> attribute with the contents of the web
  *     application archive found at <code>{war-url}</code>.</li>
- * <li><b>/deploy?path=/xxx&war={war-url}</b> - Install and start a new
+ * <li><b>/deploy?path=/xxx&amp;war={war-url}</b> - Install and start a new
  *     web application attached to context path <code>/xxx</code>, based
  *     on the contents of the web application archive found at the
  *     specified URL.</li>
@@ -105,7 +105,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <li><b>/expire?path=/xxx</b> - List session idle timeinformation about the
  *     web application attached to context path <code>/xxx</code> for this
  *     virtual host.</li>
- * <li><b>/expire?path=/xxx&idle=mm</b> - Expire sessions
+ * <li><b>/expire?path=/xxx&amp;idle=mm</b> - Expire sessions
  *     for the context path <code>/xxx</code> which were idle for at
  *     least mm minutes.</li>
  * <li><b>/start?path=/xxx</b> - Start the web application attached to
