@@ -73,7 +73,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
     /**
      * Data is always available for blocking IO (if you wait long enough) so
      * return a value of 1. Note that the actual value is never used it is only
-     * tested for == 0 or > 0.
+     * tested for == 0 or &gt; 0.
      */
     @Override
     public int available() {

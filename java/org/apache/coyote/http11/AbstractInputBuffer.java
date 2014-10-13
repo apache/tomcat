@@ -361,7 +361,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
     /**
      * Has all of the request body been read? There are subtle differences
-     * between this and available() > 0 primarily because of having to handle
+     * between this and available() &gt; 0 primarily because of having to handle
      * faking non-blocking reads with the blocking IO connector.
      */
     public boolean isFinished() {
