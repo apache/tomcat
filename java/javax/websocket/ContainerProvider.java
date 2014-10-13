@@ -30,6 +30,8 @@ public abstract class ContainerProvider {
 
     /**
      * Create a new container used to create outgoing WebSocket connections.
+     *
+     * @return A newly created container.
      */
     public static WebSocketContainer getWebSocketContainer() {
         WebSocketContainer result = null;

@@ -39,6 +39,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
     /**
      * Returns the path at which this WebSocket server endpoint has been
      * registered. It may be a path or a level 0 URI template.
+     * @return The registered path
      */
     String getPath();
 

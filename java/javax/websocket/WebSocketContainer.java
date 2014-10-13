@@ -23,14 +23,16 @@ import java.util.Set;
 public interface WebSocketContainer {
 
     /**
-     * Obtain the default timeout (in milliseconds) for sending a message
-     * asynchronously. A non-positive value means an infinite timeout.
+     * Get the default timeout for sending a message asynchronously.
+     * @return The current default timeout in milliseconds. A non-positive value
+     *         means an infinite timeout.
      */
     long getDefaultAsyncSendTimeout();
 
     /**
-     * Set the default timeout (in milliseconds) for sending a message
-     * asynchronously. A non-positive value means an infinite timeout.
+     * Set the default timeout for sending a message asynchronously.
+     * @param timeout The new default timeout in milliseconds. A non-positive
+     *                value means an infinite timeout.
      */
     void setAsyncSendTimeout(long timeout);
 
@@ -54,6 +56,8 @@ public interface WebSocketContainer {
      * @return The WebSocket session for the connection
      *
      * @throws DeploymentException  If the connection can not be established
+     * @throws IOException If an I/O occurred while trying to establish the
+     *                     connection
      */
     Session connectToServer(Endpoint endpoint,
             ClientEndpointConfig clientEndpointConfiguration, URI path)
@@ -73,46 +77,55 @@ public interface WebSocketContainer {
      * @return The WebSocket session for the connection
      *
      * @throws DeploymentException  If the connection can not be established
+     * @throws IOException If an I/O occurred while trying to establish the
+     *                     connection
      */
     Session connectToServer(Class<? extends Endpoint> endpoint,
             ClientEndpointConfig clientEndpointConfiguration, URI path)
             throws DeploymentException, IOException;
 
     /**
-     * Get the current default session idle timeout in milliseconds. Zero or
-     * negative values indicate an infinite timeout.
+     * Get the current default session idle timeout.
+     * @return The current default session idle timeout in milliseconds. Zero or
+     *         negative values indicate an infinite timeout.
      */
     long getDefaultMaxSessionIdleTimeout();
 
     /**
-     * Set the current default session idle timeout in milliseconds. Zero or
-     * negative values indicate an infinite timeout.
+     * Set the default session idle timeout.
+     * @param timeout The new default session idle timeout in milliseconds. Zero
+     *                or negative values indicate an infinite timeout.
      */
     void setDefaultMaxSessionIdleTimeout(long timeout);
 
     /**
-     * Get the default maximum buffer size (in bytes) for binary messages.
+     * Get the default maximum buffer size for binary messages.
+     * @return The current default maximum buffer size in bytes
      */
     int getDefaultMaxBinaryMessageBufferSize();
 
     /**
-     * Set the default maximum buffer size (in bytes) for binary messages.
+     * Set the default maximum buffer size for binary messages.
+     * @param max The new default maximum buffer size in bytes
      */
     void setDefaultMaxBinaryMessageBufferSize(int max);
 
     /**
-     * Get the default maximum buffer size (in characters) for text messages.
+     * Get the default maximum buffer size for text messages.
+     * @return The current default maximum buffer size in characters
      */
     int getDefaultMaxTextMessageBufferSize();
 
     /**
-     * Set the default maximum buffer size (in characters) for text messages.
+     * Set the default maximum buffer size for text messages.
+     * @param max The new default maximum buffer size in characters
      */
     void setDefaultMaxTextMessageBufferSize(int max);
 
     /**
-     * Get the set of extensions that are supported by this WebSocket
-     * implementation.
+     * Get the installed extensions.
+     * @return The set of extensions that are supported by this WebSocket
+     *         implementation.
      */
     Set<Extension> getInstalledExtensions();
 }
