@@ -850,7 +850,7 @@ public class DeltaManager extends ClusterManagerBase{
                     //
                 }
                 reqNow = System.currentTimeMillis();
-                isTimeout = ((reqNow - reqStart) > (1000 * getStateTransferTimeout()));
+                isTimeout = ((reqNow - reqStart) > (1000L * getStateTransferTimeout()));
             } while ((!getStateTransfered()) && (!isTimeout) && (!isNoContextManagerReceived()));
         } else {
             if(getStateTransferTimeout() == -1) {
@@ -1031,7 +1031,7 @@ public class DeltaManager extends ClusterManagerBase{
             if (!expires && (msg == null)) {
                 long replDelta = System.currentTimeMillis() - session.getLastTimeReplicated();
                 if (session.getMaxInactiveInterval() >=0 &&
-                        replDelta > (session.getMaxInactiveInterval() * 1000)) {
+                        replDelta > (session.getMaxInactiveInterval() * 1000L)) {
                     counterSend_EVT_SESSION_ACCESSED++;
                     msg = new SessionMessageImpl(getName(),
                                                  SessionMessage.EVT_SESSION_ACCESSED,
