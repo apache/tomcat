@@ -63,6 +63,10 @@
         optionally include (enabled by default) the values of key environment
         variables. (markt)
       </add>
+      <add>
+        <bug>49939</bug>: Expose the method that clears the static resource
+        cache for a web application via JMX. (markt)
+      </add>
       <fix>
         <bug>55951</bug>: Allow cookies to use UTF-8 encoded values in HTTP
         headers. This requires the use of the RFC6265

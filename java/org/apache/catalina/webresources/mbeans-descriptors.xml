@@ -87,6 +87,12 @@
                  type="long"
             writeable="true"/>
 
+    <operation name="clear"
+        description="Clears all cached content from the cache."
+             impact="ACTION"
+         returnType="void">
+    </operation>
+
   </mbean>
 
 </mbeans-descriptors>
