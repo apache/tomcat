@@ -204,6 +204,15 @@ public abstract class ExpressionFactory {
     }
 
     /**
+     * Create a new value expression.
+     *
+     * @param context      The EL context for this evaluation
+     * @param expression   The String representation of the value expression
+     * @param expectedType The expected type of the result of evaluating the
+     *                     expression
+     *
+     * @return A new value expression formed from the input parameters
+     *
      * @throws NullPointerException
      *              If the expected type is <code>null</code>
      * @throws ELException
@@ -216,6 +225,17 @@ public abstract class ExpressionFactory {
             Class<?> expectedType);
 
     /**
+     * Create a new method expression instance.
+     *
+     * @param context            The EL context for this evaluation
+     * @param expression         The String representation of the method
+     *                           expression
+     * @param expectedReturnType The expected type of the result of invoking the
+     *                           method
+     * @param expectedParamTypes The expected types of the input parameters
+     *
+     * @return A new method expression formed from the input parameters.
+     *
      * @throws NullPointerException
      *              If the expected parameters types are <code>null</code>
      * @throws ELException
@@ -226,12 +246,21 @@ public abstract class ExpressionFactory {
             Class<?>[] expectedParamTypes);
 
     /**
+     * Coerce the supplied object to the requested type.
+     *
+     * @param obj          The object to be coerced
+     * @param expectedType The type to which the object should be coerced
+     *
+     * @return An instance of the requested type.
+     *
      * @throws ELException
      *              If the conversion fails
      */
     public abstract Object coerceToType(Object obj, Class<?> expectedType);
 
     /**
+     * @return This default implementation returns null
+     *
      * @since EL 3.0
      */
     public ELResolver getStreamELResolver() {
@@ -239,6 +268,8 @@ public abstract class ExpressionFactory {
     }
 
     /**
+     * @return This default implementation returns null
+     *
      * @since EL 3.0
      */
     public Map<String,Method> getInitFunctionMap() {

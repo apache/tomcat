@@ -164,6 +164,12 @@ public class ELProcessor {
 
 
     /**
+     * Map a method to a function name.
+     *
+     * @param prefix    Function prefix
+     * @param function  Function name
+     * @param method    Method
+     *
      * @throws NullPointerException
      *              If any of the arguments are null
      * @throws NoSuchMethodException
