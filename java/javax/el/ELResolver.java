@@ -46,13 +46,21 @@ public abstract class ELResolver {
             Object property);
 
     /**
+     * Invokes a method on the the given object. This default implementation
+     * always returns <code>null</code>.
+     *
+     * @param context    The EL context for this evaluation
+     * @param base       The base object on which the method is to be found
+     * @param method     The method to invoke
+     * @param paramTypes The types of the parameters of the method to invoke
+     * @param params     The parameters with which to invoke the method
+     *
+     * @return Always <code>null</code>
+     *
      * @since EL 2.2
      */
-    public Object invoke(@SuppressWarnings("unused") ELContext context,
-            @SuppressWarnings("unused") Object base,
-            @SuppressWarnings("unused") Object method,
-            @SuppressWarnings("unused") Class<?>[] paramTypes,
-            @SuppressWarnings("unused") Object[] params) {
+    public Object invoke(ELContext context, Object base, Object method,
+            Class<?>[] paramTypes, Object[] params) {
         return null;
     }
 
@@ -119,11 +127,15 @@ public abstract class ELResolver {
      * Converts the given object to the given type. This default implementation
      * always returns <code>null</code>.
      *
+     * @param context The EL context for this evaluation
+     * @param obj     The object to convert
+     * @param type    The type to which the object should be converted
+     *
+     * @return Always <code>null</code>
+     *
      * @since EL 3.0
      */
-    public Object convertToType(@SuppressWarnings("unused") ELContext context,
-            @SuppressWarnings("unused") Object obj,
-            @SuppressWarnings("unused") Class<?> type) {
+    public Object convertToType(ELContext context, Object obj, Class<?> type) {
         return null;
     }
 }

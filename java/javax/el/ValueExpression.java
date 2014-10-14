@@ -21,6 +21,10 @@ public abstract class ValueExpression extends Expression {
     private static final long serialVersionUID = 8577809572381654673L;
 
     /**
+     * @param context The EL context for this evaluation
+     *
+     * @return The result of evaluating this value expression
+     *
      * @throws NullPointerException
      *              If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException
@@ -33,6 +37,10 @@ public abstract class ValueExpression extends Expression {
     public abstract Object getValue(ELContext context);
 
     /**
+     * @param context The EL context for this evaluation
+     * @param value   The value to set the property to which this value
+     *                expression refers
+     *
      * @throws NullPointerException
      *              If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException
@@ -48,6 +56,11 @@ public abstract class ValueExpression extends Expression {
     public abstract void setValue(ELContext context, Object value);
 
     /**
+     * @param context The EL context for this evaluation
+     *
+     * @return <code>true</code> if this expression is read only otherwise
+     *         <code>false</code>
+     *
      * @throws NullPointerException
      *              If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException
@@ -60,6 +73,10 @@ public abstract class ValueExpression extends Expression {
     public abstract boolean isReadOnly(ELContext context);
 
     /**
+     * @param context The EL context for this evaluation
+     *
+     * @return The type of the result of this value expression
+     *
      * @throws NullPointerException
      *              If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException
@@ -74,6 +91,10 @@ public abstract class ValueExpression extends Expression {
     public abstract Class<?> getExpectedType();
 
     /**
+     * @param context The EL context for this evaluation
+     *
+     * @return This default implementation always returns <code>null</code>
+     *
      * @since EL 2.2
      */
     public ValueReference getValueReference(ELContext context) {
