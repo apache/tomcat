@@ -32,18 +32,27 @@ public interface Part {
     /**
      * Obtain an <code>InputStream</code> that can be used to retrieve the
      * contents of the file.
+     *
+     * @return An InputStream for the contents of the file
+     *
+     * @throws IOException if an I/O occurs while obtaining the stream
      */
     public InputStream getInputStream() throws IOException;
 
     /**
-     * Obtain the content type passed by the browser or <code>null</code> if not
-     * defined.
+     * Obtain the content type passed by the browser.
+     *
+     * @return The content type passed by the browser or <code>null</code> if
+     *         not defined.
      */
     public String getContentType();
 
     /**
      * Obtain the name of the field in the multipart form corresponding to this
      * part.
+     *
+     * @return The name of the field in the multipart form corresponding to this
+     *         part.
      */
     public String getName();
 
@@ -60,6 +69,8 @@ public interface Part {
 
     /**
      * Obtain the size of this part.
+     *
+     * @return The size of the part if bytes
      */
     public long getSize();
 
@@ -77,6 +88,8 @@ public interface Part {
      * @param fileName  The location into which the uploaded part should be
      *                  stored. Relative locations are relative to {@link
      *                  javax.servlet.MultipartConfigElement#getLocation()}
+     *
+     * @throws IOException if an I/O occurs while attempting to write the part
      */
     public void write(String fileName) throws IOException;
 
@@ -90,6 +103,8 @@ public interface Part {
      * Part instance is garbage collected. Apache Tomcat will delete the
      * associated storage when the associated request has finished processing.
      * Behaviour of other containers may be different.
+     *
+     * @throws IOException if an I/O occurs while attempting to delete the part
      */
     public void delete() throws IOException;
 
@@ -105,14 +120,18 @@ public interface Part {
     public String getHeader(String name);
 
     /**
-     * Obtain all the values of the specified part header. If the part did not
-     * include any headers of the specified name, this method returns an empty
-     * Collection. The header name is case insensitive.
+     * Obtain all the values of the specified part header.
+     * @param name The name of the header of interest. The header name is case
+     *             insensitive.
+     * @return All the values of the specified part header. If the part did not
+     *         include any headers of the specified name, this method returns an
+     *         empty Collection.
      */
     public Collection<String> getHeaders(String name);
 
     /**
-     * Returns a Collection of all the header names provided for this part.
+     * Get the header names provided for this part.
+     * @return a Collection of all the header names provided for this part.
      */
     public Collection<String> getHeaderNames();
 }

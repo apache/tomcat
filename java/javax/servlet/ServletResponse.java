@@ -173,7 +173,12 @@ public interface ServletResponse {
     public void setContentLength(int len);
 
     /**
-     * TODO SERVLET 3.1
+     * Sets the length of the content body in the response In HTTP servlets,
+     * this method sets the HTTP Content-Length header.
+     *
+     * @param length
+     *            an integer specifying the length of the content being returned
+     *            to the client; sets the Content-Length header
      */
     public void setContentLengthLong(long length);
 
@@ -246,6 +251,8 @@ public interface ServletResponse {
      * Forces any content in the buffer to be written to the client. A call to
      * this method automatically commits the response, meaning the status code
      * and headers will be written.
+     *
+     * @throws IOException if an I/O occurs during the flushing of the response
      *
      * @see #setBufferSize
      * @see #getBufferSize
@@ -332,8 +339,11 @@ public interface ServletResponse {
     /**
      * Returns the locale specified for this response using the
      * {@link #setLocale} method. Calls made to <code>setLocale</code> after the
-     * response is committed have no effect. If no locale has been specified,
-     * the container's default locale is returned.
+     * response is committed have no effect.
+     *
+     * @return The locale specified for this response using the
+     *          {@link #setLocale} method. If no locale has been specified, the
+     *          container's default locale is returned.
      *
      * @see #setLocale
      */

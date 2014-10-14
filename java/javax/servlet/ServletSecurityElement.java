@@ -45,7 +45,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
 
     /**
      * Use specified HttpConstraintElement.
-     * @param httpConstraintElement
+     * @param httpConstraintElement The constraint
      */
     public ServletSecurityElement(HttpConstraintElement httpConstraintElement) {
         this (httpConstraintElement, null);
@@ -54,7 +54,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
     /**
      * Use specific constraints for specified methods and default
      * HttpConstraintElement for all other methods.
-     * @param httpMethodConstraints
+     * @param httpMethodConstraints Method constraints
      * @throws IllegalArgumentException if a method name is specified more than
      * once
      */
@@ -68,8 +68,8 @@ public class ServletSecurityElement extends HttpConstraintElement {
     /**
      * Use specified HttpConstraintElement as default and specific constraints
      * for specified methods.
-     * @param httpConstraintElement
-     * @param httpMethodConstraints
+     * @param httpConstraintElement Default constraint
+     * @param httpMethodConstraints Method constraints
      * @throws IllegalArgumentException if a method name is specified more than
      */
     public ServletSecurityElement(HttpConstraintElement httpConstraintElement,
@@ -82,7 +82,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
 
     /**
      * Create from an annotation.
-     * @param annotation
+     * @param annotation Annotation to use as the basis for the new instance
      * @throws IllegalArgumentException if a method name is specified more than
      */
     public ServletSecurityElement(ServletSecurity annotation) {
