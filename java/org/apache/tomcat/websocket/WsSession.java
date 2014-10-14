@@ -106,10 +106,34 @@ public class WsSession implements Session {
      * at the time this constructor is called will be used when calling
      * {@link Endpoint#onClose(Session, CloseReason)}.
      *
-     * @param localEndpoint
-     * @param wsRemoteEndpoint
-     * @param negotiatedExtensions
-     * @throws DeploymentException
+     * @param localEndpoint        The end point managed by this code
+     * @param wsRemoteEndpoint     The other / remote endpoint
+     * @param wsWebSocketContainer The container that created this session
+     * @param requestUri           The URI used to connect to this endpoint or
+     *                             <code>null</code> is this is a client session
+     * @param requestParameterMap  The parameters associated with the request
+     *                             that initiated this session or
+     *                             <code>null</code> if this is a client session
+     * @param queryString          The query string associated with the request
+     *                             that initiated this session or
+     *                             <code>null</code> if this is a client session
+     * @param userPrincipal        The principal associated with the request
+     *                             that initiated this session or
+     *                             <code>null</code> if this is a client session
+     * @param httpSessionId        The HTTP session ID associated with the
+     *                             request that initiated this session or
+     *                             <code>null</code> if this is a client session
+     * @param negotiatedExtensions The agreed extensions to use for this session
+     * @param subProtocol          The agreed subprotocol to use for this
+     *                             session
+     * @param pathParameters       The path parameters associated with the
+     *                             request that initiated this session or
+     *                             <code>null</code> if this is a client session
+     * @param secure               Was this session initiated over a secure
+     *                             connection?
+     * @param endpointConfig       The configuration information for the
+     *                             endpoint
+     * @throws DeploymentException if an invalid encode is specified
      */
     public WsSession(Endpoint localEndpoint,
             WsRemoteEndpointImplBase wsRemoteEndpoint,
@@ -455,6 +479,9 @@ public class WsSession implements Session {
      * Called when a close message is received. Should only ever happen once.
      * Also called after a protocol error when the ProtocolHandler needs to
      * force the closing of the connection.
+     *
+     * @param closeReason The reason contained within the received close
+     *                    message.
      */
     public void onClose(CloseReason closeReason) {
 
