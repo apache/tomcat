@@ -158,6 +158,9 @@
         Add support for the <code>SessionIdGenerator</code> to cluster manager
         template. (kfujino)
       </fix>
+      <fix>
+        Avoid possible integer overflows reported by Coverity Scan. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
