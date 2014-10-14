@@ -152,6 +152,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Add support for the <code>SessionIdGenerator</code> to cluster manager
+        template. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

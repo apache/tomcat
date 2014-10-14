@@ -24,6 +24,7 @@ import org.apache.catalina.Cluster;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
+import org.apache.catalina.SessionIdGenerator;
 import org.apache.catalina.Valve;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
@@ -199,6 +200,17 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
         copy.setSecureRandomClass(getSecureRandomClass());
         copy.setSecureRandomProvider(getSecureRandomProvider());
         copy.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
+        if (getSessionIdGenerator() != null) {
+            try {
+                SessionIdGenerator copyIdGenerator = sessionIdGeneratorClass.newInstance();
+                copyIdGenerator.setSessionIdLength(getSessionIdGenerator().getSessionIdLength());
+                copyIdGenerator.setJvmRoute(getSessionIdGenerator().getJvmRoute());
+                copy.setSessionIdGenerator(copyIdGenerator);
+            } catch (InstantiationException | IllegalAccessException e) {
+             // Ignore
+            }
+        }
+       
     }
 
     /**
