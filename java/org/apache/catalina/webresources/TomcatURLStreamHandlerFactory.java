@@ -34,6 +34,8 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
      * Obtain a reference to the singleton instance. It is recommended that
      * callers check the value of {@link #isRegistered()} before using the
      * returned instance.
+     *
+     * @return A reference to the singleton instance
      */
     public static TomcatURLStreamHandlerFactory getInstance() {
         getInstanceInternal(true);
@@ -93,6 +95,8 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
      * Release references to any user provided factories that have been loaded
      * using the provided class loader. Called during web application stop to
      * prevent memory leaks.
+     *
+     * @param classLoader The class loader to release
      */
     public static void release(ClassLoader classLoader) {
         Iterator<URLStreamHandlerFactory> iter = instance.userFactories.iterator();
@@ -130,6 +134,9 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
      * {@link URL#setURLStreamHandlerFactory(URLStreamHandlerFactory)} and
      * Tomcat needs to register a handler, provide a mechanism to allow
      * applications to register their own handlers.
+     *
+     * @param factory The user provided factory to add to the factories Tomcat
+     *                has alredy registered
      */
     public void addUserFactory(URLStreamHandlerFactory factory) {
         userFactories.add(factory);
