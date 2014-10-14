@@ -423,6 +423,7 @@ public interface HttpServletRequest extends ServletRequest {
     public boolean isRequestedSessionIdFromURL();
 
     /**
+     * @return {@link #isRequestedSessionIdFromURL()}
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *             {@link #isRequestedSessionIdFromURL} instead.
      */
@@ -439,6 +440,12 @@ public interface HttpServletRequest extends ServletRequest {
      * @return <code>true</code> if the user is successfully authenticated and
      *         <code>false</code> if not
      *
+     * @throws IOException if the authentication process attempted to read from
+     *         the request or write to the response and an I/O error occurred
+     * @throws IllegalStateException if the authentication process attempted to
+     *         write to the response after it had been committed
+     * @throws ServletException if the authentication failed and the caller is
+     *         expected to handle the failure
      * @since Servlet 3.0
      */
     public boolean authenticate(HttpServletResponse response)
@@ -490,7 +497,8 @@ public interface HttpServletRequest extends ServletRequest {
      * Gets the named Part or null if the Part does not exist. Triggers upload
      * of all Parts.
      *
-     * @param name
+     * @param name The name of the Part to obtain
+     *
      * @return The named Part or null if the Part does not exist
      * @throws IOException
      *             if an I/O error occurs
@@ -510,6 +518,12 @@ public interface HttpServletRequest extends ServletRequest {
      * HttpServletResponse#SC_SWITCHING_PROTOCOLS} and flushes the response.
      * Protocol specific headers must have already been set before this method
      * is called.
+     *
+     * @param <T>                     The type of the upgrade handler
+     * @param httpUpgradeHandlerClass The class that implements the upgrade
+     *                                handler
+     *
+     * @return A newly created instance of the specified upgrade handler type
      *
      * @throws IOException
      *             if an I/O error occurred during the upgrade

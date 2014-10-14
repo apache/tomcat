@@ -296,7 +296,9 @@ public interface HttpServletResponse extends ServletResponse {
     public void setStatus(int sc, String sm);
 
     /**
-     * Return the HTTP status code associated with this Response.
+     * Get the HTTP status code for this Response.
+     *
+     * @return The HTTP status code for this Response
      *
      * @since Servlet 3.0
      */
@@ -310,6 +312,10 @@ public interface HttpServletResponse extends ServletResponse {
      *
      * @param name Header name to look up
      *
+     * @return The first value for the specified header. This is the raw value
+     *         so if multiple values are specified in the first header then they
+     *         will be returned as a single header value .
+     *
      * @since Servlet 3.0
      */
     public String getHeader(String name);
@@ -320,12 +326,18 @@ public interface HttpServletResponse extends ServletResponse {
      *
      * @param name Header name to look up
      *
+     * @return The values for the specified header. These are the raw values so
+     *         if multiple values are specified in a single header that will be
+     *         returned as a single header value.
+     *
      * @since Servlet 3.0
      */
     public Collection<String> getHeaders(String name);
 
     /**
-     * Return an Iterable of all the header names set for this response.
+     * Get the header names set for this HTTP response.
+     *
+     * @return The header names set for this HTTP response.
      *
      * @since Servlet 3.0
      */

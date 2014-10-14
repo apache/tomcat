@@ -36,6 +36,8 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     /**
      * Constructs a response adaptor wrapping the given response.
      *
+     * @param response The response to be wrapped
+     *
      * @throws java.lang.IllegalArgumentException
      *             if the response is null
      */

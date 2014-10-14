@@ -22,8 +22,10 @@ import javax.servlet.annotation.ServletSecurity.EmptyRoleSemantic;
 import javax.servlet.annotation.ServletSecurity.TransportGuarantee;
 
 /**
+ * Equivalent of {@link javax.servlet.annotation.HttpConstraint} for
+ * programmatic configuration of security constraints.
+ *
  * @since Servlet 3.0
- * TODO SERVLET3 - Add comments
  */
 public class HttpConstraintElement {
 
@@ -46,8 +48,11 @@ public class HttpConstraintElement {
     }
 
     /**
-     * Convenience constructor for {@link EmptyRoleSemantic#DENY}.
+     * Construct a constraint with an empty role semantic. Typically used with
+     * {@link EmptyRoleSemantic#DENY}.
      *
+     * @param emptyRoleSemantic The empty role semantic to apply to the newly
+     *                          created constraint
      */
     public HttpConstraintElement(EmptyRoleSemantic emptyRoleSemantic) {
         this.emptyRoleSemantic = emptyRoleSemantic;
@@ -56,7 +61,12 @@ public class HttpConstraintElement {
     }
 
     /**
-     * Convenience constructor to specify transport guarantee and/or roles.
+     * Construct a constraint with a transport guarantee and roles.
+     *
+     * @param transportGuarantee The transport guarantee to apply to the newly
+     *                           created constraint
+     * @param rolesAllowed       The roles to associate with the newly created
+     *                           constraint
      */
     public HttpConstraintElement(TransportGuarantee transportGuarantee,
             String... rolesAllowed) {
@@ -66,10 +76,15 @@ public class HttpConstraintElement {
     }
 
     /**
+     * Construct a constraint with an empty role semantic, a transport guarantee
+     * and roles.
      *
-     * @param emptyRoleSemantic
-     * @param transportGuarantee
-     * @param rolesAllowed
+     * @param emptyRoleSemantic The empty role semantic to apply to the newly
+     *                          created constraint
+     * @param transportGuarantee The transport guarantee to apply to the newly
+     *                           created constraint
+     * @param rolesAllowed       The roles to associate with the newly created
+     *                           constraint
      * @throws IllegalArgumentException if roles are specified when DENY is used
      */
     public HttpConstraintElement(EmptyRoleSemantic emptyRoleSemantic,
@@ -84,14 +99,26 @@ public class HttpConstraintElement {
         this.rolesAllowed = rolesAllowed;
     }
 
+    /**
+     * TODO
+     * @return TODO
+     */
     public EmptyRoleSemantic getEmptyRoleSemantic() {
         return emptyRoleSemantic;
     }
 
+    /**
+     * TODO
+     * @return TODO
+     */
     public TransportGuarantee getTransportGuarantee() {
         return transportGuarantee;
     }
 
+    /**
+     * TODO
+     * @return TODO
+     */
     public String[] getRolesAllowed() {
         return rolesAllowed;
     }

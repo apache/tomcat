@@ -51,8 +51,8 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
      *            the session to which the object is bound or unbound
      * @param name
      *            the name with which the object is bound or unbound
-     * @see #getName
-     * @see #getSession
+     * @see #getName()
+     * @see #getSession()
      */
     public HttpSessionBindingEvent(HttpSession session, String name) {
         super(session);
@@ -69,8 +69,11 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
      *            the session to which the object is bound or unbound
      * @param name
      *            the name with which the object is bound or unbound
-     * @see #getName
-     * @see #getSession
+     * @param value
+     *            the object that is bound or unbound
+     * @see #getName()
+     * @see #getSession()
+     * @see #getValue()
      */
     public HttpSessionBindingEvent(HttpSession session, String name,
             Object value) {
@@ -79,7 +82,10 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
         this.value = value;
     }
 
-    /** Return the session that changed. */
+    /**
+     * Get the session that changed.
+     * @return The session that changed
+     */
     @Override
     public HttpSession getSession() {
         return super.getSession();
@@ -98,10 +104,12 @@ public class HttpSessionBindingEvent extends HttpSessionEvent {
 
     /**
      * Returns the value of the attribute that has been added, removed or
-     * replaced. If the attribute was added (or bound), this is the value of the
-     * attribute. If the attribute was removed (or unbound), this is the value
-     * of the removed attribute. If the attribute was replaced, this is the old
-     * value of the attribute.
+     * replaced.
+     *
+     * @return If the attribute was added (or bound), this is the value of the
+     *         attribute. If the attribute was removed (or unbound), this is the
+     *         value of the removed attribute. If the attribute was replaced,
+     *         this is the old value of the attribute.
      *
      * @since 2.3
      */
