@@ -55,6 +55,9 @@ public class JarResourceSet extends AbstractArchiveResourceSet {
      *                          org.apache.catalina.WebResourceSet} where
      *                          resources will be served from. E.g. for a
      *                          resource JAR, this would be "META-INF/resources"
+     *
+     * @throws IllegalArgumentException if the webAppMount or internalPath is
+     *         not valid (valid paths must start with '/')
      */
     public JarResourceSet(WebResourceRoot root, String webAppMount, String base,
             String internalPath) throws IllegalArgumentException {
