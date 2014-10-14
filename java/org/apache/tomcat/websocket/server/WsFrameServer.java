@@ -40,6 +40,9 @@ public class WsFrameServer extends WsFrameBase {
 
     /**
      * Called when there is data in the ServletInputStream to process.
+     *
+     * @throws IOException if an I/O error occurs while processing the available
+     *                     data
      */
     public void onDataAvailable() throws IOException {
         synchronized (connectionReadLock) {

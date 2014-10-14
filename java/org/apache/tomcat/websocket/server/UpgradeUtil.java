@@ -65,6 +65,11 @@ public class UpgradeUtil {
      * Note: RFC 2616 does not limit HTTP upgrade to GET requests but the Java
      *       WebSocket spec 1.0, section 8.2 implies such a limitation and RFC
      *       6455 section 4.1 requires that a WebSocket Upgrade uses GET.
+     * @param request  The request to check if it is an HTTP upgrade request for
+     *                 a WebSocket connection
+     * @param response The response associated with the request
+     * @return <code>true</code> if the request includes a HTTP Upgrade request
+     *         for the WebSocket protocol, otherwise <code>false</code>
      */
     public static boolean isWebSocketUpgradeRequest(ServletRequest request,
             ServletResponse response) {
