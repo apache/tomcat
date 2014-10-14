@@ -210,7 +210,6 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
              // Ignore
             }
         }
-       
     }
 
     /**
