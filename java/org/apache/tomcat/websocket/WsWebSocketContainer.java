@@ -159,6 +159,7 @@ public class WsWebSocketContainer
         ClientEndpointConfig config = builder.
                 decoders(Arrays.asList(annotation.decoders())).
                 encoders(Arrays.asList(annotation.encoders())).
+                preferredSubprotocols(Arrays.asList(annotation.subprotocols())).
                 build();
         return connectToServer(ep, config, path);
     }
