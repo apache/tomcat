@@ -39,7 +39,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
 
-public class TestMimeHeaders extends TomcatBaseTest {
+public class TestMimeHeadersIntegration extends TomcatBaseTest {
 
     private HeaderCountLogValve alv;
 
