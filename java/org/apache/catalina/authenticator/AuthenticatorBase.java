@@ -446,12 +446,12 @@ public abstract class AuthenticatorBase extends ValveBase
         // where the login form (and therefore the "j_security_check" URI
         // to which it submits) might be outside the secured area
         String contextPath = this.context.getPath();
-        String requestURI = request.getDecodedRequestURI();
-        if (requestURI.startsWith(contextPath) &&
-            requestURI.endsWith(Constants.FORM_ACTION)) {
+        String decodedRequestURI = request.getDecodedRequestURI();
+        if (decodedRequestURI.startsWith(contextPath) &&
+                decodedRequestURI.endsWith(Constants.FORM_ACTION)) {
             if (!authenticate(request, response)) {
                 if (log.isDebugEnabled()) {
-                    log.debug(" Failed authenticate() test ??" + requestURI );
+                    log.debug(" Failed authenticate() test ??" + decodedRequestURI );
                 }
                 return;
             }
@@ -467,23 +467,18 @@ public abstract class AuthenticatorBase extends ValveBase
         if (session != null) {
             SavedRequest savedRequest =
                     (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
-            if (savedRequest != null) {
-                String decodedRequestURI = request.getDecodedRequestURI();
-                if (decodedRequestURI != null &&
-                        decodedRequestURI.equals(
-                                savedRequest.getDecodedRequestURI())) {
-                    if (!authenticate(request, response)) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(" Failed authenticate() test");
-                        }
-                        /*
-                         * ASSERT: Authenticator already set the appropriate
-                         * HTTP status code, so we do not have to do anything
-                         * special
-                         */
-                        return;
-                    }
+            if (savedRequest != null &&
+                    decodedRequestURI.equals(savedRequest.getDecodedRequestURI()) &&
+                    !authenticate(request, response)) {
+                if (log.isDebugEnabled()) {
+                    log.debug(" Failed authenticate() test");
                 }
+                /*
+                 * ASSERT: Authenticator already set the appropriate
+                 * HTTP status code, so we do not have to do anything
+                 * special
+                 */
+                return;
             }
         }
 
