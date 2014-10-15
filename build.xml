@@ -720,13 +720,13 @@
       filesId="files.el-api"
       manifest="${tomcat.manifests}/el-api.jar.manifest" />
 
-    <!-- WebSocket 1.0 API JAR File -->
+    <!-- WebSocket 1.1 API JAR File -->
     <jarIt jarfile="${websocket-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
 
-    <!-- WebSocket 1.0 implementation JAR File -->
+    <!-- WebSocket 1.1 implementation JAR File -->
     <jarIt jarfile="${tomcat-websocket.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-websocket"
@@ -1918,9 +1918,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/websocketapi"
       version="true"
-      windowtitle="WebSocket 1.0 API Documentation - Apache Tomcat ${version}"
-      doctitle="WebSocket 1.0 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;WebSocket 1.0 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="WebSocket 1.1 API Documentation - Apache Tomcat ${version}"
+      doctitle="WebSocket 1.1 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;WebSocket 1.1 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
       additionalparam="-breakiterator"
@@ -2590,13 +2590,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       filesId="files.el-api"
       manifest="${tomcat.manifests}/el-api.jar.manifest" />
 
-    <!-- WebSocket 1.0 API JAR File -->
+    <!-- WebSocket 1.1 API JAR File -->
     <jarIt jarfile="${websocket-api-src.jar}"
       filesDir="java"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
 
-    <!-- WebSocket 1.0 implementation JAR File -->
+    <!-- WebSocket 1.1 implementation JAR File -->
     <jarIt jarfile="${tomcat-websocket-src.jar}"
       filesDir="java"
       filesId="files.tomcat-websocket" />
