@@ -54,7 +54,7 @@ public abstract class BeanNameResolver {
      * is created with the given value.
      *
      * @param beanName The name of the bean to be set/create
-     * @param value    The value of the bean to set/create]
+     * @param value    The value of the bean to set/create
      *
      * @throws PropertyNotWritableException if the bean is read only
      */
