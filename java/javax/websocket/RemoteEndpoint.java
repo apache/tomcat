@@ -173,6 +173,8 @@ public interface RemoteEndpoint {
      * @param applicationData   The payload for the ping message
      *
      * @throws IOException If an I/O error occurs while sending the ping
+     * @throws IllegalArgumentException if the applicationData is too large for
+     *         a control message (max 125 bytes)
      */
     void sendPing(ByteBuffer applicationData)
             throws IOException, IllegalArgumentException;
@@ -185,6 +187,8 @@ public interface RemoteEndpoint {
      * @param applicationData   The payload for the pong message
      *
      * @throws IOException If an I/O error occurs while sending the pong
+     * @throws IllegalArgumentException if the applicationData is too large for
+     *         a control message (max 125 bytes)
      */
     void sendPong(ByteBuffer applicationData)
             throws IOException, IllegalArgumentException;
