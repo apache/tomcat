@@ -12,7 +12,6 @@ Bundle-Vendor: Apache Software Foundation
 Bundle-Version: @VERSION@
 Bundle-Name: Apache Tomcat JDBC Connection Pool
 Bundle-ManifestVersion: 2
-Created-By: 11.0-b16 (Sun Microsystems Inc.)
 Bundle-SymbolicName: org.apache.tomcat.jdbc
 Import-Package: 
   javax.management;version="0",
