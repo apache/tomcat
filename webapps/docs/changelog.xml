@@ -105,7 +105,11 @@
         <code>&lt;Engine&gt;</code>'s <code>jvmRoute</code> or in a system
         property. (schultz)
       </fix>
-      </changelog>
+      <fix>
+        Correct version of Java WebSocket mentioned in documentation
+        (s/1.0/1.1/). (markt/kkolinko)
+      </fix>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 7.0.56 (violetagg)" rtext="released 2014-10-06">

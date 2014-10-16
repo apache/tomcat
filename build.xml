@@ -155,7 +155,7 @@
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
 
-  <!-- WebSocket 1.0 (JSR-356) API and implementation JARs & source JARS     -->
+  <!-- WebSocket 1.1 (JSR-356) API and implementation JARs & source JARS     -->
   <!-- The API JAR is the same as the one that ships with Tomcat 8 except    -->
   <!-- that it does not use Java 7 features (<> and multi-catch) and has     -->
   <!-- been compiled for Java 6. The implementation JAR includes a number of -->
@@ -800,13 +800,13 @@
 
   <target name="package-java7" depends="compile,build-manifests"
           if="java.7.home">
-    <!-- WebSocket 1.0 API JAR File -->
+    <!-- WebSocket 1.1 API JAR File -->
     <jarIt jarfile="${websocket-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
 
-    <!-- WebSocket 1.0 implementation JAR File -->
+    <!-- WebSocket 1.1 implementation JAR File -->
     <jarIt jarfile="${tomcat7-websocket.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat7-websocket"
@@ -1874,9 +1874,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/websocketapi"
       version="true"
-      windowtitle="WebSocket 1.0 API Documentation - Apache Tomcat ${version}"
-      doctitle="WebSocket 1.0 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;WebSocket 1.0 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="WebSocket 1.1 API Documentation - Apache Tomcat ${version}"
+      doctitle="WebSocket 1.1 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;WebSocket 1.1 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
       additionalparam="-breakiterator"
@@ -2603,13 +2603,13 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           depends="build-manifests,build-tomcat-jdbc-src"
           if="java.7.home">
 
-    <!-- WebSocket 1.0 API JAR File -->
+    <!-- WebSocket 1.1 API JAR File -->
     <jarIt jarfile="${websocket-api-src.jar}"
       filesDir="java"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
 
-    <!-- WebSocket 1.0 implementation JAR File -->
+    <!-- WebSocket 1.1 implementation JAR File -->
     <jarIt jarfile="${tomcat7-websocket-src.jar}"
       filesDir="java"
       filesId="files.tomcat7-websocket" />
