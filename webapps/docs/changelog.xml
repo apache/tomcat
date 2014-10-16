@@ -84,6 +84,9 @@
         single pass; either because the buffer is too small or the server sent
         the response in multiple packets. (markt)
       </fix>
+      <fix>
+        Fix client subprotocol handling. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
