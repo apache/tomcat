@@ -145,6 +145,11 @@
         correctly identify the associated Context when multiple versions of a
         Context with the same path are present. (markt)
       </fix>
+      <fix>
+        Remove the unnecessary registration of context.xml as a redeploy
+        resource. The context.xml having an external docBase has already been
+        registered as a redeploy resource at first. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

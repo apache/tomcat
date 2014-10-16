@@ -602,8 +602,6 @@ public class HostConfig
             if (isExternalWar && unpackWARs) {
                 deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
                         Long.valueOf(expandedDocBase.lastModified()));
-                deployedApp.redeployResources.put(contextXml.getAbsolutePath(),
-                        Long.valueOf(contextXml.lastModified()));
                 addWatchedResources(deployedApp, expandedDocBase.getAbsolutePath(), context);
             } else {
                 // Find an existing matching war and expanded folder
