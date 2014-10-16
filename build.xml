@@ -1099,6 +1099,9 @@
       <property name="tomcat.pool" value="${tomcat.pool}" />
       <property name="tomcat.juli.jar" value="${tomcat-juli.jar}" />
       <property name="skip.download" value="set"/>
+      <property name="version" value="${version}"/>
+      <property name="version.major" value="${version.major}"/>
+      <property name="version.major.minor" value="${version.major.minor}"/>
     </ant>
     <copy file="${tomcat-jdbc.jar}" todir="${tomcat.build}/lib"/>
   </target>
