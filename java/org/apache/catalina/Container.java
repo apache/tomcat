@@ -113,22 +113,28 @@ public interface Container extends Lifecycle {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the Logger with which this Container is associated.  If there is
-     * no associated Logger, return the Logger associated with our parent
-     * Container (if any); otherwise return <code>null</code>.
+     * Obtain the log to which events for this container should be logged.
+     *
+     * @return The Logger with which this Container is associated.  If there is
+     *         no associated Logger, return the Logger associated with the
+     *         parent Container (if any); otherwise return <code>null</code>.
      */
     public Log getLogger();
 
 
     /**
-     * Return the JMX name associated with this container.
+     * Obtain the JMX name for this container.
+     *
+     * @return the JMX name associated with this container.
      */
     public ObjectName getObjectName();
 
 
     /**
-     * Obtain the domain under which this container will be / has been
+     * Obtain the JMX domain under which this container will be / has been
      * registered.
+     *
+     * @return The JMX domain name
      */
     public String getDomain();
 
@@ -146,14 +152,18 @@ public interface Container extends Lifecycle {
     /**
      * Return the Pipeline object that manages the Valves associated with
      * this Container.
+     *
+     * @return The Pipeline
      */
     public Pipeline getPipeline();
 
 
     /**
-     * Return the Cluster with which this Container is associated.  If there is
-     * no associated Cluster, return the Cluster associated with our parent
-     * Container (if any); otherwise return <code>null</code>.
+     * Get the Cluster for this container.
+     *
+     * @return The Cluster with which this Container is associated. If there is
+     *         no associated Cluster, return the Cluster associated with our
+     *         parent Container (if any); otherwise return <code>null</code>.
      */
     public Cluster getCluster();
 
@@ -168,12 +178,17 @@ public interface Container extends Lifecycle {
 
     /**
      * Get the delay between the invocation of the backgroundProcess method on
-     * this container and its children. Child containers will not be invoked
-     * if their delay value is not negative (which would mean they are using
-     * their own thread). Setting this to a positive value will cause
-     * a thread to be spawn. After waiting the specified amount of time,
-     * the thread will invoke the executePeriodic method on this container
-     * and all its children.
+     * this container and its children. Child containers will not be invoked if
+     * their delay value is positive (which would mean they are using their own
+     * thread). Setting this to a positive value will cause a thread to be
+     * spawned. After waiting the specified amount of time, the thread will
+     * invoke the {@link #backgroundProcess()} method on this container and all
+     * children with non-positive delay values.
+     *
+     * @return The delay between the invocation of the backgroundProcess method
+     *         on this container and its children. A non-positive value
+     *         indicates that background processing will be managed by the
+     *         parent.
      */
     public int getBackgroundProcessorDelay();
 
@@ -192,6 +207,8 @@ public interface Container extends Lifecycle {
      * Return a name string (suitable for use by humans) that describes this
      * Container.  Within the set of child containers belonging to a particular
      * parent, Container names must be unique.
+     *
+     * @return The human readable name of this container.
      */
     public String getName();
 
@@ -211,8 +228,11 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the Container for which this Container is a child, if there is
-     * one.  If there is no defined parent, return <code>null</code>.
+     * Get the parent container.
+     *
+     * @return Return the Container for which this Container is a child, if
+     *         there is one. If there is no defined parent, return
+     *         <code>null</code>.
      */
     public Container getParent();
 
@@ -232,9 +252,11 @@ public interface Container extends Lifecycle {
 
 
     /**
-     * Return the parent class loader for this component. If not set, return
-     * {@link #getParent()} {@link #getParentClassLoader()}. If no parent has
-     * been set, return the system class loader.
+     * Get the parent class loader.
+     *
+     * @return the parent class loader for this component. If not set, return
+     *         {@link #getParent()}.{@link #getParentClassLoader()}. If no
+     *         parent has been set, return the system class loader.
      */
     public ClassLoader getParentClassLoader();
 
