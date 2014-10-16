@@ -68,7 +68,7 @@ implement its own timeout mechanism to handle these cases.</p>
 </section>
 
 <section name="Tomcat WebSocket specific configuration">
-<p>The JSR-356 Java WebSocket 1.0 implementation is only available when Tomcat
+<p>The JSR-356 Java WebSocket 1.1 implementation is only available when Tomcat
    is running on Java 7 or later.</p>
 
 <p>Tomcat provides a number of Tomcat specific configuration options for

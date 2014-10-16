@@ -36,7 +36,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  * specific functionality. Applications that wish to operate on a message basis
  * rather than a stream basis should use {@link MessageInbound}.
  * 
- * @deprecated  Replaced by the JSR356 WebSocket 1.0 implementation and will be
+ * @deprecated  Replaced by the JSR356 WebSocket 1.1 implementation and will be
  *              removed in Tomcat 8.0.x.  
  */
 @Deprecated

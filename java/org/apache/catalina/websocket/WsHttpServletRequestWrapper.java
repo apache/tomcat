@@ -45,7 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  * Wrapper for the HttpServletRequest object that allows the underlying request
  * object to be invalidated.
  * 
- * @deprecated  Replaced by the JSR356 WebSocket 1.0 implementation and will be
+ * @deprecated  Replaced by the JSR356 WebSocket 1.1 implementation and will be
  *              removed in Tomcat 8.0.x.  
  */
 @Deprecated

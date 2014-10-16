@@ -32,7 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
  * client) are synchronized to prevent multiple threads trying to write to the
  * client at the same time.
  * 
- * @deprecated  Replaced by the JSR356 WebSocket 1.0 implementation and will be
+ * @deprecated  Replaced by the JSR356 WebSocket 1.1 implementation and will be
  *              removed in Tomcat 8.0.x.  
  */
 @Deprecated
