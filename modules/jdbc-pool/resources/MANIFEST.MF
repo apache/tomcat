@@ -8,7 +8,6 @@ Export-Package: org.apache.tomcat.jdbc.naming;uses:="javax.naming,org.ap
  .logging,javax.management.openmbean,javax.management";version="@VERSION@
  ",org.apache.tomcat.jdbc.pool.jmx;uses:="org.apache.tomcat.jdbc.pool,or
  g.apache.juli.logging,javax.management";version="@VERSION@"
-Ant-Version: Apache Ant 1.7.0
 Bundle-Vendor: Apache Software Foundation
 Bundle-Version: @VERSION@
 Bundle-Name: Apache Tomcat JDBC Connection Pool
