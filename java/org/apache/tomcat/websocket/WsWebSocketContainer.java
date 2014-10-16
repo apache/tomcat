@@ -137,8 +137,7 @@ public class WsWebSocketContainer
         Endpoint ep = new PojoEndpointClient(pojo, annotation.decoders());
 
         Class<? extends ClientEndpointConfig.Configurator> configuratorClazz =
-                pojo.getClass().getAnnotation(
-                        ClientEndpoint.class).configurator();
+                annotation.configurator();
 
         ClientEndpointConfig.Configurator configurator = null;
         if (!ClientEndpointConfig.Configurator.class.equals(
