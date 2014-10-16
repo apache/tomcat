@@ -25,7 +25,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestNode extends TomcatBaseTest {
+public class TestNodeIntegration extends TomcatBaseTest {
 
     @Test
     public void testJspAttributeIsLiteral() throws Exception {
