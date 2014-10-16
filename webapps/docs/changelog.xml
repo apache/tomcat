@@ -235,6 +235,10 @@
         <bug>57005</bug>: Fix javadoc errors when building with Java 8. Patch
         provided by Pierre Viret. (markt)
       </fix>
+      <fix>
+        <bug>57079</bug>: Use Tomcat version number for jdbc-pool module when
+        building and shipping the module as part of Tomcat. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
