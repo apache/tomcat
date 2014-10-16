@@ -22,12 +22,15 @@ import java.security.SecureRandom;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.SessionIdGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class SessionIdGeneratorBase implements SessionIdGenerator {
+public abstract class SessionIdGeneratorBase extends LifecycleBase
+        implements SessionIdGenerator {
 
     private static final Log log = LogFactory.getLog(SessionIdGeneratorBase.class);
 
@@ -238,5 +241,33 @@ public abstract class SessionIdGeneratorBase implements SessionIdGenerator {
             log.info(sm.getString("sessionIdGeneratorBase.createRandom",
                     result.getAlgorithm(), Long.valueOf(t2-t1)));
         return result;
+    }
+
+
+    @Override
+    protected void initInternal() throws LifecycleException {
+        // NO-OP
+    }
+
+
+    @Override
+    protected void startInternal() throws LifecycleException {
+        // Ensure SecureRandom has been initialised
+        generateSessionId();
+
+        setState(LifecycleState.STARTING);
+    }
+
+
+    @Override
+    protected void stopInternal() throws LifecycleException {
+        setState(LifecycleState.STOPPING);
+        randoms.clear();
+    }
+
+
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+        // NO-OP
     }
 }
