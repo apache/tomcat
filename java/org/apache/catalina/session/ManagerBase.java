@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
@@ -615,17 +616,23 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             sig.setSecureRandomProvider(getSecureRandomProvider());
         }
 
-        // Force initialization of the random number generator
-        if (log.isDebugEnabled())
-            log.debug("Force random number initialization starting");
-        sessionIdGenerator.generateSessionId();
-        if (log.isDebugEnabled())
-            log.debug("Force random number initialization completed");
+        if (sessionIdGenerator instanceof Lifecycle) {
+            ((Lifecycle) sessionIdGenerator).start();
+        } else {
+            // Force initialization of the random number generator
+            if (log.isDebugEnabled())
+                log.debug("Force random number initialization starting");
+            sessionIdGenerator.generateSessionId();
+            if (log.isDebugEnabled())
+                log.debug("Force random number initialization completed");
+        }
     }
 
     @Override
     protected void stopInternal() throws LifecycleException {
-        this.sessionIdGenerator = null;
+        if (sessionIdGenerator instanceof Lifecycle) {
+            ((Lifecycle) sessionIdGenerator).stop();
+        }
     }
 
 
