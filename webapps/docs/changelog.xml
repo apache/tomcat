@@ -161,6 +161,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>57099</bug>: Ensure that semi-colons are not permitted in JSP
+        import page directives. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>

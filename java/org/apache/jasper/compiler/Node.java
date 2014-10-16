@@ -583,19 +583,34 @@ abstract class Node implements TagConstants {
             int start = 0;
             int index;
             while ((index = value.indexOf(',', start)) != -1) {
-                imports.add(value.substring(start, index).trim());
+                imports.add(validateImport(value.substring(start, index)));
                 start = index + 1;
             }
             if (start == 0) {
                 // No comma found
-                imports.add(value.trim());
+                imports.add(validateImport(value));
             } else {
-                imports.add(value.substring(start).trim());
+                imports.add(validateImport(value.substring(start)));
             }
         }
 
         public List<String> getImports() {
             return imports;
+        }
+
+        /**
+         * Just need enough validation to make sure nothing strange is going on.
+         * The compiler will validate this thoroughly when it tries to compile
+         * the resulting .java file.
+         */
+        private String validateImport(String importEntry) {
+            // This should either be a fully-qualified class name or a package
+            // name with a wildcard
+            if (importEntry.indexOf(';') > -1) {
+                throw new IllegalArgumentException(
+                        Localizer.getMessage("jsp.error.page.invaild.import"));
+            }
+            return importEntry.trim();
         }
     }
 
