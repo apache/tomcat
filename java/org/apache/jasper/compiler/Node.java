@@ -608,7 +608,7 @@ abstract class Node implements TagConstants {
             // name with a wildcard
             if (importEntry.indexOf(';') > -1) {
                 throw new IllegalArgumentException(
-                        Localizer.getMessage("jsp.error.page.invaild.import"));
+                        Localizer.getMessage("jsp.error.page.invalid.import"));
             }
             return importEntry.trim();
         }
