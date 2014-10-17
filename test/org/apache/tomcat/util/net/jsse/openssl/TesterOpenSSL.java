@@ -139,7 +139,7 @@ public class TesterOpenSSL {
     }
 
 
-    /**
+    /*
      * Use this method to filter parser results when comparing them to OpenSSL
      * results to take account of unimplemented cipher suites.
      */

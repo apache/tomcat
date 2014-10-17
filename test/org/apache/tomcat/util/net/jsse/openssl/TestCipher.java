@@ -34,7 +34,7 @@ public class TestCipher {
         Assume.assumeTrue(TesterOpenSSL.IS_EXPECTED_VERSION);
     }
 
-    /**
+    /*
      * Checks that every cipher suite returned by OpenSSL is mapped to at least
      * one cipher suite that is recognised by JSSE or is a cipher suite known
      * not to be supported by JSSE.
@@ -70,7 +70,7 @@ public class TestCipher {
     }
 
 
-    /**
+    /*
      * Checks that the unit tests are running with a version of OpenSSL that
      * includes all the expected ciphers and does not include any unexpected
      * ones.
