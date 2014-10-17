@@ -170,7 +170,7 @@
         JRE. (markt)
       </add>
       <add>
-        Disable SSLv3 by default for the APT/native HTTPS connector. (markt)
+        Disable SSLv3 by default for the APR/native HTTPS connector. (markt)
       </add>
     </changelog>
   </subsection>
