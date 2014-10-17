@@ -1368,11 +1368,11 @@
 
     <attribute name="SSLProtocol" required="false">
       <p>Protocol which may be used for communicating with clients. The default
-      value is <code>all</code>, which is equivalent to <code>SSLv3+TLSv1</code>
+      value is <code>all</code>, which is equivalent to <code>TLSv1</code>
       with other acceptable values being <code>SSLv2</code>,
       <code>SSLv3</code>, <code>TLSv1</code> and any combination of the three
-      protocols concatenated with a plus sign. Note that the protocol
-      <code>SSLv2</code> is inherently unsafe.</p>
+      protocols concatenated with a plus sign. Note that the protocols
+      <code>SSLv2</code> and <code>SSLv3</code> are inherently unsafe.</p>
     </attribute>
 
     <attribute name="SSLVerifyClient" required="false">
