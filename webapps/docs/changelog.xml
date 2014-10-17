@@ -74,6 +74,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        Disable SSLv3 by default for JSSE based HTTPS connectors (BIO and NIO).
+        The change also ensures that SSLv2 is disabled for these connectors
+        although SSLv2 should already be disabled by default by the JRE. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
