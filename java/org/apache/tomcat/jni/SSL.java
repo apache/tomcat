@@ -135,6 +135,9 @@ public final class SSL {
     public static final int SSL_OP_NO_SSLv2                         = 0x01000000;
     public static final int SSL_OP_NO_SSLv3                         = 0x02000000;
     public static final int SSL_OP_NO_TLSv1                         = 0x04000000;
+    public static final int SSL_OP_NO_TLSv1_1                       = 0x08000000;
+    public static final int SSL_OP_NO_TLSv1_2                       = 0x10000000;
+
     public static final int SSL_OP_NO_TICKET                        = 0x00004000;
 
     /* The next flag deliberately changes the ciphertest, this is a check
