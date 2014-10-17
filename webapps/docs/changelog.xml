@@ -68,10 +68,6 @@
         cache for a web application via JMX. (markt)
       </add>
       <fix>
-        <bug>53952</bug>: Add support for TLSv1.1 and TLSv1.2 for APR connector.
-        Based upon a patch by Marcel &#352;ebek. (schultz/jfclere)
-      </fix>
-      <fix>
         <bug>55951</bug>: Allow cookies to use UTF-8 encoded values in HTTP
         headers. This requires the use of the RFC6265
         <strong>CookieProcessor</strong>. (markt)
@@ -162,6 +158,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        <bug>53952</bug>: Add support for TLSv1.1 and TLSv1.2 for APR connector.
+        Based upon a patch by Marcel &#352;ebek. (schultz/jfclere)
+      </add>
       <scode>
         Cache the <code>Encoder</code> instances used to convert Strings to byte
         arrays in the Connectors (e.g. when writing HTTP headers) to improve
