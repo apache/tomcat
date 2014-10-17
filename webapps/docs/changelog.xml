@@ -212,6 +212,9 @@
       <fix>
         Fix client subprotocol handling. (remm)
       </fix>
+      <fix>
+        Add null checks for arguments in remote endpoint. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
