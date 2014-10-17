@@ -1175,8 +1175,9 @@
       <p>The comma separated list of SSL protocols to support for HTTPS
       connections. If specified, only the protocols that are listed and
       supported by the SSL implementation will be enabled. If not specified,
-      the JVM default is used. The permitted values may be obtained from the
-      JVM documentation for the allowed values for
+      the JVM default (excluding SSLv2 and SSLv3 if the JVM enables either or
+      both of them by default) is used. The permitted values may be obtained
+      from the JVM documentation for the allowed values for
       <code>SSLSocket.setEnabledProtocols()</code> e.g.
       <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#jssenames">
       Oracle Java 7</a>. Note: There is overlap between this attribute and
