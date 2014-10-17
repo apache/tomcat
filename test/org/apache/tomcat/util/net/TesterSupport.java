@@ -20,17 +20,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -109,12 +104,11 @@ public final class TesterSupport {
 
     protected static void configureClientSsl() {
         try {
-            SSLContext sc = SSLContext.getInstance("SSL");
+            SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
                     null);
-            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
-                    new TesterSSLSocketFactory(sc.getSocketFactory()));
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -241,69 +235,6 @@ public final class TesterSupport {
         public void checkServerTrusted(X509Certificate[] certs,
                 String authType) {
             // NOOP - Trust everything
-        }
-    }
-
-    private static class TesterSSLSocketFactory
-            extends SSLSocketFactory {
-
-        private SSLSocketFactory factory;
-
-        public TesterSSLSocketFactory(SSLSocketFactory factory) {
-            this.factory = factory;
-        }
-
-        @Override
-        public String[] getDefaultCipherSuites() {
-            return factory.getDefaultCipherSuites();
-        }
-
-        @Override
-        public String[] getSupportedCipherSuites() {
-            return factory.getSupportedCipherSuites();
-        }
-
-        @Override
-        public Socket createSocket(Socket socket, String s, int i, boolean flag)
-                throws IOException {
-            SSLSocket result =
-                (SSLSocket) factory.createSocket(socket, s, i, flag);
-            result.setEnabledProtocols(new String[] { "SSLv3" } );
-            return result;
-        }
-
-        @Override
-        public Socket createSocket(String s, int i) throws IOException,
-                UnknownHostException {
-            SSLSocket result = (SSLSocket) factory.createSocket(s, i);
-            result.setEnabledProtocols(new String[] { "SSLv3" } );
-            return result;
-        }
-
-        @Override
-        public Socket createSocket(String s, int i, InetAddress inetaddress,
-                int j) throws IOException, UnknownHostException {
-            SSLSocket result =
-                (SSLSocket) factory.createSocket(s, i, inetaddress, j);
-            result.setEnabledProtocols(new String[] { "SSLv3" } );
-            return result;
-        }
-
-        @Override
-        public Socket createSocket(InetAddress inetaddress, int i)
-                throws IOException {
-            SSLSocket result = (SSLSocket) factory.createSocket(inetaddress, i);
-            result.setEnabledProtocols(new String[] { "SSLv3" } );
-            return result;
-        }
-
-        @Override
-        public Socket createSocket(InetAddress inetaddress, int i,
-                InetAddress inetaddress1, int j) throws IOException {
-            SSLSocket result = (SSLSocket) factory.createSocket(
-                    inetaddress, i, inetaddress1, j);
-            result.setEnabledProtocols(new String[] { "SSLv3" } );
-            return result;
         }
     }
 }
