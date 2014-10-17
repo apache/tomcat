@@ -129,7 +129,16 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
             SSLServerSocket socket = (SSLServerSocket) ssf.createServerSocket();
             ciphers = socket.getEnabledCipherSuites();
-            protocols = socket.getEnabledProtocols();
+            // Filter out all the SSL protocols (SSLv2 and SSLv3) from the
+            // default protocols since they are no longer considered secure
+            List<String> filteredProtocols = new ArrayList<>();
+            for (String protocol : socket.getEnabledProtocols()) {
+                if (protocol.contains("SSL")) {
+                    continue;
+                }
+                filteredProtocols.add(protocol);
+            }
+            protocols = filteredProtocols.toArray(new String[filteredProtocols.size()]);
         } catch (NoSuchAlgorithmException | KeyManagementException | IOException |
                 IllegalArgumentException e) {
             // Assume no RFC 5746 support if an SSLContext could not be created

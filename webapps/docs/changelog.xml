@@ -163,6 +163,12 @@
         arrays in the Connectors (e.g. when writing HTTP headers) to improve
         throughput. (markt)
       </scode>
+      <add>
+        Disable SSLv3 by default for JSSE based HTTPS connectors (BIO, NIO and
+        NIO2). The change also ensures that SSLv2 is disabled for these
+        connectors although SSLv2 should already be disabled by default by the
+        JRE. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
