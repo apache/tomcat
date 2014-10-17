@@ -344,7 +344,7 @@ this:</p>
            scheme="https" secure="true" SSLEnabled="true"
            SSLCertificateFile="/usr/local/ssl/server.crt"
            SSLCertificateKeyFile="/usr/local/ssl/server.pem"
-           SSLVerifyClient="optional" SSLProtocol="TLSv1"/>]]></source>
+           SSLVerifyClient="optional" SSLProtocol="TLSv1+TLSv1.1+TLSv1.2"/>]]></source>
 
 
 <p>You will note that the example SSL connector elements are commented out by
