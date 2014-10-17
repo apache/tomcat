@@ -190,6 +190,14 @@ static const jint supported_ssl_opts = 0
      | SSL_OP_PKCS1_CHECK_2
 #endif
 
+#ifdef SSL_OP_NO_TLSv1_1
+     | SSL_OP_NO_TLSv1_1
+#endif
+
+#ifdef SSL_OP_NO_TLSv1_2
+     | SSL_OP_NO_TLSv1_2
+#endif
+
 #ifdef SSL_OP_SINGLE_DH_USE
      | SSL_OP_SINGLE_DH_USE
 #endif

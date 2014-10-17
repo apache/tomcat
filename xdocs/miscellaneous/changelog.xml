@@ -36,6 +36,13 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.31 and 1.1.32">
+  <changelog>
+    <fix>
+      <bug>53952</bug>: Add support for TLSv1.2 and TLSv1.1.
+      Patch provided by Marcel &#352;ebek. (schultz)
+  </changelog>
+</section>
 <section name="Changes between 1.1.30 and 1.1.31">
   <changelog>
     <fix>

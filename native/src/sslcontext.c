@@ -71,43 +71,64 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
     SSL_CTX *ctx = NULL;
     UNREFERENCED(o);
 
-    switch (protocol) {
-        case SSL_PROTOCOL_SSLV2:
-            if (mode == SSL_MODE_CLIENT)
-                ctx = SSL_CTX_new(SSLv2_client_method());
-            else if (mode == SSL_MODE_SERVER)
-                ctx = SSL_CTX_new(SSLv2_server_method());
-            else
-                ctx = SSL_CTX_new(SSLv2_method());
-        break;
-        case SSL_PROTOCOL_SSLV3:
-            if (mode == SSL_MODE_CLIENT)
-                ctx = SSL_CTX_new(SSLv3_client_method());
-            else if (mode == SSL_MODE_SERVER)
-                ctx = SSL_CTX_new(SSLv3_server_method());
-            else
-                ctx = SSL_CTX_new(SSLv3_method());
-        break;
-        case SSL_PROTOCOL_SSLV2 | SSL_PROTOCOL_SSLV3:
-        case SSL_PROTOCOL_SSLV2 | SSL_PROTOCOL_TLSV1:
-        case SSL_PROTOCOL_ALL:
-        case SSL_PROTOCOL_SSLV3 | SSL_PROTOCOL_TLSV1:
-            if (mode == SSL_MODE_CLIENT)
-                ctx = SSL_CTX_new(SSLv23_client_method());
-            else if (mode == SSL_MODE_SERVER)
-                ctx = SSL_CTX_new(SSLv23_server_method());
-            else
-                ctx = SSL_CTX_new(SSLv23_method());
-        break;
-        case SSL_PROTOCOL_TLSV1:
-            if (mode == SSL_MODE_CLIENT)
-                ctx = SSL_CTX_new(TLSv1_client_method());
-            else if (mode == SSL_MODE_SERVER)
-                ctx = SSL_CTX_new(TLSv1_server_method());
-            else
-                ctx = SSL_CTX_new(TLSv1_method());
-        break;
+    if (protocol == SSL_PROTOCOL_TLSV1_2) {
+#ifdef SSL_OP_NO_TLSv1_2
+        if (mode == SSL_MODE_CLIENT)
+            ctx = SSL_CTX_new(TLSv1_2_client_method());
+        else if (mode == SSL_MODE_SERVER)
+            ctx = SSL_CTX_new(TLSv1_2_server_method());
+        else
+            ctx = SSL_CTX_new(TLSv1_2_method());
+#endif
+    } else if (protocol == SSL_PROTOCOL_TLSV1_1) {
+#ifdef SSL_OP_NO_TLSv1_1
+        if (mode == SSL_MODE_CLIENT)
+            ctx = SSL_CTX_new(TLSv1_1_client_method());
+        else if (mode == SSL_MODE_SERVER)
+            ctx = SSL_CTX_new(TLSv1_1_server_method());
+        else
+            ctx = SSL_CTX_new(TLSv1_1_method());
+#endif
+    } else if (protocol == SSL_PROTOCOL_TLSV1) {
+        if (mode == SSL_MODE_CLIENT)
+            ctx = SSL_CTX_new(TLSv1_client_method());
+        else if (mode == SSL_MODE_SERVER)
+            ctx = SSL_CTX_new(TLSv1_server_method());
+        else
+            ctx = SSL_CTX_new(TLSv1_method());
+    } else if (protocol == SSL_PROTOCOL_SSLV3) {
+        if (mode == SSL_MODE_CLIENT)
+            ctx = SSL_CTX_new(SSLv3_client_method());
+        else if (mode == SSL_MODE_SERVER)
+            ctx = SSL_CTX_new(SSLv3_server_method());
+        else
+            ctx = SSL_CTX_new(SSLv3_method());
+#ifndef OPENSSL_NO_SSL2
+    } else if (protocol == SSL_PROTOCOL_SSLV2) {
+        if (mode == SSL_MODE_CLIENT)
+            ctx = SSL_CTX_new(SSLv2_client_method());
+        else if (mode == SSL_MODE_SERVER)
+            ctx = SSL_CTX_new(SSLv2_server_method());
+        else
+            ctx = SSL_CTX_new(SSLv2_method());
+#endif
+#ifndef SSL_OP_NO_TLSv1_2
+    } else if (protocol & SSL_PROTOCOL_TLSV1_2) {
+        /* requested but not supported */
+#endif
+#ifndef SSL_OP_NO_TLSv1_1
+    } else if (protocol & SSL_PROTOCOL_TLSV1_1) {
+        /* requested but not supported */
+#endif
+    } else {
+        if (mode == SSL_MODE_CLIENT)
+            ctx = SSL_CTX_new(SSLv23_client_method());
+        else if (mode == SSL_MODE_SERVER)
+            ctx = SSL_CTX_new(SSLv23_server_method());
+        else
+            ctx = SSL_CTX_new(SSLv23_method());
     }
+
     if (!ctx) {
         char err[256];
         ERR_error_string(ERR_get_error(), err);
@@ -133,6 +154,14 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
         SSL_CTX_set_options(c->ctx, SSL_OP_NO_SSLv3);
     if (!(protocol & SSL_PROTOCOL_TLSV1))
         SSL_CTX_set_options(c->ctx, SSL_OP_NO_TLSv1);
+#ifdef SSL_OP_NO_TLSv1_1
+    if (!(protocol & SSL_PROTOCOL_TLSV1_1))
+        SSL_CTX_set_options(c->ctx, SSL_OP_NO_TLSv1_1);
+#endif
+#ifdef SSL_OP_NO_TLSv1_2
+    if (!(protocol & SSL_PROTOCOL_TLSV1_2))
+        SSL_CTX_set_options(c->ctx, SSL_OP_NO_TLSv1_2);
+#endif
     /*
      * Configure additional context ingredients
      */
