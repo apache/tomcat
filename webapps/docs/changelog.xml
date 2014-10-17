@@ -59,6 +59,9 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>53952</bug>: Add support for TLSv1.1 and TLSv1.2 for APR connector.
+        Based upon a patch by Marcel &#352;ebek. (schultz/jfclere)
+      </fix>
         <bug>57022</bug>: Ensure SPNEGO authentication continues to work with
         the JNDI Realm using delegated credentials with recent Oracle JREs.
         (markt)
