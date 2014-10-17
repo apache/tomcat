@@ -506,6 +506,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         value |= SSL.SSL_PROTOCOL_SSLV3;
                     } else if ("TLSv1".equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_TLSV1;
+                    } else if ("TLSv1.1".equalsIgnoreCase(protocol)) {
+                        value |= SSL.SSL_PROTOCOL_TLSV1_1;
+                    } else if ("TLSv1.2".equalsIgnoreCase(protocol)) {
+                        value |= SSL.SSL_PROTOCOL_TLSV1_2;
                     } else if ("all".equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_ALL;
                     } else {

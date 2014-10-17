@@ -27,13 +27,15 @@ public final class SSLContext {
     /**
      * Initialize new SSL context
      * @param pool The pool to use.
-     * @param protocol The SSL protocol to use. It can be one of:
+     * @param protocol The SSL protocol to use. It can be any combination of
+     * the following:
      * <PRE>
-     * SSL_PROTOCOL_SSLV2
-     * SSL_PROTOCOL_SSLV3
-     * SSL_PROTOCOL_SSLV2 | SSL_PROTOCOL_SSLV3
-     * SSL_PROTOCOL_TLSV1
-     * SSL_PROTOCOL_ALL
+     * {@link SSL#SSL_PROTOCOL_SSLV2}
+     * {@link SSL#SSL_PROTOCOL_SSLV3}
+     * {@link SSL#SSL_PROTOCOL_TLSV1}
+     * {@link SSL#SSL_PROTOCOL_TLSV1_1}
+     * {@link SSL#SSL_PROTOCOL_TLSV1_2}
+     * {@link SSL#SSL_PROTOCOL_ALL} ( == all TLS versions, no SSL)
      * </PRE>
      * @param mode SSL mode to use
      * <PRE>

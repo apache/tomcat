@@ -70,7 +70,9 @@ public final class SSL {
     public static final int SSL_PROTOCOL_SSLV2 = (1<<0);
     public static final int SSL_PROTOCOL_SSLV3 = (1<<1);
     public static final int SSL_PROTOCOL_TLSV1 = (1<<2);
-    public static final int SSL_PROTOCOL_ALL   = (SSL_PROTOCOL_TLSV1);
+    public static final int SSL_PROTOCOL_TLSV1_1 = (1<<3);
+    public static final int SSL_PROTOCOL_TLSV1_2 = (1<<4);
+    public static final int SSL_PROTOCOL_ALL   = (SSL_PROTOCOL_TLSV1 | SSL_PROTOCOL_TLSV1_1 | SSL_PROTOCOL_TLSV1_2);
 
     /*
      * Define the SSL verify levels

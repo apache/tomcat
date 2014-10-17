@@ -181,7 +181,7 @@ public class AprSocketContext {
 
     private boolean useSendfile;
 
-    private int sslProtocol = SSL.SSL_PROTOCOL_TLSV1 | SSL.SSL_PROTOCOL_SSLV3;
+    private int sslProtocol = SSL.SSL_PROTOCOL_TLSV1 | SSL.SSL_PROTOCOL_TLSV1_1 | SSL.SSL_PROTOCOL_TLSV1_2;
 
     /**
      * Max time spent in a callback ( will be longer for blocking )
@@ -302,6 +302,10 @@ public class AprSocketContext {
             sslProtocol = SSL.SSL_PROTOCOL_SSLV3;
         } else if ("TLSv1".equalsIgnoreCase(protocol)) {
             sslProtocol = SSL.SSL_PROTOCOL_TLSV1;
+        } else if ("TLSv1.1".equalsIgnoreCase(protocol)) {
+            sslProtocol = SSL.SSL_PROTOCOL_TLSV1_1;
+        } else if ("TLSv1.2".equalsIgnoreCase(protocol)) {
+            sslProtocol = SSL.SSL_PROTOCOL_TLSV1_2;
         } else if ("all".equalsIgnoreCase(protocol)) {
             sslProtocol = SSL.SSL_PROTOCOL_ALL;
         }
