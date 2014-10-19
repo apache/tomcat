@@ -24,7 +24,9 @@ import java.nio.ByteBuffer;
  */
 public interface PongMessage {
     /**
-     * Obtain the payload of the Pong message as a ByteBuffer.
+     * Get the payload of the Pong message..
+     *
+     * @return  The payload of the Pong message.
      */
     ByteBuffer getApplicationData();
 }

@@ -30,6 +30,8 @@ public @interface ServerEndpoint {
 
     /**
      * URI or URI-template that the annotated class should be mapped to.
+     * @return The URI or URI-template that the annotated class should be mapped
+     *         to.
      */
     String value();
 

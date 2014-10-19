@@ -27,7 +27,8 @@ import java.util.Set;
 public interface Session extends Closeable {
 
     /**
-     * Returns the container that created this session.
+     * Get the container that created this session.
+     * @return the container that created this session.
      */
     WebSocketContainer getContainer();
 
@@ -63,34 +64,40 @@ public interface Session extends Closeable {
     boolean isOpen();
 
     /**
-     * Get the idle timeout for this session in milliseconds. Zero or negative
-     * values indicate an infinite timeout.
+     * Get the idle timeout for this session.
+     * @return The current idle timeout for this session in milliseconds. Zero
+     *         or negative values indicate an infinite timeout.
      */
     long getMaxIdleTimeout();
 
     /**
-     * Set the idle timeout for this session in milliseconds. Zero or negative
-     * values indicate an infinite timeout.
+     * Set the idle timeout for this session.
+     * @param timeout The new idle timeout for this session in milliseconds.
+     *                Zero or negative values indicate an infinite timeout.
      */
-    void setMaxIdleTimeout(long seconds);
+    void setMaxIdleTimeout(long timeout);
 
     /**
-     * Set the current maximum buffer size (in bytes) for binary messages.
+     * Set the current maximum buffer size for binary messages.
+     * @param max The new maximum buffer size in bytes
      */
     void setMaxBinaryMessageBufferSize(int max);
 
     /**
-     * Get the current maximum buffer size (in bytes) for binary messages.
+     * Get the current maximum buffer size for binary messages.
+     * @return The current maximum buffer size in bytes
      */
     int getMaxBinaryMessageBufferSize();
 
     /**
-     * Set the current maximum buffer size (in characters) for text messages.
+     * Set the maximum buffer size for text messages.
+     * @param max The new maximum buffer size in characters.
      */
     void setMaxTextMessageBufferSize(int max);
 
     /**
-     * Get the current maximum buffer size (in characters) for text messages.
+     * Get the maximum buffer size for text messages.
+     * @return The maximum buffer size in characters.
      */
     int getMaxTextMessageBufferSize();
 
@@ -101,6 +108,7 @@ public interface Session extends Closeable {
     /**
      * Provides a unique identifier for the session. This identifier should not
      * be relied upon to be generated from a secure random source.
+     * @return A unique identifier for the session.
      */
     String getId();
 
@@ -109,7 +117,8 @@ public interface Session extends Closeable {
      * {@link javax.websocket.CloseReason.CloseCodes#NORMAL_CLOSURE} and an
      * empty reason phrase.
      *
-     * @throws IOException
+     * @throws IOException if an I/O error occurs while the WebSocket session is
+     *                     being closed.
      */
     @Override
     void close() throws IOException;
@@ -118,10 +127,12 @@ public interface Session extends Closeable {
     /**
      * Close the connection to the remote end point using the specified code
      * and reason phrase.
+     * @param closeReason The reason the WebSocket session is being closed.
      *
-     * @throws IOException
+     * @throws IOException if an I/O error occurs while the WebSocket session is
+     *                     being closed.
      */
-    void close(CloseReason closeStatus) throws IOException;
+    void close(CloseReason closeReason) throws IOException;
 
     URI getRequestURI();
 
@@ -136,7 +147,10 @@ public interface Session extends Closeable {
     Principal getUserPrincipal();
 
     /**
-     * Obtain the set of currently open sessions for the local endpoint that
+     * Obtain the set of open sessions associated with the same local endpoint
+     * as this session.
+     *
+     * @return The set of currently open sessions for the local endpoint that
      * this session is associated with.
      */
     Set<Session> getOpenSessions();
@@ -146,12 +160,15 @@ public interface Session extends Closeable {
      * one {@link MessageHandler} may be registered for each message type (text
      * or binary, pong messages are never presented as partial messages).
      *
-     * @param clazz     The type of message that the given handler is intended
+     * @param <T>       The type of message that the given handler is intended
      *                  for
+     * @param clazz     The Class that implements T
      * @param handler   The message handler for a incoming message
      *
      * @throws IllegalStateException  If a message handler has already been
      *                                registered for the associated message type
+     *
+     * @since WebSocket 1.1
      */
     <T> void addMessageHandler(Class<T> clazz, MessageHandler.Partial<T> handler)
             throws IllegalStateException;
@@ -161,12 +178,15 @@ public interface Session extends Closeable {
      * one {@link MessageHandler} may be registered for each message type (text,
      * binary, pong).
      *
-     * @param clazz     The type of message that the given handler is intended
+     * @param <T>       The type of message that the given handler is intended
      *                  for
+     * @param clazz     The Class that implements T
      * @param handler   The message handler for a incoming message
      *
      * @throws IllegalStateException  If a message handler has already been
      *                                registered for the associated message type
+     *
+     * @since WebSocket 1.1
      */
     <T> void addMessageHandler(Class<T> clazz, MessageHandler.Whole<T> handler)
             throws IllegalStateException;
