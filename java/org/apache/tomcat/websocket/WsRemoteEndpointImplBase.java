@@ -528,6 +528,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void sendObjectByCompletion(Object obj, SendHandler completion) {
 
+        if (obj == null) {
+            throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
+        }
+        if (completion == null) {
+            throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullHandler"));
+        }
+
         if (Util.isPrimitive(obj.getClass())) {
             String msg = obj.toString();
             sendStringByCompletion(msg, completion);

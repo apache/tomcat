@@ -213,7 +213,7 @@
         Fix client subprotocol handling. (remm)
       </fix>
       <fix>
-        Add null checks for arguments in remote endpoint. (remm)
+        Add null checks for arguments in remote endpoint. (remm/kkolinko)
       </fix>
     </changelog>
   </subsection>

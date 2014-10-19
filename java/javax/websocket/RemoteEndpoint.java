@@ -68,6 +68,7 @@ public interface RemoteEndpoint {
          * when the message has been sent.
          * @param data          The text message to send
          * @return A Future that signals when the message has been sent.
+         * @throws IllegalArgumentException if {@code data} is {@code null}.
          */
         Future<Void> sendBinary(ByteBuffer data);
 
@@ -77,11 +78,29 @@ public interface RemoteEndpoint {
          * @param data          The text message to send
          * @param completion    Used to signal to the client when the message has
          *                      been sent
+         * @throws IllegalArgumentException if {@code data} or {@code completion}
+         *                      is {@code null}.
          */
         void sendBinary(ByteBuffer data, SendHandler completion);
 
+        /**
+         * Encodes object as a message and sends it asynchronously, using the
+         * Future to signal to the client when the message has been sent.
+         * @param obj           The object to be sent.
+         * @return A Future that signals when the message has been sent.
+         * @throws IllegalArgumentException if {@code obj} is {@code null}.
+         */
         Future<Void> sendObject(Object obj);
 
+        /**
+         * Encodes object as a message and sends it asynchronously, using the
+         * SendHandler to signal to the client when the message has been sent.
+         * @param obj           The object to be sent.
+         * @param completion    Used to signal to the client when the message has
+         *                      been sent
+         * @throws IllegalArgumentException if {@code obj} or
+         *                      {@code completion} is {@code null}.
+         */
         void sendObject(Object obj, SendHandler completion);
 
     }
@@ -91,6 +110,7 @@ public interface RemoteEndpoint {
         /**
          * Send the message, blocking until the message is sent.
          * @param text  The text message to send.
+         * @throws IllegalArgumentException if {@code text} is {@code null}.
          * @throws IOException if an I/O error occurs during the sending of the
          *                     message.
          */
@@ -99,6 +119,7 @@ public interface RemoteEndpoint {
         /**
          * Send the message, blocking until the message is sent.
          * @param data  The binary message to send
+         * @throws IllegalArgumentException if {@code data} is {@code null}.
          * @throws IOException if an I/O error occurs during the sending of the
          *                     message.
          */
@@ -112,6 +133,7 @@ public interface RemoteEndpoint {
          * @param fragment  The partial message to send
          * @param isLast    <code>true</code> if this is the last part of the
          *                  message, otherwise <code>false</code>
+         * @throws IllegalArgumentException if {@code fragment} is {@code null}.
          * @throws IOException if an I/O error occurs during the sending of the
          *                     message.
          */
@@ -125,6 +147,8 @@ public interface RemoteEndpoint {
          * @param partialByte   The partial message to send
          * @param isLast        <code>true</code> if this is the last part of the
          *                      message, otherwise <code>false</code>
+         * @throws IllegalArgumentException if {@code partialByte} is
+         *                     {@code null}.
          * @throws IOException if an I/O error occurs during the sending of the
          *                     message.
          */
@@ -134,7 +158,16 @@ public interface RemoteEndpoint {
 
         Writer getSendWriter() throws IOException;
 
-        void sendObject(Object o) throws IOException, EncodeException;
+        /**
+         * Encodes object as a message and sends it to the remote endpoint.
+         * @param data  The object to be sent.
+         * @throws EncodeException if there was a problem encoding the
+         *                     {@code data} object as a websocket message.
+         * @throws IllegalArgumentException if {@code data} is {@code null}.
+         * @throws IOException if an I/O error occurs during the sending of the
+         *                     message.
+         */
+        void sendObject(Object data) throws IOException, EncodeException;
 
     }
     /**
