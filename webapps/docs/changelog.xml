@@ -160,7 +160,8 @@
     <changelog>
       <add>
         <bug>53952</bug>: Add support for TLSv1.1 and TLSv1.2 for APR connector.
-        Based upon a patch by Marcel &#352;ebek. (schultz/jfclere)
+        Based upon a patch by Marcel &#352;ebek. This feature requires
+        Tomcat Native library 1.1.32 or later. (schultz/jfclere)
       </add>
       <scode>
         Cache the <code>Encoder</code> instances used to convert Strings to byte
