@@ -380,6 +380,8 @@ public interface ServletRequest {
     public RequestDispatcher getRequestDispatcher(String path);
 
     /**
+     * @param path The virtual path to be converted to a real path
+     * @return {@link ServletContext#getRealPath(String)}
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *             {@link ServletContext#getRealPath} instead.
      */
@@ -433,17 +435,18 @@ public interface ServletRequest {
 
     /**
      * @return TODO
-     * @throws java.lang.IllegalStateException
-     *             If async is not supported for this request
+     * @throws IllegalStateException If async is not supported for this request
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public AsyncContext startAsync();
 
     /**
-     * @param servletRequest
-     * @param servletResponse
+     * @param servletRequest    The ServletRequest with which to initialise the
+     *                          asynchronous context
+     * @param servletResponse   The ServletResponse with which to initialise the
+     *                          asynchronous context
      * @return TODO
-     * @throws java.lang.IllegalStateException
+     * @throws IllegalStateException If async is not supported for this request
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public AsyncContext startAsync(ServletRequest servletRequest,
@@ -463,7 +466,7 @@ public interface ServletRequest {
 
     /**
      * @return TODO
-     * @throws java.lang.IllegalStateException
+     * @throws IllegalStateException if the request is not in asynchronous mode
      * @since Servlet 3.0 TODO SERVLET3 - Add comments
      */
     public AsyncContext getAsyncContext();
