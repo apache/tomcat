@@ -116,6 +116,9 @@
       <fix>
         Fix client subprotocol handling. (remm)
       </fix>
+      <fix>
+        Add null checks for arguments in remote endpoint. (remm/kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -382,12 +385,6 @@
         Update the WebSocket implementation to support the Java WebSocket
         specification version 1.1. (markt)
       </update>
-      <fix>
-        Fix client subprotocol handling. (remm)
-      </fix>
-      <fix>
-        Add null checks for arguments in remote endpoint. (remm/kkolinko)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
