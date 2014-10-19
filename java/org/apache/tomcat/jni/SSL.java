@@ -142,9 +142,18 @@ public final class SSL {
 
     public static final int SSL_OP_NO_TICKET                        = 0x00004000;
 
-    /* The next flag deliberately changes the ciphertest, this is a check
-     * for the PKCS#1 attack */
+    // SSL_OP_PKCS1_CHECK_1 and SSL_OP_PKCS1_CHECK_2 flags are unsupported
+    // in the current version of OpenSSL library. See ssl.h changes in commit
+    // 7409d7ad517650db332ae528915a570e4e0ab88b (30 Apr 2011) of OpenSSL.
+    /**
+     * @deprecated Unsupported in the current version of OpenSSL
+     */
+    @Deprecated
     public static final int SSL_OP_PKCS1_CHECK_1                    = 0x08000000;
+    /**
+     * @deprecated Unsupported in the current version of OpenSSL
+     */
+    @Deprecated
     public static final int SSL_OP_PKCS1_CHECK_2                    = 0x10000000;
     public static final int SSL_OP_NETSCAPE_CA_DN_BUG               = 0x20000000;
     public static final int SSL_OP_NETSCAPE_DEMO_CIPHER_CHANGE_BUG  = 0x40000000;
