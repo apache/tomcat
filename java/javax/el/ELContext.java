@@ -41,8 +41,14 @@ public abstract class ELContext {
     
     // Can't use Class<?> because API needs to match specification
     /**
+     * Obtain the context object for the given key.
+     *
+     * @param key The key of the required context object
+     *
+     * @return The value of the context object associated with the given key
+     *
      * @throws NullPointerException
-     *              If the provided key is <code>null</code>
+     *              If the supplied key is <code>null</code>
      */
     public Object getContext(@SuppressWarnings("rawtypes") Class key) {
         if (key == null) {
@@ -55,6 +61,15 @@ public abstract class ELContext {
     }
     
     // Can't use Class<?> because API needs to match specification
+    /**
+     * Add an object to this EL context under the given key.
+     *
+     * @param key           The key under which to store the object
+     * @param contextObject The object to add
+     *
+     * @throws NullPointerException
+     *              If the supplied key or context is <code>null</code>
+     */
     public void putContext(@SuppressWarnings("rawtypes") Class key,
             Object contextObject) throws NullPointerException {
         if (key == null || contextObject == null) {

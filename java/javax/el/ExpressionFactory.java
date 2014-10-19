@@ -86,9 +86,35 @@ public abstract class ExpressionFactory {
         }
     }
 
+    /**
+     * Coerce the supplied object to the requested type.
+     *
+     * @param obj          The object to be coerced
+     * @param expectedType The type to which the object should be coerced
+     *
+     * @return An instance of the requested type.
+     *
+     * @throws ELException
+     *              If the conversion fails
+     */
     public abstract Object coerceToType(Object obj, Class<?> expectedType)
             throws ELException;
 
+    /**
+     * Create a new value expression.
+     *
+     * @param context      The EL context for this evaluation
+     * @param expression   The String representation of the value expression
+     * @param expectedType The expected type of the result of evaluating the
+     *                     expression
+     *
+     * @return A new value expression formed from the input parameters
+     *
+     * @throws NullPointerException
+     *              If the expected type is <code>null</code>
+     * @throws ELException
+     *              If there are syntax errors in the provided expression
+     */
     public abstract ValueExpression createValueExpression(ELContext context,
             String expression, Class<?> expectedType)
             throws NullPointerException, ELException;
@@ -96,6 +122,23 @@ public abstract class ExpressionFactory {
     public abstract ValueExpression createValueExpression(Object instance,
             Class<?> expectedType);
 
+    /**
+     * Create a new method expression instance.
+     *
+     * @param context            The EL context for this evaluation
+     * @param expression         The String representation of the method
+     *                           expression
+     * @param expectedReturnType The expected type of the result of invoking the
+     *                           method
+     * @param expectedParamTypes The expected types of the input parameters
+     *
+     * @return A new method expression formed from the input parameters.
+     *
+     * @throws NullPointerException
+     *              If the expected parameters types are <code>null</code>
+     * @throws ELException
+     *              If there are syntax errors in the provided expression
+     */
     public abstract MethodExpression createMethodExpression(ELContext context,
             String expression, Class<?> expectedReturnType,
             Class<?>[] expectedParamTypes) throws ELException,
