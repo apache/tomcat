@@ -145,7 +145,9 @@ public class IdentityInputFilter implements InputFilter {
                 } else {
                     result = nRead;
                 }
-                remaining = remaining - nRead;
+                if (nRead > 0) {
+                    remaining = remaining - nRead;
+                }
             } else {
                 // No more bytes left to be read : return -1 and clear the 
                 // buffer
