@@ -194,7 +194,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 # Remove first 25 lines from converted file which contains
-# page navagation data.
+# page navigation data.
 # Remember to increase the lines when new file is added to news.
 sed -i '' '1,25d' ../../CHANGELOG.txt
 cd "$top"
