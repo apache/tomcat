@@ -177,6 +177,10 @@
       <add>
         Disable SSLv3 by default for the APR/native HTTPS connector. (markt)
       </add>
+      <fix>
+        Do not increase remaining counter at end of stream in
+        IdentityInputFilter. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
