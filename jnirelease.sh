@@ -23,7 +23,7 @@
 
 # Default place to look for apr source.  Can be overridden with
 #   --with-apr=[directory]
-apr_src_dir=`pwd`/srclib/apr
+apr_src_dir=`pwd`/native/srclib/apr
 JKJNIEXT=""
 JKJNIVER=""
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/native
