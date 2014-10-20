@@ -1,6 +1,6 @@
 --- include/apr.hw
 +++ include/apr.hw
-@@ -276,7 +276,7 @@
+@@ -282,7 +282,7 @@
  #define APR_HAVE_IN_ADDR        1
  #define APR_HAVE_INET_ADDR      1
  #define APR_HAVE_INET_NETWORK   0
@@ -9,7 +9,7 @@
  #define APR_HAVE_MEMMOVE        1
  #define APR_HAVE_SETRLIMIT      0
  #define APR_HAVE_SIGACTION      0
-@@ -340,7 +340,7 @@
+@@ -346,7 +346,7 @@
  /* If we have a TCP implementation that can be "corked", what flag
   * do we use?
   */
