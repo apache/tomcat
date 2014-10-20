@@ -411,8 +411,24 @@
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements and should be the first listener defined.</p>
 
-    <p>No additional attributes are supported by the <strong>Version Logging
-    Lifecycle Listener</strong>.</p>
+    <p>The following additional attributes are supported by the <strong>Version
+    Logging Lifecycle Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="logArgs" required="false">
+        <p>If <code>true</code>, the command line arguments passed to Java when
+        Tomcat started will be logged. If not specified, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="logEnv" required="false">
+        <p>If <code>true</code>, the current environment variables when Tomcat
+        starts will be logged. If not specified, the default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 

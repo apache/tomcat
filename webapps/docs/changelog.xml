@@ -59,6 +59,11 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>47919</bug>: Extend the information logged when Tomcat starts to
+        optionally include (disabled by default) the values of key environment
+        variables. (markt)  
+      </add>
+      <add>
         <bug>56401</bug>: Log version information when Tomcat starts.
         (markt/kkolinko)
       </add>
