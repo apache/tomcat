@@ -58,6 +58,10 @@
 <section name="Tomcat 7.0.57 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>56401</bug>: Log version information when Tomcat starts.
+        (markt/kkolinko)
+      </add>
       <fix>
         <bug>57022</bug>: Ensure SPNEGO authentication continues to work with
         the JNDI Realm using delegated credentials with recent Oracle JREs.
@@ -71,6 +75,11 @@
         Remove the unnecessary registration of context.xml as a redeploy
         resource. The context.xml having an external docBase has already been
         registered as a redeploy resources at first. (kfujino)
+      </fix>
+      <fix>
+        Improve the previous fix for <bug>56401</bug>. Avoid logging version
+        information in the constructor since it then gets logged at undesirable
+        times such as when using <code>StoreConfig</code>. (markt)
       </fix>
     </changelog>
   </subsection>
