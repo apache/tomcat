@@ -213,12 +213,11 @@
     </fileset>
   </path>
 
-
   <!-- Version info filter set -->
   <tstamp>
-    <format property="year" pattern="yyyy" locale="en"/>
-    <format property="today" pattern="MMM d yyyy" locale="en"/>
-    <format property="tstamp" pattern="hh:mm:ss"/>
+    <format property="year" pattern="yyyy" locale="en" timezone="UTC"/>
+    <format property="today" pattern="MMM d yyyy" locale="en" timezone="UTC"/>
+    <format property="tstamp" pattern="HH:mm:ss" locale="en" timezone="UTC"/>
   </tstamp>
   <filterset id="version.filters">
     <filter token="YEAR" value="${year}"/>
@@ -226,7 +225,7 @@
     <filter token="VERSION_NUMBER" value="${version.number}"/>
     <filter token="VERSION_MAJOR" value="${version.major}"/>
     <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
-    <filter token="VERSION_BUILT" value="${today} ${tstamp}"/>
+    <filter token="VERSION_BUILT" value="${today} ${tstamp} UTC"/>
     <filter token="JDT_VERSION" value="${jdt.version}"/>
   </filterset>
 
