@@ -60,8 +60,10 @@
       </add>
       <add>
         <bug>47919</bug>: Extend the information logged when Tomcat starts to
-        optionally include (disabled by default) the values of key environment
-        variables. (markt)
+        optionally log the values of command line arguments (enabled by
+        default) and environment variables (disabled by default). Note that
+        the values added to CATALINA_OPTS and JAVA_OPTS environment variables
+        will be logged, as they are used to build up the command line. (markt)
       </add>
       <add>
         <bug>49939</bug>: Expose the method that clears the static resource
