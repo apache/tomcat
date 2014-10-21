@@ -191,6 +191,11 @@
         <bug>57099</bug>: Ensure that semi-colons are not permitted in JSP
         import page directives. (markt)
       </fix>
+      <fix>
+        <bug>57113</bug>: Fix broken package imports in Expression Language when
+        more than one package was imported and the desired class was not in the
+        last package imported. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
