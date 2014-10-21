@@ -168,6 +168,10 @@
         Correct version of Java WebSocket mentioned in documentation
         (s/1.0/1.1/). (markt/kkolinko)
       </fix>
+      <update>
+        In examples web application move Async and Comet examples from JSP
+        to Servlet examples page. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

@@ -157,7 +157,7 @@
 
     <servlet-mapping>
         <servlet-name>ChatServlet</servlet-name>
-        <url-pattern>/jsp/chat/chat</url-pattern>
+        <url-pattern>/servlets/chat/chat</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CompressionFilterTestServlet</servlet-name>
