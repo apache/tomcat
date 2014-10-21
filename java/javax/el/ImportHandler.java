@@ -143,7 +143,10 @@ public class ImportHandler {
             // (which correctly triggers an error)
             for (String p : packages) {
                 String className = p + '.' + name;
-                result = findClass(className, true);
+                Class<?> clazz = findClass(className, true);
+                if (clazz != null) {
+                    result = clazz;
+                }
             }
         }
 

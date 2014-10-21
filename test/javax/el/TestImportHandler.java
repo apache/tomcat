@@ -16,6 +16,8 @@
  */
 package javax.el;
 
+import java.util.ArrayList;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -60,6 +62,23 @@ public class TestImportHandler {
         handler.importPackage("org.apache.jasper.util");
 
         handler.resolveClass("ExceptionUtils");
+    }
+
+
+    /**
+     * Multiple package imports with a single match.
+     * https://issues.apache.org/bugzilla/show_bug.cgi?id=57113
+     */
+    @Test
+    public void testResolveClass04() {
+        ImportHandler handler = new ImportHandler();
+
+        handler.importPackage("java.util");
+        handler.importPackage("java.net");
+
+        Class<?> clazz = handler.resolveClass("ArrayList");
+
+        Assert.assertEquals(ArrayList.class, clazz);
     }
 
 
