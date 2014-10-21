@@ -512,14 +512,21 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    public void sendObject(Object obj) throws IOException {
+    public void sendObject(Object obj) throws IOException, EncodeException {
         Future<Void> f = sendObjectByFuture(obj);
         try {
             f.get();
         } catch (InterruptedException e) {
             throw new IOException(e);
         } catch (ExecutionException e) {
-            throw new IOException(e);
+            Throwable cause = e.getCause();
+            if (cause instanceof IOException) {
+                throw (IOException) cause;
+            } else if (cause instanceof EncodeException) {
+                throw (EncodeException) cause;
+            } else {
+                throw new IOException(e);
+            }
         }
     }
 
