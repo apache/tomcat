@@ -598,4 +598,36 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             }
         }
     }
+
+
+    @Test
+    public void testUnsupportedObject() throws Exception{
+        Tomcat tomcat = getTomcatInstance();
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        ctx.addApplicationListener(ProgramaticServerEndpointConfig.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+
+        tomcat.start();
+
+        Client client = new Client();
+        URI uri = new URI("ws://localhost:" + getPort() + PATH_PROGRAMMATIC_EP);
+        Session session = wsContainer.connectToServer(client, uri);
+
+        // This should fail
+        Object msg1 = new Object();
+        try {
+            session.getBasicRemote().sendObject(msg1);
+            Assert.fail("No exception thrown ");
+        } catch (EncodeException e) {
+            // Expected
+        } catch (Throwable t) {
+            Assert.fail("Wrong exception type");
+        } finally {
+            session.close();
+        }
+    }
 }
