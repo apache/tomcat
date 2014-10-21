@@ -170,6 +170,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>57079</bug>: Use Tomcat version number for jdbc-pool module when
+        building and shipping the module as part of Tomcat. (markt/kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
