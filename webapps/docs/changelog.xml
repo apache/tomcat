@@ -220,6 +220,12 @@
       <fix>
         Add null checks for arguments in remote endpoint. (remm/kkolinko)
       </fix>
+      <fix>
+        <bug>57118</bug>: Ensure that that an <code>EncodeException</code> is
+        thrown by <code>RemoteEndpoint.Basic.sendObject(Object)</code> rather
+        than an <code>IOException</code> when no suitable <code>Encoder</code>
+        is configured for the given Object. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
