@@ -85,11 +85,11 @@ public class JspPropertyGroup {
     }
     public String getDefaultContentType() { return this.defaultContentType; }
 
-    private Integer buffer = null;
+    private String buffer = null;
     public void setBuffer(String buffer) {
-        this.buffer = Integer.valueOf(buffer);
+        this.buffer = buffer;
     }
-    public Integer getBuffer() { return this.buffer; }
+    public String getBuffer() { return this.buffer; }
 
     private Boolean errorOnUndeclaredNamespace = null;
     public void setErrorOnUndeclaredNamespace(
