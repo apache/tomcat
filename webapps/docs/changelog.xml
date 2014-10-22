@@ -258,6 +258,9 @@
         Correct version of Java WebSocket mentioned in documentation
         (s/1.0/1.1/). (markt/kkolinko)
       </fix>
+      <update>
+        Suppress timestamp comments in Javadoc. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">

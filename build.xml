@@ -1875,7 +1875,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;Servlet 3.1 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
-      additionalparam="-breakiterator"
+      additionalparam="-breakiterator -notimestamp"
       maxmemory="256m" >
       <classpath>
         <path refid="compile.classpath"/>
@@ -1892,7 +1892,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;JSP 2.3 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
-      additionalparam="-breakiterator"
+      additionalparam="-breakiterator -notimestamp"
       maxmemory="256m" >
       <classpath>
         <path refid="compile.classpath"/>
@@ -1909,7 +1909,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;EL 3.0 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
-      additionalparam="-breakiterator"
+      additionalparam="-breakiterator -notimestamp"
       maxmemory="256m" >
       <classpath>
         <path refid="compile.classpath"/>
@@ -1926,7 +1926,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;WebSocket 1.1 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
-      additionalparam="-breakiterator"
+      additionalparam="-breakiterator -notimestamp"
       maxmemory="256m" >
       <classpath>
         <path refid="compile.classpath"/>
@@ -1942,7 +1942,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
-      additionalparam="-breakiterator"
+      additionalparam="-breakiterator -notimestamp"
       maxmemory="256m" >
       <classpath>
         <path refid="compile.classpath"/>
