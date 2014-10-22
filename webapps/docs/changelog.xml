@@ -233,6 +233,11 @@
         Add null checks for arguments in remote endpoint. (remm/kkolinko)
       </fix>
       <fix>
+        <bug>57091</bug>: Work around the behaviour of the Oracle JRE when
+        creating new threads in an applet environment that breaks the WebSocket
+        client implementation. Patch provided by Niklas Hallqvist. (markt)
+      </fix>
+      <fix>
         <bug>57118</bug>: Ensure that that an <code>EncodeException</code> is
         thrown by <code>RemoteEndpoint.Basic.sendObject(Object)</code> rather
         than an <code>IOException</code> when no suitable <code>Encoder</code>
