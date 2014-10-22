@@ -158,7 +158,7 @@
       </fix>
       <fix>
         <bug>57105</bug>: When parsing web.xml do not limit the buffer element
-        of the jsp-property-group element to integer values as the allowed 
+        of the jsp-property-group element to integer values as the allowed
         values are <code>&lt;number&gt;kb</code> or <code>none</code>. (markt)
       </fix>
     </changelog>
