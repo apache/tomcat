@@ -226,25 +226,27 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     /**
      * Return the all roles mode.
+     * @return A string representation of the current all roles mode
      */
     public String getAllRolesMode() {
-
         return allRolesMode.toString();
-
     }
 
 
     /**
      * Set the all roles mode.
+     * @param allRolesMode A string representation of the new all roles mode
      */
     public void setAllRolesMode(String allRolesMode) {
-
         this.allRolesMode = AllRolesMode.toMode(allRolesMode);
-
     }
 
+
     /**
-     * Return the digest algorithm  used for storing credentials.
+     * Return the digest algorithm used for storing credentials.
+     *
+     * @return The currently configured algorithm used to digest stored
+     *         credentials
      *
      * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
      *              by the CredentialHandler
@@ -346,11 +348,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     /**
      * Return the "validate certificate chains" flag.
+     * @return The value of the validate certificate chains flag
      */
     public boolean getValidate() {
-
-        return (this.validate);
-
+        return validate;
     }
 
 
