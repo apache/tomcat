@@ -1387,16 +1387,17 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     // --------------------------------------------------------- Static Methods
 
-
     /**
-     * Digest password using the algorithm specified and
-     * convert the result to a corresponding hex string.
-     * If exception, the plain credentials string is returned
+     * Digest password using the algorithm specified and convert the result to a
+     * corresponding hex string.
      *
-     * @param credentials Password or other credentials to use in
-     *  authenticating this username
-     * @param algorithm Algorithm used to do the digest
-     * @param encoding Character encoding of the string to digest
+     * @param credentials Password or other credentials to use in authenticating
+     *                    this username
+     * @param algorithm   Algorithm used to do the digest
+     * @param encoding    Character encoding of the string to digest
+     *
+     * @return The digested credentials as a hex string or the original plain
+     *         text credentials if an error occurs.
      */
     public static final String Digest(String credentials, String algorithm,
                                       String encoding) {
@@ -1433,8 +1434,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *                 credential. If not specified a default of SHA-512 will be
      *                 used.</li>
      * <li><b>-e</b> - The encoding to use for any byte to/from character
-     *                 conversion that may be necessary. If not specified, a
-     *                 default of UTF-8 will be used.</li>
+     *                 conversion that may be necessary. If not specified, the
+     *                 system encoding ({@link Charset#defaultCharset()}) will
+     *                 be used.</li>
      * <li><b>-i</b> - The number of iterations to use when generating the
      *                 stored credential. If not specified, the default for the
      *                 CredentialHandler will be used.</li>
@@ -1456,11 +1458,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * <li>{@link MessageDigestCredentialHandler}</li>
      * <li>{@link SecretKeyCredentialHandler}</li>
      * </ul>
+     * @param args The parameters passed on the command line
      */
     public static void main(String args[]) {
 
         String algorithm = "SHA-512";
-        String encoding = "UTF-8";
+        String encoding = Charset.defaultCharset().name();
         int saltLength = -1;
         int iterations = -1;
         int keyLength = -1;

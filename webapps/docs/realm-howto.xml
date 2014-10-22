@@ -189,8 +189,8 @@ techniques are supported:</p>
 <li>If you are writing an application that needs to calculate digested
     passwords dynamically, call the static <code>Digest()</code> method of the
     <code>org.apache.catalina.realm.RealmBase</code> class, passing the
-    cleartext password and the digest algorithm name as arguments.  This
-    method will return the digested password.</li>
+    cleartext password, the digest algorithm name and the encoding as arguments.
+    This method will return the digested password.</li>
 <li>If you want to execute a command line utility to calculate the digested
     password, simply execute
 <source>CATALINA_HOME/bin/digest.[bat|sh] -a {algorithm} {cleartext-password}</source>
