@@ -209,13 +209,42 @@ techniques are supported:</p>
    not specified in web.xml, the default value of <code>Authentication
    required</code> is used.</p>
 
-<p>Non-ASCII usernames and/or passwords are supported using</p>
+<p>Usernames and/or passwords using encodings other than the platform default
+are supported using</p>
 <source>CATALINA_HOME/bin/digest.[bat|sh] -a {algorithm} -e {encoding} {input}</source>
-<p>but care is required to ensure that the non-ASCII input is
-correctly passed to the digester.
-The digester returns <code>{input}:{digest}</code>. If the input appears
-corrupted in the return, the digest will be invalid.</p>
+<p>but care is required to ensure that the input is correctly passed to the
+digester. The digester returns <code>{input}:{digest}</code>. If the input
+appears corrupted in the return, the digest will be invalid.</p>
 
+<p>The full syntax of <code>CATALINA_HOME/bin/digest.[bat|sh]</code> is:</p>
+<source>CATALINA_HOME/bin/digest.[bat|sh] [-a &lt;algorithm&gt;] [-e &lt;encoding&gt;]
+        [-i &lt;iterations&gt;] [-s &lt;salt-length&gt;] [-k &lt;key-length&gt;]
+        [-h &lt;handler-class-name&gt;] &lt;credentials&gt;
+</source>
+<ul>
+<li><b>-a</b> - The algorithm to use to generate the stored
+                credential. If not specified, the default for the handler will
+                be used. If neither handler nor algorithm is specified then a
+                default of <code>SHA-512</code> will be used</li>
+<li><b>-e</b> - The encoding to use for any byte to/from character
+                conversion that may be necessary. If not specified, the
+                system encoding (<code>Charset#defaultCharset()</code>) will
+                be used.</li>
+<li><b>-i</b> - The number of iterations to use when generating the
+                stored credential. If not specified, the default for the
+                CredentialHandler will be used.</li>
+<li><b>-s</b> - The length (in bytes) of salt to generate and store as
+                part of the credential. If not specified, the default for
+                the CredentialHandler will be used.</li>
+<li><b>-k</b> - The length (in bits) of the key(s), if any, created while
+                generating the credential. If not specified, the default
+                for the CredentialHandler will be used.</li>
+<li><b>-h</b> - The fully qualified class name of the CredentialHandler
+                to use. If not specified, the built-in handlers will be
+                tested in turn (MessageDigestCredentialHandler then
+                SecretKeyCredentialHandler) and the first one to accept the
+                specified algorithm will be used.</li>
+</ul>
 </subsection>
 
 
