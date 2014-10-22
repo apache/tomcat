@@ -80,6 +80,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             new ArrayList<>();
 
     static {
+        // Order is important since it determines the search order for a
+        // matching handler if only an algorithm is specified when calling
+        // main()
         credentialHandlerClasses.add(MessageDigestCredentialHandler.class);
         credentialHandlerClasses.add(SecretKeyCredentialHandler.class);
     }
@@ -1462,11 +1465,15 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      */
     public static void main(String args[]) {
 
-        String algorithm = "SHA-512";
-        String encoding = Charset.defaultCharset().name();
+        // Use negative values since null is not an option to indicate 'not set'
         int saltLength = -1;
         int iterations = -1;
         int keyLength = -1;
+        // Default
+        String encoding = Charset.defaultCharset().name();
+        // Default values for these depend on whether either of them are set on
+        // the command line
+        String algorithm = null;
         String handlerClassName = null;
 
         if (args.length == 0) {
@@ -1509,6 +1516,19 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
             }
             argIndex += 2;
+        }
+
+        // Determine defaults for -a and -h. The rules are more complex to
+        // express than the implementation:
+        // - if neither -a nor -h is set, use SHA-512 and
+        //   MessageDigestCredentialHandler
+        // - if only -a is set the built-in handlers will be searched in order
+        //   (MessageDigestCredentialHandler, SecretKeyCredentialHandler) and
+        //   the first handler that supports the algorithm will be used
+        // - if only -h is set no default will be used for -a. The handler may
+        //   or may nor support -a and may or may not supply a sensible default
+        if (algorithm == null && handlerClassName == null) {
+            algorithm = "SHA-512";
         }
 
         CredentialHandler handler = null;
