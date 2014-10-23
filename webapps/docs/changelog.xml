@@ -205,6 +205,11 @@
         <bug>57132</bug>: Fix import conflicts reporting in Expression Language.
         (kkolinko)
       </fix>
+      <fix>
+        When coercing an object to a given type, only attempt coercion to an
+        array if both the object type and the target type are an array type.
+        (violetagg/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
