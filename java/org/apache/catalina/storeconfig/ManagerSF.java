@@ -19,6 +19,8 @@ package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
 
+import org.apache.catalina.Manager;
+import org.apache.catalina.SessionIdGenerator;
 import org.apache.catalina.session.StandardManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -47,9 +49,7 @@ public class ManagerSF extends StoreFactoryBase {
                     if (log.isDebugEnabled())
                         log.debug(sm.getString("factory.storeTag", elementDesc
                                 .getTag(), aElement));
-                    getStoreAppender().printIndent(aWriter, indent + 2);
-                    getStoreAppender().printTag(aWriter, indent + 2, manager,
-                            elementDesc);
+                    super.store(aWriter, indent, aElement);
                 }
             } else {
                 super.store(aWriter, indent, aElement);
@@ -76,6 +76,20 @@ public class ManagerSF extends StoreFactoryBase {
         }
         return (true);
 
+    }
+
+    @Override
+    public void storeChildren(PrintWriter aWriter, int indent, Object aManager,
+            StoreDescription parentDesc) throws Exception {
+        if (aManager instanceof Manager) {
+            Manager manager = (Manager) aManager;
+            // Store nested <SessionIdGenerator> element
+            System.out.println("Checking SessionIdGenerator for store .....");
+            SessionIdGenerator sessionIdGenerator = manager.getSessionIdGenerator();
+            if (sessionIdGenerator != null) {
+                storeElement(aWriter, indent, sessionIdGenerator);
+            }
+        }
     }
 
 }
