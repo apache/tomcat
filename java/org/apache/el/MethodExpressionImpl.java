@@ -88,20 +88,10 @@ public final class MethodExpressionImpl extends MethodExpression implements
 
     private Class<?>[] paramTypes;
 
-    /**
-     *
-     */
     public MethodExpressionImpl() {
         super();
     }
 
-    /**
-     * @param expr
-     * @param node
-     * @param fnMapper
-     * @param expectedType
-     * @param paramTypes
-     */
     public MethodExpressionImpl(String expr, Node node,
             FunctionMapper fnMapper, VariableMapper varMapper,
             Class<?> expectedType, Class<?>[] paramTypes) {

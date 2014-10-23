@@ -14,22 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el.parser;
 
 import javax.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
  * @author Jacob Hookom [jacob@hookom.net]
  */
 public abstract class ArithmeticNode extends SimpleNode {
 
-    /**
-     * @param i
-     */
     public ArithmeticNode(int i) {
         super(i);
     }

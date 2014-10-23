@@ -150,7 +150,7 @@ public class ELSupport {
      * @param obj0 the first object
      * @param obj1 the second object
      * @return true if the objects are equal
-     * @throws ELException
+     * @throws ELException if one of the coercion fails
      */
     public static final boolean equals(final Object obj0, final Object obj1)
             throws ELException {
@@ -220,6 +220,8 @@ public class ELSupport {
      * Convert an object to Boolean.
      * Null and empty string are false.
      * @param obj the object to convert
+     * @param primitive is the target a primitive in which case coercion to null
+     *                  is not permitted
      * @return the Boolean value of the object
      * @throws ELException if object is not Boolean or String
      */
@@ -412,8 +414,8 @@ public class ELSupport {
     }
 
     /**
-     * Coerce an object to a string
-     * @param obj
+     * Coerce an object to a string.
+     * @param obj the object to convert
      * @return the String value of the object
      */
     public static final String coerceToString(final Object obj) {
