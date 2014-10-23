@@ -1847,7 +1847,7 @@
         tofile="${tomcat.dist}/bin/i64/tomcat${version.major}.exe" />
     <!-- tc native -->
     <copy todir="${tomcat.dist}/bin">
-      <fileset dir="${tomcat-native.home}/${tomcat-native.win.path}/bin">
+      <fileset dir="${tomcat-native.home}/bin">
         <include name="*.dll"/>
         <include name="**/*.dll"/>
       </fileset>
@@ -2082,8 +2082,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="-installer-prep"
-      description="Prepares file structure required to buidl installer"
-      depends="dist-static">
+      description="Prepares file structure required to build installer"
+      unless="skip.installer" depends="dist-static">
     <copy todir="${tomcat.dist}">
       <fileset dir="res">
         <include name="INSTALLLICENSE" />
@@ -2106,7 +2106,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="-installer-create-tempinstaller"
       description="Creates the temporary installer"
-      depends="-installer-prep">
+      unless="skip.installer" depends="-installer-prep">
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
       <arg value="/DUNINSTALLONLY" />
       <arg value="/DNSISDIR=${nsis.home}" />
@@ -2123,8 +2123,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="-installer-create-uninstaller"
-    description="Execute the temporary installer to create the uninstaller"
-    depends="-installer-create-tempinstaller">
+      description="Execute the temporary installer to create the uninstaller"
+      unless="skip.installer" depends="-installer-create-tempinstaller">
     <!-- Execute the temporary installer to create the uninstaller -->
     <exec dir="${tomcat.dist}" executable="${tomcat.dist}/tempinstaller.exe"
         osfamily="windows"  />
@@ -2136,7 +2136,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="-installer-sign-uninstaller"
       description="Sign the uninstaller executable"
-      depends="-installer-create-uninstaller"
+      unless="skip.installer" depends="-installer-create-uninstaller"
       if="${do.codesigning}">
     <taskdef name="signcode"
         classname="org.apache.tomcat.buildutil.SignCode"
@@ -2815,7 +2815,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <antcall target="downloadzip-2">
       <param name="sourcefile.1" value="${tomcat-native.win.1}"/>
       <param name="sourcefile.2" value="${tomcat-native.win.2}"/>
-      <param name="destfile" value="${tomcat-native.home}/${tomcat-native.win.path}/LICENSE"/>
+      <param name="destfile" value="${tomcat-native.home}/LICENSE"/>
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
