@@ -31,7 +31,8 @@ TCTRUNK_SVNBASE=https://svn.apache.org/repos/asf/tomcat/trunk
 
 # Set the environment variable that stops OSX storing extended
 # attributes in tar archives etc. with a file starting with ._
-export COPYFILE_DISABLE=1
+COPYFILE_DISABLE=1
+export COPYFILE_DISABLE
 
 for o
 do
@@ -193,10 +194,11 @@ if [ $? -ne 0 ]; then
     echo ""
     exit 1
 fi
-# Remove first 25 lines from converted file which contains
-# page navigation data.
-# Remember to increase the lines when new file is added to news.
-sed -i '' '1,25d' ../../CHANGELOG.txt
+# Remove page navigation data from converted file.
+cp -p ../../CHANGELOG.txt ../../CHANGELOG.txt.tmp
+awk '/Preface/ {o=1} o>0' ../../CHANGELOG.txt.tmp > ../../CHANGELOG.txt
+rm ../../CHANGELOG.txt.tmp
+
 cd "$top"
 mv ${JKJNIDIST}/jni/build/docs ${JKJNIDIST}/jni/docs
 rm -rf ${JKJNIDIST}/jni/build
