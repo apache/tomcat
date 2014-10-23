@@ -146,6 +146,10 @@ public class ImportHandler {
 
 
     public java.lang.Class<?> resolveClass(String name) {
+        if (name == null || name.contains(".")) {
+            return null;
+        }
+
         Class<?> result = clazzes.get(name);
 
         if (result == null) {
