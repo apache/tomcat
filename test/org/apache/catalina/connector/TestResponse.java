@@ -100,7 +100,7 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Tests an issue noticed during the investigation of BZ 52811.
      */
     @Test

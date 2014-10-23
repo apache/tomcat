@@ -53,7 +53,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
     private static Log log = LogFactory.getLog(TestSwallowAbortedUploads.class);
 
-    /**
+    /*
      * Test whether size limited uploads correctly handle connection draining.
      */
     public Exception doAbortedUploadTest(AbortedUploadClient client, boolean limited,
@@ -71,7 +71,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         return ex;
     }
 
-    /**
+    /*
      * Test whether aborted POST correctly handle connection draining.
      */
     public Exception doAbortedPOSTTest(AbortedPOSTClient client, int status,

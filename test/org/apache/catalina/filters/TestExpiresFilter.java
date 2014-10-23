@@ -159,7 +159,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
         }
     }
 
-    /**
+    /*
      * Test that a resource with empty content is also processed
      */
     @Test

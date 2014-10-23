@@ -35,7 +35,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestOutputBuffer extends TomcatBaseTest{
 
-    /**
+    /*
      * Expect that the buffered results are slightly slower since Tomcat now has
      * an internal buffer so an extra one just adds overhead.
      *
