@@ -118,12 +118,19 @@ public class ImportHandler {
         String simpleName = clazz.getSimpleName();
         Class<?> conflict = clazzes.get(simpleName);
 
-        if (conflict != null) {
-            throw new ELException(Util.message(null,
-                    "importHandler.ambiguousImport", name, conflict.getName()));
+        if (conflict == null) {
+            // No conflict - add it
+            clazzes.put(simpleName, clazz);
+        } else {
+            // Check for a duplicate
+            if (conflict.equals(clazz)) {
+                // This is a duplicate.
+                // NO-OP
+            } else {
+                throw new ELException(Util.message(null,
+                        "importHandler.ambiguousImport", name, conflict.getName()));
+            }
         }
-
-        clazzes.put(simpleName, clazz);
     }
 
 
