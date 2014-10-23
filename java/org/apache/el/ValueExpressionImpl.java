@@ -102,9 +102,6 @@ public final class ValueExpressionImpl extends ValueExpression implements
         super();
     }
 
-    /**
-     *
-     */
     public ValueExpressionImpl(String expr, Node node, FunctionMapper fnMapper,
             VariableMapper varMapper, Class<?> expectedType) {
         this.expr = expr;

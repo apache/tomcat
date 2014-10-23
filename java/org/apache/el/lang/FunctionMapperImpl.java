@@ -96,9 +96,6 @@ public class FunctionMapperImpl extends FunctionMapper implements
         protected String prefix;
         protected String localName;
 
-        /**
-         *
-         */
         public Function(String prefix, String localName, Method m) {
             if (localName == null) {
                 throw new NullPointerException("LocalName cannot be null");
