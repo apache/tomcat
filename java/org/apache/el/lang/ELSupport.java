@@ -482,7 +482,7 @@ public class ELSupport {
         }
 
         // Handle arrays
-        if (type.isArray()) {
+        if (type.isArray() && obj.getClass().isArray()) {
             return coerceToArray(obj, type);
         }
 

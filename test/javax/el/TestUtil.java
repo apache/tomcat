@@ -41,9 +41,16 @@ public class TestUtil {
 
 
     @Test
-    public void testBug56425() {
+    public void testBug56425a() {
         ELProcessor processor = new ELProcessor();
         processor.defineBean("string", "a-b-c-d");
         Assert.assertEquals("a_b_c_d", processor.eval("string.replace(\"-\",\"_\")"));
+    }
+
+    @Test
+    public void testBug56425b() {
+        ELProcessor processor = new ELProcessor();
+        processor.defineBean("string", "Not used. Any value is fine here");
+        Assert.assertEquals("5", processor.eval("string.valueOf(5)"));
     }
 }
