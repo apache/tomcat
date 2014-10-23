@@ -167,6 +167,23 @@ public class TestImportHandler {
 
 
     /**
+     * Import duplicate classes (i.e. the same class twice).
+     */
+    @Test
+    public void testImportClass04() {
+        ImportHandler handler = new ImportHandler();
+
+        handler.importClass("org.apache.tomcat.util.res.StringManager");
+        handler.importClass("org.apache.tomcat.util.res.StringManager");
+
+        Class<?> result = handler.resolveClass("StringManager");
+
+        Assert.assertEquals(StringManager.class, result);
+    }
+
+
+
+    /**
      * Import an invalid package.
      */
     @Test(expected=ELException.class)
