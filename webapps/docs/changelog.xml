@@ -161,6 +161,10 @@
         of the jsp-property-group element to integer values as the allowed
         values are <code>&lt;number&gt;kb</code> or <code>none</code>. (markt)
       </fix>
+      <update>
+        Update the minimum required version of the Tomcat Native library (if
+        used) to 1.1.32. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
