@@ -76,9 +76,12 @@ public class ReflectionUtil {
     }
 
     /**
-     * Converts an array of Class names to Class types
-     * @param s
-     * @throws ClassNotFoundException
+     * Converts an array of Class names to Class types.
+     * @param s  The array of class names
+     * @return An array of Class instance where the element at index i in the
+     *         result is an instance of the class with the name at index i in
+     *         the input
+     * @throws ClassNotFoundException If a class of a given name cannot be found
      */
     public static Class<?>[] toTypeArray(String[] s) throws ClassNotFoundException {
         if (s == null)
@@ -91,8 +94,10 @@ public class ReflectionUtil {
     }
 
     /**
-     * Converts an array of Class types to Class names
-     * @param c
+     * Converts an array of Class types to Class names.
+     * @param c The array of class instances
+     * @return An array of Class names where the element at index i in the
+     *         result is the name of the class instance at index i in the input
      */
     public static String[] toTypeNameArray(Class<?>[] c) {
         if (c == null)
@@ -111,7 +116,8 @@ public class ReflectionUtil {
      * @param paramTypes the parameter types to use
      * @param paramValues the parameter values
      * @return the method specified
-     * @throws MethodNotFoundException
+     * @throws MethodNotFoundException If a method can not be found that matches
+     *         the given criteria
      */
     /*
      * This class duplicates code in javax.el.Util. When making changes keep
