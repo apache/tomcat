@@ -364,7 +364,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                             // because the client has gone away). In some cases
                             // there may be a large (ish) buffer to fill before
                             // the write fails.
-                            for (int j = 0 ; j < 8; i++) {
+                            for (int j = 0 ; j < 8; j++) {
                                 os.write(BYTES_8K);
                             }
                             os.flush();
