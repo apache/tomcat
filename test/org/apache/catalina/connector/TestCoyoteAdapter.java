@@ -360,7 +360,13 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                 public void run() {
                     for (int i = 0; i < 20; i++) {
                         try {
-                            os.write(BYTES_8K);
+                            // Some tests depend on this write failing (e.g.
+                            // because the client has gone away). In some cases
+                            // there may be a large (ish) buffer to fill before
+                            // the write fails.
+                            for (int j = 0 ; j < 8; i++) {
+                                os.write(BYTES_8K);
+                            }
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
