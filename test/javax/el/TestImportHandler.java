@@ -91,6 +91,36 @@ public class TestImportHandler {
 
 
     /**
+     * Attempting to resolve something that isn't a simple class name
+     * https://issues.apache.org/bugzilla/show_bug.cgi?id=57132
+     */
+    @Test
+    public void testResolveClass05() {
+        ImportHandler handler = new ImportHandler();
+
+        handler.importPackage("java.nio");
+
+        Class<?> clazz = handler.resolveClass("charset.StandardCharsets");
+
+        Assert.assertNull(clazz);
+    }
+
+    /**
+     * Attempting to resolve something that isn't a simple class name
+     * https://issues.apache.org/bugzilla/show_bug.cgi?id=57132
+     */
+    @Test
+    public void testResolveClass06() {
+        ImportHandler handler = new ImportHandler();
+
+        handler.importPackage("java.nio");
+
+        Class<?> clazz = handler.resolveClass(null);
+
+        Assert.assertNull(clazz);
+    }
+
+    /**
      * Import a valid class.
      */
     @Test

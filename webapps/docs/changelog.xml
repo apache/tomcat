@@ -210,6 +210,10 @@
         array if both the object type and the target type are an array type.
         (violetagg/markt)
       </fix>
+      <fix>
+        Improve handling of invalid input to
+        <code>javax.el.ImportHandler.resolveClass()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
