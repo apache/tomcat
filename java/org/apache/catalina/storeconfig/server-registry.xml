@@ -116,9 +116,11 @@
         tag="Manager"
         standard="false"
         default="false"
+        children="true"
         tagClass="org.apache.catalina.Manager"
         storeFactoryClass="org.apache.catalina.storeconfig.ManagerSF">
         <TransientAttribute>distributable</TransientAttribute>
+        <TransientAttribute>domain</TransientAttribute>
     </Description>
     <Description
         tag="Manager"
@@ -409,6 +411,35 @@
         standard="false"
         default="false"
         tagClass="org.apache.catalina.core.StandardThreadExecutor"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+     </Description>
+     <Description
+        tag="JarScanner"
+        standard="true"
+        default="false"
+        children="true"
+        tagClass="org.apache.tomcat.util.scan.StandardJarScanner"
+        storeFactoryClass="org.apache.catalina.storeconfig.JarScannerSF">
+     </Description>
+     <Description
+        tag="JarScanFilter"
+        standard="true"
+        default="false"
+        tagClass="org.apache.tomcat.util.scan.StandardJarScanFilter"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+     </Description>
+     <Description
+        tag="CookieProcessor"
+        standard="true"
+        default="false"
+        tagClass="org.apache.tomcat.util.http.LegacyCookieProcessor"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+     </Description>
+     <Description
+        tag="SessionIdGenerator"
+        standard="true"
+        default="false"
+        tagClass="org.apache.catalina.util.StandardSessionIdGenerator"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
 </Registry>

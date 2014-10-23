@@ -42,7 +42,9 @@ import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.util.ContextName;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
+import org.apache.tomcat.util.http.CookieProcessor;
 
 /**
  * Store server.xml Context element with all children
@@ -293,6 +295,14 @@ public class StandardContextSF extends StoreFactoryBase {
             wresources = filterWatchedResources(context, wresources);
             getStoreAppender().printTagArray(aWriter, "WatchedResource",
                     indent + 2, wresources);
+
+            // Store nested <JarScanner> elements
+            JarScanner jarScanner = context.getJarScanner();
+            storeElement(aWriter, indent, jarScanner);
+
+            // Store nested <CookieProcessor> elements
+            CookieProcessor cookieProcessor = context.getCookieProcessor();
+            storeElement(aWriter, indent, cookieProcessor);
         }
     }
 

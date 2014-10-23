@@ -165,6 +165,10 @@
         Update the minimum required version of the Tomcat Native library (if
         used) to 1.1.32. (markt)
       </update>
+      <fix>
+        Update storeconfig with newly introduced elements: SessionIdGenerator,
+        CookieProcessor, JarScanner and JarScanFilter. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
