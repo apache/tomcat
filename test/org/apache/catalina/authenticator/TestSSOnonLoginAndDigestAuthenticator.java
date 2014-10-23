@@ -86,7 +86,7 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
 
     private List<String> cookies;
 
-    /**
+    /*
      * Try to access an unprotected resource without an
      * established SSO session.
      * This should be permitted.
@@ -108,7 +108,7 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
                        false, true, 403);
     }
 
-    /**
+    /*
      * Logon to access a protected resource using DIGEST authentication,
      * which will establish an SSO session.
      * Wait until the SSO session times-out, then try to re-access

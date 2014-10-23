@@ -350,7 +350,7 @@ public class TestCometProcessor extends TomcatBaseTest {
         }
     }
 
-    /**
+    /*
      * Tests if the Comet connection is closed if the Tomcat connector is
      * stopped.
      */

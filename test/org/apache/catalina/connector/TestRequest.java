@@ -255,7 +255,7 @@ public class TestRequest extends TomcatBaseTest {
 
     }
 
-    /**
+    /*
      * Test case for
      * <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=38113">bug
      * 38118</a>.
@@ -301,7 +301,7 @@ public class TestRequest extends TomcatBaseTest {
         }
     }
 
-    /**
+    /*
      * Test case for {@link Request#login(String, String)} and
      * {@link Request#logout()}.
      */

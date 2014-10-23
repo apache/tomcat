@@ -539,7 +539,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
                 actualRequest.getAttribute(AccessLog.REMOTE_HOST_ATTRIBUTE));
     }
 
-    /**
+    /*
      * Test {@link RemoteIpFilter} in Tomcat standalone server
      */
     @Test

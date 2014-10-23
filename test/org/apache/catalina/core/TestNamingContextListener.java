@@ -41,7 +41,7 @@ public class TestNamingContextListener extends TomcatBaseTest {
     private static final String BUG54096_NameB = "envB";
     private static final String BUG54096_ValueB = "B";
 
-    /**
+    /*
      * Test JNDI is available to ServletContextListeners.
      */
     @Test
