@@ -201,6 +201,10 @@
         more than one package was imported and the desired class was not in the
         last package imported. (markt)
       </fix>
+      <fix>
+        <bug>57132</bug>: Fix import conflicts reporting in Expression Language.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

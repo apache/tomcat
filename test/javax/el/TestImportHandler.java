@@ -54,14 +54,22 @@ public class TestImportHandler {
     /**
      * Conflict on resolution.
      */
-    @Test(expected=ELException.class)
+    @Test
     public void testResolveClass03() {
         ImportHandler handler = new ImportHandler();
 
         handler.importPackage("org.apache.tomcat.util");
         handler.importPackage("org.apache.jasper.util");
 
-        handler.resolveClass("ExceptionUtils");
+        for (int i = 1; i <= 3; i++) {
+            try {
+                Class<?> clazz = handler.resolveClass("ExceptionUtils");
+                Assert.fail("Expected ELException but got [" + clazz.getName()
+                        + "] on iteration " + i);
+            } catch (ELException ex) {
+                // Expected
+            }
+        }
     }
 
 
@@ -111,12 +119,20 @@ public class TestImportHandler {
     /**
      * Import conflicting classes
      */
-    @Test(expected=ELException.class)
+    @Test
     public void testImportClass03() {
         ImportHandler handler = new ImportHandler();
 
         handler.importClass("org.apache.tomcat.util.ExceptionUtils");
-        handler.importClass("org.apache.jasper.util.ExceptionUtils");
+        for (int i = 1; i <= 3; i++) {
+            try {
+                handler.importClass("org.apache.jasper.util.ExceptionUtils");
+                Assert.fail("Expected ELException but got none on iteration "
+                        + i);
+            } catch (ELException ex) {
+                // Expected
+            }
+        }
     }
 
 
@@ -175,11 +191,19 @@ public class TestImportHandler {
     /**
      * Import an invalid static field - conflict.
      */
-    @Test(expected=ELException.class)
+    @Test
     public void testImportStatic04() {
         ImportHandler handler = new ImportHandler();
 
         handler.importStatic("org.apache.tomcat.util.buf.Constants.Package");
-        handler.importStatic("org.apache.tomcat.util.scan.Constants.Package");
+        for (int i = 1; i <= 3; i++) {
+            try {
+                handler.importStatic("org.apache.tomcat.util.scan.Constants.Package");
+                Assert.fail("Expected ELException but got none on iteration "
+                        + i);
+            } catch (ELException ex) {
+                // Expected
+            }
+        }
     }
 }

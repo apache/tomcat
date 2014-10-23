@@ -51,7 +51,7 @@ public class ImportHandler {
         String className = name.substring(0, lastPeriod);
         String fieldOrMethodName = name.substring(lastPeriod + 1);
 
-        Class<?> clazz = findClass(className, false);
+        Class<?> clazz = findClass(className);
 
         if (clazz == null) {
             throw new ELException(Util.message(
@@ -108,12 +108,22 @@ public class ImportHandler {
                     null, "importHandler.invalidClassName", name));
         }
 
-        Class<?> clazz = findClass(name, true);
+        Class<?> clazz = findClass(name);
 
         if (clazz == null) {
             throw new ELException(Util.message(
                     null, "importHandler.classNotFound", name));
         }
+
+        String simpleName = clazz.getSimpleName();
+        Class<?> conflict = clazzes.get(simpleName);
+
+        if (conflict != null) {
+            throw new ELException(Util.message(null,
+                    "importHandler.ambiguousImport", name, conflict.getName()));
+        }
+
+        clazzes.put(simpleName, clazz);
     }
 
 
@@ -143,10 +153,18 @@ public class ImportHandler {
             // (which correctly triggers an error)
             for (String p : packages) {
                 String className = p + '.' + name;
-                Class<?> clazz = findClass(className, true);
+                Class<?> clazz = findClass(className);
                 if (clazz != null) {
+                    if (result != null) {
+                        throw new ELException(Util.message(null,
+                                "importHandler.ambiguousImport", className,
+                                result.getName()));
+                    }
                     result = clazz;
                 }
+            }
+            if (result != null) {
+                clazzes.put(name, result);
             }
         }
 
@@ -159,7 +177,7 @@ public class ImportHandler {
     }
 
 
-    private Class<?> findClass(String name, boolean cache) {
+    private Class<?> findClass(String name) {
         Class<?> clazz;
         try {
              clazz = Class.forName(name);
@@ -173,18 +191,6 @@ public class ImportHandler {
                 Modifier.isInterface(modifiers)) {
             throw new ELException(Util.message(
                     null, "importHandler.invalidClass", name));
-        }
-
-        if (cache) {
-            String simpleName = clazz.getSimpleName();
-            Class<?> conflict = clazzes.get(simpleName);
-
-            if (conflict != null) {
-                throw new ELException(Util.message(null,
-                        "importHandler.ambiguousImport", name, conflict.getName()));
-            }
-
-            clazzes.put(simpleName, clazz);
         }
 
         return clazz;
