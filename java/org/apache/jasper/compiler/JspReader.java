@@ -730,7 +730,7 @@ class JspReader {
     }
 
     /**
-     * Pop a file from the file stack.  The field "current" is retored
+     * Pop a file from the file stack.  The field "current" is restored
      * to the value to point to the previous files, if any, and is set
      * to null otherwise.
      * @return true is there is a previous file on the stack.
