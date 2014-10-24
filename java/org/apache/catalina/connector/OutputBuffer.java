@@ -523,7 +523,6 @@ public class OutputBuffer extends Writer
             return;
         }
 
-        charsWritten += len;
         if (s == null) {
             s = "null";
         }
