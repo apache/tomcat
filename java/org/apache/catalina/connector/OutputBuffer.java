@@ -611,8 +611,10 @@ public class OutputBuffer extends Writer
     }
 
     /**
-     * True if this buffer hasn't been used ( since recycle() ) -
-     * i.e. no chars or bytes have been added to the buffer.
+     * Has this buffer been used at all?
+     *
+     * @return true if no chars or bytes have been added to the buffer since the
+     *         last call to {@link #recycle()}
      */
     public boolean isNew() {
         return (bytesWritten == 0) && (charsWritten == 0);
