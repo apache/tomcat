@@ -32,6 +32,7 @@ import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * The buffer used by Tomcat response. This is a derivative of the Tomcat 3.3
@@ -43,6 +44,9 @@ import org.apache.tomcat.util.buf.CharChunk;
  */
 public class OutputBuffer extends Writer
     implements ByteChunk.ByteOutputChannel, CharChunk.CharOutputChannel {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
     // -------------------------------------------------------------- Constants
 
@@ -524,7 +528,7 @@ public class OutputBuffer extends Writer
         }
 
         if (s == null) {
-            s = "null";
+            throw new NullPointerException(sm.getString("outputBuffer.writeNull"));
         }
         cb.append(s, off, len);
         charsWritten += len;

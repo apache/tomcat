@@ -169,6 +169,12 @@
         Update storeconfig with newly introduced elements: SessionIdGenerator,
         CookieProcessor, JarScanner and JarScanFilter. (remm)
       </fix>
+      <fix>
+        Throw a <code>NullPointerException</code> if a null string is passed to
+        the <code>write(String,int,int)</code> method of the
+        <code>PrintWriter</code> obtained from the <code>ServletResponse</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
