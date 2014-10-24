@@ -605,7 +605,11 @@ class JspDocumentParser
                         lastCh = ch;
                     }
                 } else if (lastCh == '\\' && (ch == '$' || ch == '#')) {
-                    if (pageInfo.isELIgnored()) {
+                    if (i + 1 < charBuffer.length() && charBuffer.charAt(i + 1) == '{') {
+                        if (pageInfo.isELIgnored()) {
+                            ttext.write('\\');
+                        }
+                    } else {
                         ttext.write('\\');
                     }
                     ttext.write(ch);

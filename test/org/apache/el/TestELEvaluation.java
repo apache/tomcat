@@ -110,19 +110,19 @@ public class TestELEvaluation {
         assertEquals("\\", evaluateExpression("\\"));
         assertEquals("$", evaluateExpression("$"));
         assertEquals("#", evaluateExpression("#"));
-        assertEquals("$", evaluateExpression("\\$"));
-        assertEquals("#", evaluateExpression("\\#"));
-        assertEquals("\\$", evaluateExpression("\\\\$"));
-        assertEquals("\\#", evaluateExpression("\\\\#"));
+        assertEquals("\\$", evaluateExpression("\\$"));
+        assertEquals("\\#", evaluateExpression("\\#"));
+        assertEquals("\\\\$", evaluateExpression("\\\\$"));
+        assertEquals("\\\\#", evaluateExpression("\\\\#"));
         assertEquals("${", evaluateExpression("\\${"));
         assertEquals("#{", evaluateExpression("\\#{"));
         assertEquals("\\${", evaluateExpression("\\\\${"));
         assertEquals("\\#{", evaluateExpression("\\\\#{"));
 
-        // '\' is only an escape for '$' and '#'.
-        assertEquals("$", evaluateExpression("\\$"));
+        // '\' is only an escape for '${' and '#{'.
+        assertEquals("\\$", evaluateExpression("\\$"));
         assertEquals("${", evaluateExpression("\\${"));
-        assertEquals("$a", evaluateExpression("\\$a"));
+        assertEquals("\\$a", evaluateExpression("\\$a"));
         assertEquals("\\a", evaluateExpression("\\a"));
         assertEquals("\\\\", evaluateExpression("\\\\"));
     }
