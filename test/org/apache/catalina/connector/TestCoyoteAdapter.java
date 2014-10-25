@@ -371,7 +371,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            log.info("Exception caught " + e.getMessage());
+                            log.info("Exception caught " + e);
                             try {
                                 // Note if request times out before this
                                 // exception is thrown and the complete call
