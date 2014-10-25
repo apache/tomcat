@@ -307,8 +307,9 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         for (int i = 0; i < 10; i++) {
             String line = client.readLine();
-            if (line != null && line.length() > 20)
-            System.err.println(line.subSequence(0, 20) + "...");
+            if (line != null && line.length() > 20) {
+                log.info(line.subSequence(0, 20) + "...");
+            }
         }
 
         client.disconnect();
@@ -319,13 +320,13 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
             Thread.sleep(250);
             count ++;
         }
-        System.err.println("Waited for servlet thread to stop for "
-                + (count * 250) + " ms");
+        log.info("Waited for servlet thread to stop for " + (count * 250)
+                + " ms");
 
         Assert.assertTrue(servlet.isCompleted());
     }
 
-    private static class AsyncServlet extends HttpServlet {
+    private class AsyncServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
@@ -370,7 +371,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            System.err.println("Exception caught " + e.getMessage());
+                            log.info("Exception caught " + e.getMessage());
                             try {
                                 // Note if request times out before this
                                 // exception is thrown and the complete call
