@@ -315,13 +315,17 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         client.disconnect();
 
         // Wait for server thread to stop
-        int count = 0;
-        while (servlet.getThread().isAlive() && count < 20) {
-            Thread.sleep(250);
-            count ++;
+        Thread t = servlet.getThread();
+        long startTime = System.nanoTime();
+        for (int count = 0; t.isAlive() && count < 20; count++) {
+            t.join(250);
+            if (!t.isAlive()) {
+                break;
+            }
         }
-        log.info("Waited for servlet thread to stop for " + (count * 250)
-                + " ms");
+        long endTime = System.nanoTime();
+        log.info("Waited for servlet thread to stop for "
+                + (endTime - startTime) / 1000000 + " ms");
 
         Assert.assertTrue(servlet.isCompleted());
     }
