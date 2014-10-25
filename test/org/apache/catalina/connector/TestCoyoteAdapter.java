@@ -18,8 +18,10 @@ package org.apache.catalina.connector;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,12 +31,26 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCoyoteAdapter extends TomcatBaseTest {
 
+    public static final String TEXT_8K;
+    public static final byte[] BYTES_8K;
+
+    static {
+        StringBuilder sb = new StringBuilder(8192);
+        for (int i = 0; i < 512; i++) {
+            sb.append("0123456789ABCDEF");
+        }
+        TEXT_8K = sb.toString();
+        BYTES_8K = TEXT_8K.getBytes(B2CConverter.UTF_8);
+    }
     @Test
     public void testPathParmsRootNone() throws Exception {
         pathParamTest("/", "none");
@@ -253,6 +269,126 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
             // Not thread safe
             pathInfo = req.getPathInfo();
+        }
+    }
+
+
+    @Test
+    public void testBug54928() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx =
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+
+        AsyncServlet servlet = new AsyncServlet();
+        Wrapper w = Tomcat.addServlet(ctx, "async", servlet);
+        w.setAsyncSupported(true);
+        ctx.addServletMapping("/async", "async");
+
+        tomcat.start();
+
+        SimpleHttpClient client = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+
+        String request = "GET /async HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: a" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+
+        client.setPort(getPort());
+        client.setRequest(new String[] {request});
+
+        client.connect();
+        client.sendRequest();
+
+        for (int i = 0; i < 10; i++) {
+            String line = client.readLine();
+            if (line != null && line.length() > 20) {
+                log.info(line.subSequence(0, 20) + "...");
+            }
+        }
+
+        client.disconnect();
+
+        // Wait for server thread to stop
+        int count = 0;
+        while (servlet.getThread().isAlive() && count < 20) {
+            Thread.sleep(250);
+            count ++;
+        }
+        log.info("Waited for servlet thread to stop for " + (count * 250)
+                + " ms");
+
+        Assert.assertTrue(servlet.isCompleted());
+    }
+
+    private class AsyncServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        // This is a hack that won't work generally as servlets are expected to
+        // handle more than one request.
+        private Thread t;
+        private volatile boolean completed = false;
+
+        public Thread getThread() {
+            return t;
+        }
+
+        public boolean isCompleted() {
+            return completed;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            final OutputStream os = resp.getOutputStream();
+
+            final AsyncContext asyncCtxt = req.startAsync();
+            asyncCtxt.setTimeout(3000);
+
+            t = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    for (int i = 0; i < 20; i++) {
+                        try {
+                            // Some tests depend on this write failing (e.g.
+                            // because the client has gone away). In some cases
+                            // there may be a large (ish) buffer to fill before
+                            // the write fails.
+                            for (int j = 0 ; j < 8; j++) {
+                                os.write(BYTES_8K);
+                            }
+                            os.flush();
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                            log.info("Exception caught " + e);
+                            try {
+                                // Note if request times out before this
+                                // exception is thrown and the complete call
+                                // below is made, the complete call below will
+                                // fail since the timeout will have completed
+                                // the request.
+                                asyncCtxt.complete();
+                                break;
+                            } finally {
+                                completed = true;
+                            }
+                        }
+                    }
+                }
+            });
+            t.setName("testBug54928");
+            t.start();
         }
     }
 }
