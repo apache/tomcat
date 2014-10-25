@@ -603,19 +603,19 @@
       </attribute>
       <attribute name="socket.performanceConnectionTime" required="false">
         <p>(int)The first value for the performance settings. See
-        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>.
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
       <attribute name="socket.performanceLatency" required="false">
         <p>(int)The second value for the performance settings. See
-        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>.
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
       <attribute name="socket.performanceBandwidth" required="false">
         <p>(int)The third value for the performance settings. See
-        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a>.
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
@@ -1371,7 +1371,7 @@
       value is <code>all</code>, which is equivalent to <code>TLSv1+TLSv1.1+TLSv1.2</code>
       with other acceptable values being <code>SSLv2</code>,
       <code>SSLv3</code>, <code>TLSv1</code>, <code>TLSv1.1</code>, <code>TLSv1.2</code>
-      and any combination of the three protocols concatenated with a plus sign.
+      and any combination of these protocols concatenated with a plus sign.
       Note that both protocols <code>SSLv2</code> and <code>SSLv3</code> are
       inherently unsafe.</p>
     </attribute>
