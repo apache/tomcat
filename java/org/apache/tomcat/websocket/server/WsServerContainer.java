@@ -309,7 +309,8 @@ public class WsServerContainer extends WsWebSocketContainer
         }
         if (!success) {
             log.warn(sm.getString("serverContainer.threadGroupNotDestroyed",
-                    threadGroup.getName(), Integer.valueOf(threadCount)));        }
+                    threadGroup.getName(), Integer.valueOf(threadCount)));
+        }
     }
 
 
