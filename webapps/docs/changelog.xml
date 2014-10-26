@@ -326,6 +326,10 @@
         <bug>57079</bug>: Use Tomcat version number for jdbc-pool module when
         building and shipping the module as part of Tomcat. (markt)
       </fix>
+      <fix>
+        Fix broken overview page in javadoc generated via "javadoc" task in
+        jdbc-pool build.xml file. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
