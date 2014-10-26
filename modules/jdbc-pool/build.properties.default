@@ -79,7 +79,7 @@ mysql.home=${base.path}/mysql-connector-java-5.1.12
 mysql.jar=${mysql.home}/mysql-connector-java-5.1.12-bin.jar
 mysql.loc=http://mysql.mirrors.hoobly.com/Downloads/Connector-J/mysql-connector-java-5.1.12.zip
 
-tomcat.version=8.0.9
+tomcat.version=8.0.14
 tomcat.home=${base.path}/apache-tomcat-${tomcat.version}
 tomcat.dbcp.jar=${tomcat.home}/lib/tomcat-dbcp.jar
 tomcat.juli.jar=${tomcat.home}/bin/tomcat-juli.jar
