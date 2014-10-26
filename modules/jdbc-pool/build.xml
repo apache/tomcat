@@ -123,9 +123,14 @@
     </xslt>
     <move tofile="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool/package.html"
           file="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool/jdbc-pool.html"/>
-    <javadoc sourcepath="${basedir}/src/main/java" destdir="${tomcat.api}" verbose="false"
-             link="http://java.sun.com/javase/6/docs/api/">
+    <javadoc
+        destdir="${tomcat.api}"
+        bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+        additionalparam="-breakiterator -notimestamp"
+        verbose="false">
       <classpath refid="tomcat.jdbc.classpath"/>
+      <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+      <sourcepath location="${basedir}/src/main/java"/>
     </javadoc>
     <!-- connection pool API  file-->
     <jar jarfile="${tomcat-jdbc-api.jar}" update="true">
