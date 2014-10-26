@@ -1837,6 +1837,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;Servlet 3.0 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
+      docencoding="ISO-8859-1"
+      charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
       executable="${java.7.home}/bin/javadoc">
@@ -1855,6 +1857,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;JSP 2.2 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
+      docencoding="ISO-8859-1"
+      charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
       executable="${java.7.home}/bin/javadoc">
@@ -1873,6 +1877,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;EL 2.2 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
+      docencoding="ISO-8859-1"
+      charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
       executable="${java.7.home}/bin/javadoc">
@@ -1891,6 +1897,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;WebSocket 1.1 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
+      docencoding="ISO-8859-1"
+      charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
       executable="${java.7.home}/bin/javadoc">
@@ -1908,6 +1916,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       header="&lt;b&gt;Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="ISO-8859-1"
+      docencoding="ISO-8859-1"
+      charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
       executable="${java.7.home}/bin/javadoc">

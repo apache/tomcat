@@ -186,7 +186,8 @@
         to Servlet examples page. (kkolinko)
       </update>
       <update>
-        Suppress timestamp comments in Javadoc. (kkolinko)
+        Suppress timestamp comments and enable charset header in Javadoc.
+        (kkolinko)
       </update>
     </changelog>
   </subsection>
