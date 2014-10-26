@@ -76,14 +76,10 @@ public class TestClassLoaderLogManager {
         listThread.setName("LoggerList");
         listThread.start();
 
-        int count = 0;
-        while (count < 4 && listThread.isAlive()) {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-            count++;
+        try {
+            listThread.join(2000);
+        } catch (InterruptedException e) {
+            // Ignore
         }
 
         for (int i = 0; i < createThreads.length; i ++) {

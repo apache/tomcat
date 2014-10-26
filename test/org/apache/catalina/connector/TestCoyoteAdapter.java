@@ -317,12 +317,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         // Wait for server thread to stop
         Thread t = servlet.getThread();
         long startTime = System.nanoTime();
-        for (int count = 0; t.isAlive() && count < 20; count++) {
-            t.join(250);
-            if (!t.isAlive()) {
-                break;
-            }
-        }
+        t.join(5000);
         long endTime = System.nanoTime();
         log.info("Waited for servlet thread to stop for "
                 + (endTime - startTime) / 1000000 + " ms");
