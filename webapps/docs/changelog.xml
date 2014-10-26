@@ -97,6 +97,10 @@
         Update the minimum required version of the Tomcat Native library (if
         used) to 1.1.32. (markt)
       </update>
+      <update>
+        <bug>57144</bug>: Improve ClientAbortException to provide non-null
+        message. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
