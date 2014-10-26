@@ -392,19 +392,9 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         tomcat.getConnector().stop();
 
-        int count = 0;
-        // Wait for the read thread to stop
-        while (readThread.isAlive() && count < 50) {
-            Thread.sleep(100);
-            count ++;
-        }
-
-        // Wait for the write thread to stop
-        count = 0;
-        while (writeThread.isAlive() && count < 50) {
-            Thread.sleep(100);
-            count ++;
-        }
+        // Wait for the read and write threads to stop
+        readThread.join(5000);
+        writeThread.join(5000);
 
         // Destroy the connector once the executor has sent the end event
         tomcat.getConnector().destroy();

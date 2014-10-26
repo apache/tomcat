@@ -63,11 +63,7 @@ public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
         for (Thread thread : threads) {
             if (thread != null && thread.isAlive() &&
                     TaskServlet.TIMER_THREAD_NAME.equals(thread.getName())) {
-                int count = 0;
-                while (count < 50 && thread.isAlive()) {
-                    Thread.sleep(100);
-                    count++;
-                }
+                thread.join(5000);
                 if (thread.isAlive()) {
                     fail("Timer thread still running");
                 }
