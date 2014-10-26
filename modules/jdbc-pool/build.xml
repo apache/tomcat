@@ -126,6 +126,9 @@
     <javadoc
         destdir="${tomcat.api}"
         bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
+        encoding="UTF-8"
+        docencoding="UTF-8"
+        charset="UTF-8"
         additionalparam="-breakiterator -notimestamp"
         verbose="false">
       <classpath refid="tomcat.jdbc.classpath"/>
