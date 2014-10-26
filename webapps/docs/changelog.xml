@@ -185,6 +185,9 @@
         In examples web application move Async and Comet examples from JSP
         to Servlet examples page. (kkolinko)
       </update>
+      <update>
+        Suppress timestamp comments in Javadoc. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
