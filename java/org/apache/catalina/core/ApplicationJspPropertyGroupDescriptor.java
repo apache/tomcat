@@ -41,25 +41,13 @@ public class ApplicationJspPropertyGroupDescriptor
     
     @Override
     public String getBuffer() {
-        String result = null;
-        
-        if (jspPropertyGroup.getBuffer() != null) {
-            result = jspPropertyGroup.getBuffer().toString();
-        }
-        
-        return result;
+        return jspPropertyGroup.getBuffer();
     }
 
     
     @Override
     public String getDefaultContentType() {
-        String result = null;
-        
-        if (jspPropertyGroup.getDefaultContentType() != null) {
-            result = jspPropertyGroup.getDefaultContentType().toString();
-        }
-        
-        return result;
+        return jspPropertyGroup.getDefaultContentType();
     }
 
     
@@ -126,13 +114,7 @@ public class ApplicationJspPropertyGroupDescriptor
     
     @Override
     public String getPageEncoding() {
-        String result = null;
-        
-        if (jspPropertyGroup.getPageEncoding() != null) {
-            result = jspPropertyGroup.getPageEncoding().toString();
-        }
-        
-        return result;
+        return jspPropertyGroup.getPageEncoding();
     }
 
     
