@@ -524,7 +524,7 @@ class ParserController implements TagConstants {
      * @return true if this page contains a root element whose prefix is bound
      * to the JSP namespace, and false otherwise
      */
-    private boolean hasJspRoot(JspReader reader) throws JasperException {
+    private boolean hasJspRoot(JspReader reader) {
 
         // <prefix>:root must be the first element
         Mark start = null;
