@@ -1345,8 +1345,8 @@ class Parser implements TagConstants {
                         "&lt;jsp:text&gt;");
             }
             CharArrayWriter ttext = new CharArrayWriter();
-            while (reader.hasMoreInput()) {
-                int ch = reader.nextChar();
+            int ch = reader.nextChar();
+            while (ch != -1) {
                 if (ch == '<') {
                     // Check for <![CDATA[
                     if (!reader.matches("![CDATA[")) {
@@ -1360,38 +1360,37 @@ class Parser implements TagConstants {
                     String text = reader.getText(start, stop);
                     ttext.write(text, 0, text.length());
                 } else if (ch == '\\') {
-                    if (!reader.hasMoreInput()) {
+                    int next = reader.peekChar(0);
+                    if (next == '$' || next =='#') {
+                        if (reader.peekChar(1) == '{') {
+                            ttext.write(reader.nextChar());
+                            ttext.write(reader.nextChar());
+                        }
+                    } else {
                         ttext.write('\\');
-                        break;
                     }
-                    ch = reader.nextChar();
-                    if (ch != '$' && ch != '#') {
-                        ttext.write('\\');
-                    }
-                    ttext.write(ch);
                 } else if (ch == '$' || ch == '#') {
-                    if (!reader.hasMoreInput()) {
-                        ttext.write(ch);
-                        break;
-                    }
-                    if (reader.nextChar() != '{') {
-                        ttext.write(ch);
-                        reader.pushChar();
-                        continue;
-                    }
-                    // Create a template text node
-                    @SuppressWarnings("unused")
-                    Node unused = new Node.TemplateText(
-                            ttext.toString(), start, parent);
+                    if (reader.peekChar(0) == '{') {
+                        // Swallow the '{'
+                        reader.nextChar();
 
-                    // Mark and parse the EL expression and create its node:
-                    parseELExpression(parent, (char) ch);
+                        // Create a template text node
+                        @SuppressWarnings("unused")
+                        Node unused = new Node.TemplateText(
+                                ttext.toString(), start, parent);
 
-                    start = reader.mark();
-                    ttext.reset();
+                        // Mark and parse the EL expression and create its node:
+                        parseELExpression(parent, (char) ch);
+
+                        start = reader.mark();
+                        ttext.reset();
+                    } else {
+                        ttext.write(ch);
+                    }
                 } else {
                     ttext.write(ch);
                 }
+                ch = reader.nextChar();
             }
 
             @SuppressWarnings("unused")
