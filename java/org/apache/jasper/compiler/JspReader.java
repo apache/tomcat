@@ -248,10 +248,30 @@ class JspReader {
         return caw.toString();
     }
 
+    /**
+     * Read ahead one character without moving the cursor.
+     *
+     * @return The next character or -1 if no further input is available
+     */
     int peekChar() {
-        if (!hasMoreInput())
+        return peekChar(0);
+    }
+
+    /**
+     * Read ahead the given number of characters without moving the cursor.
+     *
+     * @param readAhead The number of characters to read ahead. NOTE: This is
+     *                  zero based.
+     *
+     * @return The requested character or -1 if the end of the input is reached
+     *         first
+     */
+    int peekChar(int readAhead) {
+        int target = current.cursor + readAhead;
+        if (target < current.stream.length) {
             return -1;
-        return current.stream[current.cursor];
+        }
+        return current.stream[target];
     }
 
     Mark mark() {
