@@ -389,7 +389,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
     }
 
 
-    private static volatile boolean timoutOnContainer = false;
+    private static volatile boolean timeoutOnContainer = false;
 
     private void doTestWriteTimeoutServer(boolean setTimeoutOnContainer)
             throws Exception {
@@ -404,7 +404,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
          *       because the API uses classes and the tests really need access
          *       to the instances which simply isn't possible.
          */
-        timoutOnContainer = setTimeoutOnContainer;
+        timeoutOnContainer = setTimeoutOnContainer;
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -558,7 +558,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             exception = null;
             running = true;
 
-            if (!TestWsWebSocketContainer.timoutOnContainer) {
+            if (!TestWsWebSocketContainer.timeoutOnContainer) {
                 session.getAsyncRemote().setSendTimeout(TIMEOUT_MS);
             }
 
@@ -607,7 +607,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             try {
                 sc.addEndpoint(ServerEndpointConfig.Builder.create(
                         ConstantTxEndpoint.class, PATH).build());
-                if (TestWsWebSocketContainer.timoutOnContainer) {
+                if (TestWsWebSocketContainer.timeoutOnContainer) {
                     sc.setAsyncSendTimeout(TIMEOUT_MS);
                 }
             } catch (DeploymentException e) {
