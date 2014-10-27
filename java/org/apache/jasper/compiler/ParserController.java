@@ -356,7 +356,6 @@ class ParserController implements TagConstants {
         } catch (FileNotFoundException ex) {
             throw new JasperException(ex);
         }
-        jspReader.setSingleFile(true);
         Mark startMark = jspReader.mark();
         if (!isExternal) {
             jspReader.reset(startMark);

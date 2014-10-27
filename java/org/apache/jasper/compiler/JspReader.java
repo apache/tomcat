@@ -84,13 +84,6 @@ class JspReader {
     private final ErrorDispatcher err;
 
     /**
-     * Set to true when using the JspReader on a single file where we read up
-     * to the end and reset to the beginning many times.
-     * (as in ParserController.figureOutJspDocument()).
-     */
-    private boolean singleFile;
-
-    /**
      * Constructor.
      *
      * @param ctxt The compilation context
@@ -127,7 +120,6 @@ class JspReader {
         this.err = err;
         sourceFiles = new Vector<>();
         currFileId = 0;
-        singleFile = false;
         pushFile(fname, reader);
     }
 
@@ -157,10 +149,6 @@ class JspReader {
      */
     boolean hasMoreInput() throws JasperException {
         if (current.cursor >= current.stream.length) {
-            if (singleFile) return false;
-            while (popFile()) {
-                if (current.cursor < current.stream.length) return true;
-            }
             return false;
         }
         return true;
@@ -195,7 +183,7 @@ class JspReader {
 
         int ch = current.stream[current.cursor];
 
-        mark.init(current, singleFile);
+        mark.init(current, true);
 
         current.cursor++;
 
@@ -415,7 +403,7 @@ class JspReader {
         while((result = indexOf(firstChar, ret)) != null) {
            if (result.booleanValue()) {
                if (restart != null) {
-                   restart.init(current, singleFile);
+                   restart.init(current, true);
                } else {
                    restart = mark();
                }
@@ -423,7 +411,7 @@ class JspReader {
                    if (peekChar() == limit.charAt(i)) {
                        nextChar();
                    } else {
-                       current.init(restart, singleFile);
+                       current.init(restart, true);
                        continue skip;
                    }
                }
@@ -595,10 +583,6 @@ class JspReader {
         }
 
         return StringBuilder.toString();
-    }
-
-    void setSingleFile(boolean val) {
-        singleFile = val;
     }
 
 

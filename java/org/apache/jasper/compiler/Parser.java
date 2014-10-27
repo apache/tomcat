@@ -1786,7 +1786,6 @@ class Parser implements TagConstants {
     }
 
     private void parseFileDirectives(Node parent) throws JasperException {
-        reader.setSingleFile(true);
         reader.skipUntil("<");
         while (reader.hasMoreInput()) {
             start = reader.mark();
