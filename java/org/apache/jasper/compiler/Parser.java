@@ -1284,61 +1284,48 @@ class Parser implements TagConstants {
 
         CharArrayWriter ttext = new CharArrayWriter();
 
-        while (reader.hasMoreInput()) {
-            int ch = reader.nextChar();
+        int ch = reader.nextChar();
+        while (ch != -1) {
             if (ch == '<') {
                 // Check for "<\%"
-                if (reader.nextChar() == '\\') {
-                    if (reader.nextChar() == '%') {
-                        ttext.append('<');
-                        ttext.append('%');
-                    } else {
-                        reader.pushChar();
-                        reader.pushChar();
-                        if (ttext.size() == 0) {
-                            ttext.append('<');
-                        } else {
-                            reader.pushChar();
-                            break;
-                        }
-                    }
+                if (reader.peekChar(0) == '\\' && reader.peekChar(1) == '%') {
+                    ttext.write(ch);
+                    // Swallow the \
+                    reader.nextChar();
+                    ttext.write(reader.nextChar());
                 } else {
-                    reader.pushChar();
                     if (ttext.size() == 0) {
-                        ttext.append('<');
+                        ttext.write(ch);
                     } else {
                         reader.pushChar();
                         break;
                     }
                 }
             } else if (ch == '\\' && !pageInfo.isELIgnored()) {
-                int next = reader.nextChar();
+                int next = reader.peekChar(0);
                 if (next == '$' || next == '#') {
-                    if (reader.nextChar() == '{') {
-                        ttext.write(next);
-                        ttext.append('{');
+                    if (reader.peekChar(1) == '{') {
+                        ttext.write(reader.nextChar());
+                        ttext.write(reader.nextChar());
                     } else {
-                        ttext.append('\\');
-                        ttext.write(next);
-                        reader.pushChar();
+                        ttext.write(ch);
+                        ttext.write(reader.nextChar());
                     }
                 } else {
-                    ttext.append('\\');
-                    reader.pushChar();
+                    ttext.write(ch);
                 }
             } else if ((ch == '$' || ch == '#' && !pageInfo.isDeferredSyntaxAllowedAsLiteral()) &&
                     !pageInfo.isELIgnored()) {
-                if (reader.nextChar() == '{') {
-                    reader.pushChar();
+                if (reader.peekChar(0) == '{') {
                     reader.pushChar();
                     break;
                 } else {
-                    reader.pushChar();
                     ttext.write(ch);
                 }
             } else {
                 ttext.write(ch);
             }
+            ch = reader.nextChar();
         }
 
         @SuppressWarnings("unused")
