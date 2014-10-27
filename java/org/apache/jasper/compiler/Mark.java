@@ -18,7 +18,6 @@ package org.apache.jasper.compiler;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Stack;
 
 import org.apache.jasper.JspCompilationContext;
 
@@ -43,12 +42,6 @@ final class Mark {
 
     // name of the current file
     private String fileName;
-
-    /*
-     * stack of stream and stream state of streams that have included
-     * current stream
-     */
-    private Stack<IncludeState> includeStack = null;
 
     // reader that owns this mark (so we can look up fileid's)
     private JspReader reader;
@@ -76,7 +69,6 @@ final class Mark {
         this.fileId = fileId;
         this.fileName = name;
         this.baseDir = inBaseDir;
-        this.includeStack = new Stack<>();
     }
 
 
@@ -105,15 +97,6 @@ final class Mark {
             this.fileId = other.fileId;
             this.fileName = other.fileName;
             this.baseDir = other.baseDir;
-
-            if (includeStack == null) {
-                includeStack = new Stack<>();
-            } else {
-                includeStack.clear();
-            }
-            for (int i = 0; i < other.includeStack.size(); i++ ) {
-                includeStack.addElement(other.includeStack.elementAt(i));
-            }
         }
     }
 
@@ -132,7 +115,6 @@ final class Mark {
         this.fileId = -1;
         this.fileName = filename;
         this.baseDir = "le-basedir";
-        this.includeStack = null;
     }
 
 
@@ -186,32 +168,5 @@ final class Mark {
         result = prime * result + line;
         result = prime * result + ((reader == null) ? 0 : reader.hashCode());
         return result;
-    }
-
-
-    /**
-     * Keep track of parser before parsing an included file.
-     * This class keeps track of the parser before we switch to parsing an
-     * included file. In other words, it's the parser's continuation to be
-     * reinstalled after the included file parsing is done.
-     */
-    private static class IncludeState {
-        private final int cursor, line, col;
-        private final int fileId;
-        private final String fileName;
-        private final String baseDir;
-        private final char[] stream;
-
-        IncludeState(int inCursor, int inLine, int inCol, int inFileId,
-                     String name, String inBaseDir,
-                     char[] inStream) {
-            cursor = inCursor;
-            line = inLine;
-            col = inCol;
-            fileId = inFileId;
-            fileName = name;
-            baseDir = inBaseDir;
-            stream = inStream;
-        }
     }
 }
