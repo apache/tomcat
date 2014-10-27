@@ -69,11 +69,6 @@ class JspReader {
     private final List<String> sourceFiles;
 
     /**
-     * The current file ID (-1 indicates an error or no file).
-     */
-    private int currFileId;
-
-    /**
      * The compilation context.
      */
     private final JspCompilationContext context;
@@ -119,7 +114,6 @@ class JspReader {
         this.context = ctxt;
         this.err = err;
         sourceFiles = new Vector<>();
-        currFileId = 0;
 
         int fileid = registerSourceFile(fname);
 
@@ -136,8 +130,6 @@ class JspReader {
             err.jspError("jsp.error.file.already.registered", fname);
         }
 
-        currFileId = fileid;
-
         try {
             CharArrayWriter caw = new CharArrayWriter();
             char buf[] = new char[1024];
@@ -148,8 +140,6 @@ class JspReader {
         } catch (Throwable ex) {
             ExceptionUtils.handleThrowable(ex);
             log.error("Exception parsing file ", ex);
-            // Pop state being constructed:
-            popFile();
             err.jspError("jsp.error.file.cannot.read", fname);
         } finally {
             if (reader != null) {
@@ -668,58 +658,6 @@ class JspReader {
 
         sourceFiles.add(file);
         return sourceFiles.size() - 1;
-    }
-
-
-    /**
-     * Unregister the source file.
-     * This method is used to implement file inclusion. Each included file
-     * gets a unique identifier (which is the index in the array of source
-     * files).
-     *
-     * @return The index of the now registered file.
-     */
-    private int unregisterSourceFile(final String file) {
-        if (!sourceFiles.contains(file)) {
-            return -1;
-        }
-
-        sourceFiles.remove(file);
-        return sourceFiles.size() - 1;
-    }
-
-    /**
-     * Pop a file from the file stack.  The field "current" is restored
-     * to the value to point to the previous files, if any, and is set
-     * to null otherwise.
-     * @return true is there is a previous file on the stack.
-     *         false otherwise.
-     */
-    private boolean popFile() throws JasperException {
-
-        // Is stack created ? (will happen if the Jsp file we're looking at is
-        // missing.
-        if (current == null || currFileId < 0) {
-            return false;
-        }
-
-        // Restore parser state:
-        String fName = getFile(currFileId);
-        currFileId = unregisterSourceFile(fName);
-        if (currFileId < -1) {
-            err.jspError("jsp.error.file.not.registered", fName);
-        }
-
-        Mark previous = current.popStream();
-        if (previous != null) {
-            master = current.baseDir;
-            current = previous;
-            return true;
-        }
-        // Note that although the current file is undefined here, "current"
-        // is not set to null just for convenience, for it maybe used to
-        // set the current (undefined) position.
-        return false;
     }
 }
 
