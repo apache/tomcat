@@ -136,59 +136,6 @@ final class Mark {
     }
 
 
-    /**
-     * Sets this mark's state to a new stream.
-     * It will store the current stream in it's includeStack.
-     *
-     * @param inStream new stream for mark
-     * @param inFileId id of new file from which stream comes from
-     * @param inBaseDir directory of file
-     */
-    public void pushStream(char[] inStream, int inFileId, String name,
-                           String inBaseDir) {
-
-        // store current state in stack
-        includeStack.push(new IncludeState(cursor, line, col, fileId,
-                                           fileName, baseDir,
-                                           stream) );
-
-        // set new variables
-        cursor = 0;
-        line = 1;
-        col = 1;
-        fileId = inFileId;
-        fileName = name;
-        baseDir = inBaseDir;
-        stream = inStream;
-    }
-
-
-    /**
-     * Restores this mark's state to a previously stored stream.
-     * @return The previous Mark instance when the stream was pushed, or null
-     * if there is no previous stream
-     */
-    public Mark popStream() {
-        // make sure we have something to pop
-        if ( includeStack.size() <= 0 ) {
-            return null;
-        }
-
-        // get previous state in stack
-        IncludeState state = includeStack.pop( );
-
-        // set new variables
-        cursor = state.cursor;
-        line = state.line;
-        col = state.col;
-        fileId = state.fileId;
-        fileName = state.fileName;
-        baseDir = state.baseDir;
-        stream = state.stream;
-        return this;
-    }
-
-
     public int getLineNumber() {
         return line;
     }
