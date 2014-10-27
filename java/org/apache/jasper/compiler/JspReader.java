@@ -120,8 +120,56 @@ class JspReader {
         this.err = err;
         sourceFiles = new Vector<>();
         currFileId = 0;
-        pushFile(fname, reader);
+
+        int fileid = registerSourceFile(fname);
+
+        if (fileid == -1) {
+            // http://issues.apache.org/bugzilla/show_bug.cgi?id=37407
+            try {
+                reader.close();
+            } catch (Exception any) {
+                if(log.isDebugEnabled()) {
+                    log.debug("Exception closing reader: ", any);
+                }
+            }
+
+            err.jspError("jsp.error.file.already.registered", fname);
+        }
+
+        currFileId = fileid;
+
+        try {
+            CharArrayWriter caw = new CharArrayWriter();
+            char buf[] = new char[1024];
+            for (int i = 0 ; (i = reader.read(buf)) != -1 ;)
+                caw.write(buf, 0, i);
+            caw.close();
+            if (current == null) {
+                current = new Mark(this, caw.toCharArray(), fileid,
+                                   getFile(fileid), master);
+            } else {
+                current.pushStream(caw.toCharArray(), fileid, getFile(fileid),
+                                   fname);
+            }
+        } catch (Throwable ex) {
+            ExceptionUtils.handleThrowable(ex);
+            log.error("Exception parsing file ", ex);
+            // Pop state being constructed:
+            popFile();
+            err.jspError("jsp.error.file.cannot.read", fname);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (Exception any) {
+                    if(log.isDebugEnabled()) {
+                        log.debug("Exception closing reader: ", any);
+                    }
+                }
+            }
+        }
     }
+
 
     /**
      * @return JSP compilation context with which this JspReader is
@@ -644,65 +692,6 @@ class JspReader {
 
         sourceFiles.remove(file);
         return sourceFiles.size() - 1;
-    }
-
-    /**
-     * Push a file (and its associated Stream) on the file stack.  THe
-     * current position in the current file is remembered.
-     */
-    private void pushFile(String file,
-                           InputStreamReader reader) throws JasperException {
-
-        // Register the file
-        String longName = file;
-
-        int fileid = registerSourceFile(longName);
-
-        if (fileid == -1) {
-            // http://issues.apache.org/bugzilla/show_bug.cgi?id=37407
-            try {
-                reader.close();
-            } catch (Exception any) {
-                if(log.isDebugEnabled()) {
-                    log.debug("Exception closing reader: ", any);
-                }
-            }
-
-            err.jspError("jsp.error.file.already.registered", file);
-        }
-
-        currFileId = fileid;
-
-        try {
-            CharArrayWriter caw = new CharArrayWriter();
-            char buf[] = new char[1024];
-            for (int i = 0 ; (i = reader.read(buf)) != -1 ;)
-                caw.write(buf, 0, i);
-            caw.close();
-            if (current == null) {
-                current = new Mark(this, caw.toCharArray(), fileid,
-                                   getFile(fileid), master);
-            } else {
-                current.pushStream(caw.toCharArray(), fileid, getFile(fileid),
-                                   longName);
-            }
-        } catch (Throwable ex) {
-            ExceptionUtils.handleThrowable(ex);
-            log.error("Exception parsing file ", ex);
-            // Pop state being constructed:
-            popFile();
-            err.jspError("jsp.error.file.cannot.read", file);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (Exception any) {
-                    if(log.isDebugEnabled()) {
-                        log.debug("Exception closing reader: ", any);
-                    }
-                }
-            }
-        }
     }
 
     /**
