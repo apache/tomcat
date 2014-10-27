@@ -136,7 +136,7 @@ class JspReader {
             for (int i = 0 ; (i = reader.read(buf)) != -1 ;)
                 caw.write(buf, 0, i);
             caw.close();
-            current = new Mark(this, caw.toCharArray(), fileid, getFile(fileid), master);
+            current = new Mark(this, caw.toCharArray(), getFile(fileid), master);
         } catch (Throwable ex) {
             ExceptionUtils.handleThrowable(ex);
             log.error("Exception parsing file ", ex);

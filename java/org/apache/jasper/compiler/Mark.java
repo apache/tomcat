@@ -37,14 +37,8 @@ final class Mark {
     // current stream
     char[] stream = null;
 
-    // fileid of current stream
-    private int fileId;
-
     // name of the current file
     private String fileName;
-
-    // reader that owns this mark (so we can look up fileid's)
-    private JspReader reader;
 
     private JspCompilationContext ctxt;
 
@@ -53,20 +47,17 @@ final class Mark {
      *
      * @param reader JspReader this mark belongs to
      * @param inStream current stream for this mark
-     * @param fileId id of requested jsp file
      * @param name JSP file name
      * @param inBaseDir base directory of requested jsp file
      */
-    Mark(JspReader reader, char[] inStream, int fileId, String name,
+    Mark(JspReader reader, char[] inStream, String name,
          String inBaseDir) {
 
-        this.reader = reader;
         this.ctxt = reader.getJspCompilationContext();
         this.stream = inStream;
         this.cursor = 0;
         this.line = 1;
         this.col = 1;
-        this.fileId = fileId;
         this.fileName = name;
         this.baseDir = inBaseDir;
     }
@@ -91,10 +82,8 @@ final class Mark {
         this.col = other.col;
 
         if (!singleFile) {
-            this.reader = other.reader;
             this.ctxt = other.ctxt;
             this.stream = other.stream;
-            this.fileId = other.fileId;
             this.fileName = other.fileName;
             this.baseDir = other.baseDir;
         }
@@ -106,13 +95,11 @@ final class Mark {
      */
     Mark(JspCompilationContext ctxt, String filename, int line, int col) {
 
-        this.reader = null;
         this.ctxt = ctxt;
         this.stream = null;
         this.cursor = 0;
         this.line = line;
         this.col = col;
-        this.fileId = -1;
         this.fileName = filename;
         this.baseDir = "le-basedir";
     }
@@ -150,9 +137,7 @@ final class Mark {
     public boolean equals(Object other) {
         if (other instanceof Mark) {
             Mark m = (Mark) other;
-            return this.reader == m.reader && this.fileId == m.fileId
-                && this.cursor == m.cursor && this.line == m.line
-                && this.col == m.col;
+            return this.cursor == m.cursor && this.line == m.line && this.col == m.col;
         }
         return false;
     }
@@ -164,9 +149,7 @@ final class Mark {
         int result = 1;
         result = prime * result + col;
         result = prime * result + cursor;
-        result = prime * result + fileId;
         result = prime * result + line;
-        result = prime * result + ((reader == null) ? 0 : reader.hashCode());
         return result;
     }
 }
