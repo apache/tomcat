@@ -269,9 +269,9 @@ class JspReader {
     int peekChar(int readAhead) {
         int target = current.cursor + readAhead;
         if (target < current.stream.length) {
-            return -1;
+            return current.stream[target];
         }
-        return current.stream[target];
+        return -1;
     }
 
     Mark mark() {
