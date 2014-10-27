@@ -31,9 +31,6 @@ final class Mark {
     // position within current stream
     int cursor, line, col;
 
-    // directory of file for current stream
-    String baseDir;
-
     // current stream
     char[] stream = null;
 
@@ -48,18 +45,14 @@ final class Mark {
      * @param reader JspReader this mark belongs to
      * @param inStream current stream for this mark
      * @param name JSP file name
-     * @param inBaseDir base directory of requested jsp file
      */
-    Mark(JspReader reader, char[] inStream, String name,
-         String inBaseDir) {
-
+    Mark(JspReader reader, char[] inStream, String name) {
         this.ctxt = reader.getJspCompilationContext();
         this.stream = inStream;
         this.cursor = 0;
         this.line = 1;
         this.col = 1;
         this.fileName = name;
-        this.baseDir = inBaseDir;
     }
 
 
@@ -85,7 +78,6 @@ final class Mark {
             this.ctxt = other.ctxt;
             this.stream = other.stream;
             this.fileName = other.fileName;
-            this.baseDir = other.baseDir;
         }
     }
 
@@ -94,14 +86,12 @@ final class Mark {
      * Constructor
      */
     Mark(JspCompilationContext ctxt, String filename, int line, int col) {
-
         this.ctxt = ctxt;
         this.stream = null;
         this.cursor = 0;
         this.line = line;
         this.col = col;
         this.fileName = filename;
-        this.baseDir = "le-basedir";
     }
 
 

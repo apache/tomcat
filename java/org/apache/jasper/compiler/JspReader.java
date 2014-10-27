@@ -57,11 +57,6 @@ class JspReader {
     private Mark current;
 
     /**
-     * What is this?
-     */
-    private String master;
-
-    /**
      * The compilation context.
      */
     private final JspCompilationContext context;
@@ -113,7 +108,7 @@ class JspReader {
             for (int i = 0 ; (i = reader.read(buf)) != -1 ;)
                 caw.write(buf, 0, i);
             caw.close();
-            current = new Mark(this, caw.toCharArray(), fname, master);
+            current = new Mark(this, caw.toCharArray(), fname);
         } catch (Throwable ex) {
             ExceptionUtils.handleThrowable(ex);
             log.error("Exception parsing file ", ex);
