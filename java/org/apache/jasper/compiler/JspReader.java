@@ -92,6 +92,13 @@ class JspReader {
     /**
      * Constructor: same as above constructor but with initialized reader
      * to the file given.
+     *
+     * @param ctxt   The compilation context
+     * @param fname  The file name
+     * @param reader A reader for the JSP source file
+     * @param err The error dispatcher
+     *
+     * @throws JasperException If an error occurs parsing the JSP file
      */
     public JspReader(JspCompilationContext ctxt,
                      String fname,
