@@ -20,8 +20,6 @@ import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Vector;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -62,11 +60,6 @@ class JspReader {
      * What is this?
      */
     private String master;
-
-    /**
-     * The list of source files.
-     */
-    private final List<String> sourceFiles;
 
     /**
      * The compilation context.
@@ -113,22 +106,6 @@ class JspReader {
 
         this.context = ctxt;
         this.err = err;
-        sourceFiles = new Vector<>();
-
-        int fileid = registerSourceFile(fname);
-
-        if (fileid == -1) {
-            // http://issues.apache.org/bugzilla/show_bug.cgi?id=37407
-            try {
-                reader.close();
-            } catch (Exception any) {
-                if(log.isDebugEnabled()) {
-                    log.debug("Exception closing reader: ", any);
-                }
-            }
-
-            err.jspError("jsp.error.file.already.registered", fname);
-        }
 
         try {
             CharArrayWriter caw = new CharArrayWriter();
@@ -631,23 +608,6 @@ class JspReader {
         } else {
             return true;
         }
-    }
-
-    /**
-     * Register a new source file.
-     * This method is used to implement file inclusion. Each included file
-     * gets a unique identifier (which is the index in the array of source
-     * files).
-     *
-     * @return The index of the now registered file.
-     */
-    private int registerSourceFile(final String file) {
-        if (sourceFiles.contains(file)) {
-            return -1;
-        }
-
-        sourceFiles.add(file);
-        return sourceFiles.size() - 1;
     }
 }
 
