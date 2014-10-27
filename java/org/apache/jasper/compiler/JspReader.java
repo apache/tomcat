@@ -136,7 +136,7 @@ class JspReader {
             for (int i = 0 ; (i = reader.read(buf)) != -1 ;)
                 caw.write(buf, 0, i);
             caw.close();
-            current = new Mark(this, caw.toCharArray(), getFile(fileid), master);
+            current = new Mark(this, caw.toCharArray(), fname, master);
         } catch (Throwable ex) {
             ExceptionUtils.handleThrowable(ex);
             log.error("Exception parsing file ", ex);
@@ -161,16 +161,6 @@ class JspReader {
      */
     JspCompilationContext getJspCompilationContext() {
         return context;
-    }
-
-    /**
-     * Returns the file at the given position in the list.
-     *
-     * @param fileid The file position in the list
-     * @return The file at that position, if found, null otherwise
-     */
-    String getFile(final int fileid) {
-        return sourceFiles.get(fileid);
     }
 
     /**
