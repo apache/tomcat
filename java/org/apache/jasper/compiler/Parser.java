@@ -235,7 +235,7 @@ class Parser implements TagConstants {
     /**
      * Name ::= (Letter | '_' | ':') (Letter | Digit | '.' | '_' | '-' | ':')*
      */
-    private String parseName() throws JasperException {
+    private String parseName() {
         char ch = (char) reader.peekChar();
         if (Character.isLetter(ch) || ch == '_' || ch == ':') {
             StringBuilder buf = new StringBuilder();
@@ -1277,7 +1277,7 @@ class Parser implements TagConstants {
      * Parse for a template text string until '<' or "${" or "#{" is encountered,
      * recognizing escape sequences "<\%", "\${", and "\#{".
      */
-    private void parseTemplateText(Node parent) throws JasperException {
+    private void parseTemplateText(Node parent) {
 
         if (!reader.hasMoreInput())
             return;

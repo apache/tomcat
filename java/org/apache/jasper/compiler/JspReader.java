@@ -145,16 +145,12 @@ class JspReader {
      * Checks if the current file has more input.
      *
      * @return True if more reading is possible
-     * @throws JasperException if an error occurs
      */
-    boolean hasMoreInput() throws JasperException {
-        if (current.cursor >= current.stream.length) {
-            return false;
-        }
-        return true;
+    boolean hasMoreInput() {
+        return current.cursor < current.stream.length;
     }
 
-    int nextChar() throws JasperException {
+    int nextChar() {
         if (!hasMoreInput())
             return -1;
 
@@ -176,7 +172,7 @@ class JspReader {
      * However, this approach is only safe if the mark is only used within the
      * JspReader.
      */
-    private int nextChar(Mark mark) throws JasperException {
+    private int nextChar(Mark mark) {
         if (!hasMoreInput()) {
             return -1;
         }
@@ -200,7 +196,7 @@ class JspReader {
      * Search the given character, If it was found, then mark the current cursor
      * and the cursor point to next character.
      */
-    private Boolean indexOf(char c, Mark mark) throws JasperException {
+    private Boolean indexOf(char c, Mark mark) {
         if (!hasMoreInput())
             return null;
 
@@ -239,7 +235,7 @@ class JspReader {
         current.col--;
     }
 
-    String getText(Mark start, Mark stop) throws JasperException {
+    String getText(Mark start, Mark stop) {
         Mark oldstart = mark();
         reset(start);
         CharArrayWriter caw = new CharArrayWriter();
@@ -251,7 +247,7 @@ class JspReader {
         return caw.toString();
     }
 
-    int peekChar() throws JasperException {
+    int peekChar() {
         if (!hasMoreInput())
             return -1;
         return current.stream[current.cursor];
@@ -288,7 +284,7 @@ class JspReader {
      *         in stream is positioned after the search string, <strong>
      *               false</strong> otherwise, position in stream unchanged.
      */
-    boolean matches(String string) throws JasperException {
+    boolean matches(String string) {
        int len = string.length();
        int cursor = current.cursor;
        int streamSize = current.stream.length;
@@ -325,7 +321,7 @@ class JspReader {
        return true;
     }
 
-    boolean matchesETag(String tagName) throws JasperException {
+    boolean matchesETag(String tagName) {
         Mark mark = mark();
 
         if (!matches("</" + tagName))
@@ -338,9 +334,7 @@ class JspReader {
         return false;
     }
 
-    boolean matchesETagWithoutLessThan(String tagName)
-        throws JasperException
-    {
+    boolean matchesETagWithoutLessThan(String tagName) {
        Mark mark = mark();
 
        if (!matches("/" + tagName))
@@ -360,9 +354,7 @@ class JspReader {
      * characters are skipped.  If not, false is returned and the
      * position is restored to where we were before.
      */
-    boolean matchesOptionalSpacesFollowedBy( String s )
-        throws JasperException
-    {
+    boolean matchesOptionalSpacesFollowedBy(String s) {
         Mark mark = mark();
 
         skipSpaces();
@@ -374,7 +366,7 @@ class JspReader {
         return result;
     }
 
-    int skipSpaces() throws JasperException {
+    int skipSpaces() {
         int i = 0;
         while (hasMoreInput() && isSpace()) {
             i++;
@@ -392,7 +384,7 @@ class JspReader {
      *         before the search string) if found, <strong>null</strong>
      *         otherwise.
      */
-    Mark skipUntil(String limit) throws JasperException {
+    Mark skipUntil(String limit) {
         Mark ret = mark();
         int limlen = limit.length();
         char firstChar = limit.charAt(0);
@@ -431,7 +423,7 @@ class JspReader {
      *         before the search string) if found, <strong>null</strong>
      *         otherwise.
      */
-    Mark skipUntilIgnoreEsc(String limit) throws JasperException {
+    Mark skipUntilIgnoreEsc(String limit) {
         Mark ret = mark();
         int limlen = limit.length();
         int ch;
@@ -462,7 +454,7 @@ class JspReader {
      * @return A non-null <code>Mark</code> instance (positioned immediately
      *               before the ETag) if found, <strong>null</strong> otherwise.
      */
-    Mark skipUntilETag(String tag) throws JasperException {
+    Mark skipUntilETag(String tag) {
         Mark ret = skipUntil("</" + tag);
         if (ret != null) {
             skipSpaces();
@@ -485,7 +477,7 @@ class JspReader {
      *
      * @return Mark for the last character of EL expression or <code>null</code>
      */
-    Mark skipELExpression() throws JasperException {
+    Mark skipELExpression() {
         // ELExpressionBody.
         //  Starts with "#{" or "${".  Ends with "}".
         //  May contain quoted "{", "}", '{', or '}' and nested "{...}"
@@ -524,7 +516,7 @@ class JspReader {
         return last;
     }
 
-    final boolean isSpace() throws JasperException {
+    final boolean isSpace() {
         // Note: If this logic changes, also update Node.TemplateText.rtrim()
         return peekChar() <= ' ';
     }
@@ -593,7 +585,7 @@ class JspReader {
      *
      * @return A boolean.
      */
-    private boolean isDelimiter() throws JasperException {
+    private boolean isDelimiter() {
         if (! isSpace()) {
             int ch = peekChar();
             // Look for a single-char work delimiter:
