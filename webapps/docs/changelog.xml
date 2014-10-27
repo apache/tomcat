@@ -352,6 +352,10 @@
         pick up the Windows binaries that are based on OpenSSL 1.0.1j and APR
         1.5.1. (markt)
       </update>
+      <scode>
+        In Tomcat tests: log name of the current test method at start time.
+        (kkolinko) 
+      </scode>
     </changelog>
   </subsection>
 </section>
