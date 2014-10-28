@@ -409,8 +409,12 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // Context ctx =
+        //    tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // FIXME: Using docBase = appBase. A temporary workaround to avoid
+        // using the system temporary directory as docBase, until either
+        // BZ 57154 is fixed or there is better API from BZ 57155
+        Context ctx = tomcat.addContext("", "");
         ctx.addApplicationListener(ConstantTxConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
