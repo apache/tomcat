@@ -354,7 +354,7 @@
       </update>
       <scode>
         In Tomcat tests: log name of the current test method at start time.
-        (kkolinko) 
+        (kkolinko)
       </scode>
     </changelog>
   </subsection>
