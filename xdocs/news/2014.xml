@@ -29,6 +29,12 @@
 <body>
 
 <section name="2014 News &amp; Status">
+ <subsection anchor="20141023.1" name="23 October 2014 - TC-Native-1.1.32 released">
+  <p>The Apache Tomcat team is proud to announce the immediate availability
+  of Tomcat Native 1.1.32. This release add support for TLSv1.1 and TLSv1.2 and
+  includes Windows binaries built with OpenSSL 1.0.1j and APR 1.5.1.
+  </p>
+ </subsection>    
  <subsection anchor="20140707.1" name="7 July 2014 - TC-Native-1.1.31 released">
   <p>The Apache Tomcat team is proud to announce the immediate availability
   of Tomcat Native 1.1.31. This is a bug fixing release and includes Windows
