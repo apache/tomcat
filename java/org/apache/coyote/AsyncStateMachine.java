@@ -249,7 +249,6 @@ public class AsyncStateMachine {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
                             "asyncComplete()", state));
-
         }
         return doComplete;
     }
