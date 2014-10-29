@@ -107,26 +107,26 @@ public class AsyncStateMachine {
 
     private static enum AsyncState {
         DISPATCHED(false, false, false, false),
-        STARTING(true, true, true, false),
-        STARTED(true, true, true, false),
-        MUST_COMPLETE(true, true, false, false),
-        COMPLETING(true, false, false, false),
+        STARTING(true, true, false, false),
+        STARTED(true, true, false, false),
+        MUST_COMPLETE(true, true, true, false),
+        COMPLETING(true, false, true, false),
         TIMING_OUT(true, false, false, false),
         MUST_DISPATCH(true, true, false, true),
         DISPATCHING(true, false, false, true),
-        READ_WRITE_OP(true, true, true, false),
+        READ_WRITE_OP(true, true, false, false),
         ERROR(true, false, false, false);
 
         private final boolean isAsync;
         private final boolean isStarted;
-        private final boolean canComplete;
+        private final boolean isCompleting;
         private final boolean isDispatching;
 
-        private AsyncState(boolean isAsync, boolean isStarted, boolean canComplete,
+        private AsyncState(boolean isAsync, boolean isStarted, boolean isCompleting,
                 boolean isDispatching) {
             this.isAsync = isAsync;
             this.isStarted = isStarted;
-            this.canComplete = canComplete;
+            this.isCompleting = isCompleting;
             this.isDispatching = isDispatching;
         }
 
@@ -142,8 +142,8 @@ public class AsyncStateMachine {
             return isDispatching;
         }
 
-        public boolean canComplete() {
-            return canComplete;
+        public boolean isCompleting() {
+            return isCompleting;
         }
     }
 
@@ -179,8 +179,8 @@ public class AsyncStateMachine {
         return state == AsyncState.ERROR;
     }
 
-    public boolean canComplete() {
-        return state.canComplete();
+    public boolean isCompleting() {
+        return state.isCompleting();
     }
 
     public synchronized void asyncStart(AsyncContextCallback asyncCtxt) {

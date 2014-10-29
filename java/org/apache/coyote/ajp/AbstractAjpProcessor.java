@@ -522,10 +522,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             getSocketWrapper().access();
             break;
         }
-        case ASYNC_CAN_COMPLETE: {
-            ((AtomicBoolean) param).set(asyncStateMachine.canComplete());
-            break;
-        }
         case ASYNC_COMPLETE: {
             socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
@@ -564,6 +560,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         }
         case ASYNC_IS_STARTED: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
+            break;
+        }
+        case ASYNC_IS_COMPLETING: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isCompleting());
             break;
         }
         case ASYNC_IS_DISPATCHING: {
