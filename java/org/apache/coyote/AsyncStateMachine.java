@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import org.apache.catalina.Globals;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
@@ -109,7 +110,7 @@ public class AsyncStateMachine {
         DISPATCHED(false, false, false),
         STARTING(true, true, false),
         STARTED(true, true, false),
-        MUST_COMPLETE(true, true, false),
+        MUST_COMPLETE(true, Globals.STRICT_SERVLET_COMPLIANCE, false),
         COMPLETING(true, false, false),
         TIMING_OUT(true, false, false),
         MUST_DISPATCH(true, true, true),
