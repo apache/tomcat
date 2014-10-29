@@ -1634,13 +1634,13 @@ public class Request
         return result.get();
     }
 
-    public boolean canAsyncComplete() {
+    public boolean isAsyncCompleting() {
         if (asyncContext == null) {
             return false;
         }
 
         AtomicBoolean result = new AtomicBoolean(false);
-        coyoteRequest.action(ActionCode.ASYNC_CAN_COMPLETE, result);
+        coyoteRequest.action(ActionCode.ASYNC_IS_COMPLETING, result);
         return result.get();
     }
 
