@@ -190,6 +190,11 @@
         AsyncContext createListener should wrap any instantiation exception
         using a ServletException. (remm)
       </fix>
+      <fix>
+        <bug>57155</bug>: Allow a web application to be configured that does not
+        have a docBase on the file system. This is primarily intended for use
+        when embedding. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
