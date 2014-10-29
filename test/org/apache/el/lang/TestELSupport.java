@@ -16,6 +16,7 @@
  */
 package org.apache.el.lang;
 
+import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -204,6 +205,39 @@ public class TestELSupport {
         Object result = ELManager.getExpressionFactory().coerceToType(
                 "", boolean.class);
         Assert.assertEquals(Boolean.FALSE, result);
+    }
+
+    @Test
+    public void testCoerceToType13() {
+        Object result = ELManager.getExpressionFactory().coerceToType(
+                "", TesterType.class);
+        Assert.assertNull(result);
+    }
+
+    @Test
+    public void testCoerceToType14() {
+        PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorNoError.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(
+                "Foo", TesterType.class);
+        Assert.assertTrue(result instanceof TesterType);
+        Assert.assertEquals("Foo", ((TesterType) result).getValue());
+    }
+
+    @Test(expected=ELException.class)
+    public void testCoerceToType15() {
+        PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorError.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(
+                "Foo", TesterType.class);
+        Assert.assertTrue(result instanceof TesterType);
+        Assert.assertEquals("Foo", ((TesterType) result).getValue());
+    }
+
+    @Test
+    public void testCoerceToType16() {
+        PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorError.class);
+        Object result = ELManager.getExpressionFactory().coerceToType(
+                "", TesterType.class);
+        Assert.assertNull(result);
     }
 
     @Test
