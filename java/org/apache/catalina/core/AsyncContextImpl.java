@@ -84,6 +84,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         check();
         request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
+        if (!Globals.STRICT_SERVLET_COMPLIANCE) {
+            clearServletRequestResponse();
+        }
     }
 
     @Override
@@ -103,7 +106,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
             }
         } finally {
-            clearServletRequestResponse();
+            if (Globals.STRICT_SERVLET_COMPLIANCE) {
+                clearServletRequestResponse();
+            }
             context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
         }
 
