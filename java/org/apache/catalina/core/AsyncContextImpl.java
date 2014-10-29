@@ -516,6 +516,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                     "asyncContextImpl.requestEnded"));
         }
     }
+
     private static class DebugException extends Exception {
         private static final long serialVersionUID = 1L;
     }
