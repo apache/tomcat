@@ -49,7 +49,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TestDefaultServlet extends TomcatBaseTest {
 
-    /**
+    /*
      * Test attempting to access special paths (WEB-INF/META-INF) using
      * DefaultServlet.
      */
@@ -89,7 +89,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
     }
 
-    /**
+    /*
      * Verify serving of gzipped resources from context root.
      */
     @Test
@@ -144,7 +144,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         assertTrue(responseHeaders.contains("Content-Length: " + indexSize));
     }
 
-    /**
+    /*
      * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50026
      * Verify serving of resources from context root with subpath mapping.
      */
@@ -215,7 +215,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
     }
 
-    /**
+    /*
      * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50413 Serving a
      * custom error page
      */
@@ -297,7 +297,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         assertEquals("It is 404.html", client.getResponseBody());
     }
 
-    /**
+    /*
      * Test what happens if a custom 404 page is configured,
      * but its file is actually missing.
      */

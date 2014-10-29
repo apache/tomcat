@@ -134,7 +134,7 @@ public class TestErrorReportValve extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Custom error/status codes should not result in a blank response.
      */
     @Test

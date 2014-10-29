@@ -32,7 +32,7 @@ public final class IntrospectionUtils {
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( IntrospectionUtils.class );
 
-    /**
+    /*
      * Find a method with the right name If found, call the method ( if param is
      * int or boolean we'll convert value to the right type before) - that means
      * you can have setDebug(1).
@@ -178,7 +178,7 @@ public final class IntrospectionUtils {
         return false;
     }
 
-    /**
+    /*
      * Reverse of Introspector.decapitalize
      */
     public static String capitalize(String name) {

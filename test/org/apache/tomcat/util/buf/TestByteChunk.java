@@ -38,7 +38,7 @@ public class TestByteChunk {
         assertTrue(Arrays.equals(bytes, expected));
     }
 
-    /**
+    /*
      * Test for {@code findByte} vs. {@code indexOf} methods difference.
      *
      * <p>

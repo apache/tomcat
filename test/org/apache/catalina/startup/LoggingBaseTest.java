@@ -57,7 +57,7 @@ public abstract class LoggingBaseTest {
     @Rule
     public final TestName testName = new TestName();
 
-    /**
+    /*
      * Helper method that returns the directory where Tomcat build resides. It
      * is used to access resources that are part of default Tomcat deployment.
      * E.g. the examples webapp.
@@ -67,7 +67,7 @@ public abstract class LoggingBaseTest {
                 "output/build"));
     }
 
-    /**
+    /*
      * Helper method that returns the path of the temporary directory used by
      * the test runs. The directory is configured during {@link #setUp()}.
      *

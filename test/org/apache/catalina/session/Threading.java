@@ -35,7 +35,7 @@ import org.junit.Test;
  */
 public class Threading {
 
-    /**
+    /*
      * {@link FileInputStream#read(byte[])} and related methods are all native
      * methods so it isn't immediately obvious if they are thread-safe or not.
      *

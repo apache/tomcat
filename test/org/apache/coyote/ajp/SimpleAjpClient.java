@@ -63,7 +63,7 @@ public class SimpleAjpClient {
         socket = null;
     }
 
-    /**
+    /*
      * Create a message to request the given URL.
      */
     public TesterAjpMessage createForwardMessage(String url) {
@@ -126,7 +126,7 @@ public class SimpleAjpClient {
     }
 
 
-    /**
+    /*
      * Sends an TesterAjpMessage to the server and returns the response message.
      */
     public TesterAjpMessage sendMessage(TesterAjpMessage headers)
@@ -148,7 +148,7 @@ public class SimpleAjpClient {
         return readMessage();
     }
 
-    /**
+    /*
      * Tests the connection to the server and returns the CPONG response.
      */
     public TesterAjpMessage cping() throws IOException {
@@ -158,7 +158,7 @@ public class SimpleAjpClient {
         return readMessage();
     }
 
-    /**
+    /*
      * Reads a message from the server.
      */
     public TesterAjpMessage readMessage() throws IOException {

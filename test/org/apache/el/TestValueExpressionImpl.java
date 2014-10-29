@@ -198,7 +198,7 @@ public class TestValueExpressionImpl {
     }
 
 
-    /**
+    /*
      * Test returning an empty list as a bean property.
      */
     @Test
@@ -221,7 +221,7 @@ public class TestValueExpressionImpl {
     }
 
 
-    /**
+    /*
      * Test using list directly as variable.
      */
     @Test

@@ -64,21 +64,21 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
-    /**
+    /*
      * Make Tomcat instance accessible to sub-classes.
      */
     public Tomcat getTomcatInstance() {
         return tomcat;
     }
 
-    /**
+    /*
      * Sub-classes need to know port so they can connect
      */
     public int getPort() {
         return tomcat.getConnector().getLocalPort();
     }
 
-    /**
+    /*
      * Sub-classes may want to check, whether an AccessLogValve is active
      */
     public boolean isAccessLogEnabled() {
@@ -196,7 +196,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     }
 
 
-    /**
+    /*
      *  Wrapper for getting the response.
      */
     public static ByteChunk getUrl(String path) throws IOException {

@@ -36,7 +36,7 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
 
 public class TesterConnectionLimit extends TomcatBaseTest{
 
-    /**
+    /*
      * Simple test to see how many outgoing connections can be created on a
      * single machine.
      */

@@ -29,7 +29,7 @@ public class TesterUtil {
     }
 
 
-    /**
+    /*
      * Configures a set of channels to use a random domain. Use to ensure that
      * multiple instance of the test suite do not interfere when running on the
      * same machine. This may happen in a CI system or when a developer is

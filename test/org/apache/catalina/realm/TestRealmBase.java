@@ -637,7 +637,7 @@ public class TestRealmBase {
     }
 
 
-    /**
+    /*
      * This test case covers the special case in section 13.4.1 of the Servlet
      * 3.1 specification for {@link javax.servlet.annotation.HttpConstraint}.
      */
