@@ -183,6 +183,13 @@
         full class path, ensure that class path entries added directly to the
         web application class loader are scanned. (markt)
       </fix>
+      <fix>
+        AsyncContext should remain usable until fireOnComplete is called. (remm)
+      </fix>
+      <fix>
+        AsyncContext createListener should wrap any instantiation exception
+        using a ServletException. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -218,6 +225,9 @@
         <bug>57157</bug>: Allow calls to
         <code>AsyncContext.start(Runnable)</code> during non-blocking IO reads
         and writes. (markt)
+      </fix>
+      <fix>
+        Async state MUST_COMPLETE should still be started. (remm)
       </fix>
     </changelog>
   </subsection>
