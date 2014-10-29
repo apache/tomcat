@@ -53,8 +53,8 @@ public class TestStandardSession extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "bug56578", new Bug56578Servlet());
         ctx.addServletMapping("/bug56578", "bug56578");
