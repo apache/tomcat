@@ -241,6 +241,11 @@
         <code>$</code> and <code>#</code> when processing literal expressions in
         expression language. (markt)
       </fix>
+      <fix>
+        When coercing an object to an array type in Expression Langauage, handle
+        the case where the source object is an array of primitives.
+        (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
