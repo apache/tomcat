@@ -47,7 +47,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -1843,16 +1842,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
 
     @Test
-    @Ignore // Test is broken. It needs to be adjusted to check for the ISE
-            // once complete has taken effect
     public void testGetRequestISE() throws Exception {
         doTestAsyncISE(true);
     }
 
 
     @Test
-    @Ignore // Test is broken. It needs to be adjusted to check for the ISE
-            // once complete has taken effect
     public void testGetResponseISE() throws Exception {
         doTestAsyncISE(false);
     }
@@ -1865,8 +1860,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
-        Wrapper w = Tomcat.addServlet(ctx, "AsyncISEServlet",
-                new AsyncISEServlet(useGetRequest));
+        AsyncISEServlet servlet = new AsyncISEServlet();
+
+        Wrapper w = Tomcat.addServlet(ctx, "AsyncISEServlet", servlet);
         w.setAsyncSupported(true);
         ctx.addServletMapping("/test", "AsyncISEServlet");
 
@@ -1877,43 +1873,50 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals("OK", response.toString());
+
+        boolean hasIse = false;
+        try {
+            if (useGetRequest) {
+                servlet.getAsyncContext().getRequest();
+            } else {
+                servlet.getAsyncContext().getResponse();
+                }
+        } catch (IllegalStateException ise) {
+            hasIse = true;
+        }
+
+        Assert.assertTrue(hasIse);
     }
 
 
+    /**
+     * Accessing the AsyncContext in this way is an ugly hack that should never
+     * be used in a real application since it is not thread safe. That said, it
+     * is this sort of hack that the ISE is meant to be preventing.
+     *
+     */
     private static class AsyncISEServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
-        private boolean useGetRequest = false;
-
-        public AsyncISEServlet(boolean useGetRequest) {
-            this.useGetRequest = useGetRequest;
-        }
+        private AsyncContext asyncContext;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
             resp.setContentType("text/plain;UTF-8");
-            PrintWriter pw = resp.getWriter();
 
-            AsyncContext async = req.startAsync();
+            asyncContext = req.startAsync();
             // This will commit the response
-            async.complete();
+            asyncContext.complete();
+        }
 
-            try {
-                if (useGetRequest) {
-                    async.getRequest();
-                } else {
-                    async.getResponse();
-                }
-                pw.print("FAIL");
-            } catch (IllegalStateException ise) {
-                pw.print("OK");
-            }
+        public AsyncContext getAsyncContext() {
+            return asyncContext;
         }
     }
+
 
     @Test
     public void testDispatchWithCustomRequestResponse() throws Exception {
