@@ -37,7 +37,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     protected Adapter adapter;
-    protected final AsyncStateMachine<S> asyncStateMachine;
+    protected final AsyncStateMachine asyncStateMachine;
     protected final AbstractEndpoint<S> endpoint;
     protected final Request request;
     protected final Response response;
@@ -62,7 +62,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
     public AbstractProcessor(AbstractEndpoint<S> endpoint) {
         this.endpoint = endpoint;
-        asyncStateMachine = new AsyncStateMachine<>(this);
+        asyncStateMachine = new AsyncStateMachine(this);
         request = new Request();
         response = new Response();
         response.setHook(this);
