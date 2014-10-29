@@ -84,7 +84,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         check();
         request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
-        clearServletRequestResponse();
     }
 
     @Override
@@ -104,6 +103,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
             }
         } finally {
+            clearServletRequestResponse();
             context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
         }
 
@@ -288,6 +288,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             ServletException se = new ServletException(e);
             throw se;
         } catch (ClassNotFoundException e) {
+            ServletException se = new ServletException(e);
+            throw se;
+        } catch (Exception e) {
+            ExceptionUtils.handleThrowable(e.getCause());
             ServletException se = new ServletException(e);
             throw se;
         }
