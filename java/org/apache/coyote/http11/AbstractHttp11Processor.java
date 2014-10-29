@@ -1639,24 +1639,23 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         if (status == SocketStatus.OPEN_WRITE) {
             try {
                 asyncStateMachine.asyncOperation();
-                try {
-                    if (outputBuffer.hasDataToWrite()) {
-                        if (outputBuffer.flushBuffer(false)) {
-                            // There is data to write but go via Response to
-                            // maintain a consistent view of non-blocking state
-                            response.checkRegisterForWrite(true);
-                            return SocketState.LONG;
-                        }
+
+                if (outputBuffer.hasDataToWrite()) {
+                    if (outputBuffer.flushBuffer(false)) {
+                        // There is data to write but go via Response to
+                        // maintain a consistent view of non-blocking state
+                        response.checkRegisterForWrite(true);
+                        return SocketState.LONG;
                     }
-                } catch (IOException x) {
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("Unable to write async data.",x);
-                    }
-                    status = SocketStatus.ASYNC_WRITE_ERROR;
-                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
-            } catch (IllegalStateException x) {
-                registerForEvent(false, true);
+            } catch (IOException | IllegalStateException x) {
+                // IOE - Problem writing to socket
+                // ISE - Request/Response not in correct state for async write
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Unable to write async data.",x);
+                }
+                status = SocketStatus.ASYNC_WRITE_ERROR;
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
             }
         } else if (status == SocketStatus.OPEN_READ &&
                 request.getReadListener() != null) {
@@ -1665,7 +1664,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     asyncStateMachine.asyncOperation();
                 }
             } catch (IllegalStateException x) {
-                registerForEvent(true, false);
+                // ISE - Request/Response not in correct state for async read
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Unable to read async data.",x);
+                }
+                status = SocketStatus.ASYNC_READ_ERROR;
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
             }
         }
 
