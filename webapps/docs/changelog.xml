@@ -209,6 +209,11 @@
         Trigger an error if an invalid attempt is made to use non-blocking IO.
         (markt)
       </fix>
+      <fix>
+        <bug>57157</bug>: Allow calls to
+        <code>AsyncContext.start(Runnable)</code> during non-blocking IO reads
+        and writes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

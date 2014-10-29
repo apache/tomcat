@@ -318,7 +318,8 @@ public class AsyncStateMachine {
     }
 
     public synchronized void asyncRun(Runnable runnable) {
-        if (state == AsyncState.STARTING || state ==  AsyncState.STARTED) {
+        if (state == AsyncState.STARTING || state ==  AsyncState.STARTED ||
+                state == AsyncState.READ_WRITE_OP) {
             // Execute the runnable using a container thread from the
             // Connector's thread pool. Use a wrapper to prevent a memory leak
             ClassLoader oldCL;
