@@ -36,7 +36,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestStandardSession extends TomcatBaseTest {
 
-    /**
+    /*
      * Test session.invalidate() in a clustered environment.
      */
     @Test

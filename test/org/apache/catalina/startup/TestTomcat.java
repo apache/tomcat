@@ -170,7 +170,7 @@ public class TestTomcat extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Start tomcat with a single context and one
      * servlet - all programmatic, no server.xml or
      * web.xml used.
@@ -259,7 +259,7 @@ public class TestTomcat extends TomcatBaseTest {
      }
 
 
-    /**
+    /*
      * Test for enabling JNDI.
      */
     @Test
@@ -290,7 +290,7 @@ public class TestTomcat extends TomcatBaseTest {
         assertEquals("Hello, Tomcat User", res.toString());
     }
 
-    /**
+    /*
      * Test for enabling JNDI and using global resources.
      */
     @Test
@@ -327,7 +327,7 @@ public class TestTomcat extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Test for https://issues.apache.org/bugzilla/show_bug.cgi?id=47866
      */
     @Test

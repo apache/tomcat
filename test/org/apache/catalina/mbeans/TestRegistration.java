@@ -141,7 +141,7 @@ public class TestRegistration extends TomcatBaseTest {
         };
     }
 
-    /**
+    /*
      * Test verifying that Tomcat correctly de-registers the MBeans it has
      * registered.
      * @author Marc Guillemot
@@ -252,7 +252,7 @@ public class TestRegistration extends TomcatBaseTest {
         assertEquals("Remaining: " + onames, 0, onames.size());
     }
 
-    /**
+    /*
      * Confirm that, as far as ObjectName is concerned, the order of the key
      * properties is not significant.
      */

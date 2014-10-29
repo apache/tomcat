@@ -34,7 +34,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TestWebdavServlet extends TomcatBaseTest {
 
-    /**
+    /*
      * Test attempting to access special paths (WEB-INF/META-INF) using WebdavServlet
      */
     @Test
@@ -77,7 +77,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
     }
 
-    /**
+    /*
      * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50026
      * Verify protection of special paths with re-mount of web app resource root.
      */
