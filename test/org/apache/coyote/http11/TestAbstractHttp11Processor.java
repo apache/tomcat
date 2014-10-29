@@ -57,13 +57,13 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     public void testResponseWithErrorChunked() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctxt = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         // Add protected servlet
-        Tomcat.addServlet(ctxt, "ChunkedResponseWithErrorServlet",
+        Tomcat.addServlet(ctx, "ChunkedResponseWithErrorServlet",
                 new ResponseWithErrorServlet(true));
-        ctxt.addServletMapping("/*", "ChunkedResponseWithErrorServlet");
+        ctx.addServletMapping("/*", "ChunkedResponseWithErrorServlet");
 
         tomcat.start();
 
@@ -347,13 +347,12 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     public void testPipelining() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctxt = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         // Add protected servlet
-        Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
-        ctxt.addServletMapping("/foo", "TesterServlet");
+        Tomcat.addServlet(ctx, "TesterServlet", new TesterServlet());
+        ctx.addServletMapping("/foo", "TesterServlet");
 
         tomcat.start();
 
@@ -408,13 +407,12 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     public void testChunking11NoContentLength() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctxt = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
-        Tomcat.addServlet(ctxt, "NoContentLengthFlushingServlet",
+        Tomcat.addServlet(ctx, "NoContentLengthFlushingServlet",
                 new NoContentLengthFlushingServlet());
-        ctxt.addServletMapping("/test", "NoContentLengthFlushingServlet");
+        ctx.addServletMapping("/test", "NoContentLengthFlushingServlet");
 
         tomcat.start();
 
@@ -436,13 +434,12 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctxt = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
-        Tomcat.addServlet(ctxt, "NoContentLengthConnectionCloseFlushingServlet",
+        Tomcat.addServlet(ctx, "NoContentLengthConnectionCloseFlushingServlet",
                 new NoContentLengthConnectionCloseFlushingServlet());
-        ctxt.addServletMapping("/test",
+        ctx.addServletMapping("/test",
                 "NoContentLengthConnectionCloseFlushingServlet");
 
         tomcat.start();
@@ -477,13 +474,12 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     private void doTestBug53677(boolean flush) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctxt = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
-        Tomcat.addServlet(ctxt, "LargeHeaderServlet",
+        Tomcat.addServlet(ctx, "LargeHeaderServlet",
                 new LargeHeaderServlet(flush));
-        ctxt.addServletMapping("/test", "LargeHeaderServlet");
+        ctx.addServletMapping("/test", "LargeHeaderServlet");
 
         tomcat.start();
 
@@ -514,12 +510,11 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         tomcat.getConnector().setProperty("processorCache", "1");
         tomcat.getConnector().setProperty("maxThreads", "1");
 
-        // Must have a real docBase - just use temp
-        Context ctxt = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
-        Tomcat.addServlet(ctxt, "async", new Bug55772Servlet());
-        ctxt.addServletMapping("/*", "async");
+        Tomcat.addServlet(ctx, "async", new Bug55772Servlet());
+        ctx.addServletMapping("/*", "async");
 
         tomcat.start();
 
