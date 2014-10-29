@@ -45,9 +45,8 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
         tomcat.getServer().addLifecycleListener(
                 new JreMemoryLeakPreventionListener());
 
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "leakServlet1",
                 "org.apache.tomcat.unittest.TesterLeakingServlet1");
@@ -100,9 +99,8 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
         tomcat.getServer().addLifecycleListener(
                 new JreMemoryLeakPreventionListener());
 
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "leakServlet2",
                 "org.apache.tomcat.unittest.TesterLeakingServlet2");

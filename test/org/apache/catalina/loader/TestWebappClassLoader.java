@@ -39,7 +39,7 @@ public class TestWebappClassLoader extends TomcatBaseTest {
         expected[1] = "jar:" + warUrl + "!/WEB-INF/lib/test.jar";
 
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
+
         StandardContext ctx =
                 (StandardContext)tomcat.addContext("",  f.getAbsolutePath());
 
