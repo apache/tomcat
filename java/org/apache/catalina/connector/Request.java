@@ -1634,6 +1634,16 @@ public class Request
         return result.get();
     }
 
+    public boolean canAsyncComplete() {
+        if (asyncContext == null) {
+            return false;
+        }
+
+        AtomicBoolean result = new AtomicBoolean(false);
+        coyoteRequest.action(ActionCode.ASYNC_CAN_COMPLETE, result);
+        return result.get();
+    }
+
     public boolean isAsync() {
         if (asyncContext == null) {
             return false;

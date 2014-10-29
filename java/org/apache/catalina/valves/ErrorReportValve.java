@@ -123,7 +123,7 @@ public class ErrorReportValve extends ValveBase {
             ExceptionUtils.handleThrowable(tt);
         }
 
-        if (request.isAsyncStarted()) {
+        if (request.canAsyncComplete()) {
             request.getAsyncContext().complete();
         }
     }

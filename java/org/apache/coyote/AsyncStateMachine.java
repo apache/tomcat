@@ -19,7 +19,6 @@ package org.apache.coyote;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
-import org.apache.catalina.Globals;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
@@ -107,38 +106,44 @@ public class AsyncStateMachine {
         StringManager.getManager(Constants.Package);
 
     private static enum AsyncState {
-        DISPATCHED(false, false, false),
-        STARTING(true, true, false),
-        STARTED(true, true, false),
-        MUST_COMPLETE(true, Globals.STRICT_SERVLET_COMPLIANCE, false),
-        COMPLETING(true, false, false),
-        TIMING_OUT(true, false, false),
-        MUST_DISPATCH(true, true, true),
-        DISPATCHING(true, false, true),
-        READ_WRITE_OP(true,true,false),
-        ERROR(true,false,false);
+        DISPATCHED(false, false, false, false),
+        STARTING(true, true, true, false),
+        STARTED(true, true, true, false),
+        MUST_COMPLETE(true, true, false, false),
+        COMPLETING(true, false, false, false),
+        TIMING_OUT(true, false, false, false),
+        MUST_DISPATCH(true, true, false, true),
+        DISPATCHING(true, false, false, true),
+        READ_WRITE_OP(true, true, true, false),
+        ERROR(true, false, false, false);
 
-        private boolean isAsync;
-        private boolean isStarted;
-        private boolean isDispatching;
+        private final boolean isAsync;
+        private final boolean isStarted;
+        private final boolean canComplete;
+        private final boolean isDispatching;
 
-        private AsyncState(boolean isAsync, boolean isStarted,
+        private AsyncState(boolean isAsync, boolean isStarted, boolean canComplete,
                 boolean isDispatching) {
             this.isAsync = isAsync;
             this.isStarted = isStarted;
+            this.canComplete = canComplete;
             this.isDispatching = isDispatching;
         }
 
         public boolean isAsync() {
-            return this.isAsync;
+            return isAsync;
         }
 
         public boolean isStarted() {
-            return this.isStarted;
+            return isStarted;
         }
 
         public boolean isDispatching() {
-            return this.isDispatching;
+            return isDispatching;
+        }
+
+        public boolean canComplete() {
+            return canComplete;
         }
     }
 
@@ -172,6 +177,10 @@ public class AsyncStateMachine {
 
     public boolean isAsyncError() {
         return state == AsyncState.ERROR;
+    }
+
+    public boolean canComplete() {
+        return state.canComplete();
     }
 
     public synchronized void asyncStart(AsyncContextCallback asyncCtxt) {
