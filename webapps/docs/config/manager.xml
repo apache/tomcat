@@ -359,6 +359,16 @@
       to use this implementation.</p>
     </attribute>
 
+    <attribute name="connectionName" required="true">
+      <p>The user name that will be handed to the configured JDBC driver to
+      establish a connection to the database containing the session table.</p>
+    </attribute>
+
+    <attribute name="connectionPassword" required="true">
+      <p>The password that will be handed to the configured JDBC driver to
+      establish a connection to the database containing the session table.</p>
+    </attribute>
+
     <attribute name="connectionURL" required="true">
       <p>The connection URL that will be handed to the configured JDBC
       driver to establish a connection to the database containing our
@@ -368,8 +378,9 @@
     <attribute name="dataSourceName" required="false">
       <p>Name of the JNDI resource for a JDBC DataSource-factory. If this option
       is given and a valid JDBC resource can be found, it will be used and any
-      direct configuration of a JDBC connection via <code>connectionURL</code>
-      and <code>driverName</code> will be ignored. Since this code uses prepared
+      direct configuration of a JDBC connection via <code>connectionURL</code>,
+      <code>connectionName</code>, <code>connectionPassword</code> and
+      <code>driverName</code> will be ignored. Since this code uses prepared
       statements, you might want to configure pooled prepared statements as
       shown in <a href="../jndi-resources-howto.html">the JNDI resources
       HOW-TO</a>.</p>
@@ -379,52 +390,57 @@
       <p>Java class name of the JDBC driver to be used.</p>
     </attribute>
 
-    <attribute name="sessionAppCol" required="true">
-      <p>Name of the database column, contained in the specified session
-      table, that contains the Engine, Host, and Web Application Context
-      name in the format <code>/Engine/Host/Context</code>.</p>
+    <attribute name="sessionAppCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the Engine, Host, and Web Application Context name in the
+      format <code>/Engine/Host/Context</code>. If not specified the default
+      value of <code>app</code> will be used.</p>
     </attribute>
 
-    <attribute name="sessionDataCol" required="true">
-      <p>Name of the database column, contained in the specified
-      session table, that contains the serialized form of all session
-      attributes for a swapped out session.  The column type must accept
-      a binary object (typically called a BLOB).</p>
+    <attribute name="sessionDataCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the serialized form of all session attributes for a swapped
+      out session. The column type must accept a binary object (typically called
+      a BLOB). If not specified the default value of <code>data</code> will be
+      used.</p>
     </attribute>
 
-    <attribute name="sessionIdCol" required="true">
-      <p>Name of the database column, contained in the specified
-      session table, that contains the session identifier of the
-      swapped out session.  The column type must accept character
-      string data of at least as many characters as are contained
-      in session identifiers created by Tomcat (typically 32).</p>
+    <attribute name="sessionIdCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the session identifier of the swapped out session. The
+      column type must accept character string data of at least as many
+      characters as are contained in session identifiers created by Tomcat
+      (typically 32). If not specified the default value of <code>id</code> will
+      be used.</p>
     </attribute>
 
-    <attribute name="sessionLastAccessedCol" required="true">
-      <p>Name of the database column, contained in the specified
-      session table, that contains the <code>lastAccessedTime</code>
-      property of this session.  The column type must accept a
-      Java <code>long</code> (64 bits).</p>
+    <attribute name="sessionLastAccessedCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the <code>lastAccessedTime</code> property of this session.
+      The column type must accept a Java <code>long</code> (64 bits). If not
+      specified the default value of <code>maxinactive</code> will be used.</p>
     </attribute>
 
-    <attribute name="sessionMaxInactiveCol" required="true">
-      <p>Name of the database column, contained in the specified
-      session table, that contains the <code>maxInactiveInterval</code>
-      property of this session.  The column type must accept a
-      Java <code>integer</code> (32 bits).</p>
+    <attribute name="sessionMaxInactiveCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains the <code>maxInactiveInterval</code> property of this
+      session. The column type must accept a Java <code>integer</code> (32
+      bits). If not specified, the default value of <code>maxinactive</code>
+      will be used.</p>
     </attribute>
 
-    <attribute name="sessionTable" required="true">
-      <p>Name of the database table to be used for storing swapped out
-      sessions.  This table must contain (at least) the database columns
-      that are configured by the other attributes of this element.</p>
+    <attribute name="sessionTable" required="false">
+      <p>Name of the database table to be used for storing swapped out sessions.
+      This table must contain (at least) the database columns that are
+      configured by the other attributes of this element. If not specified the
+      default value of <code>tomcat$sessions</code> will be used.</p>
     </attribute>
 
-    <attribute name="sessionValidCol" required="true">
-      <p>Name of the database column, contained in the specified
-      session table, that contains a flag indicating whether this
-      swapped out session is still valid or not.  The column type
-      must accept a single character.</p>
+    <attribute name="sessionValidCol" required="false">
+      <p>Name of the database column, contained in the specified session table,
+      that contains a flag indicating whether this swapped out session is stil
+      valid or not. The column type must accept a single character. If not
+      specified the default value of <code>valid</code> will be used.</p>
     </attribute>
 
   </attributes>
@@ -443,6 +459,10 @@
   session_data   mediumblob,
   KEY kapp_name(app_name)
 );</source>
+
+  <p>Note: The SQL command above does not use the default names for either the
+  table or the clumns so the JDBC Store would need to be configured to reflect
+  this.</p>
 
   <p>In order for the JDBC Based Store to successfully connect to your
   database, the JDBC driver you configure must be visible to Tomcat's

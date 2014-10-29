@@ -353,6 +353,11 @@
       <update>
         Suppress timestamp comments in Javadoc. (kkolinko)
       </update>
+      <fix>
+        <bug>57147</bug>: Various corrections to the JDBC Store section of the
+        session manager configuration page of the documentation web application.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
