@@ -421,9 +421,8 @@ public class TestStandardContext extends TomcatBaseTest {
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        File docBase = new File(System.getProperty("java.io.tmpdir"));
-        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         // Setup realm
         TesterMapRealm realm = new TesterMapRealm();
@@ -491,9 +490,9 @@ public class TestStandardContext extends TomcatBaseTest {
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        File docBase = new File(System.getProperty("java.io.tmpdir"));
-        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
         ctx.setDenyUncoveredHttpMethods(enableDeny);
 
         // Setup realm
@@ -572,9 +571,8 @@ public class TestStandardContext extends TomcatBaseTest {
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        File docBase = new File(System.getProperty("java.io.tmpdir"));
-        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         // Add ServletContainerInitializer
         Bug51376SCI sci = new Bug51376SCI(loadOnStartUp);

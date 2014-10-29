@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -41,9 +40,8 @@ public class TestStandardHostValve extends TomcatBaseTest {
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        File docBase = new File(System.getProperty("java.io.tmpdir"));
-        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         // Add the error page
         Tomcat.addServlet(ctx, "error", new ErrorServlet());
