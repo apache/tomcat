@@ -60,9 +60,8 @@ public class TestNamingContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
-        // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext)
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
 
         // Create the resource
         ContextResource cr = new ContextResource();
@@ -122,9 +121,8 @@ public class TestNamingContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
-        // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext)
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
 
         // Create the resource
         ContextResource cr = new ContextResource();
@@ -174,9 +172,8 @@ public class TestNamingContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
-        // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext)
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
 
         // Create the resource
         ContextResource cr = new ContextResource();
@@ -234,9 +231,8 @@ public class TestNamingContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
-        // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext)
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
 
         ctx.setJndiExceptionOnFailedWrite(exceptionOnFailedWrite);
 
@@ -293,9 +289,8 @@ public class TestNamingContext extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
-        // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext)
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
 
         // Create the resource
         ContextEnvironment env = new ContextEnvironment();
