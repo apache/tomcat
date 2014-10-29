@@ -37,6 +37,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.MessageBytes;
 
 public class TestCoyoteAdapter extends TomcatBaseTest {
 
@@ -324,6 +325,28 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         Assert.assertTrue(servlet.isCompleted());
     }
+
+    @Test
+    public void testNormalize01() {
+        doTestNormalize("/foo/../bar", "/bar");
+    }
+
+    private void doTestNormalize(String input, String expected) {
+        MessageBytes mb = MessageBytes.newInstance();
+        byte[] b = input.getBytes(StandardCharsets.UTF_8);
+        mb.setBytes(b, 0, b.length);
+
+        boolean result = CoyoteAdapter.normalize(mb);
+        mb.toString();
+
+        if (expected == null) {
+            Assert.assertFalse(result);
+        } else {
+            Assert.assertTrue(result);
+            Assert.assertEquals(expected, mb.toString());
+        }
+    }
+
 
     private class AsyncServlet extends HttpServlet {
 
