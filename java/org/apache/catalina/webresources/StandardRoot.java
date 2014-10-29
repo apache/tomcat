@@ -653,21 +653,26 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     protected void startInternal() throws LifecycleException {
         String docBase = context.getDocBase();
 
-        File f = new File(docBase);
-        if (!f.isAbsolute()) {
-            f = new File(((Host)context.getParent()).getAppBaseFile(), f.getPath());
-        }
-        if (f.isDirectory()) {
-            main = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
-        } else if(f.isFile() && docBase.endsWith(".war")) {
-            main = new JarResourceSet(this, "/", f.getAbsolutePath(), "/");
+        mainResources.clear();
+
+        if (docBase == null) {
+            main = new EmptyResourceSet(this);
         } else {
-            throw new IllegalArgumentException(
-                    sm.getString("standardRoot.startInvalidMain",
-                            f.getAbsolutePath()));
+            File f = new File(docBase);
+            if (!f.isAbsolute()) {
+                f = new File(((Host)context.getParent()).getAppBaseFile(), f.getPath());
+            }
+            if (f.isDirectory()) {
+                main = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
+            } else if(f.isFile() && docBase.endsWith(".war")) {
+                main = new JarResourceSet(this, "/", f.getAbsolutePath(), "/");
+            } else {
+                throw new IllegalArgumentException(
+                        sm.getString("standardRoot.startInvalidMain",
+                                f.getAbsolutePath()));
+            }
         }
 
-        mainResources.clear();
         mainResources.add(main);
 
         for (ArrayList<WebResourceSet> list : allResources) {
