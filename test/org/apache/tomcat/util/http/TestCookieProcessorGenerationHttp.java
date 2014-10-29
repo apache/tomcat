@@ -41,8 +41,8 @@ public class TestCookieProcessorGenerationHttp extends TomcatBaseTest {
     @Test
     public void testUtf8CookieValue() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.setCookieProcessor(new Rfc6265CookieProcessor());
         Tomcat.addServlet(ctx, "test", new CookieServlet("\u0120"));
         ctx.addServletMapping("/test", "test");
