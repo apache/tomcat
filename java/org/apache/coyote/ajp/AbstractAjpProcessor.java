@@ -522,6 +522,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             getSocketWrapper().access();
             break;
         }
+        case ASYNC_CAN_COMPLETE: {
+            ((AtomicBoolean) param).set(asyncStateMachine.canComplete());
+            break;
+        }
         case ASYNC_COMPLETE: {
             socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {

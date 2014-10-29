@@ -158,6 +158,12 @@ public enum ActionCode {
     ASYNC_RUN,
 
     /**
+     * Call back to see if it is currently possible to call
+     * {@link javax.servlet.AsyncContext#complete()} without error.
+     */
+    ASYNC_CAN_COMPLETE,
+
+    /**
      * Callback for an async call to
      * {@link javax.servlet.AsyncContext#complete()}
      */
