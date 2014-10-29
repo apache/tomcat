@@ -263,6 +263,10 @@
         the case where the source object is an array of primitives.
         (markt/kkolinko)
       </fix>
+      <fix>
+        Do not throw an exception on missing JSP file servlet initialization.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
