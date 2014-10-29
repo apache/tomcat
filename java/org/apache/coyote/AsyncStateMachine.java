@@ -97,7 +97,7 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  *     |----------------------------------------------------------------------------|
  * </pre>
  */
-public class AsyncStateMachine<S> {
+public class AsyncStateMachine {
 
     /**
      * The string manager for this package.
@@ -145,10 +145,10 @@ public class AsyncStateMachine<S> {
     private volatile AsyncState state = AsyncState.DISPATCHED;
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
-    private final Processor<S> processor;
+    private final Processor<?> processor;
 
 
-    public AsyncStateMachine(Processor<S> processor) {
+    public AsyncStateMachine(Processor<?> processor) {
         this.processor = processor;
     }
 
