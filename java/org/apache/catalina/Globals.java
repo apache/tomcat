@@ -232,9 +232,6 @@ public final class Globals {
             org.apache.coyote.Constants.REMOTE_ADDR_ATTRIBUTE;
 
 
-    /**
-     *
-     */
     public static final String ASYNC_SUPPORTED_ATTR =
         "org.apache.catalina.ASYNC_SUPPORTED";
 
