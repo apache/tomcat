@@ -641,12 +641,12 @@ public class RewriteValve extends ValveBase {
     protected static void parseRuleFlag(String line, RewriteRule rule, String flag) {
         if (flag.equals("chain") || flag.equals("C")) {
             rule.setChain(true);
-        } else if (flag.startsWith("cookie=") || flag.startsWith("C=")) {
+        } else if (flag.startsWith("cookie=") || flag.startsWith("CO=")) {
             rule.setCookie(true);
             if (flag.startsWith("cookie")) {
                 flag = flag.substring("cookie=".length());
-            } else if (flag.startsWith("C=")) {
-                flag = flag.substring("C=".length());
+            } else if (flag.startsWith("CO=")) {
+                flag = flag.substring("CO=".length());
             }
             StringTokenizer tokenizer = new StringTokenizer(flag, ":");
             if (tokenizer.countTokens() < 2) {

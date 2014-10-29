@@ -175,6 +175,9 @@
         <code>PrintWriter</code> obtained from the <code>ServletResponse</code>.
         (markt)
       </fix>
+      <fix>
+        Cookie rewrite flag abbreviation should be CO rather than C. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
