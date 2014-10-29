@@ -494,16 +494,18 @@ public class ELSupport {
             final Class<?> type) {
         // Note: Nested arrays will result in nested calls to this method.
 
+        // Note: Calling method has checked the obj is an array.
+
+        int size = Array.getLength(obj);
         // Cast the input object to an array (calling method has checked it is
         // an array)
-        Object[] array = (Object[]) obj;
         // Get the target type for the array elements
         Class<?> componentType = type.getComponentType();
         // Create a new array of the correct type
-        Object result = Array.newInstance(componentType, array.length);
+        Object result = Array.newInstance(componentType, size);
         // Coerce each element in turn.
-        for (int i = 0; i < array.length; i++) {
-            Array.set(result, i, coerceToType(array[i], componentType));
+        for (int i = 0; i < size; i++) {
+            Array.set(result, i, coerceToType(Array.get(obj, i), componentType));
         }
 
         return result;

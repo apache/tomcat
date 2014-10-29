@@ -191,4 +191,21 @@ public class TestELProcessor {
         elp.eval("fn:test(null, null)");
         Assert.assertEquals("I", TesterFunctions.getCallList());
     }
+
+
+    @Test
+    public void testPrimitiveArray01() {
+        ELProcessor elp = new ELProcessor();
+        TesterBean bean01= new TesterBean("bean01");
+        elp.defineBean("bean01", bean01);
+        elp.defineBean("bean02", new TesterBean("bean02"));
+
+        Object result = elp.eval("bean02.setValueC(bean01.valueB);bean02.valueC");
+
+        Integer[] resultArray = (Integer[]) result;
+        Assert.assertEquals(bean01.getValueB().length, resultArray.length);
+        for (int i = 0; i < resultArray.length; i++) {
+            Assert.assertEquals(bean01.getValueB()[i], resultArray[i].intValue());
+        }
+    }
 }
