@@ -37,9 +37,8 @@ public class TestApplicationFilterConfig extends TomcatBaseTest {
     public void testBug54170() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "HelloWorld", new HelloWorldServlet());
         ctx.addServletMapping("/", "HelloWorld");
