@@ -19,6 +19,7 @@ package org.apache.catalina.filters;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.Map;
@@ -52,6 +53,27 @@ public class TesterServletContext implements ServletContext {
         return "";
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return an empty Set.
+     */
+    @Override
+    public Set<String> getResourcePaths(String path) {
+        return Collections.emptySet();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This test implementation is hard coded to return the class loader that
+     * loaded this class.
+     */
+    @Override
+    public ClassLoader getClassLoader() {
+        return getClass().getClassLoader();
+    }
+
     @Override
     public ServletContext getContext(String uripath) {
         throw new RuntimeException("Not implemented");
@@ -69,11 +91,6 @@ public class TesterServletContext implements ServletContext {
 
     @Override
     public String getMimeType(String file) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public Set<String> getResourcePaths(String path) {
         throw new RuntimeException("Not implemented");
     }
 
@@ -304,11 +321,6 @@ public class TesterServletContext implements ServletContext {
 
     @Override
     public JspConfigDescriptor getJspConfigDescriptor() {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public ClassLoader getClassLoader() {
         throw new RuntimeException("Not implemented");
     }
 

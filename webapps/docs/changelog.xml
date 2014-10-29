@@ -178,6 +178,11 @@
       <fix>
         Cookie rewrite flag abbreviation should be CO rather than C. (remm)
       </fix>
+      <fix>
+        <bug>57153</bug>: When the StandardJarScanner is configured to scan the
+        full class path, ensure that class path entries added directly to the
+        web application class loader are scanned. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

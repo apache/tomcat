@@ -195,11 +195,7 @@ public class StandardJarScanner implements JarScanner {
                 stopLoader = ClassLoader.getSystemClassLoader().getParent();
             }
 
-
             ClassLoader classLoader = context.getClassLoader();
-            // No need to scan the web application class loader - we have
-            // already scanned WEB-INF/lib and WEB-INF/classes
-            classLoader = classLoader.getParent();
 
             // JARs are treated as application provided until the common class
             // loader is reached.
