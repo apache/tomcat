@@ -1275,7 +1275,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
 
         // Check user-agent header
-        if ((restrictedUserAgents != null) && ((http11) || (keepAlive))) {
+        if (restrictedUserAgents != null && (http11 || keepAlive)) {
             MessageBytes userAgentValueMB = headers.getValue("user-agent");
             // Check in the restricted list, and adjust the http11
             // and keepAlive flags accordingly
@@ -1313,7 +1313,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 hostMB.setBytes(uriB, uriBCStart + pos + 3,
                                 slashPos - pos - 3);
             }
-
         }
 
         // Input filter setup
@@ -1476,7 +1475,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             contentDelimitation = true;
         } else {
             // If the response code supports an entity body and we're on
-            // HTTP 1.1 then we chunk unless we have a Connection: close header
+            // HTTP 1.1 and we are using keep-alive then we chunk unless we have
+            // a Connection: close header
             connectionClosePresent = isConnectionClose(headers);
             if (entityBody && http11 && keepAlive && !connectionClosePresent) {
                 getOutputBuffer().addActiveFilter
