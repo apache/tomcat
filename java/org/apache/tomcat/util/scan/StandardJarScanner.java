@@ -146,7 +146,7 @@ public class StandardJarScanner implements JarScanner {
             while (it.hasNext()) {
                 String path = it.next();
                 if (path.endsWith(Constants.JAR_EXT) &&
-                        jarScanFilter.check(scanType,
+                        getJarScanFilter().check(scanType,
                                 path.substring(path.lastIndexOf('/')+1))) {
                     // Need to scan this JAR
                     if (log.isDebugEnabled()) {
@@ -168,7 +168,7 @@ public class StandardJarScanner implements JarScanner {
         }
 
         // Scan WEB-INF/classes
-        if (scanAllDirectories) {
+        if (isScanAllDirectories()) {
             try {
                 URL url = context.getResource("/WEB-INF/classes/META-INF");
                 if (url != null) {
@@ -184,13 +184,13 @@ public class StandardJarScanner implements JarScanner {
         }
 
         // Scan the classpath
-        if (scanClassPath) {
+        if (isScanClassPath()) {
             if (log.isTraceEnabled()) {
                 log.trace(sm.getString("jarScan.classloaderStart"));
             }
 
             ClassLoader stopLoader = null;
-            if (!scanBootstrapClassPath) {
+            if (!isScanBootstrapClassPath()) {
                 // Stop when we reach the bootstrap class loader
                 stopLoader = ClassLoader.getSystemClassLoader().getParent();
             }
@@ -217,7 +217,7 @@ public class StandardJarScanner implements JarScanner {
                         if ((cpe.isJar() ||
                                 scanType == JarScanType.PLUGGABILITY ||
                                 isScanAllDirectories()) &&
-                                        jarScanFilter.check(scanType,
+                                        getJarScanFilter().check(scanType,
                                                 cpe.getName())) {
                             if (log.isDebugEnabled()) {
                                 log.debug(sm.getString(
@@ -299,7 +299,7 @@ public class StandardJarScanner implements JarScanner {
                     File f;
                     try {
                         f = new File(url.toURI());
-                        if (f.isFile() && scanAllFiles) {
+                        if (f.isFile() && isScanAllFiles()) {
                             // Treat this file as a JAR
                             URL jarURL = new URL("jar:" + urlStr + "!/");
                             callback.scan(
