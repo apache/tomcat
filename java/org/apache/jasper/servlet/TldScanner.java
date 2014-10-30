@@ -66,9 +66,16 @@ public class TldScanner {
     private final List<String> listeners = new ArrayList<>();
 
     /**
-     * Initialize with the application's ServletContext.
+     * Initialise with the application's ServletContext.
      *
-     * @param context the application's servletContext
+     * @param context        the application's servletContext
+     * @param namespaceAware should the XML parser used to parse TLD files be
+     *                       configured to be name space aware
+     * @param validation     should the XML parser used to parse TLD files be
+     *                       configured to use validation
+     * @param blockExternal  should the XML parser used to parse TLD files be
+     *                       configured to be block references to external
+     *                       entities
      */
     public TldScanner(ServletContext context,
                       boolean namespaceAware,
@@ -129,7 +136,10 @@ public class TldScanner {
 
     /**
      * Set the class loader used by the digester to create objects as a result
-     * of this scan. Normally this only needs tobe set when using JspC.
+     * of this scan. Normally this only needs to be set when using JspC.
+     *
+     * @param classLoader Class loader to use when creating new objects while
+     *                    parsing TLDs
      */
     public void setClassLoader(ClassLoader classLoader) {
         tldParser.setClassLoader(classLoader);
@@ -330,12 +340,17 @@ public class TldScanner {
                         return FileVisitResult.CONTINUE;
                     }
 
-                    String subPath = file.subpath(
-                            filePath.getNameCount(), file.getNameCount()).toString();
-                    if ('/' != File.separatorChar) {
-                        subPath = subPath.replace(File.separatorChar, '/');
+                    String resourcePath;
+                    if (webappPath == null) {
+                        resourcePath = null;
+                    } else {
+                        String subPath = file.subpath(
+                                filePath.getNameCount(), file.getNameCount()).toString();
+                        if ('/' != File.separatorChar) {
+                            subPath = subPath.replace(File.separatorChar, '/');
+                        }
+                        resourcePath = webappPath + "/" + subPath;
                     }
-                    String resourcePath = webappPath + "/" + subPath;
 
                     try {
                         URL url = file.toUri().toURL();
