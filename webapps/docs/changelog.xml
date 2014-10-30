@@ -195,6 +195,10 @@
         have a docBase on the file system. This is primarily intended for use
         when embedding. (markt)
       </fix>
+      <fix>
+        Propagate header ordering from fileupload to the part implementation.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

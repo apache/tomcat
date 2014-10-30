@@ -22,8 +22,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 
@@ -69,7 +69,7 @@ public class ApplicationPart implements Part {
     @Override
     public Collection<String> getHeaderNames() {
         if (fileItem instanceof DiskFileItem) {
-            HashSet<String> headerNames = new HashSet<>();
+            LinkedHashSet<String> headerNames = new LinkedHashSet<>();
             Iterator<String> iter =
                 ((DiskFileItem) fileItem).getHeaders().getHeaderNames();
             while (iter.hasNext()) {
@@ -83,7 +83,7 @@ public class ApplicationPart implements Part {
     @Override
     public Collection<String> getHeaders(String name) {
         if (fileItem instanceof DiskFileItem) {
-            HashSet<String> headers = new HashSet<>();
+            LinkedHashSet<String> headers = new LinkedHashSet<>();
             Iterator<String> iter =
                 ((DiskFileItem) fileItem).getHeaders().getHeaders(name);
             while (iter.hasNext()) {
