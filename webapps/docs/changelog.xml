@@ -239,8 +239,10 @@
         Async state MUST_COMPLETE should still be started. (remm)
       </fix>
       <fix>
-        Disable chunking when there is no keepalive (connection close is added
-        at the end of the method). (remm)
+        Provide a new option on the connector (disableChunkingOnClose) to
+        disable chunking when there is no keepalive (connection close is added
+        at the end of the method). This option is disabled by default.
+        (remm/markt)
       </fix>
     </changelog>
   </subsection>

@@ -207,6 +207,13 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         endpoint.setMaxKeepAliveRequests(mkar);
     }
 
+    public boolean getDisableChunkingOnClose() {
+        return endpoint.getDisableChunkingOnClose();
+    }
+    public void setDisableChunkingOnClose(boolean disableChunkingOnClose) {
+        endpoint.setDisableChunkingOnClose(disableChunkingOnClose);
+    }
+
     protected NpnHandler<S> npnHandler;
     @SuppressWarnings("unchecked")
     public void setNpnHandler(String impl) {
