@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -139,6 +140,8 @@ public class StandardJarScanner implements JarScanner {
             log.trace(sm.getString("jarScan.webinflibStart"));
         }
 
+        Set<URL> processedURLs = new HashSet<>();
+
         // Scan WEB-INF/lib
         Set<String> dirList = context.getResourcePaths(Constants.WEB_INF_LIB);
         if (dirList != null) {
@@ -155,6 +158,7 @@ public class StandardJarScanner implements JarScanner {
                     URL url = null;
                     try {
                         url = context.getResource(path);
+                        processedURLs.add(url);
                         process(scanType, callback, url, path, true);
                     } catch (IOException e) {
                         log.warn(sm.getString("jarScan.webinflibFail", url), e);
@@ -172,6 +176,14 @@ public class StandardJarScanner implements JarScanner {
             try {
                 URL url = context.getResource("/WEB-INF/classes/META-INF");
                 if (url != null) {
+                    // Class path scanning will look at WEB-INF/classes since
+                    // that is the URL that Tomcat's web application class
+                    // loader returns. Therefore, it is this URL that needs to
+                    // be added to the set of processed URLs.
+                    URL webInfURL = context.getResource("/WEB-INF/classes");
+                    if (webInfURL != null) {
+                        processedURLs.add(webInfURL);
+                    }
                     try {
                         callback.scanWebInfClasses();
                     } catch (IOException e) {
@@ -208,6 +220,11 @@ public class StandardJarScanner implements JarScanner {
                     }
                     URL[] urls = ((URLClassLoader) classLoader).getURLs();
                     for (int i=0; i<urls.length; i++) {
+                        if (processedURLs.contains(urls[i])) {
+                            // Skip this URL it has already been processed
+                            continue;
+                        }
+
                         ClassPathEntry cpe = new ClassPathEntry(urls[i]);
 
                         // JARs are scanned unless the filter says not to.
