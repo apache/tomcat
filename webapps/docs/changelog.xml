@@ -296,6 +296,11 @@
         coerce the empty string to <code>null</code> if the
         <code>PropertyEditor</code> throws an exception. (kkolinko/markt)
       </fix>
+      <fix>
+        <bug>57153</bug>: Correctly scan for TLDs located in directories that
+        represent exanded JARs files that have been added to the web application
+        class loader&apos;s class path. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
