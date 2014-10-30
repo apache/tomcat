@@ -1478,7 +1478,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // HTTP 1.1 and we are using keep-alive then we chunk unless we have
             // a Connection: close header
             connectionClosePresent = isConnectionClose(headers);
-            if (entityBody && http11 && keepAlive && !connectionClosePresent) {
+            if (entityBody && http11 && (keepAlive || !endpoint.getDisableChunkingOnClose()) &&
+                    !connectionClosePresent) {
                 getOutputBuffer().addActiveFilter
                     (outputFilters[Constants.CHUNKED_FILTER]);
                 contentDelimitation = true;
