@@ -238,6 +238,10 @@
       <fix>
         Async state MUST_COMPLETE should still be started. (remm)
       </fix>
+      <fix>
+        Disable chunking when there is no keepalive (connection close is added
+        at the end of the method). (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
