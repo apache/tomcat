@@ -519,6 +519,59 @@ public class TestCorsFilter {
                 CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST)).booleanValue());
     }
 
+    /*
+     * Tests whether requests with Origin 'null' (String) are accepted when
+     * enabled explicitly by configuration.
+     */
+    @Test
+    public void testDoFilterNullOriginAllowed() throws IOException,
+            ServletException {
+        TesterHttpServletRequest request = new TesterHttpServletRequest();
+
+        request.setMethod("POST");
+        request.setContentType("text/plain");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "null");
+        TesterHttpServletResponse response = new TesterHttpServletResponse();
+
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getFilterConfigNullOriginAllowed());
+        CorsFilter.CORSRequestType requestType =
+                corsFilter.checkRequestType(request);
+        Assert.assertEquals(CorsFilter.CORSRequestType.SIMPLE, requestType);
+
+        corsFilter.doFilter(request, response, filterChain);
+
+        Assert.assertTrue(((Boolean) request.getAttribute(
+                CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST)).booleanValue());
+    }
+
+    /*
+     * Tests whether requests with Origin 'null' (String) are not accepted when
+     * disabled by configuration (which is the default).
+     */
+    @Test
+    public void testDoFilterNullOriginNotAllowed() throws IOException,
+            ServletException {
+        TesterHttpServletRequest request = new TesterHttpServletRequest();
+
+        request.setMethod("POST");
+        request.setContentType("text/plain");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "null");
+        TesterHttpServletResponse response = new TesterHttpServletResponse();
+
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
+        CorsFilter.CORSRequestType requestType = corsFilter
+                .checkRequestType(request);
+        Assert.assertEquals(CorsFilter.CORSRequestType.INVALID_CORS,
+                requestType);
+
+        corsFilter.doFilter(request, response, filterChain);
+
+        Assert.assertNull(request
+                .getAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST));
+    }
+
     @Test
     public void testDoFilterInvalidCORSOriginNotAllowed() throws IOException,
             ServletException {
@@ -1285,28 +1338,38 @@ public class TestCorsFilter {
     }
 
     @Test
-    public void testValidOrigin() {
-        Assert.assertTrue(CorsFilter.isValidOrigin("http://www.w3.org"));
+    public void testValidOrigin() throws ServletException {
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getNullFilterConfig());
+        Assert.assertTrue(corsFilter.isValidOrigin("http://www.w3.org"));
     }
 
     @Test
-    public void testInValidOriginCRLF() {
-        Assert.assertFalse(CorsFilter.isValidOrigin("http://www.w3.org\r\n"));
+    public void testInValidOriginCRLF() throws ServletException {
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getNullFilterConfig());
+        Assert.assertFalse(corsFilter.isValidOrigin("http://www.w3.org\r\n"));
     }
 
     @Test
-    public void testInValidOriginEncodedCRLF1() {
-        Assert.assertFalse(CorsFilter.isValidOrigin("http://www.w3.org%0d%0a"));
+    public void testInValidOriginEncodedCRLF1() throws ServletException {
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getNullFilterConfig());
+        Assert.assertFalse(corsFilter.isValidOrigin("http://www.w3.org%0d%0a"));
     }
 
     @Test
-    public void testInValidOriginEncodedCRLF2() {
-        Assert.assertFalse(CorsFilter.isValidOrigin("http://www.w3.org%0D%0A"));
+    public void testInValidOriginEncodedCRLF2() throws ServletException {
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getNullFilterConfig());
+        Assert.assertFalse(corsFilter.isValidOrigin("http://www.w3.org%0D%0A"));
     }
 
     @Test
-    public void testInValidOriginEncodedCRLF3() {
-        Assert.assertFalse(CorsFilter
+    public void testInValidOriginEncodedCRLF3() throws ServletException {
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getNullFilterConfig());
+        Assert.assertFalse(corsFilter
                 .isValidOrigin("http://www.w3.org%0%0d%0ad%0%0d%0aa"));
     }
 
