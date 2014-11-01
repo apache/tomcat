@@ -56,12 +56,26 @@ public class ScopedAttributeELResolver extends ELResolver {
                 result = page.findAttribute(key);
 
                 if (result == null) {
-                    // This might be the name of an import class
+                    // This might be the name of an imported class
                     ImportHandler importHandler = context.getImportHandler();
                     if (importHandler != null) {
                         Class<?> clazz = importHandler.resolveClass(key);
                         if (clazz != null) {
                             result = new ELClass(clazz);
+                        }
+                        if (result == null) {
+                            // This might be the name of an imported static field
+                            clazz = importHandler.resolveStatic(key);
+                            if (clazz != null) {
+                                try {
+                                    result = clazz.getField(key).get(null);
+                                } catch (IllegalArgumentException | IllegalAccessException |
+                                        NoSuchFieldException | SecurityException e) {
+                                    // Most (all?) of these should have been
+                                    // prevented by the checks when the import
+                                    // was defined.
+                                }
+                            }
                         }
                     }
                 }
