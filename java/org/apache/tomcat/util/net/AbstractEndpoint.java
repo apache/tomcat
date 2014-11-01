@@ -45,7 +45,6 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  *
  * @author Mladen Turk
  * @author Remy Maucherat
- * @param <S> The type of socket the endpoint is associated with.
  */
 public abstract class AbstractEndpoint<S> {
 
@@ -421,21 +420,6 @@ public abstract class AbstractEndpoint<S> {
     }
     public void setMaxKeepAliveRequests(int maxKeepAliveRequests) {
         this.maxKeepAliveRequests = maxKeepAliveRequests;
-    }
-
-    /**
-     * Should the option of using chunked transfer encoding be disabled when it
-     * is known that the connection is going to be closed at the end of the
-     * response. Disabling chunking in this case is marginally more efficient
-     * but makes it impossible for the user agent to determine if the whole
-     * response was received or if it was truncated due to an error.
-     */
-    private boolean disableChunkingOnClose = false;
-    public boolean getDisableChunkingOnClose() {
-        return disableChunkingOnClose;
-    }
-    public void setDisableChunkingOnClose(boolean disableChunkingOnClose) {
-        this.disableChunkingOnClose = disableChunkingOnClose;
     }
 
     /**
