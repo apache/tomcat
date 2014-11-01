@@ -42,7 +42,7 @@ public class Threading {
      * <pre>
      * Windows JDK 1.6.0_22_x64 - Thread safe
      * OSX     JDK 1.6.0_22_x64 - Not thread safe
-     * OSX     JDL 1.7.0_51_x64 - Not thread safe
+     * OSX     JDK 1.7.0_51_x64 - Not thread safe
      * </pre>
      *
      * Therefore, have to assume that {@link FileInputStream#read(byte[])} is
