@@ -16,40 +16,20 @@
  */
 package javax.el;
 
-import java.io.File;
-
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.webresources.StandardRoot;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCompositeELResolver extends TomcatBaseTest {
 
     @Test
     public void testBug50408() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir =  new File("test/webapp");
-        // app dir is relative to server home
-        StandardContext ctxt = (StandardContext) tomcat.addWebapp(null,
-                "/test", appDir.getAbsolutePath());
-
-        // This test needs the JSTL libraries
-        File lib = new File("webapps/examples/WEB-INF/lib");
-        ctxt.setResources(new StandardRoot(ctxt));
-        ctxt.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/lib",
-                lib.getAbsolutePath(), null, "/");
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(true, true);
 
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug5nnnn/bug50408.jsp", new ByteChunk(), null);
