@@ -363,18 +363,6 @@
       </p>
     </attribute>
 
-    <attribute name="disableChunkingOnClose" required="false">
-      <p>Should the option of using chunked transfer encoding be disabled when
-      it is known that the connection is going to be closed at the end of the
-      response. The connection will be closed at the end of the response if the
-      client requested connection closure or if
-      <strong>maxKeepAliveRequests</strong> has been reached. Disabling chunking
-      is marginally more efficient but makes it impossible for the user agent to
-      determine if the whole response was received or if it was truncated due to
-      an error. If not specified, the default value of <code>false</code> will
-      be used.</p>
-    </attribute>
-
     <attribute name="disableUploadTimeout" required="false">
       <p>This flag allows the servlet container to use a different, usually
       longer connection timeout during data upload. If not specified, this

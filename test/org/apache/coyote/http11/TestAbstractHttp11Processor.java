@@ -55,17 +55,11 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testResponseWithErrorChunked() throws Exception {
-        doTestResponseWithErrorChunked(false);
-    }
-
-    @Test
-    public void testResponseWithErrorChunkedDisabled() throws Exception {
-        doTestResponseWithErrorChunked(true);
-    }
-
-
-    private void doTestResponseWithErrorChunked(boolean disabled) throws Exception {
         Tomcat tomcat = getTomcatInstance();
+
+        // This setting means the connection will be closed at the end of the
+        // request
+        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -74,14 +68,6 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "ChunkedResponseWithErrorServlet",
                 new ResponseWithErrorServlet(true));
         ctx.addServletMapping("/*", "ChunkedResponseWithErrorServlet");
-
-        // This setting means the connection will be closed at the end of the
-        // request
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
-
-        if (disabled) {
-            tomcat.getConnector().setAttribute("disableChunkingOnClose", "true");
-        }
 
         tomcat.start();
 
@@ -102,19 +88,14 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         // Should use chunked encoding
         String transferEncoding = null;
         for (String header : client.getResponseHeaders()) {
-            if (header.startsWith("Transfer-Encoding:")) {
+             if (header.startsWith("Transfer-Encoding:")) {
                 transferEncoding = header.substring(18).trim();
             }
         }
-        if (disabled) {
-            Assert.assertNull(transferEncoding);
-        } else {
-            Assert.assertEquals("chunked", transferEncoding);
-        }
-        // In both cases:
-        // - there should be no end chunk
-        // - the response should end with the last text written before the error
+        Assert.assertEquals("chunked", transferEncoding);
+        // There should not be an end chunk
         assertFalse(client.getResponseBody().endsWith("0"));
+        // The last portion of text should be there
         assertTrue(client.getResponseBody().endsWith("line03"));
     }
 
