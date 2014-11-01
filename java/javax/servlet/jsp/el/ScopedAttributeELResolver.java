@@ -22,8 +22,10 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.el.ELClass;
 import javax.el.ELContext;
 import javax.el.ELResolver;
+import javax.el.ImportHandler;
 import javax.servlet.jsp.JspContext;
 import javax.servlet.jsp.PageContext;
 
@@ -43,17 +45,30 @@ public class ScopedAttributeELResolver extends ELResolver {
             throw new NullPointerException();
         }
 
+        Object result = null;
+
         if (base == null) {
             context.setPropertyResolved(base, property);
             if (property != null) {
                 String key = property.toString();
                 PageContext page = (PageContext) context
                         .getContext(JspContext.class);
-                return page.findAttribute(key);
+                result = page.findAttribute(key);
+
+                if (result == null) {
+                    // This might be the name of an import class
+                    ImportHandler importHandler = context.getImportHandler();
+                    if (importHandler != null) {
+                        Class<?> clazz = importHandler.resolveClass(key);
+                        if (clazz != null) {
+                            result = new ELClass(clazz);
+                        }
+                    }
+                }
             }
         }
 
-        return null;
+        return result;
     }
 
     @Override
