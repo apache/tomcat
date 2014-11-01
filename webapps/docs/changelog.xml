@@ -297,6 +297,11 @@
         represent exanded JARs files that have been added to the web application
         class loader&apos;s class path. (markt)
       </fix>
+      <fix>
+        <bug>57141</bug>: Enable EL in JSPs to refer to static fields of
+        imported classes including the standard <code>java.lang.*</code>
+        imports. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
