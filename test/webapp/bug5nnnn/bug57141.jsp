@@ -18,5 +18,9 @@
   <body>
     <p>00-${Boolean.TRUE}</p>
     <p>01-${Boolean.FALSE}</p>
+    <%
+    pageContext.getELContext().getImportHandler().importStatic("java.lang.Integer.MAX_VALUE");
+    %>
+    <p>02-${MAX_VALUE}</p>
   </body>
 </html>
