@@ -1475,8 +1475,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             contentDelimitation = true;
         } else {
             // If the response code supports an entity body and we're on
-            // HTTP 1.1 and we are using keep-alive then we chunk unless we have
-            // a Connection: close header
+            // HTTP 1.1 then we chunk unless we have a Connection: close header
             connectionClosePresent = isConnectionClose(headers);
             if (entityBody && http11 && keepAlive && !connectionClosePresent) {
                 getOutputBuffer().addActiveFilter
