@@ -17,6 +17,7 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.Executor;
 
 import javax.servlet.ServletInputStream;
@@ -177,5 +178,10 @@ public abstract class AbstractProcessor<S>
     @Override
     public final void setSslSupport(SSLSupport sslSupport) {
         // NOOP
+    }
+
+    @Override
+    public ByteBuffer getLeftoverInput() {
+        return null;
     }
 }

@@ -18,6 +18,7 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
@@ -33,10 +34,10 @@ public class BioProcessor extends AbstractProcessor<Socket> {
 
     private static final int INFINITE_TIMEOUT = 0;
 
-    public BioProcessor(SocketWrapper<Socket> wrapper,
+    public BioProcessor(SocketWrapper<Socket> wrapper, ByteBuffer leftoverInput,
             HttpUpgradeHandler httpUpgradeProcessor,
             int asyncWriteBufferSize) throws IOException {
-        super(httpUpgradeProcessor, new BioServletInputStream(wrapper),
+        super(httpUpgradeProcessor, new BioServletInputStream(wrapper, leftoverInput),
                 new BioServletOutputStream(wrapper, asyncWriteBufferSize));
 
         wrapper.getSocket().setSoTimeout(INFINITE_TIMEOUT);

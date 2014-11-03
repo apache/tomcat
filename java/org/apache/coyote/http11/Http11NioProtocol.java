@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
@@ -289,10 +290,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
         @Override
         protected Processor<NioChannel> createUpgradeProcessor(
-                SocketWrapper<NioChannel> socket,
+                SocketWrapper<NioChannel> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
-            return new NioProcessor(socket, httpUpgradeProcessor,
+            return new NioProcessor(socket, leftoverInput, httpUpgradeProcessor,
                     proto.getEndpoint().getSelectorPool(),
                     proto.getUpgradeAsyncWriteBufferSize());
         }

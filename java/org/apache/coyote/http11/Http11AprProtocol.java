@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
@@ -330,11 +331,11 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
         @Override
         protected Processor<Long> createUpgradeProcessor(
-                SocketWrapper<Long> socket,
+                SocketWrapper<Long> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
-            return new AprProcessor(socket, httpUpgradeProcessor,
-                    (AprEndpoint) proto.endpoint,
+            return new AprProcessor(socket, leftoverInput,
+                    httpUpgradeProcessor, (AprEndpoint) proto.endpoint,
                     proto.getUpgradeAsyncWriteBufferSize());
         }
     }

@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http11.upgrade;
 
+import java.nio.ByteBuffer;
+
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.juli.logging.Log;
@@ -32,11 +34,11 @@ public class AprProcessor extends AbstractProcessor<Long> {
 
     private static final int INFINITE_TIMEOUT = -1;
 
-    public AprProcessor(SocketWrapper<Long> wrapper,
+    public AprProcessor(SocketWrapper<Long> wrapper, ByteBuffer leftoverInput,
             HttpUpgradeHandler httpUpgradeProcessor, AprEndpoint endpoint,
             int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,
-                new AprServletInputStream(wrapper),
+                new AprServletInputStream(wrapper, leftoverInput),
                 new AprServletOutputStream(wrapper, asyncWriteBufferSize, endpoint));
 
         Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);

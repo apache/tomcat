@@ -45,6 +45,14 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.0.16 (markt)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Allow HTTP upgrade process to complete without data corruption when
+        additional content is sent along with the upgrade header. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.0.15 (markt)">
   <subsection name="Catalina">

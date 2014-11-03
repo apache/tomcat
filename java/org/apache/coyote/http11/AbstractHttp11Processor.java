@@ -18,6 +18,7 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1792,7 +1793,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             SocketWrapper<S> socketWrapper);
 
 
-
     @Override
     public final void recycle(boolean isSocketClosing) {
         getAdapter().checkRecycled(request, response);
@@ -1813,4 +1813,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     }
 
     protected abstract void recycleInternal();
+
+
+    @Override
+    public ByteBuffer getLeftoverInput() {
+        return inputBuffer.getLeftover();
+    }
+
 }
