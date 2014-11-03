@@ -37,14 +37,7 @@ public class TestValidator extends TomcatBaseTest {
 
     @Test
     public void testBug47331() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir =
-            new File("test/webapp");
-        // app dir is relative to server home
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug47331.jsp", new ByteChunk(), null);
