@@ -82,13 +82,7 @@ public class TestContextConfig extends TomcatBaseTest {
 
     @Test
     public void testBug53574() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp");
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
-
+        getTomcatInstanceTestWebapp(false, true);
         assertPageContains("/test/bug53574", "OK");
     }
 
