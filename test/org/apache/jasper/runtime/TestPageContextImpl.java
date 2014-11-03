@@ -41,12 +41,7 @@ public class TestPageContextImpl extends TomcatBaseTest {
 
     @Test
     public void testDoForward() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp");
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = new ByteChunk();
 
@@ -82,12 +77,7 @@ public class TestPageContextImpl extends TomcatBaseTest {
 
     @Test
     public void testIncludeThrowsIOException() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp");
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = new ByteChunk();
 
