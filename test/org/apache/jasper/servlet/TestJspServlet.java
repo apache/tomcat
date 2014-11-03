@@ -70,14 +70,7 @@ public class TestJspServlet  extends TomcatBaseTest {
 
     @Test
     public void testBug56568b() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the test web application so JSP support is available and the
-        // default JSP error page can be used.
-        File appDir = new File("test/webapp");
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         int rc = methodUrl("http://localhost:" + getPort() + "/test/jsp/error.jsp",
                 new ByteChunk(), 500000, null, null, "PUT");
@@ -91,14 +84,7 @@ public class TestJspServlet  extends TomcatBaseTest {
 
     @Test
     public void testBug56568c() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the test web application so JSP support is available and the
-        // default JSP error page can be used.
-        File appDir = new File("test/webapp");
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         int rc = methodUrl("http://localhost:" + getPort() + "/test/jsp/test.jsp",
                 new ByteChunk(), 500000, null, null, "PUT");
