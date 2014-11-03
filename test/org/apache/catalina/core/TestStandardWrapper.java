@@ -169,19 +169,12 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
     @Test
     public void testSecurityAnnotationsMetaDataPriority() throws Exception {
-
-        // Setup Tomcat instance
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp");
-        tomcat.addWebapp(null, "", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk bc = new ByteChunk();
         int rc;
         rc = getUrl("http://localhost:" + getPort() +
-                "/testStandardWrapper/securityAnnotationsMetaDataPriority",
+                "/test/testStandardWrapper/securityAnnotationsMetaDataPriority",
                 bc, null, null);
 
         assertEquals("OK", bc.toString());
