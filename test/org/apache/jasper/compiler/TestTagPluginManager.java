@@ -16,8 +16,6 @@
  */
 package org.apache.jasper.compiler;
 
-import java.io.File;
-
 import javax.servlet.ServletContext;
 import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
@@ -39,13 +37,11 @@ public class TestTagPluginManager extends TomcatBaseTest {
 
     @Test
     public void testBug54240() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
 
-        File appDir = new File("test/webapp");
-        Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-        tomcat.start();
 
-        ServletContext context = ctx.getServletContext();
+
+        ServletContext context = ((Context) tomcat.getHost().findChildren()[0]).getServletContext();
 
         TagPluginManager manager = new TagPluginManager(context);
 

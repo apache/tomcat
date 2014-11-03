@@ -17,7 +17,6 @@
 
 package org.apache.jasper.compiler;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -46,14 +44,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
 
     @Test
     public void testBug48627() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir =
-            new File("test/webapp");
-        // app dir is relative to server home
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug48nnn/bug48627.jsp");
@@ -67,14 +58,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
 
     @Test
     public void testBug48668a() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir =
-            new File("test/webapp");
-        // app dir is relative to server home
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug48nnn/bug48668a.jsp");
@@ -113,13 +97,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
 
     @Test
     public void testBug48668b() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp");
-        // app dir is relative to server home
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/test/bug48nnn/bug48668b.jsp");
@@ -130,14 +108,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
 
     @Test
     public void testBug49297NoSpaceNotStrict() throws Exception {
-
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp");
-        // app dir is relative to server home
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() +
@@ -151,13 +122,7 @@ public class TestParserNoStrictWhitespace extends TomcatBaseTest {
 
     @Test
     public void testBug49297DuplicateAttr() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp");
-        // app dir is relative to server home
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         int sc = getUrl("http://localhost:" + getPort() +
                 "/test/bug49nnn/bug49297DuplicateAttr.jsp", new ByteChunk(),

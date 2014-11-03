@@ -16,12 +16,9 @@
  */
 package org.apache.jasper.compiler;
 
-import java.io.File;
-
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -29,16 +26,10 @@ public class TestJspReader extends TomcatBaseTest {
 
     @Test
     public void testBug53986() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir =
-            new File("test/webapp");
-        tomcat.addWebapp(null, "", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/bug5nnnn/bug53986.jsp");
+                "/test/bug5nnnn/bug53986.jsp");
         Assert.assertTrue(res.toString().contains("OK"));
     }
 }
