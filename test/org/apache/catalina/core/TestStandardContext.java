@@ -292,50 +292,45 @@ public class TestStandardContext extends TomcatBaseTest {
         // called only once, even if is selected by several mapping
         // url-patterns or by both a url-pattern and a servlet-name.
 
-        // Set up a container
-        Tomcat tomcat = getTomcatInstance();
+        getTomcatInstanceTestWebapp(false, true);
 
-        File root = new File("test/webapp");
-        tomcat.addWebapp("", root.getAbsolutePath());
-
-        tomcat.start();
         ByteChunk result = new ByteChunk();
 
         // Check filter and servlet aren't called
         int rc = getUrl("http://localhost:" + getPort() +
-                "/bug49922/foo", result, null);
+                "/test/bug49922/foo", result, null);
         assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
         assertTrue(result.getLength() > 0);
 
         // Check extension mapping works
-        result = getUrl("http://localhost:" + getPort() + "/foo.do");
+        result = getUrl("http://localhost:" + getPort() + "/test/foo.do");
         assertEquals("FilterServlet", result.toString());
 
         // Check path mapping works
-        result = getUrl("http://localhost:" + getPort() + "/bug49922/servlet");
+        result = getUrl("http://localhost:" + getPort() + "/test/bug49922/servlet");
         assertEquals("FilterServlet", result.toString());
 
         // Check servlet name mapping works
-        result = getUrl("http://localhost:" + getPort() + "/foo.od");
+        result = getUrl("http://localhost:" + getPort() + "/test/foo.od");
         assertEquals("FilterServlet", result.toString());
 
         // Check filter is only called once
         result = getUrl("http://localhost:" + getPort() +
-                "/bug49922/servlet/foo.do");
+                "/test/bug49922/servlet/foo.do");
         assertEquals("FilterServlet", result.toString());
         result = getUrl("http://localhost:" + getPort() +
-                "/bug49922/servlet/foo.od");
+                "/test/bug49922/servlet/foo.od");
         assertEquals("FilterServlet", result.toString());
 
         // Check dispatcher mapping
         result = getUrl("http://localhost:" + getPort() +
-                "/bug49922/target");
+                "/test/bug49922/target");
         assertEquals("Target", result.toString());
         result = getUrl("http://localhost:" + getPort() +
-                "/bug49922/forward");
+                "/test/bug49922/forward");
         assertEquals("FilterTarget", result.toString());
         result = getUrl("http://localhost:" + getPort() +
-                "/bug49922/include");
+                "/test/bug49922/include");
         assertEquals("IncludeFilterTarget", result.toString());
     }
 
@@ -934,16 +929,9 @@ public class TestStandardContext extends TomcatBaseTest {
 
     @Test
     public void testBug56085() throws Exception {
-        // Set up a container
-        Tomcat tomcat = getTomcatInstance();
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
 
-        File docBase = new File("test/webapp");
-        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
-
-        // Start the context
-        tomcat.start();
-
-        String realPath = ctx.getRealPath("\\");
+        String realPath = ((Context) tomcat.getHost().findChildren()[0]).getRealPath("\\");
 
         Assert.assertNull(realPath);
     }
