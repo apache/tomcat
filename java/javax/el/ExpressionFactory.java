@@ -336,7 +336,7 @@ public abstract class ExpressionFactory {
         }
 
         public void setFactoryClass(Class<?> clazz) {
-            ref = new WeakReference<Class<?>>(clazz);
+            ref = new WeakReference<>(clazz);
         }
     }
 
