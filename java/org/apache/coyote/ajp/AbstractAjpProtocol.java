@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.ajp;
 
+import java.nio.ByteBuffer;
+
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
@@ -99,7 +101,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         }
 
         @Override
-        protected P createUpgradeProcessor(SocketWrapper<S> socket,
+        protected P createUpgradeProcessor(SocketWrapper<S> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeHandler) {
             // TODO should fail - throw IOE
             return null;

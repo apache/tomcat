@@ -18,6 +18,7 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
@@ -34,13 +35,18 @@ public class AprServletInputStream extends AbstractServletInputStream {
 
     private final SocketWrapper<Long> wrapper;
     private final long socket;
+    private ByteBuffer leftoverInput;
     private volatile boolean eagain = false;
     private volatile boolean closed = false;
 
 
-    public AprServletInputStream(SocketWrapper<Long> wrapper) {
+    public AprServletInputStream(SocketWrapper<Long> wrapper, ByteBuffer leftoverInput) {
         this.wrapper = wrapper;
         this.socket = wrapper.getSocket().longValue();
+        if (leftoverInput != null) {
+            this.leftoverInput = ByteBuffer.allocate(leftoverInput.remaining());
+            this.leftoverInput.put(leftoverInput);
+        }
     }
 
 
@@ -50,6 +56,17 @@ public class AprServletInputStream extends AbstractServletInputStream {
 
         if (closed) {
             throw new IOException(sm.getString("apr.closed", Long.valueOf(socket)));
+        }
+
+        if (leftoverInput != null) {
+            if (leftoverInput.remaining() < len) {
+                len = leftoverInput.remaining();
+            }
+            leftoverInput.get(b, off, len);
+            if (leftoverInput.remaining() == 0) {
+                leftoverInput = null;
+            }
+            return len;
         }
 
         Lock readLock = wrapper.getBlockingStatusReadLock();

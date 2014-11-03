@@ -17,6 +17,7 @@
 package org.apache.coyote;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.Executor;
 
 import javax.servlet.http.HttpUpgradeHandler;
@@ -54,4 +55,10 @@ public interface Processor<S> {
     void recycle(boolean socketClosing);
 
     void setSslSupport(SSLSupport sslSupport);
+
+    /**
+     * Allows retrieving additional input during the upgrade process
+     * @return leftover bytes
+     */
+    ByteBuffer getLeftoverInput();
 }

@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.ReadPendingException;
 
 import javax.net.ssl.SSLEngine;
@@ -257,11 +258,11 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
 
         @Override
         protected Processor<Nio2Channel> createUpgradeProcessor(
-                SocketWrapper<Nio2Channel> socket,
+                SocketWrapper<Nio2Channel> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
-            return new Nio2Processor(proto.endpoint, socket, httpUpgradeProcessor,
-                    proto.getUpgradeAsyncWriteBufferSize());
+            return new Nio2Processor(proto.endpoint, socket, leftoverInput,
+                    httpUpgradeProcessor, proto.getUpgradeAsyncWriteBufferSize());
         }
 
         @Override

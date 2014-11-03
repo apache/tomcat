@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -666,11 +667,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         // Get the HTTP upgrade handler
                         HttpUpgradeHandler httpUpgradeHandler =
                                 processor.getHttpUpgradeHandler();
+                        // Retrieve leftover input
+                        ByteBuffer leftoverInput = processor.getLeftoverInput();
                         // Release the Http11 processor to be re-used
                         release(wrapper, processor, false, false);
                         // Create the upgrade processor
                         processor = createUpgradeProcessor(
-                                wrapper, httpUpgradeHandler);
+                                wrapper, leftoverInput, httpUpgradeHandler);
                         // Mark the connection as upgraded
                         wrapper.setUpgraded(true);
                         // Associate with the processor with the connection
@@ -776,7 +779,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 Processor<S> processor, boolean socketClosing,
                 boolean addToPoller);
         protected abstract Processor<S> createUpgradeProcessor(
-                SocketWrapper<S> socket,
+                SocketWrapper<S> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor) throws IOException;
 
         protected void register(AbstractProcessor<S> processor) {
