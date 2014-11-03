@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.ajp;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -121,13 +120,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
     public void doTestPost(boolean multipleCL, int expectedStatus) throws Exception {
 
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp");
-        tomcat.addWebapp("", root.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         SimpleAjpClient ajpClient = new SimpleAjpClient();
         ajpClient.setPort(getPort());
@@ -136,7 +129,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         validateCpong(ajpClient.cping());
 
         TesterAjpMessage forwardMessage =
-                ajpClient.createForwardMessage("/echo-params.jsp", 4);
+                ajpClient.createForwardMessage("/test/echo-params.jsp", 4);
         forwardMessage.addHeader(0xA008, "9");
         if (multipleCL) {
             forwardMessage.addHeader(0xA008, "99");
