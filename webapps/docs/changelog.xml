@@ -44,6 +44,8 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.0.16 (markt)">
+</section>
 <section name="Tomcat 8.0.15 (markt)">
   <subsection name="Catalina">
     <changelog>
