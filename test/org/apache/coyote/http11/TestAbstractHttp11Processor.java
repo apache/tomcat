@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.http11;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -137,13 +136,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testWithUnknownExpectation() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp");
-        tomcat.addWebapp("", root.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
@@ -151,7 +144,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
             "Expect: unknoen" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF;
 
-        Client client = new Client(tomcat.getConnector().getLocalPort());
+        Client client = new Client(getPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -162,13 +155,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testWithTEVoid() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp");
-        tomcat.addWebapp("", root.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
@@ -180,7 +167,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
                     SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client(tomcat.getConnector().getLocalPort());
+        Client client = new Client(getPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -191,13 +178,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testWithTEBuffered() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp");
-        tomcat.addWebapp("", root.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
@@ -209,7 +190,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
                     SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client(tomcat.getConnector().getLocalPort());
+        Client client = new Client(getPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -231,19 +212,12 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     }
 
 
-    private void doTestWithTEChunked(boolean withCL)
-            throws Exception {
+    private void doTestWithTEChunked(boolean withCL) throws Exception {
 
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp");
-        tomcat.addWebapp("", root.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         String request =
-            "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
+            "POST /test/echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
             (withCL ? "Content-length: 1" + SimpleHttpClient.CRLF : "") +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
@@ -256,7 +230,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
             "0" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF;
 
-        Client client = new Client(tomcat.getConnector().getLocalPort());
+        Client client = new Client(getPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -268,16 +242,10 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testWithTEIdentity() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp");
-        tomcat.addWebapp("", root.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         String request =
-            "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
+            "POST /test/echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
             "Transfer-encoding: identity" + SimpleHttpClient.CRLF +
             "Content-Length: 9" + SimpleHttpClient.CRLF +
@@ -287,7 +255,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
                 SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client(tomcat.getConnector().getLocalPort());
+        Client client = new Client(getPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -299,13 +267,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testWithTESavedRequest() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp");
-        tomcat.addWebapp("", root.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
@@ -317,7 +279,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
                     SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client(tomcat.getConnector().getLocalPort());
+        Client client = new Client(getPort());
         client.setRequest(new String[] {request});
 
         client.connect();
@@ -328,13 +290,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testWithTEUnsupported() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Use the normal Tomcat ROOT context
-        File root = new File("test/webapp");
-        tomcat.addWebapp("", root.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
@@ -346,7 +302,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
                     SimpleHttpClient.CRLF +
             "test=data";
 
-        Client client = new Client(tomcat.getConnector().getLocalPort());
+        Client client = new Client(getPort());
         client.setRequest(new String[] {request});
 
         client.connect();
