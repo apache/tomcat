@@ -16,14 +16,11 @@
  */
 package org.apache.jasper;
 
-import java.io.File;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -31,13 +28,7 @@ public class TestJspCompilationContext extends TomcatBaseTest {
 
     @Test
     public void testTagFileInJar() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp");
-        // app dir is relative to server home
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
-
-        tomcat.start();
+        getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk body = new ByteChunk();
 
