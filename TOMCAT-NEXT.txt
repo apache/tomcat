@@ -26,7 +26,7 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
  4. Refactor the connectors to minimise code duplication
     - All implementation specific per connector code -> Endpoint
     - All implementation specific per connection code -> SocketWrapper
-   
+
  5. SNI support for JSSE.
 
  6. See what Java 8 language features we want to use.
