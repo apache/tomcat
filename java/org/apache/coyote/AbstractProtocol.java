@@ -161,18 +161,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
     @Override
-    public boolean isCometSupported() {
-        return endpoint.getUseComet();
-    }
-
-
-    @Override
-    public boolean isCometTimeoutSupported() {
-        return endpoint.getUseCometTimeout();
-    }
-
-
-    @Override
     public boolean isSendfileSupported() {
         return endpoint.getUseSendfile();
     }
@@ -640,16 +628,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             state = processor.asyncDispatch(
                                     nextDispatch.getSocketStatus());
                         }
-                    } else if (status == SocketStatus.DISCONNECT &&
-                            !processor.isComet()) {
+                    } else if (status == SocketStatus.DISCONNECT) {
                         // Do nothing here, just wait for it to get recycled
-                        // Don't do this for Comet we need to generate an end
-                        // event (see BZ 54022)
                     } else if (processor.isAsync() ||
                             state == SocketState.ASYNC_END) {
                         state = processor.asyncDispatch(status);
-                    } else if (processor.isComet()) {
-                        state = processor.event(status);
                     } else if (processor.isUpgrade()) {
                         state = processor.upgradeDispatch(status);
                     } else if (status == SocketStatus.OPEN_WRITE) {

@@ -110,29 +110,9 @@ public enum ActionCode {
     REQ_SET_BODY_REPLAY,
 
     /**
-     * Callback for begin Comet processing.
-     */
-    COMET_BEGIN,
-
-    /**
-     * Callback for end Comet processing.
-     */
-    COMET_END,
-
-    /**
      * Callback for getting the amount of available bytes.
      */
     AVAILABLE,
-
-    /**
-     * Callback for an asynchronous close of the Comet event
-     */
-    COMET_CLOSE,
-
-    /**
-     * Callback for setting the timeout asynchronously
-     */
-    COMET_SETTIMEOUT,
 
     /**
      * Callback for an async request.

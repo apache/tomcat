@@ -36,8 +36,6 @@ public interface Processor<S> {
 
     SocketState process(SocketWrapper<S> socketWrapper) throws IOException;
 
-    SocketState event(SocketStatus status) throws IOException;
-
     SocketState asyncDispatch(SocketStatus status);
     SocketState asyncPostProcess();
 
@@ -46,7 +44,6 @@ public interface Processor<S> {
 
     void errorDispatch();
 
-    boolean isComet();
     boolean isAsync();
     boolean isUpgrade();
 

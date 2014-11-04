@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
@@ -104,28 +103,5 @@ final class StandardContextValve extends ValveBase {
             request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());
         }
         wrapper.getPipeline().getFirst().invoke(request, response);
-    }
-
-
-    /**
-     * Select the appropriate child Wrapper to process this request,
-     * based on the specified request URI.  If no matching Wrapper can
-     * be found, return an appropriate HTTP error.
-     *
-     * @param request Request to be processed
-     * @param response Response to be produced
-     * @param event
-     *
-     * @exception IOException if an input/output error occurred
-     * @exception ServletException if a servlet error occurred
-     */
-    @Override
-    public final void event(Request request, Response response, CometEvent event)
-        throws IOException, ServletException {
-
-        // Select the Wrapper to be used for this Request
-        Wrapper wrapper = request.getWrapper();
-
-        wrapper.getPipeline().getFirst().event(request, response, event);
     }
 }

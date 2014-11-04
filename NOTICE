@@ -15,13 +15,6 @@ which is open source software.  The original software and
 related information is available at
 http://www.eclipse.org.
 
-For the bayeux implementation
-The org.apache.cometd.bayeux API is derivative work originating at the Dojo Foundation
-* Copyright 2007-2008 Guy Molinari
-* Copyright 2007-2008 Filip Hanik
-* Copyright 2007 Dojo Foundation
-* Copyright 2007 Mort Bay Consulting Pty. Ltd.
-
 The original XML Schemas for Java EE Deployment Descriptors:
  - javaee_5.xsd
  - javaee_web_services_1_2.xsd

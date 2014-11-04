@@ -31,7 +31,6 @@ public class SocketWrapper<E> {
     private long timeout = -1;
     private boolean error = false;
     private volatile int keepAliveLeft = 100;
-    private volatile boolean comet = false;
     private volatile boolean async = false;
     private boolean keptAlive = false;
     private volatile boolean upgraded = false;
@@ -76,8 +75,6 @@ public class SocketWrapper<E> {
         return socket;
     }
 
-    public boolean isComet() { return comet; }
-    public void setComet(boolean comet) { this.comet = comet; }
     public boolean isAsync() { return async; }
     public void setAsync(boolean async) { this.async = async; }
     public boolean isUpgraded() { return upgraded; }
@@ -155,7 +152,6 @@ public class SocketWrapper<E> {
     public void reset(E socket, long timeout) {
         async = false;
         blockingStatus = true;
-        comet = false;
         dispatches.clear();
         error = false;
         keepAliveLeft = 100;

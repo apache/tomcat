@@ -18,13 +18,11 @@ package org.apache.coyote.http11;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ErrorState;
-import org.apache.coyote.RequestInfo;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -33,11 +31,8 @@ import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 
@@ -98,47 +93,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Process pipelined HTTP requests using the specified input and output
-     * streams.
-     *
-     * @throws IOException error during an I/O operation
-     */
-    @Override
-    public SocketState event(SocketStatus status)
-        throws IOException {
-
-        RequestInfo rp = request.getRequestProcessor();
-
-        try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            if (!getAdapter().event(request, response, status)) {
-                setErrorState(ErrorState.CLOSE_NOW, null);
-            }
-        } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW, e);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // 500 - Internal Server Error
-            response.setStatus(500);
-            setErrorState(ErrorState.CLOSE_NOW, t);
-            getAdapter().log(request, response, 0);
-            log.error(sm.getString("http11processor.request.process"), t);
-        }
-
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-
-        if (getErrorState().isError() || status==SocketStatus.STOP) {
-            return SocketState.CLOSED;
-        } else if (!comet) {
-            inputBuffer.nextRequest();
-            outputBuffer.nextRequest();
-            return SocketState.OPEN;
-        } else {
-            return SocketState.LONG;
-        }
-    }
-
     @Override
     protected boolean disableKeepAlive() {
         return false;
@@ -182,12 +136,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     @Override
     protected void setSocketTimeout(int timeout) {
         Socket.timeoutSet(socketWrapper.getSocket().longValue(), timeout * 1000);
-    }
-
-
-    @Override
-    protected void setCometTimeouts(SocketWrapper<Long> socketWrapper) {
-        // NO-OP for APR/native
     }
 
 
@@ -453,23 +401,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
                 }
             }
-            break;
-        }
-        case COMET_BEGIN: {
-            comet = true;
-            break;
-        }
-        case COMET_END: {
-            comet = false;
-            break;
-        }
-        case COMET_CLOSE: {
-            ((AprEndpoint)endpoint).processSocket(this.socketWrapper,
-                    SocketStatus.OPEN_READ, true);
-            break;
-        }
-        case COMET_SETTIMEOUT: {
-            //no op
             break;
         }
         }

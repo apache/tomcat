@@ -141,11 +141,6 @@ public abstract class AbstractProcessor<S>
     }
 
     @Override
-    public final SocketState event(SocketStatus status) throws IOException {
-        return null;
-    }
-
-    @Override
     public final SocketState asyncDispatch(SocketStatus status) {
         return null;
     }
@@ -158,11 +153,6 @@ public abstract class AbstractProcessor<S>
     @Override
     public final SocketState asyncPostProcess() {
         return null;
-    }
-
-    @Override
-    public final boolean isComet() {
-        return false;
     }
 
     @Override

@@ -266,7 +266,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
                 }
                 if (processor == null) {
-                    // if not null - this is a former comet request, handled by http11
+                    // if not null - handled by http11
                     SocketState socketState = proto.npnHandler.process(socket, status);
                     // handled by npn protocol.
                     if (socketState == SocketState.CLOSED ||
@@ -291,19 +291,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
             if (processor.isAsync()) {
                 // Async
                 socket.setAsync(true);
-            } else if (processor.isComet()) {
-                // Comet
-                if (proto.endpoint.isRunning()) {
-                    socket.setComet(true);
-                    ((AprEndpoint) proto.endpoint).getPoller().add(
-                            socket.getSocket().longValue(),
-                            proto.endpoint.getSoTimeout(), true, false);
-                } else {
-                    // Process a STOP directly
-                    ((AprEndpoint) proto.endpoint).processSocket(
-                            socket.getSocket().longValue(),
-                            SocketStatus.STOP);
-                }
             } else {
                 // Upgraded
                 Poller p = ((AprEndpoint) proto.endpoint).getPoller();

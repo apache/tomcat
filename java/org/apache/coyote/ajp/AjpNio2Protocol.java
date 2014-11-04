@@ -27,7 +27,6 @@ import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.Nio2Endpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 
@@ -156,7 +155,7 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
         @Override
         public void closeAll() {
             for (Nio2Channel channel : connections.keySet()) {
-                ((Nio2Endpoint) proto.endpoint).closeSocket(channel.getSocket(), SocketStatus.STOP);
+                ((Nio2Endpoint) proto.endpoint).closeSocket(channel.getSocket());
             }
         }
     }

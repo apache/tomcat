@@ -22,7 +22,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Host;
-import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
@@ -88,25 +87,4 @@ final class StandardEngineValve extends ValveBase {
         host.getPipeline().getFirst().invoke(request, response);
 
     }
-
-
-    /**
-     * Process Comet event.
-     *
-     * @param request Request to be processed
-     * @param response Response to be produced
-     * @param event the event
-     *
-     * @exception IOException if an input/output error occurred
-     * @exception ServletException if a servlet error occurred
-     */
-    @Override
-    public final void event(Request request, Response response, CometEvent event)
-        throws IOException, ServletException {
-
-        // Ask this Host to process this request
-        request.getHost().getPipeline().getFirst().event(request, response, event);
-
-    }
-
 }

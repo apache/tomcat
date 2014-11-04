@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -25,11 +24,9 @@ import javax.net.ssl.SSLEngine;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ErrorState;
-import org.apache.coyote.RequestInfo;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
@@ -83,72 +80,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
 
     // --------------------------------------------------------- Public Methods
-
-    @Override
-    public SocketState event(SocketStatus status)
-        throws IOException {
-
-        long soTimeout = endpoint.getSoTimeout();
-
-        RequestInfo rp = request.getRequestProcessor();
-        try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            if (!getAdapter().event(request, response, status)) {
-                setErrorState(ErrorState.CLOSE_NOW, null);
-            }
-            if (!getErrorState().isError()) {
-                if (socketWrapper != null) {
-                    socketWrapper.setComet(comet);
-                    if (comet) {
-                        Integer comettimeout = (Integer) request.getAttribute(
-                                org.apache.coyote.Constants.COMET_TIMEOUT_ATTR);
-                        if (comettimeout != null) {
-                            socketWrapper.setTimeout(comettimeout.longValue());
-                        }
-                    } else {
-                        //reset the timeout
-                        if (keepAlive) {
-                            socketWrapper.setTimeout(keepAliveTimeout);
-                        } else {
-                            socketWrapper.setTimeout(soTimeout);
-                        }
-                    }
-
-                }
-            }
-        } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW, e);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // 500 - Internal Server Error
-            response.setStatus(500);
-            setErrorState(ErrorState.CLOSE_NOW, t);
-            getAdapter().log(request, response, 0);
-            log.error(sm.getString("http11processor.request.process"), t);
-        }
-
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-
-        if (getErrorState().isError() || status==SocketStatus.STOP) {
-            return SocketState.CLOSED;
-        } else if (!comet) {
-            if (keepAlive) {
-                inputBuffer.nextRequest();
-                outputBuffer.nextRequest();
-                if (((InternalNio2InputBuffer) inputBuffer).isPending()) {
-                    // Following comet processing, a read is still pending, so
-                    // keep the processor associated
-                    return SocketState.LONG;
-                } else {
-                    return SocketState.OPEN;
-                }
-            } else {
-                return SocketState.CLOSED;
-            }
-        } else {
-            return SocketState.LONG;
-        }
-    }
 
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
@@ -254,21 +185,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     @Override
     protected void setSocketTimeout(int timeout) throws IOException {
         socketWrapper.setTimeout(timeout);
-    }
-
-
-    @Override
-    protected void setCometTimeouts(SocketWrapper<Nio2Channel> socketWrapper) {
-        if (socketWrapper != null)  {
-            socketWrapper.setComet(comet);
-            if (comet) {
-                Integer comettimeout = (Integer) request.getAttribute(
-                        org.apache.coyote.Constants.COMET_TIMEOUT_ATTR);
-                if (comettimeout != null) {
-                    socketWrapper.setTimeout(comettimeout.longValue());
-                }
-            }
-        }
     }
 
 
@@ -500,42 +416,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
                 }
-            }
-            break;
-        }
-        case COMET_BEGIN: {
-            comet = true;
-            break;
-        }
-        case COMET_END: {
-            comet = false;
-            break;
-        }
-        case COMET_CLOSE: {
-            if (socketWrapper == null || socketWrapper.getSocket() == null) {
-                return;
-            }
-            RequestInfo rp = request.getRequestProcessor();
-            if (rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE) {
-                // Close event for this processor triggered by request
-                // processing in another processor, a non-Tomcat thread (i.e.
-                // an application controlled thread) or similar.
-                endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
-            }
-            break;
-        }
-        case COMET_SETTIMEOUT: {
-            if (param == null) {
-                return;
-            }
-            if (socketWrapper == null) {
-                return;
-            }
-            long timeout = ((Long)param).longValue();
-            //if we are not piggy backing on a worker thread, set the timeout
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {
-                socketWrapper.setTimeout(timeout);
             }
             break;
         }

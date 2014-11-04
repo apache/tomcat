@@ -27,10 +27,4 @@
     <!--
     <Manager pathname="" />
     -->
-
-    <!-- Uncomment this to enable Comet connection tacking (provides events
-         on session expiration as well as webapp lifecycle) -->
-    <!--
-    <Valve className="org.apache.catalina.valves.CometConnectionManagerValve" />
-    -->
 </Context>

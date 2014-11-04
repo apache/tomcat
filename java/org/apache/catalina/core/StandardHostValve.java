@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -189,52 +188,6 @@ final class StandardHostValve extends ValveBase {
 
             context.unbind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
         }
-    }
-
-
-    /**
-     * Process Comet event.
-     *
-     * @param request Request to be processed
-     * @param response Response to be produced
-     * @param event the event
-     *
-     * @exception IOException if an input/output error occurred
-     * @exception ServletException if a servlet error occurred
-     */
-    @Override
-    public final void event(Request request, Response response, CometEvent event)
-        throws IOException, ServletException {
-
-        // Select the Context to be used for this Request
-        Context context = request.getContext();
-
-        context.bind(false, MY_CLASSLOADER);
-
-        // Ask this Context to process this request
-        context.getPipeline().getFirst().event(request, response, event);
-
-
-        // Error page processing
-        response.setSuspended(false);
-
-        Throwable t = (Throwable) request.getAttribute(
-                RequestDispatcher.ERROR_EXCEPTION);
-
-        if (t != null) {
-            throwable(request, response, t);
-        } else {
-            status(request, response);
-        }
-
-        // Access a session (if present) to update last accessed time, based on a
-        // strict interpretation of the specification
-        if (ACCESS_SESSION) {
-            request.getSession(false);
-        }
-
-        // Restore the context classloader
-        context.unbind(false, MY_CLASSLOADER);
     }
 
 

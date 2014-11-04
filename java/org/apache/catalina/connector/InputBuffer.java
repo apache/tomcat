@@ -214,7 +214,7 @@ public class InputBuffer extends Reader
 
 
     /**
-     * Clear cached encoders (to save memory for Comet requests).
+     * Clear cached encoders (to save memory for async requests).
      */
     public void clearEncoders() {
         encoders.clear();

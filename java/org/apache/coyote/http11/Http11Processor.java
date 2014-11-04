@@ -25,10 +25,8 @@ import org.apache.coyote.ActionCode;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
 
 
@@ -179,12 +177,6 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
 
     @Override
-    protected void setCometTimeouts(SocketWrapper<Socket> socketWrapper) {
-        // NO-OP for BIO
-    }
-
-
-    @Override
     protected boolean breakKeepAliveLoop(SocketWrapper<Socket> socketWrapper) {
         openSocket = keepAlive;
         // If we don't have a pipe-lined request allow this thread to be
@@ -216,15 +208,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
     }
 
 
-    @Override
-    public SocketState event(SocketStatus status) throws IOException {
-        // Should never reach this code but in case we do...
-        throw new IOException(
-                sm.getString("http11processor.comet.notsupported"));
-    }
-
     // ----------------------------------------------------- ActionHook Methods
-
 
     /**
      * Send an action to the connector.

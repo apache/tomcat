@@ -159,15 +159,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     public boolean getUseSendfile() { return useSendfile; }
 
 
-    /**
-     * Allow comet request handling.
-     */
-    protected boolean useComet = true;
-    public void setUseComet(boolean useComet) { this.useComet = useComet; }
-    @Override
-    public boolean getUseComet() { return useComet; }
-    @Override
-    public boolean getUseCometTimeout() { return false; } // Not supported
     @Override
     public boolean getUsePolling() { return true; } // Always supported
 
@@ -857,8 +848,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     /**
-     * Process given socket. Called in non-comet mode, typically keep alive
-     * or upgraded protocol.
+     * Process given socket. Typically keep alive or upgraded protocol.
      */
     public boolean processSocket(long socket, SocketStatus status) {
         try {
@@ -1405,14 +1395,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             // Close all sockets in the add queue
             SocketInfo info = addList.get();
             while (info != null) {
-                boolean comet =
-                        connections.get(Long.valueOf(info.socket)).isComet();
-                if (!comet || (comet && !processSocket(
-                        info.socket, SocketStatus.STOP))) {
-                    // Poller isn't running at this point so use destroySocket()
-                    // directly
-                    destroySocket(info.socket);
-                }
+                // Poller isn't running at this point so use destroySocket()
+                // directly
+                destroySocket(info.socket);
                 info = addList.get();
             }
             addList.clear();
@@ -1421,12 +1406,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 int rv = Poll.pollset(pollers[i], desc);
                 if (rv > 0) {
                     for (int n = 0; n < rv; n++) {
-                        boolean comet = connections.get(
-                                Long.valueOf(desc[n*2+1])).isComet();
-                        if (!comet || (comet && !processSocket(
-                                desc[n*2+1], SocketStatus.STOP))) {
-                            destroySocket(desc[n*2+1]);
-                        }
+                        destroySocket(desc[n*2+1]);
                     }
                 }
             }
@@ -1483,12 +1463,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             }
             if (!ok) {
                 // Can't do anything: close the socket right away
-                boolean comet = connections.get(
-                        Long.valueOf(socket)).isComet();
-                if (!comet || (comet && !processSocket(
-                        socket, SocketStatus.ERROR))) {
-                    closeSocket(socket);
-                }
+                closeSocket(socket);
             }
         }
 
@@ -1576,12 +1551,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             Long.valueOf(socket)));
                 }
                 removeFromPoller(socket);
-                boolean comet = connections.get(
-                        Long.valueOf(socket)).isComet();
-                if (!comet || (comet && !processSocket(
-                        socket, SocketStatus.TIMEOUT))) {
-                    destroySocket(socket);
-                }
+                destroySocket(socket);
                 socket = timeouts.check(date);
             }
 
@@ -1703,20 +1673,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 continue;
                             }
                             if (info.read() || info.write()) {
-                                boolean comet = wrapper.isComet();
-                                if (comet || wrapper.pollerFlags != 0) {
-                                    removeFromPoller(info.socket);
-                                }
                                 wrapper.pollerFlags = wrapper.pollerFlags |
                                         (info.read() ? Poll.APR_POLLIN : 0) |
                                         (info.write() ? Poll.APR_POLLOUT : 0);
                                 if (!addToPoller(info.socket, wrapper.pollerFlags)) {
-                                    // Can't do anything: close the socket right
-                                    // away
-                                    if (!comet || (comet && !processSocket(
-                                            info.socket, SocketStatus.ERROR))) {
-                                        closeSocket(info.socket);
-                                    }
+                                    closeSocket(info.socket);
                                 } else {
                                     timeouts.add(info.socket,
                                             System.currentTimeMillis() +
@@ -1770,42 +1731,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 }
                                 wrapper.pollerFlags = wrapper.pollerFlags & ~((int) desc[n*2]);
                                 // Check for failed sockets and hand this socket off to a worker
-                                if (wrapper.isComet()) {
-                                    // Event processes either a read or a write depending on what the poller returns
-                                    if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
-                                            || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
-                                            || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
-                                        if (!processSocket(desc[n*2+1], SocketStatus.ERROR)) {
-                                            // Close socket and clear pool
-                                            closeSocket(desc[n*2+1]);
-                                        }
-                                    } else if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
-                                        if (wrapper.pollerFlags != 0) {
-                                            add(desc[n*2+1], 1, wrapper.pollerFlags);
-                                        }
-                                        if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
-                                            // Close socket and clear pool
-                                            closeSocket(desc[n*2+1]);
-                                        }
-                                    } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
-                                        if (wrapper.pollerFlags != 0) {
-                                            add(desc[n*2+1], 1, wrapper.pollerFlags);
-                                        }
-                                        if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
-                                            // Close socket and clear pool
-                                            closeSocket(desc[n*2+1]);
-                                        }
-                                    } else {
-                                        // Unknown event
-                                        getLog().warn(sm.getString(
-                                                "endpoint.apr.pollUnknownEvent",
-                                                Long.valueOf(desc[n*2])));
-                                        if (!processSocket(desc[n*2+1], SocketStatus.ERROR)) {
-                                            // Close socket and clear pool
-                                            closeSocket(desc[n*2+1]);
-                                        }
-                                    }
-                                } else if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
+                                if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                         || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
                                         || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
                                     if (wrapper.isAsync() || wrapper.isUpgraded()) {

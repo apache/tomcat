@@ -122,10 +122,6 @@
       <servlet-class>ServletToJsp</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>ChatServlet</servlet-name>
-        <servlet-class>chat.ChatServlet</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>CompressionFilterTestServlet</servlet-name>
         <servlet-class>compressionFilters.CompressionFilterTestServlet</servlet-class>
     </servlet>
@@ -154,10 +150,6 @@
         <servlet-class>SessionExample</servlet-class>
     </servlet>
 
-    <servlet-mapping>
-        <servlet-name>ChatServlet</servlet-name>
-        <url-pattern>/servlets/chat/chat</url-pattern>
-    </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CompressionFilterTestServlet</servlet-name>
         <url-pattern>/CompressionTest</url-pattern>

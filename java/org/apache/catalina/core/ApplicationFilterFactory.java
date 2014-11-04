@@ -22,9 +22,7 @@ import javax.servlet.ServletRequest;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.comet.CometFilter;
 import org.apache.catalina.connector.Request;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
 /**
@@ -87,19 +85,13 @@ public final class ApplicationFilterFactory {
         if (servlet == null)
             return (null);
 
-        boolean comet = false;
-
         // Create and initialize a filter chain object
         ApplicationFilterChain filterChain = null;
         if (request instanceof Request) {
             Request req = (Request) request;
-            comet = req.isComet();
             if (Globals.IS_SECURITY_ENABLED) {
                 // Security: Do not recycle
                 filterChain = new ApplicationFilterChain();
-                if (comet) {
-                    req.setFilterChain(filterChain);
-                }
             } else {
                 filterChain = (ApplicationFilterChain) req.getFilterChain();
                 if (filterChain == null) {
@@ -141,23 +133,7 @@ public final class ApplicationFilterFactory {
                 // FIXME - log configuration problem
                 continue;
             }
-            boolean isCometFilter = false;
-            if (comet) {
-                try {
-                    isCometFilter = filterConfig.getFilter() instanceof CometFilter;
-                } catch (Exception e) {
-                    // Note: The try catch is there because getFilter has a lot of
-                    // declared exceptions. However, the filter is allocated much
-                    // earlier
-                    Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
-                    ExceptionUtils.handleThrowable(t);
-                }
-                if (isCometFilter) {
-                    filterChain.addFilter(filterConfig);
-                }
-            } else {
-                filterChain.addFilter(filterConfig);
-            }
+            filterChain.addFilter(filterConfig);
         }
 
         // Add filters that match on servlet name second
@@ -173,26 +149,11 @@ public final class ApplicationFilterFactory {
                 // FIXME - log configuration problem
                 continue;
             }
-            boolean isCometFilter = false;
-            if (comet) {
-                try {
-                    isCometFilter = filterConfig.getFilter() instanceof CometFilter;
-                } catch (Exception e) {
-                    // Note: The try catch is there because getFilter has a lot of
-                    // declared exceptions. However, the filter is allocated much
-                    // earlier
-                }
-                if (isCometFilter) {
-                    filterChain.addFilter(filterConfig);
-                }
-            } else {
-                filterChain.addFilter(filterConfig);
-            }
+            filterChain.addFilter(filterConfig);
         }
 
         // Return the completed filter chain
-        return (filterChain);
-
+        return filterChain;
     }
 
 
