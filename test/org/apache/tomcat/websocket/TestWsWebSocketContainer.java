@@ -45,14 +45,12 @@ import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.coyote.http11.Http11Protocol;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicBinary;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicHandler;
@@ -388,11 +386,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
     private void doTestWriteTimeoutServer(boolean setTimeoutOnContainer)
             throws Exception {
-
-        // This will never work for BIO
-        Assume.assumeFalse(
-                "Skipping test. This feature will never work for BIO connector.",
-                getProtocol().equals(Http11Protocol.class.getName()));
 
         /*
          * Note: There are all sorts of horrible uses of statics in this test

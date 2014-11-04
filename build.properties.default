@@ -32,7 +32,6 @@ version.suffix=-dev
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
 execute.validate=false
-execute.test.bio=true
 execute.test.nio=true
 execute.test.nio2=true
 # Still requires APR/native library to be present

@@ -50,13 +50,22 @@
  -->
 <section name="Tomcat 9.0.0">
   <subsection name="General">
-    <add>
-      Make Java 8 the minimum required version to build and run Tomcat 9.
-      (markt)
-    </add>
-    <update>
-      Remove support for Comet. (markt)
-    </update>
+    <changelog>
+      <add>
+        Make Java 8 the minimum required version to build and run Tomcat 9.
+        (markt)
+      </add>
+      <update>
+        Remove support for Comet. (markt)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Remove support for the HTTP BIO and AJP BIO connectors. (markt)
+      </update>
+    </changelog>
   </subsection>
 </section>
 </body>

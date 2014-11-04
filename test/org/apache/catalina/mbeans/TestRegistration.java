@@ -170,11 +170,6 @@ public class TestRegistration extends TomcatBaseTest {
         combinedRealm.addRealm(nullRealm);
         ctx.setRealm(combinedRealm);
 
-        // Disable keep-alive otherwise request processing threads in keep-alive
-        // won't shut down fast enough with BIO to de-register the processor
-        // triggering a test failure
-        tomcat.getConnector().setAttribute("maxKeepAliveRequests", Integer.valueOf(1));
-
         tomcat.start();
 
         getUrl("http://localhost:" + getPort());
@@ -195,12 +190,10 @@ public class TestRegistration extends TomcatBaseTest {
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.indexOf("Nio2") > 0) {
             protocol = "nio2";
-        } else if (protocol.indexOf("Nio") > 0) {
-            protocol = "nio";
         } else if (protocol.indexOf("Apr") > 0) {
             protocol = "apr";
         } else {
-            protocol = "bio";
+            protocol = "nio";
         }
         String index = tomcat.getConnector().getProperty("nameIndex").toString();
         ArrayList<String> expected = new ArrayList<>(Arrays.asList(basicMBeanNames()));
