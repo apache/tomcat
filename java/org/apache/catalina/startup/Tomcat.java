@@ -404,7 +404,6 @@ public class Tomcat {
         // and for the use case the speed benefit wouldn't matter.
 
         connector = new Connector("HTTP/1.1");
-        // connector = new Connector("org.apache.coyote.http11.Http11Protocol");
         connector.setPort(port);
         service.addConnector( connector );
         return connector;
@@ -645,7 +644,7 @@ public class Tomcat {
     }
 
     static final String[] silences = new String[] {
-        "org.apache.coyote.http11.Http11Protocol",
+        "org.apache.coyote.http11.Http11NioProtocol",
         "org.apache.catalina.core.StandardService",
         "org.apache.catalina.core.StandardEngine",
         "org.apache.catalina.startup.ContextConfig",
