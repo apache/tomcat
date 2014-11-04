@@ -51,28 +51,26 @@ public class TestGzipOutputFilter {
     public void testFlushingWithGzip() throws Exception {
         // set up response, InternalOutputBuffer, and ByteArrayOutputStream
         Response res = new Response();
-        TesterOutputBuffer iob = new TesterOutputBuffer(res, 8 * 1024);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        iob.outputStream = bos;
-        res.setOutputBuffer(iob);
+        TesterOutputBuffer tob = new TesterOutputBuffer(res, 8 * 1024);
+        res.setOutputBuffer(tob);
 
-        // set up GzipOutputFilter to attach to the InternalOutputBuffer
+        // set up GzipOutputFilter to attach to the TesterOutputBuffer
         GzipOutputFilter gf = new GzipOutputFilter();
-        iob.addFilter(gf);
-        iob.addActiveFilter(gf);
+        tob.addFilter(gf);
+        tob.addActiveFilter(gf);
 
         // write a chunk out
         ByteChunk chunk = new ByteChunk(1024);
         byte[] d = "Hello there tomcat developers, there is a bug in JDK".getBytes();
         chunk.append(d, 0, d.length);
-        iob.doWrite(chunk, res);
+        tob.doWrite(chunk, res);
 
         // flush the InternalOutputBuffer
-        iob.flush();
+        tob.flush();
 
         // read from the ByteArrayOutputStream to find out what's being written
         // out (flushed)
-        byte[] dataFound = bos.toByteArray();
+        byte[] dataFound = tob.toByteArray();
 
         // find out what's expected by writing to GZIPOutputStream and close it
         // (to force flushing)
