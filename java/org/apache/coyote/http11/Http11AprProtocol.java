@@ -200,7 +200,11 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
     @Override
     protected String getNamePrefix() {
-        return ("http-apr");
+        if (isSSLEnabled()) {
+            return ("https-apr");
+        } else {
+            return ("http-apr");
+        }
     }
 
 
