@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.coyote.http11;
+package org.apache.coyote.http11.filters;
 
 import java.io.ByteArrayOutputStream;
 import java.util.zip.GZIPOutputStream;
@@ -25,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.coyote.Response;
-import org.apache.coyote.http11.filters.GzipOutputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -52,7 +51,7 @@ public class TestGzipOutputFilter {
     public void testFlushingWithGzip() throws Exception {
         // set up response, InternalOutputBuffer, and ByteArrayOutputStream
         Response res = new Response();
-        InternalOutputBuffer iob = new InternalOutputBuffer(res, 8 * 1024);
+        TesterOutputBuffer iob = new TesterOutputBuffer(res, 8 * 1024);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         iob.outputStream = bos;
         res.setOutputBuffer(iob);
