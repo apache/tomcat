@@ -269,7 +269,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                 socket.setAsync(true);
             } else {
                 // Either:
-                //  - this is comet request
                 //  - this is an upgraded connection
                 //  - the request line/headers have not been completely
                 //    read

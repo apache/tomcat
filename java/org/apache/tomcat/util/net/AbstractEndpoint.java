@@ -821,8 +821,6 @@ public abstract class AbstractEndpoint<S> {
     // Some of these are always hard-coded, some are hard-coded to false (i.e.
     // the endpoint does not support them) and some are configurable.
     public abstract boolean getUseSendfile();
-    public abstract boolean getUseComet();
-    public abstract boolean getUseCometTimeout();
     public abstract boolean getUsePolling();
 
     protected LimitLatch initializeConnectionLatch() {

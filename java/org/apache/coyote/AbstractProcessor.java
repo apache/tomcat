@@ -179,9 +179,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     }
 
     @Override
-    public abstract boolean isComet();
-
-    @Override
     public abstract boolean isUpgrade();
 
     /**
@@ -190,12 +187,6 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      */
     @Override
     public abstract SocketState process(SocketWrapper<S> socket) throws IOException;
-
-    /**
-     * Process in-progress Comet requests. These will start as HTTP requests.
-     */
-    @Override
-    public abstract SocketState event(SocketStatus status) throws IOException;
 
     /**
      * Process in-progress Servlet 3.0 Async requests. These will start as HTTP

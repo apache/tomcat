@@ -118,10 +118,6 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     @Override
     public boolean getUseSendfile() { return false; } // Not supported
     @Override
-    public boolean getUseComet() { return false; } // Not supported
-    @Override
-    public boolean getUseCometTimeout() { return false; } // Not supported
-    @Override
     public boolean getDeferAccept() { return false; } // Not supported
     @Override
     public boolean getUsePolling() { return false; } // Not supported

@@ -21,7 +21,8 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
 
  2. Remove BIO AJP and HTTP connector.
 
- 3. Remove Comet support.
+ 3. DONE.
+    Remove Comet support.
 
  4. Refactor the connectors to minimise code duplication
     - All implementation specific per connector code -> Endpoint

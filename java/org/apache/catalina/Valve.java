@@ -14,19 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
-
 
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-
 
 /**
  * <p>A <b>Valve</b> is a request processing component associated with a
@@ -123,22 +118,5 @@ public interface Valve {
         throws IOException, ServletException;
 
 
-    /**
-     * Process a Comet event.
-     *
-     * @param request The servlet request to be processed
-     * @param response The servlet response to be created
-     *
-     * @exception IOException if an input/output error occurs, or is thrown
-     *  by a subsequently invoked Valve, Filter, or Servlet
-     * @exception ServletException if a servlet error occurs, or is thrown
-     *  by a subsequently invoked Valve, Filter, or Servlet
-     */
-    public void event(Request request, Response response, CometEvent event)
-        throws IOException, ServletException;
-
-
     public boolean isAsyncSupported();
-
-
 }

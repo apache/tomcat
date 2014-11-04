@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.valves;
 
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -27,13 +26,11 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Valve;
-import org.apache.catalina.comet.CometEvent;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.res.StringManager;
-
 
 /**
  * Convenience base class for implementations of the <b>Valve</b> interface.
@@ -180,27 +177,6 @@ public abstract class ValveBase extends LifecycleMBeanBase
     @Override
     public abstract void invoke(Request request, Response response)
         throws IOException, ServletException;
-
-
-    /**
-     * Process a Comet event. This method will rarely need to be provided by
-     * a subclass, unless it needs to reassociate a particular object with
-     * the thread that is processing the request.
-     *
-     * @param request The servlet request to be processed
-     * @param response The servlet response to be created
-     *
-     * @exception IOException if an input/output error occurs, or is thrown
-     *  by a subsequently invoked Valve, Filter, or Servlet
-     * @exception ServletException if a servlet error occurs, or is thrown
-     *  by a subsequently invoked Valve, Filter, or Servlet
-     */
-    @Override
-    public void event(Request request, Response response, CometEvent event)
-        throws IOException, ServletException {
-        // Perform the request
-        getNext().event(request, response, event);
-    }
 
 
     @Override

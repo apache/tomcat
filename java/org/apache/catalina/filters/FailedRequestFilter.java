@@ -25,9 +25,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
-import org.apache.catalina.comet.CometEvent;
-import org.apache.catalina.comet.CometFilter;
-import org.apache.catalina.comet.CometFilterChain;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -43,7 +40,7 @@ import org.apache.juli.logging.LogFactory;
  * <code>request.getInputStream()</code> and <code>request.getReader()</code>,
  * if requests parsed by them do not use standard value for content mime-type.
  */
-public class FailedRequestFilter extends FilterBase implements CometFilter {
+public class FailedRequestFilter extends FilterBase {
 
     private static final Log log = LogFactory.getLog(FailedRequestFilter.class);
 
@@ -61,19 +58,6 @@ public class FailedRequestFilter extends FilterBase implements CometFilter {
             return;
         }
         chain.doFilter(request, response);
-    }
-
-    @Override
-    public void doFilterEvent(CometEvent event, CometFilterChain chain)
-            throws IOException, ServletException {
-        if (event.getEventType() == CometEvent.EventType.BEGIN
-                && !isGoodRequest(event.getHttpServletRequest())) {
-            event.getHttpServletResponse().sendError(
-                    HttpServletResponse.SC_BAD_REQUEST);
-            event.close();
-            return;
-        }
-        chain.doFilterEvent(event);
     }
 
     private boolean isGoodRequest(ServletRequest request) {

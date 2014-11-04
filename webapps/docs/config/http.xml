@@ -677,11 +677,6 @@
         default value is <code>1000</code> milliseconds.</p>
       </attribute>
 
-      <attribute name="useComet" required="false">
-        <p>(bool)Whether to allow comet servlets or not. Default value is
-        <code>true</code>.</p>
-      </attribute>
-
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
         The default value is <code>true</code>. Note that the use of sendfile
@@ -810,11 +805,6 @@
         <p>(bool)Use this attribute to enable or disable object caching to
         reduce the amount of GC objects produced.
         The default value is <code>false</code>.</p>
-      </attribute>
-
-      <attribute name="useComet" required="false">
-        <p>(bool)Whether to allow comet servlets or not. Default value is
-        <code>true</code>.</p>
       </attribute>
 
       <attribute name="useSendfile" required="false">
@@ -962,11 +952,6 @@
         <code>java.lang.Thread.NORM_PRIORITY</code> constant). See the JavaDoc
         for the <code>java.lang.Thread</code> class for more details on what
         this priority means.</p>
-      </attribute>
-
-      <attribute name="useComet" required="false">
-        <p>(bool)Whether to allow comet servlets or not. Default value is
-        <code>true</code>.</p>
       </attribute>
 
       <attribute name="useSendfile" required="false">

@@ -54,6 +54,9 @@
       Make Java 8 the minimum required version to build and run Tomcat 9.
       (markt)
     </add>
+    <update>
+      Remove support for Comet. (markt)
+    </update>
   </subsection>
 </section>
 </body>

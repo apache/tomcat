@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
-
 
 import java.io.IOException;
 import java.security.Principal;
@@ -34,10 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.InstanceEvent;
-import org.apache.catalina.comet.CometEvent;
-import org.apache.catalina.comet.CometFilter;
-import org.apache.catalina.comet.CometFilterChain;
-import org.apache.catalina.comet.CometProcessor;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.InstanceSupport;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -52,7 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-final class ApplicationFilterChain implements FilterChain, CometFilterChain {
+final class ApplicationFilterChain implements FilterChain {
 
     // Used to enforce requirements of SRV.8.2 / SRV.14.2.5.1
     private static final ThreadLocal<ServletRequest> lastServicedRequest;
@@ -144,23 +137,8 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     private static final Class<?>[] classTypeUsedInService = new Class[]{
         ServletRequest.class, ServletResponse.class};
 
-    /**
-     * Static class array used when the SecurityManager is turned on and
-     * <code>doFilterEvent</code> is invoked.
-     */
-    private static final Class<?>[] cometClassType =
-        new Class[]{ CometEvent.class, CometFilterChain.class};
-
-    /**
-     * Static class array used when the SecurityManager is turned on and
-     * <code>event</code> is invoked.
-     */
-    private static final Class<?>[] classTypeUsedInEvent =
-        new Class[] { CometEvent.class };
-
 
     // ---------------------------------------------------- FilterChain Methods
-
 
     /**
      * Invoke the next filter in this chain, passing the specified request
@@ -324,48 +302,6 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
 
     /**
-     * Process the event, using the security manager if the option is enabled.
-     *
-     * @param event the event to process
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet exception occurs
-     */
-    @Override
-    public void doFilterEvent(CometEvent event)
-        throws IOException, ServletException {
-
-        if( Globals.IS_SECURITY_ENABLED ) {
-            final CometEvent ev = event;
-            try {
-                java.security.AccessController.doPrivileged(
-                    new java.security.PrivilegedExceptionAction<Void>() {
-                        @Override
-                        public Void run()
-                            throws ServletException, IOException {
-                            internalDoFilterEvent(ev);
-                            return null;
-                        }
-                    }
-                );
-            } catch( PrivilegedActionException pe) {
-                Exception e = pe.getException();
-                if (e instanceof ServletException)
-                    throw (ServletException) e;
-                else if (e instanceof IOException)
-                    throw (IOException) e;
-                else if (e instanceof RuntimeException)
-                    throw (RuntimeException) e;
-                else
-                    throw new ServletException(e.getMessage(), e);
-            }
-        } else {
-            internalDoFilterEvent(event);
-        }
-    }
-
-
-    /**
      * The last request passed to a servlet for servicing from the current
      * thread.
      *
@@ -387,124 +323,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     }
 
 
-    private void internalDoFilterEvent(CometEvent event)
-        throws IOException, ServletException {
-
-        // Call the next filter if there is one
-        if (pos < n) {
-            ApplicationFilterConfig filterConfig = filters[pos++];
-            CometFilter filter = null;
-            try {
-                filter = (CometFilter) filterConfig.getFilter();
-                // FIXME: No instance listener processing for events for now
-                /*
-                support.fireInstanceEvent(InstanceEvent.BEFORE_FILTER_EVENT,
-                        filter, event);
-                        */
-
-                if( Globals.IS_SECURITY_ENABLED ) {
-                    final CometEvent ev = event;
-                    Principal principal =
-                        ev.getHttpServletRequest().getUserPrincipal();
-
-                    Object[] args = new Object[]{ev, this};
-                    SecurityUtil.doAsPrivilege("doFilterEvent", filter,
-                            cometClassType, args, principal);
-
-                } else {
-                    filter.doFilterEvent(event, this);
-                }
-
-                /*support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                        filter, event);*/
-            } catch (IOException e) {
-                /*
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                            filter, event, e);
-                            */
-                throw e;
-            } catch (ServletException e) {
-                /*
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                            filter, event, e);
-                            */
-                throw e;
-            } catch (RuntimeException e) {
-                /*
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                            filter, event, e);
-                            */
-                throw e;
-            } catch (Throwable e) {
-                e = ExceptionUtils.unwrapInvocationTargetException(e);
-                ExceptionUtils.handleThrowable(e);
-                /*if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                            filter, event, e);*/
-                throw new ServletException
-                    (sm.getString("filterChain.filter"), e);
-            }
-            return;
-        }
-
-        // We fell off the end of the chain -- call the servlet instance
-        try {
-            /*
-            support.fireInstanceEvent(InstanceEvent.BEFORE_SERVICE_EVENT,
-                    servlet, request, response);
-                    */
-            if( Globals.IS_SECURITY_ENABLED ) {
-                final CometEvent ev = event;
-                Principal principal =
-                    ev.getHttpServletRequest().getUserPrincipal();
-                Object[] args = new Object[]{ ev };
-                SecurityUtil.doAsPrivilege("event",
-                        servlet,
-                        classTypeUsedInEvent,
-                        args,
-                        principal);
-            } else {
-                ((CometProcessor) servlet).event(event);
-            }
-            /*
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                    servlet, request, response);*/
-        } catch (IOException e) {
-            /*
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                    servlet, request, response, e);
-                    */
-            throw e;
-        } catch (ServletException e) {
-            /*
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                    servlet, request, response, e);
-                    */
-            throw e;
-        } catch (RuntimeException e) {
-            /*
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                    servlet, request, response, e);
-                    */
-            throw e;
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            /*
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                    servlet, request, response, e);
-                    */
-            throw new ServletException
-                (sm.getString("filterChain.servlet"), e);
-        }
-
-    }
-
-
     // -------------------------------------------------------- Package Methods
-
 
     /**
      * Add a filter to the set of filters that will be executed in this chain.

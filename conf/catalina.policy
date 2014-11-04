@@ -186,9 +186,6 @@ grant {
     permission java.util.PropertyPermission
      "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR", "read";
 
-    // Applications using Comet need to be able to access this package
-    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.comet";
-
     // Applications using WebSocket need to be able to access these packages
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.websocket";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.websocket.server";

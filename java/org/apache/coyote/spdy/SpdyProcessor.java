@@ -507,20 +507,9 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
     }
 
     @Override
-    public boolean isComet() {
-        return false;
-    }
-
-    @Override
     public SocketState process(SocketWrapper<S> socket)
             throws IOException {
         throw new IOException("Unimplemented");
-    }
-
-    @Override
-    public SocketState event(SocketStatus status) throws IOException {
-        System.err.println("EVENT: " + status);
-        return null;
     }
 
     @Override

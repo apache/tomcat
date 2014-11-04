@@ -84,7 +84,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             }
             @Override
             public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
-                endpoint.closeSocket(attachment, SocketStatus.ERROR);
+                endpoint.closeSocket(attachment);
             }
         };
         handshakeWriteCompletionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
@@ -98,7 +98,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             }
             @Override
             public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
-                endpoint.closeSocket(attachment, SocketStatus.ERROR);
+                endpoint.closeSocket(attachment);
             }
         };
     }

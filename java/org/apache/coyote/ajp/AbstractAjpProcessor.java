@@ -587,26 +587,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             throw new UnsupportedOperationException(
                     sm.getString("ajpprocessor.httpupgrade.notsupported"));
         }
-        case COMET_BEGIN: {
-            // HTTP connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("ajpprocessor.comet.notsupported"));
-        }
-        case COMET_END: {
-            // HTTP connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("ajpprocessor.comet.notsupported"));
-        }
-        case COMET_CLOSE: {
-            // HTTP connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("ajpprocessor.comet.notsupported"));
-        }
-        case COMET_SETTIMEOUT: {
-            // HTTP connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("ajpprocessor.comet.notsupported"));
-        }
         case AVAILABLE: {
             if (available()) {
                 request.setAvailable(1);
@@ -894,14 +874,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     @Override
-    public SocketState event(SocketStatus status) throws IOException {
-        // Should never reach this code but in case we do...
-        throw new IOException(
-                sm.getString("ajpprocessor.comet.notsupported"));
-    }
-
-
-    @Override
     public SocketState upgradeDispatch(SocketStatus status) throws IOException {
         // Should never reach this code but in case we do...
         throw new IOException(
@@ -1067,13 +1039,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             read(buf, headerLength, messageLength, true);
             return true;
         }
-    }
-
-
-    @Override
-    public final boolean isComet() {
-        // AJP does not support Comet
-        return false;
     }
 
 
