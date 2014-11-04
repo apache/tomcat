@@ -14,14 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
-
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-
 
 /**
  * A <b>Manager</b> manages the pool of Sessions that are associated with a
@@ -43,11 +39,12 @@ import java.io.IOException;
  */
 public interface Manager {
 
-
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the Context with which this Manager is associated.
+     * Get the Context with which this Manager is associated.
+     *
+     * @return The associated Context
      */
     public Context getContext();
 
@@ -61,16 +58,18 @@ public interface Manager {
 
 
     /**
-     * Return the distributable flag for the sessions supported by
-     * this Manager.
+     * Is this Manager marked as using distributable sessions?
+     *
+     * @return {@code true} if this manager is marked as distributable otherwise
+     *         {@code false}
      */
     public boolean getDistributable();
 
 
     /**
-     * Set the distributable flag for the sessions supported by this
-     * Manager.  If this flag is set, all user data objects added to
-     * sessions associated with this manager must implement Serializable.
+     * Configure whether this manager uses distributable sessions. If this flag
+     * is set, all user data objects added to sessions associated with this
+     * manager must implement Serializable.
      *
      * @param distributable The new distributable flag
      */
@@ -78,8 +77,10 @@ public interface Manager {
 
 
     /**
-     * Return the default maximum inactive interval (in seconds)
-     * for Sessions created by this Manager.
+     * Get the default time in seconds before a session managed by this manager
+     * will be considered inactive.
+     *
+     * @return The default maximum inactive interval in seconds
      */
     public int getMaxInactiveInterval();
 
@@ -94,7 +95,7 @@ public interface Manager {
 
 
     /**
-     * return the session id generator
+     * @return the session id generator
      */
     public SessionIdGenerator getSessionIdGenerator();
 
@@ -222,8 +223,9 @@ public interface Manager {
      * @return  The current rate (in sessions per minute) of session expiration
      */
     public int getSessionExpireRate();
-    // --------------------------------------------------------- Public Methods
 
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Add this Session to the set of active Sessions for this Manager.
@@ -263,6 +265,8 @@ public interface Manager {
      * Get a session from the recycled ones or create a new empty one.
      * The PersistentManager manager does not need to create session data
      * because it reads it from the Store.
+     *
+     * @return An empty Session object
      */
     public Session createEmptySession();
 
@@ -280,6 +284,9 @@ public interface Manager {
      *  method of the returned session.
      * @exception IllegalStateException if a new session cannot be
      *  instantiated for any reason
+     *
+     * @return An empty Session object with the given ID or a newly created
+     *         session ID if none was specified
      */
     public Session createSession(String sessionId);
 
@@ -294,6 +301,9 @@ public interface Manager {
      *  instantiated for any reason
      * @exception IOException if an input/output error occurs while
      *  processing this request
+     *
+     * @return the request session or {@code null} if a session with the
+     *         requested ID could not be found
      */
     public Session findSession(String id) throws IOException;
 
@@ -301,6 +311,8 @@ public interface Manager {
     /**
      * Return the set of active Sessions associated with this Manager.
      * If this Manager has no active Sessions, a zero-length array is returned.
+     *
+     * @return All the currently active sessions managed by this manager
      */
     public Session[] findSessions();
 
@@ -351,11 +363,11 @@ public interface Manager {
      */
     public void unload() throws IOException;
 
-     /**
-      * This method will be invoked by the context/container on a periodic
-      * basis and allows the manager to implement
-      * a method that executes periodic tasks, such as expiring sessions etc.
-      */
-     public void backgroundProcess();
 
+    /**
+     * This method will be invoked by the context/container on a periodic
+     * basis and allows the manager to implement
+     * a method that executes periodic tasks, such as expiring sessions etc.
+     */
+    public void backgroundProcess();
 }
