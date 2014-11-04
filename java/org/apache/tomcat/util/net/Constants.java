@@ -23,11 +23,4 @@ public class Constants {
      * the tomcat instance installation path
      */
     public static final String CATALINA_BASE_PROP = "catalina.base";
-
-
-    /**
-     * Has security been turned on?
-     */
-    public static final boolean IS_SECURITY_ENABLED =
-        (System.getSecurityManager() != null);
 }
