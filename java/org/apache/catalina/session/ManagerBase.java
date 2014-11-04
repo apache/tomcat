@@ -215,25 +215,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     // ------------------------------------------------------------- Properties
 
     @Override
-    @Deprecated
-    public Container getContainer() {
-        return getContext();
-    }
-
-
-    @Override
-    @Deprecated
-    public void setContainer(Container container) {
-
-        if (container instanceof Context || container == null) {
-            setContext((Context) container);
-        } else {
-            log.warn(sm.getString("managerBase.container.noop"));
-        }
-    }
-
-
-    @Override
     public Context getContext() {
         return context;
     }
@@ -249,8 +230,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         Context oldContext = this.context;
         this.context = context;
         support.firePropertyChange("context", oldContext, this.context);
-        // TODO - delete the line below in Tomcat 9 onwards
-        support.firePropertyChange("container", oldContext, this.context);
 
         // Register with the new Context (if any)
         if (this.context != null) {
@@ -323,46 +302,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         support.firePropertyChange("maxInactiveInterval",
                                    Integer.valueOf(oldMaxInactiveInterval),
                                    Integer.valueOf(this.maxInactiveInterval));
-
-    }
-
-
-    /**
-     * Gets the session id length (in bytes) of Sessions created by
-     * this Manager.
-     *
-     * @deprecated Use {@link SessionIdGenerator#getSessionIdLength()}.
-     *             This method will be removed in Tomcat 9 onwards.
-     *
-     * @return The session id length
-     */
-    @Override
-    @Deprecated
-    public int getSessionIdLength() {
-
-        return (this.sessionIdLength);
-
-    }
-
-
-    /**
-     * Sets the session id length (in bytes) for Sessions created by this
-     * Manager.
-     *
-     * @deprecated Use {@link SessionIdGenerator#setSessionIdLength(int)}.
-     *             This method will be removed in Tomcat 9 onwards.
-     *
-     * @param idLength The session id length
-     */
-    @Override
-    @Deprecated
-    public void setSessionIdLength(int idLength) {
-
-        int oldSessionIdLength = this.sessionIdLength;
-        this.sessionIdLength = idLength;
-        support.firePropertyChange("sessionIdLength",
-                                   Integer.valueOf(oldSessionIdLength),
-                                   Integer.valueOf(this.sessionIdLength));
 
     }
 
