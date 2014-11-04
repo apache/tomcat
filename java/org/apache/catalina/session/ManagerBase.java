@@ -89,17 +89,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     protected int maxInactiveInterval = 30 * 60;
 
-
-    protected static final int SESSION_ID_LENGTH_UNSET = -1;
-
-    /**
-     * The session id length of Sessions created by this Manager.
-     * The length should be set directly on the SessionIdGenerator.
-     * Setting it here is deprecated.
-     */
-    protected int sessionIdLength = SESSION_ID_LENGTH_UNSET;
-
-
     /**
      * The Java class name of the secure random number generator class to be
      * used when generating session identifiers. The random number generator
@@ -544,9 +533,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
             setSessionIdGenerator(sessionIdGenerator);
         }
 
-        if (sessionIdLength != SESSION_ID_LENGTH_UNSET) {
-            sessionIdGenerator.setSessionIdLength(sessionIdLength);
-        }
         sessionIdGenerator.setJvmRoute(getJvmRoute());
         if (sessionIdGenerator instanceof SessionIdGeneratorBase) {
             SessionIdGeneratorBase sig = (SessionIdGeneratorBase)sessionIdGenerator;

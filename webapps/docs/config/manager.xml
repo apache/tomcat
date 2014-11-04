@@ -99,15 +99,6 @@
         varied by a servlet via the
         <code>setMaxInactiveInterval</code> method of the <code>HttpSession</code> object.</p>
       </attribute>
-
-      <attribute name="sessionIdLength" required="false">
-       <p>The length of session ids created by this Manager, measured in bytes,
-        excluding subsequent conversion to a hexadecimal string and
-        excluding any JVM route information used for load balancing.
-        This attribute is deprecated. Set the length on a nested
-        <strong>SessionIdGenerator</strong> element instead.</p>
-      </attribute>
-
     </attributes>
 
   </subsection>
