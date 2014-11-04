@@ -17,7 +17,9 @@
 package org.apache.coyote.spdy;
 
 import java.io.IOException;
-import java.net.Socket;
+import java.nio.channels.SocketChannel;
+
+import javax.net.ssl.SSLEngine;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.ajp.Constants;
@@ -29,7 +31,8 @@ import org.apache.tomcat.spdy.SpdyContext;
 import org.apache.tomcat.spdy.SpdyContext.SpdyHandler;
 import org.apache.tomcat.spdy.SpdyStream;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
-import org.apache.tomcat.util.net.JIoEndpoint;
+import org.apache.tomcat.util.net.NioChannel;
+import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapper;
@@ -40,7 +43,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * a reverse proxy ( apache, etc ).
  *
  * To configure:
- * &lt;Connector port="8011" protocol="org.apache.coyote.spdy.SpdyProxyProtocol"/&gt;
+ * &lt;Connector port="8011" protocol="org.apache.coyote.spdy.SpdyProxyNioProtocol"/&gt;
  *
  * To test, use
  *   chrome  --use-spdy=no-compress,no-ssl [--enable-websocket-over-spdy]
@@ -48,18 +51,23 @@ import org.apache.tomcat.util.net.SocketWrapper;
  * TODO: Remote information (client ip, certs, etc ) will be sent in X- headers.
  * TODO: if spdy-&gt;spdy proxy, info about original spdy stream for pushes.
  *
+ * TODO: This proxy implementation was refactored to use NIO instead of BIO. It
+ *       is untested as SPDY/2 is now obsolete and is not supported by current
+ *       browsers. This code should be reviewed when work starts on the HTTP/2
+ *       implementation.
+ *
  */
-public class SpdyProxyProtocol extends AbstractProtocol<Socket> {
+public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
     private static final Log log = LogFactory.getLog(SpdyProxyProtocol.class);
 
-    private final JIoEndpoint.Handler cHandler = new TomcatJioHandler();
+    private final NioEndpoint.Handler cHandler = new TomcatNioHandler();
     private SpdyContext spdyContext;
 
     private boolean compress = false;
 
     public SpdyProxyProtocol() {
-        endpoint = new JIoEndpoint();
-        ((JIoEndpoint) endpoint).setHandler(cHandler);
+        endpoint = new NioEndpoint();
+        ((NioEndpoint) endpoint).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
@@ -72,7 +80,7 @@ public class SpdyProxyProtocol extends AbstractProtocol<Socket> {
 
     @Override
     protected String getNamePrefix() {
-        return "spdy2-jio";
+        return "spdy2-nio";
     }
 
     @Override
@@ -93,7 +101,7 @@ public class SpdyProxyProtocol extends AbstractProtocol<Socket> {
         spdyContext.setHandler(new SpdyHandler() {
             @Override
             public void onStream(SpdyConnection con, SpdyStream ch) throws IOException {
-                SpdyProcessor<Socket> sp = new SpdyProcessor<>(con, endpoint);
+                SpdyProcessor<NioChannel> sp = new SpdyProcessor<>(con, endpoint);
                 sp.setAdapter(getAdapter());
                 sp.onSynStream(ch);
             }
@@ -110,7 +118,7 @@ public class SpdyProxyProtocol extends AbstractProtocol<Socket> {
         this.compress = compress;
     }
 
-    public class TomcatJioHandler implements JIoEndpoint.Handler {
+    public class TomcatNioHandler implements NioEndpoint.Handler {
 
         @Override
         public Object getGlobal() {
@@ -122,7 +130,7 @@ public class SpdyProxyProtocol extends AbstractProtocol<Socket> {
         }
 
         @Override
-        public SocketState process(SocketWrapper<Socket> socket,
+        public SocketState process(SocketWrapper<NioChannel> socket,
                 SocketStatus status) {
 
             spdyContext.getNetSupport().onAccept(socket.getSocket());
@@ -135,8 +143,18 @@ public class SpdyProxyProtocol extends AbstractProtocol<Socket> {
         }
 
         @Override
-        public void beforeHandshake(SocketWrapper<Socket> socket) {
+        public void release(SocketWrapper<NioChannel> socket) {
+            // TODO Auto-generated method stub
         }
 
+        @Override
+        public void release(SocketChannel socket) {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onCreateSSLEngine(SSLEngine engine) {
+            // No SSL in proxy. Should be a NO-OP.
+        }
     }
 }
