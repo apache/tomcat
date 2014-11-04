@@ -523,17 +523,7 @@ public class Request
     }
 
 
-    /**
-     * Clear cached encoders (to save memory for async requests).
-     */
-    public boolean read()
-        throws IOException {
-        return (inputBuffer.realReadBytes(null, 0, 0) > 0);
-    }
-
-
     // -------------------------------------------------------- Request Methods
-
 
     /**
      * Associated Catalina connector.
@@ -3128,17 +3118,6 @@ public class Request
             }
             values.add(acceptLanguage.getLocale());
         }
-    }
-
-
-    protected static final boolean isAlpha(String value) {
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) {
-                return false;
-            }
-        }
-        return true;
     }
 
 
