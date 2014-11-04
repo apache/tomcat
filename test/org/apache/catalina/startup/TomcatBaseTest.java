@@ -61,6 +61,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * don't have to keep writing the cleanup code.
  */
 public abstract class TomcatBaseTest extends LoggingBaseTest {
+    private static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
     private Tomcat tomcat;
     private boolean accessLogEnabled = false;
 
@@ -247,13 +248,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     public static int headUrl(String path, ByteChunk out,
             Map<String, List<String>> resHead) throws IOException {
-        return methodUrl(path, out, 1000000, null, resHead, "HEAD");
+        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, "HEAD");
     }
 
     public static int getUrl(String path, ByteChunk out,
             Map<String, List<String>> reqHead,
             Map<String, List<String>> resHead) throws IOException {
-        return getUrl(path, out, 1000000, reqHead, resHead);
+        return getUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, reqHead, resHead);
     }
 
     public static int getUrl(String path, ByteChunk out, int readTimeout,
