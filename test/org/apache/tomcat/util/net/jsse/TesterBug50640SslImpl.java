@@ -17,24 +17,21 @@
 package org.apache.tomcat.util.net.jsse;
 
 import org.apache.tomcat.util.net.AbstractEndpoint;
-import org.apache.tomcat.util.net.ServerSocketFactory;
+import org.apache.tomcat.util.net.SSLUtil;
 
 public class TesterBug50640SslImpl extends JSSEImplementation {
 
     public static final String PROPERTY_NAME = "bug50640";
     public static final String PROPERTY_VALUE = "pass";
 
-    @Override
-    public ServerSocketFactory getServerSocketFactory(
-            AbstractEndpoint<?> endpoint)  {
 
-        // Check the custom attribute is visible & correcly set
+    @Override
+    public SSLUtil getSSLUtil(AbstractEndpoint<?> endpoint) {
         String flag = endpoint.getProperty(PROPERTY_NAME);
         if (PROPERTY_VALUE.equals(flag)) {
-            return super.getServerSocketFactory(endpoint);
+            return super.getSSLUtil(endpoint);
         } else {
             return null;
         }
     }
-
 }
