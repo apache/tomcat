@@ -1337,15 +1337,9 @@
   <property name="junit.formatter.extension" value=".txt" />
 
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-bio,test-nio,test-nio2,test-apr,cobertura-report" >
+          depends="test-nio,test-nio2,test-apr,cobertura-report" >
     <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "FAILED".' />
     <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
-  </target>
-
-  <target name="test-bio" description="Runs the JUnit test cases for BIO. Does not stop on errors."
-          depends="test-compile,deploy,cobertura-instrument,test-openssl-exists" if="${execute.test.bio}">
-    <runtests protocol="org.apache.coyote.http11.Http11Protocol"
-              extension=".BIO" />
   </target>
 
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
@@ -1498,7 +1492,7 @@
   </target>
 
   <target name="cobertura-report" if="${test.cobertura}"
-          depends="test-bio,test-nio,test-nio2,test-apr"
+          depends="test-nio,test-nio2,test-apr"
           description="Creates report from gathered Cobertura results">
 
     <cobertura-report srcdir="${basedir}/java" destdir="${cobertura.out}"

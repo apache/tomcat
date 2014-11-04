@@ -798,7 +798,7 @@ has been reloaded several times, it may be listed several times.</p>
 <source>http://localhost:8080/manager/text/sslConnectorCiphers</source>
 
 <p>The SSL Connector/Ciphers diagnostic lists the SSL ciphers that are currently
-configured for each connector. For BIO and NIO, the names of the individual
+configured for each connector. For NIO and NIO2, the names of the individual
 cipher suites are listed. For APR, the value of SSLCipherSuite is returned.</p>
 
 <p>The response will ook something like this:</p>

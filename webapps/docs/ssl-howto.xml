@@ -355,7 +355,7 @@ and environment. The configuration options and information on which attributes
 are mandatory, are documented in the SSL Support section of the
 <a href="config/http.html#SSL_Support">HTTP connector</a> configuration
 reference. Make sure that you use the correct attributes for the connector you
-are using. The BIO and NIO connectors use JSSE whereas the APR/native connector
+are using. The NIO and NIO2 connectors use JSSE whereas the APR/native connector
 uses APR.</p>
 
 <p>The <code>port</code> attribute (default value is 8443) is the TCP/IP
@@ -541,7 +541,7 @@ public class SessionTrackingModeListener implements ServletContextListener {
 
 }]]></source>
 
-  <p>Note: SSL session tracking is implemented for the BIO and NIO connectors.
+  <p>Note: SSL session tracking is implemented for the NIO and NIO2 connectors.
      It is not yet implemented for the APR connector.</p>
 
 </section>
@@ -571,8 +571,8 @@ mgr.invalidateSession();
 response.setHeader("Connection", "close");]]></source>
   <p>
     Note that this code is Tomcat specific due to the use of the
-    SSLSessionManager class. This is currently only available for the BIO and
-    NIO connectors, not the APR/native connector.
+    SSLSessionManager class. This is currently only available for the NIO and
+    NIO2 connectors, not the APR/native connector.
   </p>
 </section>
 

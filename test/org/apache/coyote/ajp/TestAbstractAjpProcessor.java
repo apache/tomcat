@@ -46,17 +46,15 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         // Has a protocol been specified
         String protocol = System.getProperty("tomcat.test.protocol");
 
-        // Use BIO by default
+        // Use NIO by default
         if (protocol == null) {
-            protocol = "org.apache.coyote.ajp.AjpProtocol";
+            protocol = "org.apache.coyote.ajp.AjpNioProtocol";
         } else if (protocol.contains("Nio2")) {
             protocol = "org.apache.coyote.ajp.AjpNio2Protocol";
-        } else if (protocol.contains("Nio")) {
-            protocol = "org.apache.coyote.ajp.AjpNioProtocol";
         } else if (protocol.contains("Apr")) {
             protocol = "org.apache.coyote.ajp.AjpAprProtocol";
         } else {
-            protocol = "org.apache.coyote.ajp.AjpProtocol";
+            protocol = "org.apache.coyote.ajp.AjpNioProtocol";
         }
 
         return protocol;
