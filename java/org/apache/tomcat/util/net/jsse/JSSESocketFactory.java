@@ -22,10 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -54,9 +51,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
-import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
@@ -64,7 +59,6 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
-import org.apache.tomcat.util.net.ServerSocketFactory;
 import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -80,7 +74,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author EKR -- renamed to JSSESocketFactory
  * @author Jan Luehe
  */
-public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
+public class JSSESocketFactory implements SSLUtil {
 
     private static final org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JSSESocketFactory.class);
@@ -99,7 +93,6 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
 
     private AbstractEndpoint<?> endpoint;
 
-    private final boolean rfc5746Supported;
     private final String[] defaultServerProtocols;
     private final String[] defaultServerCipherSuites;
 
@@ -137,21 +130,9 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             throw new IllegalArgumentException(e);
         }
 
-        // Supported cipher suites aren't accessible directly from the
-        // SSLContext so use the SSL server socket factory
-        SSLServerSocketFactory ssf = context.getServerSocketFactory();
-        String supportedCiphers[] = ssf.getSupportedCipherSuites();
-        boolean found = false;
-        for (String cipher : supportedCiphers) {
-            if ("TLS_EMPTY_RENEGOTIATION_INFO_SCSV".equals(cipher)) {
-                found = true;
-                break;
-            }
-        }
-        rfc5746Supported = found;
-
         // There is no standard way to determine the default protocols and
         // cipher suites so create a server socket to see what the defaults are
+        SSLServerSocketFactory ssf = context.getServerSocketFactory();
         SSLServerSocket socket;
         try {
             socket = (SSLServerSocket) ssf.createServerSocket();
@@ -187,64 +168,6 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         }
     }
 
-
-    @Override
-    public ServerSocket createSocket (int port)
-        throws IOException
-    {
-        init();
-        ServerSocket socket = sslProxy.createServerSocket(port);
-        initServerSocket(socket);
-        return socket;
-    }
-
-    @Override
-    public ServerSocket createSocket (int port, int backlog)
-        throws IOException
-    {
-        init();
-        ServerSocket socket = sslProxy.createServerSocket(port, backlog);
-        initServerSocket(socket);
-        return socket;
-    }
-
-    @Override
-    public ServerSocket createSocket (int port, int backlog,
-                                      InetAddress ifAddress)
-        throws IOException
-    {
-        init();
-        ServerSocket socket = sslProxy.createServerSocket(port, backlog,
-                                                          ifAddress);
-        initServerSocket(socket);
-        return socket;
-    }
-
-    @Override
-    public Socket acceptSocket(ServerSocket socket)
-        throws IOException
-    {
-        SSLSocket asock = null;
-        try {
-             asock = (SSLSocket)socket.accept();
-        } catch (SSLException e){
-          throw new SocketException("SSL handshake error" + e.toString());
-        }
-        return asock;
-    }
-
-    @Override
-    public void handshake(Socket sock) throws IOException {
-        // We do getSession instead of startHandshake() so we can call this multiple times
-        SSLSession session = ((SSLSocket)sock).getSession();
-        if (session.getCipherSuite().equals("SSL_NULL_WITH_NULL_NULL"))
-            throw new IOException("SSL handshake failed. Ciper suite in SSL Session is SSL_NULL_WITH_NULL_NULL");
-
-        if (!allowUnsafeLegacyRenegotiation && !rfc5746Supported) {
-            // Prevent further handshakes by removing all cipher suites
-            ((SSLSocket) sock).setEnabledCipherSuites(new String[0]);
-        }
-    }
 
     @Override
     public String[] getEnableableCiphers(SSLContext context) {

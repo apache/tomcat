@@ -14,19 +14,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net.jsse;
 
-import java.net.Socket;
-
 import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
 
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SSLUtil;
-import org.apache.tomcat.util.net.ServerSocketFactory;
 
 /* JSSEImplementation:
 
@@ -40,16 +35,6 @@ public class JSSEImplementation extends SSLImplementation {
     @Override
     public String getImplementationName(){
         return "JSSE";
-    }
-
-    @Override
-    public ServerSocketFactory getServerSocketFactory(AbstractEndpoint<?> endpoint)  {
-        return new JSSESocketFactory(endpoint);
-    }
-
-    @Override
-    public SSLSupport getSSLSupport(Socket s) {
-        return new JSSESupport((SSLSocket) s);
     }
 
     @Override
