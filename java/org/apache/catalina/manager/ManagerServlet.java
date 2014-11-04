@@ -102,7 +102,7 @@ import org.apache.tomcat.util.res.StringManager;
  *     (fully qualified Java class name), if available.</li>
  * <li><b>/serverinfo</b> - Display system OS and JVM properties.
  * <li><b>/sessions</b> - Deprecated. Use expire.
- * <li><b>/expire?path=/xxx</b> - List session idle timeinformation about the
+ * <li><b>/expire?path=/xxx</b> - List session idle time information about the
  *     web application attached to context path <code>/xxx</code> for this
  *     virtual host.</li>
  * <li><b>/expire?path=/xxx&amp;idle=mm</b> - Expire sessions
