@@ -159,10 +159,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     public boolean getUseSendfile() { return useSendfile; }
 
 
-    @Override
-    public boolean getUsePolling() { return true; } // Always supported
-
-
     /**
      * Sendfile thread count.
      */

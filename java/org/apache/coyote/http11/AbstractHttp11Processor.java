@@ -973,11 +973,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         openSocket = false;
         sendfileInProgress = false;
         readComplete = true;
-        if (endpoint.getUsePolling()) {
-            keptAlive = false;
-        } else {
-            keptAlive = socketWrapper.isKeptAlive();
-        }
+        keptAlive = false;
 
         if (disableKeepAlive()) {
             socketWrapper.setKeepAliveLeft(0);
