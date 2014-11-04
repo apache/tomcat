@@ -167,21 +167,6 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     }
 
 
-    protected final void onAllDataRead() throws IOException {
-        if (listener == null) {
-            return;
-        }
-        Thread thread = Thread.currentThread();
-        ClassLoader originalClassLoader = thread.getContextClassLoader();
-        try {
-            thread.setContextClassLoader(applicationLoader);
-            listener.onAllDataRead();
-        } finally {
-            thread.setContextClassLoader(originalClassLoader);
-        }
-    }
-
-
     protected final void onDataAvailable() throws IOException {
         if (listener == null) {
             return;
