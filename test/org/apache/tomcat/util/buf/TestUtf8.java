@@ -59,8 +59,8 @@ public class TestUtf8 {
     private static int workAroundCount = 0;
 
     static {
-        // Future proof test and assume some UTF-8 bugs won't get fixed until
-        // Java 9 or later
+        // All known issues have been fixed in Java 8
+        // https://bugs.openjdk.java.net/browse/JDK-8039751
         // Base assumption in Java 7
         int javaVersion = 7;
         try {
@@ -69,8 +69,6 @@ public class TestUtf8 {
         } catch (Exception e) {
             // Ignore
         }
-        // TODO Identify a class to test for Java 9
-        //javaVersion = 9;
 
         Utf8TestCase testCase = null;
 
@@ -99,14 +97,14 @@ public class TestUtf8 {
                 new int[] {0xF0, 0x90, 0x90, 0x80},
                 -1,
                 "\uD801\uDC00"));
-        // Java 7/8 JVM decoder does not report error until all 4 bytes are
+        // Java 7 JVM decoder does not report error until all 4 bytes are
         // available
         testCase = new Utf8TestCase(
                 "Invalid code point - out of range",
                 new int[] {0x41, 0xF4, 0x90, 0x80, 0x80, 0x41},
                 2,
                 "A\uFFFD\uFFFD\uFFFD\uFFFDA");
-        if (javaVersion < 9) {
+        if (javaVersion < 8) {
             testCase.addForJvm(ERROR_POS_PLUS2);
         }
         TEST_CASES.add(testCase);
@@ -133,14 +131,14 @@ public class TestUtf8 {
         }
         TEST_CASES.add(testCase);
 
-        // Java 7/8 JVM decoder does not report error until all 4 bytes are
+        // Java 7 JVM decoder does not report error until all 4 bytes are
         // available
         testCase = new Utf8TestCase(
                 "Valid sequence padded from one byte to four",
                 new int[] {0x41, 0xF0, 0x80, 0x80, 0xC1, 0x41},
                 2,
                 "A\uFFFD\uFFFD\uFFFD\uFFFDA");
-        if (javaVersion < 9) {
+        if (javaVersion < 8) {
             testCase.addForJvm(ERROR_POS_PLUS2);
         }
         TEST_CASES.add(testCase);
@@ -352,7 +350,7 @@ public class TestUtf8 {
                 new int[] {0x61, 0xF0, 0x80, 0x80, 0x80, 0x61},
                 2,
                 "a\uFFFD\uFFFD\uFFFD\uFFFDa");
-        if (javaVersion < 9) {
+        if (javaVersion < 8) {
             testCase.addForJvm(ERROR_POS_PLUS2);
         }
         TEST_CASES.add(testCase);
@@ -362,7 +360,7 @@ public class TestUtf8 {
                 new int[] {0x61, 0xF0, 0x80, 0x81, 0xBF, 0x61},
                 2,
                 "a\uFFFD\uFFFD\uFFFD\uFFFDa");
-        if (javaVersion < 9) {
+        if (javaVersion < 8) {
             testCase.addForJvm(ERROR_POS_PLUS2);
         }
         TEST_CASES.add(testCase);
@@ -372,7 +370,7 @@ public class TestUtf8 {
                 new int[] {0x61, 0xF0, 0x80, 0x9F, 0xBF, 0x61},
                 2,
                 "a\uFFFD\uFFFD\uFFFD\uFFFDa");
-        if (javaVersion < 9) {
+        if (javaVersion < 8) {
             testCase.addForJvm(ERROR_POS_PLUS2);
         }
         TEST_CASES.add(testCase);
@@ -382,7 +380,7 @@ public class TestUtf8 {
                 new int[] {0x61, 0xF0, 0x8F, 0xBF, 0xBF, 0x61},
                 2,
                 "a\uFFFD\uFFFD\uFFFD\uFFFDa");
-        if (javaVersion < 9) {
+        if (javaVersion < 8) {
             testCase.addForJvm(ERROR_POS_PLUS2);
         }
         TEST_CASES.add(testCase);
