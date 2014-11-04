@@ -24,7 +24,7 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
  3. DONE.
     Remove Comet support.
 
- 4. Refactor the connectors to minimise code duplication
+ 4. Refactor the connectors to minimise code duplication.
     - All implementation specific per connector code -> Endpoint
     - All implementation specific per connection code -> SocketWrapper
 
@@ -42,4 +42,7 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
     the Servlet API.
 
 10. Remove the use of system properties to control configuration wherever
-     possible
+    possible.
+
+11. Reduce instances of setters and getters for the same property existing on an
+    object and its parent. This may require new objects to be exposed via JMX.
