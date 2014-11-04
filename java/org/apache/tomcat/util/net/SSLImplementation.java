@@ -17,8 +17,6 @@
 
 package org.apache.tomcat.util.net;
 
-import java.net.Socket;
-
 import javax.net.ssl.SSLSession;
 
 /* SSLImplementation:
@@ -79,11 +77,6 @@ public abstract class SSLImplementation {
     }
 
     public abstract String getImplementationName();
-
-    public abstract ServerSocketFactory getServerSocketFactory(
-            AbstractEndpoint<?> endpoint);
-
-    public abstract SSLSupport getSSLSupport(Socket sock);
 
     public abstract SSLSupport getSSLSupport(SSLSession session);
 
