@@ -183,10 +183,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     public Handler getHandler() { return handler; }
 
 
-    @Override
-    public boolean getUsePolling() { return true; } // Always supported
-
-
     /**
      * Poller thread count.
      */

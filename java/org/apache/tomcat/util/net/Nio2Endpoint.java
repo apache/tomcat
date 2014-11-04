@@ -151,9 +151,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     public Handler getHandler() { return handler; }
 
 
-    @Override
-    public boolean getUsePolling() { return true; } // Always supported
-
     public void setSocketProperties(SocketProperties socketProperties) {
         this.socketProperties = socketProperties;
     }
