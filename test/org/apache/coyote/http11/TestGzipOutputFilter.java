@@ -35,7 +35,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestGzipOutputFilter {
 
     /*
-     * Test the interaction betwen gzip and flushing. The idea is to: 1. create
+     * Test the interaction between gzip and flushing. The idea is to: 1. create
      * a internal output buffer, response, and attach an active gzipoutputfilter
      * to the output buffer 2. set the output stream of the internal buffer to
      * be a ByteArrayOutputStream so we can inspect the output bytes 3. write a
@@ -75,7 +75,7 @@ public class TestGzipOutputFilter {
         // out (flushed)
         byte[] dataFound = bos.toByteArray();
 
-        // find out what's expected by wrting to GZIPOutputStream and close it
+        // find out what's expected by writing to GZIPOutputStream and close it
         // (to force flushing)
         ByteArrayOutputStream gbos = new ByteArrayOutputStream(1024);
         GZIPOutputStream gos = new GZIPOutputStream(gbos);
