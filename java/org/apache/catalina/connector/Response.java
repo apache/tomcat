@@ -914,8 +914,9 @@ public class Response
 
     /**
      * Special method for adding a session cookie as we should be overriding
-     * any previous
-     * @param cookie
+     * any previous.
+     *
+     * @param cookie The new session cookie to add the response
      */
     public void addSessionCookieInternal(final Cookie cookie) {
         if (isCommitted()) {
