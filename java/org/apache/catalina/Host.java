@@ -202,8 +202,10 @@ public interface Host extends Container {
 
 
     /**
-     * Set to true if the Host should attempt to create directories for xmlBase and appBase upon startup
-     * @param createDirs
+     * Should the Host attempt to create directories for xmlBase and appBase
+     * upon startup.
+     *
+     * @param createDirs The new value for this flag
      */
     public void setCreateDirs(boolean createDirs);
 
