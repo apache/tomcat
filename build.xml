@@ -2855,75 +2855,95 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
   <target name="downloadgz" unless="exist" depends="testexist,setproxy">
     <!-- Download and extract the package -->
-    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${base.path}/file.tar.gz" />
-    <gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar"/>
-    <untar src="${base.path}/file.tar" dest="${base.path}"/>
-    <delete file="${base.path}/file.tar"/>
-    <delete file="${base.path}/file.tar.gz"/>
+    <local name="temp.file"/>
+    <mkdir dir="${base.path}"/>
+    <tempfile property="temp.file" destdir="${base.path}" prefix="download-"/>
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${temp.file}.tar.gz" />
+    <gunzip src="${temp.file}.tar.gz" dest="${temp.file}.tar"/>
+    <untar src="${temp.file}.tar" dest="${base.path}"/>
+    <delete file="${temp.file}.tar"/>
+    <delete file="${temp.file}.tar.gz"/>
   </target>
 
   <target name="downloadgz-2" unless="exist" depends="testexist">
     <!-- Download and extract the package from the two alternative locations -->
-    <delete file="${base.path}/file.tar" quiet="true" />
-    <delete file="${base.path}/file.tar.gz" quiet="true" />
+    <local name="temp.file"/>
+    <mkdir dir="${base.path}"/>
+    <tempfile property="temp.file" destdir="${base.path}" prefix="download-"/>
     <antcall target="trydownload">
       <param name="sourcefile" value="${sourcefile.1}" />
-      <param name="destfile" value="${base.path}/file.tar.gz" />
+      <param name="destfile" value="${temp.file}.tar.gz" />
     </antcall>
     <antcall target="trydownload">
       <param name="sourcefile" value="${sourcefile.2}" />
-      <param name="destfile" value="${base.path}/file.tar.gz" />
+      <param name="destfile" value="${temp.file}.tar.gz" />
     </antcall>
-    <gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar"/>
-    <untar src="${base.path}/file.tar" dest="${base.path}"/>
-    <delete file="${base.path}/file.tar"/>
-    <delete file="${base.path}/file.tar.gz"/>
+    <gunzip src="${temp.file}.tar.gz" dest="${temp.file}.tar"/>
+    <untar src="${temp.file}.tar" dest="${base.path}"/>
+    <delete file="${temp.file}.tar"/>
+    <delete file="${temp.file}.tar.gz"/>
   </target>
 
   <target name="downloadzip" unless="exist" depends="testexist,setproxy">
     <!-- Download and extract the package -->
-    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${base.path}/file.zip" />
-    <mkdir dir="${destdir}" />
-    <unzip src="${base.path}/file.zip" dest="${destdir}"/>
-    <delete file="${base.path}/file.zip"/>
+    <local name="temp.file"/>
+    <mkdir dir="${base.path}"/>
+    <tempfile property="temp.file" destdir="${base.path}" prefix="download-" suffix=".zip"/>
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${temp.file}"/>
+    <mkdir dir="${destdir}"/>
+    <unzip src="${temp.file}" dest="${destdir}"/>
+    <delete file="${temp.file}"/>
   </target>
 
   <target name="downloadzip-2" unless="exist" depends="testexist">
     <!-- Download and extract the package from the two alternative locations -->
-    <delete file="${base.path}/file.zip" quiet="true" />
+    <local name="temp.file"/>
+    <mkdir dir="${base.path}"/>
+    <tempfile property="temp.file" destdir="${base.path}" prefix="download-" suffix=".zip"/>
     <antcall target="trydownload">
       <param name="sourcefile" value="${sourcefile.1}" />
-      <param name="destfile" value="${base.path}/file.zip" />
+      <param name="destfile" value="${temp.file}" />
     </antcall>
     <antcall target="trydownload">
       <param name="sourcefile" value="${sourcefile.2}" />
-      <param name="destfile" value="${base.path}/file.zip" />
+      <param name="destfile" value="${temp.file}" />
     </antcall>
     <mkdir dir="${destdir}" />
-    <unzip src="${base.path}/file.zip" dest="${destdir}"/>
-    <delete file="${base.path}/file.zip"/>
+    <unzip src="${temp.file}" dest="${destdir}"/>
+    <delete file="${temp.file}"/>
   </target>
 
   <target name="downloadfile" unless="exist" depends="testexist,setproxy">
-    <!-- Download extract the file -->
-    <mkdir dir="${destdir}" />
-    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${destfile}" />
+    <!-- Download the file -->
+    <local name="temp.file"/>
+    <mkdir dir="${base.path}"/>
+    <tempfile property="temp.file" destdir="${base.path}" prefix="download-" suffix=".tmp"/>
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${temp.file}"/>
+    <mkdir dir="${destdir}"/>
+    <move file="${temp.file}" tofile="${destfile}"/>
   </target>
 
   <target name="downloadfile-2" unless="exist" depends="testexist">
     <!-- Download the file from the two alternative locations -->
-    <mkdir dir="${destdir}" />
+    <local name="temp.file"/>
+    <mkdir dir="${base.path}"/>
+    <tempfile property="temp.file" destdir="${base.path}" prefix="download-" suffix=".tmp"/>
 
     <antcall target="trydownload">
       <param name="sourcefile" value="${sourcefile.1}" />
+      <param name="destfile" value="${temp.file}" />
     </antcall>
 
     <antcall target="trydownload">
       <param name="sourcefile" value="${sourcefile.2}" />
+      <param name="destfile" value="${temp.file}" />
     </antcall>
 
-    <available file="${destfile}" property="exist"/>
+    <available file="${temp.file}" property="exist"/>
     <fail unless="exist" message="Failed to download [${destfile}]. All download sources are unavailable." />
+
+    <mkdir dir="${destdir}"/>
+    <move file="${temp.file}" tofile="${destfile}"/>
   </target>
 
   <target name="trydownload.check" depends="setproxy">
