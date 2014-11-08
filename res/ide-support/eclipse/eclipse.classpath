@@ -19,7 +19,7 @@
     <classpathentry kind="src" path="java"/>
     <classpathentry kind="src" path="test"/>
     <classpathentry kind="src" path="webapps/examples/WEB-INF/classes"/>
-    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/Java 8"/>
+    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
     <classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
     <classpathentry kind="var" path="ANT_HOME/lib/ant.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/jaxrpc-1.1-rc4/geronimo-spec-jaxrpc-1.1-rc4.jar"/>
