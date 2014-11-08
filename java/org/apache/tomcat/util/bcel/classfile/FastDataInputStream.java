@@ -69,9 +69,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     @Override
     public boolean readBoolean() throws IOException {
         if (pos >= count) {
-            fillNew();
-            if (pos >= count)
-                throw new EOFException();
+            fillNew(1);
         }
         int ch = this.buf[pos++] & 0xff;
         return (ch != 0);
@@ -81,9 +79,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     @Override
     public final byte readByte() throws IOException {
         if (pos >= count) {
-            fillNew();
-            if (pos >= count)
-                throw new EOFException();
+            fillNew(1);
         }
         return this.buf[pos++];
     }
@@ -92,9 +88,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     @Override
     public int readUnsignedByte() throws IOException {
         if (pos >= count) {
-            fillNew();
-            if (pos >= count)
-                throw new EOFException();
+            fillNew(1);
         }
         int ch = this.buf[pos++] & 0xff;
         return ch;
@@ -104,8 +98,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     @Override
     public final short readShort() throws IOException {
         if(pos + 1 >= count){
-            fillNew();
-            if(pos + 1 >= count) throw new EOFException();
+            fillNew(2);
         }
         int ch1 = this.buf[pos++] & 0xff;
         int ch2 = this.buf[pos++] & 0xff;
@@ -116,8 +109,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     @Override
     public int readUnsignedShort() throws IOException{
         if(pos + 1 >= count) {
-            fillNew();
-            if(pos + 1 >= count) throw new EOFException();
+            fillNew(2);
         }
 
         int ch1 = this.buf[pos++] & 0xff;
@@ -129,8 +121,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     @Override
     public final char readChar() throws IOException {
         if(pos + 1 >= count) {
-            fillNew();
-            if(pos + 1 >= count) throw new EOFException();
+            fillNew(2);
         }
         int ch1 = this.buf[pos++] & 0xff;
         int ch2 = this.buf[pos++] & 0xff;
@@ -141,8 +132,7 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     @Override
     public final int readInt() throws IOException {
         if(pos + 3 >= count){
-            fillNew();
-            if(pos + 3 >= count) throw new EOFException();
+            fillNew(4);
         }
         int ch1 = this.buf[pos++] & 0xff;
         int ch2 = this.buf[pos++] & 0xff;
@@ -184,15 +174,26 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     }
 
 
-    private void fillNew() throws IOException {
-        int remain = 0;
-        if(pos < count){
-            remain = count - pos;
+    /*
+     * Read until there are at least minimumCount bytes in the buffer, or EOF
+     * is reached.
+     */
+    private void fillNew(int minimumCount) throws IOException {
+        if (pos < count) {
+            int remain = count - pos;
             System.arraycopy(buf, pos, buf, 0, remain);
+            count = remain;
+        } else {
+            count = 0;
         }
         pos = 0;
-        int n = this.in.read(buf, remain, buf.length - remain);
-        count = pos + n + remain;
+        do {
+            int n = in.read(buf, count, buf.length - count);
+            if (n < 0) {
+                throw new EOFException();
+            }
+            count += n;
+        } while (count < minimumCount);
     }
 
 
@@ -230,5 +231,18 @@ class FastDataInputStream extends BufferedInputStream implements DataInput {
     public String readLine() throws IOException {
         // Unimplemented
         throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public synchronized void mark(int readlimit) {
+        // Mark operation is not supported, as fillNew() method does not update
+        // marker position when refilling the buffer.
+    }
+
+
+    @Override
+    public boolean markSupported() {
+        return false;
     }
 }
