@@ -48,7 +48,7 @@ these simple steps.  For more information, read the rest of this HOW-TO.</p>
 <li><p>Create a keystore file to store the server&apos;s private key and
 self-signed certificate by executing the following command:</p>
 <p>Windows:</p>
-<source>%JAVA_HOME%\bin\keytool -genkey -alias tomcat -keyalg RSA</source>
+<source>"%JAVA_HOME%\bin\keytool" -genkey -alias tomcat -keyalg RSA</source>
 <p>Unix:</p>
 <source>$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA</source>
 
@@ -208,16 +208,16 @@ they exist before importing the key using <code>keytool</code>.
 </p>
 <p>To import an existing certificate signed by your own CA into a PKCS12
 keystore using OpenSSL you would execute a command like:</p>
-<source>openssl pkcs12 -export -in mycert.crt -inkey mykey.key \
-                        -out mycert.p12 -name tomcat -CAfile myCA.crt \
-                        -caname root -chain</source>
+<source>openssl pkcs12 -export -in mycert.crt -inkey mykey.key
+                       -out mycert.p12 -name tomcat -CAfile myCA.crt
+                       -caname root -chain</source>
 <p>For more advanced cases, consult the <a href="http://www.openssl.org/">OpenSSL
 documentation</a>.
 </p>
 <p>To create a new keystore from scratch, containing a single self-signed
 Certificate, execute the following from a terminal command line:</p>
 <p>Windows:</p>
-<source>%JAVA_HOME%\bin\keytool -genkey -alias tomcat -keyalg RSA</source>
+<source>"%JAVA_HOME%\bin\keytool" -genkey -alias tomcat -keyalg RSA</source>
 <p>Unix:</p>
 <source>$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA</source>
 
@@ -232,10 +232,10 @@ to the <code>keytool</code> command shown above.  You will also need to
 reflect this new location in the <code>server.xml</code> configuration file,
 as described later.  For example:</p>
 <p>Windows:</p>
-<source>%JAVA_HOME%\bin\keytool -genkey -alias tomcat -keyalg RSA \
+<source>"%JAVA_HOME%\bin\keytool" -genkey -alias tomcat -keyalg RSA
   -keystore \path\to\my\keystore</source>
 <p>Unix:</p>
-<source>$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA \
+<source>$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA
   -keystore /path/to/my/keystore</source>
 
 <p>After executing this command, you will first be prompted for the keystore
@@ -374,7 +374,7 @@ numbers lower than 1024 on many operating systems.</p>
 <p>After completing these configuration changes, you must restart Tomcat as
 you normally do, and you should be in business.  You should be able to access
 any web application supported by Tomcat via SSL.  For example, try:</p>
-<source>https://localhost:8443</source>
+<source>https://localhost:8443/</source>
 <p>and you should see the usual Tomcat splash page (unless you have modified
 the ROOT web application).  If this does not work, the following section
 contains some troubleshooting tips.</p>
@@ -394,13 +394,13 @@ by the Certificate Authority to create a Certificate that will identify your web
 as "secure". To create a CSR follow these steps:</p>
 <ul>
 <li>Create a local Certificate (as described in the previous section):
-    <source>keytool -genkey -alias tomcat -keyalg RSA \
+    <source>keytool -genkey -alias tomcat -keyalg RSA
     -keystore &lt;your_keystore_filename&gt;</source>
     Note: In some cases you will have to enter the domain of your website (i.e. <code>www.myside.org</code>)
     in the field "first- and lastname" in order to create a working Certificate.
 </li>
 <li>The CSR is then created with:
-    <source>keytool -certreq -keyalg RSA -alias tomcat -file certreq.csr \
+    <source>keytool -certreq -keyalg RSA -alias tomcat -file certreq.csr
     -keystore &lt;your_keystore_filename&gt;</source>
 </li>
 </ul>
@@ -425,11 +425,11 @@ After that you can proceed with importing your Certificate.</p>
             http://www.thawte.com/certs/trustmap.html<br/>
 </li>
 <li>Import the Chain Certificate into your keystore
-    <source>keytool -import -alias root -keystore &lt;your_keystore_filename&gt; \
+    <source>keytool -import -alias root -keystore &lt;your_keystore_filename&gt;
     -trustcacerts -file &lt;filename_of_the_chain_certificate&gt;</source>
 </li>
 <li>And finally import your new Certificate
-    <source>keytool -import -alias tomcat -keystore &lt;your_keystore_filename&gt; \
+    <source>keytool -import -alias tomcat -keystore &lt;your_keystore_filename&gt;
     -file &lt;your_certificate_filename&gt;</source>
 </li>
 </ul>
