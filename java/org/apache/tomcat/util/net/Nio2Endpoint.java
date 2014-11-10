@@ -511,7 +511,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             }
             Nio2SocketWrapper socketWrapper = (useCaches) ? socketWrapperCache.pop() : null;
             if (socketWrapper == null) {
-                socketWrapper = new Nio2SocketWrapper(channel);
+                socketWrapper = new Nio2SocketWrapper(channel, this);
             }
             channel.reset(socket, socketWrapper);
             socketWrapper.reset(channel, getSocketProperties().getSoTimeout());
@@ -732,8 +732,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private SendfileData sendfileData = null;
         private boolean upgradeInit = false;
 
-        public Nio2SocketWrapper(Nio2Channel channel) {
-            super(channel);
+        public Nio2SocketWrapper(Nio2Channel channel, Nio2Endpoint endpoint) {
+            super(channel, endpoint);
         }
 
         @Override

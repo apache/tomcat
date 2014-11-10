@@ -823,7 +823,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             Long.valueOf(socket)));
                 }
                 AprSocketWrapper wrapper =
-                        new AprSocketWrapper(Long.valueOf(socket));
+                        new AprSocketWrapper(Long.valueOf(socket), this);
                 wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
                 wrapper.setSecure(isSSLEnabled());
                 connections.put(Long.valueOf(socket), wrapper);
@@ -2351,8 +2351,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         // This field should only be used by Poller#run()
         private int pollerFlags = 0;
 
-        public AprSocketWrapper(Long socket) {
-            super(socket);
+        public AprSocketWrapper(Long socket, AprEndpoint endpoint) {
+            super(socket, endpoint);
         }
     }
 }
