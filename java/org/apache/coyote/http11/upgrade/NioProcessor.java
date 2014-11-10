@@ -36,7 +36,7 @@ public class NioProcessor extends AbstractProcessor<NioChannel> {
     public NioProcessor(SocketWrapperBase<NioChannel> wrapper, ByteBuffer leftoverInput,
             HttpUpgradeHandler httpUpgradeProcessor, int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,
-                new NioServletInputStream(wrapper),
+                new ServletInputStreamImpl(wrapper),
                 new NioServletOutputStream(wrapper, asyncWriteBufferSize));
 
         wrapper.setTimeout(INFINITE_TIMEOUT);
