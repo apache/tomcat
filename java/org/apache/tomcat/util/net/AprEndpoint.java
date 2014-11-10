@@ -853,7 +853,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 log.warn(sm.getString("endpoint.warn.noExector",
                         Long.valueOf(socket), null));
             } else {
-                SocketWrapper<Long> wrapper =
+                SocketWrapperBase<Long> wrapper =
                         connections.get(Long.valueOf(socket));
                 // Make sure connection hasn't been closed
                 if (wrapper != null) {
@@ -875,7 +875,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     @Override
-    public void processSocket(SocketWrapper<Long> socket, SocketStatus status,
+    public void processSocket(SocketWrapperBase<Long> socket, SocketStatus status,
             boolean dispatch) {
         try {
             // Synchronisation is required here as this code may be called as a
@@ -2218,7 +2218,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler {
-        public SocketState process(SocketWrapper<Long> socket,
+        public SocketState process(SocketWrapperBase<Long> socket,
                 SocketStatus status);
     }
 
@@ -2234,10 +2234,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
      */
     protected class SocketWithOptionsProcessor implements Runnable {
 
-        protected SocketWrapper<Long> socket = null;
+        protected SocketWrapperBase<Long> socket = null;
 
 
-        public SocketWithOptionsProcessor(SocketWrapper<Long> socket) {
+        public SocketWithOptionsProcessor(SocketWrapperBase<Long> socket) {
             this.socket = socket;
         }
 
@@ -2290,10 +2290,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
      */
     protected class SocketProcessor implements Runnable {
 
-        private final SocketWrapper<Long> socket;
+        private final SocketWrapperBase<Long> socket;
         private final SocketStatus status;
 
-        public SocketProcessor(SocketWrapper<Long> socket,
+        public SocketProcessor(SocketWrapperBase<Long> socket,
                 SocketStatus status) {
             this.socket = socket;
             if (status == null) {
@@ -2346,7 +2346,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     }
 
 
-    private static class AprSocketWrapper extends SocketWrapper<Long> {
+    private static class AprSocketWrapper extends SocketWrapperBase<Long> {
 
         // This field should only be used by Poller#run()
         private int pollerFlags = 0;

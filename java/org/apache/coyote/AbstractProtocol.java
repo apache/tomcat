@@ -42,7 +42,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractProtocol<S> implements ProtocolHandler,
@@ -577,7 +577,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
 
-        public SocketState process(SocketWrapper<S> wrapper,
+        public SocketState process(SocketWrapperBase<S> wrapper,
                 SocketStatus status) {
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
@@ -754,15 +754,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
         protected abstract P createProcessor();
-        protected abstract void initSsl(SocketWrapper<S> socket,
+        protected abstract void initSsl(SocketWrapperBase<S> socket,
                 Processor<S> processor);
-        protected abstract void longPoll(SocketWrapper<S> socket,
+        protected abstract void longPoll(SocketWrapperBase<S> socket,
                 Processor<S> processor);
-        protected abstract void release(SocketWrapper<S> socket,
+        protected abstract void release(SocketWrapperBase<S> socket,
                 Processor<S> processor, boolean socketClosing,
                 boolean addToPoller);
         protected abstract Processor<S> createUpgradeProcessor(
-                SocketWrapper<S> socket, ByteBuffer leftoverInput,
+                SocketWrapperBase<S> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor) throws IOException;
 
         protected void register(AbstractProcessor<S> processor) {

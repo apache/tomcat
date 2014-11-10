@@ -26,7 +26,7 @@ import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
 
@@ -37,7 +37,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
     private volatile boolean closed = false;
     private final ByteBuffer sslOutputBuffer;
 
-    public AprServletOutputStream(SocketWrapper<Long> socketWrapper,
+    public AprServletOutputStream(SocketWrapperBase<Long> socketWrapper,
             int asyncWriteBufferSize, AprEndpoint endpoint) {
         super(socketWrapper, asyncWriteBufferSize);
         this.endpoint = endpoint;

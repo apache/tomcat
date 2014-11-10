@@ -35,7 +35,7 @@ import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * SPDY in 'proxy' mode - no SSL and no header compression.
@@ -130,7 +130,7 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
         }
 
         @Override
-        public SocketState process(SocketWrapper<NioChannel> socket,
+        public SocketState process(SocketWrapperBase<NioChannel> socket,
                 SocketStatus status) {
 
             spdyContext.getNetSupport().onAccept(socket.getSocket());
@@ -143,7 +143,7 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
         }
 
         @Override
-        public void release(SocketWrapper<NioChannel> socket) {
+        public void release(SocketWrapperBase<NioChannel> socket) {
             // TODO Auto-generated method stub
         }
 

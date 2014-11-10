@@ -36,7 +36,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Output buffer implementation for NIO2.
@@ -57,7 +57,7 @@ public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel>
     /**
      * Underlying socket.
      */
-    private SocketWrapper<Nio2Channel> socket;
+    private SocketWrapperBase<Nio2Channel> socket;
 
     /**
      * Track write interest
@@ -67,7 +67,7 @@ public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel>
     /**
      * The completion handler used for asynchronous read operations
      */
-    private CompletionHandler<Integer, SocketWrapper<Nio2Channel>> completionHandler;
+    private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> completionHandler;
 
     /**
      * The associated endpoint.
@@ -131,7 +131,7 @@ public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel>
     // ------------------------------------------------------ Protected Methods
 
     @Override
-    protected void init(SocketWrapper<Nio2Channel> socketWrapper,
+    protected void init(SocketWrapperBase<Nio2Channel> socketWrapper,
             AbstractEndpoint<Nio2Channel> associatedEndpoint) throws IOException {
 
         endpoint = associatedEndpoint;
@@ -149,10 +149,10 @@ public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel>
         }
 
         // Initialize the completion handler
-        this.completionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
+        this.completionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
 
             @Override
-            public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
+            public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
                 boolean notify = false;
                 synchronized (completionHandler) {
                     if (nBytes.intValue() < 0) {
@@ -171,7 +171,7 @@ public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel>
             }
 
             @Override
-            public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
+            public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
                 attachment.setError(true);
                 if (exc instanceof IOException) {
                     e = (IOException) exc;

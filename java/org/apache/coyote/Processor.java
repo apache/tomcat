@@ -25,7 +25,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -34,7 +34,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
 public interface Processor<S> {
     Executor getExecutor();
 
-    SocketState process(SocketWrapper<S> socketWrapper) throws IOException;
+    SocketState process(SocketWrapperBase<S> socketWrapper) throws IOException;
 
     SocketState asyncDispatch(SocketStatus status);
     SocketState asyncPostProcess();

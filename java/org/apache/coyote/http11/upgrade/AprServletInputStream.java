@@ -27,20 +27,20 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class AprServletInputStream extends AbstractServletInputStream {
 
     private static final Log log = LogFactory.getLog(AprServletInputStream.class);
 
-    private final SocketWrapper<Long> wrapper;
+    private final SocketWrapperBase<Long> wrapper;
     private final long socket;
     private ByteBuffer leftoverInput;
     private volatile boolean eagain = false;
     private volatile boolean closed = false;
 
 
-    public AprServletInputStream(SocketWrapper<Long> wrapper, ByteBuffer leftoverInput) {
+    public AprServletInputStream(SocketWrapperBase<Long> wrapper, ByteBuffer leftoverInput) {
         this.wrapper = wrapper;
         this.socket = wrapper.getSocket().longValue();
         if (leftoverInput != null) {

@@ -23,7 +23,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -127,7 +127,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
          * required.
          */
         @Override
-        public void release(SocketWrapper<Long> socket,
+        public void release(SocketWrapperBase<Long> socket,
                 Processor<Long> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);

@@ -53,7 +53,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -716,7 +716,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState process(SocketWrapper<S> socket) throws IOException {
+    public SocketState process(SocketWrapperBase<S> socket) throws IOException {
 
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
@@ -934,10 +934,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             boolean block) throws IOException;
 
     // Methods called by process()
-    protected abstract void setupSocket(SocketWrapper<S> socketWrapper)
+    protected abstract void setupSocket(SocketWrapperBase<S> socketWrapper)
             throws IOException;
 
-    protected abstract void setTimeout(SocketWrapper<S> socketWrapper,
+    protected abstract void setTimeout(SocketWrapperBase<S> socketWrapper,
             int timeout) throws IOException;
 
     // Methods used by readMessage

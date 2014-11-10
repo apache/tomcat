@@ -31,7 +31,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Channel> {
 
@@ -41,7 +41,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
     private final CompletionHandler<Integer, ByteBuffer> completionHandler;
     private final Semaphore writePending = new Semaphore(1);
 
-    public Nio2ServletOutputStream(SocketWrapper<Nio2Channel> socketWrapper0,
+    public Nio2ServletOutputStream(SocketWrapperBase<Nio2Channel> socketWrapper0,
             int asyncWriteBufferSize, AbstractEndpoint<Nio2Channel> endpoint0) {
         super(socketWrapper0, asyncWriteBufferSize);
         this.endpoint = endpoint0;

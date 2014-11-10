@@ -50,7 +50,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * A spdy stream ( multiplexed over a spdy tcp connection ) processed by a
@@ -507,7 +507,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
     }
 
     @Override
-    public SocketState process(SocketWrapper<S> socket)
+    public SocketState process(SocketWrapperBase<S> socket)
             throws IOException {
         throw new IOException("Unimplemented");
     }

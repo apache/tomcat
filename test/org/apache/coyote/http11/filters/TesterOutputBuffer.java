@@ -26,7 +26,7 @@ import org.apache.coyote.Response;
 import org.apache.coyote.http11.AbstractOutputBuffer;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Output buffer for use in unit tests. This is a minimal implementation.
@@ -52,7 +52,7 @@ public class TesterOutputBuffer extends AbstractOutputBuffer<Socket> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public void init(SocketWrapper<Socket> socketWrapper,
+    public void init(SocketWrapperBase<Socket> socketWrapper,
             AbstractEndpoint<Socket> endpoint) throws IOException {
         // NO-OP: Unused
     }

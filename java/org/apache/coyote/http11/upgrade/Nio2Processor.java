@@ -24,7 +24,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class Nio2Processor extends AbstractProcessor<Nio2Channel> {
 
@@ -35,7 +35,7 @@ public class Nio2Processor extends AbstractProcessor<Nio2Channel> {
     private static final int INFINITE_TIMEOUT = -1;
 
     public Nio2Processor(AbstractEndpoint<Nio2Channel> endpoint,
-            SocketWrapper<Nio2Channel> wrapper, ByteBuffer leftoverInput,
+            SocketWrapperBase<Nio2Channel> wrapper, ByteBuffer leftoverInput,
             HttpUpgradeHandler httpUpgradeProcessor,
             int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,

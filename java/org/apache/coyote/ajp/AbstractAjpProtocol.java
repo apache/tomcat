@@ -22,7 +22,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
@@ -89,19 +89,19 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
             extends AbstractConnectionHandler<S, P> {
 
         @Override
-        protected void initSsl(SocketWrapper<S> socket, Processor<S> processor) {
+        protected void initSsl(SocketWrapperBase<S> socket, Processor<S> processor) {
             // NOOP for AJP
         }
 
         @Override
-        protected void longPoll(SocketWrapper<S> socket,
+        protected void longPoll(SocketWrapperBase<S> socket,
                 Processor<S> processor) {
             // Same requirements for all AJP connectors
             socket.setAsync(true);
         }
 
         @Override
-        protected P createUpgradeProcessor(SocketWrapper<S> socket, ByteBuffer leftoverInput,
+        protected P createUpgradeProcessor(SocketWrapperBase<S> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeHandler) {
             // TODO should fail - throw IOE
             return null;

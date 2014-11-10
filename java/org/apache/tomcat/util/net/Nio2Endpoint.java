@@ -378,7 +378,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 @Override
                 public void run() {
                     // Timeout any pending async request
-                    for (SocketWrapper<Nio2Channel> socket : waitingRequests) {
+                    for (SocketWrapperBase<Nio2Channel> socket : waitingRequests) {
                         processSocket(socket, SocketStatus.TIMEOUT, false);
                     }
                     // Then close all active connections if any remains
@@ -566,12 +566,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
     @Override
-    public void processSocket(SocketWrapper<Nio2Channel> socketWrapper,
+    public void processSocket(SocketWrapperBase<Nio2Channel> socketWrapper,
             SocketStatus socketStatus, boolean dispatch) {
         processSocket0(socketWrapper, socketStatus, dispatch);
     }
 
-    protected boolean processSocket0(SocketWrapper<Nio2Channel> socketWrapper, SocketStatus status, boolean dispatch) {
+    protected boolean processSocket0(SocketWrapperBase<Nio2Channel> socketWrapper, SocketStatus status, boolean dispatch) {
         try {
             SocketProcessor sc = (useCaches) ? processorCache.pop() : null;
             if (sc == null) {
@@ -598,7 +598,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         return true;
     }
 
-    public void closeSocket(SocketWrapper<Nio2Channel> socket) {
+    public void closeSocket(SocketWrapperBase<Nio2Channel> socket) {
         if (socket == null) {
             return;
         }
@@ -727,7 +727,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     }
 
 
-    public static class Nio2SocketWrapper extends SocketWrapper<Nio2Channel> {
+    public static class Nio2SocketWrapper extends SocketWrapperBase<Nio2Channel> {
 
         private SendfileData sendfileData = null;
         private boolean upgradeInit = false;
@@ -799,9 +799,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler {
-        public SocketState process(SocketWrapper<Nio2Channel> socket,
+        public SocketState process(SocketWrapperBase<Nio2Channel> socket,
                 SocketStatus status);
-        public void release(SocketWrapper<Nio2Channel> socket);
+        public void release(SocketWrapperBase<Nio2Channel> socket);
         public void closeAll();
         public SSLImplementation getSslImplementation();
         public void onCreateSSLEngine(SSLEngine engine);
@@ -810,11 +810,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     /**
      * The completion handler used for asynchronous read operations
      */
-    private CompletionHandler<Integer, SocketWrapper<Nio2Channel>> awaitBytes
-            = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
+    private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> awaitBytes
+            = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
 
         @Override
-        public synchronized void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
+        public synchronized void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
             if (nBytes.intValue() < 0) {
                 failed(new ClosedChannelException(), attachment);
                 return;
@@ -823,16 +823,16 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
         @Override
-        public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
+        public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
             processSocket0(attachment, SocketStatus.DISCONNECT, true);
         }
     };
 
-    public void addTimeout(SocketWrapper<Nio2Channel> socket) {
+    public void addTimeout(SocketWrapperBase<Nio2Channel> socket) {
         waitingRequests.add(socket);
     }
 
-    public boolean removeTimeout(SocketWrapper<Nio2Channel> socket) {
+    public boolean removeTimeout(SocketWrapperBase<Nio2Channel> socket) {
         return waitingRequests.remove(socket);
     }
 
@@ -853,7 +853,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
     }
 
-    public void awaitBytes(SocketWrapper<Nio2Channel> socket) {
+    public void awaitBytes(SocketWrapperBase<Nio2Channel> socket) {
         if (socket == null || socket.getSocket() == null) {
             return;
         }
@@ -996,14 +996,14 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
      */
     protected class SocketProcessor implements Runnable {
 
-        private SocketWrapper<Nio2Channel> socket = null;
+        private SocketWrapperBase<Nio2Channel> socket = null;
         private SocketStatus status = null;
 
-        public SocketProcessor(SocketWrapper<Nio2Channel> socket, SocketStatus status) {
+        public SocketProcessor(SocketWrapperBase<Nio2Channel> socket, SocketStatus status) {
             reset(socket,status);
         }
 
-        public void reset(SocketWrapper<Nio2Channel> socket, SocketStatus status) {
+        public void reset(SocketWrapperBase<Nio2Channel> socket, SocketStatus status) {
             this.socket = socket;
             this.status = status;
         }

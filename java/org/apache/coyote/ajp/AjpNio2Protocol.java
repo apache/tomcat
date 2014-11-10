@@ -27,7 +27,7 @@ import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.Nio2Endpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -116,7 +116,7 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
          * close, errors etc.
          */
         @Override
-        public void release(SocketWrapper<Nio2Channel> socket) {
+        public void release(SocketWrapperBase<Nio2Channel> socket) {
             Processor<Nio2Channel> processor =
                     connections.remove(socket.getSocket());
             if (processor != null) {
@@ -130,7 +130,7 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
          * required.
          */
         @Override
-        public void release(SocketWrapper<Nio2Channel> socket,
+        public void release(SocketWrapperBase<Nio2Channel> socket,
                 Processor<Nio2Channel> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);

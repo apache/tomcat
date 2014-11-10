@@ -37,7 +37,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Output buffer implementation for NIO2.
@@ -59,7 +59,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     /**
      * Underlying socket.
      */
-    private SocketWrapper<Nio2Channel> socket;
+    private SocketWrapperBase<Nio2Channel> socket;
 
     /**
      * Track write interest
@@ -104,7 +104,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public void init(SocketWrapper<Nio2Channel> socketWrapper,
+    public void init(SocketWrapperBase<Nio2Channel> socketWrapper,
             AbstractEndpoint<Nio2Channel> associatedEndpoint) throws IOException {
         this.socket = socketWrapper;
         this.endpoint = associatedEndpoint;

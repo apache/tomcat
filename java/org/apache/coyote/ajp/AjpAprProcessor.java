@@ -27,7 +27,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Processes AJP requests.
@@ -87,7 +87,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
 
     @Override
-    protected void setupSocket(SocketWrapper<Long> socketWrapper) {
+    protected void setupSocket(SocketWrapperBase<Long> socketWrapper) {
         long socketRef = socketWrapper.getSocket().longValue();
         Socket.setrbb(socketRef, inputBuffer);
         Socket.setsbb(socketRef, outputBuffer);
@@ -95,7 +95,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
 
     @Override
-    protected void setTimeout(SocketWrapper<Long> socketWrapper,
+    protected void setTimeout(SocketWrapperBase<Long> socketWrapper,
             int timeout) throws IOException {
         Socket.timeoutSet(
                 socketWrapper.getSocket().longValue(), timeout * 1000);

@@ -24,14 +24,14 @@ import java.nio.channels.Selector;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class NioServletInputStream extends AbstractServletInputStream {
 
     private final NioChannel channel;
     private final NioSelectorPool pool;
 
-    public NioServletInputStream(SocketWrapper<NioChannel> wrapper,
+    public NioServletInputStream(SocketWrapperBase<NioChannel> wrapper,
             NioSelectorPool pool) {
         this.channel = wrapper.getSocket();
         this.pool = pool;
@@ -118,8 +118,8 @@ public class NioServletInputStream extends AbstractServletInputStream {
                 // Ignore
             }
             try {
-                NioEndpoint.KeyAttachment att =
-                        (NioEndpoint.KeyAttachment) channel.getAttachment(false);
+                NioEndpoint.NioSocketWrapper att =
+                        (NioEndpoint.NioSocketWrapper) channel.getAttachment(false);
                 if (att == null) {
                     throw new IOException("Key must be cancelled.");
                 }

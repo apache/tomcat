@@ -23,7 +23,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-public class SocketWrapper<E> {
+public abstract class SocketWrapperBase<E> {
 
     private volatile E socket;
 
@@ -64,7 +64,7 @@ public class SocketWrapper<E> {
 
     private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
-    public SocketWrapper(E socket) {
+    public SocketWrapperBase(E socket) {
         this.socket = socket;
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         this.blockingStatusReadLock = lock.readLock();

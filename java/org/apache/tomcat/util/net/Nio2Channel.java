@@ -38,7 +38,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
     protected static ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
     protected AsynchronousSocketChannel sc = null;
-    protected SocketWrapper<Nio2Channel> socket = null;
+    protected SocketWrapperBase<Nio2Channel> socket = null;
     protected ApplicationBufferHandler bufHandler;
 
     public Nio2Channel(ApplicationBufferHandler bufHandler) {
@@ -50,7 +50,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
      *
      * @throws IOException If a problem was encountered resetting the channel
      */
-    public void reset(AsynchronousSocketChannel channel, SocketWrapper<Nio2Channel> socket)
+    public void reset(AsynchronousSocketChannel channel, SocketWrapperBase<Nio2Channel> socket)
             throws IOException {
         this.sc = channel;
         this.socket = socket;
@@ -58,7 +58,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
         bufHandler.getWriteBuffer().clear();
     }
 
-    public SocketWrapper<Nio2Channel> getSocket() {
+    public SocketWrapperBase<Nio2Channel> getSocket() {
         return socket;
     }
 
