@@ -21,18 +21,27 @@ import java.io.IOException;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
+import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractServletInputStream extends ServletInputStream {
+public class ServletInputStreamImpl extends ServletInputStream {
 
     protected static final StringManager sm = StringManager.getManager(
-            AbstractServletInputStream.class.getPackage().getName());
+            ServletInputStreamImpl.class.getPackage().getName());
+
+    private final SocketWrapperBase<?> socketWrapper;
 
     private volatile boolean closeRequired = false;
     // Start in blocking-mode
     private volatile Boolean ready = Boolean.TRUE;
     private volatile ReadListener listener = null;
     private volatile ClassLoader applicationLoader = null;
+
+
+    public ServletInputStreamImpl(SocketWrapperBase<?> socketWrapper) {
+        this.socketWrapper = socketWrapper;
+    }
+
 
     @Override
     public final boolean isFinished() {
@@ -59,7 +68,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
         }
 
         try {
-            ready = Boolean.valueOf(doIsReady());
+            ready = Boolean.valueOf(socketWrapper.isReady());
         } catch (IOException e) {
             onError(e);
         }
@@ -117,7 +126,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
         preReadChecks();
 
         try {
-            return doRead(listener == null, b, off, len);
+            return socketWrapper.read(listener == null, b, off, len);
         } catch (IOException ioe) {
             closeRequired = true;
             throw ioe;
@@ -129,7 +138,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     @Override
     public void close() throws IOException {
         closeRequired = true;
-        doClose();
+        socketWrapper.close();
     }
 
 
@@ -149,7 +158,7 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
         byte[] b = new byte[1];
         int result;
         try {
-            result = doRead(listener == null, b, 0, 1);
+            result = socketWrapper.read(listener == null, b, 0, 1);
         } catch (IOException ioe) {
             closeRequired = true;
             throw ioe;
@@ -202,17 +211,4 @@ public abstract class AbstractServletInputStream extends ServletInputStream {
     protected final boolean isCloseRequired() {
         return closeRequired;
     }
-
-
-    protected abstract boolean doIsReady() throws IOException;
-
-    /**
-     * Abstract method to be overridden by concrete implementations. The base
-     * class will ensure that there are no concurrent calls to this method for
-     * the same socket.
-     */
-    protected abstract int doRead(boolean block, byte[] b, int off, int len)
-            throws IOException;
-
-    protected abstract void doClose() throws IOException;
 }
