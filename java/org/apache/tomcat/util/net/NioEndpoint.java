@@ -1319,8 +1319,10 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
     }
 
-// ----------------------------------------------------- Key Attachment Class
+    // ---------------------------------------------------- Key Attachment Class
     public static class NioSocketWrapper extends SocketWrapperBase<NioChannel> {
+
+        private final int maxWrite;
 
         private Poller poller = null;
         private int interestOps = 0;
@@ -1332,6 +1334,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
+            maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
         }
 
         public void reset(Poller poller, NioChannel channel, long soTimeout) {
@@ -1513,7 +1516,100 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             return nRead;
         }
 
+
+        public int write(boolean block, byte[] b, int off, int len)
+                throws IOException {
+            int leftToWrite = len;
+            int count = 0;
+            int offset = off;
+
+            while (leftToWrite > 0) {
+                int writeThisLoop;
+                int writtenThisLoop;
+
+                if (leftToWrite > maxWrite) {
+                    writeThisLoop = maxWrite;
+                } else {
+                    writeThisLoop = leftToWrite;
+                }
+
+                writtenThisLoop = writeInternal(block, b, offset, writeThisLoop);
+                count += writtenThisLoop;
+                offset += writtenThisLoop;
+                leftToWrite -= writtenThisLoop;
+
+                if (writtenThisLoop < writeThisLoop) {
+                    break;
+                }
+            }
+
+            return count;
+        }
+
+
+        private int writeInternal (boolean block, byte[] b, int off, int len)
+                throws IOException {
+            getSocket().getBufHandler().getWriteBuffer().clear();
+            getSocket().getBufHandler().getWriteBuffer().put(b, off, len);
+            getSocket().getBufHandler().getWriteBuffer().flip();
+
+            int written = 0;
+            NioEndpoint.NioSocketWrapper att =
+                    (NioEndpoint.NioSocketWrapper) getSocket().getAttachment(false);
+            if (att == null) {
+                throw new IOException("Key must be cancelled");
+            }
+            long writeTimeout = att.getWriteTimeout();
+            NioSelectorPool pool = ((NioEndpoint) getEndpoint()).getSelectorPool();
+            Selector selector = null;
+            try {
+                selector = pool.get();
+            } catch ( IOException x ) {
+                //ignore
+            }
+            try {
+                written = pool.write(getSocket().getBufHandler().getWriteBuffer(),
+                        getSocket(), selector, writeTimeout, block);
+            } finally {
+                if (selector != null) {
+                    pool.put(selector);
+                }
+            }
+            if (written < len) {
+                getSocket().getPoller().add(getSocket(), SelectionKey.OP_WRITE);
+            }
+            return written;
+        }
+
+
+        public void flush() throws IOException {
+            NioEndpoint.NioSocketWrapper att =
+                    (NioEndpoint.NioSocketWrapper) getSocket().getAttachment(false);
+            if (att == null) {
+                throw new IOException("Key must be cancelled");
+            }
+            long writeTimeout = att.getWriteTimeout();
+            NioSelectorPool pool = ((NioEndpoint) getEndpoint()).getSelectorPool();
+            Selector selector = null;
+            try {
+                selector = pool.get();
+            } catch ( IOException x ) {
+                //ignore
+            }
+            try {
+                do {
+                    if (getSocket().flush(true, selector, writeTimeout)) {
+                        break;
+                    }
+                } while (true);
+            } finally {
+                if (selector != null) {
+                    pool.put(selector);
+                }
+            }
+        }
     }
+
 
     // ------------------------------------------------ Application Buffer Handler
     public static class NioBufferHandler implements ApplicationBufferHandler {
