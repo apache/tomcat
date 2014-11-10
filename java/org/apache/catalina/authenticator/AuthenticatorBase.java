@@ -70,19 +70,20 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-public abstract class AuthenticatorBase extends ValveBase
-        implements Authenticator {
+public abstract class AuthenticatorBase extends ValveBase implements Authenticator {
 
     private static final Log log = LogFactory.getLog(AuthenticatorBase.class);
 
+    /**
+     * "Expires" header always set to Date(1), so generate once only
+     */
+    private static final String DATE_ONE = (new SimpleDateFormat(
+            FastHttpDateFormat.RFC1123_DATE, Locale.US)).format(new Date(1));
 
-    //------------------------------------------------------ Constructor
-    public AuthenticatorBase() {
-        super(true);
-    }
-
-    // ----------------------------------------------------- Instance Variables
-
+    /**
+     * The string manager for this package.
+     */
+    protected static final StringManager sm = StringManager.getManager(AuthenticatorBase.class);
 
     /**
      * Authentication header
@@ -93,6 +94,37 @@ public abstract class AuthenticatorBase extends ValveBase
      * Default authentication realm name.
      */
     protected static final String REALM_NAME = "Authentication required";
+
+
+    protected static String getRealmName(Context context) {
+        if (context == null) {
+            // Very unlikely
+            return REALM_NAME;
+        }
+
+        LoginConfig config = context.getLoginConfig();
+        if (config == null) {
+            return REALM_NAME;
+        }
+
+        String result = config.getRealmName();
+        if (result == null) {
+            return REALM_NAME;
+        }
+
+        return result;
+    }
+
+
+
+    //------------------------------------------------------ Constructor
+
+    public AuthenticatorBase() {
+        super(true);
+    }
+
+
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * Should a session always be used once a user is authenticated? This may
@@ -171,49 +203,13 @@ public abstract class AuthenticatorBase extends ValveBase
     protected SessionIdGeneratorBase sessionIdGenerator = null;
 
     /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
-    /**
      * The SingleSignOn implementation in our request processing chain,
      * if there is one.
      */
     protected SingleSignOn sso = null;
 
 
-    /**
-     * "Expires" header always set to Date(1), so generate once only
-     */
-    private static final String DATE_ONE =
-        (new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE,
-                              Locale.US)).format(new Date(1));
-
-
-    protected static String getRealmName(Context context) {
-        if (context == null) {
-            // Very unlikely
-            return REALM_NAME;
-        }
-
-        LoginConfig config = context.getLoginConfig();
-        if (config == null) {
-            return REALM_NAME;
-        }
-
-        String result = config.getRealmName();
-        if (result == null) {
-            return REALM_NAME;
-        }
-
-        return result;
-    }
-
-
     // ------------------------------------------------------------- Properties
-
 
     public boolean getAlwaysUseSession() {
         return alwaysUseSession;
@@ -229,9 +225,7 @@ public abstract class AuthenticatorBase extends ValveBase
      * Return the cache authenticated Principals flag.
      */
     public boolean getCache() {
-
-        return (this.cache);
-
+        return this.cache;
     }
 
 
@@ -241,9 +235,7 @@ public abstract class AuthenticatorBase extends ValveBase
      * @param cache The new cache flag
      */
     public void setCache(boolean cache) {
-
         this.cache = cache;
-
     }
 
 
@@ -252,9 +244,7 @@ public abstract class AuthenticatorBase extends ValveBase
      */
     @Override
     public Container getContainer() {
-
-        return (this.context);
-
+        return this.context;
     }
 
 
@@ -400,7 +390,6 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Enforce the security restrictions in the web application deployment

@@ -20,9 +20,6 @@ package org.apache.catalina.authenticator;
 
 
 public class Constants {
-
-    public static final String Package = "org.apache.catalina.authenticator";
-
     // Authentication methods for login configuration
     // Servlet spec schemes are defined in HttpServletRequest
     // Vendor specific schemes
