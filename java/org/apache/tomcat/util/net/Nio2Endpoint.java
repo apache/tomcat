@@ -788,7 +788,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     if (nBytes.intValue() < 0) {
                         failed(new EOFException(), attachment);
                     } else if (attachment.hasRemaining()) {
-                        channel.write(attachment, getTimeout(),
+                        getSocket().write(attachment, getTimeout(),
                                 TimeUnit.MILLISECONDS, attachment, completionHandlerWrite);
                     } else {
                         writePending.release();
