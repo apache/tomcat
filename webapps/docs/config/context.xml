@@ -1376,11 +1376,9 @@ mywebapp/
 <source>
 &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
   &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
-    extraResourcePaths=
-      "/WEB-INF/classes=/Users/theuser/mywebapp/target/classes" />
+    extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes" />
   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
-    virtualClasspath="/Users/theuser/mywebapp/target/classes;
-      /Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
+    virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
   &lt;JarScanner scanAllDirectories="true" />
 &lt;/Context>
 </source>
@@ -1415,19 +1413,11 @@ mywebapp/
 
 <source wrapped="true">
 &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
-<indent>
   &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
-    <indent><outdent>extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes,/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies"</outdent></indent>
-    <indent>/></indent>
-</indent>
-<indent>
+    extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes,/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies"
   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
-    <indent><outdent>virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/mylib/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar"</outdent></indent>
-    <indent>/></indent>
-</indent>
-<indent>
+   virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/mylib/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar"
   &lt;JarScanner scanAllDirectories="true" />
-</indent>
 &lt;/Context>
 </source>
 

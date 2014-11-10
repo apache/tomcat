@@ -445,19 +445,6 @@ p.notice {
   </div>
   </xsl:template>
 
-
-  <!-- Process a wrapped source code example - indent -->
-  <xsl:template match="source//indent">
-    <div><xsl:apply-templates /></div>
-  </xsl:template>
-
-
-  <!-- Process a wrapped source code example - outdent -->
-  <xsl:template match="source//outdent">
-    <p><xsl:apply-templates /></p>
-  </xsl:template>
-
-
   <!-- Process an attributes list with nested attribute elements -->
   <xsl:template match="attributes">
     <table border="1" cellpadding="5">
