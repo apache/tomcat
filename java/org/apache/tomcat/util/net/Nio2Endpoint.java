@@ -986,6 +986,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
 
+        @Override
         public int write(boolean block, byte[] b, int off, int len) throws IOException {
             int leftToWrite = len;
             int count = 0;
@@ -1060,6 +1061,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
 
+        @Override
         public void flush() throws IOException {
             try {
                 // Block until a possible non blocking write is done

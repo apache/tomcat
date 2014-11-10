@@ -26,12 +26,12 @@ import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractServletOutputStream<S> extends ServletOutputStream {
+public class UpgradeServletOutputStream extends ServletOutputStream {
 
     protected static final StringManager sm = StringManager.getManager(
-            AbstractServletOutputStream.class.getPackage().getName());
+            UpgradeServletOutputStream.class.getPackage().getName());
 
-    protected final SocketWrapperBase<S> socketWrapper;
+    protected final SocketWrapperBase<?> socketWrapper;
 
     // Used to ensure that isReady() and onWritePossible() have a consistent
     // view of buffer and fireListener when determining if the listener should
@@ -62,7 +62,7 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
     private final int asyncWriteBufferSize;
 
 
-    public AbstractServletOutputStream(SocketWrapperBase<S> socketWrapper,
+    public UpgradeServletOutputStream(SocketWrapperBase<?> socketWrapper,
             int asyncWriteBufferSize) {
         this.socketWrapper = socketWrapper;
         this.asyncWriteBufferSize = asyncWriteBufferSize;
@@ -151,7 +151,7 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
     private void writeInternal(byte[] b, int off, int len) throws IOException {
         if (listener == null) {
             // Simple case - blocking IO
-            doWrite(true, b, off, len);
+            socketWrapper.write(true, b, off, len);
         } else {
             // Non-blocking IO
             // If the non-blocking read does not complete, doWrite() will add
@@ -159,7 +159,7 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
             // write event before this method has finished updating buffer. The
             // writeLock sync makes sure that buffer is updated before the next
             // write executes.
-            int written = doWrite(false, b, off, len);
+            int written = socketWrapper.write(false, b, off, len);
             if (written < len) {
                 if (b == buffer) {
                     // This is a partial write of the existing buffer. Just
@@ -239,16 +239,4 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
             thread.setContextClassLoader(originalClassLoader);
         }
     }
-
-
-    /**
-     * Abstract method to be overridden by concrete implementations. The base
-     * class will ensure that there are no concurrent calls to this method for
-     * the same socket by ensuring that the writeLock is held when making any
-     * calls to this method.
-     */
-    protected abstract int doWrite(boolean block, byte[] b, int off, int len)
-            throws IOException;
-
-    protected abstract void doFlush() throws IOException;
 }
