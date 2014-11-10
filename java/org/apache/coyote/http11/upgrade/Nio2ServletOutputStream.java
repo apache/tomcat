@@ -27,7 +27,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -35,16 +34,14 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Channel> {
 
-    private final AbstractEndpoint<Nio2Channel> endpoint;
     private final Nio2Channel channel;
     private final int maxWrite;
     private final CompletionHandler<Integer, ByteBuffer> completionHandler;
     private final Semaphore writePending = new Semaphore(1);
 
     public Nio2ServletOutputStream(SocketWrapperBase<Nio2Channel> socketWrapper0,
-            int asyncWriteBufferSize, AbstractEndpoint<Nio2Channel> endpoint0) {
+            int asyncWriteBufferSize) {
         super(socketWrapper0, asyncWriteBufferSize);
-        this.endpoint = endpoint0;
         channel = socketWrapper0.getSocket();
         maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
         this.completionHandler = new CompletionHandler<Integer, ByteBuffer>() {
@@ -58,7 +55,8 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                 } else {
                     writePending.release();
                     if (!Nio2Endpoint.isInline()) {
-                        endpoint.processSocket(socketWrapper, SocketStatus.OPEN_WRITE, false);
+                        socketWrapper.getEndpoint().processSocket(socketWrapper,
+                                SocketStatus.OPEN_WRITE, false);
                     }
                 }
             }
@@ -71,7 +69,7 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
                     return;
                 }
                 onError(exc);
-                endpoint.processSocket(socketWrapper, SocketStatus.ERROR, true);
+                socketWrapper.getEndpoint().processSocket(socketWrapper, SocketStatus.ERROR, true);
             }
         };
     }
