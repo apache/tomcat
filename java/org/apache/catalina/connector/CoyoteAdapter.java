@@ -604,6 +604,27 @@ public class CoyoteAdapter implements Adapter {
             req.serverName().setString(proxyName);
         }
 
+        // Check for ping OPTIONS * request
+        if (req.requestURI().equals("*")) {
+            if (req.method().equalsIgnoreCase("OPTIONS")) {
+                StringBuilder allow = new StringBuilder();
+                allow.append("GET, HEAD, POST, PUT, DELETE");
+                // Trace if allowed
+                if (connector.getAllowTrace()) {
+                    allow.append(", TRACE");
+                }
+                // Always allow options
+                allow.append(", OPTIONS");
+                res.setHeader("Allow", allow.toString());
+            } else {
+                res.setStatus(404);
+                res.setMessage("Not found");
+            }
+            connector.getService().getContainer().logAccess(
+                    request, response, 0, true);
+            return false;
+        }
+
         // Copy the raw URI to the decodedURI
         MessageBytes decodedURI = req.decodedURI();
         decodedURI.duplicate(req.requestURI());
