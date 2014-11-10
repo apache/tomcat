@@ -2378,7 +2378,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 throws IOException {
 
             if (closed) {
-                throw new IOException(sm.getString("apr.closed", getSocket()));
+                throw new IOException(sm.getString("socket.apr.closed", getSocket()));
             }
 
             if (leftOverInput != null) {
@@ -2441,18 +2441,18 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 // identified any issues with this but log it so it can be tracked
                 // if it is suspected of causing issues in the future.
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("apr.read.sslGeneralError", getSocket(), this));
+                    log.debug(sm.getString("socket.apr.read.sslGeneralError", getSocket(), this));
                 }
                 eagain = true;
                 return 0;
             } else if (-result == Status.APR_EOF) {
-                throw new EOFException(sm.getString("apr.clientAbort"));
+                throw new EOFException(sm.getString("socket.apr.clientAbort"));
             } else if ((OS.IS_WIN32 || OS.IS_WIN64) &&
                     (-result == Status.APR_OS_START_SYSERR + 10053)) {
                 // 10053 on Windows is connection aborted
-                throw new EOFException(sm.getString("apr.clientAbort"));
+                throw new EOFException(sm.getString("socket.apr.clientAbort"));
             } else {
-                throw new IOException(sm.getString("apr.read.error",
+                throw new IOException(sm.getString("socket.apr.read.error",
                         Integer.valueOf(-result), getSocket(), this));
             }
         }
