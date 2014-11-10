@@ -32,17 +32,15 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
 
     private static final int SSL_OUTPUT_BUFFER_SIZE = 8192;
 
-    private final AprEndpoint endpoint;
     private final long socket;
     private volatile boolean closed = false;
     private final ByteBuffer sslOutputBuffer;
 
     public AprServletOutputStream(SocketWrapperBase<Long> socketWrapper,
-            int asyncWriteBufferSize, AprEndpoint endpoint) {
+            int asyncWriteBufferSize) {
         super(socketWrapper, asyncWriteBufferSize);
-        this.endpoint = endpoint;
         this.socket = socketWrapper.getSocket().longValue();
-        if (endpoint.isSSLEnabled()) {
+        if (socketWrapper.getEndpoint().isSSLEnabled()) {
             sslOutputBuffer = ByteBuffer.allocateDirect(SSL_OUTPUT_BUFFER_SIZE);
             sslOutputBuffer.position(SSL_OUTPUT_BUFFER_SIZE);
         } else {
@@ -76,7 +74,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
             // Set the current settings for this socket
             socketWrapper.setBlockingStatus(block);
             if (block) {
-                Socket.timeoutSet(socket, endpoint.getSoTimeout() * 1000);
+                Socket.timeoutSet(socket, socketWrapper.getEndpoint().getSoTimeout() * 1000);
             } else {
                 Socket.timeoutSet(socket, 0);
             }
@@ -106,7 +104,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
         int written;
 
         do {
-            if (endpoint.isSSLEnabled()) {
+            if (socketWrapper.getEndpoint().isSSLEnabled()) {
                 if (sslOutputBuffer.remaining() == 0) {
                     // Buffer was fully written last time around
                     sslOutputBuffer.clear();
@@ -147,7 +145,7 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
         } while (written > 0 && left > 0);
 
         if (left > 0) {
-            endpoint.getPoller().add(socket, -1, false, true);
+            ((AprEndpoint) socketWrapper.getEndpoint()).getPoller().add(socket, -1, false, true);
         }
         return len - left;
     }

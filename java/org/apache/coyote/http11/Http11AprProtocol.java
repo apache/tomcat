@@ -325,8 +325,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 SocketWrapperBase<Long> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
-            return new AprProcessor(socket, leftoverInput,
-                    httpUpgradeProcessor, (AprEndpoint) proto.endpoint,
+            return new AprProcessor(socket, leftoverInput, httpUpgradeProcessor,
                     proto.getUpgradeAsyncWriteBufferSize());
         }
     }
