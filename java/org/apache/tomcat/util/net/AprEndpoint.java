@@ -2353,7 +2353,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
     public static class AprSocketWrapper extends SocketWrapperBase<Long> {
 
-        private ByteBuffer leftOverInput;
+        private static final int SSL_OUTPUT_BUFFER_SIZE = 8192;
+
+        private final ByteBuffer sslOutputBuffer;
+
+        private volatile ByteBuffer leftOverInput;
         private volatile boolean eagain = false;
         private volatile boolean closed = false;
 
@@ -2363,6 +2367,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         public AprSocketWrapper(Long socket, AprEndpoint endpoint) {
             super(socket, endpoint);
+
+            if (endpoint.isSSLEnabled()) {
+                sslOutputBuffer = ByteBuffer.allocateDirect(SSL_OUTPUT_BUFFER_SIZE);
+                sslOutputBuffer.position(SSL_OUTPUT_BUFFER_SIZE);
+            } else {
+                sslOutputBuffer = null;
+            }
         }
 
 
@@ -2469,6 +2480,111 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             closed = true;
             // AbstractProcessor needs to trigger the close as multiple closes for
             // APR/native sockets will cause problems.
+        }
+
+
+        public int write(boolean block, byte[] b, int off, int len) throws IOException {
+
+            if (closed) {
+                throw new IOException(sm.getString("apr.closed", getSocket()));
+            }
+
+            Lock readLock = getBlockingStatusReadLock();
+            WriteLock writeLock = getBlockingStatusWriteLock();
+
+            readLock.lock();
+            try {
+                if (getBlockingStatus() == block) {
+                    return doWriteInternal(b, off, len);
+                }
+            } finally {
+                readLock.unlock();
+            }
+
+            writeLock.lock();
+            try {
+                // Set the current settings for this socket
+                setBlockingStatus(block);
+                if (block) {
+                    Socket.timeoutSet(getSocket().longValue(), getEndpoint().getSoTimeout() * 1000);
+                } else {
+                    Socket.timeoutSet(getSocket().longValue(), 0);
+                }
+
+                // Downgrade the lock
+                readLock.lock();
+                try {
+                    writeLock.unlock();
+                    return doWriteInternal(b, off, len);
+                } finally {
+                    readLock.unlock();
+                }
+            } finally {
+                // Should have been released above but may not have been on some
+                // exception paths
+                if (writeLock.isHeldByCurrentThread()) {
+                    writeLock.unlock();
+                }
+            }
+        }
+
+
+        private int doWriteInternal(byte[] b, int off, int len) throws IOException {
+
+            int start = off;
+            int left = len;
+            int written;
+
+            do {
+                if (getEndpoint().isSSLEnabled()) {
+                    if (sslOutputBuffer.remaining() == 0) {
+                        // Buffer was fully written last time around
+                        sslOutputBuffer.clear();
+                        if (left < SSL_OUTPUT_BUFFER_SIZE) {
+                            sslOutputBuffer.put(b, start, left);
+                        } else {
+                            sslOutputBuffer.put(b, start, SSL_OUTPUT_BUFFER_SIZE);
+                        }
+                        sslOutputBuffer.flip();
+                    } else {
+                        // Buffer still has data from previous attempt to write
+                        // APR + SSL requires that exactly the same parameters are
+                        // passed when re-attempting the write
+                    }
+                    written = Socket.sendb(getSocket().longValue(), sslOutputBuffer,
+                            sslOutputBuffer.position(), sslOutputBuffer.limit());
+                    if (written > 0) {
+                        sslOutputBuffer.position(
+                                sslOutputBuffer.position() + written);
+                    }
+                } else {
+                    written = Socket.send(getSocket().longValue(), b, start, left);
+                }
+                if (Status.APR_STATUS_IS_EAGAIN(-written)) {
+                    written = 0;
+                } else if (-written == Status.APR_EOF) {
+                    throw new EOFException(sm.getString("apr.clientAbort"));
+                } else if ((OS.IS_WIN32 || OS.IS_WIN64) &&
+                        (-written == Status.APR_OS_START_SYSERR + 10053)) {
+                    // 10053 on Windows is connection aborted
+                    throw new EOFException(sm.getString("apr.clientAbort"));
+                } else if (written < 0) {
+                    throw new IOException(sm.getString("apr.write.error",
+                            Integer.valueOf(-written), getSocket(), this));
+                }
+                start += written;
+                left -= written;
+            } while (written > 0 && left > 0);
+
+            if (left > 0) {
+                ((AprEndpoint) getEndpoint()).getPoller().add(getSocket().longValue(), -1, false, true);
+            }
+            return len - left;
+        }
+
+
+        public void flush() {
+            // NO-OP
         }
     }
 }
