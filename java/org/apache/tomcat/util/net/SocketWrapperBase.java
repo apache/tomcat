@@ -77,6 +77,10 @@ public abstract class SocketWrapperBase<E> {
         return socket;
     }
 
+    public AbstractEndpoint<E> getEndpoint() {
+        return endpoint;
+    }
+
     public boolean isAsync() { return async; }
     public void setAsync(boolean async) { this.async = async; }
     public boolean isUpgraded() { return upgraded; }

@@ -31,10 +31,9 @@ public class NioServletInputStream extends AbstractServletInputStream {
     private final NioChannel channel;
     private final NioSelectorPool pool;
 
-    public NioServletInputStream(SocketWrapperBase<NioChannel> wrapper,
-            NioSelectorPool pool) {
+    public NioServletInputStream(SocketWrapperBase<NioChannel> wrapper) {
         this.channel = wrapper.getSocket();
-        this.pool = pool;
+        this.pool = ((NioEndpoint) wrapper.getEndpoint()).getSelectorPool();
     }
 
     @Override

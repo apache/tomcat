@@ -23,7 +23,6 @@ import javax.servlet.http.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
-import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class NioProcessor extends AbstractProcessor<NioChannel> {
@@ -35,11 +34,10 @@ public class NioProcessor extends AbstractProcessor<NioChannel> {
     private static final int INFINITE_TIMEOUT = -1;
 
     public NioProcessor(SocketWrapperBase<NioChannel> wrapper, ByteBuffer leftoverInput,
-            HttpUpgradeHandler httpUpgradeProcessor, NioSelectorPool pool,
-            int asyncWriteBufferSize) {
+            HttpUpgradeHandler httpUpgradeProcessor, int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,
-                new NioServletInputStream(wrapper, pool),
-                new NioServletOutputStream(wrapper, asyncWriteBufferSize, pool));
+                new NioServletInputStream(wrapper),
+                new NioServletOutputStream(wrapper, asyncWriteBufferSize));
 
         wrapper.setTimeout(INFINITE_TIMEOUT);
         if (leftoverInput != null) {
