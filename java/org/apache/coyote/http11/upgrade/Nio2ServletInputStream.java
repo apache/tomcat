@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -34,7 +33,6 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class Nio2ServletInputStream extends AbstractServletInputStream {
 
-    private final AbstractEndpoint<Nio2Channel> endpoint;
     private final SocketWrapperBase<Nio2Channel> wrapper;
     private final Nio2Channel channel;
     private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> completionHandler;
@@ -42,8 +40,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
     private volatile boolean readPending = false;
     private volatile boolean interest = true;
 
-    public Nio2ServletInputStream(SocketWrapperBase<Nio2Channel> wrapper, AbstractEndpoint<Nio2Channel> endpoint0) {
-        this.endpoint = endpoint0;
+    public Nio2ServletInputStream(SocketWrapperBase<Nio2Channel> wrapper) {
         this.wrapper = wrapper;
         this.channel = wrapper.getSocket();
         this.completionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
@@ -62,7 +59,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                     }
                 }
                 if (notify) {
-                    endpoint.processSocket(attachment, SocketStatus.OPEN_READ, false);
+                    wrapper.getEndpoint().processSocket(attachment, SocketStatus.OPEN_READ, false);
                 }
             }
             @Override
@@ -74,7 +71,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                     return;
                 }
                 onError(exc);
-                endpoint.processSocket(attachment, SocketStatus.ERROR, true);
+                wrapper.getEndpoint().processSocket(attachment, SocketStatus.ERROR, true);
             }
         };
     }
