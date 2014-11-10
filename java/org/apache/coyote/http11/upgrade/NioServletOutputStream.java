@@ -131,10 +131,4 @@ public class NioServletOutputStream extends AbstractServletOutputStream<NioChann
             }
         }
     }
-
-
-    @Override
-    protected void doClose() throws IOException {
-        channel.close(true);
-    }
 }

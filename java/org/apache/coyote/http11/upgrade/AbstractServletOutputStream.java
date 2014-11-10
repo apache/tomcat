@@ -134,7 +134,7 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
     @Override
     public void close() throws IOException {
         closeRequired = true;
-        doClose();
+        socketWrapper.close();
     }
 
 
@@ -251,6 +251,4 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
             throws IOException;
 
     protected abstract void doFlush() throws IOException;
-
-    protected abstract void doClose() throws IOException;
 }

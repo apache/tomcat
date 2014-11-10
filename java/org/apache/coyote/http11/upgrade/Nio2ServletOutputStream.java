@@ -179,10 +179,4 @@ public class Nio2ServletOutputStream extends AbstractServletOutputStream<Nio2Cha
             throw ex;
         }
     }
-
-    @Override
-    protected void doClose() throws IOException {
-        channel.close(true);
-    }
-
 }
