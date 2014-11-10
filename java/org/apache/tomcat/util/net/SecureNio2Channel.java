@@ -41,7 +41,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SecureNio2Channel extends Nio2Channel  {
 
-    protected static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");
+    protected static final StringManager sm = StringManager.getManager(
+            SecureNio2Channel.class.getPackage().getName());
 
     protected ByteBuffer netInBuffer;
     protected ByteBuffer netOutBuffer;

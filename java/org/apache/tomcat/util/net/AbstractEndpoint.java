@@ -52,7 +52,8 @@ public abstract class AbstractEndpoint<S> {
 
     protected static final String DEFAULT_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5";
 
-    protected static final StringManager sm = StringManager.getManager("org.apache.tomcat.util.net.res");
+    protected static final StringManager sm = StringManager.getManager(
+            AbstractEndpoint.class.getPackage().getName());
 
     public static interface Handler {
         /**
