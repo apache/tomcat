@@ -1479,6 +1479,21 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
+        public void unRead(ByteBuffer returnedInput) {
+            if (returnedInput != null) {
+                ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
+                if (readBuffer.remaining() > 0) {
+                    readBuffer.flip();
+                } else {
+                    readBuffer.clear();
+                }
+                readBuffer.put(returnedInput);
+                readBuffer.flip();
+            }
+        }
+
+
+        @Override
         public void close() throws IOException {
             getSocket().close();
         }

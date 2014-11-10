@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -188,6 +189,18 @@ public abstract class SocketWrapperBase<E> {
 
     public abstract int read(boolean block, byte[] b, int off, int len) throws IOException;
     public abstract boolean isReady() throws IOException;
+    /**
+     * Return input that has been read to the input buffer for re-reading by the
+     * correct component. There are times when a component may read more data
+     * than it needs before it passes control to another component. One example
+     * of this is during HTTP upgrade. If an (arguably misbehaving client) sends
+     * data associated with the upgraded protocol before the HTTP upgrade
+     * completes, the HTTP handler may read it. This method provides a way for
+     * that data to be returned so it can be processed by the correct component.
+     *
+     * @param input The input to return to the input buffer.
+     */
+    public abstract void unRead(ByteBuffer input);
     public abstract void close() throws IOException;
 
     public abstract int write(boolean block, byte[] b, int off, int len) throws IOException;
