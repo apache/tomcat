@@ -32,16 +32,16 @@ public class NioServletInputStream extends AbstractServletInputStream {
 
     @Override
     protected boolean doIsReady() throws IOException {
-        return ((NioSocketWrapper) wrapper).doIsReady();
+        return ((NioSocketWrapper) wrapper).isReady();
     }
 
     @Override
     protected int doRead(boolean block, byte[] b, int off, int len) throws IOException {
-        return ((NioSocketWrapper) wrapper).doRead(block, b, off, len);
+        return ((NioSocketWrapper) wrapper).read(block, b, off, len);
     }
 
     @Override
     protected void doClose() throws IOException {
-        ((NioSocketWrapper) wrapper).doClose();
+        ((NioSocketWrapper) wrapper).close();
     }
 }

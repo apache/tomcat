@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -183,4 +184,9 @@ public abstract class SocketWrapperBase<E> {
     public String toString() {
         return super.toString() + ":" + String.valueOf(socket);
     }
+
+
+    public abstract int read(boolean block, byte[] b, int off, int len) throws IOException;
+    public abstract boolean isReady() throws IOException;
+    public abstract void close() throws IOException;
 }

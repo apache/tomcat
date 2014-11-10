@@ -805,7 +805,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf; }
         public SendfileData getSendfileData() { return this.sendfileData; }
 
-        public boolean doIsReady() throws IOException {
+
+        @Override
+        public boolean isReady() throws IOException {
             synchronized (completionHandler) {
                 if (readPending) {
                     interest = true;
@@ -837,8 +839,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             }
         }
 
-        public int doRead(boolean block, byte[] b, int off, int len)
-                throws IOException {
+
+        @Override
+        public int read(boolean block, byte[] b, int off, int len) throws IOException {
 
             synchronized (completionHandler) {
                 if (readPending) {
@@ -901,9 +904,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             }
         }
 
-        public void doClose() throws IOException {
+
+        @Override
+        public void close() throws IOException {
             getSocket().close();
         }
+
 
         private int fillReadBuffer(boolean block) throws IOException {
             ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
