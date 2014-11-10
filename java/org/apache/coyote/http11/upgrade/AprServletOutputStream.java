@@ -155,12 +155,4 @@ public class AprServletOutputStream extends AbstractServletOutputStream<Long> {
     protected void doFlush() throws IOException {
         // TODO Auto-generated method stub
     }
-
-
-    @Override
-    protected void doClose() throws IOException {
-        closed = true;
-        // AbstractProcessor needs to trigger the close as multiple closes for
-        // APR/native sockets will cause problems.
-    }
 }
