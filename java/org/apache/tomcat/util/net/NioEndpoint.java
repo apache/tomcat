@@ -926,7 +926,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public void register(final NioChannel socket) {
             socket.setPoller(this);
             NioSocketWrapper key = keyCache.pop();
-            final NioSocketWrapper ka = key!=null?key:new NioSocketWrapper(socket);
+            final NioSocketWrapper ka = key!=null?key:new NioSocketWrapper(socket, NioEndpoint.this);
             ka.reset(this,socket,getSocketProperties().getSoTimeout());
             ka.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
             ka.setSecure(isSSLEnabled());
@@ -1321,8 +1321,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 // ----------------------------------------------------- Key Attachment Class
     public static class NioSocketWrapper extends SocketWrapperBase<NioChannel> {
 
-        public NioSocketWrapper(NioChannel channel) {
-            super(channel);
+        public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
+            super(channel, endpoint);
         }
 
         public void reset(Poller poller, NioChannel channel, long soTimeout) {

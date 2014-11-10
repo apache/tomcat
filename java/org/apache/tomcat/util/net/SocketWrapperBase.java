@@ -26,6 +26,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 public abstract class SocketWrapperBase<E> {
 
     private volatile E socket;
+    private final AbstractEndpoint<E> endpoint;
 
     private volatile long lastAccess = System.currentTimeMillis();
     private long timeout = -1;
@@ -64,8 +65,9 @@ public abstract class SocketWrapperBase<E> {
 
     private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
-    public SocketWrapperBase(E socket) {
+    public SocketWrapperBase(E socket, AbstractEndpoint<E> endpoint) {
         this.socket = socket;
+        this.endpoint = endpoint;
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         this.blockingStatusReadLock = lock.readLock();
         this.blockingStatusWriteLock = lock.writeLock();
