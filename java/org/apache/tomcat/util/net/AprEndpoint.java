@@ -2483,6 +2483,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
+        @Override
         public int write(boolean block, byte[] b, int off, int len) throws IOException {
 
             if (closed) {
@@ -2583,6 +2584,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
+        @Override
         public void flush() {
             // NO-OP
         }

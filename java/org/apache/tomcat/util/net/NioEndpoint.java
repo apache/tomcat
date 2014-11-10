@@ -1517,8 +1517,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
 
 
-        public int write(boolean block, byte[] b, int off, int len)
-                throws IOException {
+        @Override
+        public int write(boolean block, byte[] b, int off, int len) throws IOException {
             int leftToWrite = len;
             int count = 0;
             int offset = off;
@@ -1582,6 +1582,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
 
 
+        @Override
         public void flush() throws IOException {
             NioEndpoint.NioSocketWrapper att =
                     (NioEndpoint.NioSocketWrapper) getSocket().getAttachment(false);

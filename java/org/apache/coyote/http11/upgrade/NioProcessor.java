@@ -37,7 +37,7 @@ public class NioProcessor extends AbstractProcessor<NioChannel> {
             HttpUpgradeHandler httpUpgradeProcessor, int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,
                 new UpgradeServletInputStream(wrapper),
-                new NioServletOutputStream(wrapper, asyncWriteBufferSize));
+                new UpgradeServletOutputStream(wrapper, asyncWriteBufferSize));
 
         wrapper.setTimeout(INFINITE_TIMEOUT);
         if (leftoverInput != null) {

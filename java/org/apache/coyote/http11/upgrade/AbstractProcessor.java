@@ -43,11 +43,11 @@ public abstract class AbstractProcessor<S>
 
     private final HttpUpgradeHandler httpUpgradeHandler;
     private final UpgradeServletInputStream upgradeServletInputStream;
-    private final AbstractServletOutputStream<S> upgradeServletOutputStream;
+    private final UpgradeServletOutputStream upgradeServletOutputStream;
 
     protected AbstractProcessor (HttpUpgradeHandler httpUpgradeHandler,
             UpgradeServletInputStream upgradeServletInputStream,
-            AbstractServletOutputStream<S> upgradeServletOutputStream) {
+            UpgradeServletOutputStream upgradeServletOutputStream) {
         this.httpUpgradeHandler = httpUpgradeHandler;
         this.upgradeServletInputStream = upgradeServletInputStream;
         this.upgradeServletOutputStream = upgradeServletOutputStream;

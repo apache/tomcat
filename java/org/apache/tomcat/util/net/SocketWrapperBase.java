@@ -189,4 +189,7 @@ public abstract class SocketWrapperBase<E> {
     public abstract int read(boolean block, byte[] b, int off, int len) throws IOException;
     public abstract boolean isReady() throws IOException;
     public abstract void close() throws IOException;
+
+    public abstract int write(boolean block, byte[] b, int off, int len) throws IOException;
+    public abstract void flush() throws IOException;
 }
