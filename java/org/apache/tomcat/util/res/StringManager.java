@@ -180,6 +180,19 @@ public class StringManager {
 
 
     /**
+     * Get the StringManager for a given class. The StringManager will be
+     * returned for the package in which the class is located. If a manager for
+     * that package already exists, it will be reused, else a new
+     * StringManager will be created and returned.
+     *
+     * @param clazz The class for which to retrieve the StringManager
+     */
+    public static final StringManager getManager(Class<?> clazz) {
+        return getManager(clazz.getPackage().getName());
+    }
+
+
+    /**
      * Get the StringManager for a particular package. If a manager for
      * a package already exists, it will be reused, else a new
      * StringManager will be created and returned.
