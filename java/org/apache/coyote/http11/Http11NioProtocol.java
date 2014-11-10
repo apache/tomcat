@@ -26,7 +26,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.upgrade.NioProcessor;
+import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -296,7 +296,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                 SocketWrapperBase<NioChannel> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
-            return new NioProcessor(socket, leftoverInput, httpUpgradeProcessor,
+            return new UpgradeProcessor<>(socket, leftoverInput, httpUpgradeProcessor,
                     proto.getUpgradeAsyncWriteBufferSize());
         }
 
