@@ -34,8 +34,8 @@ public class NioProcessor extends AbstractProcessor<NioChannel> {
     private static final int INFINITE_TIMEOUT = -1;
 
     public NioProcessor(SocketWrapperBase<NioChannel> wrapper, ByteBuffer leftoverInput,
-            HttpUpgradeHandler httpUpgradeProcessor, int asyncWriteBufferSize) {
-        super(httpUpgradeProcessor,
+            HttpUpgradeHandler httpUpgradeHandler, int asyncWriteBufferSize) {
+        super(httpUpgradeHandler,
                 new UpgradeServletInputStream(wrapper),
                 new UpgradeServletOutputStream(wrapper, asyncWriteBufferSize));
 
