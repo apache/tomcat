@@ -846,15 +846,6 @@ public final class Mapper {
 
         path.setOffset(servletPath);
 
-        if ((pathEnd - pathOffset) == 1 && path.getBuffer()[pathOffset] == '*') {
-            // Special "*" URL
-            if (contextVersion.defaultWrapper != null) {
-                mappingData.wrapper = contextVersion.defaultWrapper.object;
-                mappingData.wrapperPath.setString("*");
-            }
-            return;
-        }
-
         // Rule 1 -- Exact Match
         MappedWrapper[] exactWrappers = contextVersion.exactWrappers;
         internalMapExactWrapper(exactWrappers, path, mappingData);
