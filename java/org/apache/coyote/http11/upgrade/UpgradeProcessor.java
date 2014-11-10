@@ -105,12 +105,12 @@ public class UpgradeProcessor<S> implements Processor<S>, WebConnection {
             try {
                 upgradeServletInputStream.close();
             } catch (IOException ioe) {
-                log.debug(sm.getString("abstractProcessor.isCloseFail", ioe));
+                log.debug(sm.getString("upgradeProcessor.isCloseFail", ioe));
             }
             try {
                 upgradeServletOutputStream.close();
             } catch (IOException ioe) {
-                log.debug(sm.getString("abstractProcessor.osCloseFail", ioe));
+                log.debug(sm.getString("upgradeProcessor.osCloseFail", ioe));
             }
             return SocketState.CLOSED;
         } else {
