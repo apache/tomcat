@@ -38,17 +38,7 @@ public class NioProcessor extends AbstractProcessor<NioChannel> {
         super(httpUpgradeHandler,
                 new UpgradeServletInputStream(wrapper),
                 new UpgradeServletOutputStream(wrapper, asyncWriteBufferSize));
-
+        wrapper.unRead(leftoverInput);
         wrapper.setTimeout(INFINITE_TIMEOUT);
-        if (leftoverInput != null) {
-            ByteBuffer readBuffer = wrapper.getSocket().getBufHandler().getReadBuffer();
-            if (readBuffer.remaining() > 0) {
-                readBuffer.flip();
-            } else {
-                readBuffer.clear();
-            }
-            readBuffer.put(leftoverInput);
-            readBuffer.flip();
-        }
     }
 }

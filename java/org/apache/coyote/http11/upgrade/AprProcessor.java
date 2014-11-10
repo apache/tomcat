@@ -22,8 +22,6 @@ import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.util.net.AprEndpoint.AprSocketWrapper;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class AprProcessor extends AbstractProcessor<Long> {
@@ -39,7 +37,7 @@ public class AprProcessor extends AbstractProcessor<Long> {
         super(httpUpgradeHandler,
                 new UpgradeServletInputStream(wrapper),
                 new UpgradeServletOutputStream(wrapper, asyncWriteBufferSize));
-        ((AprSocketWrapper) wrapper).setLeftOverInput(leftOverInput);
-        Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);
+        wrapper.unRead(leftOverInput);
+        wrapper.setTimeout(INFINITE_TIMEOUT);
     }
 }

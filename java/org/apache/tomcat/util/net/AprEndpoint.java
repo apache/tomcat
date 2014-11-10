@@ -2357,7 +2357,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         private final ByteBuffer sslOutputBuffer;
 
-        private volatile ByteBuffer leftOverInput;
+        private volatile ByteBuffer returnedInput;
         private volatile boolean eagain = false;
         private volatile boolean closed = false;
 
@@ -2377,14 +2377,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        public void setLeftOverInput(ByteBuffer leftOverInput) {
-            if (leftOverInput != null) {
-                this.leftOverInput = ByteBuffer.allocate(leftOverInput.remaining());
-                this.leftOverInput.put(leftOverInput);
-            }
-        }
-
-
         @Override
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
 
@@ -2392,13 +2384,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 throw new IOException(sm.getString("socket.apr.closed", getSocket()));
             }
 
-            if (leftOverInput != null) {
-                if (leftOverInput.remaining() < len) {
-                    len = leftOverInput.remaining();
+            if (returnedInput != null) {
+                if (returnedInput.remaining() < len) {
+                    len = returnedInput.remaining();
                 }
-                leftOverInput.get(b, off, len);
-                if (leftOverInput.remaining() == 0) {
-                    leftOverInput = null;
+                returnedInput.get(b, off, len);
+                if (returnedInput.remaining() == 0) {
+                    returnedInput = null;
                 }
                 return len;
             }
@@ -2472,6 +2464,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         @Override
         public boolean isReady() {
             return !eagain;
+        }
+
+
+
+        @Override
+        public void unRead(ByteBuffer input) {
+            if (returnedInput != null) {
+                this.returnedInput = ByteBuffer.allocate(returnedInput.remaining());
+                this.returnedInput.put(returnedInput);
+            }
         }
 
 
