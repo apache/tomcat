@@ -2374,8 +2374,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        public int doRead(boolean block, byte[] b, int off, int len)
-                throws IOException {
+        @Override
+        public int read(boolean block, byte[] b, int off, int len) throws IOException {
 
             if (closed) {
                 throw new IOException(sm.getString("socket.apr.closed", getSocket()));
@@ -2458,12 +2458,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        public boolean doIsReady() {
+        @Override
+        public boolean isReady() {
             return !eagain;
         }
 
 
-        public void doClose() {
+        @Override
+        public void close() {
             closed = true;
             // AbstractProcessor needs to trigger the close as multiple closes for
             // APR/native sockets will cause problems.

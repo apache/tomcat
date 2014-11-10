@@ -31,16 +31,16 @@ public class AprServletInputStream extends AbstractServletInputStream {
 
     @Override
     protected boolean doIsReady() throws IOException {
-        return ((AprSocketWrapper) wrapper).doIsReady();
+        return ((AprSocketWrapper) wrapper).isReady();
     }
 
     @Override
     protected int doRead(boolean block, byte[] b, int off, int len) throws IOException {
-        return ((AprSocketWrapper) wrapper).doRead(block, b, off, len);
+        return ((AprSocketWrapper) wrapper).read(block, b, off, len);
     }
 
     @Override
     protected void doClose() throws IOException {
-        ((AprSocketWrapper) wrapper).doClose();
+        ((AprSocketWrapper) wrapper).close();
     }
 }

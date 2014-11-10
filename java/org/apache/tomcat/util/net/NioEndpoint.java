@@ -1409,7 +1409,9 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
         public long getWriteTimeout() {return this.writeTimeout;}
 
-        public boolean doIsReady() throws IOException {
+
+        @Override
+        public boolean isReady() throws IOException {
             ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
 
             if (readBuffer.remaining() > 0) {
@@ -1424,7 +1426,9 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             return isReady;
         }
 
-        public int doRead(boolean block, byte[] b, int off, int len)
+
+        @Override
+        public int read(boolean block, byte[] b, int off, int len)
                 throws IOException {
 
             ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
@@ -1470,7 +1474,9 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             return len - leftToWrite;
         }
 
-        public void doClose() throws IOException {
+
+        @Override
+        public void close() throws IOException {
             getSocket().close();
         }
 
