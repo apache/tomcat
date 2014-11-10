@@ -17,118 +17,28 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 
 import org.apache.tomcat.util.net.NioChannel;
-import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioSelectorPool;
+import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class NioServletOutputStream extends AbstractServletOutputStream<NioChannel> {
 
-    private final NioChannel channel;
-    private final NioSelectorPool pool;
-    private final int maxWrite;
-
-
     public NioServletOutputStream(SocketWrapperBase<NioChannel> socketWrapper,
             int asyncWriteBufferSize) {
         super(socketWrapper, asyncWriteBufferSize);
-        channel = socketWrapper.getSocket();
-        this.pool = ((NioEndpoint) socketWrapper.getEndpoint()).getSelectorPool();
-        maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
     }
 
 
     @Override
     protected int doWrite(boolean block, byte[] b, int off, int len)
             throws IOException {
-        int leftToWrite = len;
-        int count = 0;
-        int offset = off;
-
-        while (leftToWrite > 0) {
-            int writeThisLoop;
-            int writtenThisLoop;
-
-            if (leftToWrite > maxWrite) {
-                writeThisLoop = maxWrite;
-            } else {
-                writeThisLoop = leftToWrite;
-            }
-
-            writtenThisLoop = doWriteInternal(block, b, offset, writeThisLoop);
-            count += writtenThisLoop;
-            offset += writtenThisLoop;
-            leftToWrite -= writtenThisLoop;
-
-            if (writtenThisLoop < writeThisLoop) {
-                break;
-            }
-        }
-
-        return count;
-    }
-
-    private int doWriteInternal (boolean block, byte[] b, int off, int len)
-            throws IOException {
-        channel.getBufHandler().getWriteBuffer().clear();
-        channel.getBufHandler().getWriteBuffer().put(b, off, len);
-        channel.getBufHandler().getWriteBuffer().flip();
-
-        int written = 0;
-        NioEndpoint.NioSocketWrapper att =
-                (NioEndpoint.NioSocketWrapper) channel.getAttachment(false);
-        if (att == null) {
-            throw new IOException("Key must be cancelled");
-        }
-        long writeTimeout = att.getWriteTimeout();
-        Selector selector = null;
-        try {
-            selector = pool.get();
-        } catch ( IOException x ) {
-            //ignore
-        }
-        try {
-            written = pool.write(channel.getBufHandler().getWriteBuffer(),
-                    channel, selector, writeTimeout, block);
-        } finally {
-            if (selector != null) {
-                pool.put(selector);
-            }
-        }
-        if (written < len) {
-            channel.getPoller().add(channel, SelectionKey.OP_WRITE);
-        }
-        return written;
+        return ((NioSocketWrapper) socketWrapper).write(block, b, off, len);
     }
 
 
     @Override
     protected void doFlush() throws IOException {
-        NioEndpoint.NioSocketWrapper att =
-                (NioEndpoint.NioSocketWrapper) channel.getAttachment(false);
-        if (att == null) {
-            throw new IOException("Key must be cancelled");
-        }
-        long writeTimeout = att.getWriteTimeout();
-        Selector selector = null;
-        try {
-            selector = pool.get();
-        } catch ( IOException x ) {
-            //ignore
-        }
-        try {
-            do {
-                if (channel.flush(true, selector, writeTimeout)) {
-                    break;
-                }
-            } while (true);
-        } finally {
-            if (selector != null) {
-                pool.put(selector);
-            }
-        }
+        ((NioSocketWrapper) socketWrapper).flush();
     }
 }
