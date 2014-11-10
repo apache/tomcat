@@ -25,8 +25,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractServletInputStream extends ServletInputStream {
 
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(
+            AbstractServletInputStream.class.getPackage().getName());
 
     private volatile boolean closeRequired = false;
     // Start in blocking-mode
