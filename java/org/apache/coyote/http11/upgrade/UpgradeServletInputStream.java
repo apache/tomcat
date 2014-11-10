@@ -24,10 +24,10 @@ import javax.servlet.ServletInputStream;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public class ServletInputStreamImpl extends ServletInputStream {
+public class UpgradeServletInputStream extends ServletInputStream {
 
     protected static final StringManager sm = StringManager.getManager(
-            ServletInputStreamImpl.class.getPackage().getName());
+            UpgradeServletInputStream.class.getPackage().getName());
 
     private final SocketWrapperBase<?> socketWrapper;
 
@@ -38,7 +38,7 @@ public class ServletInputStreamImpl extends ServletInputStream {
     private volatile ClassLoader applicationLoader = null;
 
 
-    public ServletInputStreamImpl(SocketWrapperBase<?> socketWrapper) {
+    public UpgradeServletInputStream(SocketWrapperBase<?> socketWrapper) {
         this.socketWrapper = socketWrapper;
     }
 

@@ -37,7 +37,7 @@ public class AprProcessor extends AbstractProcessor<Long> {
     public AprProcessor(SocketWrapperBase<Long> wrapper, ByteBuffer leftOverInput,
             HttpUpgradeHandler httpUpgradeProcessor, int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,
-                new ServletInputStreamImpl(wrapper),
+                new UpgradeServletInputStream(wrapper),
                 new AprServletOutputStream(wrapper, asyncWriteBufferSize));
         ((AprSocketWrapper) wrapper).setLeftOverInput(leftOverInput);
         Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);
