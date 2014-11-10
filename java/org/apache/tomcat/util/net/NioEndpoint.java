@@ -17,6 +17,7 @@
 
 package org.apache.tomcat.util.net;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -1321,6 +1322,14 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 // ----------------------------------------------------- Key Attachment Class
     public static class NioSocketWrapper extends SocketWrapperBase<NioChannel> {
 
+        private Poller poller = null;
+        private int interestOps = 0;
+        private boolean callBackNotify = false;
+        private CountDownLatch readLatch = null;
+        private CountDownLatch writeLatch = null;
+        private SendfileData sendfileData = null;
+        private long writeTimeout = -1;
+
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
         }
@@ -1400,13 +1409,103 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
         public long getWriteTimeout() {return this.writeTimeout;}
 
-        private Poller poller = null;
-        private int interestOps = 0;
-        private boolean callBackNotify = false;
-        private CountDownLatch readLatch = null;
-        private CountDownLatch writeLatch = null;
-        private SendfileData sendfileData = null;
-        private long writeTimeout = -1;
+        public boolean doIsReady() throws IOException {
+            ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
+
+            if (readBuffer.remaining() > 0) {
+                return true;
+            }
+
+            readBuffer.clear();
+            fillReadBuffer(false);
+
+            boolean isReady = readBuffer.position() > 0;
+            readBuffer.flip();
+            return isReady;
+        }
+
+        public int doRead(boolean block, byte[] b, int off, int len)
+                throws IOException {
+
+            ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
+            int remaining = readBuffer.remaining();
+
+            // Is there enough data in the read buffer to satisfy this request?
+            if (remaining >= len) {
+                readBuffer.get(b, off, len);
+                return len;
+            }
+
+            // Copy what data there is in the read buffer to the byte array
+            int leftToWrite = len;
+            int newOffset = off;
+            if (remaining > 0) {
+                readBuffer.get(b, off, remaining);
+                leftToWrite -= remaining;
+                newOffset += remaining;
+            }
+
+            // Fill the read buffer as best we can
+            readBuffer.clear();
+            int nRead = fillReadBuffer(block);
+
+            // Full as much of the remaining byte array as possible with the data
+            // that was just read
+            if (nRead > 0) {
+                readBuffer.flip();
+                if (nRead > leftToWrite) {
+                    readBuffer.get(b, newOffset, leftToWrite);
+                    leftToWrite = 0;
+                } else {
+                    readBuffer.get(b, newOffset, nRead);
+                    leftToWrite -= nRead;
+                }
+            } else if (nRead == 0) {
+                readBuffer.flip();
+            } else if (nRead == -1) {
+                // TODO i18n
+                throw new EOFException();
+            }
+
+            return len - leftToWrite;
+        }
+
+        public void doClose() throws IOException {
+            getSocket().close();
+        }
+
+
+        private int fillReadBuffer(boolean block) throws IOException {
+            int nRead;
+            NioChannel channel = getSocket();
+            if (block) {
+                Selector selector = null;
+                NioSelectorPool pool = ((NioEndpoint) getEndpoint()).getSelectorPool();
+                try {
+                    selector = pool.get();
+                } catch ( IOException x ) {
+                    // Ignore
+                }
+                try {
+                    NioEndpoint.NioSocketWrapper att =
+                            (NioEndpoint.NioSocketWrapper) channel.getAttachment(false);
+                    if (att == null) {
+                        throw new IOException("Key must be cancelled.");
+                    }
+                    nRead = pool.read(channel.getBufHandler().getReadBuffer(),
+                            channel, selector, att.getTimeout());
+                } catch (EOFException eof) {
+                    nRead = -1;
+                } finally {
+                    if (selector != null) {
+                        pool.put(selector);
+                    }
+                }
+            } else {
+                nRead = channel.read(channel.getBufHandler().getReadBuffer());
+            }
+            return nRead;
+        }
 
     }
 

@@ -16,124 +16,32 @@
  */
 package org.apache.coyote.http11.upgrade;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.Selector;
 
 import org.apache.tomcat.util.net.NioChannel;
-import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioSelectorPool;
+import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class NioServletInputStream extends AbstractServletInputStream {
 
-    private final NioChannel channel;
-    private final NioSelectorPool pool;
+    private final SocketWrapperBase<NioChannel> wrapper;
 
     public NioServletInputStream(SocketWrapperBase<NioChannel> wrapper) {
-        this.channel = wrapper.getSocket();
-        this.pool = ((NioEndpoint) wrapper.getEndpoint()).getSelectorPool();
+        this.wrapper = wrapper;
     }
 
     @Override
     protected boolean doIsReady() throws IOException {
-        ByteBuffer readBuffer = channel.getBufHandler().getReadBuffer();
-
-        if (readBuffer.remaining() > 0) {
-            return true;
-        }
-
-        readBuffer.clear();
-        fillReadBuffer(false);
-
-        boolean isReady = readBuffer.position() > 0;
-        readBuffer.flip();
-        return isReady;
+        return ((NioSocketWrapper) wrapper).doIsReady();
     }
 
     @Override
-    protected int doRead(boolean block, byte[] b, int off, int len)
-            throws IOException {
-
-        ByteBuffer readBuffer = channel.getBufHandler().getReadBuffer();
-        int remaining = readBuffer.remaining();
-
-        // Is there enough data in the read buffer to satisfy this request?
-        if (remaining >= len) {
-            readBuffer.get(b, off, len);
-            return len;
-        }
-
-        // Copy what data there is in the read buffer to the byte array
-        int leftToWrite = len;
-        int newOffset = off;
-        if (remaining > 0) {
-            readBuffer.get(b, off, remaining);
-            leftToWrite -= remaining;
-            newOffset += remaining;
-        }
-
-        // Fill the read buffer as best we can
-        readBuffer.clear();
-        int nRead = fillReadBuffer(block);
-
-        // Full as much of the remaining byte array as possible with the data
-        // that was just read
-        if (nRead > 0) {
-            readBuffer.flip();
-            if (nRead > leftToWrite) {
-                readBuffer.get(b, newOffset, leftToWrite);
-                leftToWrite = 0;
-            } else {
-                readBuffer.get(b, newOffset, nRead);
-                leftToWrite -= nRead;
-            }
-        } else if (nRead == 0) {
-            readBuffer.flip();
-        } else if (nRead == -1) {
-            // TODO i18n
-            throw new EOFException();
-        }
-
-        return len - leftToWrite;
+    protected int doRead(boolean block, byte[] b, int off, int len) throws IOException {
+        return ((NioSocketWrapper) wrapper).doRead(block, b, off, len);
     }
-
-
 
     @Override
     protected void doClose() throws IOException {
-        channel.close();
-    }
-
-
-    private int fillReadBuffer(boolean block) throws IOException {
-        int nRead;
-        if (block) {
-            Selector selector = null;
-            try {
-                selector = pool.get();
-            } catch ( IOException x ) {
-                // Ignore
-            }
-            try {
-                NioEndpoint.NioSocketWrapper att =
-                        (NioEndpoint.NioSocketWrapper) channel.getAttachment(false);
-                if (att == null) {
-                    throw new IOException("Key must be cancelled.");
-                }
-                nRead = pool.read(channel.getBufHandler().getReadBuffer(),
-                        channel, selector, att.getTimeout());
-            } catch (EOFException eof) {
-                nRead = -1;
-            } finally {
-                if (selector != null) {
-                    pool.put(selector);
-                }
-            }
-        } else {
-            nRead = channel.read(channel.getBufHandler().getReadBuffer());
-        }
-        return nRead;
+        ((NioSocketWrapper) wrapper).doClose();
     }
 }
