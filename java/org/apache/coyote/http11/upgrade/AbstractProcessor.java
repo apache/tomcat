@@ -37,8 +37,8 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class AbstractProcessor<S>
         implements Processor<S>, WebConnection {
 
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(
+            AbstractProcessor.class.getPackage().getName());
     protected abstract Log getLog();
 
     private final HttpUpgradeHandler httpUpgradeHandler;
