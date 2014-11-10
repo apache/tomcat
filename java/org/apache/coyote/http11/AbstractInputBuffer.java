@@ -25,7 +25,7 @@ import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractInputBuffer<S> implements InputBuffer{
@@ -246,7 +246,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      */
     protected abstract boolean fill(boolean block) throws IOException;
 
-    protected abstract void init(SocketWrapper<S> socketWrapper,
+    protected abstract void init(SocketWrapperBase<S> socketWrapper,
             AbstractEndpoint<S> endpoint) throws IOException;
 
     protected abstract Log getLog();

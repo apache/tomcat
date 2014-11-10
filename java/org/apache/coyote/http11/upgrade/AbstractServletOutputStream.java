@@ -23,7 +23,7 @@ import javax.servlet.WriteListener;
 
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.DispatchType;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractServletOutputStream<S> extends ServletOutputStream {
@@ -31,7 +31,7 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
-    protected final SocketWrapper<S> socketWrapper;
+    protected final SocketWrapperBase<S> socketWrapper;
 
     // Used to ensure that isReady() and onWritePossible() have a consistent
     // view of buffer and fireListener when determining if the listener should
@@ -62,7 +62,7 @@ public abstract class AbstractServletOutputStream<S> extends ServletOutputStream
     private final int asyncWriteBufferSize;
 
 
-    public AbstractServletOutputStream(SocketWrapper<S> socketWrapper,
+    public AbstractServletOutputStream(SocketWrapperBase<S> socketWrapper,
             int asyncWriteBufferSize) {
         this.socketWrapper = socketWrapper;
         this.asyncWriteBufferSize = asyncWriteBufferSize;

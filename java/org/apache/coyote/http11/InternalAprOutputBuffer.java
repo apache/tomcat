@@ -31,7 +31,7 @@ import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Output buffer.
@@ -68,7 +68,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     private long socket;
 
 
-    private SocketWrapper<Long> wrapper;
+    private SocketWrapperBase<Long> wrapper;
 
 
     /**
@@ -90,7 +90,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public void init(SocketWrapper<Long> socketWrapper,
+    public void init(SocketWrapperBase<Long> socketWrapper,
             AbstractEndpoint<Long> endpoint) throws IOException {
 
         wrapper = socketWrapper;

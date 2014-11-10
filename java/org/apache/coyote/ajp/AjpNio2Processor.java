@@ -28,7 +28,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Processes AJP requests using NIO2.
@@ -44,7 +44,7 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
     /**
      * The completion handler used for asynchronous write operations
      */
-    protected CompletionHandler<Integer, SocketWrapper<Nio2Channel>> writeCompletionHandler;
+    protected CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> writeCompletionHandler;
 
     /**
      * Flipped flag for read buffer.
@@ -59,9 +59,9 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
     public AjpNio2Processor(int packetSize, Nio2Endpoint endpoint0) {
         super(packetSize, endpoint0);
         response.setOutputBuffer(new SocketOutputBuffer());
-        this.writeCompletionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
+        this.writeCompletionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
             @Override
-            public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
+            public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
                 boolean notify = false;
                 synchronized (writeCompletionHandler) {
                     if (nBytes.intValue() < 0) {
@@ -78,7 +78,7 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
                 }
             }
             @Override
-            public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
+            public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
                 attachment.setError(true);
                 writePending = false;
                 endpoint.processSocket(attachment, SocketStatus.DISCONNECT, true);
@@ -120,14 +120,14 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
 
 
     @Override
-    protected void setupSocket(SocketWrapper<Nio2Channel> socketWrapper)
+    protected void setupSocket(SocketWrapperBase<Nio2Channel> socketWrapper)
             throws IOException {
         // NO-OP
     }
 
 
     @Override
-    protected void setTimeout(SocketWrapper<Nio2Channel> socketWrapper,
+    protected void setTimeout(SocketWrapperBase<Nio2Channel> socketWrapper,
             int timeout) throws IOException {
         socketWrapper.setTimeout(timeout);
     }

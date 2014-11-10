@@ -33,7 +33,7 @@ import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -140,7 +140,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     @Override
-    protected boolean breakKeepAliveLoop(SocketWrapper<Long> socketWrapper) {
+    protected boolean breakKeepAliveLoop(SocketWrapperBase<Long> socketWrapper) {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {

@@ -31,7 +31,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.AbstractEndpoint;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
@@ -381,7 +381,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     }
 
 
-    public abstract void init(SocketWrapper<S> socketWrapper,
+    public abstract void init(SocketWrapperBase<S> socketWrapper,
             AbstractEndpoint<S> endpoint) throws IOException;
 
     public abstract void sendAck() throws IOException;

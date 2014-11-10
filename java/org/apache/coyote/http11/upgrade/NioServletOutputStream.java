@@ -23,7 +23,7 @@ import java.nio.channels.Selector;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class NioServletOutputStream extends AbstractServletOutputStream<NioChannel> {
 
@@ -32,7 +32,7 @@ public class NioServletOutputStream extends AbstractServletOutputStream<NioChann
     private final int maxWrite;
 
 
-    public NioServletOutputStream(SocketWrapper<NioChannel> socketWrapper,
+    public NioServletOutputStream(SocketWrapperBase<NioChannel> socketWrapper,
             int asyncWriteBufferSize, NioSelectorPool pool) {
         super(socketWrapper, asyncWriteBufferSize);
         channel = socketWrapper.getSocket();
@@ -78,8 +78,8 @@ public class NioServletOutputStream extends AbstractServletOutputStream<NioChann
         channel.getBufHandler().getWriteBuffer().flip();
 
         int written = 0;
-        NioEndpoint.KeyAttachment att =
-                (NioEndpoint.KeyAttachment) channel.getAttachment(false);
+        NioEndpoint.NioSocketWrapper att =
+                (NioEndpoint.NioSocketWrapper) channel.getAttachment(false);
         if (att == null) {
             throw new IOException("Key must be cancelled");
         }
@@ -107,8 +107,8 @@ public class NioServletOutputStream extends AbstractServletOutputStream<NioChann
 
     @Override
     protected void doFlush() throws IOException {
-        NioEndpoint.KeyAttachment att =
-                (NioEndpoint.KeyAttachment) channel.getAttachment(false);
+        NioEndpoint.NioSocketWrapper att =
+                (NioEndpoint.NioSocketWrapper) channel.getAttachment(false);
         if (att == null) {
             throw new IOException("Key must be cancelled");
         }

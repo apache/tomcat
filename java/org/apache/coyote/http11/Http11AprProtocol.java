@@ -31,7 +31,7 @@ import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.net.AprEndpoint.Poller;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -248,7 +248,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
          * @param addToPoller
          */
         @Override
-        public void release(SocketWrapper<Long> socket,
+        public void release(SocketWrapperBase<Long> socket,
                 Processor<Long> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);
@@ -261,7 +261,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         }
 
         @Override
-        public SocketState process(SocketWrapper<Long> socket,
+        public SocketState process(SocketWrapperBase<Long> socket,
                 SocketStatus status) {
             if (proto.npnHandler != null) {
                 Processor<Long> processor = null;
@@ -283,13 +283,13 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         }
 
         @Override
-        protected void initSsl(SocketWrapper<Long> socket,
+        protected void initSsl(SocketWrapperBase<Long> socket,
                 Processor<Long> processor) {
             // NOOP for APR
         }
 
         @Override
-        protected void longPoll(SocketWrapper<Long> socket,
+        protected void longPoll(SocketWrapperBase<Long> socket,
                 Processor<Long> processor) {
 
             if (processor.isAsync()) {
@@ -322,7 +322,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
         @Override
         protected Processor<Long> createUpgradeProcessor(
-                SocketWrapper<Long> socket, ByteBuffer leftoverInput,
+                SocketWrapperBase<Long> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
             return new AprProcessor(socket, leftoverInput,

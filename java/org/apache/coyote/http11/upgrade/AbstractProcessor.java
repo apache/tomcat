@@ -31,7 +31,7 @@ import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractProcessor<S>
@@ -135,7 +135,7 @@ public abstract class AbstractProcessor<S>
     }
 
     @Override
-    public final SocketState process(SocketWrapper<S> socketWrapper)
+    public final SocketState process(SocketWrapperBase<S> socketWrapper)
             throws IOException {
         return null;
     }

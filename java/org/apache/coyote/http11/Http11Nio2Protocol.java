@@ -36,7 +36,7 @@ import org.apache.tomcat.util.net.Nio2Endpoint.Nio2SocketWrapper;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SecureNio2Channel;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -160,7 +160,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
          * close, errors etc.
          */
         @Override
-        public void release(SocketWrapper<Nio2Channel> socket) {
+        public void release(SocketWrapperBase<Nio2Channel> socket) {
             Processor<Nio2Channel> processor =
                 connections.remove(socket.getSocket());
             if (processor != null) {
@@ -170,7 +170,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         }
 
         @Override
-        public SocketState process(SocketWrapper<Nio2Channel> socket,
+        public SocketState process(SocketWrapperBase<Nio2Channel> socket,
                 SocketStatus status) {
             if (proto.npnHandler != null) {
                 SocketState ss = proto.npnHandler.process(socket, status);
@@ -192,7 +192,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
          * @param addToPoller
          */
         @Override
-        public void release(SocketWrapper<Nio2Channel> socket,
+        public void release(SocketWrapperBase<Nio2Channel> socket,
                 Processor<Nio2Channel> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);
@@ -207,7 +207,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
 
 
         @Override
-        protected void initSsl(SocketWrapper<Nio2Channel> socket,
+        protected void initSsl(SocketWrapperBase<Nio2Channel> socket,
                 Processor<Nio2Channel> processor) {
             if (proto.isSSLEnabled() &&
                     (proto.sslImplementation != null)
@@ -223,7 +223,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         }
 
         @Override
-        protected void longPoll(SocketWrapper<Nio2Channel> socket,
+        protected void longPoll(SocketWrapperBase<Nio2Channel> socket,
                 Processor<Nio2Channel> processor) {
             if (processor.isAsync()) {
                 socket.setAsync(true);
@@ -261,7 +261,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
 
         @Override
         protected Processor<Nio2Channel> createUpgradeProcessor(
-                SocketWrapper<Nio2Channel> socket, ByteBuffer leftoverInput,
+                SocketWrapperBase<Nio2Channel> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
             return new Nio2Processor(proto.endpoint, socket, leftoverInput,

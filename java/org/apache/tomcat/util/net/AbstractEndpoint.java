@@ -127,7 +127,7 @@ public abstract class AbstractEndpoint<S> {
                     // Ignore
                 }
                 long now = System.currentTimeMillis();
-                for (SocketWrapper<S> socket : waitingRequests) {
+                for (SocketWrapperBase<S> socket : waitingRequests) {
                     long access = socket.getLastAccess();
                     if (socket.getTimeout() > 0 && (now - access) > socket.getTimeout()) {
                         processSocket(socket, SocketStatus.TIMEOUT, true);
@@ -678,11 +678,11 @@ public abstract class AbstractEndpoint<S> {
      * @param dispatch      Should the processing be performed on a new
      *                          container thread
      */
-    public abstract void processSocket(SocketWrapper<S> socketWrapper,
+    public abstract void processSocket(SocketWrapperBase<S> socketWrapper,
             SocketStatus socketStatus, boolean dispatch);
 
 
-    public void executeNonBlockingDispatches(SocketWrapper<S> socketWrapper) {
+    public void executeNonBlockingDispatches(SocketWrapperBase<S> socketWrapper) {
         /*
          * This method is called when non-blocking IO is initiated by defining
          * a read and/or write listener in a non-container thread. It is called
@@ -1027,8 +1027,8 @@ public abstract class AbstractEndpoint<S> {
     }
 
 
-    protected final Set<SocketWrapper<S>> waitingRequests = Collections
-            .newSetFromMap(new ConcurrentHashMap<SocketWrapper<S>, Boolean>());
+    protected final Set<SocketWrapperBase<S>> waitingRequests = Collections
+            .newSetFromMap(new ConcurrentHashMap<SocketWrapperBase<S>, Boolean>());
 
 
     /**

@@ -30,7 +30,7 @@ import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -145,7 +145,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
          * close, errors etc.
          */
         @Override
-        public void release(SocketWrapper<NioChannel> socket) {
+        public void release(SocketWrapperBase<NioChannel> socket) {
             Processor<NioChannel> processor =
                     connections.remove(socket.getSocket());
             if (processor != null) {
@@ -159,7 +159,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
          * required.
          */
         @Override
-        public void release(SocketWrapper<NioChannel> socket,
+        public void release(SocketWrapperBase<NioChannel> socket,
                 Processor<NioChannel> processor, boolean isSocketClosing,
                 boolean addToPoller) {
             processor.recycle(isSocketClosing);

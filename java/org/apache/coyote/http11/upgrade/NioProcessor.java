@@ -24,7 +24,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioSelectorPool;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class NioProcessor extends AbstractProcessor<NioChannel> {
 
@@ -34,7 +34,7 @@ public class NioProcessor extends AbstractProcessor<NioChannel> {
 
     private static final int INFINITE_TIMEOUT = -1;
 
-    public NioProcessor(SocketWrapper<NioChannel> wrapper, ByteBuffer leftoverInput,
+    public NioProcessor(SocketWrapperBase<NioChannel> wrapper, ByteBuffer leftoverInput,
             HttpUpgradeHandler httpUpgradeProcessor, NioSelectorPool pool,
             int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,

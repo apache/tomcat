@@ -30,25 +30,25 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class Nio2ServletInputStream extends AbstractServletInputStream {
 
     private final AbstractEndpoint<Nio2Channel> endpoint;
-    private final SocketWrapper<Nio2Channel> wrapper;
+    private final SocketWrapperBase<Nio2Channel> wrapper;
     private final Nio2Channel channel;
-    private final CompletionHandler<Integer, SocketWrapper<Nio2Channel>> completionHandler;
+    private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> completionHandler;
     private boolean flipped = false;
     private volatile boolean readPending = false;
     private volatile boolean interest = true;
 
-    public Nio2ServletInputStream(SocketWrapper<Nio2Channel> wrapper, AbstractEndpoint<Nio2Channel> endpoint0) {
+    public Nio2ServletInputStream(SocketWrapperBase<Nio2Channel> wrapper, AbstractEndpoint<Nio2Channel> endpoint0) {
         this.endpoint = endpoint0;
         this.wrapper = wrapper;
         this.channel = wrapper.getSocket();
-        this.completionHandler = new CompletionHandler<Integer, SocketWrapper<Nio2Channel>>() {
+        this.completionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
             @Override
-            public void completed(Integer nBytes, SocketWrapper<Nio2Channel> attachment) {
+            public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
                 boolean notify = false;
                 synchronized (completionHandler) {
                     if (nBytes.intValue() < 0) {
@@ -66,7 +66,7 @@ public class Nio2ServletInputStream extends AbstractServletInputStream {
                 }
             }
             @Override
-            public void failed(Throwable exc, SocketWrapper<Nio2Channel> attachment) {
+            public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
                 attachment.setError(true);
                 readPending = false;
                 if (exc instanceof AsynchronousCloseException) {

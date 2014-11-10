@@ -29,10 +29,10 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
+import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SecureNioChannel;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -99,7 +99,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     @Override
     protected void resetTimeouts() {
-        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
+        final NioEndpoint.NioSocketWrapper attach = (NioEndpoint.NioSocketWrapper)socketWrapper.getSocket().getAttachment(false);
         if (!getErrorState().isError() && attach != null &&
                 asyncStateMachine.isAsyncDispatching()) {
             long soTimeout = endpoint.getSoTimeout();
@@ -179,17 +179,17 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
 
     @Override
-    protected boolean breakKeepAliveLoop(SocketWrapper<NioChannel> socketWrapper) {
+    protected boolean breakKeepAliveLoop(SocketWrapperBase<NioChannel> socketWrapper) {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {
-            ((KeyAttachment) socketWrapper).setSendfileData(sendfileData);
+            ((NioSocketWrapper) socketWrapper).setSendfileData(sendfileData);
             sendfileData.keepAlive = keepAlive;
             SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
                     socketWrapper.getSocket().getPoller().getSelector());
             //do the first write on this thread, might as well
             if (socketWrapper.getSocket().getPoller().processSendfile(key,
-                    (KeyAttachment) socketWrapper, true)) {
+                    (NioSocketWrapper) socketWrapper, true)) {
                 sendfileInProgress = true;
             } else {
                 // Write failed

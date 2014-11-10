@@ -21,7 +21,7 @@ import org.apache.coyote.Adapter;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapper;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Interface specific for protocols that negotiate at NPN level, like
@@ -37,7 +37,7 @@ public interface NpnHandler<S> {
      * @return OPEN if the socket doesn't have the right npn.
      *    CLOSE if processing is done. LONG to request read polling.
      */
-    SocketState process(SocketWrapper<S> socket, SocketStatus status);
+    SocketState process(SocketWrapperBase<S> socket, SocketStatus status);
 
     /**
      * Initialize the npn handler.
