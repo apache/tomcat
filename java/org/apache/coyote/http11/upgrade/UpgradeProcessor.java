@@ -28,29 +28,34 @@ import javax.servlet.http.WebConnection;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractProcessor<S>
-        implements Processor<S>, WebConnection {
+public class UpgradeProcessor<S> implements Processor<S>, WebConnection {
 
-    protected static final StringManager sm = StringManager.getManager(
-            AbstractProcessor.class.getPackage().getName());
-    protected abstract Log getLog();
+    private static final int INFINITE_TIMEOUT = -1;
+
+    private static final Log log = LogFactory.getLog(UpgradeProcessor.class);
+    private static final StringManager sm = StringManager.getManager(UpgradeProcessor.class);
 
     private final HttpUpgradeHandler httpUpgradeHandler;
     private final UpgradeServletInputStream upgradeServletInputStream;
     private final UpgradeServletOutputStream upgradeServletOutputStream;
 
-    protected AbstractProcessor (HttpUpgradeHandler httpUpgradeHandler,
-            UpgradeServletInputStream upgradeServletInputStream,
-            UpgradeServletOutputStream upgradeServletOutputStream) {
+
+    public UpgradeProcessor(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
+            HttpUpgradeHandler httpUpgradeHandler, int asyncWriteBufferSize) {
         this.httpUpgradeHandler = httpUpgradeHandler;
-        this.upgradeServletInputStream = upgradeServletInputStream;
-        this.upgradeServletOutputStream = upgradeServletOutputStream;
+        this.upgradeServletInputStream = new UpgradeServletInputStream(wrapper);
+        this.upgradeServletOutputStream =
+                new UpgradeServletOutputStream(wrapper, asyncWriteBufferSize);
+
+        wrapper.unRead(leftOverInput);
+        wrapper.setTimeout(INFINITE_TIMEOUT);
     }
 
 
@@ -83,15 +88,15 @@ public abstract class AbstractProcessor<S>
         return true;
     }
 
+
     @Override
     public HttpUpgradeHandler getHttpUpgradeHandler() {
         return httpUpgradeHandler;
     }
 
-    @Override
-    public final SocketState upgradeDispatch(SocketStatus status)
-            throws IOException {
 
+    @Override
+    public final SocketState upgradeDispatch(SocketStatus status) throws IOException {
         if (status == SocketStatus.OPEN_READ) {
             upgradeServletInputStream.onDataAvailable();
         } else if (status == SocketStatus.OPEN_WRITE) {
@@ -100,14 +105,12 @@ public abstract class AbstractProcessor<S>
             try {
                 upgradeServletInputStream.close();
             } catch (IOException ioe) {
-                getLog().debug(sm.getString(
-                        "abstractProcessor.isCloseFail", ioe));
+                log.debug(sm.getString("abstractProcessor.isCloseFail", ioe));
             }
             try {
                 upgradeServletOutputStream.close();
             } catch (IOException ioe) {
-                getLog().debug(sm.getString(
-                        "abstractProcessor.osCloseFail", ioe));
+                log.debug(sm.getString("abstractProcessor.osCloseFail", ioe));
             }
             return SocketState.CLOSED;
         } else {
@@ -120,6 +123,7 @@ public abstract class AbstractProcessor<S>
         }
         return SocketState.UPGRADED;
     }
+
 
     @Override
     public final void recycle(boolean socketClosing) {
@@ -134,41 +138,48 @@ public abstract class AbstractProcessor<S>
         return null;
     }
 
+
     @Override
-    public final SocketState process(SocketWrapperBase<S> socketWrapper)
-            throws IOException {
+    public final SocketState process(SocketWrapperBase<S> socketWrapper) throws IOException {
         return null;
     }
+
 
     @Override
     public final SocketState asyncDispatch(SocketStatus status) {
         return null;
     }
 
+
     @Override
     public void errorDispatch() {
         // NO-OP
     }
+
 
     @Override
     public final SocketState asyncPostProcess() {
         return null;
     }
 
+
     @Override
     public final boolean isAsync() {
         return false;
     }
+
 
     @Override
     public final Request getRequest() {
         return null;
     }
 
+
     @Override
     public final void setSslSupport(SSLSupport sslSupport) {
         // NOOP
     }
+
 
     @Override
     public ByteBuffer getLeftoverInput() {
