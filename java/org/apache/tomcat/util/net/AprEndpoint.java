@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -2346,13 +2351,122 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     }
 
 
-    private static class AprSocketWrapper extends SocketWrapperBase<Long> {
+    public static class AprSocketWrapper extends SocketWrapperBase<Long> {
+
+        private ByteBuffer leftOverInput;
+        private volatile boolean eagain = false;
+        private volatile boolean closed = false;
 
         // This field should only be used by Poller#run()
         private int pollerFlags = 0;
 
+
         public AprSocketWrapper(Long socket, AprEndpoint endpoint) {
             super(socket, endpoint);
+        }
+
+
+        public void setLeftOverInput(ByteBuffer leftOverInput) {
+            if (leftOverInput != null) {
+                this.leftOverInput = ByteBuffer.allocate(leftOverInput.remaining());
+                this.leftOverInput.put(leftOverInput);
+            }
+        }
+
+
+        public int doRead(boolean block, byte[] b, int off, int len)
+                throws IOException {
+
+            if (closed) {
+                throw new IOException(sm.getString("apr.closed", getSocket()));
+            }
+
+            if (leftOverInput != null) {
+                if (leftOverInput.remaining() < len) {
+                    len = leftOverInput.remaining();
+                }
+                leftOverInput.get(b, off, len);
+                if (leftOverInput.remaining() == 0) {
+                    leftOverInput = null;
+                }
+                return len;
+            }
+
+            Lock readLock = getBlockingStatusReadLock();
+            WriteLock writeLock = getBlockingStatusWriteLock();
+
+            boolean readDone = false;
+            int result = 0;
+            readLock.lock();
+            try {
+                if (getBlockingStatus() == block) {
+                    result = Socket.recv(getSocket().longValue(), b, off, len);
+                    readDone = true;
+                }
+            } finally {
+                readLock.unlock();
+            }
+
+            if (!readDone) {
+                writeLock.lock();
+                try {
+                    setBlockingStatus(block);
+                    // Set the current settings for this socket
+                    Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
+                    // Downgrade the lock
+                    readLock.lock();
+                    try {
+                        writeLock.unlock();
+                        result = Socket.recv(getSocket().longValue(), b, off, len);
+                    } finally {
+                        readLock.unlock();
+                    }
+                } finally {
+                    // Should have been released above but may not have been on some
+                    // exception paths
+                    if (writeLock.isHeldByCurrentThread()) {
+                        writeLock.unlock();
+                    }
+                }
+            }
+
+            if (result > 0) {
+                eagain = false;
+                return result;
+            } else if (-result == Status.EAGAIN) {
+                eagain = true;
+                return 0;
+            } else if (-result == Status.APR_EGENERAL && isSecure()) {
+                // Not entirely sure why this is necessary. Testing to date has not
+                // identified any issues with this but log it so it can be tracked
+                // if it is suspected of causing issues in the future.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("apr.read.sslGeneralError", getSocket(), this));
+                }
+                eagain = true;
+                return 0;
+            } else if (-result == Status.APR_EOF) {
+                throw new EOFException(sm.getString("apr.clientAbort"));
+            } else if ((OS.IS_WIN32 || OS.IS_WIN64) &&
+                    (-result == Status.APR_OS_START_SYSERR + 10053)) {
+                // 10053 on Windows is connection aborted
+                throw new EOFException(sm.getString("apr.clientAbort"));
+            } else {
+                throw new IOException(sm.getString("apr.read.error",
+                        Integer.valueOf(-result), getSocket(), this));
+            }
+        }
+
+
+        public boolean doIsReady() {
+            return !eagain;
+        }
+
+
+        public void doClose() {
+            closed = true;
+            // AbstractProcessor needs to trigger the close as multiple closes for
+            // APR/native sockets will cause problems.
         }
     }
 }

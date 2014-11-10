@@ -24,6 +24,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.net.AprEndpoint;
+import org.apache.tomcat.util.net.AprEndpoint.AprSocketWrapper;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class AprProcessor extends AbstractProcessor<Long> {
@@ -34,13 +35,13 @@ public class AprProcessor extends AbstractProcessor<Long> {
 
     private static final int INFINITE_TIMEOUT = -1;
 
-    public AprProcessor(SocketWrapperBase<Long> wrapper, ByteBuffer leftoverInput,
+    public AprProcessor(SocketWrapperBase<Long> wrapper, ByteBuffer leftOverInput,
             HttpUpgradeHandler httpUpgradeProcessor, AprEndpoint endpoint,
             int asyncWriteBufferSize) {
         super(httpUpgradeProcessor,
-                new AprServletInputStream(wrapper, leftoverInput),
+                new AprServletInputStream(wrapper),
                 new AprServletOutputStream(wrapper, asyncWriteBufferSize, endpoint));
-
+        ((AprSocketWrapper) wrapper).setLeftOverInput(leftOverInput);
         Socket.timeoutSet(wrapper.getSocket().longValue(), INFINITE_TIMEOUT);
     }
 }
