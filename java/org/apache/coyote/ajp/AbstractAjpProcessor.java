@@ -678,7 +678,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             if(!getAdapter().asyncDispatch(request, response, status)) {
                 setErrorState(ErrorState.CLOSE_NOW, null);
             }
-            resetTimeouts();
         } catch (InterruptedIOException e) {
             setErrorState(ErrorState.CLOSE_NOW, e);
         } catch (Throwable t) {
@@ -697,6 +696,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 return SocketState.LONG;
             }
         } else {
+            // Set keep alive timeout for next request if enabled
+            if (keepAliveTimeout > 0) {
+                socketWrapper.setTimeout(keepAliveTimeout);
+            }
             request.updateCounters();
             if (getErrorState().isError()) {
                 return SocketState.CLOSED;
@@ -841,7 +844,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             request.updateCounters();
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-            // Set keep alive timeout if enabled
+            // Set keep alive timeout for next request if enabled
             if (keepAliveTimeout > 0) {
                 socketWrapper.setTimeout(keepAliveTimeout);
             }
@@ -918,14 +921,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     // ------------------------------------------------------ Protected Methods
-
-    // Methods called by asyncDispatch
-    /**
-     * Provides a mechanism for those connector implementations (currently only
-     * NIO) that need to reset timeouts from Async timeouts to standard HTTP
-     * timeouts once async processing completes.
-     */
-    protected abstract void resetTimeouts();
 
     // Methods called by prepareResponse()
     protected abstract int output(byte[] src, int offset, int length,
