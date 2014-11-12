@@ -1399,7 +1399,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         }
                     } else if (state == SocketState.UPGRADING) {
                         socket.setKeptAlive(true);
-                        socket.access();
                         launch = true;
                     }
                 } else if (handshake == -1 ) {
