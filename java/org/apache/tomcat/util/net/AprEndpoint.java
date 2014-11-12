@@ -2374,6 +2374,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
+        // TODO Can this be removed once all reads and writes are handled within
+        // this class?
+        @Override
+        public void setTimeout(long timeout) {
+            super.setTimeout(timeout);
+            Socket.timeoutSet(getSocket().longValue(), timeout * 1000);
+        }
+
+
+
         @Override
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
 

@@ -738,7 +738,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 }
                 // Set back timeout if keep alive timeout is enabled
                 if (keepAliveTimeout > 0) {
-                    setTimeout(socketWrapper, soTimeout);
+                    socketWrapper.setTimeout(soTimeout);
                 }
                 // Check message type, process right away and break if
                 // not regular request processing
@@ -843,7 +843,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
             // Set keep alive timeout if enabled
             if (keepAliveTimeout > 0) {
-                setTimeout(socketWrapper, keepAliveTimeout);
+                socketWrapper.setTimeout(keepAliveTimeout);
             }
 
             recycle(false);
@@ -934,9 +934,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     // Methods called by process()
     protected abstract void setupSocket(SocketWrapperBase<S> socketWrapper)
             throws IOException;
-
-    protected abstract void setTimeout(SocketWrapperBase<S> socketWrapper,
-            int timeout) throws IOException;
 
     // Methods used by readMessage
     /**
