@@ -34,7 +34,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Iterator;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
@@ -1253,10 +1252,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 return;
             }
             //timeout
-            Set<SelectionKey> keys = selector.keys();
             int keycount = 0;
-            for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext();) {
-                SelectionKey key = iter.next();
+            for (SelectionKey key : selector.keys()) {
                 keycount++;
                 try {
                     NioSocketWrapper ka = (NioSocketWrapper) key.attachment();
