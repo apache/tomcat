@@ -85,36 +85,8 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
 
     @Override
-    protected int output(byte[] src, int offset, int length, boolean block)
-            throws IOException {
-
-        NioEndpoint.NioSocketWrapper att =
-                (NioEndpoint.NioSocketWrapper) socketWrapper.getSocket().getAttachment(false);
-        if ( att == null ) throw new IOException("Key must be cancelled");
-
-        ByteBuffer writeBuffer =
-                socketWrapper.getSocket().getBufHandler().getWriteBuffer();
-
-        writeBuffer.put(src, offset, length);
-
-        writeBuffer.flip();
-
-        long writeTimeout = att.getWriteTimeout();
-        Selector selector = null;
-        try {
-            selector = pool.get();
-        } catch (IOException x) {
-            //ignore
-        }
-        try {
-            return pool.write(writeBuffer, socketWrapper.getSocket(), selector,
-                    writeTimeout, block);
-        } finally {
-            writeBuffer.clear();
-            if (selector != null) {
-                pool.put(selector);
-            }
-        }
+    protected int output(byte[] src, int offset, int length, boolean block) throws IOException {
+        return socketWrapper.write(block, src, offset, length);
     }
 
 
