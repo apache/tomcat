@@ -78,28 +78,6 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
 
     @Override
-    protected void resetTimeouts() {
-        // The NIO connector uses the timeout configured on the wrapper in the
-        // poller. Therefore, it needs to be reset once asycn processing has
-        // finished.
-        final NioEndpoint.NioSocketWrapper attach =
-                (NioEndpoint.NioSocketWrapper)socketWrapper.getSocket().getAttachment(false);
-        if (!getErrorState().isError() && attach != null &&
-                asyncStateMachine.isAsyncDispatching()) {
-            long soTimeout = endpoint.getSoTimeout();
-
-            //reset the timeout
-            if (keepAliveTimeout > 0) {
-                attach.setTimeout(keepAliveTimeout);
-            } else {
-                attach.setTimeout(soTimeout);
-            }
-        }
-
-    }
-
-
-    @Override
     protected void setupSocket(SocketWrapperBase<NioChannel> socketWrapper)
             throws IOException {
         // NO-OP
