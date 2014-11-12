@@ -32,6 +32,7 @@ public abstract class SocketWrapperBase<E> {
 
     private volatile long lastAccess = System.currentTimeMillis();
     private volatile long lastAsyncStart = 0;
+    private volatile long asyncTimeout = -1;
     private long timeout = -1;
     private boolean error = false;
     private volatile int keepAliveLeft = 100;
@@ -112,6 +113,12 @@ public abstract class SocketWrapperBase<E> {
     public long getLastAsyncStart() {
        return lastAsyncStart;
     }
+    public void setAsyncTimeout(long timeout) {
+        asyncTimeout = timeout;
+    }
+    public long getAsyncTimeout() {
+        return asyncTimeout;
+    }
     public boolean isUpgraded() { return upgraded; }
     public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
     public boolean isSecure() { return secure; }
@@ -186,6 +193,7 @@ public abstract class SocketWrapperBase<E> {
         keepAliveLeft = 100;
         lastAccess = System.currentTimeMillis();
         lastAsyncStart = 0;
+        asyncTimeout = -1;
         localAddr = null;
         localName = null;
         localPort = -1;
