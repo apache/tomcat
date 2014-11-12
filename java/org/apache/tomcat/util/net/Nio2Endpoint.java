@@ -737,13 +737,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private SendfileData sendfileData = null;
         private boolean upgradeInit = false;
 
-        private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> completionHandlerRead;
+        private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> readCompletionHandler;
         private boolean flipped = false;
         private volatile boolean readPending = false;
         private volatile boolean interest = true;
 
         private final int maxWrite;
-        private final CompletionHandler<Integer, ByteBuffer> completionHandlerWrite;
+        private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
         private final Semaphore writePending = new Semaphore(1);
 
 
@@ -751,11 +751,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             super(channel, endpoint);
             maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
 
-            this.completionHandlerRead = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
+            this.readCompletionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
                 @Override
                 public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
                     boolean notify = false;
-                    synchronized (completionHandlerRead) {
+                    synchronized (readCompletionHandler) {
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attachment);
                         } else {
@@ -782,14 +782,14 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 }
             };
 
-            this.completionHandlerWrite = new CompletionHandler<Integer, ByteBuffer>() {
+            this.writeCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
                     if (nBytes.intValue() < 0) {
                         failed(new EOFException(), attachment);
                     } else if (attachment.hasRemaining()) {
                         getSocket().write(attachment, getTimeout(),
-                                TimeUnit.MILLISECONDS, attachment, completionHandlerWrite);
+                                TimeUnit.MILLISECONDS, attachment, writeCompletionHandler);
                     } else {
                         writePending.release();
                         if (!Nio2Endpoint.isInline()) {
@@ -844,7 +844,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         @Override
         public boolean isReady() throws IOException {
-            synchronized (completionHandlerRead) {
+            synchronized (readCompletionHandler) {
                 if (readPending) {
                     interest = true;
                     return false;
@@ -879,7 +879,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
 
-            synchronized (completionHandlerRead) {
+            synchronized (readCompletionHandler) {
                 if (readPending) {
                     return 0;
                 }
@@ -984,7 +984,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 flipped = false;
                 Nio2Endpoint.startInline();
                 getSocket().read(readBuffer, getTimeout(), TimeUnit.MILLISECONDS,
-                        this, completionHandlerRead);
+                        this, readCompletionHandler);
                 Nio2Endpoint.endInline();
                 if (!readPending) {
                     nRead = readBuffer.position();
@@ -1034,14 +1034,14 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         private int writeInternal(boolean block, byte[] b, int off, int len)
                 throws IOException {
-            ByteBuffer buffer = getSocket().getBufHandler().getWriteBuffer();
+            ByteBuffer writeBuffer = getSocket().getBufHandler().getWriteBuffer();
             int written = 0;
             if (block) {
-                buffer.clear();
-                buffer.put(b, off, len);
-                buffer.flip();
+                writeBuffer.clear();
+                writeBuffer.put(b, off, len);
+                writeBuffer.flip();
                 try {
-                    written = getSocket().write(buffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue();
+                    written = getSocket().write(writeBuffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue();
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
                         throw (IOException) e.getCause();
@@ -1056,11 +1056,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 }
             } else {
                 if (writePending.tryAcquire()) {
-                    buffer.clear();
-                    buffer.put(b, off, len);
-                    buffer.flip();
+                    writeBuffer.clear();
+                    writeBuffer.put(b, off, len);
+                    writeBuffer.flip();
                     Nio2Endpoint.startInline();
-                    getSocket().write(buffer, getTimeout(), TimeUnit.MILLISECONDS, buffer, completionHandlerWrite);
+                    getSocket().write(writeBuffer, getTimeout(), TimeUnit.MILLISECONDS, writeBuffer, writeCompletionHandler);
                     Nio2Endpoint.endInline();
                     written = len;
                 }
