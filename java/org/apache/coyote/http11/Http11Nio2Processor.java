@@ -155,7 +155,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         // Check to see if we have read any of the request line yet
         if (((InternalNio2InputBuffer)
                 inputBuffer).getParsingRequestLinePhase() < 1) {
-            if (socketWrapper.getLastAccess() > -1 || keptAlive) {
+            if (keptAlive) {
                 // Haven't read the request line and have previously processed a
                 // request. Must be keep-alive. Make sure poller uses keepAlive.
                 socketWrapper.setTimeout(endpoint.getKeepAliveTimeout());
