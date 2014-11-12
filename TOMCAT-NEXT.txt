@@ -19,7 +19,8 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
 
  1. Fix Java 8 Javadoc warnings. Currently ~2800.
 
- 2. Remove BIO AJP and HTTP connector.
+ 2. DONE.
+    Remove BIO AJP and HTTP connector.
 
  3. DONE.
     Remove Comet support.
@@ -46,3 +47,6 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
 
 11. Reduce instances of setters and getters for the same property existing on an
     object and its parent. This may require new objects to be exposed via JMX.
+
+12. Consider wrapping the SocketWrapper with a facade to detect / prevent
+    components retaining references longer than they should.
