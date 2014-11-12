@@ -1292,7 +1292,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                             processKey(key,ka);
                         } else if (!ka.isAsync() || ka.getTimeout() > 0) {
                             // Async requests with a timeout of 0 or less never timeout
-                            long delta = now - ka.getLastAccess();
+                            long delta = now - ka.getLastAsyncStart();
                             long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
                             boolean isTimedout = delta > timeout;
                             if (isTimedout) {
