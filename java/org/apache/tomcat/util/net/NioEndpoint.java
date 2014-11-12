@@ -1319,6 +1319,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     public static class NioSocketWrapper extends SocketWrapperBase<NioChannel> {
 
         private final int maxWrite;
+        private final NioSelectorPool pool;
 
         private Poller poller = null;
         private int interestOps = 0;
@@ -1331,6 +1332,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
             maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
+            pool = endpoint.getSelectorPool();
         }
 
         public void reset(Poller poller, NioChannel channel, long soTimeout) {
@@ -1500,7 +1502,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             NioChannel channel = getSocket();
             if (block) {
                 Selector selector = null;
-                NioSelectorPool pool = ((NioEndpoint) getEndpoint()).getSelectorPool();
                 try {
                     selector = pool.get();
                 } catch ( IOException x ) {
@@ -1560,18 +1561,20 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
         private int writeInternal (boolean block, byte[] b, int off, int len)
                 throws IOException {
-            getSocket().getBufHandler().getWriteBuffer().clear();
-            getSocket().getBufHandler().getWriteBuffer().put(b, off, len);
-            getSocket().getBufHandler().getWriteBuffer().flip();
 
-            int written = 0;
             NioEndpoint.NioSocketWrapper att =
                     (NioEndpoint.NioSocketWrapper) getSocket().getAttachment(false);
             if (att == null) {
                 throw new IOException("Key must be cancelled");
             }
+
+            ByteBuffer writeBuffer = getSocket().getBufHandler().getWriteBuffer();
+            writeBuffer.clear();
+            writeBuffer.put(b, off, len);
+            writeBuffer.flip();
+
+            int written = 0;
             long writeTimeout = att.getWriteTimeout();
-            NioSelectorPool pool = ((NioEndpoint) getEndpoint()).getSelectorPool();
             Selector selector = null;
             try {
                 selector = pool.get();
@@ -1579,8 +1582,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 //ignore
             }
             try {
-                written = pool.write(getSocket().getBufHandler().getWriteBuffer(),
-                        getSocket(), selector, writeTimeout, block);
+                written = pool.write(writeBuffer, getSocket(), selector,
+                        writeTimeout, block);
             } finally {
                 if (selector != null) {
                     pool.put(selector);
@@ -1601,7 +1604,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 throw new IOException("Key must be cancelled");
             }
             long writeTimeout = att.getWriteTimeout();
-            NioSelectorPool pool = ((NioEndpoint) getEndpoint()).getSelectorPool();
             Selector selector = null;
             try {
                 selector = pool.get();
