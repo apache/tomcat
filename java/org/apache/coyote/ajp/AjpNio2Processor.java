@@ -127,13 +127,6 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
 
 
     @Override
-    protected void setTimeout(SocketWrapperBase<Nio2Channel> socketWrapper,
-            int timeout) throws IOException {
-        socketWrapper.setTimeout(timeout);
-    }
-
-
-    @Override
     protected int output(byte[] src, int offset, int length, boolean block)
             throws IOException {
 
