@@ -922,10 +922,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
     // ------------------------------------------------------ Protected Methods
 
-    // Methods called by prepareResponse()
-    protected abstract int output(byte[] src, int offset, int length,
-            boolean block) throws IOException;
-
     // Methods called by process()
     protected abstract void setupSocket(SocketWrapperBase<S> socketWrapper)
             throws IOException;
@@ -1534,6 +1530,15 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         } else {
             output(endMessageArray, 0, endMessageArray.length, true);
         }
+    }
+
+
+    private int output(byte[] src, int offset, int length,
+            boolean block) throws IOException {
+        if (socketWrapper == null || socketWrapper.getSocket() == null)
+            return -1;
+
+        return socketWrapper.write(block, src, offset, length);
     }
 
 

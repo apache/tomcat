@@ -70,16 +70,6 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
 
 
     @Override
-    protected int output(byte[] src, int offset, int length, boolean block) throws IOException {
-
-        if (socketWrapper == null || socketWrapper.getSocket() == null)
-            return -1;
-
-        return socketWrapper.write(block, src, offset, length);
-    }
-
-
-    @Override
     protected boolean read(byte[] buf, int pos, int n, boolean blockFirstRead)
         throws IOException {
 
