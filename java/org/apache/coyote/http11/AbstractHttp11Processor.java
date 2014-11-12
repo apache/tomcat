@@ -792,8 +792,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
         case ASYNC_START: {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
-            // Async time out is based on SocketWrapper access time
-            getSocketWrapper().access();
             break;
         }
         case ASYNC_DISPATCHED: {
@@ -848,9 +846,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (param == null || socketWrapper == null) {
                 return;
             }
-            long timeout = ((Long)param).longValue();
-            // If we are not piggy backing on a worker thread, set the timeout
-            socketWrapper.setTimeout(timeout);
+            long timeout = ((Long) param).longValue();
+            socketWrapper.setAsyncTimeout(timeout);
             break;
         }
         case ASYNC_DISPATCH: {

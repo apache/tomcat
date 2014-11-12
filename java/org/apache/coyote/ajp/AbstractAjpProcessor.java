@@ -518,8 +518,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         }
         case ASYNC_START: {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
-            // Async time out is based on SocketWrapper access time
-            getSocketWrapper().access();
             break;
         }
         case ASYNC_COMPLETE: {
@@ -542,7 +540,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         case ASYNC_SETTIMEOUT: {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
-            socketWrapper.setTimeout(timeout);
+            socketWrapper.setAsyncTimeout(timeout);
             break;
         }
         case ASYNC_TIMEOUT: {
