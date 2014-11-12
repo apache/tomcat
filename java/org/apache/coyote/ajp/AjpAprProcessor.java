@@ -81,14 +81,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
 
     @Override
-    protected int output(byte[] src, int offset, int length, boolean block)
-            throws IOException {
-
-        return socketWrapper.write(block, src, offset, length);
-    }
-
-
-    @Override
     protected boolean read(byte[] buf, int pos, int n, boolean block)
             throws IOException {
 
