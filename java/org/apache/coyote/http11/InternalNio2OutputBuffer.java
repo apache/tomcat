@@ -294,8 +294,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
 
         ByteBuffer writeByteBuffer = socket.getSocket().getBufHandler().getWriteBuffer();
 
-        socket.access();
-
         if (isBlocking()) {
             while (length > 0) {
                 int thisTime = transfer(buf, offset, length, writeByteBuffer);
@@ -416,8 +414,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
         } else {
             synchronized (completionHandler) {
                 if (hasPermit || writePending.tryAcquire()) {
-                    //prevent timeout for async
-                    socket.access();
                     if (!flipped) {
                         byteBuffer.flip();
                         flipped = true;

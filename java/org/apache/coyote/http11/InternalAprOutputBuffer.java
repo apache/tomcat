@@ -184,8 +184,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
             offset = offset + thisTime;
         }
 
-        wrapper.access();
-
         if (!isBlocking() && length>0) {
             // Buffer the remaining data
             addToBuffers(buf, offset, length);
@@ -207,8 +205,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     @Override
     protected synchronized boolean flushBuffer(boolean block)
             throws IOException {
-
-        wrapper.access();
 
         if (hasMoreDataToFlush()) {
             writeToSocket(block);

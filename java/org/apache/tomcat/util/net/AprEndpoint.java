@@ -2275,7 +2275,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         closeSocket(socket.getSocket().longValue());
                         socket = null;
                     } else if (state == Handler.SocketState.LONG) {
-                        socket.access();
                         if (socket.isAsync()) {
                             waitingRequests.add(socket);
                         }
@@ -2337,12 +2336,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 closeSocket(socket.getSocket().longValue());
                 socket.reset(null, 1);
             } else if (state == Handler.SocketState.LONG) {
-                socket.access();
                 if (socket.isAsync()) {
                     waitingRequests.add(socket);
                 }
             } else if (state == Handler.SocketState.ASYNC_END) {
-                socket.access();
                 SocketProcessor proc = new SocketProcessor(socket,
                         SocketStatus.OPEN_READ);
                 getExecutor().execute(proc);
