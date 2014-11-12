@@ -2716,7 +2716,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           description="Download components necessary to validate source"
           if="${execute.validate}">
 
-    <antcall target="downloadzip">
+    <antcall target="downloadfile">
       <param name="sourcefile" value="${checkstyle.loc}"/>
       <param name="destfile" value="${checkstyle.jar}"/>
       <param name="destdir" value="${base.path}"/>
