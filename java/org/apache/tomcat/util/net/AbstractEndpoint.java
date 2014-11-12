@@ -129,9 +129,12 @@ public abstract class AbstractEndpoint<S> {
                 }
                 long now = System.currentTimeMillis();
                 for (SocketWrapperBase<S> socket : waitingRequests) {
-                    long access = socket.getLastAsyncStart();
-                    if (socket.getTimeout() > 0 && (now - access) > socket.getTimeout()) {
-                        processSocket(socket, SocketStatus.TIMEOUT, true);
+                    long asyncTimeout = socket.getAsyncTimeout();
+                    if (asyncTimeout > 0) {
+                        long asyncStart = socket.getLastAsyncStart();
+                        if ((now - asyncStart) > asyncTimeout) {
+                            processSocket(socket, SocketStatus.TIMEOUT, true);
+                        }
                     }
                 }
 

@@ -1290,12 +1290,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                             key.interestOps(0);
                             ka.interestOps(0); //avoid duplicate stop calls
                             processKey(key,ka);
-                        } else if (!ka.isAsync() || ka.getTimeout() > 0) {
-                            // Async requests with a timeout of 0 or less never timeout
-                            long delta = now - ka.getLastAsyncStart();
-                            long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
-                            boolean isTimedout = delta > timeout;
-                            if (isTimedout) {
+                        } else if (ka.getAsyncTimeout() > 0) {
+                            if ((now - ka.getLastAsyncStart()) > ka.getAsyncTimeout()) {
                                 // Prevent subsequent timeouts if the timeout event takes a while to process
                                 ka.access(Long.MAX_VALUE);
                                 processSocket(ka, SocketStatus.TIMEOUT, true);
