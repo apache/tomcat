@@ -217,16 +217,6 @@ checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 
-# ----- JSON Libraries (for bayeux module) -----
-json-lib.home=${base.path}/json-20080701
-json-lib.lib=http://repo1.maven.org/maven2/org/json/json/20080701/json-20080701.jar
-json-lib.jar=json.jar
-
-# ----- Dojo Toolkit (for bayeux module) -----
-dojo-js.home=${base.path}/dojo-release-1.1.1
-dojo-js.loc=http://download.dojotoolkit.org/release-1.1.1/dojo-release-1.1.1.tar.gz
-dojo-js.jar=${dojo-js.home}/dojo/dojo.js
-
 # ----- Cobertura code coverage tool -----
 cobertura.version=2.0.3
 cobertura.home=${base.path}/cobertura-${cobertura.version}
