@@ -56,6 +56,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.58 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>57208</bug>: Prevent NPE in JNDI Realm when no results are found
+        in a directory context for a user with specified user name. Based on
+        a patch provided by Jason McIntosh. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.57 (violetagg)" rtext="released 2014-11-11">
   <subsection name="Catalina">
