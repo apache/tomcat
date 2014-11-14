@@ -1276,11 +1276,17 @@ public class JNDIRealm extends RealmBase {
         // Use pattern or search for user entry
         if (userPatternFormatArray != null && curUserPattern >= 0) {
             user = getUserByPattern(context, username, credentials, attrIds, curUserPattern);
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug("Found user by pattern [" + user + "]");
+            }
         } else {
             user = getUserBySearch(context, username, attrIds);
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug("Found user by search [" + user + "]");
+            }
         }
 
-        if (userPassword == null && credentials != null) {
+        if (userPassword == null && credentials != null && user != null) {
             // The password is available. Insert it since it may be required for
             // role searches.
             return new User(user.getUserName(), user.getDN(), credentials,
