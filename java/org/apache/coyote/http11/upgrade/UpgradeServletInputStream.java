@@ -26,8 +26,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class UpgradeServletInputStream extends ServletInputStream {
 
-    protected static final StringManager sm = StringManager.getManager(
-            UpgradeServletInputStream.class.getPackage().getName());
+    protected static final StringManager sm =
+            StringManager.getManager(UpgradeServletInputStream.class);
 
     private final SocketWrapperBase<?> socketWrapper;
 
