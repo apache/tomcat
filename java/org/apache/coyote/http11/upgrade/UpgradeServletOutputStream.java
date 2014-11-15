@@ -28,8 +28,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class UpgradeServletOutputStream extends ServletOutputStream {
 
-    protected static final StringManager sm = StringManager.getManager(
-            UpgradeServletOutputStream.class.getPackage().getName());
+    protected static final StringManager sm =
+            StringManager.getManager(UpgradeServletOutputStream.class);
 
     protected final SocketWrapperBase<?> socketWrapper;
 
