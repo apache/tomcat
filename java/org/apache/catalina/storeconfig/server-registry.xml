@@ -256,7 +256,7 @@
         storeFactoryClass="org.apache.catalina.storeconfig.WebResourceRootSF">
         <TransientAttribute>allowLinking</TransientAttribute>
         <TransientAttribute>cachingAllowed</TransientAttribute>
-        <TransientAttribute>cacheTTL</TransientAttribute>
+        <TransientAttribute>cacheTtl</TransientAttribute>
         <TransientAttribute>cacheMaxSize</TransientAttribute>
         <TransientAttribute>cacheObjectMaxSize</TransientAttribute>
         <TransientAttribute>cached</TransientAttribute>

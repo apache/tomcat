@@ -97,7 +97,7 @@
         application is running (e.g. via JMX).</p>
       </attribute>
 
-      <attribute name="cacheTTL" required="false">
+      <attribute name="cacheTtl" required="false">
         <p>The amount of time in milliseconds between the revalidation of cache
         entries. If not specified, the default value is <code>5000</code> (5
         seconds). This value may be changed while the web application is running
