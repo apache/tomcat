@@ -917,6 +917,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (log.isDebugEnabled())
             log.debug("    findResource(" + name + ")");
 
+        checkStateForResourceLoading(name);
+
         URL url = null;
 
         String path = nameToPath(name);
@@ -964,6 +966,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         if (log.isDebugEnabled())
             log.debug("    findResources(" + name + ")");
+
+        checkStateForResourceLoading(name);
 
         LinkedHashSet<URL> result = new LinkedHashSet<>();
 
@@ -1015,6 +1019,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         if (log.isDebugEnabled())
             log.debug("getResource(" + name + ")");
+
+        checkStateForResourceLoading(name);
+
         URL url = null;
 
         // (1) Delegate to parent if requested
@@ -1069,6 +1076,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         if (log.isDebugEnabled())
             log.debug("getResourceAsStream(" + name + ")");
+
+        checkStateForResourceLoading(name);
+
         InputStream stream = null;
 
         // (0) Check for a cached copy of this resource
@@ -1299,16 +1309,26 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     protected void checkStateForClassLoading(String className) throws ClassNotFoundException {
         // It is not permitted to load new classes once the web application has
         // been stopped.
-        if (!state.isAvailable()) {
-            String msg = sm.getString("webappClassLoader.stopped", className);
-            IllegalStateException cause = new IllegalStateException(msg);
+        try {
+            checkStateForResourceLoading(className);
+        } catch (IllegalStateException ise) {
             ClassNotFoundException cnfe = new ClassNotFoundException();
-            cnfe.initCause(cause);
-            log.info(msg, cnfe);
+            cnfe.initCause(ise);
             throw cnfe;
         }
     }
 
+
+    protected void checkStateForResourceLoading(String resource) throws IllegalStateException {
+        // It is not permitted to load resources once the web application has
+        // been stopped.
+        if (!state.isAvailable()) {
+            String msg = sm.getString("webappClassLoader.stopped", resource);
+            IllegalStateException ise = new IllegalStateException(msg);
+            log.info(msg, ise);
+            throw ise;
+        }
+    }
 
     /**
      * Get the Permissions for a CodeSource.  If this instance
