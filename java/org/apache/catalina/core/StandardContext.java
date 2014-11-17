@@ -2008,12 +2008,19 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public void setPath(String path) {
-        if (path == null || (!path.equals("") && !path.startsWith("/"))) {
+        boolean invalid = false;
+        if (path == null || path.equals("/")) {
+            path = "";
+            invalid = true;
+        } else if (!path.equals("") && !path.startsWith("/")) {
             this.path = "/" + path;
-            log.warn(sm.getString(
-                    "standardContext.pathInvalid", path, this.path));
+            invalid = true;
         } else {
             this.path = path;
+        }
+        if (invalid) {
+            log.warn(sm.getString(
+                    "standardContext.pathInvalid", path, this.path));
         }
         encodedPath = urlEncoder.encode(this.path);
         if (getName() == null) {
