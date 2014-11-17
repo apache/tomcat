@@ -20,22 +20,21 @@ package org.apache.catalina.storeconfig;
 import java.io.PrintWriter;
 
 import org.apache.catalina.CredentialHandler;
-import org.apache.catalina.Realm;
-import org.apache.catalina.realm.CombinedRealm;
+import org.apache.catalina.realm.NestedCredentialHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Store server.xml Element Realm
+ * Store server.xml Element CredentialHandler
  */
-public class RealmSF extends StoreFactoryBase {
+public class CredentialHandlerSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(RealmSF.class);
+    private static Log log = LogFactory.getLog(CredentialHandlerSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement)
             throws Exception {
-        if (aElement instanceof CombinedRealm) {
+        if (aElement instanceof NestedCredentialHandler) {
             StoreDescription elementDesc = getRegistry().findDescription(
                     aElement.getClass());
 
@@ -75,17 +74,12 @@ public class RealmSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aRealm,
             StoreDescription parentDesc) throws Exception {
-        if (aRealm instanceof CombinedRealm) {
-            CombinedRealm combinedRealm = (CombinedRealm) aRealm;
+        if (aRealm instanceof NestedCredentialHandler) {
+            NestedCredentialHandler nestedCredentialHandler = (NestedCredentialHandler) aRealm;
 
-            // Store nested <Realm> element
-            Realm[] realms = combinedRealm.getNestedRealms();
-            storeElementArray(aWriter, indent, realms);
-        }
-        // Store nested <CredentialHandler> element
-        CredentialHandler credentialHandler = ((Realm) aRealm).getCredentialHandler();
-        if (credentialHandler != null) {
-            storeElement(aWriter, indent, credentialHandler);
+            // Store nested <CredentialHandler> element
+            CredentialHandler[] credentialHandlers = nestedCredentialHandler.getCredentialHandlers();
+            storeElementArray(aWriter, indent, credentialHandlers);
         }
     }
 
