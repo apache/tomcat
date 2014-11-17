@@ -57,4 +57,9 @@ public class NestedCredentialHandler implements CredentialHandler {
     public void addCredentialHandler(CredentialHandler handler) {
         credentialHandlers.add(handler);
     }
+
+    public CredentialHandler[] getCredentialHandlers() {
+        return credentialHandlers.toArray(new CredentialHandler[0]);
+    }
+
 }
