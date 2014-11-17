@@ -40,7 +40,7 @@ public final class UDecoder {
 
     private static final Log log = LogFactory.getLog(UDecoder.class);
 
-    private static final boolean ALLOW_ENCODED_SLASH =
+    public static final boolean ALLOW_ENCODED_SLASH =
         Boolean.valueOf(System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "false")).booleanValue();
 
     private static class DecodeException extends CharConversionException {

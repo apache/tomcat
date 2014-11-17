@@ -84,6 +84,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Parameters;
@@ -1871,23 +1872,59 @@ public class Request
 
     /**
      * Return the portion of the request URI used to select the Context
-     * of the Request.
+     * of the Request. The value returned is not decoded which also implies it
+     * is not normalised.
      */
     @Override
     public String getContextPath() {
+        String canonicalContextPath = getServletContext().getContextPath();
         String uri = getRequestURI();
+        char[] uriChars = uri.toCharArray();
         int lastSlash = mappingData.contextSlashCount;
         int pos = 0;
+        // Need at least the number of slashed in the context path
         while (lastSlash > 0) {
-            pos = uri.indexOf('/', pos + 1);
+            pos = nextSlash(uriChars, pos + 1);
             if (pos == -1) {
                 return uri;
             }
             lastSlash--;
         }
+        // Now allow for normalization and/or encoding. Essentially, keep
+        // extending the candidate path up to the next slash until the decoded
+        //and normalized candidate path is the same as the canonical path.
+        String candidate = uri.substring(0, pos);
+        if (pos > 0) {
+            candidate = UDecoder.URLDecode(candidate);
+            candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+        }
+        while (!canonicalContextPath.equals(candidate)) {
+            pos = nextSlash(uriChars, pos + 1);
+            if (pos == -1) {
+                return uri;
+            }
+            candidate = uri.substring(0, pos);
+            candidate = UDecoder.URLDecode(candidate);
+            candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+        }
         return uri.substring(0, pos);
     }
 
+
+    private int nextSlash(char[] uri, int startPos) {
+        int len = uri.length;
+        int pos = startPos;
+        while (pos < len) {
+            if (uri[pos] == '/') {
+                return pos;
+            } else if (UDecoder.ALLOW_ENCODED_SLASH && uri[pos] == '%' && pos + 2 < len &&
+                    uri[pos+1] == '2' && (uri[pos + 2] == 'f' || uri[pos + 2] == 'F')) {
+                return pos;
+            }
+            pos++;
+        }
+        return -1;
+    }
 
     /**
      * Return the set of Cookies received with this Request. Triggers parsing of
