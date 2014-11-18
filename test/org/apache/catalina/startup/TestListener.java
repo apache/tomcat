@@ -42,7 +42,7 @@ public class TestListener extends TomcatBaseTest {
     public void testServletContainerInitializer() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context context = tomcat.addContext("/",
+        Context context = tomcat.addContext("",
                 System.getProperty("java.io.tmpdir"));
 
         context.addServletContainerInitializer(new SCI(), null);
@@ -59,7 +59,7 @@ public class TestListener extends TomcatBaseTest {
     public void testServletContextListener() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context context = tomcat.addContext("/",
+        Context context = tomcat.addContext("",
                 System.getProperty("java.io.tmpdir"));
 
         // SCL2 pretends to be in web.xml, and tries to install a

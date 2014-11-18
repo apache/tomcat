@@ -309,10 +309,10 @@ public class TestTomcat extends TomcatBaseTest {
     public void testLaunchTime() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         long t0 = System.currentTimeMillis();
-        tomcat.addContext(null, "/", ".");
+        tomcat.addContext(null, "", ".");
         tomcat.start();
-        System.err.println("Test time: " +
-                (System.currentTimeMillis() - t0));
+        log.info("Tomcat started in [" + (System.currentTimeMillis() - t0)
+                + "] ms");
      }
 
 
