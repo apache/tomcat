@@ -2010,13 +2010,17 @@ public class StandardContext extends ContainerBase
     public void setPath(String path) {
         boolean invalid = false;
         if (path == null || path.equals("/")) {
+            invalid = true;
             this.path = "";
-            invalid = true;
-        } else if (!path.equals("") && !path.startsWith("/")) {
-            this.path = "/" + path;
-            invalid = true;
-        } else {
+        } else if ("".equals(path) || path.startsWith("/")) {
             this.path = path;
+        } else {
+            invalid = true;
+            this.path = "/" + path;
+        }
+        if (this.path.endsWith("/")) {
+            invalid = true;
+            this.path = this.path.substring(0, this.path.length() - 1);
         }
         if (invalid) {
             log.warn(sm.getString(
