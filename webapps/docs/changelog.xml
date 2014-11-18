@@ -63,6 +63,15 @@
         in a directory context for a user with specified user name. Based on
         a patch provided by Jason McIntosh. (violetagg)
       </fix>
+      <fix>
+        <bug>57216</bug>: Improve handling of invalid context paths. A context
+        path should either be an empty string or start with a
+        <code>&apos;/&apos;</code> and do not end with a
+        <code>&apos;/&apos;</code>. Invalid context path are automatically
+        corrected and a warning is logged. The <code>null</code> and
+        <code>&quot;/&quot;</code> values are now correctly changed to
+        <code>&quot;&quot;</code>. (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>

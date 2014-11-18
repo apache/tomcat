@@ -872,4 +872,22 @@ public class TestStandardContext extends TomcatBaseTest {
         Assert.assertThat(Arrays.asList(context.getResourceOnlyServlets().split(",")),
                 CoreMatchers.hasItems("a", "b", "c"));
     }
+
+    @Test
+    public void testSetPath() {
+        testSetPath("", "");
+        testSetPath("/foo", "/foo");
+        testSetPath("/foo/bar", "/foo/bar");
+        testSetPath(null, "");
+        testSetPath("/", "");
+        testSetPath("foo", "/foo");
+        testSetPath("/foo/bar/", "/foo/bar");
+        testSetPath("foo/bar/", "/foo/bar");
+    }
+
+    private void testSetPath(String value, String expectedValue) {
+        StandardContext context = new StandardContext();
+        context.setPath(value);
+        Assert.assertEquals(expectedValue, context.getPath());
+    }
 }
