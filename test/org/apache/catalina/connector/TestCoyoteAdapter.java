@@ -238,7 +238,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         // Must have a real docBase - just use temp
         Context ctx =
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         PathInfoServlet servlet = new PathInfoServlet();
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -280,7 +280,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         // Must have a real docBase - just use temp
         Context ctx =
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         AsyncServlet servlet = new AsyncServlet();
         Wrapper w = Tomcat.addServlet(ctx, "async", servlet);
