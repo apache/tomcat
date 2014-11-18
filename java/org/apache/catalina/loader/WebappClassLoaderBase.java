@@ -2524,10 +2524,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     protected ResourceEntry findResourceInternal(final String name, final String path) {
 
-        if (!state.isAvailable()) {
-            log.info(sm.getString("webappClassLoader.stopped", name));
-            return null;
-        }
+        checkStateForResourceLoading(name);
 
         if (name == null || path == null) {
             return null;
