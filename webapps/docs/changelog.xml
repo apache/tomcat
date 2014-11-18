@@ -74,6 +74,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        When downloading required libraries at build time, use random name
+        for temporary file and automatically create destination directory
+        (<code>base.path</code>). (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.57 (violetagg)" rtext="released 2014-11-11">
   <subsection name="Catalina">
