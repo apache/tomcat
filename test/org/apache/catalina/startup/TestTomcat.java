@@ -248,8 +248,8 @@ public class TestTomcat extends TomcatBaseTest {
         long t0 = System.currentTimeMillis();
         tomcat.addContext(null, "", ".");
         tomcat.start();
-        log.info("Tomcat started in " + (System.currentTimeMillis() - t0)
-                + "ms");
+        log.info("Tomcat started in [" + (System.currentTimeMillis() - t0)
+                + "] ms");
      }
 
 
