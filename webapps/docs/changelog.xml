@@ -81,6 +81,9 @@
         for temporary file and automatically create destination directory
         (<code>base.path</code>). (kkolinko)
       </update>
+      <update>
+        Update optional Checkstyle library to 6.0. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
