@@ -84,6 +84,10 @@
       <update>
         Update optional Checkstyle library to 6.0. (kkolinko)
       </update>
+      <update>
+        Simplify <code>setproxy</code> task in <code>build.xml</code>.
+        Taskdef there is not needed since Ant 1.8.2. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>

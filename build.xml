@@ -2775,8 +2775,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="setproxy" depends="proxyflags" if="useproxy">
-    <taskdef name="setproxy"
-            classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
     <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"
               proxyuser="${proxy.user}" proxypassword="${proxy.password}" />
     <echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}"/>
