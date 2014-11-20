@@ -78,6 +78,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Update documentation for CGI servlet. Recommend to copy the servlet
+        declaration into web application instead of enabling it globally.
+        Correct documentation for cgiPathPrefix. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
