@@ -119,10 +119,14 @@ public class TesterFirehoseServer {
 
             for (int i = 0; i < MESSAGE_COUNT; i++) {
                 remote.sendText(MESSAGE);
+                if (i % (MESSAGE_COUNT * 0.4) == 0) {
+                    remote.setBatchingAllowed(false);
+                    remote.setBatchingAllowed(true);
+                }
             }
 
-            // Ensure remaining messages are flushed
-            remote.setBatchingAllowed(false);
+            // Flushing should happen automatically on session close
+            session.close();
         }
 
         @OnError
