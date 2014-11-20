@@ -72,6 +72,10 @@
         <code>&quot;/&quot;</code> values are now correctly changed to
         <code>&quot;&quot;</code>. (markt/kkolinko)
       </fix>
+      <fix>
+        Correct message that is logged when load-on-startup servlet fails
+        to load. It was logging a wrong name. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
