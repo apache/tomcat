@@ -4954,11 +4954,12 @@ public class StandardContext extends ContainerBase
                 try {
                     wrapper.load();
                 } catch (ServletException e) {
-                    getLogger().error(sm.getString("standardWrapper.loadException",
-                                      getName()), StandardWrapper.getRootCause(e));
+                    getLogger().error(sm.getString("standardContext.loadOnStartup.loadException",
+                          getName(), wrapper.getName()), StandardWrapper.getRootCause(e));
                     // NOTE: load errors (including a servlet that throws
-                    // UnavailableException from tht init() method) are NOT
-                    // fatal to application startup, excepted if failDeploymentIfServletLoadedOnStartupFails is specified
+                    // UnavailableException from the init() method) are NOT
+                    // fatal to application startup
+                    // unless failCtxIfServletStartFails="true" is specified
                     if(getComputedFailCtxIfServletStartFails()) {
                         return false;
                     }
