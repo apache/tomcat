@@ -109,6 +109,12 @@
         Simplify <code>setproxy</code> task in <code>build.xml</code>.
         Taskdef there is not needed since Ant 1.8.2. (kkolinko)
       </update>
+      <fix>
+        Improve Java 7 support in <code>build.xml</code>. Check whether
+        the specified ${java.7.home} is valid. By default use Java that
+        runs Ant (${java.home}) instead of the one found on $PATH
+        to run JUnit tests. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>

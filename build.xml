@@ -448,6 +448,19 @@
     <exclude name="**/LocalStrings_*" />
   </patternset>
 
+  <!--
+    Verify availability of Java 7 JDK if one was configured.
+    Fail if java.7.home was set, but points to a non-existing path.
+  -->
+  <fail message="Invalid java.7.home setting: [${java.7.home}]. The path $${java.7.home}/bin/ does not exist.">
+    <condition>
+      <and>
+        <isset property="java.7.home" />
+        <not><available file="${java.7.home}/bin/" type="dir" /></not>
+      </and>
+    </condition>
+  </fail>
+
   <!-- =========================== Build targets =========================== -->
 
   <target name="build-prepare">
@@ -1334,15 +1347,16 @@
     <available file="${test.apr.loc}" property="apr.exists" />
   </target>
 
-  <target name="test-init1" if="java.7.home">
-    <property name="java.bin.path" value="${java.7.home}/bin/"/>
+  <target name="test-init">
+    <condition property="java.bin.path" value="${java.7.home}/bin/">
+      <isset property="java.7.home" />
+    </condition>
+    <condition property="java.bin.path" value="${java.home}/bin/">
+      <isset property="java.home" />
+    </condition>
+    <property name="java.bin.path" value="" />
+    <echo message="Using Java: [${java.bin.path}java]" />
   </target>
-
-  <target name="test-init2" unless="java.7.home">
-    <property name="java.bin.path" value=""/>
-  </target>
-
-  <target name="test-init" depends="test-init1,test-init2" />
 
   <macrodef name="runtests"
             description="Runs the unit tests using the specified connector.
