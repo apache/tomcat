@@ -302,13 +302,10 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         boolean doWrite = false;
         synchronized (messagePartLock) {
-            if (Constants.OPCODE_CLOSE == mp.getOpCode()) {
-                try {
-                    setBatchingAllowed(false);
-                } catch (IOException e) {
-                    log.warn(sm.getString(
-                            "wsRemoteEndpoint.flushOnCloseFailed"), e);
-                }
+            if (Constants.OPCODE_CLOSE == mp.getOpCode() && getBatchingAllowed()) {
+                // Should not happen. To late to send batched messages now since
+                // the session has been closed. Complain loudly.
+                log.warn(sm.getString("wsRemoteEndpoint.flushOnCloseFailed"));
             }
             if (messagePartInProgress) {
                 // When a control message is sent while another message is being
@@ -382,7 +379,10 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         if (Constants.INTERNAL_OPCODE_FLUSH == mp.getOpCode()) {
             nextFragmented = fragmented;
             nextText = text;
-            doWrite(mp.getEndHandler(), outputBuffer);
+            outputBuffer.flip();
+            SendHandler flushHandler = new OutputBufferFlushSendHandler(
+                    outputBuffer, mp.getEndHandler());
+            doWrite(flushHandler, outputBuffer);
             return;
         }
 
@@ -835,6 +835,30 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             }
         }
     }
+
+
+    /**
+     * Ensures that tne output buffer is cleared after it has been flushed.
+     */
+    private static class OutputBufferFlushSendHandler implements SendHandler {
+
+        private final ByteBuffer outputBuffer;
+        private final SendHandler handler;
+
+        public OutputBufferFlushSendHandler(ByteBuffer outputBuffer, SendHandler handler) {
+            this.outputBuffer = outputBuffer;
+            this.handler = handler;
+        }
+
+        @Override
+        public void onResult(SendResult result) {
+            if (result.isOK()) {
+                outputBuffer.clear();
+            }
+            handler.onResult(result);
+        }
+    }
+
 
     private class WsOutputStream extends OutputStream {
 
