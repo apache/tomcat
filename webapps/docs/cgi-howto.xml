@@ -93,9 +93,11 @@ configure the behaviour of the CGI servlet.</p>
 <ul>
 <li><strong>cgiPathPrefix</strong> - The CGI search path will start at
 the web application root directory + File.separator + this prefix.
-The default cgiPathPrefix is <code>WEB-INF/cgi</code></li>
+By default there is no value, which results in the web application root
+directory being used as the search path. The recommended value is
+<code>WEB-INF/cgi</code></li>
 <li><strong>debug</strong> - Debugging detail level for messages logged
-by this servlet. Default 0.</li>
+by this servlet. Default is <code>0</code>.</li>
 <li><strong>executable</strong> - The of the executable to be used to
 run the script. You may explicitly set this parameter to be an empty string
 if your script is itself executable (e.g. an exe file). Default is
@@ -105,13 +107,14 @@ and so on - additional arguments for the executable. These precede the
 CGI script name. By default there are no additional arguments.</li>
 <li><strong>parameterEncoding</strong> - Name of the parameter encoding
 to be used with the CGI servlet. Default is
-<code>System.getProperty("file.encoding","UTF-8")</code>.</li>
+<code>System.getProperty("file.encoding","UTF-8")</code>. That is the system
+default encoding, or UTF-8 if that system property is not available.</li>
 <li><strong>passShellEnvironment</strong> - Should the shell environment
-variables (if any) be passed to the CGI script? Default is
+variables from Tomcat process (if any) be passed to the CGI script? Default is
 <code>false</code>.</li>
 <li><strong>stderrTimeout</strong> - The time (in milliseconds) to wait for
 the reading of stderr to complete before terminating the CGI process. Default
-is 2000.</li>
+is <code>2000</code>.</li>
 </ul>
 
 
