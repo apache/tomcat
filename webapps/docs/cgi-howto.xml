@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="glenn@apache.org">Glenn L. Nielsen</author>
         <title>CGI How To</title>
     </properties>
 
@@ -61,11 +60,29 @@ this servlet is mapped to the URL pattern "/cgi-bin/*".</p>
 external to the Tomcat JVM. If you are using the Java SecurityManager this
 will bypass your security policy configuration in <code>catalina.policy.</code></p>
 
-<p>Remove the XML comments from around the CGI servlet and servlet-mapping
-configuration in <code>$CATALINA_BASE/conf/web.xml</code>.</p>
+<p>To enable CGI support:</p>
 
-<p>Only Contexts which are marked as privileged may use the CGI servlet (see the
-privileged property of the Context element).</p>
+<ol>
+<li><p>There are commented-out sample servlet and servlet-mapping elements for
+CGI servlet in the default <code>$CATALINA_BASE/conf/web.xml</code> file.
+To enable CGI support in your web application, copy that servlet and
+servlet-mapping declarations into <code>WEB-INF/web.xml</code> file of your
+web application.</p>
+
+<p>Uncommenting the servlet and servlet-mapping in
+<code>$CATALINA_BASE/conf/web.xml</code> file enables CGI for all installed
+web applications at once.</p>
+</li>
+
+<li><p>Set <code>privileged="true"</code> on the Context element for your
+web application.</p>
+
+<p>Only Contexts which are marked as privileged are allowed to use the
+CGI servlet. Note that modifying the global <code>$CATALINA_BASE/conf/context.xml</code>
+file affects all web applications. See
+<a href="config/context.html">Context documentation</a> for details.</p>
+</li>
+</ol>
 
 </section>
 
