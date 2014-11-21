@@ -1359,8 +1359,8 @@ for details.</p>
       <li><code>scanAllDirectories="true"</code> on the <a href="jar-scanner.html">JarScanner</a></li>
     </ul>
     <p>To illustrate this feature, here is an example of a standard maven webapp source tree:</p>
-<source>
-mywebapp/
+
+<source>mywebapp/
          src/
              main/
                   java/
@@ -1371,23 +1371,24 @@ mywebapp/
          target/
                 classes/
 </source>
+
     <p>To deploy such an application (assuming it also uses the log4j maven artefact),
     the context configuration looks like:</p>
-<source wrapped="true">
-&lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
-  &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
+
+<source wrapped="true"><![CDATA[<Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp">
+  <Resources className="org.apache.naming.resources.VirtualDirContext"
     extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes" />
-  &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
+  <Loader className="org.apache.catalina.loader.VirtualWebappLoader"
     virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
-  &lt;JarScanner scanAllDirectories="true" />
-&lt;/Context>
-</source>
+  <JarScanner scanAllDirectories="true" />
+</Context>
+]]></source>
 
     <p>Here is another example where the webapp serves pictures under /pictures and movies
     under /movies and also depends on another maven project mylib that would normally
     produce a jar to be packaged in WEB-INF/lib:</p>
-<source>
-mylib/
+
+<source>mylib/
       src/
           main/
                java/
@@ -1409,17 +1410,17 @@ mywebapp/
          target/
                 classes/
 </source>
+
     <p>The configuration is:</p>
 
-<source wrapped="true">
-&lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
-  &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
-    extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes,/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies"
-  &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
-   virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/mylib/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar"
-  &lt;JarScanner scanAllDirectories="true" />
-&lt;/Context>
-</source>
+<source wrapped="true"><![CDATA[<Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp">
+  <Resources className="org.apache.naming.resources.VirtualDirContext"
+    extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes,/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies" />
+  <Loader className="org.apache.catalina.loader.VirtualWebappLoader"
+   virtualClasspath="/Users/theuser/mywebapp/target/classes;/Users/theuser/mylib/target/classes;/Users/theuser/.m2/repository/log4j/log4j/1.2.15/log4j-1.2.15.jar" />
+  <JarScanner scanAllDirectories="true" />
+</Context>
+]]></source>
 
     <p>Note that resources in mylib/target/classes/META-INF/resources/ are mapped to / as
     required by servlet 3 specification.</p>
