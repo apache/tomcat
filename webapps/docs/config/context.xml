@@ -1373,7 +1373,7 @@ mywebapp/
 </source>
     <p>To deploy such an application (assuming it also uses the log4j maven artefact),
     the context configuration looks like:</p>
-<source>
+<source wrapped="true">
 &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
   &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
     extraResourcePaths="/WEB-INF/classes=/Users/theuser/mywebapp/target/classes" />
