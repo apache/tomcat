@@ -124,12 +124,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             tldResourcePath = generateTldResourcePath(uri, ctxt);
         }
 
-        Jar jar;
+        Jar jar = null;
         try {
             jar = tldResourcePath.getJar();
-        } catch (IOException ioe) {
-            throw new JasperException(ioe);
-        }
 
         // Add the dependencies on the TLD to the referencing page
         PageInfo pageInfo = ctxt.createCompiler().getPageInfo();
@@ -218,6 +215,14 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         this.tags = tagInfos.toArray(new TagInfo[tagInfos.size()]);
         this.tagFiles = tagFileInfos.toArray(new TagFileInfo[tagFileInfos.size()]);
         this.functions = functionInfos.toArray(new FunctionInfo[functionInfos.size()]);
+        } catch (IOException ioe) {
+            throw new JasperException(ioe);
+        }
+        finally
+        {
+            if(null != jar)
+                jar.close(); // Jar.close does not throw IOException, but probably should
+        }
     }
 
     @Override
