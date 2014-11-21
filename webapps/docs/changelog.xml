@@ -76,6 +76,10 @@
         Correct message that is logged when load-on-startup servlet fails
         to load. It was logging a wrong name. (kkolinko)
       </fix>
+      <fix>
+        <bug>57239</bug>: Correct several message typos. Includes patch by
+        vladk. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
