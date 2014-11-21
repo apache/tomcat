@@ -630,28 +630,32 @@ class TagFileProcessor {
                     TldResourcePath tldResourcePath =
                         compiler.getCompilationContext().getTldResourcePath(
                             tagFileInfo.getTagInfo().getTagLibrary().getURI());
-                    Jar jar;
-                    try {
+
+                    Jar jar = null;
+                    try
+                    {
                         jar = tldResourcePath.getJar();
+
+                        if (jar != null) {
+                            // Add TLD
+                            pageInfo.addDependant(jar.getURL(tldResourcePath.getEntryName()),
+                                                  Long.valueOf(jar.getLastModified(tldResourcePath.getEntryName())));
+                            // Add Tag
+                            pageInfo.addDependant(jar.getURL(tagFilePath.substring(1)),
+                                                  Long.valueOf(jar.getLastModified(tagFilePath.substring(1))));
+                        }
+                        else {
+                            pageInfo.addDependant(tagFilePath,
+                                                  compiler.getCompilationContext().getLastModified(
+                                                                                                   tagFilePath));
+                        }
                     } catch (IOException ioe) {
                         throw new JasperException(ioe);
                     }
-                    if (jar != null) {
-                        try {
-                            // Add TLD
-                            pageInfo.addDependant(jar.getURL(tldResourcePath.getEntryName()),
-                                    Long.valueOf(jar.getLastModified(tldResourcePath.getEntryName())));
-                            // Add Tag
-                            pageInfo.addDependant(jar.getURL(tagFilePath.substring(1)),
-                                    Long.valueOf(jar.getLastModified(tagFilePath.substring(1))));
-                        } catch (IOException ioe) {
-                            throw new JasperException(ioe);
-                        }
-                    }
-                    else {
-                        pageInfo.addDependant(tagFilePath,
-                                compiler.getCompilationContext().getLastModified(
-                                        tagFilePath));
+                    finally
+                    {
+                        if(null != jar)
+                            jar.close(); // Jar.close does not "throw IOException" but probably should
                     }
                 } else {
                     pageInfo.addDependant(tagFilePath,
