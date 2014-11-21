@@ -52,21 +52,25 @@ public class TesterPerformance {
 
         for (URL jarURL : jarURLs) {
             Jar jar = JarFactory.newInstance(jarURL);
-            jar.nextEntry();
-            String jarEntryName = jar.getEntryName();
-            while (jarEntryName != null) {
-                if (jarEntryName.endsWith(".class")) {
-                    InputStream is = jar.getEntryInputStream();
-                    long start = System.nanoTime();
-                    ClassParser cp = new ClassParser(is);
-                    cp.parse();
-                    duration += System.nanoTime() - start;
-                }
+            try {
                 jar.nextEntry();
-                jarEntryName = jar.getEntryName();
+                String jarEntryName = jar.getEntryName();
+                while (jarEntryName != null) {
+                    if (jarEntryName.endsWith(".class")) {
+                        InputStream is = jar.getEntryInputStream();
+                        long start = System.nanoTime();
+                        ClassParser cp = new ClassParser(is);
+                        cp.parse();
+                        duration += System.nanoTime() - start;
+                    }
+                    jar.nextEntry();
+                    jarEntryName = jar.getEntryName();
+                }
+            } finally {
+                jar.close();
             }
         }
 
-        System.out.println("ClassParser performance test took: " + duration + "ns");
+        System.out.println("ClassParser performance test took: " + duration + " ns");
     }
 }
