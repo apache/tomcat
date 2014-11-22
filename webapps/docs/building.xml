@@ -104,48 +104,71 @@ available, which will be used to actually perform the build.
 
 </section>
 
+<section name="Configure download area">
+
+<p>
+  Building Tomcat involves downloading a number of libraries that it depends on.
+  It is strongly recommended to configure download area for those libraries.
+</p>
+
+<p>
+  By default the build is configured to download dependencies into directory
+  <code>/usr/share/java</code>. On a typical Linux or MacOX system, an ordinary
+  user will not have access to write to this directory, and, even if you do,
+  it is likely not appropriate for you to write there. On Windows this usually
+  corresponds to the <code>C:\usr\share\java</code> directory, unless Cygwin is
+  used.
+</p>
+
+<p>
+  The build is controlled by creating a
+  <code>${tomcat.source}/build.properties</code> file. It can be used to
+  redefine any property that is present in <code>build.properties.default</code>
+  and <code>build.xml</code> files. The <code>build.properties</code> file
+  does not exist by default. You have to create it.
+</p>
+
+<p>
+  The download area is defined by property <code>base.path</code>. For example:
+</p>
+
+<source><![CDATA[# ----- Default Base Path for Dependent Packages -----
+# Replace this path with the directory path where
+# dependencies binaries should be downloaded.
+base.path=/home/me/some-place-to-download-to]]></source>
+
+<p>
+  Different versions of Tomcat are allowed to share the same download area.
+</p>
+
+<p>
+  Another example:
+</p>
+
+<source>base.path=${user.dir}/../libraries-tomcat<version-major-minor/></source>
+
+<p>
+  Users who access the Internet through a proxy must use the properties
+  file to indicate to Ant the proxy configuration:
+</p>
+
+<source><![CDATA[# ----- Proxy setup -----
+proxy.host=proxy.domain
+proxy.port=8080
+proxy.use=on]]></source>
+
+</section>
+
 <section name="Building Tomcat">
 
 <p>
 Use the following commands to build Tomcat:
-<br/><br/>
-<code>
-    cd ${tomcat.source}<br/>
-    ant
-</code>
 </p>
 
 <p>
-<b>WARNING:</b> Running this command will download libraries required
-  to build Tomcat to the <code>/usr/share/java</code> directory by default.
-  On a typical Linux or MacOX system, an ordinary user
-  will not have access to write to this directory, and, even if you do,
-  it is likely not appropriate for you to write there. On Windows
-  this usually corresponds to the <code>C:\usr\share\java</code> directory,
-  unless Cygwin is used. Read below to learn how to customize the directory
-  used to download the binaries.
+<code>cd ${tomcat.source}</code><br/>
+<code>ant</code>
 </p>
-
-<p>
-<b>NOTE:</b> Users accessing the Internet through a proxy must use a properties
-  file to indicate to Ant the proxy configuration. Read below for details.
-</p>
-
-<p>
-  The build can be controlled by creating a <code>${tomcat.source}/build.properties</code>
-  file and adding the following content to it:
-</p>
-<source># ----- Proxy setup -----
-# Uncomment if using a proxy server.
-#proxy.host=proxy.domain
-#proxy.port=8080
-#proxy.use=on
-
-# ----- Default Base Path for Dependent Packages -----
-# Replace this path with the directory path where
-# dependencies binaries should be downloaded.
-base.path=/home/me/some-place-to-download-to</source>
-
 
 <p>
 Once the build has completed successfully, a usable Tomcat installation will have been
@@ -187,11 +210,11 @@ The instructions below will automatically copy these into the required locations
 <p>
 An Ant target is provided as a convenience to download all binary dependencies, and to create
 the Eclipse project and classpath files in the root of the source tree.
-<br/>
-<code><br/>
-    cd ${tomcat.source}<br/>
-    ant ide-eclipse<br/>
-</code>
+</p>
+
+<p>
+<code>cd ${tomcat.source}</code><br/>
+<code>ant ide-eclipse</code>
 </p>
 
 <p>
@@ -221,7 +244,7 @@ and import the Tomcat project located there.
 <code>start-tomcat</code> and <code>stop-tomcat</code> launch configurations are provided in
 <code>res/ide-support/eclipse</code> and will be available in the <em>Run-&gt;Run Configurations</em>
 dialog. Use these to start and stop Tomcat from Eclipse.
-<br/>If you want to configure these yourself (or are using a different IDE)
+If you want to configure these yourself (or are using a different IDE)
 then use <code>org.apache.catalina.startup.Bootstrap</code> as the main class,
 <code>start</code>/<code>stop</code> etc. as program arguments, and specify <code>-Dcatalina.home=...</code>
 (with the name of your build directory) as VM arguments.
@@ -241,6 +264,10 @@ coding conventions (and have your contributions accepted):
   <tr><td>Ant -&gt; Editor -> Formatter</td><td>Tab size: 2<br/>Use tab character instead of spaces: unchecked</td></tr>
 </table>
 
+<p>
+The recommended configuration of Compiler Warnings is documented in
+<code>res/ide-support/eclipse/java-compiler-errors-warnings.txt</code> file.
+</p>
 
 </section>
 
