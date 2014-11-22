@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-      <author>Remy Maucherat, Tim Whittington</author>
       <title>Building Tomcat</title>
     </properties>
 
@@ -36,8 +35,10 @@
 <section name="Introduction">
 
 <p>
-Building Apache Tomcat from source is very easy, and is the first step to contributing to
-Tomcat. The following is a step by step guide.
+Building Apache Tomcat from source is very easy, and is the first step to
+contributing to Tomcat. The complete and comprehensive instructions are
+provided in the file <a href="BUILDING.txt">BUILDING.txt</a>.
+The following is a quick step by step guide.
 </p>
 
 </section>
