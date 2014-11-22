@@ -135,7 +135,7 @@ public class TldCache {
                     conn.getInputStream().close();
                 }
             }
-            try (Jar jar = tldResourcePath.getJar()) {
+            try (Jar jar = tldResourcePath.openJar()) {
                 if (jar != null) {
                     result[1] = jar.getLastModified(tldResourcePath.getEntryName());
                 }

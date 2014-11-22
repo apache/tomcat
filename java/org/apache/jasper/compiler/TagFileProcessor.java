@@ -520,7 +520,7 @@ class TagFileProcessor {
         if (tagFilePath.startsWith("/META-INF/")) {
             try {
                 tagJar = compiler.getCompilationContext().getTldResourcePath(
-                            tagInfo.getTagLibrary().getURI()).getJar();
+                            tagInfo.getTagLibrary().getURI()).openJar();
             } catch (IOException ioe) {
                 throw new JasperException(ioe);
             }
@@ -634,7 +634,7 @@ class TagFileProcessor {
                     Jar jar = null;
                     try
                     {
-                        jar = tldResourcePath.getJar();
+                        jar = tldResourcePath.openJar();
 
                         if (jar != null) {
                             // Add TLD

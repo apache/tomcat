@@ -126,7 +126,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
         Jar jar = null;
         try {
-            jar = tldResourcePath.getJar();
+            jar = tldResourcePath.openJar();
 
         // Add the dependencies on the TLD to the referencing page
         PageInfo pageInfo = ctxt.createCompiler().getPageInfo();

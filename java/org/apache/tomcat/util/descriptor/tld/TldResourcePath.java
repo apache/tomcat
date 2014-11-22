@@ -127,7 +127,7 @@ public class TldResourcePath {
         }
     }
 
-    public Jar getJar() throws IOException {
+    public Jar openJar() throws IOException {
         if (entryName == null) {
             return null;
         } else {
