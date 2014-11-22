@@ -97,6 +97,10 @@
         declaration into web application instead of enabling it globally.
         Correct documentation for cgiPathPrefix. (kkolinko)
       </fix>
+      <update>
+        Improve HTML version of build instructions and align with
+        BUILDING.txt. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
