@@ -169,8 +169,8 @@ public class FileResourceSet extends AbstractFileResourceSet {
     @Override
     protected void checkType(File file) {
         if (file.isFile() == false) {
-            throw new IllegalArgumentException(
-                    "TODO-i18n: base/internalPath is not a file");
+            throw new IllegalArgumentException(sm.getString("fileResourceSet.notFile",
+                    getBase(), File.separator, getInternalPath()));
         }
     }
 }

@@ -244,8 +244,8 @@ public class DirResourceSet extends AbstractFileResourceSet {
     @Override
     protected void checkType(File file) {
         if (file.isDirectory() == false) {
-            throw new IllegalArgumentException(
-                    "TODO-i18n: base/internalPath is not a directory");
+            throw new IllegalArgumentException(sm.getString("dirResourceSet.notDirectory",
+                    getBase(), File.separator, getInternalPath()));
         }
     }
 }
