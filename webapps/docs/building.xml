@@ -43,10 +43,10 @@ The following is a quick step by step guide.
 
 </section>
 
-<section name="Download a Java Development Kit (JDK) version 7">
+<section name="Download a Java Development Kit (JDK) version 8">
 
 <p>
-Building Apache Tomcat requires a JDK (version 7) to be installed. You can download one from<br />
+Building Apache Tomcat requires a JDK (version 8) to be installed. You can download one from<br />
 <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a><br/>
 <a href="http://openjdk.java.net/install/index.html">http://openjdk.java.net/install/index.html</a><br/>
 or another JDK vendor.
@@ -59,17 +59,17 @@ directory into which you installed the JDK release.
 
 </section>
 
-<section name="Install Apache Ant 1.8.1 or later">
+<section name="Install Apache Ant 1.9.3 or later">
 
 <p>
-Download a binary distribution of Ant 1.8.1 or later from
+Download a binary distribution of Ant 1.9.3 or later from
 <a href="http://ant.apache.org/bindownload.cgi">here</a>.
 </p>
 
 <p>
 Unpack the binary distribution into a convenient location so that the
 Ant release resides in its own directory (conventionally named
-<code>apache-ant-1.8.x</code>).  For the remainder of this guide,
+<code>apache-ant-1.9.x</code>).  For the remainder of this guide,
 the symbolic name <code>${ant.home}</code> is used to refer to the full pathname of
  the Ant installation directory directory.
 </p>
