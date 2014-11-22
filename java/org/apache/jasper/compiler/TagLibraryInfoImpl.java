@@ -124,104 +124,97 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             tldResourcePath = generateTldResourcePath(uri, ctxt);
         }
 
-        Jar jar = null;
-        try {
-            jar = tldResourcePath.openJar();
+        try (Jar jar = tldResourcePath.openJar()) {
 
-        // Add the dependencies on the TLD to the referencing page
-        PageInfo pageInfo = ctxt.createCompiler().getPageInfo();
-        if (pageInfo != null) {
-            // If the TLD is in a JAR, that JAR may not be part of the web
-            // application
-            String path = tldResourcePath.getWebappPath();
-            if (path != null) {
-                // Add TLD (jar==null) / JAR (jar!=null) file to dependency list
-                pageInfo.addDependant(path, ctxt.getLastModified(path));
-            }
-            if (jar != null) {
-                if (path == null) {
-                    // JAR not in the web application so add it directly
-                    URL jarUrl = jar.getJarFileURL();
-                    long lastMod = -1;
-                    URLConnection urlConn = null;
-                    try {
-                        urlConn = jarUrl.openConnection();
-                        lastMod = urlConn.getLastModified();
-                    } catch (IOException ioe) {
-                        throw new JasperException(ioe);
-                    } finally {
-                        if (urlConn != null) {
-                            try {
-                                urlConn.getInputStream().close();
-                            } catch (IOException e) {
-                                // Ignore
+            // Add the dependencies on the TLD to the referencing page
+            PageInfo pageInfo = ctxt.createCompiler().getPageInfo();
+            if (pageInfo != null) {
+                // If the TLD is in a JAR, that JAR may not be part of the web
+                // application
+                String path = tldResourcePath.getWebappPath();
+                if (path != null) {
+                    // Add TLD (jar==null) / JAR (jar!=null) file to dependency list
+                    pageInfo.addDependant(path, ctxt.getLastModified(path));
+                }
+                if (jar != null) {
+                    if (path == null) {
+                        // JAR not in the web application so add it directly
+                        URL jarUrl = jar.getJarFileURL();
+                        long lastMod = -1;
+                        URLConnection urlConn = null;
+                        try {
+                            urlConn = jarUrl.openConnection();
+                            lastMod = urlConn.getLastModified();
+                        } catch (IOException ioe) {
+                            throw new JasperException(ioe);
+                        } finally {
+                            if (urlConn != null) {
+                                try {
+                                    urlConn.getInputStream().close();
+                                } catch (IOException e) {
+                                    // Ignore
+                                }
                             }
                         }
+                        pageInfo.addDependant(jarUrl.toExternalForm(),
+                                Long.valueOf(lastMod));
                     }
-                    pageInfo.addDependant(jarUrl.toExternalForm(),
-                            Long.valueOf(lastMod));
-                }
-                // Add TLD within the JAR to the dependency list
-                String entryName = tldResourcePath.getEntryName();
-                try {
-                    pageInfo.addDependant(jar.getURL(entryName),
-                            Long.valueOf(jar.getLastModified(entryName)));
-                } catch (IOException ioe) {
-                    throw new JasperException(ioe);
+                    // Add TLD within the JAR to the dependency list
+                    String entryName = tldResourcePath.getEntryName();
+                    try {
+                        pageInfo.addDependant(jar.getURL(entryName),
+                                Long.valueOf(jar.getLastModified(entryName)));
+                    } catch (IOException ioe) {
+                        throw new JasperException(ioe);
+                    }
                 }
             }
-        }
 
-        // Get the representation of the TLD
-        TaglibXml taglibXml =
-                ctxt.getOptions().getTldCache().getTaglibXml(tldResourcePath);
+            // Get the representation of the TLD
+            TaglibXml taglibXml =
+                    ctxt.getOptions().getTldCache().getTaglibXml(tldResourcePath);
 
-        // Populate the TagLibraryInfo attributes
-        this.jspversion = taglibXml.getJspVersion();
-        this.tlibversion = taglibXml.getTlibVersion();
-        this.shortname = taglibXml.getShortName();
-        this.urn = taglibXml.getUri();
-        this.info = taglibXml.getInfo();
+            // Populate the TagLibraryInfo attributes
+            this.jspversion = taglibXml.getJspVersion();
+            this.tlibversion = taglibXml.getTlibVersion();
+            this.shortname = taglibXml.getShortName();
+            this.urn = taglibXml.getUri();
+            this.info = taglibXml.getInfo();
 
-        this.tagLibraryValidator = createValidator(taglibXml.getValidator());
+            this.tagLibraryValidator = createValidator(taglibXml.getValidator());
 
-        List<TagInfo> tagInfos = new ArrayList<>();
-        for (TagXml tagXml : taglibXml.getTags()) {
-            tagInfos.add(createTagInfo(tagXml));
-        }
-
-        List<TagFileInfo> tagFileInfos = new ArrayList<>();
-        for (TagFileXml tagFileXml : taglibXml.getTagFiles()) {
-            tagFileInfos.add(createTagFileInfo(tagFileXml, jar));
-        }
-
-        Set<String> names = new HashSet<>();
-        List<FunctionInfo> functionInfos = taglibXml.getFunctions();
-        // TODO Move this validation to the parsing stage
-        for (FunctionInfo functionInfo : functionInfos) {
-            String name = functionInfo.getName();
-            if (!names.add(name)) {
-                err.jspError("jsp.error.tld.fn.duplicate.name", name, uri);
+            List<TagInfo> tagInfos = new ArrayList<>();
+            for (TagXml tagXml : taglibXml.getTags()) {
+                tagInfos.add(createTagInfo(tagXml));
             }
-        }
 
-        if (tlibversion == null) {
-            err.jspError("jsp.error.tld.mandatory.element.missing", "tlib-version", uri);
-        }
-        if (jspversion == null) {
-            err.jspError("jsp.error.tld.mandatory.element.missing", "jsp-version", uri);
-        }
+            List<TagFileInfo> tagFileInfos = new ArrayList<>();
+            for (TagFileXml tagFileXml : taglibXml.getTagFiles()) {
+                tagFileInfos.add(createTagFileInfo(tagFileXml, jar));
+            }
 
-        this.tags = tagInfos.toArray(new TagInfo[tagInfos.size()]);
-        this.tagFiles = tagFileInfos.toArray(new TagFileInfo[tagFileInfos.size()]);
-        this.functions = functionInfos.toArray(new FunctionInfo[functionInfos.size()]);
+            Set<String> names = new HashSet<>();
+            List<FunctionInfo> functionInfos = taglibXml.getFunctions();
+            // TODO Move this validation to the parsing stage
+            for (FunctionInfo functionInfo : functionInfos) {
+                String name = functionInfo.getName();
+                if (!names.add(name)) {
+                    err.jspError("jsp.error.tld.fn.duplicate.name", name, uri);
+                }
+            }
+
+            if (tlibversion == null) {
+                err.jspError("jsp.error.tld.mandatory.element.missing", "tlib-version", uri);
+            }
+            if (jspversion == null) {
+                err.jspError("jsp.error.tld.mandatory.element.missing", "jsp-version", uri);
+            }
+
+            this.tags = tagInfos.toArray(new TagInfo[tagInfos.size()]);
+            this.tagFiles = tagFileInfos.toArray(new TagFileInfo[tagFileInfos.size()]);
+            this.functions = functionInfos.toArray(new FunctionInfo[functionInfos.size()]);
         } catch (IOException ioe) {
             throw new JasperException(ioe);
-        }
-        finally
-        {
-            if(null != jar)
-                jar.close(); // Jar.close does not throw IOException, but probably should
         }
     }
 
