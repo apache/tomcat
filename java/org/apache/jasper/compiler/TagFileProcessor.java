@@ -631,10 +631,7 @@ class TagFileProcessor {
                         compiler.getCompilationContext().getTldResourcePath(
                             tagFileInfo.getTagInfo().getTagLibrary().getURI());
 
-                    Jar jar = null;
-                    try
-                    {
-                        jar = tldResourcePath.openJar();
+                    try (Jar jar = tldResourcePath.openJar()) {
 
                         if (jar != null) {
                             // Add TLD
@@ -643,19 +640,13 @@ class TagFileProcessor {
                             // Add Tag
                             pageInfo.addDependant(jar.getURL(tagFilePath.substring(1)),
                                                   Long.valueOf(jar.getLastModified(tagFilePath.substring(1))));
-                        }
-                        else {
+                        } else {
                             pageInfo.addDependant(tagFilePath,
                                                   compiler.getCompilationContext().getLastModified(
                                                                                                    tagFilePath));
                         }
                     } catch (IOException ioe) {
                         throw new JasperException(ioe);
-                    }
-                    finally
-                    {
-                        if(null != jar)
-                            jar.close(); // Jar.close does not "throw IOException" but probably should
                     }
                 } else {
                     pageInfo.addDependant(tagFilePath,
