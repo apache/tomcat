@@ -79,7 +79,7 @@ source distribution, do the following:
     release.
 
 * NOTE: The Java 7 JDK is only required if you wish to build Tomcat with
-  JSR-356 (Java WebSocket 1.0) support.
+  JSR-356 (Java WebSocket 1.1) support.
 
 
 (2) Install Apache Ant version 1.8.2 or later on your computer
@@ -170,7 +170,7 @@ ${tomcat.source}.
 
   See Apache Ant documentation for the <setproxy> task for details.
 
-* NOTE: Users wishing to build Tomcat with JSR-356 (Java WebSocket 1.0) support
+* NOTE: Users wishing to build Tomcat with JSR-356 (Java WebSocket 1.1) support
   must also set the java.7.home build property to the location of the Java 7 JDK
   installation.
 
