@@ -72,7 +72,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Input.
      */
-    protected AbstractInputBuffer<S> inputBuffer ;
+    protected AbstractInputBuffer<S> inputBuffer;
 
 
     /**
@@ -629,14 +629,18 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Exposes input buffer to super class to allow better code re-use.
      * @return  The input buffer used by the processor.
      */
-    protected abstract AbstractInputBuffer<S> getInputBuffer();
+    protected AbstractInputBuffer<S> getInputBuffer() {
+        return inputBuffer;
+    }
 
 
     /**
      * Exposes output buffer to super class to allow better code re-use.
      * @return  The output buffer used by the processor.
      */
-    protected abstract AbstractOutputBuffer<S> getOutputBuffer();
+    protected AbstractOutputBuffer<S> getOutputBuffer() {
+        return outputBuffer;
+    }
 
 
     /**
@@ -863,7 +867,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             break;
         }
         case AVAILABLE: {
-            request.setAvailable(inputBuffer.available());
+            request.setAvailable(getInputBuffer().available());
             break;
         }
         case NB_WRITE_INTEREST: {
@@ -1629,7 +1633,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } else if (status == SocketStatus.OPEN_READ &&
                 request.getReadListener() != null) {
             try {
-                if (inputBuffer.available() > 0) {
+                if (getInputBuffer().available() > 0) {
                     asyncStateMachine.asyncOperation();
                 }
             } catch (IllegalStateException x) {
@@ -1770,7 +1774,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
     @Override
     public ByteBuffer getLeftoverInput() {
-        return inputBuffer.getLeftover();
+        return getInputBuffer().getLeftover();
     }
 
 }
