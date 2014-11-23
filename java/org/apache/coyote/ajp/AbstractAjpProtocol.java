@@ -76,7 +76,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         }
     }
 
-    protected void configureProcessor(AbstractAjpProcessor<S> processor) {
+    protected void configureProcessor(AjpProcessor<S> processor) {
         processor.setAdapter(getAdapter());
         processor.setTomcatAuthentication(getTomcatAuthentication());
         processor.setRequiredSecret(requiredSecret);
@@ -84,8 +84,8 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         processor.setClientCertProvider(getClientCertProvider());
     }
 
-    protected abstract static class AbstractAjpConnectionHandler<S,P extends AbstractAjpProcessor<S>>
-            extends AbstractConnectionHandler<S, P> {
+    protected abstract static class AbstractAjpConnectionHandler<S>
+            extends AbstractConnectionHandler<S,AjpProcessor<S>> {
 
         @Override
         protected void initSsl(SocketWrapperBase<S> socket, Processor<S> processor) {
@@ -100,8 +100,8 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         }
 
         @Override
-        protected P createUpgradeProcessor(SocketWrapperBase<S> socket, ByteBuffer leftoverInput,
-                HttpUpgradeHandler httpUpgradeHandler) {
+        protected AjpProcessor<S> createUpgradeProcessor(SocketWrapperBase<S> socket,
+                ByteBuffer leftoverInput, HttpUpgradeHandler httpUpgradeHandler) {
             // TODO should fail - throw IOE
             return null;
         }
