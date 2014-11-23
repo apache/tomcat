@@ -161,8 +161,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Location of next write of the response message (used withnon-blocking
-     * writes when the message may not be written in a single write). Avalue of
+     * Location of next write of the response message (used with non-blocking
+     * writes when the message may not be written in a single write). A value of
      * -1 indicates that no message has been written to the buffer.
      */
     private int responseMsgPos = -1;
