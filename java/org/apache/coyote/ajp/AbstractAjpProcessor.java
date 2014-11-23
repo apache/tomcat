@@ -925,25 +925,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     protected abstract void setupSocket(SocketWrapperBase<S> socketWrapper)
             throws IOException;
 
-    // Methods used by readMessage
-    /**
-     * Read at least the specified amount of bytes, and place them
-     * in the input buffer. Note that if any data is available to read then this
-     * method will always block until at least the specified number of bytes
-     * have been read.
-     *
-     * @param buf   Buffer to read data into
-     * @param pos   Start position
-     * @param n     The minimum number of bytes to read
-     * @param block If there is no data available to read when this method is
-     *              called, should this call block until data becomes available?
-     * @return  <code>true</code> if the requested number of bytes were read
-     *          else <code>false</code>
-     * @throws IOException
-     */
-    protected abstract boolean read(byte[] buf, int pos, int n, boolean block)
-            throws IOException;
-
     // Methods used by SocketInputBuffer
     /**
      * Read an AJP body message. Used to read both the 'special' packet in ajp13
@@ -1556,6 +1537,31 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             }
         }
         return !empty;
+    }
+
+
+    /**
+     * Read at least the specified amount of bytes, and place them
+     * in the input buffer. Note that if any data is available to read then this
+     * method will always block until at least the specified number of bytes
+     * have been read.
+     *
+     * @param buf   Buffer to read data into
+     * @param pos   Start position
+     * @param n     The minimum number of bytes to read
+     * @param block If there is no data available to read when this method is
+     *              called, should this call block until data becomes available?
+     * @return  <code>true</code> if the requested number of bytes were read
+     *          else <code>false</code>
+     * @throws IOException
+     */
+    private boolean read(byte[] buf, int pos, int n, boolean block) throws IOException {
+        int read = socketWrapper.read(block, buf, pos, n);
+        if (!block && read > 0 && read < n) {
+            socketWrapper.read(true, buf, pos + n, n - read);
+        }
+
+        return read > 0;
     }
 
 
