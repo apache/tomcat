@@ -44,6 +44,9 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
     public AbstractAjpProtocol(AbstractEndpoint<S> endpoint) {
         super(endpoint);
+        setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
+        // AJP does not use Send File
+        getEndpoint().setUseSendfile(false);
     }
 
 

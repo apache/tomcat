@@ -55,11 +55,6 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
         super(new Nio2Endpoint());
         cHandler = new AjpConnectionHandler(this);
         ((Nio2Endpoint) getEndpoint()).setHandler(cHandler);
-        setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
-        setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
-        setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
-        // AJP does not use Send File
-        getEndpoint().setUseSendfile(false);
     }
 
 
