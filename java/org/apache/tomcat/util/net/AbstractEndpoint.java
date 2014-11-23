@@ -55,7 +55,8 @@ public abstract class AbstractEndpoint<S> {
     protected static final StringManager sm = StringManager.getManager(
             AbstractEndpoint.class.getPackage().getName());
 
-    public static interface Handler {
+    public static interface Handler<S> {
+
         /**
          * Different types of socket states to react upon.
          */
@@ -64,6 +65,18 @@ public abstract class AbstractEndpoint<S> {
             //      ASYNC_END (if possible)
             OPEN, CLOSED, LONG, ASYNC_END, SENDFILE, UPGRADING, UPGRADED
         }
+
+
+        /**
+         * Process the provided socket with the given current status.
+         *
+         * @param socket The socket to process
+         * @param status The current socket status
+         *
+         * @return The state of the socket after processing
+         */
+        public SocketState process(SocketWrapperBase<S> socket,
+                SocketStatus status);
 
 
         /**

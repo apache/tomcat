@@ -52,7 +52,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
 
 
     @Override
-    protected AbstractEndpoint.Handler getHandler() {
+    protected AbstractEndpoint.Handler<Nio2Channel> getHandler() {
         return cHandler;
     }
 

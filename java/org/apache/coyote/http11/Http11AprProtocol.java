@@ -28,7 +28,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.net.AprEndpoint.Poller;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -51,7 +50,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
 
     @Override
-    protected AbstractEndpoint.Handler getHandler() {
+    protected AbstractEndpoint.Handler<Long> getHandler() {
         return cHandler;
     }
 
@@ -217,7 +216,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
-            extends AbstractConnectionHandler<Long,Http11AprProcessor> implements Handler {
+            extends AbstractConnectionHandler<Long,Http11AprProcessor> {
 
         protected Http11AprProtocol proto;
 

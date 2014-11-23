@@ -130,9 +130,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     /**
      * Handling of accepted sockets.
      */
-    protected Handler handler = null;
-    public void setHandler(Handler handler ) { this.handler = handler; }
-    public Handler getHandler() { return handler; }
+    protected Handler<Long> handler = null;
+    public void setHandler(Handler<Long> handler ) { this.handler = handler; }
+    public Handler<Long> getHandler() { return handler; }
 
 
     /**
@@ -2213,19 +2213,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         }
 
-    }
-
-    // ------------------------------------------------ Handler Inner Interface
-
-
-    /**
-     * Bare bones interface used for socket processing. Per thread data is to be
-     * stored in the ThreadWithAttributes extra folders, or alternately in
-     * thread local fields.
-     */
-    public interface Handler extends AbstractEndpoint.Handler {
-        public SocketState process(SocketWrapperBase<Long> socket,
-                SocketStatus status);
     }
 
 

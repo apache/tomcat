@@ -21,7 +21,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
@@ -37,7 +36,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
 
     @Override
-    protected AbstractEndpoint.Handler getHandler() {
+    protected AbstractEndpoint.Handler<Long> getHandler() {
         return cHandler;
     }
 
@@ -88,8 +87,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
     // --------------------------------------  AjpConnectionHandler Inner Class
 
     protected static class AjpConnectionHandler
-            extends AbstractAjpConnectionHandler<Long>
-            implements Handler {
+            extends AbstractAjpConnectionHandler<Long> {
 
         public AjpConnectionHandler(AjpAprProtocol proto) {
             super(proto);

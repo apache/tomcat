@@ -41,7 +41,7 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
 
 
     @Override
-    protected AbstractEndpoint.Handler getHandler() {
+    protected AbstractEndpoint.Handler<Nio2Channel> getHandler() {
         return cHandler;
     }
 

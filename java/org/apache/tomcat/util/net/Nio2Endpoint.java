@@ -1135,9 +1135,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
      * stored in the ThreadWithAttributes extra folders, or alternately in
      * thread local fields.
      */
-    public interface Handler extends AbstractEndpoint.Handler {
-        public SocketState process(SocketWrapperBase<Nio2Channel> socket,
-                SocketStatus status);
+    public interface Handler extends AbstractEndpoint.Handler<Nio2Channel> {
         public void release(SocketWrapperBase<Nio2Channel> socket);
         public void closeAll();
         public SSLImplementation getSslImplementation();

@@ -87,7 +87,7 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
     }
 
     @Override
-    protected Handler getHandler() {
+    protected Handler<NioChannel> getHandler() {
         return cHandler;
     }
 
