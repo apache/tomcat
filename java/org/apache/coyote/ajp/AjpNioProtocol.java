@@ -54,14 +54,14 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
 
     public AjpNioProtocol() {
-        endpoint = new NioEndpoint();
+        super(new NioEndpoint());
         cHandler = new AjpConnectionHandler(this);
-        ((NioEndpoint) endpoint).setHandler(cHandler);
+        ((NioEndpoint) getEndpoint()).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
         // AJP does not use Send File
-        endpoint.setUseSendfile(false);
+        getEndpoint().setUseSendfile(false);
     }
 
 
@@ -169,7 +169,8 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
         @Override
         protected AjpProcessor<NioChannel> createProcessor() {
-            AjpProcessor<NioChannel> processor = new AjpProcessor<>(proto.packetSize, proto.endpoint);
+            AjpProcessor<NioChannel> processor =
+                    new AjpProcessor<>(proto.getPacketSize(), proto.getEndpoint());
             proto.configureProcessor(processor);
             register(processor);
             return processor;

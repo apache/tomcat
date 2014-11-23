@@ -66,8 +66,8 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
     private boolean compress = false;
 
     public SpdyProxyProtocol() {
-        endpoint = new NioEndpoint();
-        ((NioEndpoint) endpoint).setHandler(cHandler);
+        super(new NioEndpoint());
+        ((NioEndpoint) getEndpoint()).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
@@ -101,13 +101,13 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
         spdyContext.setHandler(new SpdyHandler() {
             @Override
             public void onStream(SpdyConnection con, SpdyStream ch) throws IOException {
-                SpdyProcessor<NioChannel> sp = new SpdyProcessor<>(con, endpoint);
+                SpdyProcessor<NioChannel> sp = new SpdyProcessor<>(con, getEndpoint());
                 sp.setAdapter(getAdapter());
                 sp.onSynStream(ch);
             }
         });
         spdyContext.setNetSupport(new NetSupportSocket());
-        spdyContext.setExecutor(endpoint.getExecutor());
+        spdyContext.setExecutor(getEndpoint().getExecutor());
     }
 
     public boolean isCompress() {
