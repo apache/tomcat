@@ -18,7 +18,6 @@ package org.apache.coyote.ajp;
 
 import javax.net.ssl.SSLEngine;
 
-import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -35,7 +34,6 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  */
 public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
 
-
     private static final Log log = LogFactory.getLog(AjpNio2Protocol.class);
 
     @Override
@@ -50,7 +48,6 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
 
     // ------------------------------------------------------------ Constructor
 
-
     public AjpNio2Protocol() {
         super(new Nio2Endpoint());
         cHandler = new AjpConnectionHandler(this);
@@ -59,7 +56,6 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Connection handler for AJP.
@@ -77,20 +73,12 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
 
     // --------------------------------------  AjpConnectionHandler Inner Class
 
-
     protected static class AjpConnectionHandler
             extends AbstractAjpConnectionHandler<Nio2Channel>
             implements Handler {
 
-        protected final AjpNio2Protocol proto;
-
         public AjpConnectionHandler(AjpNio2Protocol proto) {
-            this.proto = proto;
-        }
-
-        @Override
-        protected AbstractProtocol<Nio2Channel> getProtocol() {
-            return proto;
+            super(proto);
         }
 
         @Override
@@ -136,22 +124,13 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
         }
 
         @Override
-        protected AjpProcessor<Nio2Channel> createProcessor() {
-            AjpProcessor<Nio2Channel> processor =
-                    new AjpProcessor<>(proto.getPacketSize(), proto.getEndpoint());
-            proto.configureProcessor(processor);
-            register(processor);
-            return processor;
-        }
-
-        @Override
         public void onCreateSSLEngine(SSLEngine engine) {
         }
 
         @Override
         public void closeAll() {
             for (Nio2Channel channel : connections.keySet()) {
-                ((Nio2Endpoint) proto.getEndpoint()).closeSocket(channel.getSocket());
+                ((Nio2Endpoint) getProtocol().getEndpoint()).closeSocket(channel.getSocket());
             }
         }
     }

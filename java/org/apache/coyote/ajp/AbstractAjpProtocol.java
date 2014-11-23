@@ -56,6 +56,17 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * Overridden to make getter accessible to other classes in this package.
+     */
+    @Override
+    protected AbstractEndpoint<S> getEndpoint() {
+        return super.getEndpoint();
+    }
+
+
     // ------------------------------------------------- AJP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 
@@ -102,6 +113,27 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
     protected abstract static class AbstractAjpConnectionHandler<S>
             extends AbstractConnectionHandler<S,AjpProcessor<S>> {
+
+        private final AbstractAjpProtocol<S> proto;
+
+        public AbstractAjpConnectionHandler(AbstractAjpProtocol<S> proto) {
+            this.proto = proto;
+        }
+
+        @Override
+        protected AbstractAjpProtocol<S> getProtocol() {
+            return proto;
+        }
+
+
+        @Override
+        protected AjpProcessor<S> createProcessor() {
+            AjpProcessor<S> processor =
+                    new AjpProcessor<>(proto.getPacketSize(), proto.getEndpoint());
+            proto.configureProcessor(processor);
+            register(processor);
+            return processor;
+        }
 
         @Override
         protected void initSsl(SocketWrapperBase<S> socket, Processor<S> processor) {
