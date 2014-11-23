@@ -19,7 +19,6 @@ package org.apache.coyote.ajp;
 import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -36,12 +35,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
 
     @Override
-    protected AbstractEndpoint.Handler<Long> getHandler() {
-        return cHandler;
-    }
-
-
-    @Override
     public boolean isAprRequired() {
         // Override since this protocol implementation requires the APR/native
         // library
@@ -53,17 +46,10 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
     public AjpAprProtocol() {
         super(new AprEndpoint());
-        cHandler = new AjpConnectionHandler(this);
+        AjpConnectionHandler cHandler = new AjpConnectionHandler(this);
+        setHandler(cHandler);
         ((AprEndpoint) getEndpoint()).setHandler(cHandler);
     }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * Connection handler for AJP.
-     */
-    private final AjpConnectionHandler cHandler;
 
 
     // --------------------------------------------------------- Public Methods

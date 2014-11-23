@@ -26,7 +26,6 @@ import org.apache.coyote.Processor;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Poller;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -45,15 +44,16 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
     private static final Log log = LogFactory.getLog(Http11AprProtocol.class);
 
-    @Override
-    protected Log getLog() { return log; }
-
-
-    @Override
-    protected AbstractEndpoint.Handler<Long> getHandler() {
-        return cHandler;
+    public Http11AprProtocol() {
+        super(new AprEndpoint());
+        Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
+        setHandler(cHandler);
+        ((AprEndpoint) getEndpoint()).setHandler(cHandler);
     }
 
+
+    @Override
+    protected Log getLog() { return log; }
 
     @Override
     public boolean isAprRequired() {
@@ -61,15 +61,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         // library
         return true;
     }
-
-
-    public Http11AprProtocol() {
-        super(new AprEndpoint());
-        cHandler = new Http11ConnectionHandler(this);
-        ((AprEndpoint) getEndpoint()).setHandler(cHandler);
-    }
-
-    private final Http11ConnectionHandler cHandler;
 
     public boolean getUseSendfile() { return getEndpoint().getUseSendfile(); }
     public void setUseSendfile(boolean useSendfile) { ((AprEndpoint)getEndpoint()).setUseSendfile(useSendfile); }
