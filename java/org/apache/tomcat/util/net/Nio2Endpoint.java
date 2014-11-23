@@ -755,6 +755,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 @Override
                 public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
                     boolean notify = false;
+                    if (log.isDebugEnabled()) {
+                        log.debug("Socket: [ + " + attachment + "], Interest: [" + interest + "]");
+                    }
                     synchronized (readCompletionHandler) {
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attachment);
@@ -879,8 +882,15 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
 
+            if (log.isDebugEnabled()) {
+                log.debug("Socket: [" + this + "], block: [" + block + "], length: [" + len + "]");
+            }
+
             synchronized (readCompletionHandler) {
                 if (readPending) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Socket: [" + this + "], Read: [0]");
+                    }
                     return 0;
                 }
 
@@ -894,6 +904,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 // Is there enough data in the read buffer to satisfy this request?
                 if (remaining >= len) {
                     readBuffer.get(b, off, len);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Socket: [" + this + "], Read from buffer: [" + len + "]");
+                    }
                     return len;
                 }
 
@@ -934,6 +947,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     }
                 } else if (nRead == -1) {
                     throw new EOFException();
+                }
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Socket: [" + this + "], Read: [" + (len - leftToWrite) + "]");
                 }
 
                 return len - leftToWrite;
