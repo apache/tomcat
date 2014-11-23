@@ -2597,5 +2597,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         public void flush() {
             // NO-OP
         }
+
+
+        @Override
+        public void regsiterForEvent(boolean read, boolean write) {
+            ((AprEndpoint) getEndpoint()).getPoller().add(
+                    getSocket().longValue(), -1, read, write);
+        }
     }
 }
