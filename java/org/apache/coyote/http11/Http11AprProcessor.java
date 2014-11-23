@@ -58,10 +58,10 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         super(endpoint);
 
         inputBuffer = new InternalAprInputBuffer(request, headerBufferSize);
-        request.setInputBuffer(inputBuffer);
+        request.setInputBuffer(getInputBuffer());
 
         outputBuffer = new InternalAprOutputBuffer(response, headerBufferSize);
-        response.setOutputBuffer(outputBuffer);
+        response.setOutputBuffer(getOutputBuffer());
 
         initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
     }
@@ -337,9 +337,9 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             if (endpoint.isSSLEnabled() && (socketRef != 0)) {
                 // Consume and buffer the request body, so that it does not
                 // interfere with the client's handshake messages
-                InputFilter[] inputFilters = inputBuffer.getFilters();
+                InputFilter[] inputFilters = getInputBuffer().getFilters();
                 ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(maxSavePostSize);
-                inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
+                getInputBuffer().addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
                 try {
                     // Configure connection to require a certificate
                     SSLSocket.setVerify(socketRef, SSL.SSL_CVERIFY_REQUIRE,
@@ -389,7 +389,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                 org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
         if (fileName != null) {
             // No entity body sent here
-            outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
+            getOutputBuffer().addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
             sendfileData = new AprEndpoint.SendfileData();
             sendfileData.fileName = fileName;
@@ -400,15 +400,5 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             return true;
         }
         return false;
-    }
-
-    @Override
-    protected AbstractInputBuffer<Long> getInputBuffer() {
-        return inputBuffer;
-    }
-
-    @Override
-    protected AbstractOutputBuffer<Long> getOutputBuffer() {
-        return outputBuffer;
     }
 }

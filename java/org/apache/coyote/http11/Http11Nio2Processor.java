@@ -62,10 +62,10 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         super(endpoint);
 
         inputBuffer = new InternalNio2InputBuffer(request, maxHttpHeaderSize);
-        request.setInputBuffer(inputBuffer);
+        request.setInputBuffer(getInputBuffer());
 
         outputBuffer = new InternalNio2OutputBuffer(response, maxHttpHeaderSize);
-        response.setOutputBuffer(outputBuffer);
+        response.setOutputBuffer(getOutputBuffer());
 
         initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
     }
@@ -84,7 +84,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
         SocketState state = super.asyncDispatch(status);
-        if (state == SocketState.OPEN && ((InternalNio2InputBuffer) inputBuffer).isPending()) {
+        if (state == SocketState.OPEN && ((InternalNio2InputBuffer) getInputBuffer()).isPending()) {
             // Following async processing, a read is still pending, so
             // keep the processor associated
             return SocketState.LONG;
@@ -96,10 +96,10 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     @Override
     protected void registerForEvent(boolean read, boolean write) {
         if (read) {
-            ((InternalNio2InputBuffer) inputBuffer).registerReadInterest();
+            ((InternalNio2InputBuffer) getInputBuffer()).registerReadInterest();
         }
         if (write) {
-            ((InternalNio2OutputBuffer) outputBuffer).registerWriteInterest();
+            ((InternalNio2OutputBuffer) getOutputBuffer()).registerWriteInterest();
         }
     }
 
@@ -127,7 +127,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         openSocket = true;
         // Check to see if we have read any of the request line yet
         if (((InternalNio2InputBuffer)
-                inputBuffer).getParsingRequestLinePhase() < 1) {
+                getInputBuffer()).getParsingRequestLinePhase() < 1) {
             if (keptAlive) {
                 // Haven't read the request line and have previously processed a
                 // request. Must be keep-alive. Make sure poller uses keepAlive.
@@ -357,10 +357,10 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                  * Consume and buffer the request body, so that it does not
                  * interfere with the client's handshake messages
                  */
-                InputFilter[] inputFilters = inputBuffer.getFilters();
+                InputFilter[] inputFilters = getInputBuffer().getFilters();
                 ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
                     .setLimit(maxSavePostSize);
-                inputBuffer.addActiveFilter
+                getInputBuffer().addActiveFilter
                     (inputFilters[Constants.BUFFERED_FILTER]);
                 SecureNio2Channel sslChannel = (SecureNio2Channel) socketWrapper.getSocket();
                 SSLEngine engine = sslChannel.getSslEngine();
@@ -409,7 +409,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
         if (fileName != null) {
             // No entity body sent here
-            outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
+            getOutputBuffer().addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
             sendfileData = new Nio2Endpoint.SendfileData();
             sendfileData.fileName = fileName;
@@ -420,16 +420,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             return true;
         }
         return false;
-    }
-
-    @Override
-    protected AbstractInputBuffer<Nio2Channel> getInputBuffer() {
-        return inputBuffer;
-    }
-
-    @Override
-    protected AbstractOutputBuffer<Nio2Channel> getOutputBuffer() {
-        return outputBuffer;
     }
 
     /**

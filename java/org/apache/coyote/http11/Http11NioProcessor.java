@@ -63,10 +63,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         super(endpoint);
 
         inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize);
-        request.setInputBuffer(inputBuffer);
+        request.setInputBuffer(getInputBuffer());
 
         outputBuffer = new InternalNioOutputBuffer(response, maxHttpHeaderSize);
-        response.setOutputBuffer(outputBuffer);
+        response.setOutputBuffer(getOutputBuffer());
 
         initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
     }
@@ -121,7 +121,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         openSocket = true;
         // Check to see if we have read any of the request line yet
         if (((InternalNioInputBuffer)
-                inputBuffer).getParsingRequestLinePhase() < 2) {
+                getInputBuffer()).getParsingRequestLinePhase() < 2) {
             if (keptAlive) {
                 // Haven't read the request line and have previously processed a
                 // request. Must be keep-alive. Make sure poller uses keepAlive.
@@ -317,10 +317,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                  * Consume and buffer the request body, so that it does not
                  * interfere with the client's handshake messages
                  */
-                InputFilter[] inputFilters = inputBuffer.getFilters();
+                InputFilter[] inputFilters = getInputBuffer().getFilters();
                 ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
                     .setLimit(maxSavePostSize);
-                inputBuffer.addActiveFilter
+                getInputBuffer().addActiveFilter
                     (inputFilters[Constants.BUFFERED_FILTER]);
                 SecureNioChannel sslChannel = (SecureNioChannel) socketWrapper.getSocket();
                 SSLEngine engine = sslChannel.getSslEngine();
@@ -369,7 +369,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                 org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
         if (fileName != null) {
             // No entity body sent here
-            outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
+            getOutputBuffer().addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
             sendfileData = new NioEndpoint.SendfileData();
             sendfileData.fileName = fileName;
@@ -380,16 +380,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             return true;
         }
         return false;
-    }
-
-    @Override
-    protected AbstractInputBuffer<NioChannel> getInputBuffer() {
-        return inputBuffer;
-    }
-
-    @Override
-    protected AbstractOutputBuffer<NioChannel> getOutputBuffer() {
-        return outputBuffer;
     }
 
     /**
