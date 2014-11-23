@@ -30,8 +30,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(AbstractAjpProtocol.class);
 
 
     @Override
