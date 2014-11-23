@@ -43,17 +43,25 @@ The following is a quick step by step guide.
 
 </section>
 
-<section name="Download a Java Development Kit (JDK) version 6">
+<section name="Download Java Development Kit (JDK) versions 6 and 7">
 
 <p>
-Building Apache Tomcat requires a JDK (version 6) to be installed. You can download one from<br />
-<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a><br/>
-or from another JDK vendor.
+  Building Apache Tomcat requires a Java 6 JDK to be installed and optionally
+  a Java 7 JDK installed in parallel with Java 6 one. The Java 7 JDK is only
+  required if you wish to build Tomcat with JSR-356 (Java WebSocket 1.1)
+  support.
 </p>
 
 <p>
-<b>IMPORTANT</b>: Set an environment variable JAVA_HOME to the pathname of the
-directory into which you installed the JDK release.
+  You can download JDKs from Oracle<br />
+  <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a><br/>
+  or from another JDK vendor.
+</p>
+
+<p>
+  <b>IMPORTANT</b>: Set an environment variable JAVA_HOME to the pathname of
+  the directory into which you installed the Java 6 JDK. The path to Java 7
+  JDK is configured in <code>build.properties</code> file (see below).
 </p>
 
 </section>
@@ -159,6 +167,20 @@ proxy.use=on]]></source>
 </section>
 
 <section name="Building Tomcat">
+
+<p>
+  If you have installed a Java 7 JDK and wish to build Tomcat with JSR-356
+  (Java WebSocket 1.1) support, set <code>java.7.home</code> property in
+  file <code>${tomcat.source}/build.properties</code> to the location of
+  the Java 7 JDK installation.
+</p>
+
+<p>
+  An example, using 32-bit JDK on a 64-bit Windows system:
+</p>
+
+<source><![CDATA[# Location of Java 7 JDK
+java.7.home=C:/Program Files (x86)/Java/jdk1.7.0_72]]></source>
 
 <p>
 Use the following commands to build Tomcat:
