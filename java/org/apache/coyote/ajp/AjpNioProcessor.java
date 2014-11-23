@@ -23,7 +23,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -43,15 +42,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         super(packetSize, endpoint);
 
         response.setOutputBuffer(new SocketOutputBuffer());
-
-        pool = endpoint.getSelectorPool();
     }
-
-
-    /**
-     * Selector pool for the associated endpoint.
-     */
-    protected final NioSelectorPool pool;
 
 
     @Override
