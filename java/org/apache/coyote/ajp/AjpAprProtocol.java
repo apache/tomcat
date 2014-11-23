@@ -103,7 +103,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
 
     protected static class AjpConnectionHandler
-            extends AbstractAjpConnectionHandler<Long,AjpAprProcessor>
+            extends AbstractAjpConnectionHandler<Long>
             implements Handler {
 
         protected final AjpAprProtocol proto;
@@ -141,8 +141,8 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
 
         @Override
-        protected AjpAprProcessor createProcessor() {
-            AjpAprProcessor processor = new AjpAprProcessor(proto.packetSize, (AprEndpoint)proto.endpoint);
+        protected AjpProcessor<Long> createProcessor() {
+            AjpProcessor<Long> processor = new AjpProcessor<>(proto.packetSize, proto.endpoint);
             proto.configureProcessor(processor);
             register(processor);
             return processor;

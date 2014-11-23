@@ -89,7 +89,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
 
     protected static class AjpConnectionHandler
-            extends AbstractAjpConnectionHandler<NioChannel, AjpNioProcessor>
+            extends AbstractAjpConnectionHandler<NioChannel>
             implements Handler {
 
         protected final AjpNioProtocol proto;
@@ -171,8 +171,8 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
 
         @Override
-        protected AjpNioProcessor createProcessor() {
-            AjpNioProcessor processor = new AjpNioProcessor(proto.packetSize, (NioEndpoint)proto.endpoint);
+        protected AjpProcessor<NioChannel> createProcessor() {
+            AjpProcessor<NioChannel> processor = new AjpProcessor<>(proto.packetSize, proto.endpoint);
             proto.configureProcessor(processor);
             register(processor);
             return processor;
