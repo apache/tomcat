@@ -1761,6 +1761,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
         httpUpgradeHandler = null;
         resetErrorState();
+        socketWrapper = null;
         recycleInternal();
     }
 
