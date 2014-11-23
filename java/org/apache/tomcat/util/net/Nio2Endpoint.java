@@ -1111,6 +1111,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 throw ex;
             }
         }
+
+        @Override
+        public void regsiterForEvent(boolean read, boolean write) {
+            // NO-OP. Appropriate handlers will already have been registered.
+        }
     }
 
 
