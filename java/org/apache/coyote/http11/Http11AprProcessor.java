@@ -94,12 +94,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     @Override
-    protected boolean disableKeepAlive() {
-        return false;
-    }
-
-
-    @Override
     protected void setRequestLineReadTimeout() throws IOException {
         // Timeouts while in the poller are handled entirely by the poller
         // Only need to be concerned with socket timeouts

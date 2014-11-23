@@ -917,14 +917,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Processors (currently only HTTP BIO) may elect to disable HTTP keep-alive
-     * in some circumstances. This method allows the processor implementation to
-     * determine if keep-alive should be disabled or not.
-     */
-    protected abstract boolean disableKeepAlive();
-
-
-    /**
      * Configures the timeout to be used for reading the request line.
      */
     protected abstract void setRequestLineReadTimeout() throws IOException;
@@ -971,10 +963,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         sendfileInProgress = false;
         readComplete = true;
         keptAlive = false;
-
-        if (disableKeepAlive()) {
-            socketWrapper.setKeepAliveLeft(0);
-        }
 
         while (!getErrorState().isError() && keepAlive && !isAsync() &&
                 httpUpgradeHandler == null && !endpoint.isPaused()) {
