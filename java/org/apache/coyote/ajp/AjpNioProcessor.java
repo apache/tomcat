@@ -38,10 +38,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
 
     public AjpNioProcessor(int packetSize, NioEndpoint endpoint) {
-
         super(packetSize, endpoint);
-
-        response.setOutputBuffer(new SocketOutputBuffer());
     }
 
 
