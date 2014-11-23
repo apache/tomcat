@@ -16,14 +16,12 @@
  */
 package org.apache.coyote.ajp;
 
-import java.io.IOException;
 import java.nio.channels.SelectionKey;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Processes AJP requests using NIO.
@@ -59,12 +57,5 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
             key.interestOps(key.interestOps() | SelectionKey.OP_READ);
         }
-    }
-
-
-    @Override
-    protected void setupSocket(SocketWrapperBase<NioChannel> socketWrapper)
-            throws IOException {
-        // NO-OP
     }
 }

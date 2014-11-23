@@ -726,8 +726,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         // Setting up the socket
         this.socketWrapper = socket;
 
-        setupSocket(socket);
-
         int soTimeout = endpoint.getSoTimeout();
         boolean cping = false;
 
@@ -922,10 +920,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     // ------------------------------------------------------ Protected Methods
-
-    // Methods called by process()
-    protected abstract void setupSocket(SocketWrapperBase<S> socketWrapper)
-            throws IOException;
 
     // Methods used by SocketInputBuffer
     /**
