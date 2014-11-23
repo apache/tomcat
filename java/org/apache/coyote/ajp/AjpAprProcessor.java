@@ -19,7 +19,6 @@ package org.apache.coyote.ajp;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Processes AJP requests.
@@ -49,11 +48,5 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     protected void registerForEvent(boolean read, boolean write) {
         ((AprEndpoint) endpoint).getPoller().add(
                 socketWrapper.getSocket().longValue(), -1, read, write);
-    }
-
-
-    @Override
-    protected void setupSocket(SocketWrapperBase<Long> socketWrapper) {
-        // NO-OP
     }
 }

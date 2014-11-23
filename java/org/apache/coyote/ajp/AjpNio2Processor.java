@@ -16,13 +16,10 @@
  */
 package org.apache.coyote.ajp;
 
-import java.io.IOException;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Processes AJP requests using NIO2.
@@ -43,12 +40,5 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
     protected void registerForEvent(boolean read, boolean write) {
         // Nothing to do here, the appropriate operations should
         // already be pending
-    }
-
-
-    @Override
-    protected void setupSocket(SocketWrapperBase<Nio2Channel> socketWrapper)
-            throws IOException {
-        // NO-OP
     }
 }
