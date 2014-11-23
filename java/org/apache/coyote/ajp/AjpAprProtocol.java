@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.ajp;
 
-import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -30,7 +29,6 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  * This the APR/native based protocol handler implementation for AJP.
  */
 public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
-
 
     private static final Log log = LogFactory.getLog(AjpAprProtocol.class);
 
@@ -63,7 +61,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
     // ----------------------------------------------------- Instance Variables
 
-
     /**
      * Connection handler for AJP.
      */
@@ -71,7 +68,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
 
     // --------------------------------------------------------- Public Methods
-
 
     public int getPollTime() { return ((AprEndpoint)getEndpoint()).getPollTime(); }
     public void setPollTime(int pollTime) { ((AprEndpoint)getEndpoint()).setPollTime(pollTime); }
@@ -91,20 +87,12 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
     // --------------------------------------  AjpConnectionHandler Inner Class
 
-
     protected static class AjpConnectionHandler
             extends AbstractAjpConnectionHandler<Long>
             implements Handler {
 
-        protected final AjpAprProtocol proto;
-
         public AjpConnectionHandler(AjpAprProtocol proto) {
-            this.proto = proto;
-        }
-
-        @Override
-        protected AbstractProtocol<Long> getProtocol() {
-            return proto;
+            super(proto);
         }
 
         @Override
@@ -123,20 +111,10 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
             processor.recycle(isSocketClosing);
             recycledProcessors.push(processor);
             if (addToPoller) {
-                ((AprEndpoint)proto.getEndpoint()).getPoller().add(
+                ((AprEndpoint)getProtocol().getEndpoint()).getPoller().add(
                         socket.getSocket().longValue(),
-                        proto.getEndpoint().getKeepAliveTimeout(), true, false);
+                        getProtocol().getEndpoint().getKeepAliveTimeout(), true, false);
             }
-        }
-
-
-        @Override
-        protected AjpProcessor<Long> createProcessor() {
-            AjpProcessor<Long> processor =
-                    new AjpProcessor<>(proto.getPacketSize(), proto.getEndpoint());
-            proto.configureProcessor(processor);
-            register(processor);
-            return processor;
         }
     }
 }

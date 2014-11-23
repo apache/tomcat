@@ -21,7 +21,6 @@ import java.util.Iterator;
 
 import javax.net.ssl.SSLEngine;
 
-import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -37,7 +36,6 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  */
 public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
-
     private static final Log log = LogFactory.getLog(AjpNioProtocol.class);
 
     @Override
@@ -52,7 +50,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
     // ------------------------------------------------------------ Constructor
 
-
     public AjpNioProtocol() {
         super(new NioEndpoint());
         cHandler = new AjpConnectionHandler(this);
@@ -61,7 +58,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Connection handler for AJP.
@@ -79,20 +75,12 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
     // --------------------------------------  AjpConnectionHandler Inner Class
 
-
     protected static class AjpConnectionHandler
             extends AbstractAjpConnectionHandler<NioChannel>
             implements Handler {
 
-        protected final AjpNioProtocol proto;
-
         public AjpConnectionHandler(AjpNioProtocol proto) {
-            this.proto = proto;
-        }
-
-        @Override
-        protected AbstractProtocol<NioChannel> getProtocol() {
-            return proto;
+            super(proto);
         }
 
         @Override
@@ -161,15 +149,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
             }
         }
 
-
-        @Override
-        protected AjpProcessor<NioChannel> createProcessor() {
-            AjpProcessor<NioChannel> processor =
-                    new AjpProcessor<>(proto.getPacketSize(), proto.getEndpoint());
-            proto.configureProcessor(processor);
-            register(processor);
-            return processor;
-        }
 
         @Override
         public void onCreateSSLEngine(SSLEngine engine) {
