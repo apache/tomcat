@@ -89,6 +89,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      */
     private final AbstractEndpoint<S> endpoint;
 
+    private Handler<S> handler;
+
 
     public AbstractProtocol(AbstractEndpoint<S> endpoint) {
         this.endpoint = endpoint;
@@ -320,6 +322,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    protected Handler<S> getHandler() {
+        return handler;
+    }
+
+    protected void setHandler(Handler<S> handler) {
+        this.handler = handler;
+    }
+
+
     // -------------------------------------------------------- Abstract methods
 
     /**
@@ -340,12 +351,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * Obtain the name of the protocol, (Http, Ajp, etc.). Used with JMX.
      */
     protected abstract String getProtocolName();
-
-
-    /**
-     * Obtain the handler associated with the underlying Endpoint
-     */
-    protected abstract Handler<S> getHandler();
 
 
     // ----------------------------------------------------- JMX related methods

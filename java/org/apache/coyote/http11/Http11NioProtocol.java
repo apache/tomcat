@@ -29,7 +29,6 @@ import org.apache.coyote.Processor;
 import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
@@ -52,21 +51,16 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     private static final Log log = LogFactory.getLog(Http11NioProtocol.class);
 
 
-    @Override
-    protected Log getLog() { return log; }
-
-
-    @Override
-    protected AbstractEndpoint.Handler<NioChannel> getHandler() {
-        return cHandler;
-    }
-
-
     public Http11NioProtocol() {
         super(new NioEndpoint());
-        cHandler = new Http11ConnectionHandler(this);
+        Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
+        setHandler(cHandler);
         ((NioEndpoint) getEndpoint()).setHandler(cHandler);
     }
+
+
+    @Override
+    protected Log getLog() { return log; }
 
 
     @Override
@@ -77,9 +71,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
     }
 
-    // -------------------- Properties--------------------
-
-    private final Http11ConnectionHandler cHandler;
 
     // -------------------- Pool setup --------------------
 

@@ -24,7 +24,6 @@ import javax.net.ssl.SSLEngine;
 import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
@@ -42,27 +41,14 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
     protected Log getLog() { return log; }
 
 
-    @Override
-    protected AbstractEndpoint.Handler<NioChannel> getHandler() {
-        return cHandler;
-    }
-
-
     // ------------------------------------------------------------ Constructor
 
     public AjpNioProtocol() {
         super(new NioEndpoint());
-        cHandler = new AjpConnectionHandler(this);
+        AjpConnectionHandler cHandler = new AjpConnectionHandler(this);
+        setHandler(cHandler);
         ((NioEndpoint) getEndpoint()).setHandler(cHandler);
     }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * Connection handler for AJP.
-     */
-    private final AjpConnectionHandler cHandler;
 
 
     // ----------------------------------------------------- JMX related methods

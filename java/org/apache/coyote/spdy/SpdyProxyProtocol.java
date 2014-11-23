@@ -30,7 +30,6 @@ import org.apache.tomcat.spdy.SpdyConnection;
 import org.apache.tomcat.spdy.SpdyContext;
 import org.apache.tomcat.spdy.SpdyContext.SpdyHandler;
 import org.apache.tomcat.spdy.SpdyStream;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
@@ -60,13 +59,13 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
     private static final Log log = LogFactory.getLog(SpdyProxyProtocol.class);
 
-    private final NioEndpoint.Handler cHandler = new TomcatNioHandler();
     private SpdyContext spdyContext;
 
     private boolean compress = false;
 
     public SpdyProxyProtocol() {
         super(new NioEndpoint());
+        NioEndpoint.Handler cHandler = new TomcatNioHandler();
         ((NioEndpoint) getEndpoint()).setHandler(cHandler);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
     }
@@ -84,11 +83,6 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
     @Override
     protected String getProtocolName() {
         return "spdy2";
-    }
-
-    @Override
-    protected Handler<NioChannel> getHandler() {
-        return cHandler;
     }
 
     @Override
