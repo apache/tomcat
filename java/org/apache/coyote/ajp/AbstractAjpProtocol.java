@@ -22,6 +22,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -41,11 +42,15 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     protected static final StringManager sm = StringManager.getManager(AbstractAjpProtocol.class);
 
 
+    public AbstractAjpProtocol(AbstractEndpoint<S> endpoint) {
+        super(endpoint);
+    }
+
+
     @Override
     protected String getProtocolName() {
         return "Ajp";
     }
-
 
 
     // ------------------------------------------------- AJP specific properties
@@ -55,7 +60,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
      * Should authentication be done in the native webserver layer,
      * or in the Servlet container ?
      */
-    protected boolean tomcatAuthentication = true;
+    private boolean tomcatAuthentication = true;
     public boolean getTomcatAuthentication() { return tomcatAuthentication; }
     public void setTomcatAuthentication(boolean tomcatAuthentication) {
         this.tomcatAuthentication = tomcatAuthentication;
@@ -65,7 +70,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     /**
      * Required secret.
      */
-    protected String requiredSecret = null;
+    private String requiredSecret = null;
     public void setRequiredSecret(String requiredSecret) {
         this.requiredSecret = requiredSecret;
     }
@@ -74,7 +79,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     /**
      * AJP packet size.
      */
-    protected int packetSize = Constants.MAX_PACKET_SIZE;
+    private int packetSize = Constants.MAX_PACKET_SIZE;
     public int getPacketSize() { return packetSize; }
     public void setPacketSize(int packetSize) {
         if(packetSize < Constants.MAX_PACKET_SIZE) {

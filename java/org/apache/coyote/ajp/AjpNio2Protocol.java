@@ -52,14 +52,14 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
 
 
     public AjpNio2Protocol() {
-        endpoint = new Nio2Endpoint();
+        super(new Nio2Endpoint());
         cHandler = new AjpConnectionHandler(this);
-        ((Nio2Endpoint) endpoint).setHandler(cHandler);
+        ((Nio2Endpoint) getEndpoint()).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
         // AJP does not use Send File
-        endpoint.setUseSendfile(false);
+        getEndpoint().setUseSendfile(false);
     }
 
 
@@ -142,7 +142,8 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
 
         @Override
         protected AjpProcessor<Nio2Channel> createProcessor() {
-            AjpProcessor<Nio2Channel> processor = new AjpProcessor<>(proto.packetSize, proto.endpoint);
+            AjpProcessor<Nio2Channel> processor =
+                    new AjpProcessor<>(proto.getPacketSize(), proto.getEndpoint());
             proto.configureProcessor(processor);
             register(processor);
             return processor;
@@ -155,7 +156,7 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
         @Override
         public void closeAll() {
             for (Nio2Channel channel : connections.keySet()) {
-                ((Nio2Endpoint) proto.endpoint).closeSocket(channel.getSocket());
+                ((Nio2Endpoint) proto.getEndpoint()).closeSocket(channel.getSocket());
             }
         }
     }

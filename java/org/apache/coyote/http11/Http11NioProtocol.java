@@ -63,18 +63,14 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
 
     public Http11NioProtocol() {
-        endpoint=new NioEndpoint();
+        super(new NioEndpoint());
         cHandler = new Http11ConnectionHandler(this);
-        ((NioEndpoint) endpoint).setHandler(cHandler);
+        ((NioEndpoint) getEndpoint()).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
 
-
-    public NioEndpoint getEndpoint() {
-        return ((NioEndpoint)endpoint);
-    }
 
     @Override
     public void start() throws Exception {
@@ -91,49 +87,49 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     // -------------------- Pool setup --------------------
 
     public void setPollerThreadCount(int count) {
-        ((NioEndpoint)endpoint).setPollerThreadCount(count);
+        ((NioEndpoint)getEndpoint()).setPollerThreadCount(count);
     }
 
     public int getPollerThreadCount() {
-        return ((NioEndpoint)endpoint).getPollerThreadCount();
+        return ((NioEndpoint)getEndpoint()).getPollerThreadCount();
     }
 
     public void setSelectorTimeout(long timeout) {
-        ((NioEndpoint)endpoint).setSelectorTimeout(timeout);
+        ((NioEndpoint)getEndpoint()).setSelectorTimeout(timeout);
     }
 
     public long getSelectorTimeout() {
-        return ((NioEndpoint)endpoint).getSelectorTimeout();
+        return ((NioEndpoint)getEndpoint()).getSelectorTimeout();
     }
 
     public void setAcceptorThreadPriority(int threadPriority) {
-        ((NioEndpoint)endpoint).setAcceptorThreadPriority(threadPriority);
+        ((NioEndpoint)getEndpoint()).setAcceptorThreadPriority(threadPriority);
     }
 
     public void setPollerThreadPriority(int threadPriority) {
-        ((NioEndpoint)endpoint).setPollerThreadPriority(threadPriority);
+        ((NioEndpoint)getEndpoint()).setPollerThreadPriority(threadPriority);
     }
 
     public int getAcceptorThreadPriority() {
-      return ((NioEndpoint)endpoint).getAcceptorThreadPriority();
+      return ((NioEndpoint)getEndpoint()).getAcceptorThreadPriority();
     }
 
     public int getPollerThreadPriority() {
-      return ((NioEndpoint)endpoint).getThreadPriority();
+      return ((NioEndpoint)getEndpoint()).getThreadPriority();
     }
 
 
     public boolean getUseSendfile() {
-        return endpoint.getUseSendfile();
+        return getEndpoint().getUseSendfile();
     }
 
     public void setUseSendfile(boolean useSendfile) {
-        ((NioEndpoint)endpoint).setUseSendfile(useSendfile);
+        ((NioEndpoint)getEndpoint()).setUseSendfile(useSendfile);
     }
 
     // -------------------- Tcp setup --------------------
     public void setOomParachute(int oomParachute) {
-        ((NioEndpoint)endpoint).setOomParachute(oomParachute);
+        ((NioEndpoint)getEndpoint()).setOomParachute(oomParachute);
     }
 
     // ----------------------------------------------------- JMX related methods
@@ -283,7 +279,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         @Override
         public Http11NioProcessor createProcessor() {
             Http11NioProcessor processor = new Http11NioProcessor(
-                    proto.getMaxHttpHeaderSize(), (NioEndpoint)proto.endpoint,
+                    proto.getMaxHttpHeaderSize(), (NioEndpoint)proto.getEndpoint(),
                     proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize());
             proto.configureProcessor(processor);

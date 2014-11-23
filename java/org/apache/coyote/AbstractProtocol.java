@@ -87,7 +87,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * ProtocolHandler implementation (ProtocolHandler using NIO, requires NIO
      * Endpoint etc.).
      */
-    protected AbstractEndpoint<S> endpoint = null;
+    private final AbstractEndpoint<S> endpoint;
+
+
+    public AbstractProtocol(AbstractEndpoint<S> endpoint) {
+        this.endpoint = endpoint;
+    }
 
 
     // ----------------------------------------------- Generic property handling
@@ -303,6 +308,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             name.append(port);
         }
         return ObjectName.quote(name.toString());
+    }
+
+
+    // ----------------------------------------------- Accessors for sub-classes
+
+    protected AbstractEndpoint<S> getEndpoint() {
+        return endpoint;
     }
 
 

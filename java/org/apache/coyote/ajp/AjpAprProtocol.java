@@ -55,14 +55,14 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
     // ------------------------------------------------------------ Constructor
 
     public AjpAprProtocol() {
-        endpoint = new AprEndpoint();
+        super(new AprEndpoint());
         cHandler = new AjpConnectionHandler(this);
-        ((AprEndpoint) endpoint).setHandler(cHandler);
+        ((AprEndpoint) getEndpoint()).setHandler(cHandler);
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
         // AJP does not use Send File
-        endpoint.setUseSendfile(false);
+        getEndpoint().setUseSendfile(false);
     }
 
 
@@ -78,12 +78,12 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
     // --------------------------------------------------------- Public Methods
 
 
-    public int getPollTime() { return ((AprEndpoint)endpoint).getPollTime(); }
-    public void setPollTime(int pollTime) { ((AprEndpoint)endpoint).setPollTime(pollTime); }
+    public int getPollTime() { return ((AprEndpoint)getEndpoint()).getPollTime(); }
+    public void setPollTime(int pollTime) { ((AprEndpoint)getEndpoint()).setPollTime(pollTime); }
 
     // pollerSize is now a synonym for maxConnections
-    public void setPollerSize(int pollerSize) { endpoint.setMaxConnections(pollerSize); }
-    public int getPollerSize() { return endpoint.getMaxConnections(); }
+    public void setPollerSize(int pollerSize) { getEndpoint().setMaxConnections(pollerSize); }
+    public int getPollerSize() { return getEndpoint().getMaxConnections(); }
 
 
     // ----------------------------------------------------- JMX related methods
@@ -128,16 +128,17 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
             processor.recycle(isSocketClosing);
             recycledProcessors.push(processor);
             if (addToPoller) {
-                ((AprEndpoint)proto.endpoint).getPoller().add(
+                ((AprEndpoint)proto.getEndpoint()).getPoller().add(
                         socket.getSocket().longValue(),
-                        proto.endpoint.getKeepAliveTimeout(), true, false);
+                        proto.getEndpoint().getKeepAliveTimeout(), true, false);
             }
         }
 
 
         @Override
         protected AjpProcessor<Long> createProcessor() {
-            AjpProcessor<Long> processor = new AjpProcessor<>(proto.packetSize, proto.endpoint);
+            AjpProcessor<Long> processor =
+                    new AjpProcessor<>(proto.getPacketSize(), proto.getEndpoint());
             proto.configureProcessor(processor);
             register(processor);
             return processor;
