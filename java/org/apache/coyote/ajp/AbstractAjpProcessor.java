@@ -290,6 +290,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         getBodyMessageArray = new byte[getBodyMessage.getLen()];
         System.arraycopy(getBodyMessage.getBuffer(), 0, getBodyMessageArray,
                 0, getBodyMessage.getLen());
+
+        response.setOutputBuffer(new SocketOutputBuffer());
     }
 
 

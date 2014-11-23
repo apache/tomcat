@@ -47,8 +47,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
         super(packetSize, endpoint);
 
-        response.setOutputBuffer(new SocketOutputBuffer());
-
         // Allocate input and output buffers
         inputBuffer = ByteBuffer.allocateDirect(packetSize * 2);
         inputBuffer.limit(0);
