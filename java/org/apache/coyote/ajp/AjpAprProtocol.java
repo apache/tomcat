@@ -27,12 +27,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
- * Abstract the protocol implementation, including threading, etc.
- * Processor is single threaded and specific to stream-based protocols,
- * will not fit Jk protocols like JNI.
- *
- * @author Remy Maucherat
- * @author Costin Manolache
+ * This the APR/native based protocol handler implementation for AJP.
  */
 public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
