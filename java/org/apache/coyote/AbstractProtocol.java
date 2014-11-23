@@ -345,7 +345,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * Obtain the handler associated with the underlying Endpoint
      */
-    protected abstract Handler getHandler();
+    protected abstract Handler<S> getHandler();
 
 
     // ----------------------------------------------------- JMX related methods
@@ -563,7 +563,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     // ------------------------------------------- Connection handler base class
 
     protected abstract static class AbstractConnectionHandler<S,P extends Processor<S>>
-            implements AbstractEndpoint.Handler {
+            implements AbstractEndpoint.Handler<S> {
 
         protected abstract Log getLog();
 
@@ -591,6 +591,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
 
+        @Override
         public SocketState process(SocketWrapperBase<S> wrapper,
                 SocketStatus status) {
             if (wrapper == null) {
