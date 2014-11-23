@@ -35,11 +35,6 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
         return log;
     }
 
-    /**
-     * Flipped flag for read buffer.
-     */
-    protected boolean flipped = false;
-
     public AjpNio2Processor(int packetSize, Nio2Endpoint endpoint0) {
         super(packetSize, endpoint0);
     }
@@ -47,7 +42,6 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
     @Override
     public void recycle(boolean socketClosing) {
         super.recycle(socketClosing);
-        flipped = false;
     }
 
     @Override
