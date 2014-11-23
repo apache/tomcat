@@ -40,11 +40,6 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
     }
 
     @Override
-    public void recycle(boolean socketClosing) {
-        super.recycle(socketClosing);
-    }
-
-    @Override
     protected void registerForEvent(boolean read, boolean write) {
         // Nothing to do here, the appropriate operations should
         // already be pending
