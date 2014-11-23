@@ -62,7 +62,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
         // AJP does not use Send File
-        ((AprEndpoint) endpoint).setUseSendfile(false);
+        endpoint.setUseSendfile(false);
     }
 
 

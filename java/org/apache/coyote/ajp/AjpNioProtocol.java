@@ -61,7 +61,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
         // AJP does not use Send File
-        ((NioEndpoint) endpoint).setUseSendfile(false);
+        endpoint.setUseSendfile(false);
     }
 
 
