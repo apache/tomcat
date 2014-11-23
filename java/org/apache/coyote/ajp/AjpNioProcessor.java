@@ -16,8 +16,6 @@
  */
 package org.apache.coyote.ajp;
 
-import java.nio.channels.SelectionKey;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
@@ -37,25 +35,5 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
     public AjpNioProcessor(int packetSize, NioEndpoint endpoint) {
         super(packetSize, endpoint);
-    }
-
-
-    @Override
-    protected void registerForEvent(boolean read, boolean write) {
-        final NioChannel socket = socketWrapper.getSocket();
-        final NioEndpoint.NioSocketWrapper attach =
-                (NioEndpoint.NioSocketWrapper) socket.getAttachment(false);
-        if (attach == null) {
-            return;
-        }
-        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-        if (read) {
-            attach.interestOps(attach.interestOps() | SelectionKey.OP_READ);
-            key.interestOps(key.interestOps() | SelectionKey.OP_READ);
-        }
-        if (write) {
-            attach.interestOps(attach.interestOps() | SelectionKey.OP_WRITE);
-            key.interestOps(key.interestOps() | SelectionKey.OP_READ);
-        }
     }
 }

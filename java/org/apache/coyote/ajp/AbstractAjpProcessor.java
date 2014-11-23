@@ -1675,8 +1675,14 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         }
     }
 
-    // ------------------------------------- InputStreamInputBuffer Inner Class
 
+    @Override
+    protected void registerForEvent(boolean read, boolean write) {
+        socketWrapper.regsiterForEvent(read, write);
+    }
+
+
+    // ------------------------------------- InputStreamInputBuffer Inner Class
 
     /**
      * This class is an input buffer which will read its data from an input

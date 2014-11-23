@@ -42,11 +42,4 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     public AjpAprProcessor(int packetSize, AprEndpoint endpoint) {
         super(packetSize, endpoint);
     }
-
-
-    @Override
-    protected void registerForEvent(boolean read, boolean write) {
-        ((AprEndpoint) endpoint).getPoller().add(
-                socketWrapper.getSocket().longValue(), -1, read, write);
-    }
 }

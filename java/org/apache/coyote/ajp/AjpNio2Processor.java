@@ -35,10 +35,4 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
     public AjpNio2Processor(int packetSize, Nio2Endpoint endpoint0) {
         super(packetSize, endpoint0);
     }
-
-    @Override
-    protected void registerForEvent(boolean read, boolean write) {
-        // Nothing to do here, the appropriate operations should
-        // already be pending
-    }
 }
