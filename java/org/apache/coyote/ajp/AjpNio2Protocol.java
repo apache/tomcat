@@ -133,11 +133,14 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
         public void release(SocketWrapperBase<Nio2Channel> socket,
                 Processor<Nio2Channel> processor, boolean isSocketClosing,
                 boolean addToPoller) {
+            if (getLog().isDebugEnabled()) {
+                log.debug("Socket: [" + socket + "], Processor: [" + processor +
+                        "], isSocketClosing: [" + isSocketClosing +
+                        "], addToPoller: [" + addToPoller + "]");
+            }
             processor.recycle(isSocketClosing);
             recycledProcessors.push(processor);
             if (addToPoller) {
-                //Exception e = new Exception ("Nio2 add to poller");
-                //e.printStackTrace();
                 ((Nio2Endpoint) proto.endpoint).awaitBytes(socket);
             }
         }
