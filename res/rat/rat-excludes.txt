@@ -25,10 +25,11 @@
 
   - *.manifest JAR manifest files cannot contain license
 
-  - package-list files in API documentation (javadoc) are generated
+  - package-list and script.js files in API documentation (javadoc) are
+    generated
 
   - other trivial test files, such as textual files containing only "OK' string,
-  are also excluded.
+    are also excluded.
 
   - JSON files (RFC7159) are data and cannot contain comments
 
@@ -38,6 +39,13 @@
 
   - file fragments that are combined during the build process and therefore can
     not contain a license header in every fragment
+
+  - JavaEE XML schemas that are CDDL licensed
+
+  - Checkstyle configuration file that defines how to check for the presence of
+    ALv2 headers
+
+  - files used simply to ensure directories are not empty
 
 output/build/webapps/docs/*.html
 output/build/webapps/docs/appdev/*.html
@@ -55,6 +63,10 @@ output/dist/webapps/docs/tribes/*.html
 
 output/embed/*.md5
 output/extras/*.md5
+output/release/v9.0.0-dev/bin/*.md5
+output/release/v9.0.0-dev/bin/embed/*.md5
+output/release/v9.0.0-dev/bin/extras/*.md5
+output/release/v9.0.0-dev/src/*.md5
 
 modules/jdbc-pool/resources/MANIFEST.MF
 output/dist/src/modules/jdbc-pool/resources/MANIFEST.MF
@@ -64,15 +76,28 @@ output/manifests/*.manifest
 res/META-INF/*.manifest
 
 output/dist/webapps/docs/api/package-list
+output/dist/webapps/docs/api/script.js
 output/dist/webapps/docs/elapi/package-list
+output/dist/webapps/docs/elapi/script.js
 output/dist/webapps/docs/jspapi/package-list
+output/dist/webapps/docs/jspapi/script.js
 output/dist/webapps/docs/servletapi/package-list
+output/dist/webapps/docs/servletapi/script.js
+output/dist/webapps/docs/websocket/package-list
+output/dist/webapps/docs/websocket/script.js
 
 output/dist/src/test/webapp/bug53257/*.txt
 output/dist/src/test/webapp/bug53257/foo bar/foobar.txt
 output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
+output/dist/src/test/webresources/dir1/d1/d1-f1.txt
+output/dist/src/test/webresources/dir1/d2/d2-f1.txt
+output/dist/src/test/webresources/dir1/*.txt
 test/webapp/bug53257/*.txt
+test/webapp/bug53257/foo bar/foobar.txt
 test/webapp-fragments/WEB-INF/classes/*.txt
+test/webresources/dir1/d1/d1-f1.txt
+test/webresources/dir1/d2/d2-f1.txt
+test/webresources/dir1/*.txt
 
 webapps/examples/WEB-INF/classes/websocket/echo/servers.json
 output/build/webapps/examples/WEB-INF/classes/websocket/echo/servers.json
@@ -88,3 +113,61 @@ webapps/docs/architecture/requestProcess/roseModel.mdl
 
 output/dist/confinstall/tomcat-users_2.xml
 output/dist/src/res/confinstall/tomcat-users_2.xml
+res/confinstall/tomcat-users_2.xml
+
+java/javax/servlet/resources/javaee_5.xsd
+java/javax/servlet/resources/javaee_6.xsd
+java/javax/servlet/resources/javaee_7.xsd
+java/javax/servlet/resources/javaee_web_services_1_2.xsd
+java/javax/servlet/resources/javaee_web_services_1_3.xsd
+java/javax/servlet/resources/javaee_web_services_1_4.xsd
+java/javax/servlet/resources/javaee_web_services_client_1_2.xsd
+java/javax/servlet/resources/javaee_web_services_client_1_3.xsd
+java/javax/servlet/resources/javaee_web_services_client_1_4.xsd
+java/javax/servlet/resources/jsp_2_2.xsd
+java/javax/servlet/resources/jsp_2_3.xsd
+java/javax/servlet/resources/web-app_3_0.xsd
+java/javax/servlet/resources/web-app_3_1.xsd
+java/javax/servlet/resources/web-common_3_0.xsd
+java/javax/servlet/resources/web-common_3_1.xsd
+java/javax/servlet/resources/web-fragment_3_0.xsd
+java/javax/servlet/resources/web-fragment_3_1.xsd
+output/classes/javax/servlet/resources/javaee_5.xsd
+output/classes/javax/servlet/resources/javaee_6.xsd
+output/classes/javax/servlet/resources/javaee_7.xsd
+output/classes/javax/servlet/resources/javaee_web_services_1_2.xsd
+output/classes/javax/servlet/resources/javaee_web_services_1_3.xsd
+output/classes/javax/servlet/resources/javaee_web_services_1_4.xsd
+output/classes/javax/servlet/resources/javaee_web_services_client_1_2.xsd
+output/classes/javax/servlet/resources/javaee_web_services_client_1_3.xsd
+output/classes/javax/servlet/resources/javaee_web_services_client_1_4.xsd
+output/classes/javax/servlet/resources/jsp_2_2.xsd
+output/classes/javax/servlet/resources/jsp_2_3.xsd
+output/classes/javax/servlet/resources/web-app_3_0.xsd
+output/classes/javax/servlet/resources/web-app_3_1.xsd
+output/classes/javax/servlet/resources/web-common_3_0.xsd
+output/classes/javax/servlet/resources/web-common_3_1.xsd
+output/classes/javax/servlet/resources/web-fragment_3_0.xsd
+output/classes/javax/servlet/resources/web-fragment_3_1.xsd
+output/dist/src/java/javax/servlet/resources/javaee_5.xsd
+output/dist/src/java/javax/servlet/resources/javaee_6.xsd
+output/dist/src/java/javax/servlet/resources/javaee_7.xsd
+output/dist/src/java/javax/servlet/resources/javaee_web_services_1_2.xsd
+output/dist/src/java/javax/servlet/resources/javaee_web_services_1_3.xsd
+output/dist/src/java/javax/servlet/resources/javaee_web_services_1_4.xsd
+output/dist/src/java/javax/servlet/resources/javaee_web_services_client_1_2.xsd
+output/dist/src/java/javax/servlet/resources/javaee_web_services_client_1_3.xsd
+output/dist/src/java/javax/servlet/resources/javaee_web_services_client_1_4.xsd
+output/dist/src/java/javax/servlet/resources/jsp_2_2.xsd
+output/dist/src/java/javax/servlet/resources/jsp_2_3.xsd
+output/dist/src/java/javax/servlet/resources/web-app_3_0.xsd
+output/dist/src/java/javax/servlet/resources/web-app_3_1.xsd
+output/dist/src/java/javax/servlet/resources/web-common_3_0.xsd
+output/dist/src/java/javax/servlet/resources/web-common_3_1.xsd
+output/dist/src/java/javax/servlet/resources/web-fragment_3_0.xsd
+output/dist/src/java/javax/servlet/resources/web-fragment_3_1.xsd
+
+output/dist/src/res/checkstyle/header-al2.txt
+res/checkstyle/header-al2.txt
+
+output/dist/temp/safeToDelete.tmp
