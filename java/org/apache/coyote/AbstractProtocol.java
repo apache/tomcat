@@ -693,7 +693,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
                     connections.remove(socket);
-                    release(wrapper, processor, false, true);
+                    release(wrapper, processor, false, false);
                 } else if (state == SocketState.SENDFILE) {
                     // Sendfile in progress. If it fails, the socket will be
                     // closed. If it works, the socket will be re-added to the

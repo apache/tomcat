@@ -944,6 +944,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             readBuffer.flip();
                             flipped = true;
                         }
+                    } else {
+                        interest = true;
                     }
                 } else if (nRead == -1) {
                     throw new EOFException();
