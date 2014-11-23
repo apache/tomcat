@@ -56,13 +56,4 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     protected void setupSocket(SocketWrapperBase<Long> socketWrapper) {
         // NO-OP
     }
-
-
-    /**
-     * Recycle the processor.
-     */
-    @Override
-    public void recycle(boolean socketClosing) {
-        super.recycle(socketClosing);
-    }
 }
