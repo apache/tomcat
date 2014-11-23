@@ -230,7 +230,7 @@ Variables</em> to add two new <em>Classpath Variables</em>:
 <table class="defaultTable">
  <tr><td>TOMCAT_LIBS_BASE</td><td>The same location as the <code>base.path</code>
   setting in <code>build.properties</code>, where the binary dependencies have been downloaded</td></tr>
- <tr><td>ANT_HOME</td><td>the base path of Ant 1.8.1 or later</td></tr>
+ <tr><td>ANT_HOME</td><td>the base path of Ant 1.9.3 or later</td></tr>
 </table>
 
 
