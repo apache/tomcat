@@ -121,12 +121,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
 
     @Override
-    protected boolean disableKeepAlive() {
-        return false;
-    }
-
-
-    @Override
     protected void setRequestLineReadTimeout() throws IOException {
         // socket.setTimeout()
         //     - timeout used by poller
