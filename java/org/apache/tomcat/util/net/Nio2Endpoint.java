@@ -136,14 +136,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
     /**
-     * Priority of the poller threads.
-     */
-    private int pollerThreadPriority = Thread.NORM_PRIORITY;
-    public void setPollerThreadPriority(int pollerThreadPriority) { this.pollerThreadPriority = pollerThreadPriority; }
-    public int getPollerThreadPriority() { return pollerThreadPriority; }
-
-
-    /**
      * Handling of accepted sockets.
      */
     private Handler handler = null;

@@ -73,16 +73,8 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         ((Nio2Endpoint)getEndpoint()).setAcceptorThreadPriority(threadPriority);
     }
 
-    public void setPollerThreadPriority(int threadPriority) {
-        ((Nio2Endpoint)getEndpoint()).setPollerThreadPriority(threadPriority);
-    }
-
     public int getAcceptorThreadPriority() {
       return ((Nio2Endpoint)getEndpoint()).getAcceptorThreadPriority();
-    }
-
-    public int getPollerThreadPriority() {
-      return ((Nio2Endpoint)getEndpoint()).getThreadPriority();
     }
 
     public boolean getUseSendfile() {
