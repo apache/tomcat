@@ -140,9 +140,6 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
             }
             processor.recycle(isSocketClosing);
             recycledProcessors.push(processor);
-            if (addToPoller) {
-                ((Nio2Endpoint) proto.endpoint).awaitBytes(socket);
-            }
         }
 
         @Override
