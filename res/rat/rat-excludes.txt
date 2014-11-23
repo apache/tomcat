@@ -32,6 +32,13 @@
 
   - JSON files (RFC7159) are data and cannot contain comments
 
+  - local build configuration files
+
+  - *.mdl are Rational Rose data files and cannot contain comments
+
+  - file fragments that are combined during the build process and therefore can
+    not contain a license header in every fragment
+
 output/build/webapps/docs/*.html
 output/build/webapps/docs/appdev/*.html
 output/build/webapps/docs/architecture/*.html
@@ -62,10 +69,22 @@ output/dist/webapps/docs/jspapi/package-list
 output/dist/webapps/docs/servletapi/package-list
 
 output/dist/src/test/webapp/bug53257/*.txt
+output/dist/src/test/webapp/bug53257/foo bar/foobar.txt
 output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
 test/webapp/bug53257/*.txt
 test/webapp-fragments/WEB-INF/classes/*.txt
 
 webapps/examples/WEB-INF/classes/websocket/echo/servers.json
 output/build/webapps/examples/WEB-INF/classes/websocket/echo/servers.json
+output/dist/src/webapps/examples/WEB-INF/classes/websocket/echo/servers.json
 output/dist/webapps/examples/WEB-INF/classes/websocket/echo/servers.json
+
+build.properties
+
+output/build/webapps/docs/architecture/requestProcess/roseModel.mdl
+output/dist/src/webapps/docs/architecture/requestProcess/roseModel.mdl
+output/dist/webapps/docs/architecture/requestProcess/roseModel.mdl
+webapps/docs/architecture/requestProcess/roseModel.mdl
+
+output/dist/confinstall/tomcat-users_2.xml
+output/dist/src/res/confinstall/tomcat-users_2.xml
