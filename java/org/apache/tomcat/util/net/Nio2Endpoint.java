@@ -74,11 +74,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     private AsynchronousServerSocketChannel serverSock = null;
 
     /**
-     * use send file
-     */
-    private boolean useSendfile = true;
-
-    /**
      * The size of the OOM parachute.
      */
     private int oomParachute = 1024*1024;
@@ -158,10 +153,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
     public void setSocketProperties(SocketProperties socketProperties) {
         this.socketProperties = socketProperties;
-    }
-
-    public void setUseSendfile(boolean useSendfile) {
-        this.useSendfile = useSendfile;
     }
 
     /**
@@ -460,11 +451,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
     public int getReadBufSize() {
         return socketProperties.getRxBufSize();
-    }
-
-    @Override
-    public boolean getUseSendfile() {
-        return useSendfile;
     }
 
     public int getOomParachute() {
