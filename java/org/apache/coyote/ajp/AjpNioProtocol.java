@@ -32,11 +32,8 @@ import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
-
 /**
- * Abstract the protocol implementation, including threading, etc.
- * Processor is single threaded and specific to stream-based protocols,
- * will not fit Jk protocols like JNI.
+ * This the NIO based protocol handler implementation for AJP.
  */
 public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
