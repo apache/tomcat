@@ -152,7 +152,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     @Override
     public void recycleInternal() {
-        socketWrapper = null;
         sendfileData = null;
     }
 

@@ -191,7 +191,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
     @Override
     public void recycleInternal() {
-        socketWrapper = null;
         sendfileData = null;
     }
 
