@@ -17,10 +17,6 @@
 package org.apache.coyote.ajp;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -66,92 +62,5 @@ public class AjpNio2Processor extends AbstractAjpProcessor<Nio2Channel> {
     protected void setupSocket(SocketWrapperBase<Nio2Channel> socketWrapper)
             throws IOException {
         // NO-OP
-    }
-
-
-    @Override
-    protected boolean read(byte[] buf, int pos, int n, boolean blockFirstRead)
-        throws IOException {
-
-        int read = 0;
-        int res = 0;
-        boolean block = blockFirstRead;
-
-        while (read < n) {
-            res = readSocket(buf, read + pos, n - read, block);
-            if (res > 0) {
-                read += res;
-            } else if (res == 0 && !block) {
-                return false;
-            } else {
-                throw new IOException(sm.getString("ajpprocessor.failedread"));
-            }
-            block = true;
-        }
-        return true;
-    }
-
-
-    private int readSocket(byte[] buf, int pos, int n, boolean block)
-            throws IOException {
-        int nRead = 0;
-        ByteBuffer readBuffer =
-                socketWrapper.getSocket().getBufHandler().getReadBuffer();
-
-        if (block) {
-            if (!flipped) {
-                readBuffer.flip();
-                flipped = true;
-            }
-            if (readBuffer.remaining() > 0) {
-                nRead = Math.min(n, readBuffer.remaining());
-                readBuffer.get(buf, pos, nRead);
-                if (readBuffer.remaining() == 0) {
-                    readBuffer.clear();
-                    flipped = false;
-                }
-            } else {
-                readBuffer.clear();
-                flipped = false;
-                readBuffer.limit(n);
-                try {
-                    nRead = socketWrapper.getSocket().read(readBuffer)
-                            .get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue();
-                } catch (InterruptedException | ExecutionException
-                        | TimeoutException e) {
-                    throw new IOException(sm.getString("ajpprocessor.failedread"), e);
-                }
-                if (nRead > 0) {
-                    if (!flipped) {
-                        readBuffer.flip();
-                        flipped = true;
-                    }
-                    nRead = Math.min(n, readBuffer.remaining());
-                    readBuffer.get(buf, pos, nRead);
-                    if (readBuffer.remaining() == 0) {
-                        readBuffer.clear();
-                        flipped = false;
-                    }
-                }
-            }
-        } else {
-            if (!flipped) {
-                readBuffer.flip();
-                flipped = true;
-            }
-            if (readBuffer.remaining() > 0) {
-                nRead = Math.min(n, readBuffer.remaining());
-                readBuffer.get(buf, pos, nRead);
-                if (readBuffer.remaining() == 0) {
-                    readBuffer.clear();
-                    flipped = false;
-                }
-            } else {
-                readBuffer.clear();
-                flipped = false;
-                readBuffer.limit(n);
-            }
-        }
-        return nRead;
     }
 }

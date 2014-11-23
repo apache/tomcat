@@ -62,6 +62,7 @@ public class NioChannel implements ByteChannel {
      */
     public void reset() throws IOException {
         bufHandler.getReadBuffer().clear();
+        bufHandler.getReadBuffer().limit(0);
         bufHandler.getWriteBuffer().clear();
         this.sendFile = false;
     }

@@ -16,11 +16,8 @@
  */
 package org.apache.coyote.ajp;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -81,70 +78,5 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     protected void setupSocket(SocketWrapperBase<NioChannel> socketWrapper)
             throws IOException {
         // NO-OP
-    }
-
-
-    @Override
-    protected boolean read(byte[] buf, int pos, int n, boolean blockFirstRead)
-        throws IOException {
-
-        int read = 0;
-        int res = 0;
-        boolean block = blockFirstRead;
-
-        while (read < n) {
-            res = readSocket(buf, read + pos, n - read, block);
-            if (res > 0) {
-                read += res;
-            } else if (res == 0 && !block) {
-                return false;
-            } else {
-                throw new IOException(sm.getString("ajpprocessor.failedread"));
-            }
-            block = true;
-        }
-        return true;
-    }
-
-
-    private int readSocket(byte[] buf, int pos, int n, boolean block)
-            throws IOException {
-        int nRead = 0;
-        ByteBuffer readBuffer =
-                socketWrapper.getSocket().getBufHandler().getReadBuffer();
-        readBuffer.clear();
-        readBuffer.limit(n);
-        if ( block ) {
-            Selector selector = null;
-            try {
-                selector = pool.get();
-            } catch ( IOException x ) {
-                // Ignore
-            }
-            try {
-                NioEndpoint.NioSocketWrapper att =
-                        (NioEndpoint.NioSocketWrapper) socketWrapper.getSocket().getAttachment(false);
-                if ( att == null ) throw new IOException("Key must be cancelled.");
-                nRead = pool.read(readBuffer, socketWrapper.getSocket(),
-                        selector, att.getTimeout());
-            } catch ( EOFException eof ) {
-                nRead = -1;
-            } finally {
-                if ( selector != null ) pool.put(selector);
-            }
-        } else {
-            nRead = socketWrapper.getSocket().read(readBuffer);
-        }
-        if (nRead > 0) {
-            readBuffer.flip();
-            readBuffer.limit(nRead);
-            readBuffer.get(buf, pos, nRead);
-            return nRead;
-        } else if (nRead == -1) {
-            //return false;
-            throw new EOFException(sm.getString("iib.eof.error"));
-        } else {
-            return 0;
-        }
     }
 }

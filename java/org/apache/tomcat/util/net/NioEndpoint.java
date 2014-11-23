@@ -1628,13 +1628,14 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         private ByteBuffer writebuf = null;
 
         public NioBufferHandler(int readsize, int writesize, boolean direct) {
-            if ( direct ) {
+            if (direct) {
                 readbuf = ByteBuffer.allocateDirect(readsize);
                 writebuf = ByteBuffer.allocateDirect(writesize);
-            }else {
+            } else {
                 readbuf = ByteBuffer.allocate(readsize);
                 writebuf = ByteBuffer.allocate(writesize);
             }
+            readbuf.limit(0);
         }
 
         @Override

@@ -16,16 +16,11 @@
  */
 package org.apache.coyote.ajp;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -77,103 +72,6 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     protected void setupSocket(SocketWrapperBase<Long> socketWrapper) {
         long socketRef = socketWrapper.getSocket().longValue();
         Socket.setrbb(socketRef, inputBuffer);
-    }
-
-
-    @Override
-    protected boolean read(byte[] buf, int pos, int n, boolean block)
-            throws IOException {
-
-        boolean nextReadBlocks = block;
-
-        if (!block && inputBuffer.remaining() > 0) {
-            nextReadBlocks = true;
-        }
-
-        if (inputBuffer.capacity() - inputBuffer.limit() <=
-                n - inputBuffer.remaining()) {
-            inputBuffer.compact();
-            inputBuffer.limit(inputBuffer.position());
-            inputBuffer.position(0);
-        }
-        int nRead;
-        while (inputBuffer.remaining() < n) {
-            nRead = readSocket(inputBuffer.limit(),
-                    inputBuffer.capacity() - inputBuffer.limit(),
-                    nextReadBlocks);
-            if (nRead == 0) {
-                // Must be a non-blocking read
-                return false;
-            } else if (-nRead == Status.EAGAIN) {
-                return false;
-            } else if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
-                if (block) {
-                    throw new SocketTimeoutException(
-                            sm.getString("ajpprocessor.readtimeout"));
-                } else {
-                    // Attempting to read from the socket when the poller
-                    // has not signalled that there is data to read appears
-                    // to behave like a blocking read with a short timeout
-                    // on OSX rather than like a non-blocking read. If no
-                    // data is read, treat the resulting timeout like a
-                    // non-blocking read that returned no data.
-                    return false;
-                }
-            } else if (nRead > 0) {
-                inputBuffer.limit(inputBuffer.limit() + nRead);
-                nextReadBlocks = true;
-            } else {
-                throw new IOException(sm.getString("ajpprocessor.failedread"));
-            }
-        }
-
-        inputBuffer.get(buf, pos, n);
-        return true;
-    }
-
-
-    private int readSocket(int pos, int len, boolean block) {
-
-        Lock readLock = socketWrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
-        long socket = socketWrapper.getSocket().longValue();
-
-        boolean readDone = false;
-        int result = 0;
-        readLock.lock();
-        try {
-            if (socketWrapper.getBlockingStatus() == block) {
-                result = Socket.recvbb(socket, pos, len);
-                readDone = true;
-            }
-        } finally {
-            readLock.unlock();
-        }
-
-        if (!readDone) {
-            writeLock.lock();
-            try {
-                socketWrapper.setBlockingStatus(block);
-                // Set the current settings for this socket
-                Socket.optSet(socket, Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
-                // Downgrade the lock
-                readLock.lock();
-                try {
-                    writeLock.unlock();
-                    result = Socket.recvbb(socket, pos, len);
-                } finally {
-                    readLock.unlock();
-                }
-            } finally {
-                // Should have been released above but may not have been on some
-                // exception paths
-                if (writeLock.isHeldByCurrentThread()) {
-                    writeLock.unlock();
-                }
-            }
-        }
-
-        return result;
     }
 
 
