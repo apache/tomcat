@@ -44,6 +44,9 @@ public final class Constants {
     public static final int STAGE_KEEPALIVE = 6;
     public static final int STAGE_ENDED = 7;
 
+    // Default protocol settings
+    public static final int DEFAULT_CONNECTION_LINGER = -1;
+    public static final boolean DEFAULT_TCP_NO_DELAY = true;
 
     /**
      * Has security been turned on?

@@ -92,6 +92,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     public AbstractProtocol(AbstractEndpoint<S> endpoint) {
         this.endpoint = endpoint;
+        setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
+        setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
 
 

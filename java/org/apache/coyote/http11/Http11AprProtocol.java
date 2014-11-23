@@ -68,9 +68,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         super(new AprEndpoint());
         cHandler = new Http11ConnectionHandler(this);
         ((AprEndpoint) getEndpoint()).setHandler(cHandler);
-        setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
-        setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
-        setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
 
     private final Http11ConnectionHandler cHandler;
