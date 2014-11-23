@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -91,30 +90,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     // --------------------------------------------------------- Public Methods
-
-
-    @Override
-    protected void setRequestLineReadTimeout() throws IOException {
-        // Timeouts while in the poller are handled entirely by the poller
-        // Only need to be concerned with socket timeouts
-
-        // APR uses simulated blocking so if some request line data is present
-        // then it must all be presented (with the normal socket timeout).
-
-        // When entering the processing loop for the first time there will
-        // always be some data to read so the keep-alive timeout is not required
-
-        // For the second and subsequent executions of the processing loop, if
-        // there is no request line data present then no further data will be
-        // read from the socket. If there is request line data present then it
-        // must all be presented (with the normal socket timeout)
-
-        // When the socket is created it is given the correct timeout.
-        // sendfile may change the timeout but will restore it
-        // This processor may change the timeout for uploads but will restore it
-
-        // NO-OP
-    }
 
 
     @Override

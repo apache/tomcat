@@ -917,12 +917,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Configures the timeout to be used for reading the request line.
-     */
-    protected abstract void setRequestLineReadTimeout() throws IOException;
-
-
-    /**
      * Defines how a connector handles an incomplete request line read.
      *
      * @return <code>true</code> if the processor should break out of the
@@ -969,8 +963,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
             // Parsing the request header
             try {
-                setRequestLineReadTimeout();
-
                 if (!getInputBuffer().parseRequestLine(keptAlive)) {
                     if (handleIncompleteRequestLineRead()) {
                         break;
