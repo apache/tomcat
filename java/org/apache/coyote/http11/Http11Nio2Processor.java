@@ -121,27 +121,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
 
     @Override
-    protected void setRequestLineReadTimeout() throws IOException {
-        // socket.setTimeout()
-        //     - timeout used by poller
-        // socket.getSocket().getIOChannel().socket().setSoTimeout()
-        //     - timeout used for blocking reads
-
-        // When entering the processing loop there will always be data to read
-        // so no point changing timeouts at this point
-
-        // For the second and subsequent executions of the processing loop, a
-        // non-blocking read is used so again no need to set the timeouts
-
-        // Because NIO supports non-blocking reading of the request line and
-        // headers the timeouts need to be set when returning the socket to
-        // the poller rather than here.
-
-        // NO-OP
-    }
-
-
-    @Override
     protected boolean handleIncompleteRequestLineRead() {
         // Haven't finished reading the request so keep the socket
         // open
