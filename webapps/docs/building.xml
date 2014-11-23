@@ -229,13 +229,25 @@ Sample Eclipse project files and launch targets are provided in the
 The instructions below will automatically copy these into the required locations.
 </p>
 <p>
-An Ant target is provided as a convenience to download all binary dependencies, and to create
-the Eclipse project and classpath files in the root of the source tree.
+Two Ant targets are provided as a convenience. The first one, named
+<em>ide-eclipse</em>, downloads all binary dependencies and configures
+Eclipse project in the root of the source tree. The created Eclipse project
+targets a Java 6 JDK and skips WebSocket classes that cannot be compiled with
+Java 6.
+</p>
+
+<p>
+The second target, named <em>ide-eclipse-websocket</em>, creates directory
+<code>../tomcat-7.0.x-java7</code> and configures the second Eclipse project
+there. This project targets a Java 7 JDK. This project does not have its own
+source tree, but accesses a subset of the source tree of the first project,
+compiling all WebSocket classes that were skipped.
 </p>
 
 <p>
 <code>cd ${tomcat.source}</code><br/>
-<code>ant ide-eclipse</code>
+<code>ant ide-eclipse</code><br/>
+<code>ant ide-eclipse-websocket</code>
 </p>
 
 <p>
@@ -254,11 +266,16 @@ Variables</em> to add two new <em>Classpath Variables</em>:
  <tr><td>ANT_HOME</td><td>the base path of Ant 1.8.2 or later</td></tr>
 </table>
 
+<p>
+In the <em>Preferences</em> dialog go to <em>Java-&gt;Installed JREs</em>
+and add JDK 6 and JDK 7 there. Close the dialog.
+</p>
 
 <p>
-Use <em>File-&gt;Import</em> and choose <em>Existing Projects into Workspace</em>.
+Use <em>File-&gt;Import</em> command from menu and choose <em>Existing Projects into Workspace</em>.
 From there choose the root directory of the Tomcat source tree (<code>${tomcat.source}</code>)
-and import the Tomcat project located there.
+and import the project located there. Import the second project as well,
+if you have created it (<code>../tomcat-7.0.x-java7</code>).
 </p>
 
 <p>

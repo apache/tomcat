@@ -99,7 +99,9 @@
       </fix>
       <update>
         Improve HTML version of build instructions and align with
-        BUILDING.txt. (kkolinko)
+        BUILDING.txt. Document creating second Eclipse project to compile
+        WebSocket classes with Java 7 (<code>ide-eclipse-websocket</code>
+        target added in 7.0.56). (kkolinko)
       </update>
     </changelog>
   </subsection>
