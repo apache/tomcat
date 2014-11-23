@@ -16,11 +16,8 @@
  */
 package org.apache.coyote.ajp;
 
-import java.nio.ByteBuffer;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -44,19 +41,8 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
 
     public AjpAprProcessor(int packetSize, AprEndpoint endpoint) {
-
         super(packetSize, endpoint);
-
-        // Allocate input and output buffers
-        inputBuffer = ByteBuffer.allocateDirect(packetSize * 2);
-        inputBuffer.limit(0);
     }
-
-
-    /**
-     * Direct buffer used for input.
-     */
-    protected final ByteBuffer inputBuffer;
 
 
     @Override
@@ -68,8 +54,7 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
 
     @Override
     protected void setupSocket(SocketWrapperBase<Long> socketWrapper) {
-        long socketRef = socketWrapper.getSocket().longValue();
-        Socket.setrbb(socketRef, inputBuffer);
+        // NO-OP
     }
 
 
@@ -79,8 +64,5 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     @Override
     public void recycle(boolean socketClosing) {
         super.recycle(socketClosing);
-
-        inputBuffer.clear();
-        inputBuffer.limit(0);
     }
 }
