@@ -93,11 +93,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     private ServerSocketChannel serverSock = null;
 
     /**
-     * use send file
-     */
-    private boolean useSendfile = true;
-
-    /**
      * The size of the OOM parachute.
      */
     private int oomParachute = 1024*1024;
@@ -213,10 +208,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
     public void setSocketProperties(SocketProperties socketProperties) {
         this.socketProperties = socketProperties;
-    }
-
-    public void setUseSendfile(boolean useSendfile) {
-        this.useSendfile = useSendfile;
     }
 
     /**
@@ -487,11 +478,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
     public NioSelectorPool getSelectorPool() {
         return selectorPool;
-    }
-
-    @Override
-    public boolean getUseSendfile() {
-        return useSendfile;
     }
 
     public int getOomParachute() {

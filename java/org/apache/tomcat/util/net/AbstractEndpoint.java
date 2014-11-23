@@ -199,6 +199,20 @@ public abstract class AbstractEndpoint<S> {
     // ----------------------------------------------------------------- Properties
 
     /**
+     * Has the user requested that send file be used where possible?
+     */
+    private boolean useSendfile = true;
+    public boolean getUseSendfile() {
+        return useSendfile;
+    }
+    public void setUseSendfile(boolean useSendfile) {
+        this.useSendfile = useSendfile;
+    }
+
+
+
+
+    /**
      * Time to wait for the internal executor (if used) to terminate when the
      * endpoint is stopped in milliseconds. Defaults to 5000 (5 seconds).
      */
@@ -821,10 +835,6 @@ public abstract class AbstractEndpoint<S> {
     }
 
     protected abstract Log getLog();
-    // Flags to indicate optional feature support
-    // Some of these are always hard-coded, some are hard-coded to false (i.e.
-    // the endpoint does not support them) and some are configurable.
-    public abstract boolean getUseSendfile();
 
     protected LimitLatch initializeConnectionLatch() {
         if (maxConnections==-1) return null;
