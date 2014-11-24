@@ -178,7 +178,8 @@ public class TesterOpenSSL {
         t2.start();
 
         try {
-            p.waitFor();
+            t1.join();
+            t2.join();
         } catch (InterruptedException e) {
             throw new IOException(e);
         }
