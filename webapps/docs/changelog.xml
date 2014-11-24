@@ -38,7 +38,7 @@
 
   Fixes having an issue number are sorted by their number, ascending.
 
-  There is no ordering by add/update/fix.
+  There is no ordering by add/update/fix/scode.
 
   Other fixed issues are added to the end of the list, chronologically.
   They eventually become mixed with the numbered issues. (I.e., numbered
@@ -65,6 +65,10 @@
       <update>
         Remove support for the HTTP BIO and AJP BIO connectors. (markt)
       </update>
+      <scode>
+        Refactor HTTP upgrade and AJP implementations to reduce duplication.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
