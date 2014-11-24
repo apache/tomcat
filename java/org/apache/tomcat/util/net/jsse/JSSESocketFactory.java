@@ -179,7 +179,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         // since they are no longer considered secure
         List<String> filteredProtocols = new ArrayList<String>();
         for (String protocol : socket.getEnabledProtocols()) {
-            if (protocol.contains("SSL")) {
+            if (protocol.toUpperCase(Locale.ENGLISH).contains("SSL")) {
                 log.debug(sm.getString("jsse.excludeDefaultProtocol", protocol));
                 continue;
             }
