@@ -326,10 +326,11 @@
       <code>false</code> by default and should only be changed for trusted web
       applications.</p>
 
-      <p>The <strong>allowLinking</strong> attribute controls if a context is
-      allowed to use linked files. If enabled and the context is undeployed, the
-      links will be followed when deleting the context resources. Changing this
-      setting from the default of <code>false</code> on case insensitive
+      <p>The <strong>allowLinking</strong> attribute of a nested
+      <a href="config/resources.html">Resources</a> element controls if a context
+      is allowed to use linked files. If enabled and the context is undeployed,
+      the links will be followed when deleting the context resources. Changing
+      this setting from the default of <code>false</code> on case insensitive
       operating systems (this includes Windows) will disable a number of
       security measures and allow, among other things, direct access to the
       WEB-INF directory.</p>
