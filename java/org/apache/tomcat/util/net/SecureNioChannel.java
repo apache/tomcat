@@ -196,6 +196,10 @@ public class SecureNioChannel extends NioChannel  {
                     } else if ( handshake.getStatus() == Status.BUFFER_UNDERFLOW ){
                         //read more data, reregister for OP_READ
                         return SelectionKey.OP_READ;
+                    } else if (handshake.getStatus() == Status.BUFFER_OVERFLOW) {
+                        // TODO AJP and HTTPS have different expectations for the state of
+                        // the buffer at the start of a read. These need to be reconciled.
+                        bufHandler.getReadBuffer().compact();
                     } else {
                         throw new IOException(sm.getString("channel.nio.ssl.unexpectedStatusDuringWrap", handshakeStatus));
                     }//switch

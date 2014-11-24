@@ -1635,6 +1635,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 readbuf = ByteBuffer.allocate(readsize);
                 writebuf = ByteBuffer.allocate(writesize);
             }
+            // TODO AJP and HTTPS have different expectations for the state of
+            // the buffer at the start of a read. These need to be reconciled.
             readbuf.limit(0);
         }
 
