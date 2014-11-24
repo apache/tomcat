@@ -1162,27 +1162,12 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Return the set of initialized application event listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
-     *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
-     */
     @Override
     public Object[] getApplicationEventListeners() {
         return (applicationEventListenersObjects);
     }
 
 
-    /**
-     * Store the set of initialized application event listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
-     *
-     * @param listeners The set of instantiated listener objects.
-     */
     @Override
     public void setApplicationEventListeners(Object listeners[]) {
         applicationEventListenersObjects = listeners;
@@ -1202,14 +1187,6 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Return the set of initialized application lifecycle listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
-     *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
-     */
     @Override
     public Object[] getApplicationLifecycleListeners() {
         return (applicationLifecycleListenersObjects);
@@ -1312,37 +1289,21 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Return the URL of the XML descriptor for this context.
-     */
     @Override
     public URL getConfigFile() {
-
-        return (this.configFile);
-
+        return this.configFile;
     }
 
 
-    /**
-     * Set the URL of the XML descriptor for this context.
-     *
-     * @param configFile The URL of the XML descriptor for this context.
-     */
     @Override
     public void setConfigFile(URL configFile) {
-
         this.configFile = configFile;
     }
 
 
-    /**
-     * Return the "correctly configured" flag for this Context.
-     */
     @Override
     public boolean getConfigured() {
-
-        return (this.configured);
-
+        return this.configured;
     }
 
 
@@ -1365,14 +1326,9 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Return the "use cookies for session ids" flag.
-     */
     @Override
     public boolean getCookies() {
-
-        return (this.cookies);
-
+        return this.cookies;
     }
 
 
@@ -1519,14 +1475,9 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Return the "allow crossing servlet contexts" flag.
-     */
     @Override
     public boolean getCrossContext() {
-
-        return (this.crossContext);
-
+        return this.crossContext;
     }
 
 
