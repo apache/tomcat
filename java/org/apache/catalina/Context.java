@@ -109,12 +109,11 @@ public interface Context extends Container {
 
 
     /**
-     * Return the set of initialized application event listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
+     * Obtain the registered application event listeners.
      *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
+     * @return An array containing the application event listener instances for
+     *         this web application in the order they were specified in the web
+     *         application deployment descriptor
      */
     public Object[] getApplicationEventListeners();
 
@@ -130,12 +129,11 @@ public interface Context extends Container {
 
 
     /**
-     * Return the set of initialized application lifecycle listener objects,
-     * in the order they were specified in the web application deployment
-     * descriptor, for this application.
+     * Obtain the registered application lifecycle listeners.
      *
-     * @exception IllegalStateException if this method is called before
-     *  this application has started, or after it has been stopped
+     * @return An array containing the application lifecycle listener instances
+     *         for this web application in the order they were specified in the
+     *         web application deployment descriptor
      */
     public Object[] getApplicationLifecycleListeners();
 
@@ -154,12 +152,19 @@ public interface Context extends Container {
      * Obtain the character set name to use with the given Locale. Note that
      * different Contexts may have different mappings of Locale to character
      * set.
+     *
+     * @param locale The locale for which the mapped character set should be
+     *               returned
+     *
+     * @return The name of the character set to use with the given Locale
      */
     public String getCharset(Locale locale);
 
 
     /**
      * Return the URL of the XML descriptor for this context.
+     *
+     * @return The URL of the XML descriptor for this context
      */
     public URL getConfigFile();
 
@@ -174,6 +179,9 @@ public interface Context extends Container {
 
     /**
      * Return the "correctly configured" flag for this Context.
+     *
+     * @return <code>true</code> if the Context has been correctly configured,
+     *         otherwise <code>false</code>
      */
     public boolean getConfigured();
 
@@ -190,6 +198,10 @@ public interface Context extends Container {
 
     /**
      * Return the "use cookies for session ids" flag.
+     *
+     * @return <code>true</code> if it is permitted to use cookies to track
+     *         session IDs for this web application, otherwise
+     *         <code>false</code>
      */
     public boolean getCookies();
 
@@ -303,6 +315,9 @@ public interface Context extends Container {
 
     /**
      * Return the "allow crossing servlet contexts" flag.
+     *
+     * @return <code>true</code> if cross-contest requests are allowed from this
+     *         web applications, otherwise <code>false</code>
      */
     public boolean getCrossContext();
 
