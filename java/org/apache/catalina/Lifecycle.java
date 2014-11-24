@@ -201,8 +201,11 @@ public interface Lifecycle {
 
 
     /**
-     * Get the life cycle listeners associated with this life cycle. If this
-     * component has no listeners registered, a zero-length array is returned.
+     * Get the life cycle listeners associated with this life cycle.
+     *
+     * @return An array containing the life cycle listeners associated with this
+     *         life cycle. If this component has no listeners registered, a
+     *         zero-length array is returned.
      */
     public LifecycleListener[] findLifecycleListeners();
 
@@ -315,7 +318,11 @@ public interface Lifecycle {
 
     /**
      * Obtain a textual representation of the current component state. Useful
-     * for JMX.
+     * for JMX. The format of this string may vary between point releases and
+     * should not be relied upon to determine component state. To determine
+     * component state, use {@link #getState()}.
+     *
+     * @return The name of the current component state.
      */
     public String getStateName();
 }
