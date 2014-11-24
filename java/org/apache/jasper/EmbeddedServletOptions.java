@@ -132,12 +132,12 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Compiler target VM.
      */
-    private String compilerTargetVM = "1.7";
+    private String compilerTargetVM = "1.8";
 
     /**
      * The compiler source VM.
      */
-    private String compilerSourceVM = "1.7";
+    private String compilerSourceVM = "1.8";
 
     /**
      * The compiler class name.
