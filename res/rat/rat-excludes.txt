@@ -83,8 +83,8 @@ output/dist/webapps/docs/jspapi/package-list
 output/dist/webapps/docs/jspapi/script.js
 output/dist/webapps/docs/servletapi/package-list
 output/dist/webapps/docs/servletapi/script.js
-output/dist/webapps/docs/websocket/package-list
-output/dist/webapps/docs/websocket/script.js
+output/dist/webapps/docs/websocketapi/package-list
+output/dist/webapps/docs/websocketapi/script.js
 
 output/dist/src/test/webapp/bug53257/*.txt
 output/dist/src/test/webapp/bug53257/foo bar/foobar.txt
