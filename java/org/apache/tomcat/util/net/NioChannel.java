@@ -62,6 +62,8 @@ public class NioChannel implements ByteChannel {
      */
     public void reset() throws IOException {
         bufHandler.getReadBuffer().clear();
+        // TODO AJP and HTTPS have different expectations for the state of
+        // the buffer at the start of a read. These need to be reconciled.
         bufHandler.getReadBuffer().limit(0);
         bufHandler.getWriteBuffer().clear();
         this.sendFile = false;
