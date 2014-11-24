@@ -86,7 +86,7 @@
     <changelog>
       <fix>
         <bug>57234</bug>: Make SSL protocol filtering to remove insecure
-        protoccols case insensitive. (markt)
+        protocols case insensitive. (markt)
       </fix>
     </changelog>
   </subsection>
