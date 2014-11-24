@@ -318,9 +318,9 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                         CompilerOptions.VERSION_1_7);
             }
         } else {
-            // Default to 1.7
+            // Default to 1.8
             settings.put(CompilerOptions.OPTION_Source,
-                    CompilerOptions.VERSION_1_7);
+                    CompilerOptions.VERSION_1_8);
         }
 
         // Target JVM
@@ -364,11 +364,11 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                         CompilerOptions.VERSION_1_7);
             }
         } else {
-            // Default to 1.7
+            // Default to 1.8
             settings.put(CompilerOptions.OPTION_TargetPlatform,
-                    CompilerOptions.VERSION_1_7);
+                    CompilerOptions.VERSION_1_8);
             settings.put(CompilerOptions.OPTION_Compliance,
-                    CompilerOptions.VERSION_1_7);
+                    CompilerOptions.VERSION_1_8);
         }
 
         final IProblemFactory problemFactory =

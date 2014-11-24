@@ -824,12 +824,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         private volatile int keyCount = 0;
 
         public Poller() throws IOException {
-            synchronized (Selector.class) {
-                // Selector.open() isn't thread safe
-                // http://bugs.sun.com/view_bug.do?bug_id=6427854
-                // Affects 1.6.0_29, fixed in 1.7.0_01
-                this.selector = Selector.open();
-            }
+            this.selector = Selector.open();
         }
 
         public int getKeyCount() { return keyCount; }

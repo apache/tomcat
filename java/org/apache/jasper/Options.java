@@ -126,12 +126,12 @@ public interface Options {
     public String getCompiler();
 
     /**
-     * The compiler target VM, e.g. 1.1, 1.2, 1.3, 1.4, 1.5 or 1.6.
+     * The compiler target VM, e.g. 1.8.
      */
     public String getCompilerTargetVM();
 
     /**
-     * The compiler source VM, e.g. 1.3, 1.4, 1.5 or 1.6.
+     * The compiler source VM, e.g. 1.8.
      */
     public String getCompilerSourceVM();
 
