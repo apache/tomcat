@@ -59,7 +59,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        <bug>57173</bug>: Rvert the fix for <bug>56953</bug> that broke
+        <bug>57173</bug>: Revert the fix for <bug>56953</bug> that broke
         annotation scanning in some cases. (markt)
       </fix>
       <fix>
