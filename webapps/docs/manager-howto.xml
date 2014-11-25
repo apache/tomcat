@@ -133,19 +133,22 @@ web application. The available roles are:</p>
 </ul>
 
 <p>The HTML interface is protected against CSRF (Cross-Site Request Forgery)
-attacks, but the text and JMX interfaces cannot be protected. To maintain
+attacks, but the text and JMX interfaces cannot be protected. It means that
+users who are allowed access to the text and JMX interfaces have to be cautious
+when accessing the Manager application with a web browser.
+To maintain
 the CSRF protection:</p>
 
 <ul>
-  <li>Users with the <strong>manager-gui</strong> role should not be granted
-      the <strong>manager-script</strong> or <strong>manager-jmx</strong>
-      roles.</li>
   <li>If you use web browser to access the Manager application using
       a user that has either <strong>manager-script</strong> or
       <strong>manager-jmx</strong> roles (for example for testing
-      the plain text or JMX interfaces),
-      then all windows of the browser MUST be closed afterwards to terminate
-      the session.</li>
+      the plain text or JMX interfaces), do not visit other sites
+      where you may fall victim to a CSRF attack, and you MUST close all windows
+      of the browser afterwards to terminate the session.</li>
+  <li>It is recommended to never grant
+      the <strong>manager-script</strong> or <strong>manager-jmx</strong>
+      roles to users that have the <strong>manager-gui</strong> role.</li>
 </ul>
 
 <p><strong>Note</strong> that JMX proxy interface is effectively low-level root-like
@@ -224,6 +227,13 @@ help on this interface. See:</p>
 <ul>
   <li><a href="html-manager-howto.html">HTML Manager documentation</a></li>
 </ul>
+
+<p>The HTML interface is protected against CSRF (Cross-Site Request Forgery)
+attacks. Each access to the HTML pages generates a random token, which is
+stored in your session and is included in all links on the page. If your next
+action does not have correct value of the token, the action will be denied.
+If the token has expired you can start again from the main page or
+<em>List Applications</em> page of Manager.</p>
 
 </section>
 
