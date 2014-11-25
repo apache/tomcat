@@ -888,6 +888,123 @@ The same information is available for both of them :
 
 </section>
 
+<section name="Using the JMX Proxy Servlet">
+
+  <subsection name="What is JMX Proxy Servlet">
+    The JMX Proxy Servlet is a lightweight proxy to get and set the
+    tomcat internals. (Or any class that has been exposed via an MBean)
+    Its usage is not very user friendly but the UI is
+    extremely help for integrating command line scripts for monitoring
+    and changing the internals of tomcat. You can do two things with the proxy:
+    get information and set information. For you to really understand the
+    JMX Proxy Servlet, you should have a general understanding of JMX.
+    If you don't know what JMX is, then prepare to be confused.
+  </subsection>
+
+  <subsection name="JMX Query command">
+    <p>This takes the form:</p>
+<source>http://webserver/manager/jmxproxy/?qry=STUFF</source>
+    <p>Where <code>STUFF</code> is the JMX query you wish to perform. For example,
+    here are some queries you might wish to run:</p>
+    <ul>
+      <li>
+        <code>qry=*%3Atype%3DRequestProcessor%2C* -->
+         type=RequestProcessor</code> which will locate all
+         workers which can process requests and report
+         their state.
+      </li>
+      <li>
+        <code>qry=*%3Aj2eeType=Servlet%2c* -->
+            j2eeType=Servlet</code> which return all loaded servlets.
+      </li>
+      <li>
+        <code>qry=Catalina%3Atype%3DEnvironment%2Cresourcetype%3DGlobal%2Cname%3DsimpleValue -->
+            Catalina:type=Environment,resourcetype=Global,name=simpleValue</code>
+            which look for a specific MBean by the given name.
+      </li>
+    </ul>
+    <p>
+    You'll need to experiment with this to really understand its capabilites.
+    If you provide no <code>qry</code> parameter, then all of the MBeans will
+    be displayed. We really recommend looking at the tomcat source code and
+    understand the JMX spec to get a better understanding of all the queries
+    you may run.
+    </p>
+  </subsection>
+
+  <subsection name="JMX Get command">
+  <p>
+    The JXMProxyServlet also supports a "get" command that you can use to
+    fetch the value of a specific MBean's attribute. The general form of
+    the <code>get</code> command is:
+  </p>
+
+<source>http://webserver/manager/jmxproxy/?get=BEANNAME&amp;att=MYATTRIBUTE&amp;key=MYKEY</source>
+
+    <p>You must provide the following parameters:</p>
+    <ol>
+      <li><code>get</code>: The full bean name</li>
+      <li><code>att</code>: The attribute you wish to fetch</li>
+      <li><code>key</code>: (optional) The key into a CompositeData MBean attribute</li>
+    </ol>
+    <p>
+    If all goes well, then it will say OK, otherwise an error message will
+    be shown. For example, let's say we wish to fetch the current heap memory
+    data:
+    </p>
+
+<source>http://webserver/manager/jmxproxy/?get=java.lang:type=Memory&amp;att=HeapMemoryUsage</source>
+
+    <p>Or, if you only want the "used" key:</p>
+
+<source>http://webserver/manager/jmxproxy/
+ ?get=java.lang:type=Memory&amp;att=HeapMemoryUsage&amp;key=used</source>
+  </subsection>
+
+  <subsection name="JMX Set command">
+    <p>
+    Now that you can query an MBean, its time to muck with Tomcat's internals!
+    The general form of the set command is :
+    </p>
+<source>http://webserver/manager/jmxproxy/?set=BEANNAME&amp;att=MYATTRIBUTE&amp;val=NEWVALUE</source>
+    <p>So you need to provide 3 request parameters:</p>
+    <ol>
+      <li><code>set</code>: The full bean name</li>
+      <li><code>att</code>: The attribute you wish to alter</li>
+      <li><code>val</code>: The new value </li>
+    </ol>
+    <p>
+    If all goes ok, then it will say OK, otherwise an error message will be
+    shown. For example, lets say we wish to turn up debugging on the fly for the
+    <code>ErrorReportValve</code>. The following will set debugging to 10.
+    </p>
+<source>http://localhost:8080/manager/jmxproxy/
+ ?set=Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost
+ &amp;att=debug&amp;val=10</source>
+    <p>and my result is (YMMV):</p>
+<source>Result: ok</source>
+
+    <p>Here is what I see if I pass in a bad value. Here is the URL I used,
+    I try set debugging equal to 'cow':</p>
+<source>http://localhost:8080/manager/jmxproxy/
+ ?set=Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost
+ &amp;att=debug&amp;val=cow</source>
+    <p>When I try that, my result is</p>
+<source>Error: java.lang.NumberFormatException: For input string: "cow"</source>
+  </subsection>
+
+  <subsection name="JMX Invoke command">
+    <p>The <code>invoke</code> command enables methods to be called on MBeans. The
+    general form of the command is:</p>
+<source>http://webserver/manager/jmxproxy/
+ ?invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMMASEPARATEDPARAMETERS</source>
+    <p>For example, to call the <code>findConnectors()</code> method of the
+    <strong>Service</strong> use:</p>
+<source>http://localhost:8080/manager/jmxproxy/
+ ?invoke=Catalina%3Atype%3DService&amp;op=findConnectors&amp;ps=</source>
+  </subsection>
+</section>
+
 <section name="Executing Manager Commands With Ant">
 
 <p>In addition to the ability to execute Manager commands via HTTP requests,
@@ -1167,124 +1284,6 @@ see the output of each task call appended to the file.
 </subsection>
 
 </section>
-
-<section name="Using the JMX Proxy Servlet">
-
-  <subsection name="What is JMX Proxy Servlet">
-    The JMX Proxy Servlet is a lightweight proxy to get and set the
-    tomcat internals. (Or any class that has been exposed via an MBean)
-    Its usage is not very user friendly but the UI is
-    extremely help for integrating command line scripts for monitoring
-    and changing the internals of tomcat. You can do two things with the proxy:
-    get information and set information. For you to really understand the
-    JMX Proxy Servlet, you should have a general understanding of JMX.
-    If you don't know what JMX is, then prepare to be confused.
-  </subsection>
-
-  <subsection name="JMX Query command">
-    <p>This takes the form:</p>
-<source>http://webserver/manager/jmxproxy/?qry=STUFF</source>
-    <p>Where <code>STUFF</code> is the JMX query you wish to perform. For example,
-    here are some queries you might wish to run:</p>
-    <ul>
-      <li>
-        <code>qry=*%3Atype%3DRequestProcessor%2C* -->
-         type=RequestProcessor</code> which will locate all
-         workers which can process requests and report
-         their state.
-      </li>
-      <li>
-        <code>qry=*%3Aj2eeType=Servlet%2c* -->
-            j2eeType=Servlet</code> which return all loaded servlets.
-      </li>
-      <li>
-        <code>qry=Catalina%3Atype%3DEnvironment%2Cresourcetype%3DGlobal%2Cname%3DsimpleValue -->
-            Catalina:type=Environment,resourcetype=Global,name=simpleValue</code>
-            which look for a specific MBean by the given name.
-      </li>
-    </ul>
-    <p>
-    You'll need to experiment with this to really understand its capabilites.
-    If you provide no <code>qry</code> parameter, then all of the MBeans will
-    be displayed. We really recommend looking at the tomcat source code and
-    understand the JMX spec to get a better understanding of all the queries
-    you may run.
-    </p>
-  </subsection>
-
-  <subsection name="JMX Get command">
-  <p>
-    The JXMProxyServlet also supports a "get" command that you can use to
-    fetch the value of a specific MBean's attribute. The general form of
-    the <code>get</code> command is:
-  </p>
-
-<source>http://webserver/manager/jmxproxy/?get=BEANNAME&amp;att=MYATTRIBUTE&amp;key=MYKEY</source>
-
-    <p>You must provide the following parameters:</p>
-    <ol>
-      <li><code>get</code>: The full bean name</li>
-      <li><code>att</code>: The attribute you wish to fetch</li>
-      <li><code>key</code>: (optional) The key into a CompositeData MBean attribute</li>
-    </ol>
-    <p>
-    If all goes well, then it will say OK, otherwise an error message will
-    be shown. For example, let's say we wish to fetch the current heap memory
-    data:
-    </p>
-
-<source>http://webserver/manager/jmxproxy/?get=java.lang:type=Memory&amp;att=HeapMemoryUsage</source>
-
-    <p>Or, if you only want the "used" key:</p>
-
-<source>http://webserver/manager/jmxproxy/
- ?get=java.lang:type=Memory&amp;att=HeapMemoryUsage&amp;key=used</source>
-  </subsection>
-
-  <subsection name="JMX Set command">
-    <p>
-    Now that you can query an MBean, its time to muck with Tomcat's internals!
-    The general form of the set command is :
-    </p>
-<source>http://webserver/manager/jmxproxy/?set=BEANNAME&amp;att=MYATTRIBUTE&amp;val=NEWVALUE</source>
-    <p>So you need to provide 3 request parameters:</p>
-    <ol>
-      <li><code>set</code>: The full bean name</li>
-      <li><code>att</code>: The attribute you wish to alter</li>
-      <li><code>val</code>: The new value </li>
-    </ol>
-    <p>
-    If all goes ok, then it will say OK, otherwise an error message will be
-    shown. For example, lets say we wish to turn up debugging on the fly for the
-    <code>ErrorReportValve</code>. The following will set debugging to 10.
-    </p>
-<source>http://localhost:8080/manager/jmxproxy/
- ?set=Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost
- &amp;att=debug&amp;val=10</source>
-    <p>and my result is (YMMV):</p>
-<source>Result: ok</source>
-
-    <p>Here is what I see if I pass in a bad value. Here is the URL I used,
-    I try set debugging equal to 'cow':</p>
-<source>http://localhost:8080/manager/jmxproxy/
- ?set=Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost
- &amp;att=debug&amp;val=cow</source>
-    <p>When I try that, my result is</p>
-<source>Error: java.lang.NumberFormatException: For input string: "cow"</source>
-  </subsection>
-
-  <subsection name="JMX Invoke command">
-    <p>The <code>invoke</code> command enables methods to be called on MBeans. The
-    general form of the command is:</p>
-<source>http://webserver/manager/jmxproxy/
- ?invoke=BEANNAME&amp;op=METHODNAME&amp;ps=COMMASEPARATEDPARAMETERS</source>
-    <p>For example, to call the <code>findConnectors()</code> method of the
-    <strong>Service</strong> use:</p>
-<source>http://localhost:8080/manager/jmxproxy/
- ?invoke=Catalina%3Atype%3DService&amp;op=findConnectors&amp;ps=</source>
-  </subsection>
-</section>
-
 
 
 </body>
