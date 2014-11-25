@@ -162,13 +162,13 @@ As the majority of this document describes the commands of plain textual
 interface, let the role name for further example to be
 <strong>manager-script</strong>.
 Exactly how the usernames/passwords are configured depends on which
-<code>Realm</code> implementation you are using:</p>
+<a href="config/realm.html">Realm implementation</a> you are using:</p>
 <ul>
-<li><em>MemoryRealm</em> &#8212; This one is configured in the default
-    <code>$CATALINA_BASE/conf/server.xml</code>.
-    If you have not configured it differently, or replaced it with
-    a different <code>Realm</code> implementation, this realm
-    reads an XML-format file stored at
+<li><em>UserDatabaseRealm</em> plus <em>MemoryUserDatabase</em>, or <em>MemoryRealm</em>
+    &#8212; The <em>UserDatabaseRealm</em> and <em>MemoryUserDatabase</em> are
+    configured in the default <code>$CATALINA_BASE/conf/server.xml</code>.
+    Both <em>MemoryUserDatabase</em> and <em>MemoryRealm</em> read an
+    XML-format file by default stored at
     <code>$CATALINA_BASE/conf/tomcat-users.xml</code>, which can be
     edited with any text editor.  This file contains an XML
     <code>&lt;user&gt;</code> for each individual user, which might
@@ -179,7 +179,8 @@ Exactly how the usernames/passwords are configured depends on which
     add the <strong>manager-script</strong> role to the comma-delimited
     <code>roles</code> attribute for one or more existing users, and/or
     create new users with that assigned role.</li>
-<li><em>JDBCRealm</em> &#8212; Your user and role information is stored in
+<li><em>DataSourceRealm</em> or <em>JDBCRealm</em>
+    &#8212; Your user and role information is stored in
     a database accessed via JDBC.  Add the <strong>manager-script</strong> role
     to one or more existing users, and/or create one or more new users
     with this role assigned, following the standard procedures for your
