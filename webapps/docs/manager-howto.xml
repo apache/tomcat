@@ -83,7 +83,7 @@ example:</p>
 <ul>
 <li>As an application with a user interface you use in your browser.
 Here is an example URL where you can replace <code>localhost</code> with
-your website host name:  <code>http://localhost/manager/html/</code> .</li>
+your website host name:  <code>http://localhost:8080/manager/html</code> .</li>
 <li>A minimal version using HTTP requests only which is suitable for use
 by scripts setup by system administrators.  Commands are given as part of the
 request URI, and responses are in the form of simple text that can be easily
@@ -148,7 +148,7 @@ the CSRF protection:</p>
       the session.</li>
 </ul>
 
-<p>Note that JMX proxy interface is effectively low-level root-like
+<p><strong>Note</strong> that JMX proxy interface is effectively low-level root-like
 administrative interface of Tomcat. One can do a lot, if he knows
 what commands to call. You should be cautious when enabling the
 <strong>manager-jmx</strong> role.</p>
@@ -211,6 +211,21 @@ an example of restricting access to the localhost by IP address:</p>
 
 </section>
 
+<section name="HTML User-friendly Interface">
+
+<p>The user-friendly HTML interface of Manager web application is located at</p>
+
+<source>http://{host}:{port}/manager/html</source>
+
+<p>As has already been mentioned above, you need <strong>manager-gui</strong>
+role to be allowed to access it. There is a separate document that provides
+help on this interface. See:</p>
+
+<ul>
+  <li><a href="html-manager-howto.html">HTML Manager documentation</a></li>
+</ul>
+
+</section>
 
 <section name="Supported Manager Commands">
 
