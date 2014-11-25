@@ -300,7 +300,7 @@ This command is the logical opposite of the <em>Undeploy</em> command.</p>
 
 <p>There are a number of different ways the deploy command can be used.</p>
 
-<h5>Deploy a Directory or WAR by URL</h5>
+<subsection name="Deploy a Directory or WAR by URL">
 
 <p>Install a web application directory or ".war" file located on the Tomcat
 server. If no <i>Context Path</i> is specified, the directory name or the
@@ -314,8 +314,7 @@ refer to the entire WAR file.</p>
 <p>In this example the web application located in the directory
 <code>C:\path\to\foo</code> on the Tomcat server (running on Windows)
 is deployed as the web application context named <code>/footoo</code>.</p>
-<source>
-Context Path: /footoo
+<source>Context Path: /footoo
 WAR or Directory URL: file:C:/path/to/foo
 </source>
 
@@ -327,8 +326,9 @@ parameter so the context path defaults to the name of the web application
 archive file without the ".war" extension.</p>
 <source>WAR or Directory URL: jar:file:/path/to/bar.war!/</source>
 
+</subsection>
 
-<h5>Deploy a Directory or War from the Host appBase</h5>
+<subsection name="Deploy a Directory or War from the Host appBase">
 
 <p>Install a web application directory or ".war" file located in your Host
 appBase directory. If no <i>Context Path</i> is specified the directory name
@@ -348,8 +348,9 @@ application context named <code>/bartoo</code>.</p>
 <source>Context Path: /bartoo
 WAR or Directory URL: bar.war</source>
 
+</subsection>
 
-<h5>Deploy using a Context configuration ".xml" file</h5>
+<subsection name="Deploy using a Context configuration &quot;.xml&quot; file">
 
 <p>If the Host deployXML flag is set to true, you can install a web
 application using a Context configuration ".xml" file and an optional
@@ -380,7 +381,7 @@ on the server (Tomcat running on Unix).</p>
 <source>XML Configuration file URL: file:/path/to/context.xml
 WAR or Directory URL: jar:file:/path/to/bar.war!/</source>
 
-
+</subsection>
 </subsection>
 
 <subsection name="Upload a WAR file to install">
