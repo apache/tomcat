@@ -836,15 +836,15 @@ has been reloaded several times, it may be listed several times.</p>
 
 </subsection>
 
-<subsection name="Connector SSL diagnostics">
+<subsection name="Connector SSL/TLS diagnostics">
 
 <source>http://localhost:8080/manager/text/sslConnectorCiphers</source>
 
-<p>The SSL Connector/Ciphers diagnostic lists the SSL ciphers that are currently
+<p>The SSL Connector/Ciphers diagnostic lists the SSL/TLS ciphers that are currently
 configured for each connector. For NIO and NIO2, the names of the individual
 cipher suites are listed. For APR, the value of SSLCipherSuite is returned.</p>
 
-<p>The response will ook something like this:</p>
+<p>The response will look something like this:</p>
 <source>OK - Connector / SSL Cipher information
 Connector[HTTP/1.1-8080]
   SSL is not enabled for this connector

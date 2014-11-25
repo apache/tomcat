@@ -108,6 +108,8 @@ import org.apache.tomcat.util.res.StringManager;
  * <li><b>/expire?path=/xxx&amp;idle=mm</b> - Expire sessions
  *     for the context path <code>/xxx</code> which were idle for at
  *     least mm minutes.</li>
+ * <li><b>/sslConnectorCiphers</b> - Display diagnostic info on SSL/TLS ciphers
+ *     that are currently configured for each connector.
  * <li><b>/start?path=/xxx</b> - Start the web application attached to
  *     context path <code>/xxx</code> for this virtual host.</li>
  * <li><b>/stop?path=/xxx</b> - Stop the web application attached to
