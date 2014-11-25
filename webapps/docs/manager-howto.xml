@@ -878,15 +878,27 @@ Connector[HTTP/1.1-8443]
 
 </subsection>
 
-<subsection name="Server Status">
+</section>
 
-<p>From this link , you can view information about the server.</p>
+<section name="Server Status">
+
+<p>From the following links you can view Status information about the server.
+Any one of <strong>manager-**</strong> roles allows access to this page.</p>
+
+<source>http://localhost:8080/manager/status
+http://localhost:8080/manager/status/all</source>
+
+<p>Displays server status information in HTML format.</p>
+
+<source>http://localhost:8080/manager/status?XML=true
+http://localhost:8080/manager/status/all?XML=true</source>
+
+<p>Displays server status information in XML format.</p>
 
 <p>First, you have the server and JVM version number, JVM provider, OS name
 and number followed by the architecture type.</p>
 
-<p>Second, there is several information about the memory usage of the JVM
-(available, total and max memory).</p>
+<p>Second, there is information about the memory usage of the JVM.</p>
 
 <p>Then, there is information about the Tomcat AJP and HTTP connectors.
 The same information is available for both of them :
@@ -922,7 +934,9 @@ The same information is available for both of them :
     </ul>
     </li>
 </ul>
-</subsection>
+
+<p>If you are using <code>/status/all</code> command, additional information
+on each of deployed web applications will be available.</p>
 
 </section>
 
