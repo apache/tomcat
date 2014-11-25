@@ -671,16 +671,37 @@ include an error message.  Possible causes for problems include:</p>
 <source>http://localhost:8080/manager/text/sessions?path=/examples</source>
 
 <p>Display the default session timeout for a web application, and the
-number of currently active sessions that fall within ten-minute ranges of
+number of currently active sessions that fall within one-minute ranges of
 their actual timeout times.  For example, after restarting Tomcat and then
 executing one of the JSP samples in the <code>/examples</code> web app,
 you might get something like this:</p>
-<source>OK - Session information for application at context path /examples
+
+<source><![CDATA[OK - Session information for application at context path /examples
 Default maximum session inactive interval 30 minutes
-30 - &lt;40 minutes:1 sessions</source>
+<1 minutes: 1 sessions
+1 - <2 minutes: 1 sessions]]></source>
 
 </subsection>
 
+<subsection name="Expire Sessions">
+
+<source>http://localhost:8080/manager/text/expire?path=/examples&amp;idle=num</source>
+
+<p>Display the session statistics (like the above <code>/sessions</code>
+command) and expire sessions that are idle for longer than <code>num</code>
+minutes. To expire all sessions, use <code>&amp;idle=0</code> .</p>
+
+<source><![CDATA[OK - Session information for application at context path /examples
+Default maximum session inactive interval 30 minutes
+1 - <2 minutes: 1 sessions
+3 - <4 minutes: 1 sessions
+>0 minutes: 2 sessions were expired]]></source>
+
+<p>Actually <code>/sessions</code> and <code>/expire</code> are synonims for
+the same command. The difference is in the presence of <code>idle</code>
+parameter.</p>
+
+</subsection>
 
 <subsection name="Start an Existing Application">
 
