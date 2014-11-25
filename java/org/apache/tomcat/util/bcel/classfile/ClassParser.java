@@ -17,7 +17,9 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
+import java.io.BufferedInputStream;
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -57,7 +59,7 @@ public final class ClassParser {
      * @param file Input stream
      */
     public ClassParser(InputStream file) {
-        this.file = new FastDataInputStream(file, BUFSIZE);
+        this.file = new DataInputStream(new BufferedInputStream(file, BUFSIZE));
     }
 
 

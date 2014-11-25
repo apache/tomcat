@@ -59,6 +59,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>57173</bug>: Rvert the fix for <bug>56953</bug> that broke
+        annotation scanning in some cases. (markt)
+      </fix>
+      <fix>
         <bug>57208</bug>: Prevent NPE in JNDI Realm when no results are found
         in a directory context for a user with specified user name. Based on
         a patch provided by Jason McIntosh. (violetagg)
@@ -433,9 +437,9 @@
         when running on a case sensitive file system. (markt)
       </fix>
       <add>
-          <bug>57004</bug>: Add <code>stuckThreadCount</code> property to
-          <code>StuckThreadDetectionValve</code>'s JMX bean. Patch provided by
-          Ji&#x159;&#xED; Pejchal. (schultz)
+        <bug>57004</bug>: Add <code>stuckThreadCount</code> property to
+        <code>StuckThreadDetectionValve</code>'s JMX bean. Patch provided by
+        Ji&#x159;&#xED; Pejchal. (schultz)
       </add>
       <fix>
         <bug>57011</bug>: Ensure that the request and response are correctly
