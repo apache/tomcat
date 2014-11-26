@@ -926,7 +926,7 @@ The same information is available for both of them :
         appropriate.</p></li>
         <li><p><em>"Keep-Alive"</em> : The thread keeps the connection open to
         the client in case the client sends another request. If another request
-        is received, the next stage will br "Parse and Prepare Requst". If no
+        is received, the next stage will be "Parse and Prepare Request". If no
         request is received before the keep alive times out, the connection will
         be closed and the next stage will be "Ready".</p></li>
         <li><p><em>"Ready"</em> : The thread is at rest and ready to be
