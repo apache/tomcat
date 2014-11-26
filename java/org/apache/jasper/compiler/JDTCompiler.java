@@ -315,7 +315,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else {
                 log.warn("Unknown source VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_Source,
-                        CompilerOptions.VERSION_1_7);
+                        CompilerOptions.VERSION_1_8);
             }
         } else {
             // Default to 1.8
@@ -361,7 +361,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else {
                 log.warn("Unknown target VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
-                        CompilerOptions.VERSION_1_7);
+                        CompilerOptions.VERSION_1_8);
             }
         } else {
             // Default to 1.8
@@ -464,8 +464,5 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
         if (! options.isSmapSuppressed()) {
             SmapUtil.installSmap(smap);
         }
-
     }
-
-
 }
