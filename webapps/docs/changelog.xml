@@ -115,6 +115,9 @@
         WebSocket classes with Java 7 (<code>ide-eclipse-websocket</code>
         target added in 7.0.56). (kkolinko)
       </update>
+      <update>
+        Improve Tomcat Manager documentation. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -83,7 +83,7 @@ example:</p>
 <ul>
 <li>As an application with a user interface you use in your browser.
 Here is an example URL where you can replace <code>localhost</code> with
-your website host name:  <code>http://localhost/manager/html/</code> .</li>
+your website host name:  <code>http://localhost:8080/manager/html</code> .</li>
 <li>A minimal version using HTTP requests only which is suitable for use
 by scripts setup by system administrators.  Commands are given as part of the
 request URI, and responses are in the form of simple text that can be easily
@@ -133,22 +133,25 @@ web application. The available roles are:</p>
 </ul>
 
 <p>The HTML interface is protected against CSRF (Cross-Site Request Forgery)
-attacks, but the text and JMX interfaces cannot be protected. To maintain
+attacks, but the text and JMX interfaces cannot be protected. It means that
+users who are allowed access to the text and JMX interfaces have to be cautious
+when accessing the Manager application with a web browser.
+To maintain
 the CSRF protection:</p>
 
 <ul>
-  <li>Users with the <strong>manager-gui</strong> role should not be granted
-      the <strong>manager-script</strong> or <strong>manager-jmx</strong>
-      roles.</li>
   <li>If you use web browser to access the Manager application using
       a user that has either <strong>manager-script</strong> or
       <strong>manager-jmx</strong> roles (for example for testing
-      the plain text or JMX interfaces),
-      then all windows of the browser MUST be closed afterwards to terminate
-      the session.</li>
+      the plain text or JMX interfaces), do not visit other sites
+      where you may fall victim to a CSRF attack, and you MUST close all windows
+      of the browser afterwards to terminate the session.</li>
+  <li>It is recommended to never grant
+      the <strong>manager-script</strong> or <strong>manager-jmx</strong>
+      roles to users that have the <strong>manager-gui</strong> role.</li>
 </ul>
 
-<p>Note that JMX proxy interface is effectively low-level root-like
+<p><strong>Note</strong> that JMX proxy interface is effectively low-level root-like
 administrative interface of Tomcat. One can do a lot, if he knows
 what commands to call. You should be cautious when enabling the
 <strong>manager-jmx</strong> role.</p>
@@ -162,13 +165,13 @@ As the majority of this document describes the commands of plain textual
 interface, let the role name for further example to be
 <strong>manager-script</strong>.
 Exactly how the usernames/passwords are configured depends on which
-<code>Realm</code> implementation you are using:</p>
+<a href="config/realm.html">Realm implementation</a> you are using:</p>
 <ul>
-<li><em>MemoryRealm</em> &#8212; This one is configured in the default
-    <code>$CATALINA_BASE/conf/server.xml</code>.
-    If you have not configured it differently, or replaced it with
-    a different <code>Realm</code> implementation, this realm
-    reads an XML-format file stored at
+<li><em>UserDatabaseRealm</em> plus <em>MemoryUserDatabase</em>, or <em>MemoryRealm</em>
+    &#8212; The <em>UserDatabaseRealm</em> and <em>MemoryUserDatabase</em> are
+    configured in the default <code>$CATALINA_BASE/conf/server.xml</code>.
+    Both <em>MemoryUserDatabase</em> and <em>MemoryRealm</em> read an
+    XML-format file by default stored at
     <code>$CATALINA_BASE/conf/tomcat-users.xml</code>, which can be
     edited with any text editor.  This file contains an XML
     <code>&lt;user&gt;</code> for each individual user, which might
@@ -179,7 +182,8 @@ Exactly how the usernames/passwords are configured depends on which
     add the <strong>manager-script</strong> role to the comma-delimited
     <code>roles</code> attribute for one or more existing users, and/or
     create new users with that assigned role.</li>
-<li><em>JDBCRealm</em> &#8212; Your user and role information is stored in
+<li><em>DataSourceRealm</em> or <em>JDBCRealm</em>
+    &#8212; Your user and role information is stored in
     a database accessed via JDBC.  Add the <strong>manager-script</strong> role
     to one or more existing users, and/or create one or more new users
     with this role assigned, following the standard procedures for your
@@ -210,6 +214,28 @@ an example of restricting access to the localhost by IP address:</p>
 
 </section>
 
+<section name="HTML User-friendly Interface">
+
+<p>The user-friendly HTML interface of Manager web application is located at</p>
+
+<source>http://{host}:{port}/manager/html</source>
+
+<p>As has already been mentioned above, you need <strong>manager-gui</strong>
+role to be allowed to access it. There is a separate document that provides
+help on this interface. See:</p>
+
+<ul>
+  <li><a href="html-manager-howto.html">HTML Manager documentation</a></li>
+</ul>
+
+<p>The HTML interface is protected against CSRF (Cross-Site Request Forgery)
+attacks. Each access to the HTML pages generates a random token, which is
+stored in your session and is included in all links on the page. If your next
+action does not have correct value of the token, the action will be denied.
+If the token has expired you can start again from the main page or
+<em>List Applications</em> page of Manager.</p>
+
+</section>
 
 <section name="Supported Manager Commands">
 
