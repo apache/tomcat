@@ -16,7 +16,10 @@
  */
 package org.apache.el;
 
-import static org.junit.Assert.assertTrue;
+import java.math.BigDecimal;
+import java.util.Collections;
+
+import javax.servlet.DispatcherType;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -402,8 +405,33 @@ public class TestELInJsp extends TomcatBaseTest {
     }
 
 
+    /*
+     * BZ https://issues.apache.org/bugzilla/show_bug.cgi?id=57142
+     * javax.servlet, javax.servlet.http and javax.servlet.jsp should be
+     * imported by default.
+     */
+    @Test
+    public void testBug57142() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug57142.jsp");
+
+        String result = res.toString();
+        // javax.servlet
+        assertEcho(result, "00-" + DispatcherType.ASYNC);
+        // No obvious status fields for javax.servlet.http
+        // Could hack something with HttpUtils...
+        // No obvious status fields for javax.servlet.jsp
+        // Wild card (package) import
+        assertEcho(result, "01-" + BigDecimal.ROUND_UP);
+        // Class import
+        assertEcho(result, "02-" + Collections.EMPTY_LIST.size());
+    }
+
+
     // Assertion for text contained with <p></p>, e.g. printed by tags:echo
     private static void assertEcho(String result, String expected) {
-        assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
+        Assert.assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
     }
 }
