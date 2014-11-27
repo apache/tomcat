@@ -544,13 +544,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullHandler"));
         }
 
-        if (Util.isPrimitive(obj.getClass())) {
+        Encoder encoder = findEncoder(obj);
+
+        if (encoder == null && Util.isPrimitive(obj.getClass())) {
             String msg = obj.toString();
             sendStringByCompletion(msg, completion);
             return;
         }
-
-        Encoder encoder = findEncoder(obj);
 
         try {
             if (encoder instanceof Encoder.Text) {
