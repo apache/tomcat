@@ -544,6 +544,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullHandler"));
         }
 
+        /*
+         * Note that the implementation will convert primitives and their object
+         * equivalents by default but that users are free to specify their own
+         * encoders and decoders for this if they wish.
+         */
         Encoder encoder = findEncoder(obj);
 
         if (encoder == null && Util.isPrimitive(obj.getClass())) {
