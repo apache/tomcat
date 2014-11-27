@@ -116,7 +116,8 @@
         target added in 7.0.56). (kkolinko)
       </update>
       <update>
-        Improve Tomcat Manager documentation. (kkolinko)
+        Improve Tomcat Manager documentation. Rearrange, add section on
+        HTML GUI, document Server Status page. (kkolinko)
       </update>
     </changelog>
   </subsection>
