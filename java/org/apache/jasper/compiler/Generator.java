@@ -712,6 +712,34 @@ class Generator {
         out.printil("out = pageContext.getOut();");
         out.printil("_jspx_out = out;");
         out.println();
+
+        if (pageInfo.isELUsed()) {
+            // If EL is going to be used on this page then make sure that the
+            // EL Context is properly configured with the imports.
+            // The clarification provided in https://java.net/jira/browse/JSP-44
+            // is the the page import directive applies both to the scripting
+            // environment and to the EL environment.
+            out.printin("javax.el.ImportHandler _jspx_handler = pageContext.getELContext().getImportHandler();");
+            out.println();
+            for (String importName : pageInfo.getImports()) {
+                if (importName == null) {
+                    continue;
+                }
+                String trimmed = importName.trim();
+                if (trimmed.length() == 0) {
+                    continue;
+                }
+                if (trimmed.endsWith(".*")) {
+                    out.printin("_jspx_handler.importPackage(\"");
+                    out.print(trimmed.substring(0, trimmed.length() - 2));
+                    out.println("\");");
+                } else {
+                    out.printin("_jspx_handler.importClass(\"");
+                    out.print(trimmed);
+                    out.println("\");");
+                }
+            }
+        }
     }
 
     /**
