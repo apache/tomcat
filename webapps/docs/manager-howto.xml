@@ -136,16 +136,16 @@ web application. The available roles are:</p>
 attacks, but the text and JMX interfaces cannot be protected. It means that
 users who are allowed access to the text and JMX interfaces have to be cautious
 when accessing the Manager application with a web browser.
-To maintain
-the CSRF protection:</p>
+To maintain the CSRF protection:</p>
 
 <ul>
   <li>If you use web browser to access the Manager application using
       a user that has either <strong>manager-script</strong> or
       <strong>manager-jmx</strong> roles (for example for testing
-      the plain text or JMX interfaces), do not visit other sites
-      where you may fall victim to a CSRF attack, and you MUST close all windows
-      of the browser afterwards to terminate the session.</li>
+      the plain text or JMX interfaces), you MUST close all windows
+      of the browser afterwards to terminate the session.
+      If you do not close the browser and visit other sites, you may become
+      victim of a CSRF attack.</li>
   <li>It is recommended to never grant
       the <strong>manager-script</strong> or <strong>manager-jmx</strong>
       roles to users that have the <strong>manager-gui</strong> role.</li>
