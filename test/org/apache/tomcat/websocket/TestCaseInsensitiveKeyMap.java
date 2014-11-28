@@ -43,6 +43,15 @@ public class TestCaseInsensitiveKeyMap {
     }
 
 
+    @Test(expected=NullPointerException.class)
+    public void testPutNullKey() {
+        Object o1 = new Object();
+
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put(null, o1);
+    }
+
+
     @Test
     public void testGet() {
         Object o1 = new Object();
@@ -56,6 +65,17 @@ public class TestCaseInsensitiveKeyMap {
 
 
     @Test
+    public void testGetNullKey() {
+        Object o1 = new Object();
+
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", o1);
+
+        Assert.assertNull(map.get(null));
+    }
+
+
+    @Test
     public void testContainsKey() {
         Object o1 = new Object();
 
@@ -64,6 +84,28 @@ public class TestCaseInsensitiveKeyMap {
 
         Assert.assertTrue(map.containsKey("a"));
         Assert.assertTrue(map.containsKey("A"));
+    }
+
+
+    @Test
+    public void testContainsKeyNonString() {
+        Object o1 = new Object();
+
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", o1);
+
+        Assert.assertFalse(map.containsKey(o1));
+    }
+
+
+    @Test
+    public void testContainsKeyNull() {
+        Object o1 = new Object();
+
+        CaseInsensitiveKeyMap<Object> map = new CaseInsensitiveKeyMap<>();
+        map.put("a", o1);
+
+        Assert.assertFalse(map.containsKey(null));
     }
 
 
