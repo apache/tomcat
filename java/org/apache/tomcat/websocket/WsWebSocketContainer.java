@@ -303,9 +303,8 @@ public class WsWebSocketContainer
                     afterResponse(handshakeResponse);
 
             // Sub-protocol
-            // Header names are always stored in lower case
             List<String> protocolHeaders = handshakeResponse.getHeaders().get(
-                    Constants.WS_PROTOCOL_HEADER_NAME_LOWER);
+                    Constants.WS_PROTOCOL_HEADER_NAME);
             if (protocolHeaders == null || protocolHeaders.size() == 0) {
                 subProtocol = null;
             } else if (protocolHeaders.size() == 1) {
@@ -319,7 +318,7 @@ public class WsWebSocketContainer
             // Should normally only be one header but handle the case of
             // multiple headers
             List<String> extHeaders = handshakeResponse.getHeaders().get(
-                    Constants.WS_EXTENSIONS_HEADER_NAME_LOWER);
+                    Constants.WS_EXTENSIONS_HEADER_NAME);
             if (extHeaders != null) {
                 for (String extHeader : extHeaders) {
                     Util.parseExtensionHeader(extensionsAgreed, extHeader);
