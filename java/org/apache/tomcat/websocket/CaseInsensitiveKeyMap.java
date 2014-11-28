@@ -180,10 +180,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + lcKey.hashCode();
-            return result;
+            return lcKey.hashCode();
         }
 
         @Override
