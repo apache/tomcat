@@ -51,7 +51,7 @@ public class ImportHandler {
         String className = name.substring(0, lastPeriod);
         String fieldOrMethodName = name.substring(lastPeriod + 1);
 
-        Class<?> clazz = findClass(className);
+        Class<?> clazz = findClass(className, false);
 
         if (clazz == null) {
             throw new ELException(Util.message(
@@ -108,7 +108,7 @@ public class ImportHandler {
                     null, "importHandler.invalidClassName", name));
         }
 
-        Class<?> clazz = findClass(name);
+        Class<?> clazz = findClass(name, false);
 
         if (clazz == null) {
             throw new ELException(Util.message(
@@ -164,7 +164,7 @@ public class ImportHandler {
             // (which correctly triggers an error)
             for (String p : packages) {
                 String className = p + '.' + name;
-                Class<?> clazz = findClass(className);
+                Class<?> clazz = findClass(className, false);
                 if (clazz != null) {
                     if (result != null) {
                         throw new ELException(Util.message(null,
@@ -188,7 +188,17 @@ public class ImportHandler {
     }
 
 
-    private Class<?> findClass(String name) {
+    /*
+     * This method is used for importing and resolving. Resolving has strict
+     * criteria for what may be returned. Import does not. Further, as a result
+     * of the clarification in https://java.net/jira/browse/JSP-44 any class or
+     * package imported using a JSP page directive will also be imported in to
+     * the EL environment. The validate flag is used to bypass the validation
+     * criteria required by resolving when importing else a typical JSP import
+     * (e.g. <%@page import="java.util.List"%>) would trigger an ELException and
+     * a 500 response which is clearly not correct.
+     */
+    private Class<?> findClass(String name, boolean validate) {
         Class<?> clazz;
         try {
              clazz = Class.forName(name);
@@ -198,8 +208,8 @@ public class ImportHandler {
 
         // Class must be public, non-abstract and not an interface
         int modifiers = clazz.getModifiers();
-        if (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) ||
-                Modifier.isInterface(modifiers)) {
+        if (validate && (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) ||
+                Modifier.isInterface(modifiers))) {
             throw new ELException(Util.message(
                     null, "importHandler.invalidClass", name));
         }
