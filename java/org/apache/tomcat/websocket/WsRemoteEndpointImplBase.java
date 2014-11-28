@@ -550,10 +550,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
          * encoders and decoders for this if they wish.
          */
         Encoder encoder = findEncoder(obj);
-
         if (encoder == null && Util.isPrimitive(obj.getClass())) {
             String msg = obj.toString();
             sendStringByCompletion(msg, completion);
+            return;
+        }
+        if (encoder == null && byte[].class.isAssignableFrom(obj.getClass())) {
+            ByteBuffer msg = ByteBuffer.wrap((byte[]) obj);
+            sendBytesByCompletion(msg, completion);
             return;
         }
 
