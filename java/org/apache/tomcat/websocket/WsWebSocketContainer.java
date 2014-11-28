@@ -218,7 +218,7 @@ public class WsWebSocketContainer
                     sm.getString("wsWebSocketContainer.pathNoHost"));
         }
         int port = path.getPort();
-        Map<String,List<String>> reqHeaders = createRequestHeaders(host, port,
+        Map<String,List<String>> reqHeaders = createRequestHeaders(path, host, port,
                 clientEndpointConfiguration.getPreferredSubprotocols(),
                 clientEndpointConfiguration.getExtensions());
         clientEndpointConfiguration.getConfigurator().
@@ -430,7 +430,7 @@ public class WsWebSocketContainer
         return result;
     }
 
-    private Map<String,List<String>> createRequestHeaders(String host,
+    private Map<String,List<String>> createRequestHeaders(URI path, String host,
             int port, List<String> subProtocols, List<Extension> extensions) {
 
         Map<String,List<String>> headers = new HashMap<>();
@@ -475,6 +475,11 @@ public class WsWebSocketContainer
             headers.put(Constants.WS_EXTENSIONS_HEADER_NAME,
                     generateExtensionHeaders(extensions));
         }
+
+        // Origin header
+        List<String> originValues = new ArrayList<>(1);
+        originValues.add(path.toString());
+        headers.put(Constants.ORIGIN_HEADER_NAME, originValues);
 
         return headers;
     }
@@ -571,7 +576,7 @@ public class WsWebSocketContainer
             ExecutionException, DeploymentException, EOFException,
             TimeoutException {
 
-        Map<String,List<String>> headers = new HashMap<>();
+        Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
 
         boolean readStatus = false;
         boolean readHeaders = false;
@@ -606,7 +611,7 @@ public class WsWebSocketContainer
                 }
             }
         }
-
+System.out.println("Headers: " + headers);
         return new WsHandshakeResponse(headers);
     }
 

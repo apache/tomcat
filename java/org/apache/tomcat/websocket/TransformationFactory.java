@@ -20,11 +20,7 @@ import java.util.List;
 
 import javax.websocket.Extension;
 
-import org.apache.tomcat.util.res.StringManager;
-
 public class TransformationFactory {
-
-    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
 
     private static final TransformationFactory factory = new TransformationFactory();
 
@@ -41,7 +37,6 @@ public class TransformationFactory {
         if (PerMessageDeflate.NAME.equals(name)) {
             return PerMessageDeflate.negotiate(preferences, isServer);
         }
-        throw new IllegalArgumentException(
-                sm.getString("transformerFactory.unsupportedExtension", name));
+        return null;
     }
 }
