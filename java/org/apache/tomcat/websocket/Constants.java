@@ -49,6 +49,7 @@ public class Constants {
     public static final String HOST_HEADER_NAME = "Host";
     public static final String UPGRADE_HEADER_NAME = "Upgrade";
     public static final String UPGRADE_HEADER_VALUE = "websocket";
+    public static final String ORIGIN_HEADER_NAME = "Origin";
     public static final String CONNECTION_HEADER_NAME = "Connection";
     public static final String CONNECTION_HEADER_VALUE = "upgrade";
     public static final String WS_VERSION_HEADER_NAME = "Sec-WebSocket-Version";
