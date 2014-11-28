@@ -611,7 +611,7 @@ public class WsWebSocketContainer
                 }
             }
         }
-System.out.println("Headers: " + headers);
+
         return new WsHandshakeResponse(headers);
     }
 
