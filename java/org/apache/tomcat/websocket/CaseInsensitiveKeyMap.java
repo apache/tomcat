@@ -24,15 +24,23 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
- * A Map implementation that uses case-insensitive (using {@link Locale#ENGLISH}
- * strings as keys.
+ * A Map implementation that uses case-insensitive (using {@link
+ * Locale#ENGLISH}) strings as keys.
+ * <p>
+ * Keys must be instances of {@link String}. Note that this means that
+ * <code>null</code> keys are not permitted.
  * <p>
  * This implementation is not thread-safe.
  *
  * @param <V> Type of values placed in this Map.
  */
 public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
+
+    private static final StringManager sm =
+            StringManager.getManager(CaseInsensitiveKeyMap.class);
 
     private final Map<Key,V> map = new HashMap<>();
 
@@ -45,7 +53,11 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
 
     @Override
     public V put(String key, V value) {
-        return map.put(Key.getInstance(key), value);
+        Key caseInsensitiveKey = Key.getInstance(key);
+        if (caseInsensitiveKey == null) {
+            throw new NullPointerException(sm.getString("caseInsensitiveKeyMap.nullKey"));
+        }
+        return map.put(caseInsensitiveKey, value);
     }
 
 
@@ -155,9 +167,11 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
     private static class Key {
 
         private final String key;
+        private final String lcKey;
 
         private Key(String key) {
             this.key = key;
+            this.lcKey = key.toLowerCase(Locale.ENGLISH);
         }
 
         public String getKey() {
@@ -168,8 +182,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result +
-                    ((key == null) ? 0 : key.toLowerCase(Locale.ENGLISH).hashCode());
+            result = prime * result + lcKey.hashCode();
             return result;
         }
 
@@ -185,15 +198,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
                 return false;
             }
             Key other = (Key) obj;
-            if (key == null) {
-                if (other.key != null) {
-                    return false;
-                }
-            } else if (!key.toLowerCase(Locale.ENGLISH).equals(
-                    other.key.toLowerCase(Locale.ENGLISH))) {
-                return false;
-            }
-            return true;
+            return lcKey.equals(other.lcKey);
         }
 
         public static Key getInstance(Object o) {
