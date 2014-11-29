@@ -496,29 +496,33 @@
          <code>-Dorg.apache.juli.formatter=org.apache.juli.OneLineFormatter</code></p>
     </property>
 
-    <property name="org.apache.juli. AsyncOverflowDropType">
-      <p>When the memory limit of records has been reached the system needs to determine what action to take.
-         Currently there are three actions that can be taken:
-      </p>
-         <ul>
-           <li><code>int OVERFLOW_DROP_LAST = 1</code> - the record that caused the overflow will be dropped and not logged</li>
-           <li><code>int OVERFLOW_DROP_FIRST = 2</code> - the record that is next in line to be logged will be dropped to make room for the latest record on the queue</li>
-           <li><code>int OVERFLOW_DROP_FLUSH = 3</code> - suspend the thread while the queue empties out and flushes the entries to the write buffer</li>
-           <li><code>int OVERFLOW_DROP_CURRENT = 4</code> - drop the current log entry</li>
-         </ul>
-      <p>The default value is <code>1</code> (OVERFLOW_DROP_LAST).</p>
-    </property>
-
     <property name="org.apache.juli. AsyncMaxRecordCount">
-      <p>The max number of log records that the async logger will keep in memory. When this limit is reached and a new record is being logged by the
-         JULI framework the system will take an action based on the <code>org.apache.juli.AsyncOverflowDropType</code> setting.</p>
+      <p>The maximum number of log records that the JULI AsyncFileHandler will queue in memory.
+         New records are added to the queue and get asynchronously removed from the queue
+         and written to the files by a single writer thread.
+         When the queue is full and a new record is being logged
+         the log record will be handled based on the <code>org.apache.juli.AsyncOverflowDropType</code> setting.</p>
       <p>The default value is <code>10000</code> records.
          This number represents the global number of records, not on a per handler basis.
       </p>
     </property>
 
+    <property name="org.apache.juli. AsyncOverflowDropType">
+      <p>When the queue of log records of the JULI AsyncFileHandler is full,
+         new log records are handled according to the following setting:
+      </p>
+         <ul>
+           <li><code>1</code> - the newest record in the queue will be dropped and not logged</li>
+           <li><code>2</code> - the oldest record in the queue will be dropped and not logged</li>
+           <li><code>3</code> - suspend the logging thread until older records got written to the log file and the queue is no longer full.
+                                This is the only setting that ensures that no messages get lost.</li>
+           <li><code>4</code> - drop the current log record</li>
+         </ul>
+      <p>The default value is <code>1</code> (drop the newest record in the queue).</p>
+    </property>
+
     <property name="org.apache.juli. AsyncLoggerPollInterval">
-      <p>The poll interval in milliseconds for the asynchronous logger thread in milliseconds.
+      <p>The poll interval in milliseconds for the asynchronous logger thread.
          If the log queue is empty, the async thread will issue a poll(poll interval)
          in order to not wake up too often.</p>
       <p>The default value is <code>1000</code> milliseconds.</p>
