@@ -161,6 +161,14 @@ public class ContextRuleSet extends RuleSetBase {
                             "setStore",
                             "org.apache.catalina.Store");
 
+        digester.addObjectCreate(prefix + "Context/Manager/SessionIdGenerator",
+                                 "org.apache.catalina.util.StandardSessionIdGenerator",
+                                 "className");
+        digester.addSetProperties(prefix + "Context/Manager/SessionIdGenerator");
+        digester.addSetNext(prefix + "Context/Manager/SessionIdGenerator",
+                            "setSessionIdGenerator",
+                            "org.apache.catalina.SessionIdGenerator");
+
         digester.addObjectCreate(prefix + "Context/Parameter",
                                  "org.apache.catalina.deploy.ApplicationParameter");
         digester.addSetProperties(prefix + "Context/Parameter");

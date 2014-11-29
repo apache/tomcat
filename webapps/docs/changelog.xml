@@ -84,6 +84,11 @@
         <bug>57239</bug>: Correct several message typos. Includes patch by
         vladk. (kkolinko)
       </fix>
+      <add>
+        Make the session id generator extensible by adding a
+        <code>SessionIdGenerator</code> interface, an abstract
+        base class and a standard implementation. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

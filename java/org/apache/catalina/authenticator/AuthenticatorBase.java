@@ -46,7 +46,8 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.DateTool;
-import org.apache.catalina.util.SessionIdGenerator;
+import org.apache.catalina.util.SessionIdGeneratorBase;
+import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
@@ -178,7 +179,7 @@ public abstract class AuthenticatorBase extends ValveBase
      */
     protected String secureRandomProvider = null;
 
-    protected SessionIdGenerator sessionIdGenerator = null;
+    protected SessionIdGeneratorBase sessionIdGenerator = null;
 
     /**
      * The string manager for this package.
@@ -921,7 +922,7 @@ public abstract class AuthenticatorBase extends ValveBase
                 log.debug("No SingleSignOn Valve is present");
         }
 
-        sessionIdGenerator = new SessionIdGenerator();
+        sessionIdGenerator = new StandardSessionIdGenerator();
         sessionIdGenerator.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
         sessionIdGenerator.setSecureRandomClass(getSecureRandomClass());
         sessionIdGenerator.setSecureRandomProvider(getSecureRandomProvider());

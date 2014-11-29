@@ -92,7 +92,13 @@ public class ClusterRuleSet extends RuleSetBase {
         digester.addSetNext(prefix + "Manager",
                             "setManagerTemplate",
                             "org.apache.catalina.ha.ClusterManager");
-
+        digester.addObjectCreate(prefix + "Manager/SessionIdGenerator",
+                "org.apache.catalina.util.StandardSessionIdGenerator",
+                "className");
+        digester.addSetProperties(prefix + "Manager/SessionIdGenerator");
+        digester.addSetNext(prefix + "Manager/SessionIdGenerator",
+               "setSessionIdGenerator",
+               "org.apache.catalina.SessionIdGenerator");
 
         digester.addObjectCreate(prefix + "Channel",
                                  null, // MUST be specified in the element

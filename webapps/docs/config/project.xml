@@ -63,6 +63,7 @@
         <item name="Manager"               href="manager.html"/>
         <item name="Realm"                 href="realm.html"/>
         <item name="Resources"             href="resources.html"/>
+        <item name="SessionIdGenerator"    href="sessionidgenerator.html"/>
         <item name="Valve"                 href="valve.html"/>
     </menu>
 

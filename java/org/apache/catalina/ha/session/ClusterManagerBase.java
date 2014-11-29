@@ -25,6 +25,7 @@ import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
+import org.apache.catalina.SessionIdGenerator;
 import org.apache.catalina.Valve;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
@@ -195,13 +196,24 @@ public abstract class ClusterManagerBase extends ManagerBase
         copy.setName("Clone-from-" + getName());
         copy.setMaxActiveSessions(getMaxActiveSessions());
         copy.setMaxInactiveInterval(getMaxInactiveInterval());
-        copy.setSessionIdLength(getSessionIdLength());
         copy.setProcessExpiresFrequency(getProcessExpiresFrequency());
         copy.setNotifyListenersOnReplication(isNotifyListenersOnReplication());
         copy.setSessionAttributeFilter(getSessionAttributeFilter());
         copy.setSecureRandomClass(getSecureRandomClass());
         copy.setSecureRandomProvider(getSecureRandomProvider());
         copy.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
+        if (getSessionIdGenerator() != null) {
+            try {
+                SessionIdGenerator copyIdGenerator = sessionIdGeneratorClass.newInstance();
+                copyIdGenerator.setSessionIdLength(getSessionIdGenerator().getSessionIdLength());
+                copyIdGenerator.setJvmRoute(getSessionIdGenerator().getJvmRoute());
+                copy.setSessionIdGenerator(copyIdGenerator);
+            } catch (InstantiationException e) {
+             // Ignore
+            } catch (IllegalAccessException e) {
+             // Ignore
+            }
+        }
     }
 
     /**

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,16 +22,20 @@ import java.security.SecureRandom;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
+import org.apache.catalina.SessionIdGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-public class SessionIdGenerator {
+public abstract class SessionIdGeneratorBase extends LifecycleBase
+        implements SessionIdGenerator {
 
-    private static Log log = LogFactory.getLog(SessionIdGenerator.class);
+    private static final Log log = LogFactory.getLog(SessionIdGeneratorBase.class);
 
 
-    private static StringManager sm =
+    private static final StringManager sm =
         StringManager.getManager("org.apache.catalina.util");
 
 
@@ -42,8 +46,7 @@ public class SessionIdGenerator {
      * designed this way since random number generators use a sync to make them
      * thread-safe and the sync makes using a a single object slow(er).
      */
-    private Queue<SecureRandom> randoms =
-        new ConcurrentLinkedQueue<SecureRandom>();
+    private final Queue<SecureRandom> randoms = new ConcurrentLinkedQueue<SecureRandom>();
 
 
     /**
@@ -88,7 +91,7 @@ public class SessionIdGenerator {
 
     /**
      * Specify a non-default @{link {@link SecureRandom} implementation to use.
-     * 
+     *
      * @param secureRandomClass The fully-qualified class name
      */
     public void setSecureRandomClass(String secureRandomClass) {
@@ -98,7 +101,7 @@ public class SessionIdGenerator {
 
     /**
      * Specify a non-default algorithm to use to generate random numbers.
-     * 
+     *
      * @param secureRandomAlgorithm The name of the algorithm
      */
     public void setSecureRandomAlgorithm(String secureRandomAlgorithm) {
@@ -108,7 +111,7 @@ public class SessionIdGenerator {
 
     /**
      * Specify a non-default provider to use to generate random numbers.
-     * 
+     *
      * @param secureRandomProvider  The name of the provider
      */
     public void setSecureRandomProvider(String secureRandomProvider) {
@@ -117,21 +120,40 @@ public class SessionIdGenerator {
 
 
     /**
+     * Return the node identifier associated with this node which will be
+     * included in the generated session ID.
+     */
+    @Override
+    public String getJvmRoute() {
+        return jvmRoute;
+    }
+
+
+    /**
      * Specify the node identifier associated with this node which will be
      * included in the generated session ID.
-     * 
+     *
      * @param jvmRoute  The node identifier
      */
+    @Override
     public void setJvmRoute(String jvmRoute) {
         this.jvmRoute = jvmRoute;
     }
 
 
     /**
+     * Return the number of bytes for a session ID
+     */
+    @Override
+    public int getSessionIdLength() {
+        return sessionIdLength;
+    }
+    /**
      * Specify the number of bytes for a session ID
-     * 
+     *
      * @param sessionIdLength   Number of bytes
      */
+    @Override
     public void setSessionIdLength(int sessionIdLength) {
         this.sessionIdLength = sessionIdLength;
     }
@@ -140,43 +162,12 @@ public class SessionIdGenerator {
     /**
      * Generate and return a new session identifier.
      */
+    @Override
     public String generateSessionId() {
-
-        byte random[] = new byte[16];
-
-        // Render the result as a String of hexadecimal digits
-        StringBuilder buffer = new StringBuilder();
-
-        int resultLenBytes = 0;
-
-        while (resultLenBytes < sessionIdLength) {
-            getRandomBytes(random);
-            for (int j = 0;
-            j < random.length && resultLenBytes < sessionIdLength;
-            j++) {
-                byte b1 = (byte) ((random[j] & 0xf0) >> 4);
-                byte b2 = (byte) (random[j] & 0x0f);
-                if (b1 < 10)
-                    buffer.append((char) ('0' + b1));
-                else
-                    buffer.append((char) ('A' + (b1 - 10)));
-                if (b2 < 10)
-                    buffer.append((char) ('0' + b2));
-                else
-                    buffer.append((char) ('A' + (b2 - 10)));
-                resultLenBytes++;
-            }
-        }
-
-        if (jvmRoute != null && jvmRoute.length() > 0) {
-            buffer.append('.').append(jvmRoute);
-        }
-
-        return buffer.toString();
+        return generateSessionId(jvmRoute);
     }
-    
-    
-    private void getRandomBytes(byte bytes[]) {
+
+    protected void getRandomBytes(byte bytes[]) {
 
         SecureRandom random = randoms.poll();
         if (random == null) {
@@ -185,8 +176,8 @@ public class SessionIdGenerator {
         random.nextBytes(bytes);
         randoms.add(random);
     }
-    
-    
+
+
     /**
      * Create a new random number generator instance we should use for
      * generating session identifiers.
@@ -194,7 +185,7 @@ public class SessionIdGenerator {
     private SecureRandom createSecureRandom() {
 
         SecureRandom result = null;
-        
+
         long t1 = System.currentTimeMillis();
         if (secureRandomClass != null) {
             try {
@@ -202,7 +193,7 @@ public class SessionIdGenerator {
                 Class<?> clazz = Class.forName(secureRandomClass);
                 result = (SecureRandom) clazz.newInstance();
             } catch (Exception e) {
-                log.error(sm.getString("sessionIdGenerator.random",
+                log.error(sm.getString("sessionIdGeneratorBase.random",
                         secureRandomClass), e);
             }
         }
@@ -219,10 +210,10 @@ public class SessionIdGenerator {
                     result = SecureRandom.getInstance(secureRandomAlgorithm);
                 }
             } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("sessionIdGenerator.randomAlgorithm",
+                log.error(sm.getString("sessionIdGeneratorBase.randomAlgorithm",
                         secureRandomAlgorithm), e);
             } catch (NoSuchProviderException e) {
-                log.error(sm.getString("sessionIdGenerator.randomProvider",
+                log.error(sm.getString("sessionIdGeneratorBase.randomProvider",
                         secureRandomProvider), e);
             }
         }
@@ -232,11 +223,11 @@ public class SessionIdGenerator {
             try {
                 result = SecureRandom.getInstance("SHA1PRNG");
             } catch (NoSuchAlgorithmException e) {
-                log.error(sm.getString("sessionIdGenerator.randomAlgorithm",
+                log.error(sm.getString("sessionIdGeneratorBase.randomAlgorithm",
                         secureRandomAlgorithm), e);
             }
         }
-        
+
         if (result == null) {
             // Nothing works - use platform default
             result = new SecureRandom();
@@ -244,11 +235,39 @@ public class SessionIdGenerator {
 
         // Force seeding to take place
         result.nextInt();
-        
+
         long t2=System.currentTimeMillis();
         if( (t2-t1) > 100 )
-            log.info(sm.getString("sessionIdGenerator.createRandom",
+            log.info(sm.getString("sessionIdGeneratorBase.createRandom",
                     result.getAlgorithm(), Long.valueOf(t2-t1)));
         return result;
+    }
+
+
+    @Override
+    protected void initInternal() throws LifecycleException {
+        // NO-OP
+    }
+
+
+    @Override
+    protected void startInternal() throws LifecycleException {
+        // Ensure SecureRandom has been initialised
+        generateSessionId();
+
+        setState(LifecycleState.STARTING);
+    }
+
+
+    @Override
+    protected void stopInternal() throws LifecycleException {
+        setState(LifecycleState.STOPPING);
+        randoms.clear();
+    }
+
+
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+        // NO-OP
     }
 }

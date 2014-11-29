@@ -106,7 +106,8 @@
        <p>The length of session ids created by this Manager, measured in bytes,
         excluding subsequent conversion to a hexadecimal string and
         excluding any JVM route information used for load balancing.
-        The default is 16.</p>
+        The default is 16. You should set the length on a nested
+        <strong>SessionIdGenerator</strong> element instead.</p>
       </attribute>
       <attribute name="processExpiresFrequency" required="false">
         <p>Frequency of the session expiration, and related manager operations.
@@ -230,5 +231,21 @@
     </attributes>
   </subsection>
 </section>
+<section name="Nested Components">
+  <h3>All Manager Implementations</h3>
+  <p>All Manager implementations allow nesting of a
+  <strong>&lt;SessionIdGenerator&gt;</strong> element. It defines
+  the behavior of session id generation.  All implementations
+  of the <a href="sessionidgenerator.html">SessionIdGenerator</a> allow the
+  following attributes:
+  </p>
+  <attributes>
+    <attribute name="sessionIdLength" required="false">
+      <p>The length of the session ID may be changed with the
+      <strong>sessionIdLength</strong> attribute.
+      </p>
+    </attribute>
+  </attributes>
+</section>  
 </body>
 </document>
