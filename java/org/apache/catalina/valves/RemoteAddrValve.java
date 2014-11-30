@@ -27,11 +27,46 @@ import org.apache.catalina.connector.Response;
 
 /**
  * Concrete implementation of <code>RequestFilterValve</code> that filters
- * based on the string representation of the remote client's IP address.
+ * based on the string representation of the remote client's IP address
+ * optionally combined with the server port number.
  *
  * @author Craig R. McClanahan
  */
 public final class RemoteAddrValve extends RequestFilterValve {
+
+    // ----------------------------------------------------- Instance Variables
+
+    /**
+     * Flag deciding whether we add the server port to the property
+     * compared in the filtering method. The port will be appended
+     * using a "," as a separator.
+     */
+    protected volatile boolean addLocalPort = false;
+
+    // ------------------------------------------------------------- Properties
+
+
+    /**
+     * Get the flag deciding whether we add the server port to the
+     * property compared in the filtering method. The port will be appended
+     * using a "," as a separator.
+     */
+    public boolean getAddLocalPort() {
+        return addLocalPort;
+    }
+
+
+    /**
+     * Set the flag deciding whether we add the server port to the
+     * property compared in the filtering method. The port will be appended
+     * using a "," as a separator.
+     *
+     * @param addLocalPort The new flag
+     */
+    public void setAddLocalPort(boolean addLocalPort) {
+        this.addLocalPort = addLocalPort;
+    }
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -51,7 +86,13 @@ public final class RemoteAddrValve extends RequestFilterValve {
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
 
-        process(request.getRequest().getRemoteAddr(), request, response);
+        String property;
+        if (addLocalPort) {
+            property = request.getRequest().getRemoteAddr() + "," + request.getConnector().getPort();
+        } else {
+            property = request.getRequest().getRemoteAddr();
+        }
+        process(property, request, response);
 
     }
 }

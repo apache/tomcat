@@ -26,6 +26,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
@@ -38,19 +39,23 @@ public class TestRequestFilterValve {
     private static final int FORBIDDEN = 403;
     private static final int CUSTOM    = 499;
 
-    private static final String ADDR_ALLOW_PAT        = "127\\..*";
-    private static final String ADDR_DENY_PAT         = ".*\\.1";
+    private static final String ADDR_ALLOW_PAT        = "127\\.\\d*\\.\\d*\\.\\d*";
+    private static final String ADDR_DENY_PAT         = "\\d*\\.\\d*\\.\\d*\\.1";
     private static final String ADDR_ONLY_ALLOW       = "127.0.0.2";
     private static final String ADDR_ONLY_DENY        = "192.168.0.1";
     private static final String ADDR_ALLOW_AND_DENY   = "127.0.0.1";
     private static final String ADDR_NO_ALLOW_NO_DENY = "192.168.0.2";
 
-    private static final String HOST_ALLOW_PAT        = "www\\.example\\..*";
+    private static final String HOST_ALLOW_PAT        = "www\\.example\\.[a-zA-Z0-9-]*";
     private static final String HOST_DENY_PAT         = ".*\\.org";
     private static final String HOST_ONLY_ALLOW       = "www.example.com";
     private static final String HOST_ONLY_DENY        = "host.example.org";
     private static final String HOST_ALLOW_AND_DENY   = "www.example.org";
     private static final String HOST_NO_ALLOW_NO_DENY = "host.example.com";
+
+    private static final int PORT = 8080;
+    private static final String PORT_MATCH_PATTERN    = ",\\d*";
+    private static final String PORT_NO_MATCH_PATTERN = ",8081";
 
 
     static class TerminatingValve extends ValveBase {
@@ -74,13 +79,18 @@ public class TestRequestFilterValve {
     }
 
     private void oneTest(String allow, String deny, boolean denyStatus,
+                         boolean addLocalPort,
                          String property, String type, boolean allowed) {
         // PREPARE
         RequestFilterValve valve = null;
+        Connector connector = new Connector();
         Request request = new Request();
         Response response = new MockResponse();
         StringBuilder msg = new StringBuilder();
         int expected = allowed ? OK : FORBIDDEN;
+
+        connector.setPort(PORT);
+        request.setConnector(connector);
 
         if (type == null) {
             fail("Invalid test with null type");
@@ -115,6 +125,16 @@ public class TestRequestFilterValve {
                 expected = CUSTOM;
             }
         }
+        if (addLocalPort) {
+            if (valve instanceof RemoteAddrValve) {
+                ((RemoteAddrValve)valve).setAddLocalPort(true);
+            } else if (valve instanceof RemoteHostValve) {
+                ((RemoteHostValve)valve).setAddLocalPort(true);
+            } else {
+                fail("Can only set 'addLocalPort' for RemoteAddrValve and RemoteHostValve");
+            }
+            msg.append(" addLocalPort='true'");
+        }
 
         // TEST
         try {
@@ -133,23 +153,162 @@ public class TestRequestFilterValve {
                                String OnlyAllow, String OnlyDeny,
                                String AllowAndDeny, String NoAllowNoDeny,
                                String type) {
-        oneTest(null,      null,     false, AllowAndDeny,  type, false);
-        oneTest(allow_pat, null,     false, AllowAndDeny,  type, true);
-        oneTest(allow_pat, null,     false, NoAllowNoDeny, type, false);
-        oneTest(allow_pat, null,     true,  AllowAndDeny,  type, true);
-        oneTest(allow_pat, null,     true,  NoAllowNoDeny, type, false);
-        oneTest(null,      deny_pat, false, AllowAndDeny,  type, false);
-        oneTest(null,      deny_pat, false, NoAllowNoDeny, type, true);
-        oneTest(null,      deny_pat, true,  AllowAndDeny,  type, false);
-        oneTest(null,      deny_pat, true,  NoAllowNoDeny, type, true);
-        oneTest(allow_pat, deny_pat, false, NoAllowNoDeny, type, false);
-        oneTest(allow_pat, deny_pat, false, OnlyAllow,     type, true);
-        oneTest(allow_pat, deny_pat, false, OnlyDeny,      type, false);
-        oneTest(allow_pat, deny_pat, false, AllowAndDeny,  type, false);
-        oneTest(allow_pat, deny_pat, true,  NoAllowNoDeny, type, false);
-        oneTest(allow_pat, deny_pat, true,  OnlyAllow,     type, true);
-        oneTest(allow_pat, deny_pat, true,  OnlyDeny,      type, false);
-        oneTest(allow_pat, deny_pat, true,  AllowAndDeny,  type, false);
+        String apat;
+        String dpat;
+
+        // Test without ports
+        apat = allow_pat;
+        dpat = deny_pat;
+        oneTest(null, null, false, false, AllowAndDeny,  type, false);
+        oneTest(null, null, true,  false, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, false, AllowAndDeny,  type, true);
+        oneTest(apat, null, false, false, NoAllowNoDeny, type, false);
+        oneTest(apat, null, true,  false, AllowAndDeny,  type, true);
+        oneTest(apat, null, true,  false, NoAllowNoDeny, type, false);
+        oneTest(null, dpat, false, false, AllowAndDeny,  type, false);
+        oneTest(null, dpat, false, false, NoAllowNoDeny, type, true);
+        oneTest(null, dpat, true,  false, AllowAndDeny,  type, false);
+        oneTest(null, dpat, true,  false, NoAllowNoDeny, type, true);
+        oneTest(apat, dpat, false, false, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, false, false, OnlyAllow,     type, true);
+        oneTest(apat, dpat, false, false, OnlyDeny,      type, false);
+        oneTest(apat, dpat, false, false, AllowAndDeny,  type, false);
+        oneTest(apat, dpat, true,  false, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, true,  false, OnlyAllow,     type, true);
+        oneTest(apat, dpat, true,  false, OnlyDeny,      type, false);
+        oneTest(apat, dpat, true,  false, AllowAndDeny,  type, false);
+
+        // Test with port in pattern but forgotten "addLocalPort"
+        apat = allow_pat + PORT_MATCH_PATTERN;
+        dpat = deny_pat + PORT_MATCH_PATTERN;
+        oneTest(null, null, false, false, AllowAndDeny,  type, false);
+        oneTest(null, null, true,  false, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, false, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, false, NoAllowNoDeny, type, false);
+        oneTest(apat, null, true,  false, AllowAndDeny,  type, false);
+        oneTest(apat, null, true,  false, NoAllowNoDeny, type, false);
+        oneTest(null, dpat, false, false, AllowAndDeny,  type, true);
+        oneTest(null, dpat, false, false, NoAllowNoDeny, type, true);
+        oneTest(null, dpat, true,  false, AllowAndDeny,  type, true);
+        oneTest(null, dpat, true,  false, NoAllowNoDeny, type, true);
+        oneTest(apat, dpat, false, false, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, false, false, OnlyAllow,     type, false);
+        oneTest(apat, dpat, false, false, OnlyDeny,      type, false);
+        oneTest(apat, dpat, false, false, AllowAndDeny,  type, false);
+        oneTest(apat, dpat, true,  false, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, true,  false, OnlyAllow,     type, false);
+        oneTest(apat, dpat, true,  false, OnlyDeny,      type, false);
+        oneTest(apat, dpat, true,  false, AllowAndDeny,  type, false);
+
+        // Test with "addLocalPort" but port not in pattern
+        apat = allow_pat;
+        dpat = deny_pat;
+        oneTest(null, null, false, true, AllowAndDeny,  type, false);
+        oneTest(null, null, true,  true, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, true, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, null, true,  true, AllowAndDeny,  type, false);
+        oneTest(apat, null, true,  true, NoAllowNoDeny, type, false);
+        oneTest(null, dpat, false, true, AllowAndDeny,  type, true);
+        oneTest(null, dpat, false, true, NoAllowNoDeny, type, true);
+        oneTest(null, dpat, true,  true, AllowAndDeny,  type, true);
+        oneTest(null, dpat, true,  true, NoAllowNoDeny, type, true);
+        oneTest(apat, dpat, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, false, true, OnlyAllow,     type, false);
+        oneTest(apat, dpat, false, true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, false, true, AllowAndDeny,  type, false);
+        oneTest(apat, dpat, true,  true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, true,  true, OnlyAllow,     type, false);
+        oneTest(apat, dpat, true,  true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, true,  true, AllowAndDeny,  type, false);
+
+        // Test "addLocalPort" and with port matching in both patterns
+        apat = allow_pat + PORT_MATCH_PATTERN;
+        dpat = deny_pat + PORT_MATCH_PATTERN;
+        oneTest(null, null, false, true, AllowAndDeny,  type, false);
+        oneTest(null, null, true,  true, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, true, AllowAndDeny,  type, true);
+        oneTest(apat, null, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, null, true,  true, AllowAndDeny,  type, true);
+        oneTest(apat, null, true,  true, NoAllowNoDeny, type, false);
+        oneTest(null, dpat, false, true, AllowAndDeny,  type, false);
+        oneTest(null, dpat, false, true, NoAllowNoDeny, type, true);
+        oneTest(null, dpat, true,  true, AllowAndDeny,  type, false);
+        oneTest(null, dpat, true,  true, NoAllowNoDeny, type, true);
+        oneTest(apat, dpat, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, false, true, OnlyAllow,     type, true);
+        oneTest(apat, dpat, false, true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, false, true, AllowAndDeny,  type, false);
+        oneTest(apat, dpat, true,  true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, true,  true, OnlyAllow,     type, true);
+        oneTest(apat, dpat, true,  true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, true,  true, AllowAndDeny,  type, false);
+
+        // Test "addLocalPort" and with port not matching in both patterns
+        apat = allow_pat + PORT_NO_MATCH_PATTERN;
+        dpat = deny_pat + PORT_NO_MATCH_PATTERN;
+        oneTest(null, null, false, true, AllowAndDeny,  type, false);
+        oneTest(null, null, true,  true, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, true, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, null, true,  true, AllowAndDeny,  type, false);
+        oneTest(apat, null, true,  true, NoAllowNoDeny, type, false);
+        oneTest(null, dpat, false, true, AllowAndDeny,  type, true);
+        oneTest(null, dpat, false, true, NoAllowNoDeny, type, true);
+        oneTest(null, dpat, true,  true, AllowAndDeny,  type, true);
+        oneTest(null, dpat, true,  true, NoAllowNoDeny, type, true);
+        oneTest(apat, dpat, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, false, true, OnlyAllow,     type, false);
+        oneTest(apat, dpat, false, true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, false, true, AllowAndDeny,  type, false);
+        oneTest(apat, dpat, true,  true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, true,  true, OnlyAllow,     type, false);
+        oneTest(apat, dpat, true,  true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, true,  true, AllowAndDeny,  type, false);
+
+        // Test "addLocalPort" and with port matching only in allow
+        apat = allow_pat + PORT_MATCH_PATTERN;
+        dpat = deny_pat + PORT_NO_MATCH_PATTERN;
+        oneTest(null, null, false, true, AllowAndDeny,  type, false);
+        oneTest(null, null, true,  true, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, true, AllowAndDeny,  type, true);
+        oneTest(apat, null, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, null, true,  true, AllowAndDeny,  type, true);
+        oneTest(apat, null, true,  true, NoAllowNoDeny, type, false);
+        oneTest(null, dpat, false, true, AllowAndDeny,  type, true);
+        oneTest(null, dpat, false, true, NoAllowNoDeny, type, true);
+        oneTest(null, dpat, true,  true, AllowAndDeny,  type, true);
+        oneTest(null, dpat, true,  true, NoAllowNoDeny, type, true);
+        oneTest(apat, dpat, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, false, true, OnlyAllow,     type, true);
+        oneTest(apat, dpat, false, true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, false, true, AllowAndDeny,  type, true);
+        oneTest(apat, dpat, true,  true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, true,  true, OnlyAllow,     type, true);
+        oneTest(apat, dpat, true,  true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, true,  true, AllowAndDeny,  type, true);
+
+        // Test "addLocalPort" and with port matching only in deny
+        apat = allow_pat + PORT_NO_MATCH_PATTERN;
+        dpat = deny_pat + PORT_MATCH_PATTERN;
+        oneTest(null, null, false, true, AllowAndDeny,  type, false);
+        oneTest(null, null, true,  true, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, true, AllowAndDeny,  type, false);
+        oneTest(apat, null, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, null, true,  true, AllowAndDeny,  type, false);
+        oneTest(apat, null, true,  true, NoAllowNoDeny, type, false);
+        oneTest(null, dpat, false, true, AllowAndDeny,  type, false);
+        oneTest(null, dpat, false, true, NoAllowNoDeny, type, true);
+        oneTest(null, dpat, true,  true, AllowAndDeny,  type, false);
+        oneTest(null, dpat, true,  true, NoAllowNoDeny, type, true);
+        oneTest(apat, dpat, false, true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, false, true, OnlyAllow,     type, false);
+        oneTest(apat, dpat, false, true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, false, true, AllowAndDeny,  type, false);
+        oneTest(apat, dpat, true,  true, NoAllowNoDeny, type, false);
+        oneTest(apat, dpat, true,  true, OnlyAllow,     type, false);
+        oneTest(apat, dpat, true,  true, OnlyDeny,      type, false);
+        oneTest(apat, dpat, true,  true, AllowAndDeny,  type, false);
     }
 
     @Test
