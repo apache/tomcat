@@ -455,15 +455,15 @@
 <section name="Access Control">
 
 
-<subsection name="Remote Address Filter">
+<subsection name="Remote Address Valve">
 
   <subsection name="Introduction">
 
-    <p>The <strong>Remote Address Filter</strong> allows you to compare the
+    <p>The <strong>Remote Address Valve</strong> allows you to compare the
     IP address of the client that submitted this request against one or more
     <em>regular expressions</em>, and either allow the request to continue
     or refuse to process the request from this client.  A Remote Address
-    Filter can be associated with any Catalina container
+    Valve can be associated with any Catalina container
     (<a href="engine.html">Engine</a>, <a href="host.html">Host</a>, or
     <a href="context.html">Context</a>), and must accept any request
     presented to this container for processing before it will be passed on.</p>
@@ -484,13 +484,13 @@
     will be <code>0:0:0:0:0:0:0:1</code> instead of the more widely used
     <code>::1</code>. Consult your access logs for the actual value.</p>
 
-    <p>See also: <a href="#Remote_Host_Filter">Remote Host Filter</a>,
+    <p>See also: <a href="#Remote_Host_Valve">Remote Host Valve</a>,
     <a href="#Remote_IP_Valve">Remote IP Valve</a>.</p>
   </subsection>
 
   <subsection name="Attributes">
 
-    <p>The <strong>Remote Address Filter</strong> supports the following
+    <p>The <strong>Remote Address Valve</strong> supports the following
     configuration attributes:</p>
 
     <attributes>
@@ -554,15 +554,15 @@
 </subsection>
 
 
-<subsection name="Remote Host Filter">
+<subsection name="Remote Host Valve">
 
   <subsection name="Introduction">
 
-    <p>The <strong>Remote Host Filter</strong> allows you to compare the
+    <p>The <strong>Remote Host Valve</strong> allows you to compare the
     hostname of the client that submitted this request against one or more
     <em>regular expressions</em>, and either allow the request to continue
     or refuse to process the request from this client.  A Remote Host
-    Filter can be associated with any Catalina container
+    Valve can be associated with any Catalina container
     (<a href="engine.html">Engine</a>, <a href="host.html">Host</a>, or
     <a href="context.html">Context</a>), and must accept any request
     presented to this container for processing before it will be passed on.</p>
@@ -580,13 +580,13 @@
     to return proper host names, you have to enable "DNS lookups" feature on
     a <strong>Connector</strong>.</p>
 
-    <p>See also: <a href="#Remote_Address_Filter">Remote Address Filter</a>,
+    <p>See also: <a href="#Remote_Address_Valve">Remote Address Valve</a>,
     <a href="http.html">HTTP Connector</a> configuration.</p>
   </subsection>
 
   <subsection name="Attributes">
 
-    <p>The <strong>Remote Host Filter</strong> supports the following
+    <p>The <strong>Remote Host Valve</strong> supports the following
     configuration attributes:</p>
 
     <attributes>
