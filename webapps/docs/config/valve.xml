@@ -473,8 +473,8 @@
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
-    <p>Optionally one can append the local server port separated with a
-    comma (",") to allow different expressions for each connector.</p>
+    <p>Optionally one can append the server connector port separated with a
+    comma (";") to allow different expressions for each connector.</p>
 
     <p>The behavior when a request is refused can be changed
     to not deny but instead set an invalid <code>authentication</code>
@@ -528,11 +528,11 @@
         it can be set to the value <code>404</code>.</p>
       </attribute>
 
-      <attribute name="addLocalPort" required="false">
-        <p>Append the local server port to the client IP address separated
-        with a comma (","). If this is set to <code>true</code>, the
+      <attribute name="addConnectorPort" required="false">
+        <p>Append the server connector port to the client IP address separated
+        with a semicolon (";"). If this is set to <code>true</code>, the
         expressions configured with <code>allow</code> and
-        <code>deny</code> is compared against <code>ADDRESS-PORT</code>
+        <code>deny</code> is compared against <code>ADDRESS;PORT</code>
         where <code>ADDRESS</code> is the client IP address and
         <code>PORT</code> is the Tomcat connector port which received the
         request. The default value is <code>false</code>.</p>
@@ -545,8 +545,8 @@
         set. An already existing <code>authentication</code> header will not be
         overwritten. In effect this will trigger authentication instead of deny
         even if the application does not have a security constraint configured.</p>
-        <p>This can be combined with <code>addLocalPort</code> to trigger authentication
-        depending on the client and the port that is used to access an application.</p>
+        <p>This can be combined with <code>addConnectorPort</code> to trigger authentication
+        depending on the client and the connector that is used to access an application.</p>
       </attribute>
 
     </attributes>
@@ -563,8 +563,22 @@
     <p>To allow unrestricted access for the clients connecting from localhost
     but for all other clients only to port 8443:</p>
     <source><![CDATA[<Valve className="org.apache.catalina.valves.RemoteAddrValve"
-   addLocalPort="true"
-   allow="127\.\d+\.\d+\.\d+,\d*|::1,\d*|0:0:0:0:0:0:0:1,\d*|.*,8443"/>]]></source>
+   addConnectorPort="true"
+   allow="127\.\d+\.\d+\.\d+;\d*|::1;\d*|0:0:0:0:0:0:0:1;\d*|.*;8443"/>]]></source>
+  </subsection>
+
+  <subsection name="Example">
+    <p>To allow unrestricted access to port 8009, but trigger basic
+    authentication if the application is access on another port:</p>
+<source><![CDATA[<Context>
+  ...
+  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         addConnectorPort="true"
+         invalidAuthenticationWhenDeny="true"
+         allow=".*;8009"/>
+  <Valve className="org.apache.catalina.authenticator.BasicAuthenticator" />
+  ...
+</Context>]]></source>
   </subsection>
 
 </subsection>
@@ -588,8 +602,8 @@
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
-    <p>Optionally one can append the local server port separated with a
-    comma (",") to allow different expressions for each connector.</p>
+    <p>Optionally one can append the server connector port separated with a
+    comma (";") to allow different expressions for each connector.</p>
 
     <p>The behavior when a request is refused can be changed
     to not deny but instead set an invalid <code>authentication</code>
@@ -640,11 +654,11 @@
         it can be set to the value <code>404</code>.</p>
       </attribute>
 
-      <attribute name="addLocalPort" required="false">
-        <p>Append the local server port to the client hostname separated
-        with a comma (","). If this is set to <code>true</code>, the
+      <attribute name="addConnectorPort" required="false">
+        <p>Append the server connector port to the client hostname separated
+        with a comma (";"). If this is set to <code>true</code>, the
         expressions configured with <code>allow</code> and
-        <code>deny</code> is compared against <code>HOSTNAME-PORT</code>
+        <code>deny</code> is compared against <code>HOSTNAME;PORT</code>
         where <code>HOSTNAME</code> is the client hostname and
         <code>PORT</code> is the Tomcat connector port which received the
         request. The default value is <code>false</code>.</p>
@@ -657,8 +671,8 @@
         set. An already existing <code>authentication</code> header will not be
         overwritten. In effect this will trigger authentication instead of deny
         even if the application does not have a security constraint configured.</p>
-        <p>This can be combined with <code>addLocalPort</code> to trigger authentication
-        depending on the client and the port that is used to access an application.</p>
+        <p>This can be combined with <code>addConnectorPort</code> to trigger authentication
+        depending on the client and the connector that is used to access an application.</p>
       </attribute>
 
     </attributes>
