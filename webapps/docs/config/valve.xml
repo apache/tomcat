@@ -473,6 +473,9 @@
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
 
+    <p>Optionally one can append the local server port separated with a
+    comma (",") to allow different expressions for each connector.</p>
+
     <p><strong>Note:</strong> There is a caveat when using this valve with
     IPv6 addresses. Format of the IP address that this valve is processing
     depends on the API that was used to obtain it. If the address was obtained
@@ -511,13 +514,23 @@
         remote client's IP address is compared to.  If this attribute
         is specified, the remote address MUST NOT match for this request to be
         accepted.  If this attribute is not specified, request acceptance is
-        governed solely by the <code>accept</code> attribute.</p>
+        governed solely by the <code>allow</code> attribute.</p>
       </attribute>
 
       <attribute name="denyStatus" required="false">
         <p>HTTP response status code that is used when rejecting denied
         request. The default value is <code>403</code>. For example,
         it can be set to the value <code>404</code>.</p>
+      </attribute>
+
+      <attribute name="addLocalPort" required="false">
+        <p>Append the local server port to the client IP address separated
+        with a comma (","). If this is set to <code>true</code>, the
+        expressions configured with <code>allow</code> and
+        <code>deny</code> is compared against <code>ADDRESS-PORT</code>
+        where <code>ADDRESS</code> is the client IP address and
+        <code>PORT</code> is the Tomcat connector port which received the
+        request. The default value is <code>false</code>.</p>
       </attribute>
 
     </attributes>
@@ -528,6 +541,14 @@
     <p>To allow access only for the clients connecting from localhost:</p>
     <source><![CDATA[<Valve className="org.apache.catalina.valves.RemoteAddrValve"
    allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1"/>]]></source>
+  </subsection>
+
+  <subsection name="Example">
+    <p>To allow unrestricted access for the clients connecting from localhost
+    but for all other clients only to port 8443:</p>
+    <source><![CDATA[<Valve className="org.apache.catalina.valves.RemoteAddrValve"
+   addLocalPort="true"
+   allow="127\.\d+\.\d+\.\d+,\d*|::1,\d*|0:0:0:0:0:0:0:1,\d*|.*,8443"/>]]></source>
   </subsection>
 
 </subsection>
@@ -550,6 +571,9 @@
     'standard' wildcard matching. Tomcat uses the <code>java.util.regex</code>
     package. Please consult the Java documentation for details of the
     expressions supported.</p>
+
+    <p>Optionally one can append the local server port separated with a
+    comma (",") to allow different expressions for each connector.</p>
 
     <p><strong>Note:</strong> This filter processes the value returned by
     method <code>ServletRequest.getRemoteHost()</code>. To allow the method
@@ -586,13 +610,23 @@
         remote client's hostname is compared to.  If this attribute
         is specified, the remote hostname MUST NOT match for this request to be
         accepted.  If this attribute is not specified, request acceptance is
-        governed solely by the <code>accept</code> attribute.</p>
+        governed solely by the <code>allow</code> attribute.</p>
       </attribute>
 
       <attribute name="denyStatus" required="false">
         <p>HTTP response status code that is used when rejecting denied
         request. The default value is <code>403</code>. For example,
         it can be set to the value <code>404</code>.</p>
+      </attribute>
+
+      <attribute name="addLocalPort" required="false">
+        <p>Append the local server port to the client hostname separated
+        with a comma (","). If this is set to <code>true</code>, the
+        expressions configured with <code>allow</code> and
+        <code>deny</code> is compared against <code>HOSTNAME-PORT</code>
+        where <code>HOSTNAME</code> is the client hostname and
+        <code>PORT</code> is the Tomcat connector port which received the
+        request. The default value is <code>false</code>.</p>
       </attribute>
 
     </attributes>
