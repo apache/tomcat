@@ -329,10 +329,15 @@
   </mbean>
 
   <mbean name="RemoteAddrValve"
-         description="Concrete implementation of RequestFilterValve that  filters based on the string representation of the remote client's IP address"
+         description="Concrete implementation of RequestFilterValve that filters based on the string representation of the remote client's IP address"
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.valves.RemoteAddrValve">
+
+    <attribute name="addConnectorPort"
+               description="Append the server connector port to the client IP separated by a semicolon"
+               is="true"
+               type="boolean"/>
 
     <attribute name="allow"
                description="The allow expression"
@@ -349,12 +354,12 @@
                is="true"
                type="boolean"/>
 
-    <attribute   name="className"
+    <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
 
-    <attribute   name="deny"
+    <attribute name="deny"
                description="The deny expression"
                type="java.lang.String"/>
 
@@ -367,6 +372,11 @@
                is="true"
                type="boolean"
                writeable="false"/>
+
+    <attribute name="invalidAuthenticationWhenDeny"
+               description="Send an invalid authentication header instead of deny"
+               is="true"
+               type="boolean"/>
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
@@ -389,6 +399,11 @@
          group="Valve"
          type="org.apache.catalina.valves.RemoteHostValve">
 
+    <attribute name="addConnectorPort"
+               description="Append the server connector port to the client IP separated by a semicolon"
+               is="true"
+               type="boolean"/>
+
     <attribute name="allow"
                description="The allow expression"
                type="java.lang.String"/>
@@ -404,12 +419,12 @@
                is="true"
                type="boolean"/>
 
-    <attribute   name="className"
+    <attribute name="className"
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
 
-    <attribute   name="deny"
+    <attribute name="deny"
                description="The deny expression"
                type="java.lang.String"/>
 
@@ -422,6 +437,11 @@
                is="true"
                type="boolean"
                writeable="false"/>
+
+    <attribute name="invalidAuthenticationWhenDeny"
+               description="Send an invalid authentication header instead of deny"
+               is="true"
+               type="boolean"/>
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"

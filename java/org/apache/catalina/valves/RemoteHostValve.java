@@ -28,7 +28,7 @@ import org.apache.catalina.connector.Response;
 /**
  * Concrete implementation of <code>RequestFilterValve</code> that filters
  * based on the remote client's host name optionally combined with the
- * server port number.
+ * server connector port number.
  *
  * @author Craig R. McClanahan
  */
@@ -37,34 +37,34 @@ public final class RemoteHostValve extends RequestFilterValve {
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * Flag deciding whether we add the server port to the property
+     * Flag deciding whether we add the server connector port to the property
      * compared in the filtering method. The port will be appended
-     * using a "," as a separator.
+     * using a ";" as a separator.
      */
-    protected volatile boolean addLocalPort = false;
+    protected volatile boolean addConnectorPort = false;
 
     // ------------------------------------------------------------- Properties
 
 
     /**
-     * Get the flag deciding whether we add the server port to the
+     * Get the flag deciding whether we add the server connector port to the
      * property compared in the filtering method. The port will be appended
-     * using a "," as a separator.
+     * using a ";" as a separator.
      */
-    public boolean getAddLocalPort() {
-        return addLocalPort;
+    public boolean getAddConnectorPort() {
+        return addConnectorPort;
     }
 
 
     /**
-     * Set the flag deciding whether we add the server port to the
+     * Set the flag deciding whether we add the server connector port to the
      * property compared in the filtering method. The port will be appended
-     * using a "," as a separator.
+     * using a ";" as a separator.
      *
-     * @param addLocalPort The new flag
+     * @param addConnectorPort The new flag
      */
-    public void setAddLocalPort(boolean addLocalPort) {
-        this.addLocalPort = addLocalPort;
+    public void setAddConnectorPort(boolean addConnectorPort) {
+        this.addConnectorPort = addConnectorPort;
     }
 
 
@@ -87,8 +87,8 @@ public final class RemoteHostValve extends RequestFilterValve {
         throws IOException, ServletException {
 
         String property;
-        if (addLocalPort) {
-            property = request.getRequest().getRemoteHost() + "," + request.getConnector().getPort();
+        if (addConnectorPort) {
+            property = request.getRequest().getRemoteHost() + ";" + request.getConnector().getPort();
         } else {
             property = request.getRequest().getRemoteHost();
         }

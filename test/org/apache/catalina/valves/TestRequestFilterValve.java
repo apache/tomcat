@@ -56,8 +56,8 @@ public class TestRequestFilterValve {
     private static final String HOST_NO_ALLOW_NO_DENY = "host.example.com";
 
     private static final int PORT = 8080;
-    private static final String PORT_MATCH_PATTERN    = ",\\d*";
-    private static final String PORT_NO_MATCH_PATTERN = ",8081";
+    private static final String PORT_MATCH_PATTERN    = ";\\d*";
+    private static final String PORT_NO_MATCH_PATTERN = ";8081";
 
 
     static class TerminatingValve extends ValveBase {
@@ -81,7 +81,7 @@ public class TestRequestFilterValve {
     }
 
     private void oneTest(String allow, String deny, boolean denyStatus,
-                         boolean addLocalPort, boolean auth,
+                         boolean addConnectorPort, boolean auth,
                          String property, String type, boolean allowed) {
         // PREPARE
         RequestFilterValve valve = null;
@@ -94,7 +94,7 @@ public class TestRequestFilterValve {
 
         connector.setPort(PORT);
         request.setConnector(connector);
-        request.setContext(context);
+        request.getMappingData().context = context;
         request.setCoyoteRequest(new org.apache.coyote.Request());
 
         if (type == null) {
@@ -130,15 +130,15 @@ public class TestRequestFilterValve {
                 expected = CUSTOM;
             }
         }
-        if (addLocalPort) {
+        if (addConnectorPort) {
             if (valve instanceof RemoteAddrValve) {
-                ((RemoteAddrValve)valve).setAddLocalPort(true);
+                ((RemoteAddrValve)valve).setAddConnectorPort(true);
             } else if (valve instanceof RemoteHostValve) {
-                ((RemoteHostValve)valve).setAddLocalPort(true);
+                ((RemoteHostValve)valve).setAddConnectorPort(true);
             } else {
-                fail("Can only set 'addLocalPort' for RemoteAddrValve and RemoteHostValve");
+                fail("Can only set 'addConnectorPort' for RemoteAddrValve and RemoteHostValve");
             }
-            msg.append(" addLocalPort='true'");
+            msg.append(" addConnectorPort='true'");
         }
         if (auth) {
             context.setPreemptiveAuthentication(true);
@@ -193,7 +193,7 @@ public class TestRequestFilterValve {
         oneTest(apat, dpat, true,  false, auth, OnlyDeny,      type, false);
         oneTest(apat, dpat, true,  false, auth, AllowAndDeny,  type, false);
 
-        // Test with port in pattern but forgotten "addLocalPort"
+        // Test with port in pattern but forgotten "addConnectorPort"
         apat = allow_pat + PORT_MATCH_PATTERN;
         dpat = deny_pat + PORT_MATCH_PATTERN;
         oneTest(null, null, false, false, auth, AllowAndDeny,  type, false);
@@ -215,7 +215,7 @@ public class TestRequestFilterValve {
         oneTest(apat, dpat, true,  false, auth, OnlyDeny,      type, false);
         oneTest(apat, dpat, true,  false, auth, AllowAndDeny,  type, false);
 
-        // Test with "addLocalPort" but port not in pattern
+        // Test with "addConnectorPort" but port not in pattern
         apat = allow_pat;
         dpat = deny_pat;
         oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
@@ -237,7 +237,7 @@ public class TestRequestFilterValve {
         oneTest(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
         oneTest(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
 
-        // Test "addLocalPort" and with port matching in both patterns
+        // Test "addConnectorPort" and with port matching in both patterns
         apat = allow_pat + PORT_MATCH_PATTERN;
         dpat = deny_pat + PORT_MATCH_PATTERN;
         oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
@@ -259,7 +259,7 @@ public class TestRequestFilterValve {
         oneTest(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
         oneTest(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
 
-        // Test "addLocalPort" and with port not matching in both patterns
+        // Test "addConnectorPort" and with port not matching in both patterns
         apat = allow_pat + PORT_NO_MATCH_PATTERN;
         dpat = deny_pat + PORT_NO_MATCH_PATTERN;
         oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
@@ -281,7 +281,7 @@ public class TestRequestFilterValve {
         oneTest(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
         oneTest(apat, dpat, true,  true, auth, AllowAndDeny,  type, false);
 
-        // Test "addLocalPort" and with port matching only in allow
+        // Test "addConnectorPort" and with port matching only in allow
         apat = allow_pat + PORT_MATCH_PATTERN;
         dpat = deny_pat + PORT_NO_MATCH_PATTERN;
         oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
@@ -303,7 +303,7 @@ public class TestRequestFilterValve {
         oneTest(apat, dpat, true,  true, auth, OnlyDeny,      type, false);
         oneTest(apat, dpat, true,  true, auth, AllowAndDeny,  type, true);
 
-        // Test "addLocalPort" and with port matching only in deny
+        // Test "addConnectorPort" and with port matching only in deny
         apat = allow_pat + PORT_NO_MATCH_PATTERN;
         dpat = deny_pat + PORT_MATCH_PATTERN;
         oneTest(null, null, false, true, auth, AllowAndDeny,  type, false);
