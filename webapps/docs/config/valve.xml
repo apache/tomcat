@@ -476,6 +476,11 @@
     <p>Optionally one can append the local server port separated with a
     comma (",") to allow different expressions for each connector.</p>
 
+    <p>The behavior when a request is refused can be changed
+    to not deny but instead set an invalid <code>authentication</code>
+    header. This is useful in combination with the context attribute
+    <code>preemptiveAuthentication="true"</code>.</p>
+
     <p><strong>Note:</strong> There is a caveat when using this valve with
     IPv6 addresses. Format of the IP address that this valve is processing
     depends on the API that was used to obtain it. If the address was obtained
@@ -533,6 +538,17 @@
         request. The default value is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="invalidAuthenticationWhenDeny" required="false">
+        <p>When a request should be denied, do not deny but instead
+        set an invalid <code>authentication</code> header. This only works
+        if the context has the attribute <code>preemptiveAuthentication="true"</code>
+        set. An already existing <code>authentication</code> header will not be
+        overwritten. In effect this will trigger authentication instead of deny
+        even if the application does not have a security constraint configured.</p>
+        <p>This can be combined with <code>addLocalPort</code> to trigger authentication
+        depending on the client and the port that is used to access an application.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -574,6 +590,11 @@
 
     <p>Optionally one can append the local server port separated with a
     comma (",") to allow different expressions for each connector.</p>
+
+    <p>The behavior when a request is refused can be changed
+    to not deny but instead set an invalid <code>authentication</code>
+    header. This is useful in combination with the context attribute
+    <code>preemptiveAuthentication="true"</code>.</p>
 
     <p><strong>Note:</strong> This filter processes the value returned by
     method <code>ServletRequest.getRemoteHost()</code>. To allow the method
@@ -627,6 +648,17 @@
         where <code>HOSTNAME</code> is the client hostname and
         <code>PORT</code> is the Tomcat connector port which received the
         request. The default value is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="invalidAuthenticationWhenDeny" required="false">
+        <p>When a request should be denied, do not deny but instead
+        set an invalid <code>authentication</code> header. This only works
+        if the context has the attribute <code>preemptiveAuthentication="true"</code>
+        set. An already existing <code>authentication</code> header will not be
+        overwritten. In effect this will trigger authentication instead of deny
+        even if the application does not have a security constraint configured.</p>
+        <p>This can be combined with <code>addLocalPort</code> to trigger authentication
+        depending on the client and the port that is used to access an application.</p>
       </attribute>
 
     </attributes>
