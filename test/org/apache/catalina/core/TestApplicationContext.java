@@ -168,6 +168,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         Context foo1 = new StandardContext();
         foo1.setName("/foo##1");
         foo1.setPath("/foo");
+        foo1.setWebappVersion("1");
         foo1.addLifecycleListener(new FixContextListener());
         foo1.addLifecycleListener(new SetIdListener("foo1"));
         tomcat.getHost().addChild(foo1);
@@ -175,6 +176,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         Context foo2 = new StandardContext();
         foo2.setName("/foo##2");
         foo2.setPath("/foo");
+        foo2.setWebappVersion("2");
         foo2.addLifecycleListener(new FixContextListener());
         foo2.addLifecycleListener(new SetIdListener("foo2"));
         tomcat.getHost().addChild(foo2);
