@@ -168,6 +168,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     @Override
     public void sendPing(ByteBuffer applicationData) throws IOException,
             IllegalArgumentException {
+        if (applicationData.remaining() > 125) {
+            throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.tooMuchData"));
+        }
         startMessageBlock(Constants.OPCODE_PING, applicationData, true);
     }
 
@@ -175,6 +178,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     @Override
     public void sendPong(ByteBuffer applicationData) throws IOException,
             IllegalArgumentException {
+        if (applicationData.remaining() > 125) {
+            throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.tooMuchData"));
+        }
         startMessageBlock(Constants.OPCODE_PONG, applicationData, true);
     }
 
@@ -582,7 +588,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 throw new EncodeException(obj, sm.getString(
                         "wsRemoteEndpoint.noEncoder", obj.getClass()));
             }
-        } catch (EncodeException | IOException e) {
+        } catch (Exception e) {
             SendResult sr = new SendResult(e);
             completion.onResult(sr);
         }
