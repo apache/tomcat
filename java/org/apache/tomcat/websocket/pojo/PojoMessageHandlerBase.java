@@ -116,7 +116,7 @@ public abstract class PojoMessageHandlerBase<T>
         if (t instanceof RuntimeException) {
             throw (RuntimeException) t;
         } else {
-            throw new RuntimeException(t);
+            throw new RuntimeException(t.getMessage(), t);
         }
     }
 }
