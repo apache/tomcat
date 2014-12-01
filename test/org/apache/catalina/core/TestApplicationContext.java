@@ -16,20 +16,30 @@
  */
 package org.apache.catalina.core;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
 
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.Tomcat.FixContextListener;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -145,5 +155,86 @@ public class TestApplicationContext extends TomcatBaseTest {
     public void testSetInitParameter() throws Exception {
         getTomcatInstance().start();
         getServletContext().setInitParameter("name", "value");
+    }
+
+
+    /*
+     * Cross-context requests with parallel deployment
+     */
+    @Test
+    public void testBug57190() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context foo1 = new StandardContext();
+        foo1.setName("/foo##1");
+        foo1.setPath("/foo");
+        foo1.addLifecycleListener(new FixContextListener());
+        foo1.addLifecycleListener(new SetIdListener("foo1"));
+        tomcat.getHost().addChild(foo1);
+
+        Context foo2 = new StandardContext();
+        foo2.setName("/foo##2");
+        foo2.setPath("/foo");
+        foo2.addLifecycleListener(new FixContextListener());
+        foo2.addLifecycleListener(new SetIdListener("foo2"));
+        tomcat.getHost().addChild(foo2);
+
+        Context bar = tomcat.addContext("/bar", null);
+        bar.addLifecycleListener(new SetIdListener("bar"));
+
+        Context ctx = tomcat.addContext("", null);
+        ctx.setCrossContext(true);
+
+        Tomcat.addServlet(ctx, "Bug57190Servlet", new Bug57190Servlet());
+        ctx.addServletMapping("/", "Bug57190Servlet");
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+        String body = res.toString();
+
+        Assert.assertTrue(body, body.contains("01-bar"));
+        // TODO This should pass once the bug is fixed
+        // Assert.assertTrue(body, body.contains("02-foo2"));
+        Assert.assertTrue(body, body.contains("03-foo1"));
+        Assert.assertTrue(body, body.contains("04-foo2"));
+        // TODO This should pass once the bug is fixed
+        // Assert.assertTrue(body, body.contains("05-foo2"));
+    }
+
+
+    private static class Bug57190Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            PrintWriter pw = resp.getWriter();
+            ServletContext sc = req.getServletContext();
+            pw.println("01-" + sc.getContext("/bar").getInitParameter("id"));
+            pw.println("02-" + sc.getContext("/foo").getInitParameter("id"));
+            pw.println("03-" + sc.getContext("/foo##1").getInitParameter("id"));
+            pw.println("04-" + sc.getContext("/foo##2").getInitParameter("id"));
+            pw.println("05-" + sc.getContext("/foo##3").getInitParameter("id"));
+        }
+    }
+
+
+    private static class SetIdListener implements LifecycleListener {
+
+        private final String id;
+
+        public SetIdListener(String id) {
+            this.id = id;
+        }
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType())) {
+                ((Context) event.getSource()).getServletContext().setInitParameter("id", id);
+            }
+        }
     }
 }
