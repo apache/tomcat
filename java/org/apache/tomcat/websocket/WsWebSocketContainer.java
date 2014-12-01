@@ -218,7 +218,7 @@ public class WsWebSocketContainer
                     sm.getString("wsWebSocketContainer.pathNoHost"));
         }
         int port = path.getPort();
-        Map<String,List<String>> reqHeaders = createRequestHeaders(path, host, port,
+        Map<String,List<String>> reqHeaders = createRequestHeaders(host, port,
                 clientEndpointConfiguration.getPreferredSubprotocols(),
                 clientEndpointConfiguration.getExtensions());
         clientEndpointConfiguration.getConfigurator().
@@ -442,7 +442,7 @@ public class WsWebSocketContainer
         return result;
     }
 
-    private Map<String,List<String>> createRequestHeaders(URI path, String host,
+    private Map<String,List<String>> createRequestHeaders(String host,
             int port, List<String> subProtocols, List<Extension> extensions) {
 
         Map<String,List<String>> headers = new HashMap<>();
