@@ -650,7 +650,7 @@ public final class CorsFilter implements Filter {
                                 requestType = CORSRequestType.ACTUAL;
                             }
                         }
-                    } else if (COMPLEX_HTTP_METHODS.contains(method)) {
+                    } else {
                         requestType = CORSRequestType.ACTUAL;
                     }
                 }
@@ -1034,7 +1034,11 @@ public final class CorsFilter implements Filter {
                     "PUT", "DELETE", "TRACE", "CONNECT"));
     /**
      * {@link Collection} of non-simple HTTP methods. Case sensitive.
+     * @deprecated Not used. Will be removed in Tomcat 9.0.x onwards. All HTTP
+     *             methods not in {@link #HTTP_METHODS} are assumed to be
+     *             non-simple.
      */
+    @Deprecated
     public static final Collection<String> COMPLEX_HTTP_METHODS =
             new HashSet<String>(Arrays.asList("PUT", "DELETE", "TRACE",
                     "CONNECT"));

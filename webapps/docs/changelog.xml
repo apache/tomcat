@@ -63,6 +63,10 @@
         annotation scanning in some cases. (markt)
       </fix>
       <fix>
+        <bug>57180</bug>: Do not limit the CORS filter to only accepting
+        requests that use an HTTP method defined in RFC 7231. (markt)
+      </fix>
+      <fix>
         <bug>57208</bug>: Prevent NPE in JNDI Realm when no results are found
         in a directory context for a user with specified user name. Based on
         a patch provided by Jason McIntosh. (violetagg)
