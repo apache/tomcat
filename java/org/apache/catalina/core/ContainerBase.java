@@ -752,9 +752,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-
         support.addPropertyChangeListener(listener);
-
     }
 
 
@@ -766,13 +764,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public Container findChild(String name) {
-
-        if (name == null)
-            return (null);
+        if (name == null) {
+            return null;
+        }
         synchronized (children) {
             return children.get(name);
         }
-
     }
 
 
@@ -782,12 +779,10 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public Container[] findChildren() {
-
         synchronized (children) {
             Container results[] = new Container[children.size()];
             return children.values().toArray(results);
         }
-
     }
 
 
