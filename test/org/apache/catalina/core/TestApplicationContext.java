@@ -194,12 +194,10 @@ public class TestApplicationContext extends TomcatBaseTest {
         String body = res.toString();
 
         Assert.assertTrue(body, body.contains("01-bar"));
-        // TODO This should pass once the bug is fixed
-        // Assert.assertTrue(body, body.contains("02-foo2"));
+        Assert.assertTrue(body, body.contains("02-foo2"));
         Assert.assertTrue(body, body.contains("03-foo1"));
         Assert.assertTrue(body, body.contains("04-foo2"));
-        // TODO This should pass once the bug is fixed
-        // Assert.assertTrue(body, body.contains("05-foo2"));
+        Assert.assertTrue(body, body.contains("05-foo2"));
     }
 
 
