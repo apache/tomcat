@@ -390,8 +390,10 @@ public abstract class WsFrameBase {
                         messageBufferText.toString(), last);
             } else {
                 // Caller ensures last == true if this branch is used
-                ((MessageHandler.Whole<String>) textMsgHandler).onMessage(
-                        messageBufferText.toString());
+                if (messageBufferText.remaining() > 0) {
+                    ((MessageHandler.Whole<String>) textMsgHandler).onMessage(
+                            messageBufferText.toString());
+                }
             }
         } catch (Throwable t) {
             handleThrowableOnSend(t);
@@ -583,7 +585,9 @@ public abstract class WsFrameBase {
                 ((MessageHandler.Partial<ByteBuffer>) binaryMsgHandler).onMessage(msg, last);
             } else {
                 // Caller ensures last == true if this branch is used
-                ((MessageHandler.Whole<ByteBuffer>) binaryMsgHandler).onMessage(msg);
+                if (msg.remaining() > 0) {
+                    ((MessageHandler.Whole<ByteBuffer>) binaryMsgHandler).onMessage(msg);
+                }
             }
         } catch(Throwable t) {
             handleThrowableOnSend(t);
