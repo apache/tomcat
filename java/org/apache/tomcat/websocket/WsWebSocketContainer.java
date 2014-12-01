@@ -245,7 +245,7 @@ public class WsWebSocketContainer
         // Origin header
         if (!reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
             List<String> originValues = new ArrayList<>(1);
-            StringBuffer originValue = new StringBuffer();
+            StringBuilder originValue = new StringBuilder();
             originValue.append(path.getScheme()).append("://").append(path.getHost());
             if (port != -1) {
                 originValue.append(':').append(port);
