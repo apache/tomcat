@@ -224,8 +224,6 @@ public class WsWebSocketContainer
         clientEndpointConfiguration.getConfigurator().
                 beforeRequest(reqHeaders);
 
-        ByteBuffer request = createRequest(path, reqHeaders);
-
         SocketAddress sa;
         if (port == -1) {
             if ("ws".equalsIgnoreCase(scheme)) {
@@ -243,6 +241,20 @@ public class WsWebSocketContainer
             }
             sa = new InetSocketAddress(host, port);
         }
+
+        // Origin header
+        if (!reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
+            List<String> originValues = new ArrayList<>(1);
+            StringBuffer originValue = new StringBuffer();
+            originValue.append(path.getScheme()).append("://").append(path.getHost());
+            if (port != -1) {
+                originValue.append(':').append(port);
+            }
+            originValues.add(originValue.toString());
+            reqHeaders.put(Constants.ORIGIN_HEADER_NAME, originValues);
+        }
+
+        ByteBuffer request = createRequest(path, reqHeaders);
 
         AsynchronousSocketChannel socketChannel;
         try {
@@ -475,11 +487,6 @@ public class WsWebSocketContainer
             headers.put(Constants.WS_EXTENSIONS_HEADER_NAME,
                     generateExtensionHeaders(extensions));
         }
-
-        // Origin header
-        List<String> originValues = new ArrayList<>(1);
-        originValues.add(path.toString());
-        headers.put(Constants.ORIGIN_HEADER_NAME, originValues);
 
         return headers;
     }
