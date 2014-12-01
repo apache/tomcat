@@ -875,12 +875,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private class WsOutputStream extends OutputStream {
+    private static class WsOutputStream extends OutputStream {
 
         private final WsRemoteEndpointImplBase endpoint;
         private final ByteBuffer buffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
         private final Object closeLock = new Object();
         private volatile boolean closed = false;
+        private volatile boolean used = false;
 
         public WsOutputStream(WsRemoteEndpointImplBase endpoint) {
             this.endpoint = endpoint;
@@ -913,6 +914,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 throw new IndexOutOfBoundsException();
             }
 
+            used = true;
             if (buffer.remaining() == 0) {
                 flush();
             }
@@ -951,9 +953,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         private void doWrite(boolean last) throws IOException {
-            buffer.flip();
-            endpoint.startMessageBlock(Constants.OPCODE_BINARY, buffer, last);
-            stateMachine.complete(last);
+            if (used) {
+                buffer.flip();
+                endpoint.startMessageBlock(Constants.OPCODE_BINARY, buffer, last);
+            }
+            endpoint.stateMachine.complete(last);
             buffer.clear();
         }
     }
@@ -965,6 +969,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private final CharBuffer buffer = CharBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
         private final Object closeLock = new Object();
         private volatile boolean closed = false;
+        private volatile boolean used = false;
 
         public WsWriter(WsRemoteEndpointImplBase endpoint) {
             this.endpoint = endpoint;
@@ -984,6 +989,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 throw new IndexOutOfBoundsException();
             }
 
+            used = true;
             if (buffer.remaining() == 0) {
                 flush();
             }
@@ -1022,9 +1028,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         private void doWrite(boolean last) throws IOException {
-            buffer.flip();
-            endpoint.sendPartialString(buffer, last);
-            buffer.clear();
+            if (used) {
+                buffer.flip();
+                endpoint.sendPartialString(buffer, last);
+                buffer.clear();
+            } else {
+                endpoint.stateMachine.complete(last);
+            }
         }
     }
 
