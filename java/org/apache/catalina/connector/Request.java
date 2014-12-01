@@ -1892,10 +1892,10 @@ public class Request
         }
         // Now allow for normalization and/or encoding. Essentially, keep
         // extending the candidate path up to the next slash until the decoded
-        //and normalized candidate path is the same as the canonical path.
+        // and normalized candidate path is the same as the canonical path.
         String candidate = uri.substring(0, pos);
         if (pos > 0) {
-            candidate = UDecoder.URLDecode(candidate);
+            candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
             candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
         }
         while (!canonicalContextPath.equals(candidate)) {
@@ -1904,7 +1904,7 @@ public class Request
                 return uri;
             }
             candidate = uri.substring(0, pos);
-            candidate = UDecoder.URLDecode(candidate);
+            candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
             candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
         }
         return uri.substring(0, pos);
