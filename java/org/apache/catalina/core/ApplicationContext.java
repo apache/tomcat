@@ -60,7 +60,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
-import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
@@ -270,16 +269,31 @@ public class ApplicationContext
 
         Context child = null;
         try {
-            Host host = (Host) context.getParent();
-            String mapuri = uri;
-            while (true) {
-                child = (Context) host.findChild(mapuri);
-                if (child != null)
-                    break;
-                int slash = mapuri.lastIndexOf('/');
-                if (slash < 0)
-                    break;
-                mapuri = mapuri.substring(0, slash);
+            // Look for an exact match
+            Container host = context.getParent();
+            child = (Context) host.findChild(uri);
+
+            // Remove any version information and use the mapper
+            if (child == null) {
+                int i = uri.indexOf("##");
+                if (i > -1) {
+                    uri = uri.substring(0, i);
+                }
+                // Note: This could be more efficient with a dedicated Mapper
+                //       method but such an implementation would require some
+                //       refactoring of the Mapper to avoid copy/paste of
+                //       existing code.
+                MessageBytes hostMB = MessageBytes.newInstance();
+                hostMB.setString(host.getName());
+
+                MessageBytes pathMB = MessageBytes.newInstance();
+                pathMB.setString(uri);
+
+                MappingData mappingData = new MappingData();
+                ((Engine) host.getParent()).getService().findConnectors()[0].getMapper().map(
+                        hostMB, pathMB, null, mappingData);
+
+                child = (Context) mappingData.context;
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);

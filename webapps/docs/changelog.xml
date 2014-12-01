@@ -67,6 +67,11 @@
         requests that use an HTTP method defined in RFC 7231. (markt)
       </fix>
       <fix>
+        <bug>57190</bug>: Fix <code>ServletContext.getContext(String)</code>
+        when parallel deployment is used so that the correct ServletContext is
+        returned. (markt) 
+      </fix>
+      <fix>
         <bug>57208</bug>: Prevent NPE in JNDI Realm when no results are found
         in a directory context for a user with specified user name. Based on
         a patch provided by Jason McIntosh. (violetagg)
