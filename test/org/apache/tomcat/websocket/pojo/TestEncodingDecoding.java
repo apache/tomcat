@@ -39,6 +39,7 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
+import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
@@ -48,7 +49,6 @@ import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -63,6 +63,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     private static final String PATH_PROGRAMMATIC_EP = "/echoProgrammaticEP";
     private static final String PATH_ANNOTATED_EP = "/echoAnnotatedEP";
     private static final String PATH_GENERICS_EP = "/echoGenericsEP";
+    private static final String PATH_MESSAGES_EP = "/echoMessagesEP";
 
 
     @Test
@@ -215,6 +216,61 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         session.close();
     }
 
+    //@Test
+    public void testMessagesEndPoints() throws Exception {
+        // Set up utility classes
+        MessagesServer server = new MessagesServer();
+        SingletonConfigurator.setInstance(server);
+        ServerConfigListener.setPojoClazz(MessagesServer.class);
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(ServerConfigListener.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+
+        tomcat.start();
+
+        StringClient client = new StringClient();
+        URI uri = new URI("ws://localhost:" + getPort() + PATH_MESSAGES_EP);
+        Session session = wsContainer.connectToServer(client, uri);
+
+        session.getBasicRemote().sendText(MESSAGE_ONE);
+
+        // Should not take very long
+        int i = 0;
+        while (i < 20) {
+            if (server.received.size() > 0 && client.received.size() > 0) {
+                break;
+            }
+            Thread.sleep(100);
+        }
+
+        // Check messages were received
+        Assert.assertEquals(1, server.received.size());
+        Assert.assertEquals(1, client.received.size());
+
+        // Check correct messages were received
+        Assert.assertEquals(MESSAGE_ONE, server.received.peek());
+        session.close();
+
+        Assert.assertNull(server.t);
+
+        // Should not take very long but some failures have been seen
+        i = testEvent(MsgStringEncoder.class.getName()+":init", 0);
+        i = testEvent(MsgStringDecoder.class.getName()+":init", i);
+        i = testEvent(MsgByteEncoder.class.getName()+":init", i);
+        i = testEvent(MsgByteDecoder.class.getName()+":init", i);
+        i = testEvent(MsgStringEncoder.class.getName()+":destroy", i);
+        i = testEvent(MsgStringDecoder.class.getName()+":destroy", i);
+        i = testEvent(MsgByteEncoder.class.getName()+":destroy", i);
+        i = testEvent(MsgByteDecoder.class.getName()+":destroy", i);
+    }
+
 
     private int testEvent(String name, int count) throws InterruptedException {
         int i = count;
@@ -260,6 +316,19 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
+    @ClientEndpoint
+    public static class StringClient {
+
+        private Queue<Object> received = new ConcurrentLinkedQueue<>();
+
+        @OnMessage
+        public void rx(String in) {
+            received.add(in);
+        }
+
+    }
+
+
     @ServerEndpoint(value=PATH_GENERICS_EP,
             decoders={ListStringDecoder.class},
             encoders={ListStringEncoder.class},
@@ -274,6 +343,28 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             received.add(in);
             // Echo the message back
             return in;
+        }
+    }
+
+
+    @ServerEndpoint(value=PATH_MESSAGES_EP,
+            configurator=SingletonConfigurator.class)
+    public static class MessagesServer {
+
+        private Queue<String> received = new ConcurrentLinkedQueue<>();
+        private Throwable t = null; 
+
+        @OnMessage
+        public String onMessage(String message, Session session) {
+            received.add(message);
+            session.getAsyncRemote().sendText(MESSAGE_ONE);
+            return message;
+        }
+
+        @OnError
+        public void onError(Session session, Throwable t) throws IOException {
+            t.printStackTrace();
+            this.t = t;
         }
     }
 
