@@ -242,18 +242,6 @@ public class WsWebSocketContainer
             sa = new InetSocketAddress(host, port);
         }
 
-        // Origin header
-        if (!reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
-            List<String> originValues = new ArrayList<>(1);
-            StringBuilder originValue = new StringBuilder();
-            originValue.append(path.getScheme()).append("://").append(path.getHost());
-            if (port != -1) {
-                originValue.append(':').append(port);
-            }
-            originValues.add(originValue.toString());
-            reqHeaders.put(Constants.ORIGIN_HEADER_NAME, originValues);
-        }
-
         ByteBuffer request = createRequest(path, reqHeaders);
 
         AsynchronousSocketChannel socketChannel;
