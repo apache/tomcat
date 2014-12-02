@@ -106,28 +106,30 @@ public class AsyncStateMachine {
         StringManager.getManager(Constants.Package);
 
     private static enum AsyncState {
-        DISPATCHED(false, false, false, false),
-        STARTING(true, true, false, false),
-        STARTED(true, true, false, false),
-        MUST_COMPLETE(true, true, true, false),
-        COMPLETING(true, false, true, false),
-        TIMING_OUT(true, false, false, false),
-        MUST_DISPATCH(true, true, false, true),
-        DISPATCHING(true, false, false, true),
-        READ_WRITE_OP(true, true, false, false),
-        ERROR(true, false, false, false);
+        DISPATCHED(false, false, false, false, false),
+        STARTING(true, true, false, false, true),
+        STARTED(true, true, false, false, false),
+        MUST_COMPLETE(true, true, true, false, false),
+        COMPLETING(true, false, true, false, false),
+        TIMING_OUT(true, false, false, false, false),
+        MUST_DISPATCH(true, true, false, true, true),
+        DISPATCHING(true, false, false, true, false),
+        READ_WRITE_OP(true, true, false, false, true),
+        ERROR(true, false, false, false, false);
 
         private final boolean isAsync;
         private final boolean isStarted;
         private final boolean isCompleting;
         private final boolean isDispatching;
+        private final boolean pauseNonContainerThread;
 
         private AsyncState(boolean isAsync, boolean isStarted, boolean isCompleting,
-                boolean isDispatching) {
+                boolean isDispatching, boolean pauseNonContainerThread) {
             this.isAsync = isAsync;
             this.isStarted = isStarted;
             this.isCompleting = isCompleting;
             this.isDispatching = isDispatching;
+            this.pauseNonContainerThread = pauseNonContainerThread;
         }
 
         public boolean isAsync() {
@@ -144,6 +146,10 @@ public class AsyncStateMachine {
 
         public boolean isCompleting() {
             return isCompleting;
+        }
+
+        public boolean getPauseNonContainerThread() {
+            return pauseNonContainerThread;
         }
     }
 
@@ -211,6 +217,12 @@ public class AsyncStateMachine {
      */
     public synchronized SocketState asyncPostProcess() {
 
+        // Unpause any non-container threads that may be waiting for this
+        // container thread to complete this method. Note because of the syncs
+        // those non-container threads won't start back up until until this
+        // method exits.
+        notifyAll();
+
         if (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP) {
             state = AsyncState.STARTED;
             return SocketState.LONG;
@@ -241,8 +253,8 @@ public class AsyncStateMachine {
 
 
     public synchronized boolean asyncComplete() {
+        pauseNonContainerThread();
         boolean doComplete = false;
-
         if (state == AsyncState.STARTING) {
             state = AsyncState.MUST_COMPLETE;
         } else if (state == AsyncState.STARTED) {
@@ -282,6 +294,7 @@ public class AsyncStateMachine {
 
 
     public synchronized boolean asyncDispatch() {
+        pauseNonContainerThread();
         boolean doDispatch = false;
         if (state == AsyncState.STARTING) {
             state = AsyncState.MUST_DISPATCH;
@@ -376,5 +389,25 @@ public class AsyncStateMachine {
     private void clearNonBlockingListeners() {
         processor.getRequest().listener = null;
         processor.getRequest().getResponse().listener = null;
+    }
+
+
+    /*
+     * startAsync() has been called but the container thread where this was
+     * called has not completed processing. To avoid various race conditions -
+     * including several related to error page handling - pause this
+     * non-container thread until the container thread has finished processing.
+     * The non-container thread will be paused until the container thread
+     * completes asyncPostProcess().
+     */
+    private synchronized void pauseNonContainerThread() {
+        while (!ContainerThreadMarker.isContainerThread() &&
+                state.getPauseNonContainerThread()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                // TODO Log this?
+            }
+        }
     }
 }
