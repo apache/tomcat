@@ -937,7 +937,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                         sm.getString("wsRemoteEndpoint.closedOutputStream"));
             }
 
-            doWrite(false);
+            if (buffer.position() > 0) {
+                doWrite(false);
+            }
         }
 
         @Override
@@ -1012,7 +1014,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                         sm.getString("wsRemoteEndpoint.closedWriter"));
             }
 
-            doWrite(false);
+            if (buffer.position() > 0) {
+                doWrite(false);
+            }
         }
 
         @Override
