@@ -60,10 +60,12 @@ import org.apache.tomcat.websocket.server.WsContextListener;
 public class TestEncodingDecoding extends TomcatBaseTest {
 
     private static final String MESSAGE_ONE = "message-one";
+    private static final String MESSAGE_TWO = "message-two";
     private static final String PATH_PROGRAMMATIC_EP = "/echoProgrammaticEP";
     private static final String PATH_ANNOTATED_EP = "/echoAnnotatedEP";
     private static final String PATH_GENERICS_EP = "/echoGenericsEP";
     private static final String PATH_MESSAGES_EP = "/echoMessagesEP";
+    private static final String PATH_BATCHED_EP = "/echoBatchedEP";
 
 
     @Test
@@ -272,6 +274,62 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
+    //@Test
+    public void testBatchedEndPoints() throws Exception {
+        // Set up utility classes
+        BatchedServer server = new BatchedServer();
+        SingletonConfigurator.setInstance(server);
+        ServerConfigListener.setPojoClazz(BatchedServer.class);
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(ServerConfigListener.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+
+        tomcat.start();
+
+        StringClient client = new StringClient();
+        URI uri = new URI("ws://localhost:" + getPort() + PATH_BATCHED_EP);
+        Session session = wsContainer.connectToServer(client, uri);
+
+        session.getBasicRemote().sendText(MESSAGE_ONE);
+
+        // Should not take very long
+        int i = 0;
+        while (i++ < 20) {
+            if (server.received.size() > 0 && client.received.size() > 0) {
+                break;
+            }
+            Thread.sleep(100);
+        }
+
+        // Check messages were received
+        Assert.assertEquals(1, server.received.size());
+        Assert.assertEquals(2, client.received.size());
+
+        // Check correct messages were received
+        Assert.assertEquals(MESSAGE_ONE, server.received.peek());
+        session.close();
+
+        Assert.assertNull(server.t);
+
+        // Should not take very long but some failures have been seen
+        i = testEvent(MsgStringEncoder.class.getName()+":init", 0);
+        i = testEvent(MsgStringDecoder.class.getName()+":init", i);
+        i = testEvent(MsgByteEncoder.class.getName()+":init", i);
+        i = testEvent(MsgByteDecoder.class.getName()+":init", i);
+        i = testEvent(MsgStringEncoder.class.getName()+":destroy", i);
+        i = testEvent(MsgStringDecoder.class.getName()+":destroy", i);
+        i = testEvent(MsgByteEncoder.class.getName()+":destroy", i);
+        i = testEvent(MsgByteDecoder.class.getName()+":destroy", i);
+    }
+
+
     private int testEvent(String name, int count) throws InterruptedException {
         int i = count;
         while (i < 50) {
@@ -368,6 +426,28 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         }
     }
 
+
+    @ServerEndpoint(value=PATH_BATCHED_EP,
+            configurator=SingletonConfigurator.class)
+    public static class BatchedServer {
+
+        private Queue<String> received = new ConcurrentLinkedQueue<>();
+        private Throwable t = null; 
+
+        @OnMessage
+        public String onMessage(String message, Session session) throws IOException {
+            received.add(message);
+            session.getAsyncRemote().setBatchingAllowed(true);
+            session.getAsyncRemote().sendText(MESSAGE_ONE);
+            return MESSAGE_TWO;
+        }
+
+        @OnError
+        public void onError(Session session, Throwable t) throws IOException {
+            t.printStackTrace();
+            this.t = t;
+        }
+    }
 
     @ServerEndpoint(value=PATH_ANNOTATED_EP,
             decoders={MsgStringDecoder.class, MsgByteDecoder.class},
