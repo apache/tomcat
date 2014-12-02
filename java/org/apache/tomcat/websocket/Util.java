@@ -576,9 +576,10 @@ public class Util {
                 new ArrayList<>();
         private final List<Class<? extends Decoder>> binaryDecoders =
                 new ArrayList<>();
-
+        private final Class<?> target;
 
         public DecoderMatch(Class<?> target, List<DecoderEntry> decoderEntries) {
+            this.target = target;
             for (DecoderEntry decoderEntry : decoderEntries) {
                 if (decoderEntry.getClazz().isAssignableFrom(target)) {
                     if (Binary.class.isAssignableFrom(
@@ -621,6 +622,11 @@ public class Util {
 
         public List<Class<? extends Decoder>> getBinaryDecoders() {
             return binaryDecoders;
+        }
+
+
+        public Class<?> getTarget() {
+            return target;
         }
 
 
