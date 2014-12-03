@@ -33,7 +33,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class JarWarResource extends AbstractArchiveResource {
 
-    private static final Log log = LogFactory.getLog(JarResource.class);
+    private static final Log log = LogFactory.getLog(JarWarResource.class);
 
     private final String archivePath;
 
