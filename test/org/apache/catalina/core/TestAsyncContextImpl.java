@@ -557,7 +557,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         private final Boolean completeOnTimeout;
         private final String dispatchUrl;
 
-        public static final long ASYNC_TIMEOUT = 3000;
+        public static final long ASYNC_TIMEOUT = 100;
 
         public TimeoutServlet(Boolean completeOnTimeout, String dispatchUrl) {
             this.completeOnTimeout = completeOnTimeout;
