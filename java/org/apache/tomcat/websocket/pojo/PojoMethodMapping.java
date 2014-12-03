@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -79,56 +80,105 @@ public class PojoMethodMapping {
         Method open = null;
         Method close = null;
         Method error = null;
+        Method[] clazzPojoMethods = null;
         Class<?> currentClazz = clazzPojo;
         while (!currentClazz.equals(Object.class)) {
-            for (Method method : currentClazz.getDeclaredMethods()) {
+            Method[] currentClazzMethods = currentClazz.getDeclaredMethods();
+            if (currentClazz == clazzPojo) {
+                clazzPojoMethods = currentClazzMethods;
+            }
+            for (Method method : currentClazzMethods) {
                 if (method.getAnnotation(OnOpen.class) != null) {
                     checkPublic(method);
                     if (open == null) {
                         open = method;
                     } else {
-                        // Duplicate annotation
-                        throw new DeploymentException(sm.getString(
-                                "pojoMethodMapping.duplicateAnnotation",
-                                OnOpen.class, clazzPojo));
+                        if (currentClazz == clazzPojo ||
+                                (currentClazz != clazzPojo && !isMethodOverride(open, method))) {
+                            // Duplicate annotation
+                            throw new DeploymentException(sm.getString(
+                                    "pojoMethodMapping.duplicateAnnotation",
+                                    OnOpen.class, currentClazz));
+                        }
                     }
                 } else if (method.getAnnotation(OnClose.class) != null) {
                     checkPublic(method);
                     if (close == null) {
                         close = method;
                     } else {
-                        // Duplicate annotation
-                        throw new DeploymentException(sm.getString(
-                                "pojoMethodMapping.duplicateAnnotation",
-                                OnClose.class, clazzPojo));
+                        if (currentClazz == clazzPojo ||
+                                (currentClazz != clazzPojo && !isMethodOverride(close, method))) {
+                            // Duplicate annotation
+                            throw new DeploymentException(sm.getString(
+                                    "pojoMethodMapping.duplicateAnnotation",
+                                    OnClose.class, currentClazz));
+                        }
                     }
                 } else if (method.getAnnotation(OnError.class) != null) {
                     checkPublic(method);
                     if (error == null) {
                         error = method;
                     } else {
-                        // Duplicate annotation
-                        throw new DeploymentException(sm.getString(
-                                "pojoMethodMapping.duplicateAnnotation",
-                                OnError.class, clazzPojo));
+                        if (currentClazz == clazzPojo ||
+                                (currentClazz != clazzPojo && !isMethodOverride(error, method))) {
+                            // Duplicate annotation
+                            throw new DeploymentException(sm.getString(
+                                    "pojoMethodMapping.duplicateAnnotation",
+                                    OnError.class, currentClazz));
+                        }
                     }
                 } else if (method.getAnnotation(OnMessage.class) != null) {
                     checkPublic(method);
                     MessageHandlerInfo messageHandler = new MessageHandlerInfo(method, decoders);
+                    boolean found = false;
                     for (MessageHandlerInfo otherMessageHandler : onMessage) {
                         if (messageHandler.equals(otherMessageHandler)) {
-                            // Duplicate annotation
-                            throw new DeploymentException(sm.getString(
-                                    "pojoMethodMapping.duplicateAnnotation",
-                                    OnMessage.class, clazzPojo));
+                            found = true;
+                            if (currentClazz == clazzPojo ||
+                                    (currentClazz != clazzPojo
+                                    && !isMethodOverride(messageHandler.m, otherMessageHandler.m))) {
+                                // Duplicate annotation
+                                throw new DeploymentException(sm.getString(
+                                        "pojoMethodMapping.duplicateAnnotation",
+                                        OnMessage.class, currentClazz));
+                            }
                         }
                     }
-                    onMessage.add(messageHandler);
+                    if (!found) {
+                        onMessage.add(messageHandler);
+                    }
                 } else {
                     // Method not annotated
                 }
             }
             currentClazz = currentClazz.getSuperclass();
+        }
+        // If the methods are not on clazzPojo and they are overridden
+        // by a non annotated method in clazzPojo, they should be ignored
+        if (open != null && open.getDeclaringClass() != clazzPojo) {
+            if (isOverridenWithoutAnnotation(clazzPojoMethods, open, OnOpen.class)) {
+                open = null;
+            }
+        }
+        if (close != null && close.getDeclaringClass() != clazzPojo) {
+            if (isOverridenWithoutAnnotation(clazzPojoMethods, close, OnClose.class)) {
+                close = null;
+            }
+        }
+        if (error != null && error.getDeclaringClass() != clazzPojo) {
+            if (isOverridenWithoutAnnotation(clazzPojoMethods, error, OnError.class)) {
+                error = null;
+            }
+        }
+        List<MessageHandlerInfo> overriddenOnMessage = new ArrayList<>();
+        for (MessageHandlerInfo messageHandler : onMessage) {
+            if (messageHandler.m.getDeclaringClass() != clazzPojo
+                    && isOverridenWithoutAnnotation(clazzPojoMethods, messageHandler.m, OnMessage.class)) {
+                overriddenOnMessage.add(messageHandler);
+            }
+        }
+        for (MessageHandlerInfo messageHandler : overriddenOnMessage) {
+            onMessage.remove(messageHandler);
         }
         this.onOpen = open;
         this.onClose = close;
@@ -144,6 +194,25 @@ public class PojoMethodMapping {
             throw new DeploymentException(sm.getString(
                     "pojoMethodMapping.methodNotPublic", m.getName()));
         }
+    }
+
+
+    private boolean isMethodOverride(Method method1, Method method2) {
+        return (method1.getName().equals(method2.getName())
+                && method1.getReturnType().equals(method2.getReturnType())
+                && Arrays.equals(method1.getParameterTypes(), method2.getParameterTypes()));
+    }
+
+
+    private boolean isOverridenWithoutAnnotation(Method[] methods,
+            Method superclazzMethod, Class<? extends Annotation> annotation) {
+        for (Method method : methods) {
+            if (isMethodOverride(method, superclazzMethod)
+                    && (method.getAnnotation(annotation) == null)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
