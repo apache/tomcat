@@ -421,7 +421,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         }
 
         @OnError
-        public void onError(Session session, Throwable t) throws IOException {
+        public void onError(@SuppressWarnings("unused") Session session, Throwable t) {
             t.printStackTrace();
             this.t = t;
         }
@@ -444,7 +444,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         }
 
         @OnError
-        public void onError(Session session, Throwable t) throws IOException {
+        public void onError(@SuppressWarnings("unused") Session session, Throwable t) {
             t.printStackTrace();
             this.t = t;
         }
