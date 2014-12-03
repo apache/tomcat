@@ -541,8 +541,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             long timeoutDelay = TimeoutServlet.ASYNC_TIMEOUT;
             if (asyncDispatch != null && asyncDispatch.booleanValue() &&
                     !completeOnTimeout.booleanValue()) {
-                // Extra timeout in this case
-                timeoutDelay += TimeoutServlet.ASYNC_TIMEOUT;
+                // The async dispatch includes a sleep
+                timeoutDelay += AsyncStartRunnable.THREAD_SLEEP_TIME;
             }
             alvGlobal.validateAccessLog(1, 200, timeoutDelay,
                     timeoutDelay + TIMEOUT_MARGIN + REQUEST_TIME);
