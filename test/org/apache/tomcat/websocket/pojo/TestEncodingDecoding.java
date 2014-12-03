@@ -49,6 +49,7 @@ import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -409,8 +410,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             configurator=SingletonConfigurator.class)
     public static class MessagesServer {
 
-        private Queue<String> received = new ConcurrentLinkedQueue<>();
-        private Throwable t = null; 
+        private final Queue<String> received = new ConcurrentLinkedQueue<>();
+        private volatile Throwable t = null;
 
         @OnMessage
         public String onMessage(String message, Session session) {
@@ -431,8 +432,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             configurator=SingletonConfigurator.class)
     public static class BatchedServer {
 
-        private Queue<String> received = new ConcurrentLinkedQueue<>();
-        private Throwable t = null; 
+        private final Queue<String> received = new ConcurrentLinkedQueue<>();
+        private volatile Throwable t = null;
 
         @OnMessage
         public String onMessage(String message, Session session) throws IOException {
