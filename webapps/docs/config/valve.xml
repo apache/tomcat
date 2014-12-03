@@ -553,13 +553,13 @@
 
   </subsection>
 
-  <subsection name="Example">
+  <subsection name="Example 1" anchor="Remote_Address_Valve/Example_localhost">
     <p>To allow access only for the clients connecting from localhost:</p>
     <source><![CDATA[<Valve className="org.apache.catalina.valves.RemoteAddrValve"
    allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1"/>]]></source>
   </subsection>
 
-  <subsection name="Example">
+  <subsection name="Example 2" anchor="Remote_Address_Valve/Example_localhost_port">
     <p>To allow unrestricted access for the clients connecting from localhost
     but for all other clients only to port 8443:</p>
     <source><![CDATA[<Valve className="org.apache.catalina.valves.RemoteAddrValve"
@@ -567,9 +567,9 @@
    allow="127\.\d+\.\d+\.\d+;\d*|::1;\d*|0:0:0:0:0:0:0:1;\d*|.*;8443"/>]]></source>
   </subsection>
 
-  <subsection name="Example">
+  <subsection name="Example 3" anchor="Remote_Address_Valve/Example_port_auth">
     <p>To allow unrestricted access to port 8009, but trigger basic
-    authentication if the application is access on another port:</p>
+    authentication if the application is accessed on another port:</p>
 <source><![CDATA[<Context>
   ...
   <Valve className="org.apache.catalina.valves.RemoteAddrValve"
