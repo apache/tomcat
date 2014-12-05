@@ -97,8 +97,10 @@ public class ErrorReportValve extends ValveBase {
 
         Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
-        if (request.isAsyncStarted() && ((response.getStatus() < 400 &&
-                throwable == null) || request.isAsyncDispatching())) {
+        // If an async request is in progress and is not going to end once this
+        // container thread finishes, do not trigger error page handling - it
+        // will be triggered later if required.
+        if (request.isAsync() && !request.isAsyncCompleting()) {
             return;
         }
 
@@ -121,11 +123,6 @@ public class ErrorReportValve extends ValveBase {
             report(request, response, throwable);
         } catch (Throwable tt) {
             ExceptionUtils.handleThrowable(tt);
-        }
-
-        if (request.isAsyncStarted() && !request.isAsyncCompleting() &&
-                !request.isAsyncDispatching()) {
-            request.getAsyncContext().complete();
         }
     }
 
