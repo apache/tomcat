@@ -251,6 +251,11 @@ final class StandardWrapperValve
             exception(request, response, e);
         }
 
+        // Release the filter chain (if any) for this request
+        if (filterChain != null) {
+            filterChain.release();
+        }
+
         // Deallocate the allocated servlet instance
         try {
             if (servlet != null) {
