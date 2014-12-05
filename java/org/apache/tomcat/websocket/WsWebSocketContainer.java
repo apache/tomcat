@@ -243,19 +243,10 @@ public class WsWebSocketContainer
         }
 
         // Origin header
-        if (Constants.ALWAYS_ADD_ORIGIN_HEADER &&
+        if (Constants.DEFAULT_ORIGIN_HEADER_VALUE != null &&
                 !reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
             List<String> originValues = new ArrayList<>(1);
-            if (Constants.SET_TARGET_AS_ORIGIN_HEADER) {
-                StringBuilder originValue = new StringBuilder();
-                originValue.append(path.getHost());
-                if (port != -1) {
-                    originValue.append(':').append(port);
-                }
-                originValues.add(originValue.toString());
-            } else {
-                originValues.add(Constants.DEFAULT_ORIGIN_HEADER_VALUE);
-            }
+            originValues.add(Constants.DEFAULT_ORIGIN_HEADER_VALUE);
             reqHeaders.put(Constants.ORIGIN_HEADER_NAME, originValues);
         }
 

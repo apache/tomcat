@@ -62,12 +62,8 @@ public class Constants {
             "Sec-WebSocket-Extensions";
 
     // Configuration for Origin header in client
-    static final boolean ALWAYS_ADD_ORIGIN_HEADER =
-            Boolean.getBoolean("org.apache.tomcat.websocket.ALWAYS_ADD_ORIGIN_HEADER");
-    static final boolean SET_TARGET_AS_ORIGIN_HEADER =
-            Boolean.getBoolean("org.apache.tomcat.websocket.SET_TARGET_AS_ORIGIN_HEADER");
     static final String DEFAULT_ORIGIN_HEADER_VALUE =
-            System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE", "null");
+            System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
 
     // Configuration for background processing checks intervals
     static final int DEFAULT_PROCESS_PERIOD =
