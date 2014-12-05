@@ -44,7 +44,7 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 
     @Override
     public Object coerceToType(Object obj, Class<?> type) {
-        return ELSupport.coerceToType(obj, type);
+        return ELSupport.coerceToType(null, obj, type);
     }
 
     @Override

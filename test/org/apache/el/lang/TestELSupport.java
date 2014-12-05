@@ -81,13 +81,13 @@ public class TestELSupport {
     @Test
     public void testCoerceIntegerToNumber() {
         Integer input = Integer.valueOf(4390241);
-        Object output = ELSupport.coerceToType(input, Number.class);
+        Object output = ELSupport.coerceToType(null, input, Number.class);
         assertEquals(input, output);
     }
 
     @Test
     public void testCoerceNullToNumber() {
-        Object output = ELSupport.coerceToType(null, Number.class);
+        Object output = ELSupport.coerceToType(null, null, Number.class);
         assertNull(output);
     }
 

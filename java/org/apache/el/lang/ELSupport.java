@@ -28,8 +28,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import javax.el.ELContext;
 import javax.el.ELException;
-
 import org.apache.el.util.MessageFactory;
 
 
@@ -430,8 +430,20 @@ public class ELSupport {
         }
     }
 
-    public static final Object coerceToType(final Object obj,
+    public static final Object coerceToType(final ELContext ctx, final Object obj,
             final Class<?> type) throws ELException {
+
+        if (ctx != null) {
+            boolean originalIsPropertyResolved = ctx.isPropertyResolved();
+            try {
+                Object result = ctx.getELResolver().convertToType(ctx, obj, type);
+                if (ctx.isPropertyResolved()) {
+                    return result;
+                }
+            } finally {
+                ctx.setPropertyResolved(originalIsPropertyResolved);
+            }
+        }
 
         if (type == null || Object.class.equals(type) ||
                 (obj != null && type.isAssignableFrom(obj.getClass()))) {
@@ -495,14 +507,14 @@ public class ELSupport {
 
         // Handle arrays
         if (type.isArray() && obj.getClass().isArray()) {
-            return coerceToArray(obj, type);
+            return coerceToArray(ctx, obj, type);
         }
 
         throw new ELException(MessageFactory.get("error.convert",
                 obj, obj.getClass(), type));
     }
 
-    private static Object coerceToArray(final Object obj,
+    private static Object coerceToArray(final ELContext ctx, final Object obj,
             final Class<?> type) {
         // Note: Nested arrays will result in nested calls to this method.
 
@@ -517,7 +529,7 @@ public class ELSupport {
         Object result = Array.newInstance(componentType, size);
         // Coerce each element in turn.
         for (int i = 0; i < size; i++) {
-            Array.set(result, i, coerceToType(Array.get(obj, i), componentType));
+            Array.set(result, i, coerceToType(ctx, Array.get(obj, i), componentType));
         }
 
         return result;
