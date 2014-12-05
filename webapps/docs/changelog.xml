@@ -122,6 +122,10 @@
         <bug>57234</bug>: Make SSL protocol filtering to remove insecure
         protocols case insensitive. (markt)
       </fix>
+      <fix>
+        <bug>57265</bug>: Fix some potential concurrency issues with sendFile
+        and the NIO connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

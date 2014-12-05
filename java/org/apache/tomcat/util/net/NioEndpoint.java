@@ -1608,7 +1608,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         protected boolean cometNotify = false;
         protected CountDownLatch readLatch = null;
         protected CountDownLatch writeLatch = null;
-        protected SendfileData sendfileData = null;
+        protected volatile SendfileData sendfileData = null;
         private long writeTimeout = -1;
     }
 
@@ -1805,11 +1805,11 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
      */
     public static class SendfileData {
         // File
-        public String fileName;
-        public FileChannel fchannel;
-        public long pos;
-        public long length;
+        public volatile String fileName;
+        public volatile FileChannel fchannel;
+        public volatile long pos;
+        public volatile long length;
         // KeepAlive flag
-        public boolean keepAlive;
+        public volatile boolean keepAlive;
     }
 }
