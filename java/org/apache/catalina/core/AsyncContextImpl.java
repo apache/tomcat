@@ -91,7 +91,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         check();
         request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
-        clearServletRequestResponse();
     }
 
     @Override
@@ -126,6 +125,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
             }
         } finally {
+            clearServletRequestResponse();
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
                 AccessController.doPrivileged(pa);
@@ -320,6 +320,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             ServletException se = new ServletException(e);
             throw se;
         } catch (ClassNotFoundException e) {
+            ServletException se = new ServletException(e);
+            throw se;
+        } catch (Exception e) {
+            ExceptionUtils.handleThrowable(e.getCause());
             ServletException se = new ServletException(e);
             throw se;
         }

@@ -210,6 +210,13 @@
         <bug>57144</bug>: Improve ClientAbortException to provide non-null
         message. (kkolinko)
       </update>
+      <fix>
+        AsyncContext should remain usable until fireOnComplete is called. (remm)
+      </fix>
+      <fix>
+        AsyncContext createListener should wrap any instantiation exception
+        using a ServletException. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -230,6 +237,9 @@
       <fix>
         Do not increase remaining counter at end of stream in
         IdentityInputFilter. (kkolinko)
+      </fix>
+      <fix>
+        Async state MUST_COMPLETE should still be started. (remm)
       </fix>
     </changelog>
   </subsection>
