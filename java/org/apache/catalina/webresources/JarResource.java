@@ -51,7 +51,7 @@ public class JarResource extends AbstractArchiveResource {
             return new JarInputStreamWrapper(jarFile, jarEntry, is);
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getInputStreamFail",
+                log.debug(sm.getString("jarResource.getInputStreamFail",
                         getResource().getName(), getBaseUrl()), e);
             }
             return null;
