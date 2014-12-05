@@ -43,7 +43,8 @@ public class Constants {
     static final byte INTERNAL_OPCODE_FLUSH = 0x18;
 
     // Buffers
-    static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
+    static final int DEFAULT_BUFFER_SIZE =
+            Integer.getInteger("org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024);
 
     // Client connection
     public static final String HOST_HEADER_NAME = "Host";
@@ -60,6 +61,24 @@ public class Constants {
     public static final String WS_EXTENSIONS_HEADER_NAME =
             "Sec-WebSocket-Extensions";
 
+    // Configuration for Origin header in client
+    static final boolean ALWAYS_ADD_ORIGIN_HEADER =
+            Boolean.getBoolean("org.apache.tomcat.websocket.ALWAYS_ADD_ORIGIN_HEADER");
+    static final boolean SET_TARGET_AS_ORIGIN_HEADER =
+            Boolean.getBoolean("org.apache.tomcat.websocket.SET_TARGET_AS_ORIGIN_HEADER");
+    static final String DEFAULT_ORIGIN_HEADER_VALUE =
+            System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE", "null");
+
+    // Configuration for background processing checks intervals
+    static final int DEFAULT_PROCESS_PERIOD =
+            Integer.getInteger("org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10);
+
+    // Configuration for extensions
+    static final boolean DISABLE_BUILTIN_EXTENSIONS =
+            Boolean.getBoolean("org.apache.tomcat.websocket.DISABLE_BUILTIN_EXTENSIONS");
+    static final boolean ALLOW_UNSUPPORTED_EXTENSIONS =
+            Boolean.getBoolean("org.apache.tomcat.websocket.ALLOW_UNSUPPORTED_EXTENSIONS");
+
     public static final boolean STRICT_SPEC_COMPLIANCE =
             Boolean.getBoolean(
                     "org.apache.tomcat.websocket.STRICT_SPEC_COMPLIANCE");
@@ -67,9 +86,13 @@ public class Constants {
     public static final List<Extension> INSTALLED_EXTENSIONS;
 
     static {
-        List<Extension> installed = new ArrayList<>(1);
-        installed.add(new WsExtension("permessage-deflate"));
-        INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
+        if (DISABLE_BUILTIN_EXTENSIONS) {
+            INSTALLED_EXTENSIONS = Collections.unmodifiableList(new ArrayList<Extension>());
+        } else {
+            List<Extension> installed = new ArrayList<>(1);
+            installed.add(new WsExtension("permessage-deflate"));
+            INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
+        }
     }
 
     private Constants() {

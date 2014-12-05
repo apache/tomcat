@@ -119,7 +119,7 @@ public class WsWebSocketContainer
     private int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long defaultMaxSessionIdleTimeout = 0;
     private int backgroundProcessCount = 0;
-    private int processPeriod = 10;
+    private int processPeriod = Constants.DEFAULT_PROCESS_PERIOD;
 
 
     @Override
@@ -240,6 +240,23 @@ public class WsWebSocketContainer
                 secure = true;
             }
             sa = new InetSocketAddress(host, port);
+        }
+
+        // Origin header
+        if (Constants.ALWAYS_ADD_ORIGIN_HEADER &&
+                !reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
+            List<String> originValues = new ArrayList<>(1);
+            if (Constants.SET_TARGET_AS_ORIGIN_HEADER) {
+                StringBuilder originValue = new StringBuilder();
+                originValue.append(path.getHost());
+                if (port != -1) {
+                    originValue.append(':').append(port);
+                }
+                originValues.add(originValue.toString());
+            } else {
+                originValues.add(Constants.DEFAULT_ORIGIN_HEADER_VALUE);
+            }
+            reqHeaders.put(Constants.ORIGIN_HEADER_NAME, originValues);
         }
 
         ByteBuffer request = createRequest(path, reqHeaders);
@@ -838,7 +855,6 @@ public class WsWebSocketContainer
     public void backgroundProcess() {
         // This method gets called once a second.
         backgroundProcessCount ++;
-
         if (backgroundProcessCount >= processPeriod) {
             backgroundProcessCount = 0;
 
