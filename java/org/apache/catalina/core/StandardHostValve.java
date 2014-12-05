@@ -159,23 +159,28 @@ final class StandardHostValve extends ValveBase {
 
         boolean asyncAtStart = request.isAsync(); 
         boolean asyncDispatching = request.isAsyncDispatching();
-        // An async error page may dispatch to another resource. This flag helps
-        // ensure an infinite error handling loop is not entered
-        boolean errorAtStart = response.isError();
         if (asyncAtStart || context.fireRequestInitEvent(request)) {
 
-            // Ask this Context to process this request
+            // Ask this Context to process this request. Requests that are in
+            // async mode and are not being dispatched to this resource must be
+            // in error and have been routed here to check for application
+            // defined error pages.
             try {
                 if (!asyncAtStart || asyncDispatching) {
                     context.getPipeline().getFirst().invoke(request, response);
                 } else {
-                    if (!errorAtStart) {
+                    // Make sure this request/response is here because an error
+                    // report is required.
+                    if (!response.isErrorReportRequired()) {
                         throw new IllegalStateException(sm.getString("standardHost.asyncStateError"));
                     }
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                if (errorAtStart) {
+                // If a new error occurred while trying to report a previous
+                // error simply log the new error and allow the original error
+                // to be reported.
+                if (response.isErrorReportRequired()) {
                     container.getLogger().error("Exception Processing " +
                             request.getRequestURI(), t);
                 } else {
@@ -183,33 +188,29 @@ final class StandardHostValve extends ValveBase {
                     throwable(request, response, t);
                 }
             }
+
+            Throwable t = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+
+            // Protect against NPEs if the context was destroyed during a
+            // long running request.
+            if (!context.getState().isAvailable()) {
+                return;
+            }
     
-            // If the request was async at the start and an error occurred then
-            // the async error handling will kick-in and that will fire the
-            // request destroyed event *after* the error handling has taken
-            // place
-            if (!(request.isAsync() || (asyncAtStart &&
-                    request.getAttribute(
-                            RequestDispatcher.ERROR_EXCEPTION) != null))) {
-                // Protect against NPEs if context was destroyed during a
-                // long running request.
-                if (context.getState().isAvailable()) {
-                    if (!errorAtStart) {
-                        // Error page processing
-                        response.setSuspended(false);
+            // Look for (and render if found) an application level error page
+            if (response.isErrorReportRequired()) {
+                // Error page processing
+                response.setSuspended(false);
     
-                        Throwable t = (Throwable) request.getAttribute(
-                                RequestDispatcher.ERROR_EXCEPTION);
-    
-                        if (t != null) {
-                            throwable(request, response, t);
-                        } else {
-                            status(request, response);
-                        }
-                    }
-    
-                    context.fireRequestDestroyEvent(request);
+                if (t != null) {
+                    throwable(request, response, t);
+                } else {
+                    status(request, response);
                 }
+            }
+
+            if (!request.isAsync() && !response.isErrorReportRequired()) {
+                context.fireRequestDestroyEvent(request);
             }
         }
 

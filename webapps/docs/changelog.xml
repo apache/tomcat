@@ -109,6 +109,11 @@
         thread can not change the async state until the container thread has
         completed. (markt)
       </fix>
+      <fix>
+        <bug>57252</bug>: Provide application configured error pages with a
+        chance to handle an async error before the built-in error reporting.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

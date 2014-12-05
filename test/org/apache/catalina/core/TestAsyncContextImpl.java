@@ -1264,15 +1264,25 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
     @Test
     public void testBug51197a() throws Exception {
-        doTestBug51197(false);
+        doTestBug51197(false, false);
     }
 
     @Test
     public void testBug51197b() throws Exception {
-        doTestBug51197(true);
+        doTestBug51197(true, false);
     }
 
-    private void doTestBug51197(boolean threaded) throws Exception {
+    @Test
+    public void testBug51197c() throws Exception {
+        doTestBug51197(false, true);
+    }
+
+    @Test
+    public void testBug51197d() throws Exception {
+        doTestBug51197(true, true);
+    }
+
+    private void doTestBug51197(boolean threaded, boolean customError) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -1287,6 +1297,17 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             Tomcat.addServlet(ctx, "asyncErrorServlet", asyncErrorServlet);
         wrapper.setAsyncSupported(true);
         ctx.addServletMapping("/asyncErrorServlet", "asyncErrorServlet");
+
+        if (customError) {
+            CustomErrorServlet customErrorServlet = new CustomErrorServlet();
+            Tomcat.addServlet(ctx, "customErrorServlet", customErrorServlet);
+            ctx.addServletMapping("/customErrorServlet", "customErrorServlet");
+
+            ErrorPage ep = new ErrorPage();
+            ep.setLocation("/customErrorServlet");
+
+            ctx.addErrorPage(ep);
+        }
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
@@ -1307,7 +1328,14 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // responsibility when an error occurs on an application thread.
         // Calling sendError() followed by complete() and expecting the standard
         // error page mechanism to kick in could be viewed as handling the error
-        assertTrue(res.getLength() > 0);
+        String responseBody = res.toString();
+        Assert.assertNotNull(responseBody);
+        assertTrue(responseBody.length() > 0);
+        if (customError) {
+            assertTrue(responseBody, responseBody.contains(CustomErrorServlet.ERROR_MESSAGE));
+        } else {
+            assertTrue(responseBody, responseBody.contains(AsyncErrorServlet.ERROR_MESSAGE));
+        }
 
         // Without this test may complete before access log has a chance to log
         // the request
@@ -1317,6 +1345,21 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         alv.validateAccessLog(1, HttpServletResponse.SC_BAD_REQUEST, 0,
                 REQUEST_TIME);
     }
+
+    private static class CustomErrorServlet extends GenericServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        public static final String ERROR_MESSAGE = "Custom error page";
+
+        @Override
+        public void service(ServletRequest req, ServletResponse res)
+                throws ServletException, IOException {
+            res.getWriter().println(ERROR_MESSAGE);
+        }
+
+    }
+
 
     private static class AsyncErrorServlet extends HttpServlet {
 
@@ -1333,7 +1376,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        protected void doGet(HttpServletRequest req, final HttpServletResponse resp)
                 throws ServletException, IOException {
 
             final AsyncContext actxt = req.startAsync();
@@ -1343,11 +1386,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     @Override
                     public void run() {
                         try {
-                            HttpServletResponse resp =
-                                    (HttpServletResponse) actxt.getResponse();
                             resp.sendError(status, ERROR_MESSAGE);
-                            // Complete so there is no delay waiting for the
-                            // timeout
                             actxt.complete();
                         } catch (IOException e) {
                             // Ignore
@@ -1355,7 +1394,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                     }
                 });
             } else {
-                resp.sendError(status);
+                resp.sendError(status, ERROR_MESSAGE);
+                actxt.complete();
             }
         }
     }
@@ -2002,11 +2042,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         // Must have a real docBase - just use temp
         File docBase = new File(System.getProperty("java.io.tmpdir"));
-
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
-        Wrapper w = Tomcat.addServlet(ctx, "AsyncISEServlet",
-                new AsyncISEServlet(useGetRequest));
+        AsyncISEServlet servlet = new AsyncISEServlet();
+
+        Wrapper w = Tomcat.addServlet(ctx, "AsyncISEServlet", servlet);
         w.setAsyncSupported(true);
         ctx.addServletMapping("/test", "AsyncISEServlet");
 
@@ -2017,41 +2057,47 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals("OK", response.toString());
+
+        boolean hasIse = false;
+        try {
+            if (useGetRequest) {
+                servlet.getAsyncContext().getRequest();
+            } else {
+                servlet.getAsyncContext().getResponse();
+                }
+        } catch (IllegalStateException ise) {
+            hasIse = true;
+        }
+
+        Assert.assertTrue(hasIse);
     }
 
 
+    /**
+     * Accessing the AsyncContext in this way is an ugly hack that should never
+     * be used in a real application since it is not thread safe. That said, it
+     * is this sort of hack that the ISE is meant to be preventing.
+     *
+     */
     private static class AsyncISEServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
-        private boolean useGetRequest = false;
-
-        public AsyncISEServlet(boolean useGetRequest) {
-            this.useGetRequest = useGetRequest;
-        }
+        private AsyncContext asyncContext;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
             resp.setContentType("text/plain;UTF-8");
-            PrintWriter pw = resp.getWriter();
 
-            AsyncContext async = req.startAsync();
+            asyncContext = req.startAsync();
             // This will commit the response
-            async.complete();
+            asyncContext.complete();
+        }
 
-            try {
-                if (useGetRequest) {
-                    async.getRequest();
-                } else {
-                    async.getResponse();
-                }
-                pw.print("FAIL");
-            } catch (IllegalStateException ise) {
-                pw.print("OK");
-            }
+        public AsyncContext getAsyncContext() {
+            return asyncContext;
         }
     }
 }
