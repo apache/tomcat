@@ -68,14 +68,14 @@ public class Set implements TagPlugin {
         //get the iScope according to the strScope
         iScope = Util.getScope(strScope);
 
+        String jspCtxt = null;
+        if (ctxt.isTagFile()) {
+            jspCtxt = "this.getJspContext()";
+        } else {
+            jspCtxt = "_jspx_page_context";
+        }
         //if the attribute var has been specified then assign the result to the var;
         if(hasVar){
-            String jspCtxt = null;
-            if (ctxt.isTagFile()) {
-                jspCtxt = "this.getJspContext()";
-            } else {
-                jspCtxt = "_jspx_page_context";
-            }
             String strVar = ctxt.getConstantAttribute("var");
             ctxt.generateJavaSource("if(null != " + resultName + "){");
             ctxt.generateJavaSource("    " + jspCtxt + ".setAttribute(\"" + strVar + "\"," + resultName + "," + iScope + ");");
@@ -144,7 +144,7 @@ public class Set implements TagPlugin {
 
             //invoke the method through the reflection
             ctxt.generateJavaSource("                    if(" + resultName + " != null){");
-            ctxt.generateJavaSource("                        " + methodName + ".invoke(" + targetName + ", new Object[]{org.apache.el.lang.ELSupport.coerceToType(" + resultName + ", " + methodName + ".getParameterTypes()[0])});");
+            ctxt.generateJavaSource("                        " + methodName + ".invoke(" + targetName + ", new Object[]{org.apache.el.lang.ELSupport.coerceToType(" + jspCtxt + ".getELContext(), " + resultName + ", " + methodName + ".getParameterTypes()[0])});");
             ctxt.generateJavaSource("                    }else{");
             ctxt.generateJavaSource("                        " + methodName + ".invoke(" + targetName + ", new Object[]{null});");
             ctxt.generateJavaSource("                    }");
