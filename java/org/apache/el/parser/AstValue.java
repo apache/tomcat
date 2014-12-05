@@ -198,7 +198,7 @@ public final class AstValue extends SimpleNode {
         // coerce to the expected type
         Class<?> targetClass = resolver.getType(ctx, t.base, t.property);
         resolver.setValue(ctx, t.base, t.property,
-                ELSupport.coerceToType(value, targetClass));
+                ELSupport.coerceToType(ctx, value, targetClass));
         if (!ctx.isPropertyResolved()) {
             throw new PropertyNotFoundException(MessageFactory.get(
                     "error.resolver.unhandled", t.base, t.property));
@@ -212,7 +212,7 @@ public final class AstValue extends SimpleNode {
             throws ELException {
         Target t = getTarget(ctx);
         Method m = ReflectionUtil.getMethod(
-                t.base, t.property, paramTypes, null);
+                ctx, t.base, t.property, paramTypes, null);
         return new MethodInfo(m.getName(), m.getReturnType(), m
                 .getParameterTypes());
     }
@@ -235,10 +235,10 @@ public final class AstValue extends SimpleNode {
             values = paramValues;
             types = paramTypes;
         }
-        m = ReflectionUtil.getMethod(t.base, t.property, types, values);
+        m = ReflectionUtil.getMethod(ctx, t.base, t.property, types, values);
 
         // Handle varArgs and any co-ercion required
-        values = convertArgs(values, m);
+        values = convertArgs(ctx, values, m);
 
         Object result = null;
         try {
@@ -260,7 +260,7 @@ public final class AstValue extends SimpleNode {
         return result;
     }
 
-    private Object[] convertArgs(Object[] src, Method m) {
+    private Object[] convertArgs(EvaluationContext ctx, Object[] src, Method m) {
         Class<?>[] types = m.getParameterTypes();
         if (types.length == 0) {
             return new Object[0];
@@ -271,7 +271,7 @@ public final class AstValue extends SimpleNode {
         Object[] dest = new Object[paramCount];
 
         for (int i = 0; i < paramCount - 1; i++) {
-            dest[i] = ELSupport.coerceToType(src[i], types[i]);
+            dest[i] = ELSupport.coerceToType(ctx, src[i], types[i]);
         }
 
         if (m.isVarArgs()) {
@@ -279,13 +279,13 @@ public final class AstValue extends SimpleNode {
                     m.getParameterTypes()[paramCount - 1].getComponentType(),
                     src.length - (paramCount - 1));
             for (int i = 0; i < src.length - (paramCount - 1); i ++) {
-                varArgs[i] = ELSupport.coerceToType(src[paramCount - 1 + i],
+                varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i],
                         types[paramCount - 1].getComponentType());
             }
             dest[paramCount - 1] = varArgs;
         } else {
             dest[paramCount - 1] = ELSupport.coerceToType(
-                    src[paramCount - 1], types[paramCount - 1]);
+                    ctx, src[paramCount - 1], types[paramCount - 1]);
         }
 
         return dest;

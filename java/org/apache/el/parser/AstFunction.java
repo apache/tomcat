@@ -176,12 +176,12 @@ public final class AstFunction extends SimpleNode {
                             Class<?> target = paramTypes[i].getComponentType();
                             for (int j = i; j < inputParameterCount; j++) {
                                 varargs[j-i] = parameters.jjtGetChild(j).getValue(ctx);
-                                varargs[j-i] = coerceToType(varargs[j-i], target);
+                                varargs[j-i] = coerceToType(ctx, varargs[j-i], target);
                             }
                         }
                     } else {
                         params[i] = parameters.jjtGetChild(i).getValue(ctx);
-                        params[i] = coerceToType(params[i], paramTypes[i]);
+                        params[i] = coerceToType(ctx, params[i], paramTypes[i]);
                     }
                 }
             } catch (ELException ele) {

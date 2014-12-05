@@ -28,6 +28,7 @@ import javax.el.ELException;
 import javax.el.MethodNotFoundException;
 
 import org.apache.el.lang.ELSupport;
+import org.apache.el.lang.EvaluationContext;
 
 
 /**
@@ -111,6 +112,7 @@ public class ReflectionUtil {
 
     /**
      * Returns a method based on the criteria.
+     * @param ctx the context in which the expression is being evaluated
      * @param base the object that owns the method
      * @param property the name of the method
      * @param paramTypes the parameter types to use
@@ -124,7 +126,7 @@ public class ReflectionUtil {
      * the code in sync.
      */
     @SuppressWarnings("null")
-    public static Method getMethod(Object base, Object property,
+    public static Method getMethod(EvaluationContext ctx, Object base, Object property,
             Class<?>[] paramTypes, Object[] paramValues)
             throws MethodNotFoundException {
         if (base == null || property == null) {
@@ -186,7 +188,7 @@ public class ReflectionUtil {
                                 noMatch = true;
                                 break;
                             } else {
-                                if (isCoercibleFrom(paramValues[j], varType)) {
+                                if (isCoercibleFrom(ctx, paramValues[j], varType)) {
                                     coercibleMatch++;
                                 } else {
                                     noMatch = true;
@@ -205,7 +207,7 @@ public class ReflectionUtil {
                         noMatch = true;
                         break;
                     } else {
-                        if (isCoercibleFrom(paramValues[i], mParamTypes[i])) {
+                        if (isCoercibleFrom(ctx, paramValues[i], mParamTypes[i])) {
                             coercibleMatch++;
                         } else {
                             noMatch = true;
@@ -381,11 +383,11 @@ public class ReflectionUtil {
      * This class duplicates code in javax.el.Util. When making changes keep
      * the code in sync.
      */
-    private static boolean isCoercibleFrom(Object src, Class<?> target) {
+    private static boolean isCoercibleFrom(EvaluationContext ctx, Object src, Class<?> target) {
         // TODO: This isn't pretty but it works. Significant refactoring would
         //       be required to avoid the exception.
         try {
-            ELSupport.coerceToType(src, target);
+            ELSupport.coerceToType(ctx, src, target);
         } catch (ELException e) {
             return false;
         }
