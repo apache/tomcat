@@ -104,6 +104,11 @@
         if <code>getReqyest()</code> or <code>getResponse()</code> is called
         after <code>complete()</code> or <code>dispatch()</code>. (markt)
       </add>
+      <fix>
+        Fix a concurrency issue in async processing. Ensure that a non-container
+        thread can not change the async state until the container thread has
+        completed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
