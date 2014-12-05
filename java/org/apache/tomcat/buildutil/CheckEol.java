@@ -41,8 +41,6 @@ import org.apache.tools.ant.types.FileSet;
  */
 public class CheckEol extends Task {
 
-    private static final String eoln = System.getProperty("line.separator");
-
     /** The files to be checked */
     private final List<FileSet> filesets = new LinkedList<>();
 
@@ -65,9 +63,9 @@ public class CheckEol extends Task {
     public void execute() throws BuildException {
 
         Mode mode = null;
-        if ("\n".equals(eoln)) {
+        if ("\n".equals(System.lineSeparator())) {
             mode = Mode.LF;
-        } else if ("\r\n".equals(eoln)) {
+        } else if ("\r\n".equals(System.lineSeparator())) {
             mode = Mode.CRLF;
         } else {
             log("Line ends check skipped, because OS line ends setting is neither LF nor CRLF.",
@@ -132,7 +130,7 @@ public class CheckEol extends Task {
 
         @Override
         public String toString() {
-            return eoln + file + ": uses " + value + " on line " + line;
+            return System.lineSeparator() + file + ": uses " + value + " on line " + line;
         }
     }
 

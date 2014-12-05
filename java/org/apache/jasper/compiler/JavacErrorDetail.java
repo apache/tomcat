@@ -25,7 +25,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JspCompilationContext;
 
 /**
@@ -126,7 +125,7 @@ public class JavacErrorDetail {
                         fragment.append(i+1);
                         fragment.append(": ");
                         fragment.append(jspLines[i]);
-                        fragment.append(Constants.NEWLINE);
+                        fragment.append(System.lineSeparator());
                     }
                     jspExtract = fragment.toString();
                 }

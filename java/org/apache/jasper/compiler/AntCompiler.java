@@ -101,7 +101,7 @@ public class AntCompiler extends Compiler {
         @Override
         protected void log(String message) {
             reportBuf.append(message);
-            reportBuf.append(Constants.NEWLINE);
+            reportBuf.append(System.lineSeparator());
         }
 
         protected String getReport() {
@@ -244,7 +244,7 @@ public class AntCompiler extends Compiler {
         // Stop capturing the System.err output for this thread
         String errorCapture = SystemLogHandler.unsetThread();
         if (errorCapture != null) {
-            errorReport.append(Constants.NEWLINE);
+            errorReport.append(System.lineSeparator());
             errorReport.append(errorCapture);
         }
 

@@ -39,8 +39,6 @@ import org.apache.jasper.Constants;
  */
 public class BodyContentImpl extends BodyContent {
 
-    private static final String LINE_SEPARATOR =
-        System.getProperty("line.separator");
     private static final boolean LIMIT_BUFFER =
         Boolean.valueOf(System.getProperty("org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "false")).booleanValue();
 
@@ -172,9 +170,9 @@ public class BodyContentImpl extends BodyContent {
     @Override
     public void newLine() throws IOException {
         if (writer != null) {
-            writer.write(LINE_SEPARATOR);
+            writer.write(System.lineSeparator());
         } else {
-            write(LINE_SEPARATOR);
+            write(System.lineSeparator());
         }
     }
 

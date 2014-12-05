@@ -37,11 +37,10 @@ public class TestClassLoaderLogManager {
         Assert.assertEquals("${", logManager.replace("${"));
         Assert.assertEquals("${undefinedproperty}", logManager.replace("${undefinedproperty}"));
         Assert.assertEquals(
-                System.getProperty("line.separator") + File.pathSeparator + File.separator,
+                System.lineSeparator() + File.pathSeparator + File.separator,
                 logManager.replace("${line.separator}${path.separator}${file.separator}"));
         Assert.assertEquals(
-                "foo" + File.separator + "bar" + System.getProperty("line.separator")
-                        + File.pathSeparator + "baz",
+                "foo" + File.separator + "bar" + System.lineSeparator() + File.pathSeparator + "baz",
                 logManager.replace("foo${file.separator}bar${line.separator}${path.separator}baz"));
         // BZ 51249
         Assert.assertEquals(
