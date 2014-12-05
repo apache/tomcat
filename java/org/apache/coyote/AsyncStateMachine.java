@@ -381,6 +381,9 @@ public class AsyncStateMachine {
 
 
     public synchronized void recycle() {
+        // Ensure in case of error that any non-container threads that have been
+        // paused are unpaused.
+        notifyAll();
         asyncCtxt = null;
         state = AsyncState.DISPATCHED;
     }
