@@ -505,7 +505,7 @@ public class TestCollectionOperations {
 
         Number average = (Number) ((Optional) result).get();
         Assert.assertTrue("Result: " + average.toString(),
-                ELSupport.equals(Long.valueOf(3), average));
+                ELSupport.equals(null, Long.valueOf(3), average));
     }
 
 
@@ -519,7 +519,7 @@ public class TestCollectionOperations {
 
         Number average = (Number) ((Optional) result).get();
         Assert.assertTrue("Result: " + average.toString(),
-                ELSupport.equals(Double.valueOf(3.5), average));
+                ELSupport.equals(null, Double.valueOf(3.5), average));
     }
 
 
@@ -578,7 +578,7 @@ public class TestCollectionOperations {
                 Object.class);
 
         Assert.assertTrue("Result: " + result.toString(),
-                ELSupport.equals(Long.valueOf(15), result));
+                ELSupport.equals(null, Long.valueOf(15), result));
     }
 
 
@@ -591,7 +591,7 @@ public class TestCollectionOperations {
                 Object.class);
 
         Assert.assertTrue("Result: " + result.toString(),
-                ELSupport.equals(Long.valueOf(0), result));
+                ELSupport.equals(null, Long.valueOf(0), result));
     }
 
 
@@ -604,7 +604,7 @@ public class TestCollectionOperations {
                 Object.class);
 
         Assert.assertTrue("Result: " + result.toString(),
-                ELSupport.equals(Long.valueOf(5), result));
+                ELSupport.equals(null, Long.valueOf(5), result));
     }
 
 
@@ -617,7 +617,7 @@ public class TestCollectionOperations {
                 Object.class);
 
         Assert.assertTrue("Result: " + result.toString(),
-                ELSupport.equals(Long.valueOf(0), result));
+                ELSupport.equals(null, Long.valueOf(0), result));
     }
 
 

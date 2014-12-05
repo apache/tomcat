@@ -35,12 +35,12 @@ public final class AstOr extends BooleanNode {
     public Object getValue(EvaluationContext ctx)
             throws ELException {
         Object obj = this.children[0].getValue(ctx);
-        Boolean b = coerceToBoolean(obj, true);
+        Boolean b = coerceToBoolean(ctx, obj, true);
         if (b.booleanValue()) {
             return b;
         }
         obj = this.children[1].getValue(ctx);
-        b = coerceToBoolean(obj, true);
+        b = coerceToBoolean(ctx, obj, true);
         return b;
     }
 }

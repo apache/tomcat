@@ -31,8 +31,8 @@ public class AstConcatenation extends SimpleNode {
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         // Coerce the two child nodes to string and then concatenate
-        String s1 = coerceToString(children[0].getValue(ctx));
-        String s2 = coerceToString(children[1].getValue(ctx));
+        String s1 = coerceToString(ctx, children[0].getValue(ctx));
+        String s2 = coerceToString(ctx, children[1].getValue(ctx));
         return s1 + s2;
     }
 

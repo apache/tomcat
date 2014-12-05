@@ -33,7 +33,7 @@ import org.junit.Test;
 public class TestELSupport {
     @Test
     public void testEquals() {
-        assertTrue(ELSupport.equals("01", Long.valueOf(1)));
+        assertTrue(ELSupport.equals(null, "01", Long.valueOf(1)));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class TestELSupport {
     public void testCoerceEnumAToEnumA() {
         Object output = null;
         try {
-            output = ELSupport.coerceToEnum(TestEnumA.VALA1, TestEnumA.class);
+            output = ELSupport.coerceToEnum(null, TestEnumA.VALA1, TestEnumA.class);
         } finally {
             assertEquals(TestEnumA.VALA1, output);
         }
@@ -105,7 +105,7 @@ public class TestELSupport {
     public void testCoerceEnumAToEnumB() {
         Object output = null;
         try {
-            output = ELSupport.coerceToEnum(TestEnumA.VALA1, TestEnumB.class);
+            output = ELSupport.coerceToEnum(null, TestEnumA.VALA1, TestEnumB.class);
         } catch (ELException ele) {
             // Ignore
         }
@@ -116,7 +116,7 @@ public class TestELSupport {
     public void testCoerceEnumAToEnumC() {
         Object output = null;
         try {
-            output = ELSupport.coerceToEnum(TestEnumA.VALA1, TestEnumC.class);
+            output = ELSupport.coerceToEnum(null, TestEnumA.VALA1, TestEnumC.class);
         } catch (ELException ele) {
             // Ignore
         }
@@ -243,31 +243,31 @@ public class TestELSupport {
     @Test
     public void testCoerceToNumber01() {
         Object result = ELSupport.coerceToNumber(
-                (Object) null, Integer.class);
+                null, (Object) null, Integer.class);
         Assert.assertNull("Resut: " + result, result);
     }
 
     @Test
     public void testCoerceToNumber02() {
         Object result = ELSupport.coerceToNumber(
-                (Object) null, int.class);
+                null, (Object) null, int.class);
         Assert.assertEquals(Integer.valueOf(0), result);
     }
 
     @Test
     public void testCoerceToBoolean01() {
-        Object result = ELSupport.coerceToBoolean(null, true);
+        Object result = ELSupport.coerceToBoolean(null, null, true);
         Assert.assertEquals(Boolean.FALSE, result);
     }
 
     @Test
     public void testCoerceToBoolean02() {
-        Object result = ELSupport.coerceToBoolean(null, false);
+        Object result = ELSupport.coerceToBoolean(null, null, false);
         Assert.assertNull("Resut: " + result, result);
     }
 
     private static void testIsSame(Object value) {
-        assertEquals(value, ELSupport.coerceToNumber(value, value.getClass()));
+        assertEquals(value, ELSupport.coerceToNumber(null, value, value.getClass()));
     }
 
     private static enum TestEnumA {
