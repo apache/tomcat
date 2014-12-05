@@ -757,17 +757,6 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             runtimeException = e;
         }
 
-        // Release the filter chain (if any) for this request
-        try {
-            if (filterChain != null)
-                filterChain.release();
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            wrapper.getLogger().error(sm.getString("standardWrapper.releaseFilters",
-                             wrapper.getName()), e);
-            // FIXME: Exception handling needs to be similar to what is in the StandardWrapperValue
-        }
-
         // Deallocate the allocated servlet instance
         try {
             if (servlet != null) {
