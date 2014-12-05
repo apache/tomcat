@@ -23,13 +23,11 @@ import java.util.logging.LogRecord;
 /**
  * Outputs the just the log message with no additional elements. Stack traces
  * are not logged. Log messages are separated by
- * <code>System.getProperty("line.separator")</code>. This is intended for use
+ * <code>System.lineSeparator()</code>. This is intended for use
  * by access logs and the like that need complete control over the output
  * format.
  */
 public class VerbatimFormatter extends Formatter {
-
-    private static final String LINE_SEP = System.getProperty("line.separator");
 
     @Override
     public String format(LogRecord record) {
@@ -37,7 +35,7 @@ public class VerbatimFormatter extends Formatter {
         StringBuilder sb = new StringBuilder(record.getMessage());
 
         // New line for next record
-        sb.append(LINE_SEP);
+        sb.append(System.lineSeparator());
 
         return sb.toString();
     }

@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.tagext.TagInfo;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.Options;
@@ -567,9 +566,9 @@ public class JspServletWrapper {
             if (options.getDisplaySourceFragment()) {
                 return new JasperException(Localizer.getMessage
                         ("jsp.exception", detail.getJspFileName(),
-                                "" + jspLineNumber) + Constants.NEWLINE +
-                                Constants.NEWLINE + detail.getJspExtract() +
-                                Constants.NEWLINE + Constants.NEWLINE +
+                                "" + jspLineNumber) + System.lineSeparator() +
+                                System.lineSeparator() + detail.getJspExtract() +
+                                System.lineSeparator() + System.lineSeparator() +
                                 "Stacktrace:", ex);
 
             }

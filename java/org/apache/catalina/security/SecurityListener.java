@@ -170,7 +170,7 @@ public class SecurityListener implements LifecycleListener {
             }
         }
         if (umask == null) {
-            if (Constants.CRLF.equals(Constants.LINE_SEP)) {
+            if (Constants.CRLF.equals(System.lineSeparator())) {
                 // Probably running on Windows so no umask
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("SecurityListener.checkUmaskSkip"));

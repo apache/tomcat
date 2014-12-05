@@ -38,8 +38,7 @@ import java.util.logging.LogRecord;
  */
 public class OneLineFormatter extends Formatter {
 
-    private static final String LINE_SEP = System.getProperty("line.separator");
-    private static final String ST_SEP = LINE_SEP + " ";
+    private static final String ST_SEP = System.lineSeparator() + " ";
     private static final String UNKONWN_THREAD_NAME = "Unknown thread with ID ";
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
@@ -136,7 +135,7 @@ public class OneLineFormatter extends Formatter {
         }
 
         // New line for next record
-        sb.append(LINE_SEP);
+        sb.append(System.lineSeparator());
 
         return sb.toString();
     }
