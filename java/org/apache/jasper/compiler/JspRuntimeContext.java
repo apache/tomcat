@@ -435,7 +435,6 @@ public final class JspRuntimeContext {
     private String initClassPath() {
 
         StringBuilder cpath = new StringBuilder();
-        String sep = System.getProperty("path.separator");
 
         if (parentClassLoader instanceof URLClassLoader) {
             URL [] urls = ((URLClassLoader)parentClassLoader).getURLs();
@@ -447,12 +446,12 @@ public final class JspRuntimeContext {
                 // protocol URL's to the classpath.
                 
                 if( urls[i].getProtocol().equals("file") ) {
-                    cpath.append(urls[i].getFile()+sep);
+                    cpath.append(urls[i].getFile()+File.pathSeparator);
                 }
             }
         }
 
-        cpath.append(options.getScratchDir() + sep);
+        cpath.append(options.getScratchDir() + File.pathSeparator);
 
         String cp = (String) context.getAttribute(Constants.SERVLET_CLASSPATH);
         if (cp == null || cp.equals("")) {
