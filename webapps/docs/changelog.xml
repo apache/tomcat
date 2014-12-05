@@ -69,7 +69,7 @@
       <fix>
         <bug>57190</bug>: Fix <code>ServletContext.getContext(String)</code>
         when parallel deployment is used so that the correct ServletContext is
-        returned. (markt) 
+        returned. (markt)
       </fix>
       <fix>
         <bug>57208</bug>: Prevent NPE in JNDI Realm when no results are found
@@ -143,7 +143,7 @@
         (<code>base.path</code>). (kkolinko)
       </update>
       <update>
-        Update optional Checkstyle library to 6.0. (kkolinko)
+        Update optional Checkstyle library to 6.1.1. (kkolinko)
       </update>
       <update>
         Simplify <code>setproxy</code> task in <code>build.xml</code>.
