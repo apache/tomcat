@@ -147,7 +147,8 @@ public class ErrorReportValve extends ValveBase {
             ExceptionUtils.handleThrowable(tt);
         }
 
-        if (request.isAsyncStarted()) {
+        if (request.isAsyncStarted() && !request.isAsyncCompleting() &&
+                !request.isAsyncDispatching()) {
             request.getAsyncContext().complete();
         }
     }

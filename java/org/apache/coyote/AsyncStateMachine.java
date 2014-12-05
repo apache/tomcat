@@ -101,37 +101,43 @@ public class AsyncStateMachine<S> {
         StringManager.getManager(Constants.Package);
 
     private static enum AsyncState {
-        DISPATCHED(false, false, false),
-        STARTING(true, true, false),
-        STARTED(true, true, false),
-        MUST_COMPLETE(true, true, false),
-        COMPLETING(true, false, false),
-        TIMING_OUT(true, false, false),
-        MUST_DISPATCH(true, true, true),
-        DISPATCHING(true, false, true),
-        ERROR(true,false,false);
+        DISPATCHED(false, false, false, false),
+        STARTING(true, true, false, false),
+        STARTED(true, true, false, false),
+        MUST_COMPLETE(true, true, true, false),
+        COMPLETING(true, false, true, false),
+        TIMING_OUT(true, false, false, false),
+        MUST_DISPATCH(true, true, false, true),
+        DISPATCHING(true, false, false, true),
+        ERROR(true, false, false, false);
     
-        private boolean isAsync;
-        private boolean isStarted;
-        private boolean isDispatching;
+        private final boolean isAsync;
+        private final boolean isStarted;
+        private final boolean isCompleting;
+        private final boolean isDispatching;
         
-        private AsyncState(boolean isAsync, boolean isStarted,
+        private AsyncState(boolean isAsync, boolean isStarted, boolean isCompleting,
                 boolean isDispatching) {
             this.isAsync = isAsync;
             this.isStarted = isStarted;
+            this.isCompleting = isCompleting;
             this.isDispatching = isDispatching;
         }
         
         public boolean isAsync() {
-            return this.isAsync;
+            return isAsync;
         }
         
         public boolean isStarted() {
-            return this.isStarted;
+            return isStarted;
         }
         
         public boolean isDispatching() {
-            return this.isDispatching;
+            return isDispatching;
+        }
+
+        public boolean isCompleting() {
+            return isCompleting;
         }
     }
     
@@ -165,6 +171,10 @@ public class AsyncStateMachine<S> {
 
     public boolean isAsyncError() {
         return state == AsyncState.ERROR;
+    }
+
+    public boolean isCompleting() {
+        return state.isCompleting();
     }
 
     public synchronized void asyncStart(AsyncContextCallback asyncCtxt) {
