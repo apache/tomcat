@@ -170,8 +170,8 @@ public class TestELEvaluation {
     }
 
     private void compareBoth(String msg, int expected, Object o1, Object o2){
-        int i1 = ELSupport.compare(o1, o2);
-        int i2 = ELSupport.compare(o2, o1);
+        int i1 = ELSupport.compare(null, o1, o2);
+        int i2 = ELSupport.compare(null, o2, o1);
         assertEquals(msg,expected, i1);
         assertEquals(msg,expected, -i2);
     }

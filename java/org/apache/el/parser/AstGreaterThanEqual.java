@@ -42,6 +42,6 @@ public final class AstGreaterThanEqual extends BooleanNode {
         if (obj0 == null || obj1 == null) {
             return Boolean.FALSE;
         }
-        return (compare(obj0, obj1) >= 0) ? Boolean.TRUE : Boolean.FALSE;
+        return (compare(ctx, obj0, obj1) >= 0) ? Boolean.TRUE : Boolean.FALSE;
     }
 }

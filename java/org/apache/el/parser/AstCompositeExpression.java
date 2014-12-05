@@ -48,7 +48,7 @@ public final class AstCompositeExpression extends SimpleNode {
             for (int i = 0; i < this.children.length; i++) {
                 obj = this.children[i].getValue(ctx);
                 if (obj != null) {
-                    sb.append(ELSupport.coerceToString(obj));
+                    sb.append(ELSupport.coerceToString(ctx, obj));
                 }
             }
         }
