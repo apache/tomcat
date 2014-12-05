@@ -101,15 +101,15 @@ public class AsyncStateMachine<S> {
         StringManager.getManager(Constants.Package);
 
     private static enum AsyncState {
-        DISPATCHED(false, false, false, false, false),
-        STARTING(true, true, false, false, true),
-        STARTED(true, true, false, false, false),
-        MUST_COMPLETE(true, true, true, false, false),
-        COMPLETING(true, false, true, false, false),
-        TIMING_OUT(true, false, false, false, false),
-        MUST_DISPATCH(true, true, false, true, true),
-        DISPATCHING(true, false, false, true, false),
-        ERROR(true, false, false, false, false);
+        DISPATCHED   (false, false, false, false, false),
+        STARTING     (true,  true,  false, false, true),
+        STARTED      (true,  true,  false, false, false),
+        MUST_COMPLETE(true,  true,  true,  false, false),
+        COMPLETING   (true,  false, true,  false, false),
+        TIMING_OUT   (true,  false, false, false, false),
+        MUST_DISPATCH(true,  true,  false, true,  true),
+        DISPATCHING  (true,  false, false, true,  false),
+        ERROR        (true,  false, false, false, false);
     
         private final boolean isAsync;
         private final boolean isStarted;
