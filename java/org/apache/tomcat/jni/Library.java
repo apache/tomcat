@@ -17,6 +17,8 @@
 
 package org.apache.tomcat.jni;
 
+import java.io.File;
+
 /** Library
  *
  * @author Mladen Turk
@@ -49,8 +51,7 @@ public final class Library {
                 }
                 String name = System.mapLibraryName(NAMES[i]);
                 String path = System.getProperty("java.library.path");
-                String sep = System.getProperty("path.separator");
-                String [] paths = path.split(sep);
+                String [] paths = path.split(File.pathSeparator);
                 for (int j=0; j<paths.length; j++) {
                     java.io.File fd = new java.io.File(paths[j] , name);
                     if (fd.exists()) {
