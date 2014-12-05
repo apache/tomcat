@@ -66,8 +66,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private ServletRequest servletRequest = null;
-    private ServletResponse servletResponse = null;
+    private volatile ServletRequest servletRequest = null;
+    private volatile ServletResponse servletResponse = null;
     private List<AsyncListenerWrapper> listeners = new ArrayList<AsyncListenerWrapper>();
     private boolean hasOriginalRequestAndResponse = true;
     private volatile Runnable dispatch = null;
@@ -91,6 +91,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         check();
         request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
+        clearServletRequestResposne();
     }
 
     @Override
@@ -246,17 +247,26 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
         this.dispatch = run;
         this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
+        clearServletRequestResposne();
     }
 
     @Override
     public ServletRequest getRequest() {
         check();
+        if (servletRequest == null) {
+            throw new IllegalStateException(
+                    sm.getString("asyncContextImpl.request.ise"));
+        }
         return servletRequest;
     }
 
     @Override
     public ServletResponse getResponse() {
         check();
+        if (servletResponse == null) {
+            throw new IllegalStateException(
+                    sm.getString("asyncContextImpl.response.ise"));
+        }
         return servletResponse;
     }
 
@@ -327,9 +337,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         instanceManager = null;
         listeners.clear();
         request = null;
+        clearServletRequestResposne();
+        timeout = -1;
+    }
+
+    private void clearServletRequestResposne() {
         servletRequest = null;
         servletResponse = null;
-        timeout = -1;
     }
 
     public boolean isStarted() {
