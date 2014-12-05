@@ -398,7 +398,6 @@ public final class JspRuntimeContext {
     private String initClassPath() {
 
         StringBuilder cpath = new StringBuilder();
-        String sep = System.getProperty("path.separator");
 
         if (parentClassLoader instanceof URLClassLoader) {
             URL [] urls = ((URLClassLoader)parentClassLoader).getURLs();
@@ -413,7 +412,7 @@ public final class JspRuntimeContext {
                         // Need to decode the URL, primarily to convert %20
                         // sequences back to spaces
                         String decoded = URLDecoder.decode(urls[i].getPath(), "UTF-8");
-                        cpath.append(decoded + sep);
+                        cpath.append(decoded + File.pathSeparator);
                     } catch (UnsupportedEncodingException e) {
                         // All JREs are required to support UTF-8
                     }
@@ -421,7 +420,7 @@ public final class JspRuntimeContext {
             }
         }
 
-        cpath.append(options.getScratchDir() + sep);
+        cpath.append(options.getScratchDir() + File.pathSeparator);
 
         String cp = (String) context.getAttribute(Constants.SERVLET_CLASSPATH);
         if (cp == null || cp.equals("")) {
