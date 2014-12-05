@@ -119,6 +119,11 @@
         configured programmatically via the Servlet 3.0 API and then used
         without error when running under a SecurityManager. (markt)
       </fix>
+      <fix>
+        <bug>57308</bug>: Remove unnecessary calls to
+        <code>System.getProperty()</code> where more suitable API calls are
+        available. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

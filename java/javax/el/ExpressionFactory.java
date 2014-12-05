@@ -51,7 +51,6 @@ public abstract class ExpressionFactory {
 
     private static final String PROPERTY_NAME = "javax.el.ExpressionFactory";
 
-    private static final String SEP;
     private static final String PROPERTY_FILE;
 
     private static final CacheValue nullTcclFactory = new CacheValue();
@@ -60,29 +59,19 @@ public abstract class ExpressionFactory {
 
     static {
         if (IS_SECURITY_ENABLED) {
-            SEP = AccessController.doPrivileged(
-                    new PrivilegedAction<String>(){
-                        @Override
-                        public String run() {
-                            return System.getProperty("file.separator");
-                        }
-
-                    }
-            );
             PROPERTY_FILE = AccessController.doPrivileged(
                     new PrivilegedAction<String>(){
                         @Override
                         public String run() {
-                            return System.getProperty("java.home") + SEP +
-                                    "lib" + SEP + "el.properties";
+                            return System.getProperty("java.home") + File.separator +
+                                    "lib" + File.separator + "el.properties";
                         }
 
                     }
             );
         } else {
-            SEP = System.getProperty("file.separator");
-            PROPERTY_FILE = System.getProperty("java.home") + SEP + "lib" +
-                    SEP + "el.properties";
+            PROPERTY_FILE = System.getProperty("java.home") + File.separator + "lib" +
+                    File.separator + "el.properties";
         }
     }
 
