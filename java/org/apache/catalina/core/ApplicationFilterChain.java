@@ -349,30 +349,6 @@ final class ApplicationFilterChain implements FilterChain {
 
 
     /**
-     * Release references to the filters and wrapper executed by this chain.
-     */
-    void release() {
-
-        for (int i = 0; i < n; i++) {
-            filters[i] = null;
-        }
-        n = 0;
-        pos = 0;
-        servlet = null;
-        support = null;
-
-    }
-
-
-    /**
-     * Prepare for reuse of the filters and wrapper executed by this chain.
-     */
-    void reuse() {
-        pos = 0;
-    }
-
-
-    /**
      * Set the servlet that will be executed at the end of this chain.
      *
      * @param servlet The Wrapper for the servlet to be executed
