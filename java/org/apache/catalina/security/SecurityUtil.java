@@ -69,10 +69,9 @@ public final class SecurityUtil{
     private static final String DESTROY_METHOD = "destroy";
 
     /**
-     * Cache every object for which we are creating method on it.
+     * Cache every class for which we are creating methods.
      */
-    private static final Map<Object,Method[]> objectCache =
-        new ConcurrentHashMap<Object,Method[]>();
+    private static final Map<Object,Method[]> classCache = new ConcurrentHashMap<Object,Method[]>();
 
     private static final org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( SecurityUtil.class );
@@ -135,7 +134,7 @@ public final class SecurityUtil{
      * @param methodName the method to apply the security restriction
      * @param targetObject the <code>Servlet</code> on which the method will
      * be called.
-     * @param targetType <code>Class</code> array used to instantiate a
+     * @param targetParameterTypes <code>Class</code> array used to instantiate a
      * <code>Method</code> object.
      * @param targetArguments <code>Object</code> array contains the
      * runtime parameters instance.
@@ -144,25 +143,25 @@ public final class SecurityUtil{
      */
     public static void doAsPrivilege(final String methodName,
                                      final Servlet targetObject,
-                                     final Class<?>[] targetType,
+                                     final Class<?>[] targetParameterTypes,
                                      final Object[] targetArguments,
                                      Principal principal)
         throws java.lang.Exception{
 
         Method method = null;
-        Method[] methodsCache = objectCache.get(targetObject);
+        Method[] methodsCache = classCache.get(Servlet.class);
         if(methodsCache == null) {
             method = createMethodAndCacheIt(methodsCache,
+                                            Servlet.class,
                                             methodName,
-                                            targetObject,
-                                            targetType);
+                                            targetParameterTypes);
         } else {
             method = findMethod(methodsCache, methodName);
             if (method == null) {
                 method = createMethodAndCacheIt(methodsCache,
+                                                Servlet.class,
                                                 methodName,
-                                                targetObject,
-                                                targetType);
+                                                targetParameterTypes);
             }
         }
 
@@ -215,38 +214,38 @@ public final class SecurityUtil{
      * @param methodName the method to apply the security restriction
      * @param targetObject the <code>Filter</code> on which the method will
      * be called.
-     * @param targetType <code>Class</code> array used to instantiate a
+     * @param targetParameterTypes <code>Class</code> array used to instantiate a
      * <code>Method</code> object.
-     * @param targetArguments <code>Object</code> array contains the
+     * @param targetParameterValues <code>Object</code> array contains the
      * runtime parameters instance.
      * @param principal the <code>Principal</code> to which the security
      * privilege apply
      */
     public static void doAsPrivilege(final String methodName,
                                      final Filter targetObject,
-                                     final Class<?>[] targetType,
-                                     final Object[] targetArguments,
+                                     final Class<?>[] targetParameterTypes,
+                                     final Object[] targetParameterValues,
                                      Principal principal)
         throws java.lang.Exception{
 
         Method method = null;
-        Method[] methodsCache = objectCache.get(targetObject);
+        Method[] methodsCache = classCache.get(Filter.class);
         if(methodsCache == null) {
             method = createMethodAndCacheIt(methodsCache,
+                                            Filter.class,
                                             methodName,
-                                            targetObject,
-                                            targetType);
+                                            targetParameterTypes);
         } else {
             method = findMethod(methodsCache, methodName);
             if (method == null) {
                 method = createMethodAndCacheIt(methodsCache,
+                                                Filter.class,
                                                 methodName,
-                                                targetObject,
-                                                targetType);
+                                                targetParameterTypes);
             }
         }
 
-        execute(method, targetObject, targetArguments, principal);
+        execute(method, targetObject, targetParameterValues, principal);
     }
 
 
@@ -362,25 +361,23 @@ public final class SecurityUtil{
     /**
      * Create the method and cache it for further re-use.
      * @param methodsCache the cache used to store method instance
+     * @param targetType the class on which the method will be called.
      * @param methodName the method to apply the security restriction
-     * @param targetObject the <code>Servlet</code> on which the method will
-     * be called.
-     * @param targetType <code>Class</code> array used to instantiate a
+     * @param parameterTypes <code>Class</code> array used to instantiate a
      * <code>Method</code> object.
      * @return the method instance.
      */
     private static Method createMethodAndCacheIt(Method[] methodsCache,
+                                                 Class<?> targetType,
                                                  String methodName,
-                                                 Object targetObject,
-                                                 Class<?>[] targetType)
-            throws Exception{
+                                                 Class<?>[] parameterTypes)
+            throws Exception {
 
-        if ( methodsCache == null){
+        if (methodsCache == null) {
             methodsCache = new Method[4];
         }
 
-        Method method =
-            targetObject.getClass().getMethod(methodName, targetType);
+        Method method = targetType.getMethod(methodName, parameterTypes);
 
         if (methodName.equals(INIT_METHOD)){
             methodsCache[INIT] = method;
@@ -396,7 +393,7 @@ public final class SecurityUtil{
             methodsCache[DOFILTEREVENT] = method;
         }
 
-        objectCache.put(targetObject, methodsCache );
+        classCache.put(targetType, methodsCache);
 
         return method;
     }
@@ -408,7 +405,7 @@ public final class SecurityUtil{
      * @param cachedObject The object to remove
      */
     public static void remove(Object cachedObject){
-        objectCache.remove(cachedObject);
+        classCache.remove(cachedObject);
     }
 
 

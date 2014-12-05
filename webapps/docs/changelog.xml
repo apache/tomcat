@@ -114,6 +114,11 @@
         chance to handle an async error before the built-in error reporting.
         (markt)
       </fix>
+      <fix>
+        <bug>57281</bug>: Enable non-public Filter and Servlet classes to be
+        configured programmatically via the Servlet 3.0 API and then used
+        without error when running under a SecurityManager. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
