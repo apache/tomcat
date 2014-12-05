@@ -91,7 +91,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         check();
         request.getCoyoteRequest().action(ActionCode.ASYNC_COMPLETE, null);
-        clearServletRequestResposne();
+        clearServletRequestResponse();
     }
 
     @Override
@@ -247,7 +247,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
         this.dispatch = run;
         this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
-        clearServletRequestResposne();
+        clearServletRequestResponse();
     }
 
     @Override
@@ -337,11 +337,11 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         instanceManager = null;
         listeners.clear();
         request = null;
-        clearServletRequestResposne();
+        clearServletRequestResponse();
         timeout = -1;
     }
 
-    private void clearServletRequestResposne() {
+    private void clearServletRequestResponse() {
         servletRequest = null;
         servletResponse = null;
     }
