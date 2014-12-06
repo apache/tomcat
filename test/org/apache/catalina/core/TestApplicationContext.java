@@ -200,6 +200,8 @@ public class TestApplicationContext extends TomcatBaseTest {
         Assert.assertTrue(body, body.contains("03-foo1"));
         Assert.assertTrue(body, body.contains("04-foo2"));
         Assert.assertTrue(body, body.contains("05-foo2"));
+        // FIXME: Enable this test
+        //Assert.assertTrue(body, body.contains("06-null"));
     }
 
 
@@ -218,6 +220,7 @@ public class TestApplicationContext extends TomcatBaseTest {
             pw.println("03-" + sc.getContext("/foo##1").getInitParameter("id"));
             pw.println("04-" + sc.getContext("/foo##2").getInitParameter("id"));
             pw.println("05-" + sc.getContext("/foo##3").getInitParameter("id"));
+            pw.println("06-" + sc.getContext("/unknown"));
         }
     }
 
