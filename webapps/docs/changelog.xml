@@ -124,6 +124,9 @@
         <code>System.getProperty()</code> where more suitable API calls are
         available. (markt)
       </fix>
+      <add>
+        Add unit tests for RemoteAddrValve and RemoteHostValve. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
