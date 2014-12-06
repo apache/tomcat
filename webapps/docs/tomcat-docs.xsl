@@ -374,7 +374,7 @@ p.notice {
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="
-              count(//*[(local-name()='section' or local-name()='subsection') and @name=current()/@name]) &gt; 1
+              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1
               ">
             <xsl:value-of select="concat(ancestor::section/@name, '/')"/>
           </xsl:if>
@@ -414,7 +414,7 @@ p.notice {
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="local-name()='subsection' and
-              count(//*[(local-name()='section' or local-name()='subsection') and @name=current()/@name]) &gt; 1
+              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1
               ">
             <xsl:value-of select="concat(ancestor::section/@name, '/')"/>
           </xsl:if>
