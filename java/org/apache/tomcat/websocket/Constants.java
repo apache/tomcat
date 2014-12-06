@@ -43,8 +43,9 @@ public class Constants {
     static final byte INTERNAL_OPCODE_FLUSH = 0x18;
 
     // Buffers
-    static final int DEFAULT_BUFFER_SIZE =
-            Integer.getInteger("org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024);
+    static final int DEFAULT_BUFFER_SIZE = Integer.getInteger(
+            "org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024)
+            .intValue();
 
     // Client connection
     public static final String HOST_HEADER_NAME = "Host";
@@ -66,8 +67,9 @@ public class Constants {
             System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
 
     // Configuration for background processing checks intervals
-    static final int DEFAULT_PROCESS_PERIOD =
-            Integer.getInteger("org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10);
+    static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
+            "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
+            .intValue();
 
     // Configuration for extensions
     static final boolean DISABLE_BUILTIN_EXTENSIONS =
