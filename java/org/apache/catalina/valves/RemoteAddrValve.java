@@ -27,7 +27,8 @@ import org.apache.catalina.connector.Response;
 
 /**
  * Concrete implementation of <code>RequestFilterValve</code> that filters
- * based on the string representation of the remote client's IP address.
+ * based on the string representation of the remote client's IP address
+ * optionally combined with the server connector port number.
  *
  * @author Craig R. McClanahan
  */
@@ -46,6 +47,14 @@ public final class RemoteAddrValve
         "org.apache.catalina.valves.RemoteAddrValve/1.0";
 
 
+    /**
+     * Flag deciding whether we add the server connector port to the property
+     * compared in the filtering method. The port will be appended
+     * using a ";" as a separator.
+     */
+    protected volatile boolean addConnectorPort = false;
+
+
     // ------------------------------------------------------------- Properties
 
 
@@ -57,6 +66,28 @@ public final class RemoteAddrValve
 
         return (info);
 
+    }
+
+
+    /**
+     * Get the flag deciding whether we add the server connector port to the
+     * property compared in the filtering method. The port will be appended
+     * using a ";" as a separator.
+     */
+    public boolean getAddConnectorPort() {
+        return addConnectorPort;
+    }
+
+
+    /**
+     * Set the flag deciding whether we add the server connector port to the
+     * property compared in the filtering method. The port will be appended
+     * using a ";" as a separator.
+     *
+     * @param addConnectorPort The new flag
+     */
+    public void setAddConnectorPort(boolean addConnectorPort) {
+        this.addConnectorPort = addConnectorPort;
     }
 
 
@@ -79,7 +110,13 @@ public final class RemoteAddrValve
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
 
-        process(request.getRequest().getRemoteAddr(), request, response);
+        String property;
+        if (addConnectorPort) {
+            property = request.getRequest().getRemoteAddr() + ";" + request.getConnector().getPort();
+        } else {
+            property = request.getRequest().getRemoteAddr();
+        }
+        process(property, request, response);
 
     }
 

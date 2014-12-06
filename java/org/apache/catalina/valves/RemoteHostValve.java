@@ -27,7 +27,8 @@ import org.apache.catalina.connector.Response;
 
 /**
  * Concrete implementation of <code>RequestFilterValve</code> that filters
- * based on the remote client's host name.
+ * based on the remote client's host name optionally combined with the
+ * server connector port number.
  *
  * @author Craig R. McClanahan
  */
@@ -46,6 +47,14 @@ public final class RemoteHostValve
         "org.apache.catalina.valves.RemoteHostValve/1.0";
 
 
+    /**
+     * Flag deciding whether we add the server connector port to the property
+     * compared in the filtering method. The port will be appended
+     * using a ";" as a separator.
+     */
+    protected volatile boolean addConnectorPort = false;
+
+
     // ------------------------------------------------------------- Properties
 
 
@@ -57,6 +66,28 @@ public final class RemoteHostValve
 
         return (info);
 
+    }
+
+
+    /**
+     * Get the flag deciding whether we add the server connector port to the
+     * property compared in the filtering method. The port will be appended
+     * using a ";" as a separator.
+     */
+    public boolean getAddConnectorPort() {
+        return addConnectorPort;
+    }
+
+
+    /**
+     * Set the flag deciding whether we add the server connector port to the
+     * property compared in the filtering method. The port will be appended
+     * using a ";" as a separator.
+     *
+     * @param addConnectorPort The new flag
+     */
+    public void setAddConnectorPort(boolean addConnectorPort) {
+        this.addConnectorPort = addConnectorPort;
     }
 
 
@@ -79,7 +110,13 @@ public final class RemoteHostValve
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
 
-        process(request.getRequest().getRemoteHost(), request, response);
+        String property;
+        if (addConnectorPort) {
+            property = request.getRequest().getRemoteHost() + ";" + request.getConnector().getPort();
+        } else {
+            property = request.getRequest().getRemoteHost();
+        }
+        process(property, request, response);
 
     }
 
