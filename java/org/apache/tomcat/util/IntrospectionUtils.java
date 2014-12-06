@@ -173,7 +173,7 @@ public final class IntrospectionUtils {
         // Find the directory where jarName.jar is located
 
         String cpath = System.getProperty("java.class.path");
-        String pathSep = System.getProperty("path.separator");
+        String pathSep = File.pathSeparator;
         StringTokenizer st = new StringTokenizer(cpath, pathSep);
         while (st.hasMoreTokens()) {
             String path = st.nextToken();
@@ -250,7 +250,7 @@ public final class IntrospectionUtils {
      * @deprecated Used only by deprecated method
      */
     @Deprecated
-    public static final String PATH_SEPARATOR = System.getProperty("path.separator");
+    public static final String PATH_SEPARATOR = File.pathSeparator;
 
     /**
      * Adds classpath entries from a vector of URL's to the "tc_path_add" System
@@ -675,7 +675,7 @@ public final class IntrospectionUtils {
     @Deprecated
     public static void addJarsFromClassPath(Vector<URL> jars, String cp)
             throws IOException, MalformedURLException {
-        String sep = System.getProperty("path.separator");
+        String sep = File.pathSeparator;
         StringTokenizer st;
         if (cp != null) {
             st = new StringTokenizer(cp, sep);
