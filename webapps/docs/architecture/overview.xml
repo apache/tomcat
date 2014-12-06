@@ -94,7 +94,7 @@ connectors available with Tomcat. These include the
 <a href="../config/http.html">HTTP connector</a> which is used for
 most HTTP traffic, especially when running Tomcat as a standalone server,
 and the <a href="../config/ajp.html">AJP connector</a> which implements
-the AJP procotol used when connecting Tomcat to a web server such as
+the AJP protocol used when connecting Tomcat to a web server such as
 Apache HTTPD server. Creating a customized connector is a significant
 effort.
 </p>
