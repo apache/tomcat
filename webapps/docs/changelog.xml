@@ -131,14 +131,15 @@
         Allow to configure RemoteAddrValve and RemoteHostValve to
         adopt behavior depending on the connector port. Implemented
         by optionally adding the connector port to the string compared
-        with the patterns <code>allow</code> and <code>deny</code>
-        (using <code>addConnectorPort</code>). (rjung)
+        with the patterns <code>allow</code> and <code>deny</code>. Configured
+        using <code>addConnectorPort</code> attribute on valve. (rjung)
       </add>
       <add>
-        Optionally trigger authentication intead of denial in
+        Optionally trigger authentication instead of denial in
         RemoteAddrValve and RemoteHostValve. This only works in
         combination with <code>preemptiveAuthentication</code>
-        on the application context. (rjung)
+        on the application context. Configured using
+        <code>invalidAuthenticationWhenDeny</code> attribute on valve. (rjung)
       </add>
     </changelog>
   </subsection>
