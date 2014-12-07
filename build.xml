@@ -246,6 +246,8 @@
     <include name="**/NOTICE"/>
     <include name="**/RELEASE-NOTES"/>
     <include name="**/javax.servlet.ServletContainerInitializer"/>
+    <include name="**/javax.websocket.ContainerProvider"/>
+    <include name="**/javax.websocket.server.ServerEndpointConfig$Configurator"/>
     <include name="**/.gitignore"/>
     <include name="**/*.classpath"/>
     <include name="**/*.css"/>
