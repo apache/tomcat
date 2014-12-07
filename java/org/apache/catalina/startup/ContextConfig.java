@@ -1463,8 +1463,6 @@ public class ContextConfig implements LifecycleListener {
             try {
                 URL url = new URL(globalWebXml.getSystemId());
                 globalTimeStamp = url.openConnection().getLastModified();
-            } catch (MalformedURLException e) {
-                globalTimeStamp = -1;
             } catch (IOException e) {
                 globalTimeStamp = -1;
             }
@@ -1474,8 +1472,6 @@ public class ContextConfig implements LifecycleListener {
             try {
                 URL url = new URL(hostWebXml.getSystemId());
                 hostTimeStamp = url.openConnection().getLastModified();
-            } catch (MalformedURLException e) {
-                hostTimeStamp = -1;
             } catch (IOException e) {
                 hostTimeStamp = -1;
             }
