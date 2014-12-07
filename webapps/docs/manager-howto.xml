@@ -249,16 +249,21 @@ represents the Manager command you wish to execute, and
 that are specific to that command.  In the illustrations below, customize
 the host and port appropriately for your installation.</p>
 
+<p>The commands are usually executed by HTTP GET requests. The
+<code>/deploy</code> command has a form that is executed by an HTTP PUT request.</p>
+
+<subsection name="Common Parameters">
+
 <p>Most commands accept one or more of the following query parameters:</p>
 <ul>
 <li><strong>path</strong> - The context path (including the leading slash)
     of the web application you are dealing with.  To select the ROOT web
-    application, specify "/".  <strong>NOTE</strong> -
+    application, specify "/".  <strong>NOTE</strong>:
     It is not possible to perform administrative commands on the
     Manager application itself.</li>
 <li><strong>version</strong> - The version of this web application as used by
-    the parallel deployment feature,</li>
-<li><strong>war</strong> - URL of a web application archive (WAR) file,
+    the <a href="config/context.html">parallel deployment</a> feature,</li>
+<li><strong>war</strong> - URL of a web application archive (WAR) file, or
     pathname of a directory which contains the web application, or a
     Context configuration ".xml" file.  You can use URLs in any of the
     following formats:
@@ -298,7 +303,9 @@ its message strings in resource bundles, so it is possible that the strings
 have been translated for your platform.  The examples below show the English
 version of the messages.</p>
 
-<subsection name="Deploy A New Application Remotely">
+</subsection>
+
+<subsection name="Deploy A New Application Archive (WAR) Remotely">
 
 <source>http://localhost:8080/manager/text/deploy?path=/foo</source>
 
@@ -308,6 +315,8 @@ directory of our corresponding virtual host, and start , using the directory
 name or the war file name without the .war extension as the path.  The
 application can later be undeployed (and the corresponding application directory
 removed) by use of the <code>/undeploy</code> command.</p>
+
+<p>This command is executed by an HTTP PUT request.</p>
 
 <p>The .WAR file may include Tomcat specific deployment configuration, by
 including a Context configuration XML file in
@@ -358,18 +367,21 @@ error message.  Possible causes for problems include:</p>
 <code>path</code> (which must not be in use by any other web application).
 This command is the logical opposite of the <code>/undeploy</code> command.</p>
 
-<p>There are a number of different ways the deploy command can be used.</p>
+<p>This command is executed by an HTTP GET request.
+There are a number of different ways the deploy command can be used.</p>
 
-<h5>Deploy a previously deployed webapp</h5>
+<subsection name="Deploy a previously deployed webapp">
+
+<source>http://localhost:8080/manager/text/deploy?path=/footoo&amp;tag=footag</source>
 
 <p>This can be used to deploy a previously deployed web application, which
 has been deployed using the <code>tag</code> attribute. Note that the work
-directory for the Manager webapp will contain the previously deployed WARs;
+directory of the Manager webapp will contain the previously deployed WARs;
 removing it would make the deployment fail.</p>
-<source>http://localhost:8080/manager/text/deploy?path=/footoo&amp;tag=footag</source>
 
+</subsection>
 
-<h5>Deploy a Directory or WAR by URL</h5>
+<subsection name="Deploy a Directory or WAR by URL">
 
 <p>Deploy a web application directory or ".war" file located on the Tomcat
 server. If no <code>path</code> is specified, the directory name or the war file
@@ -393,8 +405,9 @@ so the context path defaults to the name of the web application archive
 file without the ".war" extension.</p>
 <source>http://localhost:8080/manager/text/deploy?war=jar:file:/path/to/bar.war!/</source>
 
+</subsection>
 
-<h5>Deploy a Directory or War from the Host appBase</h5>
+<subsection name="Deploy a Directory or War from the Host appBase">
 
 <p>Deploy a web application directory or ".war" file located in your Host
 appBase directory. The directory name or the war file name without the ".war"
@@ -412,8 +425,9 @@ Host appBase directory on the Tomcat server is deployed as the web
 application context named <code>/bar</code>.</p>
 <source>http://localhost:8080/manager/text/deploy?war=bar.war</source>
 
+</subsection>
 
-<h5>Deploy using a Context configuration ".xml" file</h5>
+<subsection name="Deploy using a Context configuration &quot;.xml&quot; file">
 
 <p>If the Host deployXML flag is set to true you can deploy a web
 application using a Context configuration ".xml" file and an optional
@@ -444,8 +458,9 @@ on the server.</p>
 <source>http://localhost:8080/manager/text/deploy
  ?config=file:/path/context.xml&amp;war=jar:file:/path/bar.war!/</source>
 
+</subsection>
 
-<h5>Deployment Notes</h5>
+<subsection name="Deployment Notes">
 
 <p>If the Host is configured with unpackWARs=true and you deploy a war
 file, the war will be unpacked into a directory in your Host appBase
@@ -462,8 +477,9 @@ from deploying web applications using a configuration XML file and
 also prevents them from deploying application directories or ".war"
 files located outside of their Host appBase.</p>
 
+</subsection>
 
-<h5>Deploy Response</h5>
+<subsection name="Deploy Response">
 
 <p>If installation and startup is successful, you will receive a response
 like this:</p>
@@ -519,6 +535,7 @@ error message.  Possible causes for problems include:</p>
      </p></li>
 </ul>
 
+</subsection>
 </subsection>
 
 <subsection name="List Currently Deployed Applications">
