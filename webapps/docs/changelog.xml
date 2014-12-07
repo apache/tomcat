@@ -178,7 +178,7 @@
       </update>
       <update>
         Improve Tomcat Manager documentation. Rearrange, add section on
-        HTML GUI, document Server Status page. (kkolinko)
+        HTML GUI, document /expire command and Server Status page. (kkolinko)
       </update>
       <fix>
         Fix ambiguity of section links on Valves configuration reference page.
