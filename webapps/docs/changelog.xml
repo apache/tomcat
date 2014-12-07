@@ -184,6 +184,10 @@
         Fix ambiguity of section links on Valves configuration reference page.
         (kkolinko)
       </fix>
+      <fix>
+        <bug>57323</bug>: Correct display of outdated sessions in sessions
+        count listing in Manager application. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
