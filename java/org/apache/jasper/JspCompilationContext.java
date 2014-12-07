@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.util.Set;
+import java.util.jar.JarEntry;
 
 import javax.servlet.ServletContext;
 import javax.servlet.jsp.tagext.TagInfo;
@@ -363,7 +364,12 @@ public class JspCompilationContext {
                 }
                 uc = jspUrl.openConnection();
                 if (uc instanceof JarURLConnection) {
-                    result = ((JarURLConnection) uc).getJarEntry().getTime();
+                    JarEntry jarEntry = ((JarURLConnection) uc).getJarEntry();
+                    if (jarEntry != null) {
+                        result = jarEntry.getTime();
+                    } else {
+                        result = uc.getLastModified();
+                    }
                 } else {
                     result = uc.getLastModified();
                 }
