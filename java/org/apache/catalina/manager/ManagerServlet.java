@@ -1172,7 +1172,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     "managerServlet.sessiondefaultmax",
                     "" + maxInactiveInterval));
             Session [] sessions = manager.findSessions();
-            int [] timeout = new int[maxCount];
+            int[] timeout = new int[maxCount + 1];
             int notimeout = 0;
             int expired = 0;
             for (int i = 0; i < sessions.length; i++) {
@@ -1185,7 +1185,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 if (time < 0)
                     notimeout++;
                 else if (time >= maxCount)
-                    timeout[maxCount-1]++;
+                    timeout[maxCount]++;
                 else
                     timeout[time]++;
             }
@@ -1199,6 +1199,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             "managerServlet.sessiontimeout",
                             "" + (i)*histoInterval + " - <" + (i+1)*histoInterval,
                             "" + timeout[i]));
+            }
+            if (timeout[maxCount] > 0) {
+                writer.println(smClient.getString(
+                        "managerServlet.sessiontimeout",
+                        ">=" + maxCount*histoInterval,
+                        "" + timeout[maxCount]));
             }
             if (notimeout > 0)
                 writer.println(smClient.getString(
