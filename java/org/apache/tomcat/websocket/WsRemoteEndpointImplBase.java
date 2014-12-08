@@ -937,6 +937,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                         sm.getString("wsRemoteEndpoint.closedOutputStream"));
             }
 
+            // Optimisation. If there is no data to flush then do not send an
+            // empty message.
             if (buffer.position() > 0) {
                 doWrite(false);
             }
