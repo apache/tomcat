@@ -44,6 +44,12 @@
   <typedef
         name="findleaks"
         classname="org.apache.catalina.ant.FindLeaksTask" />  
+  <typedef
+        name="vminfo"
+        classname="org.apache.catalina.ant.VminfoTask" />
+  <typedef
+        name="threaddump"
+        classname="org.apache.catalina.ant.ThreaddumpTask" />
   <!-- Jk Task -->
   <typedef
         name="jkstatus"

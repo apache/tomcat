@@ -184,6 +184,11 @@
         Fix ambiguity of section links on Valves configuration reference page.
         (kkolinko)
       </fix>
+      <add>
+        <bug>57261</bug>: Add vminfo and threaddump commands to Manager
+        application. Implement <code>VminfoTask</code> and
+        <code>ThreaddumpTask</code> Ant tasks. (kkolinko)
+      </add>
       <fix>
         <bug>57323</bug>: Correct display of outdated sessions in sessions
         count listing in Manager application. (kkolinko)

@@ -857,6 +857,61 @@ has been reloaded several times, it may be listed several times.</p>
 
 </subsection>
 
+<subsection name="Thread Dump">
+
+<source>http://localhost:8080/manager/text/threaddump</source>
+
+<p>Write a JVM thread dump.</p>
+
+<p>The response will look something like this:</p>
+<source><![CDATA[OK - JVM thread dump
+2014-12-08 07:24:40.080
+Full thread dump Java HotSpot(TM) Client VM (25.25-b02 mixed mode):
+
+"http-nio-8080-exec-2" Id=26 cpu=46800300 ns usr=46800300 ns blocked 0 for -1 ms waited 0 for -1 ms
+   java.lang.Thread.State: RUNNABLE
+        locks java.util.concurrent.ThreadPoolExecutor$Worker@1738ad4
+        at sun.management.ThreadImpl.dumpThreads0(Native Method)
+        at sun.management.ThreadImpl.dumpAllThreads(ThreadImpl.java:446)
+        at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:440)
+        at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:409)
+        at org.apache.catalina.manager.ManagerServlet.threadDump(ManagerServlet.java:557)
+        at org.apache.catalina.manager.ManagerServlet.doGet(ManagerServlet.java:371)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:618)
+        at javax.servlet.http.HttpServlet.service(HttpServlet.java:725)
+...
+]]></source>
+
+</subsection>
+
+<subsection name="VM Info">
+
+<source>http://localhost:8080/manager/text/vminfo</source>
+
+<p>Write some diagnostic information about Java Virtual Machine.</p>
+
+<p>The response will look something like this:</p>
+<source><![CDATA[OK - VM info
+2014-12-08 07:27:32.578
+Runtime information:
+  vmName: Java HotSpot(TM) Client VM
+  vmVersion: 25.25-b02
+  vmVendor: Oracle Corporation
+  specName: Java Virtual Machine Specification
+  specVersion: 1.8
+  specVendor: Oracle Corporation
+  managementSpecVersion: 1.2
+  name: ...
+  startTime: 1418012458849
+  uptime: 393855
+  isBootClassPathSupported: true
+
+OS information:
+...
+]]></source>
+
+</subsection>
+
 </section>
 
 <section name="Server Status">
@@ -1085,6 +1140,8 @@ file might look something like this:</p>
   <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"/>
   <typedef name="sessions"  classname="org.apache.catalina.ant.SessionsTask"/>
   <taskdef name="findleaks" classname="org.apache.catalina.ant.FindLeaksTask"/>
+  <typedef name="vminfo"    classname="org.apache.catalina.ant.VminfoTask"/>
+  <typedef name="threaddump" classname="org.apache.catalina.ant.ThreaddumpTask"/>
 
   <!-- Executable Targets -->
   <target name="compile" description="Compile web application">
