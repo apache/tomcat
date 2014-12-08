@@ -461,6 +461,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return classResources.toArray(new WebResourceSet[0]);
     }
 
+    protected void addClassResources(WebResourceSet webResourceSet) {
+        webResourceSet.setRoot(this);
+        classResources.add(webResourceSet);
+    }
+
     @Override
     public void setAllowLinking(boolean allowLinking) {
         this.allowLinking = allowLinking;
