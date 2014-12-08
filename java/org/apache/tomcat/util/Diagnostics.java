@@ -15,23 +15,6 @@
  * limitations under the License.
  */
 
-// XXX TODO: Source code line length
-// XXX TODO: More JavaDoc
-// XXX Optional: Add support for com.sun.management specific mbean
-//               (http://docs.oracle.com/javase/7/docs/jre/api/management/extension/index.html)
-// XXX Optional: Wire additional public static methods implemented here
-//               to the manager (think about manager access roles!)
-//                 setLoggerLevel(),
-//                 setVerboseClassLoading(),
-//                 setThreadContentionMonitoringEnabled(),
-//                 setThreadCpuTimeEnabled(),
-//                 resetPeakThreadCount(),
-//                 setVerboseGarbageCollection()
-//                 gc(),
-//                 resetPeakUsage(),
-//                 setUsageThreshold(),
-//                 setCollectionUsageThreshold()
-
 package org.apache.tomcat.util;
 
 import java.lang.management.ClassLoadingMXBean;
@@ -65,16 +48,12 @@ import org.apache.tomcat.util.res.StringManager;
 public class Diagnostics {
 
     private static final String PACKAGE = "org.apache.tomcat.util";
-    private static final StringManager sm = StringManager.getManager(PACKAGE);
 
     private static final String INDENT1 = "  ";
     private static final String INDENT2 = "\t";
     private static final String INDENT3 = "   ";
     private static final String CRLF = "\r\n";
     private static final String vminfoSystemProperty = "java.vm.info";
-
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog(Diagnostics.class);
 
     private static final SimpleDateFormat timeformat =
         new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -104,171 +83,6 @@ public class Diagnostics {
         ManagementFactory.getMemoryManagerMXBeans();
     private static final List<MemoryPoolMXBean> memoryPoolMXBeans =
         ManagementFactory.getMemoryPoolMXBeans();
-
-    /**
-     * Check whether thread contention monitoring is enabled.
-     *
-     * @return true if thread contention monitoring is enabled
-     */
-    public static boolean isThreadContentionMonitoringEnabled() {
-        return threadMXBean.isThreadContentionMonitoringEnabled();
-    }
-
-    /**
-     * Enable or disable thread contention monitoring via the ThreadMxMXBean.
-     *
-     * @param enable whether to enable thread contention monitoring
-     */
-    public static void setThreadContentionMonitoringEnabled(boolean enable) {
-        threadMXBean.setThreadContentionMonitoringEnabled(enable);
-        boolean checkValue = threadMXBean.isThreadContentionMonitoringEnabled();
-        if (enable != checkValue) {
-            log.error("Could not set threadContentionMonitoringEnabled to " +
-                      enable + ", got " + checkValue + " instead");
-        }
-    }
-
-    /**
-     * Check whether thread cpu time measurement is enabled.
-     *
-     * @return true if thread cpu time measurement is enabled
-     */
-    public static boolean isThreadCpuTimeEnabled() {
-        return threadMXBean.isThreadCpuTimeEnabled();
-    }
-
-    /**
-     * Enable or disable thread cpu time measurement via the ThreadMxMXBean.
-     *
-     * @param enable whether to enable thread cpu time measurement
-     */
-    public static void setThreadCpuTimeEnabled(boolean enable) {
-        threadMXBean.setThreadCpuTimeEnabled(enable);
-        boolean checkValue = threadMXBean.isThreadCpuTimeEnabled();
-        if (enable != checkValue) {
-            log.error("Could not set threadCpuTimeEnabled to " + enable +
-                      ", got " + checkValue + " instead");
-        }
-    }
-
-    /**
-     * Reset peak thread count in ThreadMXBean
-     */
-    public static void resetPeakThreadCount() {
-        threadMXBean.resetPeakThreadCount();
-    }
-
-    /**
-     * Set verbose class loading
-     *
-     * @param verbose whether to enable verbose class loading
-     */
-    public static void setVerboseClassLoading(boolean verbose) {
-        classLoadingMXBean.setVerbose(verbose);
-        boolean checkValue = classLoadingMXBean.isVerbose();
-        if (verbose != checkValue) {
-            log.error("Could not set verbose class loading to " + verbose +
-                      ", got " + checkValue + " instead");
-        }
-    }
-
-    /**
-     * Set logger level
-     *
-     * @param loggerName the name of the logger
-     * @param levelName the level to set
-     */
-    public static void setLoggerLevel(String loggerName, String levelName) {
-        loggingMXBean.setLoggerLevel(loggerName, levelName);
-        String checkValue = loggingMXBean.getLoggerLevel(loggerName);
-        if (!checkValue.equals(levelName)) {
-            log.error("Could not set logger level for logger '" +
-                      loggerName + "' to '" + levelName +
-                      "', got '" + checkValue + "' instead");
-        }
-    }
-
-    /**
-     * Set verbose garbage collection logging
-     *
-     * @param verbose whether to enable verbose gc logging
-     */
-    public static void setVerboseGarbageCollection(boolean verbose) {
-        memoryMXBean.setVerbose(verbose);
-        boolean checkValue = memoryMXBean.isVerbose();
-        if (verbose != checkValue) {
-            log.error("Could not set verbose garbage collection logging to " + verbose +
-                      ", got " + checkValue + " instead");
-        }
-    }
-
-    /**
-     * Initiate garbage collection via MX Bean
-     */
-    public static void gc() {
-        memoryMXBean.gc();
-    }
-
-    /**
-     * Reset peak memory usage data in MemoryPoolMXBean
-     *
-     * @param name name of the MemoryPoolMXBean or "all"
-     */
-    public static void resetPeakUsage(String name) {
-        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
-            if (name.equals("all") || name.equals(mbean.getName())) {
-                mbean.resetPeakUsage();
-            }
-        }
-    }
-
-    /**
-     * Set usage threshold in MemoryPoolMXBean
-     *
-     * @param name name of the MemoryPoolMXBean
-     * @param threshold the threshold to set
-     * @return true if setting the threshold succeeded
-     */
-    public static boolean setUsageThreshold(String name, long threshold) {
-        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
-            if (name.equals(mbean.getName())) {
-                try {
-                    mbean.setUsageThreshold(threshold);
-                    return true;
-                } catch (IllegalArgumentException ex) {
-                    // IGNORE
-                } catch (UnsupportedOperationException ex) {
-                    // IGNORE
-                }
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Set collection usage threshold in MemoryPoolMXBean
-     *
-     * @param name name of the MemoryPoolMXBean
-     * @param threshold the collection threshold to set
-     * @return true if setting the threshold succeeded
-     */
-    public static boolean setCollectionUsageThreshold(String name, long threshold) {
-        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
-            if (name.equals(mbean.getName())) {
-                try {
-                    mbean.setCollectionUsageThreshold(threshold);
-                    return true;
-                } catch (IllegalArgumentException ex) {
-                    // IGNORE
-                } catch (UnsupportedOperationException ex) {
-                    // IGNORE
-                }
-                return false;
-            }
-        }
-        return false;
-    }
 
     /**
      * Formats the thread dump header for one thread.
@@ -370,7 +184,7 @@ public class Diagnostics {
      * @return a deadlock message and the formatted thread dump
      *         of the deadlocked threads
      */
-    public static String findDeadlock() {
+    private static String findDeadlock() {
         ThreadInfo[] tinfos = null;
         long[] ids = threadMXBean.findDeadlockedThreads();
         if (ids != null) {
@@ -385,16 +199,6 @@ public class Diagnostics {
             }
         }
         return "";
-    }
-
-    /**
-     * Retrieves a formatted JVM thread dump.
-     * The default StringManager will be used.
-     *
-     * @return the formatted JVM thread dump
-     */
-    public static String getThreadDump() {
-        return getThreadDump(sm);
     }
 
     /**
@@ -417,7 +221,7 @@ public class Diagnostics {
      * @param requestedSm the StringManager to use
      * @return the formatted JVM thread dump
      */
-    public static String getThreadDump(StringManager requestedSm) {
+    private static String getThreadDump(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 
         synchronized(timeformat) {
@@ -464,16 +268,6 @@ public class Diagnostics {
 
     /**
      * Retrieves a formatted JVM information text.
-     * The default StringManager will be used.
-     *
-     * @return the formatted JVM information text
-     */
-    public static String getVMInfo() {
-        return getVMInfo(sm);
-    }
-
-    /**
-     * Retrieves a formatted JVM information text.
      * The given list of locales will be used
      * to retrieve a StringManager.
      *
@@ -491,7 +285,7 @@ public class Diagnostics {
      * @param requestedSm the StringManager to use
      * @return the formatted JVM information text
      */
-    public static String getVMInfo(StringManager requestedSm) {
+    private static String getVMInfo(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 
         synchronized(timeformat) {
