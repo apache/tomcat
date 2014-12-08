@@ -1158,7 +1158,11 @@ file might look something like this:</p>
   <taskdef name="stop"      classname="org.apache.catalina.ant.StopTask"/>
   <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/>
   <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"/>
+  <typedef name="sessions"  classname="org.apache.catalina.ant.SessionsTask"/>
   <taskdef name="findleaks" classname="org.apache.catalina.ant.FindLeaksTask"/>
+  <typedef name="vminfo"    classname="org.apache.catalina.ant.VminfoTask"/>
+  <typedef name="threaddump" classname="org.apache.catalina.ant.ThreaddumpTask"/>
+  <typedef name="sslConnectorCiphers" classname="org.apache.catalina.ant.SslConnectorCiphersTask"/>
 
   <!-- Executable Targets -->
   <target name="compile" description="Compile web application">
