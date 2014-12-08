@@ -114,6 +114,7 @@ import org.apache.tomcat.util.res.StringManager;
  *     context path <code>/xxx</code> for this virtual host.</li>
  * <li><b>/stop?path=/xxx</b> - Stop the web application attached to
  *     context path <code>/xxx</code> for this virtual host.</li>
+ * <li><b>/threaddump</b> - Write a JVM thread dump.</li>
  * <li><b>/undeploy?path=/xxx</b> - Shutdown and remove the web application
  *     attached to context path <code>/xxx</code> for this virtual host,
  *     and remove the underlying WAR file or document base directory.
@@ -121,6 +122,7 @@ import org.apache.tomcat.util.res.StringManager;
  *     base is stored in the <code>appBase</code> directory of this host,
  *     typically as a result of being placed there via the <code>/deploy</code>
  *     command.</li>
+ * <li><b>/vminfo</b> - Write some VM info.</li>
  * </ul>
  * <p>Use <code>path=/</code> for the ROOT context.</p>
  * <p>The syntax of the URL for a web application archive must conform to one
@@ -364,9 +366,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         } else if (command.equals("/findleaks")) {
             findleaks(statusLine, writer, smClient);
         } else if (command.equals("/vminfo")) {
-            vmInfo(writer, request.getLocales());
+            vmInfo(writer, smClient, request.getLocales());
         } else if (command.equals("/threaddump")) {
-            threadDump(writer, request.getLocales());
+            threadDump(writer, smClient, request.getLocales());
         } else if (command.equals("/sslConnectorCiphers")) {
             sslConnectorCiphers(writer, smClient);
         } else {
@@ -537,8 +539,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      *
      * @param writer
      */
-    protected void vmInfo(PrintWriter writer,
+    protected void vmInfo(PrintWriter writer, StringManager smClient,
             Enumeration<Locale> requestedLocales) {
+        writer.println(smClient.getString("managerServlet.vminfo"));
         writer.print(Diagnostics.getVMInfo(requestedLocales));
     }
 
@@ -548,8 +551,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      *
      * @param writer
      */
-    protected void threadDump(PrintWriter writer,
+    protected void threadDump(PrintWriter writer, StringManager smClient,
             Enumeration<Locale> requestedLocales) {
+        writer.println(smClient.getString("managerServlet.threaddump"));
         writer.print(Diagnostics.getThreadDump(requestedLocales));
     }
 
