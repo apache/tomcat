@@ -457,6 +457,10 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return postResources.toArray(new WebResourceSet[0]);
     }
 
+    protected WebResourceSet[] getClassResources() {
+        return classResources.toArray(new WebResourceSet[0]);
+    }
+
     @Override
     public void setAllowLinking(boolean allowLinking) {
         this.allowLinking = allowLinking;
@@ -633,9 +637,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
         cacheJmxName = register(cache, getObjectNameKeyProperties() + ",name=Cache");
 
-        // Ensure support for jar:war:file:/ URLs will be available (required
-        // for resource JARs in packed WAR files).
-        TomcatURLStreamHandlerFactory.register();
+        registerURLStreamHandlerFactory();
 
         if (context == null) {
             throw new IllegalStateException(
@@ -649,29 +651,17 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         }
     }
 
+    protected void registerURLStreamHandlerFactory() {
+        // Ensure support for jar:war:file:/ URLs will be available (required
+        // for resource JARs in packed WAR files).
+        TomcatURLStreamHandlerFactory.register();
+    }
+
     @Override
     protected void startInternal() throws LifecycleException {
-        String docBase = context.getDocBase();
-
         mainResources.clear();
 
-        if (docBase == null) {
-            main = new EmptyResourceSet(this);
-        } else {
-            File f = new File(docBase);
-            if (!f.isAbsolute()) {
-                f = new File(((Host)context.getParent()).getAppBaseFile(), f.getPath());
-            }
-            if (f.isDirectory()) {
-                main = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
-            } else if(f.isFile() && docBase.endsWith(".war")) {
-                main = new JarResourceSet(this, "/", f.getAbsolutePath(), "/");
-            } else {
-                throw new IllegalArgumentException(
-                        sm.getString("standardRoot.startInvalidMain",
-                                f.getAbsolutePath()));
-            }
-        }
+        main = createMainResourceSet();
 
         mainResources.add(main);
 
@@ -692,6 +682,31 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         cache.enforceObjectMaxSizeLimit();
 
         setState(LifecycleState.STARTING);
+    }
+
+    protected WebResourceSet createMainResourceSet() {
+        String docBase = context.getDocBase();
+
+        WebResourceSet mainResourceSet;
+        if (docBase == null) {
+            mainResourceSet = new EmptyResourceSet(this);
+        } else {
+            File f = new File(docBase);
+            if (!f.isAbsolute()) {
+                f = new File(((Host)context.getParent()).getAppBaseFile(), f.getPath());
+            }
+            if (f.isDirectory()) {
+                mainResourceSet = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
+            } else if(f.isFile() && docBase.endsWith(".war")) {
+                mainResourceSet = new JarResourceSet(this, "/", f.getAbsolutePath(), "/");
+            } else {
+                throw new IllegalArgumentException(
+                        sm.getString("standardRoot.startInvalidMain",
+                                f.getAbsolutePath()));
+            }
+        }
+
+        return mainResourceSet;
     }
 
     @Override
