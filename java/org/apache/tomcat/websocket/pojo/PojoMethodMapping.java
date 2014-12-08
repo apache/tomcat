@@ -132,7 +132,7 @@ public class PojoMethodMapping {
                     MessageHandlerInfo messageHandler = new MessageHandlerInfo(method, decoders);
                     boolean found = false;
                     for (MessageHandlerInfo otherMessageHandler : onMessage) {
-                        if (messageHandler.equals(otherMessageHandler)) {
+                        if (messageHandler.targetsSameWebSocketMessageType(otherMessageHandler)) {
                             found = true;
                             if (currentClazz == clazzPojo ||
                                     (currentClazz != clazzPojo
@@ -589,12 +589,10 @@ public class PojoMethodMapping {
         }
 
 
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null || !(obj instanceof MessageHandlerInfo)) {
+        public boolean targetsSameWebSocketMessageType(MessageHandlerInfo otherHandler) {
+            if (otherHandler == null) {
                 return false;
             }
-            MessageHandlerInfo otherHandler = (MessageHandlerInfo) obj;
             if (indexByteArray >= 0 && otherHandler.indexByteArray >= 0) {
                 return true;
             }
