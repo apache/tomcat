@@ -111,8 +111,7 @@ public abstract class BaseGenericObjectPool<T> {
     private final StatsStore activeTimes = new StatsStore(MEAN_TIMING_STATS_CACHE_SIZE);
     private final StatsStore idleTimes = new StatsStore(MEAN_TIMING_STATS_CACHE_SIZE);
     private final StatsStore waitTimes = new StatsStore(MEAN_TIMING_STATS_CACHE_SIZE);
-    private final Object maxBorrowWaitTimeMillisLock = new Object();
-    private volatile long maxBorrowWaitTimeMillis = 0; // @GuardedBy("maxBorrowWaitTimeMillisLock")
+    private final AtomicLong maxBorrowWaitTimeMillis = new AtomicLong(0L);
     private volatile SwallowedExceptionListener swallowedExceptionListener = null;
 
 
@@ -809,7 +808,7 @@ public abstract class BaseGenericObjectPool<T> {
      * @return maximum wait time in milliseconds since the pool was created
      */
     public final long getMaxBorrowWaitTimeMillis() {
-        return maxBorrowWaitTimeMillis;
+        return maxBorrowWaitTimeMillis.get();
     }
 
     /**
@@ -873,11 +872,15 @@ public abstract class BaseGenericObjectPool<T> {
         borrowedCount.incrementAndGet();
         idleTimes.add(p.getIdleTimeMillis());
         waitTimes.add(waitTime);
-        synchronized (maxBorrowWaitTimeMillisLock) {
-            if (waitTime > maxBorrowWaitTimeMillis) {
-                maxBorrowWaitTimeMillis = waitTime;
+
+        // lock-free optimistic-locking maximum
+        long currentMax;
+        do {
+            currentMax = maxBorrowWaitTimeMillis.get();
+            if (currentMax >= waitTime) {
+                break;
             }
-        }
+        } while (!maxBorrowWaitTimeMillis.compareAndSet(currentMax, waitTime));
     }
 
     /**
@@ -1039,12 +1042,21 @@ public abstract class BaseGenericObjectPool<T> {
         }
     }
 
+    /**
+     * Maintains a cache of values for a single metric and reports
+     * statistics on the cached values.
+     */
     private class StatsStore {
 
         private final AtomicLong values[];
         private final int size;
         private int index;
 
+        /**
+         * Create a StatsStore with the given cache size.
+         *
+         * @param size number of values to maintain in the cache.
+         */
         public StatsStore(int size) {
             this.size = size;
             values = new AtomicLong[size];
@@ -1053,6 +1065,12 @@ public abstract class BaseGenericObjectPool<T> {
             }
         }
 
+        /**
+         * Adds a value to the cache.  If the cache is full, one of the
+         * existing values is replaced by the new value.
+         *
+         * @param value new value to add to the cache.
+         */
         public synchronized void add(long value) {
             values[index].set(value);
             index++;
@@ -1061,6 +1079,11 @@ public abstract class BaseGenericObjectPool<T> {
             }
         }
 
+        /**
+         * Returns the mean of the cached values.
+         *
+         * @return the mean of the cache, truncated to long
+         */
         public long getMean() {
             double result = 0;
             int counter = 0;
@@ -1073,7 +1096,6 @@ public abstract class BaseGenericObjectPool<T> {
                 }
             }
             return (long) result;
-
         }
     }
 }

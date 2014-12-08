@@ -1226,23 +1226,33 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         }
 
         /**
+         * Returns the successor node of the given non-null, but
+         * possibly previously deleted, node.
+         */
+        private Node<E> succ(Node<E> n) {
+            // Chains of deleted nodes ending in null or self-links
+            // are possible if multiple interior nodes are removed.
+            for (;;) {
+                Node<E> s = nextNode(n);
+                if (s == null)
+                    return null;
+                else if (s.item != null)
+                    return s;
+                else if (s == n)
+                    return firstNode();
+                else
+                    n = s;
+            }
+        }
+
+        /**
          * Advances next.
          */
         void advance() {
             lock.lock();
             try {
                 // assert next != null;
-                Node<E> s = nextNode(next);
-                if (s == next) {
-                    next = firstNode();
-                } else {
-                    // Skip over removed nodes.
-                    // May be necessary if multiple interior Nodes are removed.
-                    while (s != null && s.item == null) {
-                        s = nextNode(s);
-                    }
-                    next = s;
-                }
+                next = succ(next);
                 nextItem = next == null ? null : next.item;
             } finally {
                 lock.unlock();
