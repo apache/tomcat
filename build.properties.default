@@ -92,7 +92,7 @@ base-maven.loc=http://repo.maven.apache.org/maven2
 # - log4j
 # - logkit
 # - servletapi
-commons-logging.version=1.1.3
+commons-logging.version=1.2
 commons-logging.home=${base.path}/commons-logging-${commons-logging.version}
 commons-logging-src.loc.1=${base-commons.loc.1}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
 commons-logging-src.loc.2=${base-commons.loc.2}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
@@ -103,6 +103,14 @@ avalon-framework.version=4.1.5
 avalon-framework.home=${base.path}/avalon-framework-${avalon-framework.version}
 avalon-framework.loc=${base-maven.loc}/avalon-framework/avalon-framework/${avalon-framework.version}/avalon-framework-${avalon-framework.version}.jar
 avalon-framework.jar=${avalon-framework.home}/avalon-framework-${avalon-framework.version}.jar
+
+# ----- log4j2 (required by our extension of commons logging) -----
+log4j2.version=2.1
+log4j2.home=${base.path}/log4j2-${log4j2.version}
+log4j2-api.loc=${base-maven.loc}/org/apache/logging/log4j/log4j-api/${log4j2.version}/log4j-api-${log4j2.version}.jar
+log4j2-core.loc=${base-maven.loc}/org/apache/logging/log4j/log4j-core/${log4j2.version}/log4j-core-${log4j2.version}.jar
+log4j2-api.jar=${log4j2.home}/log4j-api-${log4j2.version}.jar
+log4j2-core.jar=${log4j2.home}/log4j-core-${log4j2.version}.jar
 
 # ----- log4j (required by commons logging) -----
 log4j.version=1.2.17
