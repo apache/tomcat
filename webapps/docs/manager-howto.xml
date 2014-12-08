@@ -1083,6 +1083,7 @@ file might look something like this:</p>
   <taskdef name="stop"      classname="org.apache.catalina.ant.StopTask"/>
   <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/>
   <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"/>
+  <typedef name="sessions"  classname="org.apache.catalina.ant.SessionsTask"/>
   <taskdef name="findleaks" classname="org.apache.catalina.ant.FindLeaksTask"/>
 
   <!-- Executable Targets -->
