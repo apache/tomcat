@@ -1529,6 +1529,18 @@
     </antcall>
 
     <antcall target="downloadfile">
+      <param name="sourcefile" value="${log4j2-api.loc}"/>
+      <param name="destfile" value="${log4j2-api.jar}"/>
+      <param name="destdir" value="${log4j.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${log4j2-core.loc}"/>
+      <param name="destfile" value="${log4j2-core.jar}"/>
+      <param name="destdir" value="${log4j.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
       <param name="sourcefile" value="${log4j.loc}"/>
       <param name="destfile" value="${log4j.jar}"/>
       <param name="destdir" value="${log4j.home}"/>
@@ -1577,8 +1589,15 @@
     <copy tofile="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/build2.xml"
       file="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/build.xml" />
 
+    <patch dir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src"
+      patchfile="${basedir}/res/patches/commons-logging-log4j2.patch"
+      strip="0"
+      failonerror="true"/>
+
     <copy todir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src">
       <fileset file="${avalon-framework.jar}" />
+      <fileset file="${log4j2-api.jar}" />
+      <fileset file="${log4j2-core.jar}" />
       <fileset file="${log4j.jar}" />
       <fileset file="${logkit.jar}" />
       <fileset file="${servletapi.jar}" />
