@@ -289,7 +289,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         private static final long serialVersionUID = 7398692158058772916L;
 
         /** Date format */
-        //@GuardedBy("this")
+        //@GuardedBy("format")
         private static final SimpleDateFormat format = new SimpleDateFormat
             ("'Pooled object created' yyyy-MM-dd HH:mm:ss Z " +
              "'by the following code has not been returned to the pool:'");
