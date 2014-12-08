@@ -141,6 +141,10 @@
         on the application context. Configured using
         <code>invalidAuthenticationWhenDeny</code> attribute on valve. (rjung)
       </add>
+      <fix>
+        Prevent file descriptors leak and ensure that files are closed after
+        retrieving the last modification time. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
