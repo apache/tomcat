@@ -646,10 +646,10 @@ public abstract class WsFrameBase {
         if (Util.isControl(opCode)) {
             return false;
         } else if (textMessage) {
-            return textMsgHandler instanceof MessageHandler.Partial<?>;
+            return textMsgHandler instanceof MessageHandler.Partial;
         } else {
             // Must be binary
-            return binaryMsgHandler instanceof MessageHandler.Partial<?>;
+            return binaryMsgHandler instanceof MessageHandler.Partial;
         }
     }
 

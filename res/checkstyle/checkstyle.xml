@@ -76,10 +76,7 @@
     -->
 
     <!-- Whitespace -->
-    <!-- Can't handle HashMap<String,Class<?>[]>
-    https://sourceforge.net/tracker/?func=detail&aid=3039718&group_id=29721&atid=397078
     <module name="GenericWhitespace"/>
-    -->
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
     <!--  ~ 1200 errors
