@@ -325,7 +325,7 @@
     </p>
 
     <p>
-    These HTTP headers are an instruction to the client about the document&#x27;s
+    These HTTP headers are an instruction to the client about the document's
     validity and persistence. If cached, the document may be fetched from the
     cache rather than from the source until this time has passed. After that, the
     cache copy is considered &quot;expired&quot; and invalid, and a new copy must
@@ -380,24 +380,24 @@
 
     <source><![CDATA[<init-param>
  <param-name>ExpiresDefault</param-name>
- <param-value><base> [plus] {<num>   <type>}*</param-value>
+ <param-value><base> [plus] {<num> <type>}*</param-value>
 </init-param>
 
 <init-param>
  <param-name>ExpiresByType type</param-name>
- <param-value><base> [plus]   {<num> <type>}*</param-value>
+ <param-value><base> [plus] {<num> <type>}*</param-value>
 </init-param>
 
 <init-param>
  <param-name>ExpiresByType type;encoding</param-name>
- <param-value><base> [plus]   {<num> <type>}*</param-value>
+ <param-value><base> [plus] {<num> <type>}*</param-value>
 </init-param>]]></source>
     <p>
     where <code>&lt;base&gt;</code> is one of:
     </p>
     <ul>
     <li><code>access</code></li>
-    <li><code>now</code> (equivalent to &#x27;<code>access</code>&#x27;)</li>
+    <li><code>now</code> (equivalent to '<code>access</code>')</li>
     <li><code>modification</code></li>
     </ul>
 
@@ -407,13 +407,13 @@
     <code>&lt;type&gt;</code> is one of:
     </p>
     <ul>
-    <li><code>years</code></li>
-    <li><code>months</code></li>
-    <li><code>weeks</code></li>
-    <li><code>days</code></li>
-    <li><code>hours</code></li>
-    <li><code>minutes</code></li>
-    <li><code>seconds</code></li>
+    <li><code>year</code>, <code>years</code></li>
+    <li><code>month</code>, <code>months</code></li>
+    <li><code>week</code>, <code>weeks</code></li>
+    <li><code>day</code>, <code>days</code></li>
+    <li><code>hour</code>, <code>hours</code></li>
+    <li><code>minute</code>, <code>minutes</code></li>
+    <li><code>second</code>, <code>seconds</code></li>
     </ul>
     <p>
     For example, any of the following directives can be used to make documents
@@ -435,18 +435,18 @@
  <param-value>access plus 30 days</param-value>
 </init-param>]]></source>
 <p>
-The expiry time can be fine-tuned by adding several &#x27;
-<code>&lt;num&gt; &lt;type&gt;</code>&#x27; clauses:
+The expiry time can be fine-tuned by adding several
+'<code>&lt;num&gt; &lt;type&gt;</code>' clauses:
 </p>
 
 <source><![CDATA[<init-param>
  <param-name>ExpiresByType text/html</param-name>
- <param-value>access plus 1 month 15   days 2 hours</param-value>
+ <param-value>access plus 1 month 15 days 2 hours</param-value>
 </init-param>
 
 <init-param>
  <param-name>ExpiresByType image/gif</param-name>
- <param-value>modification plus 5 hours 3   minutes</param-value>
+ <param-value>modification plus 5 hours 3 minutes</param-value>
 </init-param>]]></source>
     <p>
     Note that if you use a modification date based setting, the <code>Expires</code>
@@ -485,14 +485,13 @@ The expiry time can be fine-tuned by adding several &#x27;
     <ol>
     <li><code>ExpiresByType</code> matching the exact content-type returned by
     <code>HttpServletResponse.getContentType()</code> possibly including the charset
-    (e.g. &#x27;<code>text/xml;charset=UTF-8</code>&#x27;),</li>
+    (e.g. '<code>text/xml;charset=UTF-8</code>'),</li>
     <li><code>ExpiresByType</code> matching the content-type without the charset if
-    <code>HttpServletResponse.getContentType()</code> contains a charset (e.g. &#x27;
-    <code>text/xml;charset=UTF-8</code>&#x27; -&gt; &#x27;<code>text/xml</code>&#x27;),</li>
+    <code>HttpServletResponse.getContentType()</code> contains a charset (e.g.
+    '<code>text/xml;charset=UTF-8</code>' -&gt; '<code>text/xml</code>'),</li>
     <li><code>ExpiresByType</code> matching the major type (e.g. substring before
-    &#x27;<code>/</code>&#x27;) of <code>HttpServletResponse.getContentType()</code>
-    (e.g. &#x27;<code>text/xml;charset=UTF-8</code>&#x27; -&gt; &#x27;<code>text</code>
-    &#x27;),</li>
+    '<code>/</code>') of <code>HttpServletResponse.getContentType()</code>
+    (e.g. '<code>text/xml;charset=UTF-8</code>' -&gt; '<code>text</code>'),</li>
     <li><code>ExpiresDefault</code></li>
     </ol>
 
@@ -542,10 +541,10 @@ The expiry time can be fine-tuned by adding several &#x27;
          </p>
          <p>
          The base time is either the last modification time of the file, or the time
-         of the client&#x27;s access to the document. Which should be used is
+         of the client's access to the document. Which should be used is
          specified by the <code>&lt;code&gt;</code> field; <code>M</code> means that the
-         file&#x27;s last modification time should be used as the base time, and
-         <code>A</code> means the client&#x27;s access time should be used. The duration
+         file's last modification time should be used as the base time, and
+         <code>A</code> means the client's access time should be used. The duration
          is expressed in seconds. <code>A2592000</code> stands for
          <code>access plus 30 days</code> in alternate syntax.
          </p>
@@ -553,10 +552,10 @@ The expiry time can be fine-tuned by adding several &#x27;
          The difference in effect is subtle. If <code>M</code> (<code>modification</code> in
          alternate syntax) is used, all current copies of the document in all caches
          will expire at the same time, which can be good for something like a weekly
-         notice that&#x27;s always found at the same URL. If <code>A</code> (
+         notice that's always found at the same URL. If <code>A</code> (
          <code>access</code> or <code>now</code> in alternate syntax) is used, the date of
          expiration is different for each client; this can be good for image files
-         that don&#x27;t change very often, particularly for a set of related
+         that don't change very often, particularly for a set of related
          documents that all refer to the same images (<i>i.e.</i>, the images will be
          accessed repeatedly within a relatively short timespan).
          </p>
@@ -977,17 +976,17 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <td> 140.211.11.130 </td>
       </tr>
       <tr>
-        <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
+        <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
         <td> 140.211.11.130, 192.168.0.10 </td>
         <td> null </td>
       </tr>
       <tr>
-        <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
+        <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
         <td> null </td>
       </tr>
       <tr>
-        <td> request.header<code>[</code>&#x27;x-forwarded-proto&#x27;<code>]</code> </td>
+        <td> request.header<code>[</code>'x-forwarded-proto'<code>]</code> </td>
         <td> https </td>
         <td> https </td>
       </tr>
@@ -1052,12 +1051,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <td> 140.211.11.130 </td>
       </tr>
       <tr>
-        <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
+        <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
         <td> 140.211.11.130, proxy1, proxy2 </td>
         <td> null </td>
       </tr>
       <tr>
-        <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
+        <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
         <td> proxy1, proxy2 </td>
       </tr>
@@ -1106,12 +1105,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <td> 140.211.11.130 </td>
       </tr>
       <tr>
-        <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
+        <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
         <td> 140.211.11.130, proxy1, proxy2, 192.168.0.10 </td>
         <td> null </td>
       </tr>
       <tr>
-        <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
+        <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
         <td> proxy1, proxy2 </td>
       </tr>
@@ -1163,12 +1162,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <td> untrusted-proxy </td>
       </tr>
       <tr>
-        <td> request.header<code>[</code>&#x27;x-forwarded-for&#x27;<code>]</code> </td>
+        <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
         <td> 140.211.11.130, untrusted-proxy, proxy1 </td>
         <td> 140.211.11.130 </td>
       </tr>
       <tr>
-        <td> request.header<code>[</code>&#x27;x-forwarded-by&#x27;<code>]</code> </td>
+        <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
         <td> proxy1 </td>
       </tr>
