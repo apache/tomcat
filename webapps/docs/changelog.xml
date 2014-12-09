@@ -163,6 +163,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Fix potential issue with BeanELresolver when running under a security
+        manager. Some classes may not be accessible but may have accessible
+        interfaces. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

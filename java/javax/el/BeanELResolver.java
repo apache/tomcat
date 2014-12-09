@@ -251,12 +251,36 @@ public class BeanELResolver extends ELResolver {
             try {
                 BeanInfo info = Introspector.getBeanInfo(this.type);
                 PropertyDescriptor[] pds = info.getPropertyDescriptors();
-                for (int i = 0; i < pds.length; i++) {
-                    this.properties.put(pds[i].getName(), new BeanProperty(
-                            type, pds[i]));
+                for (PropertyDescriptor pd: pds) {
+                    this.properties.put(pd.getName(), new BeanProperty(type, pd));
+                }
+                if (System.getSecurityManager() != null) {
+                    // When running with SecurityManager, some classes may be
+                    // not accessible, but have accessible interfaces.
+                    populateFromInterfaces(type);
                 }
             } catch (IntrospectionException ie) {
                 throw new ELException(ie);
+            }
+        }
+
+        private void populateFromInterfaces(Class<?> aClass) throws IntrospectionException {
+            Class<?> interfaces[] = aClass.getInterfaces();
+            if (interfaces.length > 0) {
+                for (Class<?> ifs : interfaces) {
+                    BeanInfo info = Introspector.getBeanInfo(ifs);
+                    PropertyDescriptor[] pds = info.getPropertyDescriptors();
+                    for (PropertyDescriptor pd : pds) {
+                        if (!this.properties.containsKey(pd.getName())) {
+                            this.properties.put(pd.getName(), new BeanProperty(
+                                    this.type, pd));
+                        }
+                    }
+                }
+            }
+            Class<?> superclass = aClass.getSuperclass();
+            if (superclass != null) {
+                populateFromInterfaces(superclass);
             }
         }
 
