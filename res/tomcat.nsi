@@ -16,7 +16,6 @@
 ; Tomcat script for Nullsoft Installer
 
 !ifdef UNINSTALLONLY
-  RequestExecutionLevel user
   OutFile "tempinstaller.exe"
 !else
   OutFile tomcat-installer.exe

@@ -270,7 +270,14 @@ You can build them by using the following commands:
     You will be prompted for the GPG passphrase when the release build
     starts, unless "gpg.passphrase" property is set.
 
- 2. Build the release:
+ 2. If building the Windows installer
+ 
+    If running the build in a UAC enabled environment, building the Windows
+    installer requires elevated privileges. The simplest way to do this is to
+    open the command prompt used for the build with the "Run as administrator"
+    option.
+
+ 3. Build the release:
 
     cd ${tomcat.source}
     ant release
