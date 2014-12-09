@@ -145,6 +145,10 @@
         Prevent file descriptors leak and ensure that files are closed after
         retrieving the last modification time. (violetagg)
       </fix>
+      <fix>
+        <bug>57331</bug>: Allow ExpiresFilter to use "year" as synonym for
+        "years" in its configuration. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

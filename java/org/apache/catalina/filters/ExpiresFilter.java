@@ -1536,7 +1536,8 @@ public class ExpiresFilter extends FilterBase {
                                 Integer.valueOf(amount), line));
             }
             DurationUnit durationUnit;
-            if ("years".equalsIgnoreCase(currentToken)) {
+            if ("year".equalsIgnoreCase(currentToken) ||
+                    "years".equalsIgnoreCase(currentToken)) {
                 durationUnit = DurationUnit.YEAR;
             } else if ("month".equalsIgnoreCase(currentToken) ||
                     "months".equalsIgnoreCase(currentToken)) {
