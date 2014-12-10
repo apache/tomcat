@@ -730,10 +730,6 @@ class Validator {
             if (pageInfo.isELIgnored())
                 return;
 
-            // EL is known to be used on this page. Mark the PageInfo
-            // accordingly.
-            pageInfo.setELUsed();
-
             // JSP.2.2 - '#{' not allowed in template text
             if (n.getType() == '#') {
                 if (!pageInfo.isDeferredSyntaxAllowedAsLiteral()) {
@@ -1124,12 +1120,6 @@ class Validator {
                     }
                 }
 
-                if (elExpression) {
-                    // EL is known to be used on this page. Mark the PageInfo
-                    // accordingly.
-                    pageInfo.setELUsed();
-                }
-
                 boolean expression = runtimeExpression || elExpression;
 
                 // When attribute is not an expression,
@@ -1386,9 +1376,6 @@ class Validator {
 
                         if (el.containsEL()) {
                             validateFunctions(el, n);
-                            // EL is known to be used on this page. Mark the
-                            // PageInfo accordingly.
-                            pageInfo.setELUsed();
                         } else {
                             // Get text with \$ and \# escaping removed.
                             // Should be a single Text node

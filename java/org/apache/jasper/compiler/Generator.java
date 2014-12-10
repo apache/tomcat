@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -532,13 +533,13 @@ class Generator {
         out.printil("private static java.util.Map<java.lang.String,java.lang.Long> _jspx_dependants;");
         out.println();
         Map<String,Long> dependants = pageInfo.getDependants();
-        Iterator<Entry<String,Long>> iter = dependants.entrySet().iterator();
         if (!dependants.isEmpty()) {
             out.printil("static {");
             out.pushIndent();
             out.printin("_jspx_dependants = new java.util.HashMap<java.lang.String,java.lang.Long>(");
             out.print("" + dependants.size());
             out.println(");");
+            Iterator<Entry<String,Long>> iter = dependants.entrySet().iterator();
             while (iter.hasNext()) {
                 Entry<String,Long> entry = iter.next();
                 out.printin("_jspx_dependants.put(\"");
@@ -551,6 +552,55 @@ class Generator {
             out.printil("}");
             out.println();
         }
+
+        // Static data for getImports()
+        List<String> imports = pageInfo.getImports();
+        Set<String> packages = new HashSet<>();
+        Set<String> classes = new HashSet<>();
+        for (String importName : imports) {
+            if (importName == null) {
+                continue;
+            }
+            String trimmed = importName.trim();
+            if (trimmed.endsWith(".*")) {
+                packages.add(trimmed.substring(0, trimmed.length() - 2));
+            } else {
+                classes.add(trimmed);
+            }
+        }
+        out.printil("private static final java.util.Set<java.lang.String> _jspx_imports_packages;");
+        out.println();
+        out.printil("private static final java.util.Set<java.lang.String> _jspx_imports_classes;");
+        out.println();
+        out.printil("static {");
+        out.pushIndent();
+        if (packages.size() == 0) {
+            out.printin("_jspx_imports_packages = null;");
+            out.println();
+        } else {
+            out.printin("_jspx_imports_packages = new java.util.HashSet<>();");
+            out.println();
+            for (String packageName : packages) {
+                out.printin("_jspx_imports_packages.add(\"");
+                out.print(packageName);
+                out.println("\");");
+            }
+        }
+        if (packages.size() == 0) {
+            out.printin("_jspx_imports_classes = null;");
+            out.println();
+        } else {
+            out.printin("_jspx_imports_classes = new java.util.HashSet<>();");
+            out.println();
+            for (String className : classes) {
+                out.printin("_jspx_imports_classes.add(\"");
+                out.print(className);
+                out.println("\");");
+            }
+        }
+        out.popIndent();
+        out.printil("}");
+        out.println();
     }
 
     /**
@@ -582,13 +632,28 @@ class Generator {
      * preamble generation)
      */
     private void genPreambleMethods() {
-        // Method used to get compile time file dependencies
+        // Implement JspSourceDependent
         out.printil("public java.util.Map<java.lang.String,java.lang.Long> getDependants() {");
         out.pushIndent();
         out.printil("return _jspx_dependants;");
         out.popIndent();
         out.printil("}");
         out.println();
+
+        // Implement JspSourceImports
+        out.printil("public java.util.Set<java.lang.String> getPackageImports() {");
+        out.pushIndent();
+        out.printil("return _jspx_imports_packages;");
+        out.popIndent();
+        out.printil("}");
+        out.println();
+        out.printil("public java.util.Set<java.lang.String> getClassImports() {");
+        out.pushIndent();
+        out.printil("return _jspx_imports_classes;");
+        out.popIndent();
+        out.printil("}");
+        out.println();
+
 
         generateInit();
         generateDestroy();
@@ -614,7 +679,9 @@ class Generator {
         out.print(servletClassName);
         out.print(" extends ");
         out.println(pageInfo.getExtends());
-        out.printin("    implements org.apache.jasper.runtime.JspSourceDependent");
+        out.printin("    implements org.apache.jasper.runtime.JspSourceDependent,");
+        out.println();
+        out.printin("                 org.apache.jasper.runtime.JspSourceImports");
         if (!pageInfo.isThreadSafe()) {
             out.println(",");
             out.printin("                 javax.servlet.SingleThreadModel");
@@ -712,34 +779,6 @@ class Generator {
         out.printil("out = pageContext.getOut();");
         out.printil("_jspx_out = out;");
         out.println();
-
-        if (pageInfo.isELUsed()) {
-            // If EL is going to be used on this page then make sure that the
-            // EL Context is properly configured with the imports.
-            // The clarification provided in https://java.net/jira/browse/JSP-44
-            // is the the page import directive applies both to the scripting
-            // environment and to the EL environment.
-            out.printin("javax.el.ImportHandler _jspx_handler = pageContext.getELContext().getImportHandler();");
-            out.println();
-            for (String importName : pageInfo.getImports()) {
-                if (importName == null) {
-                    continue;
-                }
-                String trimmed = importName.trim();
-                if (trimmed.length() == 0) {
-                    continue;
-                }
-                if (trimmed.endsWith(".*")) {
-                    out.printin("_jspx_handler.importPackage(\"");
-                    out.print(trimmed.substring(0, trimmed.length() - 2));
-                    out.println("\");");
-                } else {
-                    out.printin("_jspx_handler.importClass(\"");
-                    out.print(trimmed);
-                    out.println("\");");
-                }
-            }
-        }
     }
 
     /**
