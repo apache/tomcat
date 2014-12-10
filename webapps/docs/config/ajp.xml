@@ -161,20 +161,18 @@
         an <a href="http.html">HTTP connector</a> rather than an AJP connector
         will be configured.<br/>
         The standard protocol value for an AJP connector is <code>AJP/1.3</code>
-        which uses an auto-switching mechanism to select either a Java based
+        which uses an auto-switching mechanism to select either a Java NIO based
         connector or an APR/native based connector. If the
         <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on most unix
         systems) environment variables contain the Tomcat native library, the
         native/APR connector will be used. If the native library cannot be
-        found, the Java based connector will be used.<br/>
+        found, the Java NIO based connector will be used.<br/>
         To use an explicit protocol rather than rely on the auto-switching
         mechanism described above, the following values may be used:<br/>
-        <code>org.apache.coyote.ajp.AjpProtocol</code>
-        - blocking Java connector<br/>
         <code>org.apache.coyote.ajp.AjpNioProtocol</code>
-        - non blocking Java connector.<br/>
+        - non blocking Java NIO connector.<br/>
         <code>org.apache.coyote.ajp.AjpNio2Protocol</code>
-        - non blocking Java connector.<br/>
+        - non blocking Java NIO2 connector.<br/>
         <code>org.apache.coyote.ajp.AjpAprProtocol</code>
         - the APR/native connector.<br/>
         Custom implementations may also be used.<br/>
@@ -745,8 +743,8 @@
     <table class="defaultTable" style="text-align: center;">
       <tr>
         <th />
-        <th>Java Nio Blocking Connector<br />NIO</th>
-        <th>Java Nio2 Blocking Connector<br />NIO2</th>
+        <th>Java Nio Connector<br />NIO</th>
+        <th>Java Nio2 Connector<br />NIO2</th>
         <th>APR/native Connector<br />APR</th>
       </tr>
       <tr>
