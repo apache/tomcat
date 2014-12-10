@@ -21,18 +21,19 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @since EL 3.0
  */
 public class ImportHandler {
 
-    private List<String> packages = new ArrayList<>();
-    private Map<String,Class<?>> clazzes = new HashMap<>();
-    private Map<String,Class<?>> statics = new HashMap<>();
+    private List<String> packageNames = new ArrayList<>();
+    private Map<String,String> classNames = new ConcurrentHashMap<>();
+    private Map<String,Class<?>> clazzes = new ConcurrentHashMap<>();
+    private Map<String,Class<?>> statics = new ConcurrentHashMap<>();
 
 
     public ImportHandler() {
@@ -51,7 +52,7 @@ public class ImportHandler {
         String className = name.substring(0, lastPeriod);
         String fieldOrMethodName = name.substring(lastPeriod + 1);
 
-        Class<?> clazz = findClass(className, false);
+        Class<?> clazz = findClass(className);
 
         if (clazz == null) {
             throw new ELException(Util.message(
@@ -103,33 +104,20 @@ public class ImportHandler {
 
 
     public void importClass(String name) throws javax.el.ELException {
-        if (!name.contains(".")) {
+        int lastPeriodIndex = name.lastIndexOf('.');
+
+        if (lastPeriodIndex < 0) {
             throw new ELException(Util.message(
                     null, "importHandler.invalidClassName", name));
         }
 
-        Class<?> clazz = findClass(name, false);
+        String unqualifiedName = name.substring(lastPeriodIndex + 1);
+        String currentName = classNames.putIfAbsent(unqualifiedName, name);
 
-        if (clazz == null) {
-            throw new ELException(Util.message(
-                    null, "importHandler.classNotFound", name));
-        }
-
-        String simpleName = clazz.getSimpleName();
-        Class<?> conflict = clazzes.get(simpleName);
-
-        if (conflict == null) {
-            // No conflict - add it
-            clazzes.put(simpleName, clazz);
-        } else {
-            // Check for a duplicate
-            if (conflict.equals(clazz)) {
-                // This is a duplicate.
-                // NO-OP
-            } else {
-                throw new ELException(Util.message(null,
-                        "importHandler.ambiguousImport", name, conflict.getName()));
-            }
+        if (currentName != null && !currentName.equals(name)) {
+            // Conflict. Same unqualifiedName, different fully qualified names
+            throw new ELException(Util.message(null,
+                    "importHandler.ambiguousImport", name, currentName));
         }
     }
 
@@ -148,7 +136,7 @@ public class ImportHandler {
                         null, "importHandler.invalidPackage", name));
             }
         }
-        packages.add(name);
+        packageNames.add(name);
     }
 
 
@@ -157,26 +145,39 @@ public class ImportHandler {
             return null;
         }
 
+        // Has it been previously resolved?
         Class<?> result = clazzes.get(name);
 
-        if (result == null) {
-            // Search the package imports - note there may be multiple matches
-            // (which correctly triggers an error)
-            for (String p : packages) {
-                String className = p + '.' + name;
-                Class<?> clazz = findClass(className, false);
-                if (clazz != null) {
-                    if (result != null) {
-                        throw new ELException(Util.message(null,
-                                "importHandler.ambiguousImport", className,
-                                result.getName()));
-                    }
-                    result = clazz;
+        if (result != null) {
+            return result;
+        }
+
+        // Search the class imports
+        String className = classNames.get(name);
+        if (className != null) {
+            Class<?> clazz = findClass(className);
+            if (clazz != null) {
+                clazzes.put(className, clazz);
+                return clazz;
+            }
+        }
+
+        // Search the package imports - note there may be multiple matches
+        // (which correctly triggers an error)
+        for (String p : packageNames) {
+            className = p + '.' + name;
+            Class<?> clazz = findClass(className);
+            if (clazz != null) {
+                if (result != null) {
+                    throw new ELException(Util.message(null,
+                            "importHandler.ambiguousImport", className,
+                            result.getName()));
                 }
+                result = clazz;
             }
-            if (result != null) {
-                clazzes.put(name, result);
-            }
+        }
+        if (result != null) {
+            clazzes.put(name, result);
         }
 
         return result;
@@ -188,28 +189,19 @@ public class ImportHandler {
     }
 
 
-    /*
-     * This method is used for importing and resolving. Resolving has strict
-     * criteria for what may be returned. Import does not. Further, as a result
-     * of the clarification in https://java.net/jira/browse/JSP-44 any class or
-     * package imported using a JSP page directive will also be imported in to
-     * the EL environment. The validate flag is used to bypass the validation
-     * criteria required by resolving when importing else a typical JSP import
-     * (e.g. <%@page import="java.util.List"%>) would trigger an ELException and
-     * a 500 response which is clearly not correct.
-     */
-    private Class<?> findClass(String name, boolean validate) {
+    private Class<?> findClass(String name) {
         Class<?> clazz;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
-             clazz = Class.forName(name);
+             clazz = cl.loadClass(name);
         } catch (ClassNotFoundException e) {
             return null;
         }
 
         // Class must be public, non-abstract and not an interface
         int modifiers = clazz.getModifiers();
-        if (validate && (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) ||
-                Modifier.isInterface(modifiers))) {
+        if (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) ||
+                Modifier.isInterface(modifiers)) {
             throw new ELException(Util.message(
                     null, "importHandler.invalidClass", name));
         }
