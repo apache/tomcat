@@ -47,7 +47,7 @@
               href="jndi-datasource-examples-howto.html"/>
         <item name="10) Classloading"       href="class-loader-howto.html"/>
         <item name="11) JSPs"               href="jasper-howto.html"/>
-        <item name="12) SSL"                href="ssl-howto.html"/>
+        <item name="12) SSL/TLS"            href="ssl-howto.html"/>
         <item name="13) SSI"                href="ssi-howto.html"/>
         <item name="14) CGI"                href="cgi-howto.html"/>
         <item name="15) Proxy Support"      href="proxy-howto.html"/>
