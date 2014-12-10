@@ -264,6 +264,12 @@
       proxy uses AJP then the SSL attributes of the client connection are
       passed via the AJP protocol and separate connectors are not needed.</p>
 
+      <p>The <strong>sslEnabledProtocols</strong> attribute determines which
+      versions of the SSL/TLS protocol are used.  Since the POODLE attack in
+      2014, all SSL protocols are considered unsafe and a secure setting for
+      this attribute in a standalone Tomcat setup might be
+      <code>sslEnabledProtocols="TLSv1,TLSv1.1,TLSv1.2"</code></p>
+
       <p>The <strong>ciphers</strong> attribute controls the ciphers used for
       SSL connections. By default, the default ciphers for the JVM will be used.
       This usually means that the weak export grade ciphers will be included in

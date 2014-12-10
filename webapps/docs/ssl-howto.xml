@@ -25,7 +25,7 @@
     <properties>
         <author email="ccain@apache.org">Christopher Cain</author>
         <author email="yoavs@apache.org">Yoav Shapira</author>
-        <title>SSL Configuration HOW-TO</title>
+        <title>SSL/TLS Configuration HOW-TO</title>
     </properties>
 
 <body>
@@ -44,7 +44,7 @@
     the directory into which you have installed Tomcat.</p>
     </em></blockquote>
 
-<p>To install and configure SSL support on Tomcat, you need to follow
+<p>To install and configure SSL/TLS support on Tomcat, you need to follow
 these simple steps.  For more information, read the rest of this HOW-TO.</p>
 <ol>
 <li>Create a keystore file to store the server&apos;s private key and
@@ -64,15 +64,16 @@ self-signed certificate by executing the following command:
 </section>
 
 
-<section name="Introduction to SSL">
+<section name="Introduction to SSL/TLS" anchor="Introduction_to_SSL">
 
-<p>SSL, or Secure Socket Layer, is a technology which allows web browsers and
-web servers to communicate over a secured connection.  This means that the data
-being sent is encrypted by one side, transmitted, then decrypted by the other
-side before processing.  This is a two-way process, meaning that both the
-server AND the browser encrypt all traffic before sending out data.</p>
+<p>Transport Layer Security (TLS) and its predecessor, Secure Sockets Layer
+(SSL), are technologies which allow web browsers and web servers to communicate
+over a secured connection.  This means that the data being sent is encrypted by
+one side, transmitted, then decrypted by the other side before processing.
+This is a two-way process, meaning that both the server AND the browser encrypt
+all traffic before sending out data.</p>
 
-<p>Another important aspect of the SSL protocol is Authentication.  This means
+<p>Another important aspect of the SSL/TLS protocol is Authentication.  This means
 that during your initial attempt to communicate with a web server over a secure
 connection, that server will present your web browser with a set of
 credentials, in the form of a "Certificate", as proof the site is who and what
@@ -84,11 +85,13 @@ users.  Most SSL-enabled web servers do not request Client Authentication.</p>
 
 </section>
 
-<section name="SSL and Tomcat">
+<section name="SSL/TLS and Tomcat" anchor="SSL_and_Tomcat">
 
 <p>It is important to note that configuring Tomcat to take advantage of
 secure sockets is usually only necessary when running it as a stand-alone
-web server.  When running Tomcat primarily as a Servlet/JSP container behind
+web server.  Details can be found in the
+<a href="security-howto.html">Security Considerations Document</a>.
+When running Tomcat primarily as a Servlet/JSP container behind
 another web server, such as Apache or Microsoft IIS, it is usually necessary
 to configure the primary web server to handle the SSL connections from users.
 Typically, this server will negotiate all SSL-related functionality, then
@@ -213,9 +216,9 @@ keystore using OpenSSL you would execute a command like:</p>
 <source>openssl pkcs12 -export -in mycert.crt -inkey mykey.key
                         -out mycert.p12 -name tomcat -CAfile myCA.crt
                         -caname root -chain</source>
-<p>For more advanced cases, consult the <a href="http://www.openssl.org/">OpenSSL
-documentation</a>.
-</p>
+<p>For more advanced cases, consult the
+<a href="http://www.openssl.org/" rel="nofollow">OpenSSL documentation</a>.</p>
+
 <p>To create a new <code>JKS</code> keystore from scratch, containing a single
 self-signed Certificate, execute the following from a terminal command line:</p>
 <p>Windows:</p>

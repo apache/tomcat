@@ -91,10 +91,9 @@ Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
 <li><a href="jasper-howto.html"><strong>JSPs</strong></a>
     - Information about Jasper configuration, as well as the JSP compiler
     usage.</li>
-<li><a href="ssl-howto.html"><strong>SSL</strong></a> -
-    Installing and
-    configuring SSL support so that your Apache Tomcat will serve requests using
-    the <code>https</code> protocol.</li>
+<li><a href="ssl-howto.html"><strong>SSL/TLS</strong></a> -
+    Installing and configuring SSL/TLS support so that your Apache Tomcat will
+    serve requests using the <code>https</code> protocol.</li>
 <li><a href="ssi-howto.html"><strong>SSI</strong></a> -
     Using Server Side Includes in Apache Tomcat.</li>
 <li><a href="cgi-howto.html"><strong>CGI</strong></a> -
