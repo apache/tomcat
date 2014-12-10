@@ -37,6 +37,7 @@ public class TesterEchoServer {
         public static final String PATH_BASIC = "/echoBasic";
         public static final String PATH_BASIC_LIMIT_LOW = "/echoBasicLimitLow";
         public static final String PATH_BASIC_LIMIT_HIGH = "/echoBasicLimitHigh";
+        public static final String PATH_WRITER_ERROR = "/echoWriterError";
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {
@@ -49,11 +50,13 @@ public class TesterEchoServer {
                 sc.addEndpoint(Basic.class);
                 sc.addEndpoint(BasicLimitLow.class);
                 sc.addEndpoint(BasicLimitHigh.class);
+                sc.addEndpoint(WriterError.class);
             } catch (DeploymentException e) {
                 throw new IllegalStateException(e);
             }
         }
     }
+
 
     @ServerEndpoint("/echoAsync")
     public static class Async {
@@ -186,4 +189,24 @@ public class TesterEchoServer {
         }
     }
 
+
+    @ServerEndpoint("/echoWriterError")
+    public static class WriterError {
+
+        @OnMessage
+        public void echoTextMessage(Session session, @SuppressWarnings("unused") String msg) {
+            try {
+                session.getBasicRemote().getSendWriter();
+                // Simulate an error
+                throw new RuntimeException();
+            } catch (IOException e) {
+                // Should not happen
+                try {
+                    session.close();
+                } catch (IOException e1) {
+                    // Ignore
+                }
+            }
+        }
+    }
 }
