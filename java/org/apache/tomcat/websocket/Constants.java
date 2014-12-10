@@ -73,7 +73,7 @@ public class Constants {
 
     /* Configuration for extensions
      * Note: These options are primarily present to enable this implementation
-     *       to pass the WebSocket 1.1 TCK. They are expected to be removed once
+     *       to pass compliance tests. They are expected to be removed once
      *       the WebSocket API includes a mechanism for adding custom extensions
      *       and disabling built-in extensions.
      */
@@ -81,6 +81,10 @@ public class Constants {
             Boolean.getBoolean("org.apache.tomcat.websocket.DISABLE_BUILTIN_EXTENSIONS");
     static final boolean ALLOW_UNSUPPORTED_EXTENSIONS =
             Boolean.getBoolean("org.apache.tomcat.websocket.ALLOW_UNSUPPORTED_EXTENSIONS");
+
+    // Configuration for stream behavior
+    static final boolean STREAMS_DROP_EMPTY_MESSAGES =
+            Boolean.getBoolean("org.apache.tomcat.websocket.STREAMS_DROP_EMPTY_MESSAGES");
 
     public static final boolean STRICT_SPEC_COMPLIANCE =
             Boolean.getBoolean(

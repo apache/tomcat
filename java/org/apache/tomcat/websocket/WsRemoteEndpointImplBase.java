@@ -939,7 +939,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
             // Optimisation. If there is no data to flush then do not send an
             // empty message.
-            if (buffer.position() > 0) {
+            if (!Constants.STREAMS_DROP_EMPTY_MESSAGES || buffer.position() > 0) {
                 doWrite(false);
             }
         }
@@ -957,7 +957,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         private void doWrite(boolean last) throws IOException {
-            if (used) {
+            if (!Constants.STREAMS_DROP_EMPTY_MESSAGES || used) {
                 buffer.flip();
                 endpoint.startMessageBlock(Constants.OPCODE_BINARY, buffer, last);
             }
@@ -1016,7 +1016,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                         sm.getString("wsRemoteEndpoint.closedWriter"));
             }
 
-            if (buffer.position() > 0) {
+            if (!Constants.STREAMS_DROP_EMPTY_MESSAGES || buffer.position() > 0) {
                 doWrite(false);
             }
         }
@@ -1034,7 +1034,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         private void doWrite(boolean last) throws IOException {
-            if (used) {
+            if (!Constants.STREAMS_DROP_EMPTY_MESSAGES || used) {
                 buffer.flip();
                 endpoint.sendPartialString(buffer, last);
                 buffer.clear();
