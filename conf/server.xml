@@ -61,7 +61,7 @@
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :
-         Java HTTP Connector: /docs/config/http.html (blocking & non-blocking)
+         Java HTTP Connector: /docs/config/http.html
          Java AJP  Connector: /docs/config/ajp.html
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
