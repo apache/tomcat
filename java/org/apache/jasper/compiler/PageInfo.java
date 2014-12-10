@@ -72,7 +72,6 @@ class PageInfo {
 
     private String isELIgnoredValue;
     private boolean isELIgnored = false;
-    private boolean isELUsed = false;
 
     // JSP 2.1
     private String deferredSyntaxAllowedAsLiteralValue;
@@ -676,27 +675,6 @@ class PageInfo {
 
     public boolean isELIgnored() {
         return isELIgnored;
-    }
-
-    /**
-     * Marks the current page as using EL. This allows an optimisation when
-     * generating the page. The imports need to be added to the EL Context but
-     * this is wasteful if the EL Context is never going to be used. The
-     * associated field allows the Generator to determine whether or not to
-     * configure the imports.
-     */
-    public void setELUsed() {
-        isELUsed = true;
-    }
-
-    /**
-     * Is expression language used on this page.
-     *
-     * @return <code>true</code> if expression language is used, otherwise
-     *         <code>false</code>
-     */
-    public boolean isELUsed() {
-        return isELUsed;
     }
 
     public void putNonCustomTagPrefix(String prefix, Mark where) {

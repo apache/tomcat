@@ -26,10 +26,12 @@ import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Set;
 
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
+import javax.el.ImportHandler;
 import javax.el.ValueExpression;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
@@ -962,10 +964,24 @@ public class PageContextImpl extends PageContext {
 
     @Override
     public ELContext getELContext() {
-        if (this.elContext == null) {
-            this.elContext = this.applicationContext.createELContext(this);
+        if (elContext == null) {
+            elContext = applicationContext.createELContext(this);
+            if (servlet instanceof JspSourceImports) {
+                ImportHandler ih = elContext.getImportHandler();
+                Set<String> packageImports = ((JspSourceImports) servlet).getPackageImports();
+                if (packageImports != null) {
+                    for (String packageImport : packageImports) {
+                        ih.importPackage(packageImport);
+                    }
+                }
+                Set<String> classImports = ((JspSourceImports) servlet).getClassImports();
+                if (classImports != null) {
+                    for (String classImport : classImports) {
+                        ih.importClass(classImport);
+                    }
+                }
+            }
         }
         return this.elContext;
     }
-
 }
