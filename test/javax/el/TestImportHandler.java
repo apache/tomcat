@@ -138,11 +138,12 @@ public class TestImportHandler {
     /**
      * Import an invalid class.
      */
-    @Test(expected=ELException.class)
+    @Test
     public void testImportClass02() {
         ImportHandler handler = new ImportHandler();
-
         handler.importClass("org.apache.tomcat.util.res.StringManagerX");
+        Class<?> result = handler.resolveClass("StringManagerX");
+        Assert.assertNull(result);
     }
 
 
