@@ -158,21 +158,19 @@
     <attribute name="protocol" required="false">
       <p>Sets the protocol to handle incoming traffic. The default value is
         <code>HTTP/1.1</code> which uses an auto-switching mechanism to select
-        either a non blocking Java based connector or an APR/native based connector.
+        either a Java NIO based connector or an APR/native based connector.
         If the <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on
         most unix systems) environment variables contain the Tomcat native
         library, the APR/native connector will be used. If the native library
-        cannot be found, the non blocking Java based connector will be used. Note
+        cannot be found, the Java NIO based connector will be used. Note
         that the APR/native connector has different settings for HTTPS than the
         Java connectors.<br/>
         To use an explicit protocol rather than rely on the auto-switching
         mechanism described above, the following values may be used:<br/>
-        <code>org.apache.coyote.http11.Http11Protocol</code> -
-              blocking Java connector<br/>
         <code>org.apache.coyote.http11.Http11NioProtocol</code> -
-              non blocking Java connector<br/>
+              non blocking Java NIO connector<br/>
         <code>org.apache.coyote.http11.Http11Nio2Protocol</code> -
-              non blocking Java connector<br/>
+              non blocking Java NIO2 connector<br/>
         <code>org.apache.coyote.http11.Http11AprProtocol</code> -
               the APR/native connector.<br/>
         Custom implementations may also be used.<br/>
@@ -1362,8 +1360,8 @@
     <table class="defaultTable" style="text-align: center;">
       <tr>
         <th />
-        <th>Java Nio Blocking Connector<br />NIO</th>
-        <th>Java Nio2 Blocking Connector<br />NIO2</th>
+        <th>Java Nio Connector<br />NIO</th>
+        <th>Java Nio2 Connector<br />NIO2</th>
         <th>APR/native Connector<br />APR</th>
       </tr>
       <tr>

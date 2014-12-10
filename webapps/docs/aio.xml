@@ -36,15 +36,8 @@
   <section name="Introduction">
 
   <p>
-    With usage of APR or NIO APIs as the basis of its connectors, Tomcat is
-    able to provide a number of extensions over the regular blocking IO
-    as provided with support for the Servlet API.
-  </p>
-
-  <p>
-    <b>IMPORTANT NOTE: Usage of these features requires using the APR or NIO
-    HTTP connectors. The classic java.io HTTP connector and the AJP connectors
-    do not support them.</b>
+    <b>IMPORTANT NOTE: Usage of these features requires using the
+    HTTP connectors. The AJP connectors do not support them.</b>
   </p>
 
   </section>
@@ -52,7 +45,8 @@
   <section name="Asynchronous writes">
 
   <p>
-    When APR or NIO is enabled, Tomcat supports using sendfile to send large static files.
+    When using HTTP connectors (based on APR or NIO/NIO2),
+    Tomcat supports using sendfile to send large static files.
     These writes, as soon as the system load increases, will be performed
     asynchronously in the most efficient way. Instead of sending a large response using
     blocking writes, it is possible to write content to a static file, and write it
