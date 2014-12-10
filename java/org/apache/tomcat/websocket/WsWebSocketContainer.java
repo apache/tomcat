@@ -379,14 +379,14 @@ public class WsWebSocketContainer
         registerSession(endpoint, wsSession);
 
         /* It is possible that the server sent one or more messages as soon as
-         * the connection was opened. Depending on the exact timing of when
-         * those messages were sent they could be sat in the input buffer
-         * waiting to be read and will not trigger a "data available to read"
-         * event. Therefore, it is necessary to process the input buffer here.
-         * Note that this happens on the current thread which means that this
-         * thread will be used for any onMessage notifications. This is a
-         * special case. Subsequent "data available to read" events will be
-         * handled by threads from the AsyncChannelGroup's executor.
+         * the WebSocket connection was established. Depending on the exact
+         * timing of when those messages were sent they could be sat in the
+         * input buffer waiting to be read and will not trigger a "data
+         * available to read" event. Therefore, it is necessary to process the
+         * input buffer here. Note that this happens on the current thread which
+         * means that this thread will be used for any onMessage notifications.
+         * This is a special case. Subsequent "data available to read" events
+         * will be handled by threads from the AsyncChannelGroup's executor.
          */
         wsFrameClient.startInputProcessing();
 
