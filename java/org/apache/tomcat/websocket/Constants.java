@@ -71,7 +71,12 @@ public class Constants {
             "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
             .intValue();
 
-    // Configuration for extensions
+    /* Configuration for extensions
+     * Note: These options are primarily present to enable this implementation
+     *       to pass the WebSocket 1.1 TCK. They are expected to be removed once
+     *       the WebSocket API includes a mechanism for adding custom extensions
+     *       and disabling built-in extensions.
+     */
     static final boolean DISABLE_BUILTIN_EXTENSIONS =
             Boolean.getBoolean("org.apache.tomcat.websocket.DISABLE_BUILTIN_EXTENSIONS");
     static final boolean ALLOW_UNSUPPORTED_EXTENSIONS =
