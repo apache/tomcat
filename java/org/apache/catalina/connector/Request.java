@@ -1886,7 +1886,9 @@ public class Request
         while (lastSlash > 0) {
             pos = nextSlash(uriChars, pos + 1);
             if (pos == -1) {
-                return uri;
+                // Should never happen
+                throw new IllegalStateException(sm.getString(
+                        "coyoteRequest.getContextPath.ise", canonicalContextPath, uri));
             }
             lastSlash--;
         }
@@ -1901,7 +1903,9 @@ public class Request
         while (!canonicalContextPath.equals(candidate)) {
             pos = nextSlash(uriChars, pos + 1);
             if (pos == -1) {
-                return uri;
+                // Should never happen
+                throw new IllegalStateException(sm.getString(
+                        "coyoteRequest.getContextPath.ise", canonicalContextPath, uri));
             }
             candidate = uri.substring(0, pos);
             candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
