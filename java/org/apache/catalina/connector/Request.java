@@ -1881,37 +1881,53 @@ public class Request
         String uri = getRequestURI();
         char[] uriChars = uri.toCharArray();
         int lastSlash = mappingData.contextSlashCount;
+        // Special case handling for the root context
+        if (lastSlash == 0) {
+            return "";
+        }
         int pos = 0;
-        // Need at least the number of slashed in the context path
+        // Need at least the number of slashes in the context path
         while (lastSlash > 0) {
             pos = nextSlash(uriChars, pos + 1);
             if (pos == -1) {
-                // Should never happen
-                throw new IllegalStateException(sm.getString(
-                        "coyoteRequest.getContextPath.ise", canonicalContextPath, uri));
+                break;
             }
             lastSlash--;
         }
         // Now allow for normalization and/or encoding. Essentially, keep
         // extending the candidate path up to the next slash until the decoded
         // and normalized candidate path is the same as the canonical path.
-        String candidate = uri.substring(0, pos);
-        if (pos > 0) {
-            candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
-            candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+        String candidate;
+        if (pos == -1) {
+            candidate = uri;
+        } else {
+            candidate = uri.substring(0, pos);
         }
-        while (!canonicalContextPath.equals(candidate)) {
+        candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
+        candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+        boolean match = canonicalContextPath.equals(candidate);
+        while (!match && pos != -1) {
             pos = nextSlash(uriChars, pos + 1);
             if (pos == -1) {
-                // Should never happen
-                throw new IllegalStateException(sm.getString(
-                        "coyoteRequest.getContextPath.ise", canonicalContextPath, uri));
+                candidate = uri;
+            } else {
+                candidate = uri.substring(0, pos);
             }
-            candidate = uri.substring(0, pos);
             candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
             candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+            match = canonicalContextPath.equals(candidate);
         }
-        return uri.substring(0, pos);
+        if (match) {
+            if (pos == -1) {
+                return uri;
+            } else {
+                return uri.substring(0, pos);
+            }
+        } else {
+            // Should never happen
+            throw new IllegalStateException(sm.getString(
+                    "coyoteRequest.getContextPath.ise", canonicalContextPath, uri));
+        }
     }
 
 
