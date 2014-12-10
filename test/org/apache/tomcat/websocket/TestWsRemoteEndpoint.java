@@ -62,25 +62,25 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
 
     @Test
     public void testWriterAnnotation() throws Exception {
-        doTestWriter(TesterAnnotatedEndpoint.class, true);
+        doTestWriter(TesterAnnotatedEndpoint.class, true, TEST_MESSAGE_5K);
     }
 
     @Test
     public void testWriterProgrammatic() throws Exception {
-        doTestWriter(TesterProgrammaticEndpoint.class, true);
+        doTestWriter(TesterProgrammaticEndpoint.class, true, TEST_MESSAGE_5K);
     }
 
     @Test
     public void testStreamAnnotation() throws Exception {
-        doTestWriter(TesterAnnotatedEndpoint.class, false);
+        doTestWriter(TesterAnnotatedEndpoint.class, false, TEST_MESSAGE_5K);
     }
 
     @Test
     public void testStreamProgrammatic() throws Exception {
-        doTestWriter(TesterProgrammaticEndpoint.class, false);
+        doTestWriter(TesterProgrammaticEndpoint.class, false, TEST_MESSAGE_5K);
     }
 
-    private void doTestWriter(Class<?> clazz, boolean useWriter) throws Exception {
+    private void doTestWriter(Class<?> clazz, boolean useWriter, String testMessage) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -123,7 +123,7 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
             Writer w = wsSession.getBasicRemote().getSendWriter();
 
             for (int i = 0; i < 8; i++) {
-                w.write(TEST_MESSAGE_5K);
+                w.write(testMessage);
             }
 
             w.close();
@@ -131,7 +131,7 @@ public class TestWsRemoteEndpoint extends TomcatBaseTest {
             OutputStream s = wsSession.getBasicRemote().getSendStream();
 
             for (int i = 0; i < 8; i++) {
-                s.write(TEST_MESSAGE_5K.getBytes(StandardCharsets.UTF_8));
+                s.write(testMessage.getBytes(StandardCharsets.UTF_8));
             }
 
             s.close();
