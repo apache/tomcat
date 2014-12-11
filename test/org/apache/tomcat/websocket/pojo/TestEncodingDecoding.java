@@ -48,6 +48,7 @@ import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -219,7 +220,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         session.close();
     }
 
-    //@Test
+    @Test
+    @Ignore // TODO Investigate why this test fails
     public void testMessagesEndPoints() throws Exception {
         // Set up utility classes
         MessagesServer server = new MessagesServer();
@@ -275,7 +277,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     }
 
 
-    //@Test
+    @Test
+    @Ignore // TODO Investigate why this test fails
     public void testBatchedEndPoints() throws Exception {
         // Set up utility classes
         BatchedServer server = new BatchedServer();
