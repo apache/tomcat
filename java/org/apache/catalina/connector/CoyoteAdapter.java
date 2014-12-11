@@ -605,11 +605,12 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
-        // Copy the raw URI to the decodedURI
         MessageBytes decodedURI = req.decodedURI();
-        decodedURI.duplicate(undecodedURI);
 
         if (undecodedURI.getType() == MessageBytes.T_BYTES) {
+            // Copy the raw URI to the decodedURI
+            decodedURI.duplicate(undecodedURI);
+
             // Parse the path parameters. This will:
             //   - strip out the path parameters
             //   - convert the decodedURI to bytes
@@ -645,9 +646,13 @@ public class CoyoteAdapter implements Adapter {
                 return false;
             }
         } else {
-            // The URL is chars or String, and has been sent using an in-memory
-            // protocol handler, we have to assume the URL has been properly
-            // decoded already
+            /* The URI is chars or String, and has been sent using an in-memory
+             * protocol handler. The following assumptions are made:
+             * - req.requestURI() has been set to the 'original' non-decoded,
+             *   non-normalized URI
+             * - req.decodedURI() has been set to the decoded, normalized form
+             *   of req.requestURI()
+             */
             decodedURI.toChars();
             // Remove all path parameters; any needed path parameter should be set
             // using the request object rather than passing it in the URL
