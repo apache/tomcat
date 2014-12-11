@@ -44,6 +44,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -443,7 +444,7 @@ public class RewriteValve extends ValveBase {
                         queryString = urlString.substring(queryIndex+1);
                         urlString = urlString.substring(0, queryIndex);
                     }
-                    // Set the new URL
+                    // Set the new 'original' URI
                     String contextPath = null;
                     if (context) {
                         contextPath = request.getContextPath();
@@ -454,8 +455,17 @@ public class RewriteValve extends ValveBase {
                     if (context) {
                         chunk.append(contextPath);
                     }
-                    chunk.append(urlString);
+                    chunk.append(URLEncoder.DEFAULT.encode(urlString));
                     request.getCoyoteRequest().requestURI().toChars();
+                    // Decoded URI
+                    request.getCoyoteRequest().decodedURI().setString(null);
+                    chunk = request.getCoyoteRequest().decodedURI().getCharChunk();
+                    chunk.recycle();
+                    if (context) {
+                        chunk.append(contextPath);
+                    }
+                    chunk.append(urlString);
+                    request.getCoyoteRequest().decodedURI().toChars();
                     // Set the new Query if there is one
                     if (queryString != null) {
                         request.getCoyoteRequest().queryString().setString(null);

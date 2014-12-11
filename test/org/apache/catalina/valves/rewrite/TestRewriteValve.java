@@ -33,13 +33,11 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
-    @Ignore // getRequestURI is not encoded
     public void testNoopRewrite() throws Exception {
         doTestRewrite("RewriteRule ^(.*) $1", "/a/%255A", "/a/%255A");
     }
 
     @Test
-    @Ignore // getRequestURI is not encoded
     public void testPathRewrite() throws Exception {
         doTestRewrite("RewriteRule ^/b(.*) /a$1", "/b/%255A", "/a/%255A");
     }
