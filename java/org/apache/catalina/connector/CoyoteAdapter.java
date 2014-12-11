@@ -121,28 +121,6 @@ public class CoyoteAdapter implements Adapter {
         StringManager.getManager(Constants.Package);
 
 
-    /**
-     * Encoder for the Location URL in HTTP redirects.
-     */
-    protected static final URLEncoder urlEncoder;
-
-
-    // ----------------------------------------------------- Static Initializer
-
-
-    /**
-     * The safe character set.
-     */
-    static {
-        urlEncoder = new URLEncoder();
-        urlEncoder.addSafeCharacter('-');
-        urlEncoder.addSafeCharacter('_');
-        urlEncoder.addSafeCharacter('.');
-        urlEncoder.addSafeCharacter('*');
-        urlEncoder.addSafeCharacter('/');
-    }
-
-
     // -------------------------------------------------------- Adapter Methods
 
     @Override
@@ -809,7 +787,7 @@ public class CoyoteAdapter implements Adapter {
         // Possible redirect
         MessageBytes redirectPathMB = request.getMappingData().redirectPath;
         if (!redirectPathMB.isNull()) {
-            String redirectPath = urlEncoder.encode(redirectPathMB.toString());
+            String redirectPath = URLEncoder.DEFAULT.encode(redirectPathMB.toString());
             String query = request.getQueryString();
             if (request.isRequestedSessionIdFromURL()) {
                 // This is not optimal, but as this is not very common, it

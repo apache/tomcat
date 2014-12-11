@@ -129,11 +129,6 @@ public class DefaultServlet extends HttpServlet {
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
-    /**
-     * Array containing the safe characters set.
-     */
-    protected static final URLEncoder urlEncoder;
-
     private static final DocumentBuilderFactory factory;
 
     private static final SecureEntityResolver secureEntityResolver;
@@ -162,13 +157,6 @@ public class DefaultServlet extends HttpServlet {
     // ----------------------------------------------------- Static Initializer
 
     static {
-        urlEncoder = new URLEncoder();
-        urlEncoder.addSafeCharacter('-');
-        urlEncoder.addSafeCharacter('_');
-        urlEncoder.addSafeCharacter('.');
-        urlEncoder.addSafeCharacter('*');
-        urlEncoder.addSafeCharacter('/');
-
         if (Globals.IS_SECURITY_ENABLED) {
             factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -678,7 +666,7 @@ public class DefaultServlet extends HttpServlet {
      * @param path Path which has to be rewritten
      */
     protected String rewriteUrl(String path) {
-        return urlEncoder.encode( path );
+        return URLEncoder.DEFAULT.encode( path );
     }
 
 
