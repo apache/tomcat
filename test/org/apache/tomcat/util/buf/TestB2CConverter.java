@@ -92,8 +92,7 @@ public class TestB2CConverter {
                 maxLeftover <= B2CConverter.LEFTOVER_SIZE);
     }
 
-    // TODO Work-around bug in UTF8 decoder
-    //@Test(expected=MalformedInputException.class)
+    @Test(expected=MalformedInputException.class)
     public void testBug54602a() throws Exception {
         // Check invalid input is rejected straight away
         B2CConverter conv = new B2CConverter("UTF-8");
