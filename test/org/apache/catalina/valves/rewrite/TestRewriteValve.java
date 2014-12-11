@@ -17,7 +17,6 @@
 package org.apache.catalina.valves.rewrite;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -43,7 +42,6 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
-    @Ignore // getRequestURI is not normalized
     public void testNonNormalizedPathRewrite() throws Exception {
         doTestRewrite("RewriteRule ^/b/(.*) /b/../a/$1", "/b/%255A", "/a/%255A");
     }

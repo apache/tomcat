@@ -48,6 +48,7 @@ import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.net.URL;
 
 public class RewriteValve extends ValveBase {
@@ -457,14 +458,14 @@ public class RewriteValve extends ValveBase {
                     }
                     chunk.append(URLEncoder.DEFAULT.encode(urlString));
                     request.getCoyoteRequest().requestURI().toChars();
-                    // Decoded URI
+                    // Decoded and normalized URI
                     request.getCoyoteRequest().decodedURI().setString(null);
                     chunk = request.getCoyoteRequest().decodedURI().getCharChunk();
                     chunk.recycle();
                     if (context) {
                         chunk.append(contextPath);
                     }
-                    chunk.append(urlString);
+                    chunk.append(RequestUtil.normalize(urlString));
                     request.getCoyoteRequest().decodedURI().toChars();
                     // Set the new Query if there is one
                     if (queryString != null) {
