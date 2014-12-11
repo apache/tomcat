@@ -582,8 +582,10 @@ public class CoyoteAdapter implements Adapter {
             req.serverName().setString(proxyName);
         }
 
+        MessageBytes undecodedURI = req.requestURI();
+
         // Check for ping OPTIONS * request
-        if (req.requestURI().equals("*")) {
+        if (undecodedURI.equals("*")) {
             if (req.method().equalsIgnoreCase("OPTIONS")) {
                 StringBuilder allow = new StringBuilder();
                 allow.append("GET, HEAD, POST, PUT, DELETE");
@@ -605,9 +607,9 @@ public class CoyoteAdapter implements Adapter {
 
         // Copy the raw URI to the decodedURI
         MessageBytes decodedURI = req.decodedURI();
-        decodedURI.duplicate(req.requestURI());
+        decodedURI.duplicate(undecodedURI);
 
-        if (decodedURI.getType() == MessageBytes.T_BYTES) {
+        if (undecodedURI.getType() == MessageBytes.T_BYTES) {
             // Parse the path parameters. This will:
             //   - strip out the path parameters
             //   - convert the decodedURI to bytes
