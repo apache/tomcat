@@ -232,6 +232,25 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     }
 
 
+    /**
+     * Simple servlet that dumps request information. Tests using this should
+     * note that additional information may be added to in the future and should
+     * therefore test return values accordingly.
+     */
+    public static final class SnoopServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            PrintWriter out = resp.getWriter();
+            out.println("00-RequestURI-" + req.getRequestURI());
+        }
+    }
+
+
     /*
      *  Wrapper for getting the response.
      */
