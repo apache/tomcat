@@ -168,31 +168,7 @@ public class StandardContext extends ContainerBase
     }
 
 
-    // ----------------------------------------------------- Class Variables
-
-
-    /**
-     * Array containing the safe characters set.
-     */
-    protected static URLEncoder urlEncoder;
-
-
-    /**
-     * GMT timezone - all HTTP dates are on GMT
-     */
-    static {
-        urlEncoder = new URLEncoder();
-        urlEncoder.addSafeCharacter('~');
-        urlEncoder.addSafeCharacter('-');
-        urlEncoder.addSafeCharacter('_');
-        urlEncoder.addSafeCharacter('.');
-        urlEncoder.addSafeCharacter('*');
-        urlEncoder.addSafeCharacter('/');
-    }
-
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Allow multipart/form-data requests to be parsed even when the
@@ -1977,7 +1953,7 @@ public class StandardContext extends ContainerBase
             log.warn(sm.getString(
                     "standardContext.pathInvalid", path, this.path));
         }
-        encodedPath = urlEncoder.encode(this.path);
+        encodedPath = URLEncoder.DEFAULT.encode(this.path);
         if (getName() == null) {
             setName(this.path);
         }

@@ -38,6 +38,16 @@ public class URLEncoder {
     {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
      'A', 'B', 'C', 'D', 'E', 'F'};
 
+    public static final URLEncoder DEFAULT = new URLEncoder();
+    static {
+        DEFAULT.addSafeCharacter('~');
+        DEFAULT.addSafeCharacter('-');
+        DEFAULT.addSafeCharacter('_');
+        DEFAULT.addSafeCharacter('.');
+        DEFAULT.addSafeCharacter('*');
+        DEFAULT.addSafeCharacter('/');
+    }
+
     //Array containing the safe characters set.
     protected final BitSet safeCharacters = new BitSet(256);
 
