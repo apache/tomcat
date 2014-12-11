@@ -29,16 +29,28 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testNoRewrite() throws Exception {
-        doTestRewrite("");
+        doTestRewrite("", "/a/%255A", "/a/%255A");
     }
 
     @Test
     @Ignore // getRequestURI is not encoded
     public void testNoopRewrite() throws Exception {
-        doTestRewrite("RewriteRule ^(.*) $1");
+        doTestRewrite("RewriteRule ^(.*) $1", "/a/%255A", "/a/%255A");
     }
 
-    private void doTestRewrite(String config) throws Exception {
+    @Test
+    @Ignore // getRequestURI is not encoded
+    public void testPathRewrite() throws Exception {
+        doTestRewrite("RewriteRule ^/b(.*) /a$1", "/b/%255A", "/a/%255A");
+    }
+
+    @Test
+    @Ignore // getRequestURI is not normalized
+    public void testNonNormalizedPathRewrite() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /b/../a/$1", "/b/%255A", "/a/%255A");
+    }
+
+    private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -56,9 +68,9 @@ public class TestRewriteValve extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() + "/a/%255A");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + request);
 
         String body = res.toString();
-        Assert.assertTrue(body, body.contains("/a/%255A"));
+        Assert.assertTrue(body, body.contains(expectedURI));
     }
 }
