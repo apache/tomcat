@@ -273,6 +273,11 @@ public class ApplicationContext
             Container host = context.getParent();
             child = (Context) host.findChild(uri);
 
+            // Non-running contexts should be ignored.
+            if (child != null && !child.getState().isAvailable()) {
+                child = null;
+            }
+
             // Remove any version information and use the mapper
             if (child == null) {
                 int i = uri.indexOf("##");
@@ -293,15 +298,20 @@ public class ApplicationContext
                 ((Engine) host.getParent()).getService().findConnectors()[0].getMapper().map(
                         hostMB, pathMB, null, mappingData);
 
-                child = (Context) mappingData.context;
+                // Must be an exact match. It is no good returning the ROOT
+                // context if the caller is looking for "/something-else"
+                if (((Context) mappingData.context).getPath().equals(uri)) {
+                    child = (Context) mappingData.context;
+                }
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            return (null);
+            return null;
         }
 
-        if (child == null)
-            return (null);
+        if (child == null) {
+            return null;
+        }
 
         if (context.getCrossContext()) {
             // If crossContext is enabled, can always return the context
@@ -311,7 +321,7 @@ public class ApplicationContext
             return context.getServletContext();
         } else {
             // Nothing to return
-            return (null);
+            return null;
         }
     }
 
