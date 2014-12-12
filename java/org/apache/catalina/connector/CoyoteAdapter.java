@@ -568,9 +568,6 @@ public class CoyoteAdapter implements Adapter {
             request.setSecure(connector.getSecure());
         }
 
-        // FIXME: the code below doesnt belongs to here,
-        // this is only have sense
-        // in Http11, not in ajp13..
         // At this point the Host header has been processed.
         // Override if the proxyPort/proxyHost are set
         String proxyName = connector.getProxyName();
