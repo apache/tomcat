@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11.filters;
 
 import java.io.ByteArrayOutputStream;
@@ -33,20 +32,16 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  */
 public class TesterOutputBuffer extends AbstractOutputBuffer<Socket> {
 
-    // ----------------------------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public TesterOutputBuffer(Response response, int headerBufferSize) {
-        super(response, headerBufferSize);
-        outputStreamOutputBuffer = new OutputStreamOutputBuffer();
-    }
-
     /**
      * Underlying output stream.
      */
     private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+
+    public TesterOutputBuffer(Response response, int headerBufferSize) {
+        super(response, headerBufferSize);
+        outputStreamOutputBuffer = new OutputStreamOutputBuffer();
+    }
 
 
     // --------------------------------------------------------- Public Methods
