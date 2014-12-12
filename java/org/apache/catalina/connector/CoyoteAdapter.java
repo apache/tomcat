@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
@@ -545,15 +546,26 @@ public class CoyoteAdapter implements Adapter {
 
     // ------------------------------------------------------ Protected Methods
 
-
     /**
-     * Parse additional request parameters.
+     * Perform the necessary processing after the HTTP headers have been parsed
+     * to enable the request/response pair to be passed to the start of the
+     * container pipeline for processing.
+     *
+     * @param req      The coyote request object
+     * @param request  The catalina request object
+     * @param res      The coyote response object
+     * @param response The catalina response object
+     *
+     * @return <code>true</code> if the request should be passed on to the start
+     *         of the container pipeline, otherwise <code>false</code>
+     *
+     * @throws IOException If there is insufficient space in a buffer while
+     *                     processing headers
+     * @throws ServletException If the supported methods of the target servlet
+     *                          can not be determined
      */
-    protected boolean postParseRequest(org.apache.coyote.Request req,
-                                       Request request,
-                                       org.apache.coyote.Response res,
-                                       Response response)
-            throws Exception {
+    protected boolean postParseRequest(org.apache.coyote.Request req, Request request,
+            org.apache.coyote.Response res, Response response) throws IOException, ServletException {
 
         // If the processor has set the scheme (AJP will do this) use this to
         // set the secure flag as well. If the processor hasn't set it, use the
@@ -1013,8 +1025,7 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Character conversion of the URI.
      */
-    protected void convertURI(MessageBytes uri, Request request)
-        throws Exception {
+    protected void convertURI(MessageBytes uri, Request request) throws IOException {
 
         ByteChunk bc = uri.getByteChunk();
         int length = bc.getLength();
