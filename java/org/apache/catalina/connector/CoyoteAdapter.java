@@ -555,9 +555,9 @@ public class CoyoteAdapter implements Adapter {
                                        Response response)
             throws Exception {
 
-        // XXX the processor may have set a correct scheme and port prior to this point,
-        // in ajp13 protocols dont make sense to get the port from the connector...
-        // otherwise, use connector configuration
+        // If the processor has set the scheme (AJP will do this) use this to
+        // set the secure flag as well. If the processor hasn't set it, use the
+        // settings from the connector
         if (! req.scheme().isNull()) {
             // use processor specified scheme to determine secure state
             request.setSecure(req.scheme().equals("https"));
