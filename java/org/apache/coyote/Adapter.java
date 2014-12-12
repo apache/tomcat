@@ -30,6 +30,9 @@ public interface Adapter {
     /**
      * Call the service method, and notify all listeners
      *
+     * @param req The request object
+     * @param res The response object
+     *
      * @exception Exception if an error happens during handling of
      *   the request. Common errors are:
      *   <ul><li>IOException if an input/output error occurs and we are
@@ -42,8 +45,23 @@ public interface Adapter {
      *  Tomcat should be able to handle and log any other exception ( including
      *  runtime exceptions )
      */
-    public void service(Request req, Response res)
-            throws Exception;
+    public void service(Request req, Response res) throws Exception;
+
+    /**
+     * Prepare the given request/response for processing. This method requires
+     * that the request object has been populated with the information available
+     * from the HTTP headers.
+     *
+     * @param req The request object
+     * @param res The response object
+     *
+     * @return <code>true</code> if processing can continue, otherwise
+     *         <code>false</code> in which case an appropriate error will have
+     *         been set on the response
+     *
+     * @throws Exception If the processing fails unexpectedly
+     */
+    public boolean prepare(Request req, Response res) throws Exception;
 
     public boolean asyncDispatch(Request req,Response res, SocketStatus status)
             throws Exception;
