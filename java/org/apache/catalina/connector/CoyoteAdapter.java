@@ -1091,13 +1091,13 @@ public class CoyoteAdapter implements Adapter {
 
 
     /**
-     * Normalize URI.
-     * <p>
-     * This method normalizes "\", "//", "/./" and "/../". This method will
-     * return false when trying to go above the root, or if the URI contains
-     * a null byte.
+     * This method normalizes "\", "//", "/./" and "/../".
      *
      * @param uriMB URI to be normalized
+     *
+     * @return <code>false</false> if normalizing this URI would require going
+     *         above the root, or if the URI contains a null byte, otherwise
+     *         <code>true</code>
      */
     public static boolean normalize(MessageBytes uriMB) {
 
@@ -1208,13 +1208,14 @@ public class CoyoteAdapter implements Adapter {
 
 
     /**
-     * Check that the URI is normalized following character decoding.
-     * <p>
-     * This method checks for "\", 0, "//", "/./" and "/../". This method will
-     * return false if sequences that are supposed to be normalized are still
-     * present in the URI.
+     * Check that the URI is normalized following character decoding. This
+     * method checks for "\", 0, "//", "/./" and "/../".
      *
      * @param uriMB URI to be checked (should be chars)
+     *
+     * @return <code>false</code> if sequences that are supposed to be
+     *         normalized are still present in the URI, otherwise
+     *         <code>true</code>
      */
     public static boolean checkNormalize(MessageBytes uriMB) {
 
