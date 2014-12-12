@@ -415,6 +415,15 @@ public class CoyoteAdapter implements Adapter {
     }
 
 
+    @Override
+    public boolean prepare(org.apache.coyote.Request req, org.apache.coyote.Response res)
+            throws IOException, ServletException {
+        Request request = (Request) req.getNote(ADAPTER_NOTES);
+        Response response = (Response) res.getNote(ADAPTER_NOTES);
+
+        return postParseRequest(req, request, res, response);
+    }
+
 
     @Override
     public void errorDispatch(org.apache.coyote.Request req,

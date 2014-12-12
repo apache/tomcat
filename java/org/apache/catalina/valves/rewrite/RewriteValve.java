@@ -41,6 +41,8 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.Pipeline;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
@@ -486,8 +488,14 @@ public class RewriteValve extends ValveBase {
                     request.getMappingData().recycle();
                     // Reinvoke the whole request recursively
                     try {
-                        request.getConnector().getProtocolHandler().getAdapter().service
-                        (request.getCoyoteRequest(), response.getCoyoteResponse());
+                        Connector connector = request.getConnector();
+                        if (!connector.getProtocolHandler().getAdapter().prepare(
+                                request.getCoyoteRequest(), response.getCoyoteResponse())) {
+                            return;
+                        }
+                        Pipeline pipeline = connector.getService().getContainer().getPipeline();
+                        request.setAsyncSupported(pipeline.isAsyncSupported());
+                        pipeline.getFirst().invoke(request, response);
                     } catch (Exception e) {
                         // This doesn't actually happen in the Catalina adapter implementation
                     }
@@ -552,7 +560,9 @@ public class RewriteValve extends ValveBase {
      * Example:
      *  RewriteCond %{REMOTE_HOST}  ^host1.*  [OR]
      *
-     * @param line
+     * @param line A line from the rewrite configuration
+     *
+     * @return The condition, rule or map resulting from parsing the line
      */
     public static Object parse(String line) {
         StringTokenizer tokenizer = new StringTokenizer(line);
