@@ -949,9 +949,6 @@ public class CoyoteAdapter implements Adapter {
                 SSL_ONLY.equals(request.getServletContext()
                         .getEffectiveSessionTrackingModes()) &&
                         request.connector.secure) {
-            // TODO Is there a better way to map SSL sessions to our sesison ID?
-            // TODO The request.getAttribute() will cause a number of other SSL
-            //      attribute to be populated. Is this a performance concern?
             request.setRequestedSessionId(
                     request.getAttribute(SSLSupport.SESSION_ID_KEY).toString());
             request.setRequestedSessionSSL(true);
