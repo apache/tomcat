@@ -134,7 +134,9 @@ public interface Wrapper extends Container {
      * servlet.
      *
      * @return Array of names of the methods supported by the underlying
-     * servlet
+     *         servlet
+     *
+     * @throws ServletException If the target servlet can not be loaded
      */
     public String[] getServletMethods() throws ServletException;
 
