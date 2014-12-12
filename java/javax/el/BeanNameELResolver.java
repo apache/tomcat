@@ -44,7 +44,7 @@ public class BeanNameELResolver extends ELResolver {
 
         if (beanNameResolver.isNameResolved(beanName)) {
             try {
-                Object result = beanNameResolver.getBean((String) property);
+                Object result = beanNameResolver.getBean(beanName);
                 context.setPropertyResolved(base, property);
                 return result;
             } catch (Throwable t) {
