@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.mapper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -672,10 +673,11 @@ public final class Mapper {
      * @param uri URI
      * @param mappingData This structure will contain the result of the mapping
      *                    operation
+     * @throws IOException if the buffers are too small to hold the results of
+     *                     the mapping.
      */
     public void map(MessageBytes host, MessageBytes uri, String version,
-                    MappingData mappingData)
-        throws Exception {
+                    MappingData mappingData) throws IOException {
 
         if (host.isNull()) {
             host.getCharChunk().append(defaultHostName);
@@ -696,9 +698,11 @@ public final class Mapper {
      * @param uri URI
      * @param mappingData This structure will contain the result of the mapping
      *                    operation
+     * @throws IOException if the buffers are too small to hold the results of
+     *                     the mapping.
      */
     public void map(Context context, MessageBytes uri,
-            MappingData mappingData) throws Exception {
+            MappingData mappingData) throws IOException {
 
         ContextVersion contextVersion =
                 contextObjectToContextVersionMap.get(context);
@@ -715,9 +719,10 @@ public final class Mapper {
 
     /**
      * Map the specified URI.
+     * @throws IOException
      */
     private final void internalMap(CharChunk host, CharChunk uri,
-            String version, MappingData mappingData) throws Exception {
+            String version, MappingData mappingData) throws IOException {
 
         if (mappingData.host != null) {
             // The legacy code (dating down at least to Tomcat 4.1) just
@@ -822,11 +827,12 @@ public final class Mapper {
 
     /**
      * Wrapper mapping.
+     * @throws IOException if the buffers are too small to hold the results of
+     *                     the mapping.
      */
     private final void internalMapWrapper(ContextVersion contextVersion,
                                           CharChunk path,
-                                          MappingData mappingData)
-        throws Exception {
+                                          MappingData mappingData) throws IOException {
 
         int pathOffset = path.getOffset();
         int pathEnd = path.getEnd();
