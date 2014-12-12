@@ -684,11 +684,6 @@ public class CoyoteAdapter implements Adapter {
         } else {
             serverName = req.serverName();
         }
-        if (request.isAsyncStarted()) {
-            //TODO SERVLET3 - async
-            //reset mapping data, should prolly be done elsewhere
-            request.getMappingData().recycle();
-        }
 
         // Version for the second mapping loop and
         // Context that we expect to get for that version
