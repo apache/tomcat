@@ -258,7 +258,7 @@ public class ApplicationContext
             child = (Context) host.findChild(uri);
 
             // Non-running contexts should be ignored.
-            if (!child.getState().isAvailable()) {
+            if (child != null && !child.getState().isAvailable()) {
                 child = null;
             }
 
