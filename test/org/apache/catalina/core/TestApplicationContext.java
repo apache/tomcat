@@ -200,8 +200,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         Assert.assertTrue(body, body.contains("03-foo1"));
         Assert.assertTrue(body, body.contains("04-foo2"));
         Assert.assertTrue(body, body.contains("05-foo2"));
-        // FIXME: Enable this test
-        //Assert.assertTrue(body, body.contains("06-null"));
+        Assert.assertTrue(body, body.contains("06-null"));
     }
 
 
