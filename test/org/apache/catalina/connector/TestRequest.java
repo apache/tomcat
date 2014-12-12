@@ -42,6 +42,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -60,6 +61,12 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * Test case for {@link Request}.
  */
 public class TestRequest extends TomcatBaseTest {
+
+    @BeforeClass
+    public static void setup() {
+        // Some of these tests need this and it used statically so set it once
+        System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
+    }
 
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=37794
@@ -773,6 +780,36 @@ public class TestRequest extends TomcatBaseTest {
     @Test
     public void testBug56501o() throws Exception {
         doBug56501("/pa_th/abc", "/pa_th/abc/xxx", "/pa_th/abc");
+    }
+
+    @Test
+    public void testBug57215a() throws Exception {
+        doBug56501("/path", "//path", "//path");
+    }
+
+    @Test
+    public void testBug57215b() throws Exception {
+        doBug56501("/path", "//path/", "//path");
+    }
+
+    @Test
+    public void testBug57215c() throws Exception {
+        doBug56501("/path", "/%2Fpath", "/%2Fpath");
+    }
+
+    @Test
+    public void testBug57215d() throws Exception {
+        doBug56501("/path", "/%2Fpath%2F", "/%2Fpath");
+    }
+
+    @Test
+    public void testBug57215e() throws Exception {
+        doBug56501("/path", "/foo/../path", "/foo/../path");
+    }
+
+    @Test
+    public void testBug57215f() throws Exception {
+        doBug56501("/path", "/foo/..%2fpath", "/foo/..%2fpath");
     }
 
     private void doBug56501(String deployPath, String requestPath, String expected)

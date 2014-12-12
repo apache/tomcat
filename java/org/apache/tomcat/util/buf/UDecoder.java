@@ -29,7 +29,7 @@ import java.io.IOException;
  */
 public final class UDecoder {
 
-    protected static final boolean ALLOW_ENCODED_SLASH =
+    public static final boolean ALLOW_ENCODED_SLASH =
         Boolean.valueOf(System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "false")).booleanValue();
 
     private static class DecodeException extends CharConversionException {

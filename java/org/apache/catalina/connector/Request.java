@@ -74,6 +74,7 @@ import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.ParameterMap;
+import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.StringParser;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
@@ -83,6 +84,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Parameters;
@@ -1996,23 +1998,79 @@ public class Request
 
     /**
      * Return the portion of the request URI used to select the Context
-     * of the Request.
+     * of the Request. The value returned is not decoded which also implies it
+     * is not normalised.
      */
     @Override
     public String getContextPath() {
+        String canonicalContextPath = getServletContext().getContextPath();
         String uri = getRequestURI();
+        char[] uriChars = uri.toCharArray();
         int lastSlash = mappingData.contextSlashCount;
+        // Special case handling for the root context
+        if (lastSlash == 0) {
+            return "";
+        }
         int pos = 0;
+        // Need at least the number of slashes in the context path
         while (lastSlash > 0) {
-            pos = uri.indexOf('/', pos + 1);
+            pos = nextSlash(uriChars, pos + 1);
             if (pos == -1) {
-                return uri;
+                break;
             }
             lastSlash--;
         }
-        return uri.substring(0, pos);
+        // Now allow for normalization and/or encoding. Essentially, keep
+        // extending the candidate path up to the next slash until the decoded
+        // and normalized candidate path is the same as the canonical path.
+        String candidate;
+        if (pos == -1) {
+            candidate = uri;
+        } else {
+            candidate = uri.substring(0, pos);
+        }
+        candidate = RequestUtil.URLDecode(candidate, connector.getURIEncoding());
+        candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+        boolean match = canonicalContextPath.equals(candidate);
+        while (!match && pos != -1) {
+            pos = nextSlash(uriChars, pos + 1);
+            if (pos == -1) {
+                candidate = uri;
+            } else {
+                candidate = uri.substring(0, pos);
+            }
+            candidate = RequestUtil.URLDecode(candidate, connector.getURIEncoding());
+            candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+            match = canonicalContextPath.equals(candidate);
+        }
+        if (match) {
+            if (pos == -1) {
+                return uri;
+            } else {
+                return uri.substring(0, pos);
+            }
+        } else {
+            // Should never happen
+            throw new IllegalStateException(sm.getString(
+                    "coyoteRequest.getContextPath.ise", canonicalContextPath, uri));
+        }
     }
 
+
+    private int nextSlash(char[] uri, int startPos) {
+        int len = uri.length;
+        int pos = startPos;
+        while (pos < len) {
+            if (uri[pos] == '/') {
+                return pos;
+            } else if (UDecoder.ALLOW_ENCODED_SLASH && uri[pos] == '%' && pos + 2 < len &&
+                    uri[pos+1] == '2' && (uri[pos + 2] == 'f' || uri[pos + 2] == 'F')) {
+                return pos;
+            }
+            pos++;
+        }
+        return -1;
+    }
 
     /**
      * Get the context path.
