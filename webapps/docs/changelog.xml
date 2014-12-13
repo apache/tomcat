@@ -241,6 +241,11 @@
         runs Ant (${java.home}) instead of the one found on $PATH
         to run JUnit tests. (kkolinko)
       </fix>
+      <add>
+        <bug>57344</bug>: Provide sha1 checksum files for Tomcat downloads.
+        Correct filename patterns for apache-tomcat-*-embed.tar.gz archive
+        to exclude an *.asc file. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
