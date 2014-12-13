@@ -1282,14 +1282,14 @@
     <zip destfile="${tomcat.embed}/${final.name}-embed.zip">
       <fileset dir="${tomcat.embed}">
         <include name="**" />
+        <exclude name="*.asc" />
         <exclude name="*.md5" />
+        <exclude name="*.sha1" />
         <exclude name="*.zip" />
         <exclude name="*.tar.gz" />
       </fileset>
     </zip>
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.embed}/${final.name}-embed.zip" />
-    </antcall>
+    <hashAndSign file="${tomcat.embed}/${final.name}-embed.zip" />
 
     <fixcrlf srcdir="${tomcat.embed}" eol="lf"
         encoding="ISO-8859-1" fixlast="false" >
@@ -1299,14 +1299,14 @@
          tarfile="${tomcat.embed}/${final.name}-embed.tar.gz">
       <tarfileset dir="${tomcat.embed}" prefix="${final.name}-embed">
         <include name="**" />
+        <exclude name="*.asc" />
         <exclude name="*.md5" />
+        <exclude name="*.sha1" />
         <exclude name="*.zip" />
         <exclude name="*.tar.gz" />
       </tarfileset>
     </tar>
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.embed}/${final.name}-embed.tar.gz" />
-    </antcall>
+    <hashAndSign file="${tomcat.embed}/${final.name}-embed.tar.gz" />
 
   </target>
 
@@ -1613,16 +1613,12 @@
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat-juli-extras.jar}" />
-    </antcall>
+    <hashAndSign file="${tomcat-juli-extras.jar}" />
 
     <jarIt jarfile="${tomcat-juli-adapters.jar}"
       filesDir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/target/classes"
       filesId="files.tomcat-extras-juli-adapters" />
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat-juli-adapters.jar}" />
-    </antcall>
+    <hashAndSign file="${tomcat-juli-adapters.jar}" />
 
     <!-- Source JARs -->
     <jar jarfile="${tomcat-juli-extras-src.jar}"
@@ -1696,9 +1692,7 @@
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-extras-ws" />
 
-    <antcall target="md5sum">
-      <param name="file" value="${catalina-ws.jar}" />
-    </antcall>
+    <hashAndSign file="${catalina-ws.jar}" />
 
     <jarIt jarfile="${catalina-ws-src.jar}"
       filesDir="java"
@@ -1714,9 +1708,7 @@
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-extras-jmxremote" />
 
-    <antcall target="md5sum">
-      <param name="file" value="${catalina-jmx-remote.jar}" />
-    </antcall>
+    <hashAndSign file="${catalina-jmx-remote.jar}" />
 
     <jarIt jarfile="${catalina-jmx-remote-src.jar}"
       filesDir="java"
@@ -2173,9 +2165,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <arg value="tomcat.nsi" />
     </exec>
     <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.exe" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
   </target>
 
   <target name="installer-sign" depends="-installer" if="${do.codesigning}" >
@@ -2191,12 +2181,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <filename name="v${version}/bin/${final.name}.exe"/>
       </fileset>
     </signcode>
-    <!-- .exe has changed so need to redo MD5 and OpenPGP signature -->
-    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.md5" />
+    <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.exe" />
-    </antcall>
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.md5" />
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha1" />
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
   </target>
 
   <target name="release"
@@ -2233,8 +2222,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <fileset dir="${tomcat.embed}">
         <include name="*.zip"/>
         <include name="*.tar.gz"/>
-        <include name="*.md5"/>
         <include name="*.asc"/>
+        <include name="*.md5"/>
+        <include name="*.sha1"/>
       </fileset>
     </copy>
 
@@ -2283,9 +2273,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </zipfileset>
     </zip>
 
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.zip" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.zip" />
   </target>
 
   <!-- Packages the core windows zip distros -->
@@ -2316,9 +2304,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </zipfileset>
 
     </zip>
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-windows-x86.zip" />
 
     <!-- Windows x64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip">
@@ -2346,9 +2332,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="*.exe"/>
       </zipfileset>
     </zip>
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip" />
 
     <!-- Windows i64 package -->
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip">
@@ -2377,9 +2361,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </zipfileset>
     </zip>
 
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip" />
 
   </target>
 
@@ -2402,9 +2384,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="RELEASE-NOTES" />
     </zip>
 
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip" />
   </target>
 
   <!-- Packages the core tar.gz distro -->
@@ -2472,9 +2452,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </tarfileset>
     </tar>
 
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}.tar.gz" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.tar.gz" />
   </target>
 
   <!-- Packages the deployer Tomcat distro in tar.gz format -->
@@ -2501,9 +2479,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </tarfileset>
     </tar>
 
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz" />
   </target>
 
   <!-- Packages the documentation distro in tar.gz format -->
@@ -2525,9 +2501,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       </tarfileset>
     </tar>
 
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz" />
   </target>
 
   <!-- Packages the source code distribution in zip format -->
@@ -2543,9 +2517,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
     </zip>
 
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/src/${final-src.name}.zip" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/src/${final-src.name}.zip" />
   </target>
 
   <!-- Packages the source code distribution in tar.gz format -->
@@ -2561,9 +2533,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
          tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
       <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
     </tar>
-    <antcall target="md5sum">
-      <param name="file" value="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz" />
-    </antcall>
+    <hashAndSign file="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz" />
   </target>
 
   <!-- Packages the source code in JARs to match the binary JARs -->
@@ -3055,20 +3025,27 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     </sequential>
   </macrodef>
 
-  <!-- Helper target, used to create a md5 checksum file  -->
+  <!-- Macro, used to create checksum and signature files  -->
   <!-- Requires 'file' as a parameter. -->
-  <target name="md5sum">
-    <fail unless="file" />
-    <fail if="filename" />
-    <fail if="value" />
-    <basename file="${file}" property="filename" />
-    <checksum file="${file}" property="value" />
-    <echo file="${file}.md5" message="${value}${md5sum.binary-prefix}${filename}" />
-    <!-- Anything that requires an md5 hash, also needs a signature -->
-    <antcall target="sign" >
-      <param name="file" value="${file}" />
-    </antcall>
-  </target>
+  <macrodef name="hashAndSign">
+    <attribute name="file" />
+    <sequential>
+      <local name="filename" />
+      <local name="md5value" />
+      <local name="sha1value" />
+
+      <basename file="@{file}" property="filename" />
+      <checksum algorithm="MD5" file="@{file}" property="md5value" />
+      <checksum algorithm="SHA-1" file="@{file}" property="sha1value" />
+
+      <echo file="@{file}.md5" message="${md5value}${md5sum.binary-prefix}${filename}" />
+      <echo file="@{file}.sha1" message="${sha1value}${md5sum.binary-prefix}${filename}" />
+
+      <antcall target="sign" >
+        <param name="file" value="@{file}" />
+      </antcall>
+    </sequential>
+  </macrodef>
 
   <!-- Helper target, used to create a detached ascii OpenPGP signature.     -->
   <!-- Uses GPG with default key. Requires 'file' as a parameter. Only       -->
