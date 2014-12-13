@@ -25,13 +25,17 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import static org.junit.Assert.fail;
 
@@ -232,21 +236,225 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     }
 
 
+    public final class SnoopResult {
+
+        private final HashMap<String, String> request =
+            new HashMap<String, String>();
+        private final HashMap<String, String> contextInitParameters =
+            new HashMap<String, String>();
+        private final HashMap<String, String> contextAttributes =
+            new HashMap<String, String>();
+        private final HashMap<String, String> headers =
+            new HashMap<String, String>();
+        private final HashMap<String, String> attributes =
+            new HashMap<String, String>();
+        private final HashMap<String, String> params =
+            new HashMap<String, String>();
+        private final HashMap<String, String> sessionAttributes =
+            new HashMap<String, String>();
+
+        public HashMap<String, String> getRequest() {
+            return request;
+        }
+
+        public HashMap<String, String> getContextInitParameters() {
+            return contextInitParameters;
+        }
+
+        public HashMap<String, String> getContextAttributes() {
+            return contextAttributes;
+        }
+
+        public HashMap<String, String> getHeaders() {
+            return headers;
+        }
+
+        public HashMap<String, String> getAttributes() {
+            return attributes;
+        }
+
+        public HashMap<String, String> getParams() {
+            return params;
+        }
+
+        public HashMap<String, String> getSessionAttributes() {
+            return sessionAttributes;
+        }
+
+        public SnoopResult(String body) {
+
+            int n;
+            int m;
+            String key;
+            String value;
+            String name;
+
+            for (String line: body.split("\n")) {
+                n = line.indexOf(": ");
+                if (n > 0) {
+                    key = line.substring(0, n);
+                    value = line.substring(n + 2);
+                    m = key.indexOf(':');
+                    if (m > 0) {
+                        name = key.substring(m + 1);
+                        key = key.substring(0, m);
+                        if (key.equals("CONTEXT-PARAM")) {
+                            contextInitParameters.put(name, value);
+                        } else if (key.equals("CONTEXT-ATTRIBUTE")) {
+                            contextAttributes.put(name, value);
+                        } else if (key.equals("HEADER")) {
+                            headers.put(name, value);
+                        } else if (key.equals("ATTRIBUTE")) {
+                            attributes.put(name, value);
+                        } else if (key.equals("PARAM")) {
+                            params.put(name, value);
+                        } else if (key.equals("SESSION-ATTRIBUTE")) {
+                            sessionAttributes.put(name, value);
+                        } else {
+                            request.put(key + ":" + name, value);
+                        }
+                    } else {
+                        request.put(key, value);
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Simple servlet that dumps request information. Tests using this should
      * note that additional information may be added to in the future and should
-     * therefore test return values accordingly.
+     * therefore test return values using SnoopResult.
      */
     public static final class SnoopServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+        public void service(HttpServletRequest request,
+                            HttpServletResponse response)
                 throws ServletException, IOException {
-            resp.setContentType("text/plain");
-            PrintWriter out = resp.getWriter();
-            out.println("00-RequestURI-" + req.getRequestURI());
+
+            String name;
+            StringBuilder value;
+            Object attribute;
+
+            ServletContext ctx = this.getServletContext();
+            HttpSession session = request.getSession(false);
+            PrintWriter out = response.getWriter();
+
+            response.setContentType("text/plain");
+
+            out.println("CONTEXT-NAME: " + ctx.getServletContextName());
+            out.println("CONTEXT-PATH: " + ctx.getContextPath());
+            out.println("CONTEXT-MAJOR-VERSION: " + ctx.getMajorVersion());
+            out.println("CONTEXT-MINOR-VERSION: " + ctx.getMinorVersion());
+            out.println("CONTEXT-SERVER-INFO: " + ctx.getServerInfo());
+            for (Enumeration<String> e = ctx.getInitParameterNames();
+                 e.hasMoreElements();) {
+                name = e.nextElement();
+                out.println("CONTEXT-INIT-PARAM:" + name + ": " +
+                            ctx.getInitParameter(name));
+            }
+            for (Enumeration<String> e = ctx.getAttributeNames();
+                 e.hasMoreElements();) {
+                name = e.nextElement();
+                out.println("CONTEXT-ATTRIBUTE:" + name + ": " +
+                            ctx.getAttribute(name));
+            }
+            out.println("REQUEST-CONTEXT-PATH: " + request.getContextPath());
+            out.println("REQUEST-SERVER-NAME: " + request.getServerName());
+            out.println("REQUEST-SERVER-PORT: " + request.getServerPort());
+            out.println("REQUEST-LOCAL-NAME: " + request.getLocalName());
+            out.println("REQUEST-LOCAL-ADDR: " + request.getLocalAddr());
+            out.println("REQUEST-LOCAL-PORT: " + request.getLocalPort());
+            out.println("REQUEST-REMOTE-HOST: " + request.getRemoteHost());
+            out.println("REQUEST-REMOTE-ADDR: " + request.getRemoteAddr());
+            out.println("REQUEST-REMOTE-PORT: " + request.getRemotePort());
+            out.println("REQUEST-PROTOCOL: " + request.getProtocol());
+            out.println("REQUEST-SCHEME: " + request.getScheme());
+            out.println("REQUEST-IS-SECURE: " + request.isSecure());
+            out.println("REQUEST-URI: " + request.getRequestURI());
+            out.println("REQUEST-URL: " + request.getRequestURL());
+            out.println("REQUEST-SERVLET-PATH: " + request.getServletPath());
+            out.println("REQUEST-METHOD: " + request.getMethod());
+            out.println("REQUEST-PATH-INFO: " + request.getPathInfo());
+            out.println("REQUEST-PATH-TRANSLATED: " +
+                        request.getPathTranslated());
+            out.println("REQUEST-QUERY-STRING: " + request.getQueryString());
+            out.println("REQUEST-REMOTE-USER: " + request.getRemoteUser());
+            out.println("REQUEST-USER-PRINCIPAL: " +
+                        request.getUserPrincipal());
+            out.println("REQUEST-CHARACTER-ENCODING: " +
+                        request.getCharacterEncoding());
+            out.println("REQUEST-CONTENT-LENGTH: " +
+                        request.getContentLength());
+            out.println("REQUEST-CONTENT-TYPE: " + request.getContentType());
+            out.println("REQUEST-LOCALE: " + request.getLocale());
+
+            for (Enumeration<String> e = request.getHeaderNames();
+                 e.hasMoreElements();) {
+                name = e.nextElement();
+                value = new StringBuilder();
+                for (Enumeration<String> h = request.getHeaders(name);
+                     h.hasMoreElements();) {
+                    value.append(h.nextElement());
+                    if (h.hasMoreElements()) {
+                        value.append(";");
+                    }
+                }
+                out.println("HEADER:" + name + ": " + value);
+            }
+
+            for (Enumeration<String> e = request.getAttributeNames();
+                 e.hasMoreElements();) {
+                name = e.nextElement();
+                attribute = request.getAttribute(name);
+                out.println("ATTRIBUTE:" + name + ": " +
+                            (attribute != null ? attribute : "(null)"));
+            }
+
+            for (Enumeration<String> e = request.getParameterNames();
+                 e.hasMoreElements();) {
+                name = e.nextElement();
+                value = new StringBuilder();
+                String values[] = request.getParameterValues(name);
+                int m = values.length;
+                for (int j = 0; j < m; j++) {
+                    value.append(values[j]);
+                    if (j < m - 1) {
+                        value.append(";");
+                    }
+                }
+                out.println("PARAM/" + name + ": " + value);
+            }
+
+            out.println("SESSION-REQUESTED-ID: " +
+                        request.getRequestedSessionId());
+            out.println("SESSION-REQUESTED-ID-COOKIE: " +
+                        request.isRequestedSessionIdFromCookie());
+            out.println("SESSION-REQUESTED-ID-URL: " +
+                        request.isRequestedSessionIdFromUrl());
+            out.println("SESSION-REQUESTED-ID-VALID: " +
+                        request.isRequestedSessionIdValid());
+
+            if (session != null) {
+                out.println("SESSION-ID: " + session.getId());
+                out.println("SESSION-CREATION-TIME: " +
+                        session.getCreationTime());
+                out.println("SESSION-LAST-ACCESSED-TIME: " +
+                        session.getLastAccessedTime());
+                out.println("SESSION-MAX-INACTIVE-INTERVAL: " +
+                        session.getMaxInactiveInterval());
+                out.println("SESSION-IS-NEW: " + session.isNew());
+                for (Enumeration<String> e = session.getAttributeNames();
+                     e.hasMoreElements();) {
+                    name = e.nextElement();
+                    attribute = session.getAttribute(name);
+                    out.println("SESSION-ATTRIBUTE:" + name + ": " +
+                                (attribute != null ? attribute : "(null)"));
+                }
+            }
         }
     }
 

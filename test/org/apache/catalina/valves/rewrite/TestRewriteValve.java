@@ -67,6 +67,8 @@ public class TestRewriteValve extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() + request);
 
         String body = res.toString();
-        Assert.assertTrue(body, body.contains(expectedURI));
+        SnoopResult parsedBody = new SnoopResult(body);
+        String requestURI = parsedBody.getRequest().get("REQUEST-URI");
+        Assert.assertEquals(expectedURI, requestURI);
     }
 }
