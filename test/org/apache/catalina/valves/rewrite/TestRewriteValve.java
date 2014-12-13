@@ -43,7 +43,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testNonNormalizedPathRewrite() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /b/../a/$1", "/b/%255A", "/a/%255A");
+        doTestRewrite("RewriteRule ^/b/(.*) /b/../a/$1", "/b/%255A", "/b/../a/%255A");
     }
 
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
