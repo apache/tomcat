@@ -139,11 +139,13 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     public void setContainer(Container container) {
 
         Container oldContainer = this.container;
-        if ((oldContainer != null) && (oldContainer instanceof Engine))
+        if (oldContainer instanceof Engine) {
             ((Engine) oldContainer).setService(null);
+        }
         this.container = container;
-        if ((this.container != null) && (this.container instanceof Engine))
+        if (this.container instanceof Engine) {
             ((Engine) this.container).setService(this);
+        }
         if (getState().isAvailable() && (this.container != null)) {
             try {
                 this.container.start();

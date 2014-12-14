@@ -58,7 +58,7 @@ public class ClusterSingleSignOnListener extends ClusterListener {
      */
     @Override
     public void messageReceived(ClusterMessage myobj) {
-        if (myobj != null && myobj instanceof SingleSignOnMessage) {
+        if (myobj instanceof SingleSignOnMessage) {
             SingleSignOnMessage msg = (SingleSignOnMessage) myobj;
             int action = msg.getAction();
             Session session = null;

@@ -648,7 +648,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 entry.setProxy(false);
                 entry.setBackupNodes(mapmsg.getBackupNodes());
                 entry.setPrimary(mapmsg.getPrimary());
-                if (mapmsg.getValue()!=null && mapmsg.getValue() instanceof ReplicatedMapEntry ) {
+                if (mapmsg.getValue() instanceof ReplicatedMapEntry ) {
                     ((ReplicatedMapEntry)mapmsg.getValue()).setOwner(getMapOwner());
                 }
             } else {
@@ -925,7 +925,7 @@ public abstract class AbstractReplicatedMap<K,V>
                     if ( dest!=null && dest.length >0) {
                         getChannel().send(dest, msg, getChannelSendOptions());
                     }
-                    if ( entry.getValue() != null && entry.getValue() instanceof ReplicatedMapEntry ) {
+                    if (entry.getValue() instanceof ReplicatedMapEntry) {
                         ReplicatedMapEntry val = (ReplicatedMapEntry)entry.getValue();
                         val.setOwner(getMapOwner());
                     }
@@ -1164,7 +1164,7 @@ public abstract class AbstractReplicatedMap<K,V>
         }
 
         public boolean isValueSerializable() {
-            return (value==null) || (value instanceof Serializable);
+            return (value == null) || (value instanceof Serializable);
         }
 
         public boolean isSerializable() {

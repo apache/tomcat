@@ -182,7 +182,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         } else {
             try {
                 SocketAddress sa = ssc.getLocalAddress();
-                if (sa != null && sa instanceof InetSocketAddress) {
+                if (sa instanceof InetSocketAddress) {
                     return ((InetSocketAddress) sa).getPort();
                 } else {
                     return -1;

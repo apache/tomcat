@@ -96,16 +96,16 @@ public class ClusterSingleSignOn extends SingleSignOn {
             // stop remove cluster binding
             if(cluster == null) {
                 Container host = getContainer();
-                if(host != null && host instanceof Host) {
+                if(host instanceof Host) {
                     cluster = host.getCluster();
-                    if(cluster != null && cluster instanceof CatalinaCluster) {
+                    if(cluster instanceof CatalinaCluster) {
                         setCluster((CatalinaCluster) cluster);
                         getCluster().addClusterListener(clusterSSOListener);
                     } else {
                         Container engine = host.getParent();
-                        if(engine != null && engine instanceof Engine) {
+                        if(engine instanceof Engine) {
                             cluster = engine.getCluster();
-                            if(cluster != null && cluster instanceof CatalinaCluster) {
+                            if(cluster instanceof CatalinaCluster) {
                                 setCluster((CatalinaCluster) cluster);
                                 getCluster().addClusterListener(clusterSSOListener);
                             }
@@ -168,7 +168,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
                 new SingleSignOnMessage(cluster.getLocalMember(),
                                         ssoId, session.getId());
             Manager mgr = session.getManager();
-            if ((mgr != null) && (mgr instanceof ClusterManager)) {
+            if (mgr instanceof ClusterManager) {
                 msg.setContextName(((ClusterManager) mgr).getName());
             }
 
@@ -210,7 +210,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
                 new SingleSignOnMessage(cluster.getLocalMember(),
                                         ssoId, session.getId());
             Manager mgr = session.getManager();
-            if ((mgr != null) && (mgr instanceof ClusterManager)) {
+            if (mgr instanceof ClusterManager) {
                 msg.setContextName(((ClusterManager) mgr).getName());
             }
 
@@ -401,7 +401,7 @@ public class ClusterSingleSignOn extends SingleSignOn {
                                         ssoId, session.getId());
 
             Manager mgr = session.getManager();
-            if ((mgr != null) && (mgr instanceof ClusterManager)) {
+            if (mgr instanceof ClusterManager) {
                 msg.setContextName(((ClusterManager) mgr).getName());
             }
 

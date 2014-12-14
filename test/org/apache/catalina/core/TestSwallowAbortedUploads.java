@@ -131,7 +131,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         AbortedUploadClient client = new AbortedUploadClient();
         Exception ex = doAbortedUploadTest(client, true, false);
         assertTrue("Limited upload with swallow disabled does not generate client exception",
-                   ex != null && ex instanceof java.net.SocketException);
+                   ex instanceof java.net.SocketException);
         client.reset();
     }
 
@@ -177,7 +177,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         AbortedPOSTClient client = new AbortedPOSTClient();
         Exception ex = doAbortedPOSTTest(client, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, false);
         assertTrue("Limited upload with swallow disabled does not generate client exception",
-                   ex != null && ex instanceof java.net.SocketException);
+                   ex instanceof java.net.SocketException);
         client.reset();
     }
 

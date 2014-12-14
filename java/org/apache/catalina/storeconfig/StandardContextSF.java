@@ -315,9 +315,9 @@ public class StandardContextSF extends StoreFactoryBase {
         File file = new File(System.getProperty("catalina.base"), "conf");
         Container host = context.getParent();
 
-        if ((host != null) && (host instanceof Host)) {
+        if (host instanceof Host) {
             Container engine = host.getParent();
-            if ((engine != null) && (engine instanceof Engine)) {
+            if (engine instanceof Engine) {
                 file = new File(file, engine.getName());
             }
             file = new File(file, host.getName());

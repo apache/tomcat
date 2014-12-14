@@ -100,7 +100,7 @@ public class BackupManager extends ClusterManagerBase
 //=========================================================================
     @Override
     public void objectMadePrimary(Object key, Object value) {
-        if (value!=null && value instanceof DeltaSession) {
+        if (value instanceof DeltaSession) {
             DeltaSession session = (DeltaSession)value;
             synchronized (session) {
                 session.access();
