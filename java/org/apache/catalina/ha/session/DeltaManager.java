@@ -924,7 +924,7 @@ public class DeltaManager extends ClusterManagerBase{
      */
     @Override
     public void messageDataReceived(ClusterMessage cmsg) {
-        if (cmsg != null && cmsg instanceof SessionMessage) {
+        if (cmsg instanceof SessionMessage) {
             SessionMessage msg = (SessionMessage) cmsg;
             switch (msg.getEventType()) {
                 case SessionMessage.EVT_GET_ALL_SESSIONS:

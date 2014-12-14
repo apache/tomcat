@@ -441,7 +441,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      */
     @Override
     public void removeManager(Manager manager) {
-        if (manager != null && manager instanceof ClusterManager ) {
+        if (manager instanceof ClusterManager) {
             ClusterManager cmgr = (ClusterManager) manager;
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(BEFORE_MANAGERUNREGISTER_EVENT,manager);
@@ -465,7 +465,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             Context context = manager.getContext() ;
             if(context != null) {
                 Container host = context.getParent();
-                if(host != null && host instanceof Host && clusterName!=null &&
+                if(host instanceof Host && clusterName!=null &&
                         !(clusterName.startsWith(host.getName() +"#"))) {
                     clusterName = host.getName() +"#" + clusterName ;
                 }

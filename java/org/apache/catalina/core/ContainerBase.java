@@ -893,11 +893,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         logger = null;
         getLogger();
         Cluster cluster = getClusterInternal();
-        if ((cluster != null) && (cluster instanceof Lifecycle))
+        if (cluster instanceof Lifecycle) {
             ((Lifecycle) cluster).start();
+        }
         Realm realm = getRealmInternal();
-        if ((realm != null) && (realm instanceof Lifecycle))
+        if (realm instanceof Lifecycle) {
             ((Lifecycle) realm).start();
+        }
 
         // Start our child containers, if any
         Container children[] = findChildren();
@@ -978,11 +980,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Stop our subordinate components, if any
         Realm realm = getRealmInternal();
-        if ((realm != null) && (realm instanceof Lifecycle)) {
+        if (realm instanceof Lifecycle) {
             ((Lifecycle) realm).stop();
         }
         Cluster cluster = getClusterInternal();
-        if ((cluster != null) && (cluster instanceof Lifecycle)) {
+        if (cluster instanceof Lifecycle) {
             ((Lifecycle) cluster).stop();
         }
     }
@@ -991,11 +993,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     protected void destroyInternal() throws LifecycleException {
 
         Realm realm = getRealmInternal();
-        if ((realm != null) && (realm instanceof Lifecycle)) {
+        if (realm instanceof Lifecycle) {
             ((Lifecycle) realm).destroy();
         }
         Cluster cluster = getClusterInternal();
-        if ((cluster != null) && (cluster instanceof Lifecycle)) {
+        if (cluster instanceof Lifecycle) {
             ((Lifecycle) cluster).destroy();
         }
 

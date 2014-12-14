@@ -4996,8 +4996,9 @@ public class StandardContext extends ContainerBase
             if (ok) {
                 // Start our subordinate components, if any
                 Loader loader = getLoader();
-                if ((loader != null) && (loader instanceof Lifecycle))
+                if (loader instanceof Lifecycle) {
                     ((Lifecycle) loader).start();
+                }
 
                 // since the loader just started, the webapp classloader is now
                 // created.
@@ -5021,11 +5022,13 @@ public class StandardContext extends ContainerBase
                 getLogger();
 
                 Cluster cluster = getClusterInternal();
-                if ((cluster != null) && (cluster instanceof Lifecycle))
+                if (cluster instanceof Lifecycle) {
                     ((Lifecycle) cluster).start();
+                }
                 Realm realm = getRealmInternal();
-                if ((realm != null) && (realm instanceof Lifecycle))
+                if (realm instanceof Lifecycle) {
                     ((Lifecycle) realm).start();
+                }
 
                 // Notify our interested LifecycleListeners
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
@@ -5145,7 +5148,7 @@ public class StandardContext extends ContainerBase
             try {
                 // Start manager
                 Manager manager = getManager();
-                if ((manager != null) && (manager instanceof Lifecycle)) {
+                if (manager instanceof Lifecycle) {
                     ((Lifecycle) manager).start();
                 }
             } catch(Exception e) {
@@ -5340,8 +5343,7 @@ public class StandardContext extends ContainerBase
             filterStop();
 
             Manager manager = getManager();
-            if (manager != null && manager instanceof Lifecycle &&
-                    ((Lifecycle) manager).getState().isAvailable()) {
+            if (manager instanceof Lifecycle && ((Lifecycle) manager).getState().isAvailable()) {
                 ((Lifecycle) manager).stop();
             }
 
@@ -5376,15 +5378,15 @@ public class StandardContext extends ContainerBase
                 context.clearAttributes();
 
             Realm realm = getRealmInternal();
-            if ((realm != null) && (realm instanceof Lifecycle)) {
+            if (realm instanceof Lifecycle) {
                 ((Lifecycle) realm).stop();
             }
             Cluster cluster = getClusterInternal();
-            if ((cluster != null) && (cluster instanceof Lifecycle)) {
+            if (cluster instanceof Lifecycle) {
                 ((Lifecycle) cluster).stop();
             }
             Loader loader = getLoader();
-            if ((loader != null) && (loader instanceof Lifecycle)) {
+            if (loader instanceof Lifecycle) {
                 ((Lifecycle) loader).stop();
             }
 
@@ -5458,12 +5460,12 @@ public class StandardContext extends ContainerBase
         }
 
         Loader loader = getLoader();
-        if ((loader != null) && (loader instanceof Lifecycle)) {
+        if (loader instanceof Lifecycle) {
             ((Lifecycle) loader).destroy();
         }
 
         Manager manager = getManager();
-        if ((manager != null) && (manager instanceof Lifecycle)) {
+        if (manager instanceof Lifecycle) {
             ((Lifecycle) manager).destroy();
         }
 

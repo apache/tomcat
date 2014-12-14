@@ -87,17 +87,17 @@ public class SessionUtils {
             // First search "known locations"
             for (int i = 0; i < LOCALE_TEST_ATTRIBUTES.length; ++i) {
                 Object obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i]);
-                if (null != obj && obj instanceof Locale) {
+                if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
                 obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toLowerCase(Locale.ENGLISH));
-                if (null != obj && obj instanceof Locale) {
+                if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
                 obj = in_session.getAttribute(LOCALE_TEST_ATTRIBUTES[i].toUpperCase(Locale.ENGLISH));
-                if (null != obj && obj instanceof Locale) {
+                if (obj instanceof Locale) {
                     locale = (Locale) obj;
                     break;
                 }
@@ -125,7 +125,7 @@ public class SessionUtils {
                         if (null != readMethod) {
                             // Call the property getter and return the value
                             Object possibleLocale = readMethod.invoke(probableEngine, (Object[]) null);
-                            if (null != possibleLocale && possibleLocale instanceof Locale) {
+                            if (possibleLocale instanceof Locale) {
                                 locale = (Locale) possibleLocale;
                             }
                         }
@@ -148,7 +148,7 @@ public class SessionUtils {
             for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
                 String name = enumeration.nextElement();
                 Object obj = in_session.getAttribute(name);
-                if (null != obj && obj instanceof Locale) {
+                if (obj instanceof Locale) {
                     localeArray.add(obj);
                 }
             }
@@ -210,7 +210,7 @@ public class SessionUtils {
             for (Enumeration<String> enumeration = httpSession.getAttributeNames(); enumeration.hasMoreElements();) {
                 String name = enumeration.nextElement();
                 Object obj = httpSession.getAttribute(name);
-                if (null != obj && (obj instanceof Principal || obj instanceof Subject)) {
+                if (obj instanceof Principal || obj instanceof Subject) {
                     principalArray.add(obj);
                 }
             }

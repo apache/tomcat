@@ -87,7 +87,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
         Map<String,Object> map =
                 ((ReplApplContext)this.context).getAttributeMap();
-        if ( map!=null && map instanceof ReplicatedMap) {
+        if (map instanceof ReplicatedMap) {
             ((ReplicatedMap<?,?>)map).breakdown();
         }
     }
