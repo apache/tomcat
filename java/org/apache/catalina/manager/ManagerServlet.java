@@ -123,6 +123,11 @@ import org.apache.tomcat.util.res.StringManager;
  *     typically as a result of being placed there via the <code>/deploy</code>
  *     command.</li>
  * <li><b>/vminfo</b> - Write some VM info.</li>
+ * <li><b>/save</b> - Save the current server configuration to server.xml</li>
+ * <li><b>/save?path=/xxx</b> - Save the context configuration for the web
+ *     application deployed with path <code>/xxx</code> to an appropriately
+ *     named context.xml file in the <code>xmlBase</code> for the associated
+ *     Host.</li>
  * </ul>
  * <p>Use <code>path=/</code> for the ROOT context.</p>
  * <p>The syntax of the URL for a web application archive must conform to one

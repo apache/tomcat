@@ -933,6 +933,29 @@ OS information:
 
 </subsection>
 
+<subsection name="Save Configuration">
+
+<source>http://localhost:8080/manager/text/save</source>
+
+<p>If specified without any parameters, this command saves the current
+configuration of the server to server.xml. The existing file will be renamed as
+a backup if required.</p>
+
+<p>If specified with a <code>path</code> parameter that matches the path of
+a deployed web application then the configuration for that web application will
+be saved to an appropriately named context.xml file in the <code>xmlBase</code>
+for the current Host.</p>
+
+<p>To use the command a StoreConfig MBean must be present. Typically this is
+configured using the <a
+href="config/listeners.html#StoreConfig_Lifecycle_Listener_-_org.apache.catalina.storeconfig.StoreConfigLifecycleListener">StoreConfigLifecycleListener</a>.
+</p>
+
+<p>If the command does not succeed, the response will start with
+<code>FAIL</code> and include an error message.</p>
+
+</subsection>
+
 </section>
 
 <section name="Server Status">

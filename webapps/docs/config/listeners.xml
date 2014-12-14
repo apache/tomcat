@@ -315,6 +315,40 @@
 
   </subsection>
 
+  <subsection name="StoreConfig Lifecycle Listener - org.apache.catalina.storeconfig.StoreConfigLifecycleListener">
+
+    <p>The <strong>StoreConfig Lifecycle Listener</strong> configures a
+    StoreConfig MBean that may be used to save the current server configuration
+    in server.xml or the current configuration for a web application in a
+    context.xml file.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>The following additional attributes are supported by the
+    <strong>StoreConfig Lifecycle Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="storeConfigClass" required="false">
+        <p>The name of the <code>IStoreConfig</code> implementation to use. If
+        not specified the default of
+        <code>org.apache.catalina.storeconfig.StoreConfig</code> will be
+        used.</p>
+      </attribute>
+
+      <attribute name="storeRegsitry" required="false">
+        <p>The URL of the configuration file that configures how the
+        <code>IStoreConfig</code> is to save the configuration. If not specified
+        the built in resource
+        <code>/org/apache/catalina/storeconfig/server-registry.xml</code> will
+        be used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
   <subsection name="ThreadLocal Leak Prevention Listener - org.apache.catalina.core.ThreadLocalLeakPreventionListener">
 
     <p>The <strong>ThreadLocal Leak Prevention Listener</strong> triggers the
