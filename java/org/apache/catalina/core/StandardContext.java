@@ -983,7 +983,7 @@ public class StandardContext extends ContainerBase
         Pipeline pipeline = getPipeline();
         if (pipeline != null) {
             Valve basic = pipeline.getBasic();
-            if ((basic != null) && (basic instanceof Authenticator))
+            if (basic instanceof Authenticator)
                 return (Authenticator) basic;
             Valve valves[] = pipeline.getValves();
             for (int i = 0; i < valves.length; i++) {
