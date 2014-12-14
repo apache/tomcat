@@ -690,7 +690,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     public synchronized void storeConfig() throws Exception {
         try {
-            ObjectName sname = new ObjectName(getDomain() + ":type=StoreConfig");
+            // Note: Hard-coded domain used since this object is per Server/JVM
+            ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
             if (mserver.isRegistered(sname)) {
                 mserver.invoke(sname, "storeConfig", null, null);
             } else {
@@ -716,7 +717,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     public synchronized void storeContext(Context context) throws Exception {
         try {
-            ObjectName sname = new ObjectName(getDomain() + ":type=StoreConfig");
+            // Note: Hard-coded domain used since this object is per Server/JVM
+            ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
             if (mserver.isRegistered(sname)) {
                 mserver.invoke(sname, "store",
                     new Object[] {context},

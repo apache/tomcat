@@ -583,8 +583,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         ObjectName storeConfigOname;
         try {
-            // Note that there is only ever one StoreConfig per JVM and the
-            // name of the MBean is hard-coded.
+            // Note: Hard-coded domain used since this object is per Server/JVM
             storeConfigOname = new ObjectName("Catalina:type=StoreConfig");
         } catch (MalformedObjectNameException e) {
             // Should never happen. The name above is valid.

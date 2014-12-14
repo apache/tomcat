@@ -42,7 +42,6 @@ import org.apache.catalina.realm.CombinedRealm;
 import org.apache.catalina.realm.NullRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.storeconfig.StoreConfigLifecycleListener;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
@@ -77,7 +76,6 @@ public class TestRegistration extends TomcatBaseTest {
             "Tomcat:type=Server",
             "Tomcat:type=Service",
             "Tomcat:type=StringCache",
-            "Tomcat:type=StoreConfig",
             "Tomcat:type=Valve,name=StandardEngineValve",
         };
     }
@@ -160,9 +158,6 @@ public class TestRegistration extends TomcatBaseTest {
         assertEquals("Unexpected: " + onames, 0, onames.size());
 
         final Tomcat tomcat = getTomcatInstance();
-
-        tomcat.getServer().addLifecycleListener(new StoreConfigLifecycleListener());
-
         final File contextDir = new File(getTemporaryDirectory(), "webappFoo");
         addDeleteOnTearDown(contextDir);
         if (!contextDir.mkdirs() && !contextDir.isDirectory()) {
