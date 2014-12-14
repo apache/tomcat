@@ -977,9 +977,6 @@ public class StandardContext extends ContainerBase
 
     @Override
     public Authenticator getAuthenticator() {
-        if (this instanceof Authenticator)
-            return (Authenticator) this;
-
         Pipeline pipeline = getPipeline();
         if (pipeline != null) {
             Valve basic = pipeline.getBasic();
