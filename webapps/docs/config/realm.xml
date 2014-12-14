@@ -655,6 +655,16 @@
         user's entry.</p>
       </attribute>
 
+      <attribute name="userSearchAsUser" required="false">
+        <p> When searching for a user's entry, should the search be performed as
+        the user currently being authenticated? If false,
+        <code>connectionName</code> and <code>connectionPassword</code> will be
+        used if specified, else an anonymous. If not specified, the default
+        value of <code>false</code> is used. Note that when accessing the
+        directory using delegated credentials, this attribute is always ignored
+        and the search is performed using the delegated credentials.</p>
+      </attribute>
+
       <attribute name="userSubtree" required="false">
         <p>Set to <code>true</code> if you want to search the entire
         subtree of the element specified by the <code>userBase</code>

@@ -317,6 +317,11 @@
           description="The message format used to select roles for a user"
                  type="java.lang.String"/>
 
+    <attribute   name="roleSearchAsUser"
+          description="Should the search for user roles be performed as the authenticating user?"
+                   is="true"
+                 type="boolean"/>
+
     <attribute   name="roleSubtree"
           description="Should we search the entire subtree for matching memberships?"
                  type="boolean"/>
@@ -338,13 +343,18 @@
           description="The message format used to select a user"
                  type="java.lang.String"/>
 
-     <attribute   name="userRoleName"
+    <attribute   name="userRoleName"
           description="The name of the attribute in the user's entry containing roles for that user"
                  type="java.lang.String"/>
 
-   <attribute   name="userSearch"
-         description="The message format used to search for a user"
-                type="java.lang.String"/>
+    <attribute   name="userSearch"
+          description="The message format used to search for a user"
+                 type="java.lang.String"/>
+
+    <attribute   name="userSearchAsUser"
+          description="Should the search for the user's DN be performed as the authenticating user?"
+                   is="true"
+                 type="boolean"/>
 
     <attribute   name="userSubtree"
           description="Should we search the entire subtree for matching users?"

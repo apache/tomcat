@@ -76,6 +76,10 @@
         in a directory context for a user with specified user name. Based on
         a patch provided by Jason McIntosh. (violetagg)
       </fix>
+      <add>
+        <bug>57209</bug>: Add a new attribute, userSearchAsUser to the JNDI
+        Realm. (markt)
+      </add>
       <fix>
         <bug>57215</bug>: Ensure that the result of calling
         <code>HttpServletRequest.getContextPath()</code> is neither decoded nor
