@@ -269,6 +269,15 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
+     * When searching for users, should the search be performed as the user
+     * currently being authenticated? If false, {@link #connectionName} and
+     * {@link #connectionPassword} will be used if specified, else an anonymous
+     * connection will be used.
+     */
+    private boolean userSearchAsUser = false;
+
+
+    /**
      * The MessageFormat object associated with the current
      * <code>userSearch</code>.
      */
@@ -658,6 +667,16 @@ public class JNDIRealm extends RealmBase {
     }
 
 
+    public boolean isUserSearchAsUser() {
+        return userSearchAsUser;
+    }
+
+
+    public void setUserSearchAsUser(boolean userSearchAsUser) {
+        this.userSearchAsUser = userSearchAsUser;
+    }
+
+
     /**
      * Return the "search subtree for users" flag.
      */
@@ -779,9 +798,11 @@ public class JNDIRealm extends RealmBase {
         return roleSearchAsUser;
     }
 
+
     public void setRoleSearchAsUser(boolean roleSearchAsUser) {
         this.roleSearchAsUser = roleSearchAsUser;
     }
+
 
     /**
      * Return the "search subtree for roles" flag.
@@ -1280,7 +1301,17 @@ public class JNDIRealm extends RealmBase {
                 containerLog.debug("Found user by pattern [" + user + "]");
             }
         } else {
-            user = getUserBySearch(context, username, attrIds);
+            boolean thisUserSearchAsUser = isUserSearchAsUser();
+            try {
+                if (thisUserSearchAsUser) {
+                    userCredentialsAdd(context, username, credentials);
+                }
+                user = getUserBySearch(context, username, attrIds);
+            } finally {
+                if (thisUserSearchAsUser) {
+                    userCredentialsRemove(context);
+                }
+            }
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug("Found user by search [" + user + "]");
             }
@@ -1727,13 +1758,14 @@ public class JNDIRealm extends RealmBase {
 
         // Perform the configured search and process the results
         NamingEnumeration<SearchResult> results = null;
+        boolean thisRoleSearchAsUser = isRoleSearchAsUser();
         try {
-            if (roleSearchAsUser) {
+            if (thisRoleSearchAsUser) {
                 userCredentialsAdd(context, dn, user.getPassword());
             }
             results = context.search(base, filter, controls);
         } finally {
-            if (roleSearchAsUser) {
+            if (thisRoleSearchAsUser) {
                 userCredentialsRemove(context);
             }
         }
