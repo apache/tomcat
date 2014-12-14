@@ -141,7 +141,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         String request =
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
-            "Expect: unknoen" + SimpleHttpClient.CRLF +
+            "Expect: unknown" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF;
 
         Client client = new Client(getPort());
