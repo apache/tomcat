@@ -40,6 +40,7 @@ import javax.servlet.http.HttpSession;
 import static org.junit.Assert.fail;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 
 import org.apache.catalina.Container;
@@ -236,9 +237,9 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     }
 
 
-    public final class SnoopResult {
+    public static final class RequestDescriptor {
 
-        private final HashMap<String, String> request =
+        private final HashMap<String, String> requestInfo =
             new HashMap<String, String>();
         private final HashMap<String, String> contextInitParameters =
             new HashMap<String, String>();
@@ -253,8 +254,8 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         private final HashMap<String, String> sessionAttributes =
             new HashMap<String, String>();
 
-        public HashMap<String, String> getRequest() {
-            return request;
+        public HashMap<String, String> getRequestInfo() {
+            return requestInfo;
         }
 
         public HashMap<String, String> getContextInitParameters() {
@@ -281,13 +282,115 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             return sessionAttributes;
         }
 
-        public SnoopResult(String body) {
+        public String getRequestInfo(String name) {
+            return requestInfo.get(name);
+        }
+
+        public void putRequestInfo(String name, String value) {
+            requestInfo.put(name, value);
+        }
+
+        public String getContextInitParameter(String name) {
+            return contextInitParameters.get(name);
+        }
+
+        public void putContextInitParameter(String name, String value) {
+            contextInitParameters.put(name, value);
+        }
+
+        public String getContextAttribute(String name) {
+            return contextAttributes.get(name);
+        }
+
+        public void putContextAttribute(String name, String value) {
+            contextAttributes.put(name, value);
+        }
+
+        public String getHeader(String name) {
+            return headers.get(name);
+        }
+
+        public void putHeader(String name, String value) {
+            headers.put(name, value);
+        }
+
+        public String getAttribute(String name) {
+            return attributes.get(name);
+        }
+
+        public void putAttribute(String name, String value) {
+            attributes.put(name, value);
+        }
+
+        public String getParam(String name) {
+            return params.get(name);
+        }
+
+        public void putParam(String name, String value) {
+            params.put(name, value);
+        }
+
+        public String getSessionAttribute(String name) {
+            return sessionAttributes.get(name);
+        }
+
+        public void putSessionAttribute(String name, String value) {
+            sessionAttributes.put(name, value);
+        }
+
+        public void compare (RequestDescriptor request) {
+            HashMap<String, String> base;
+            HashMap<String, String> cmp;
+            base = request.getRequestInfo();
+            cmp = this.getRequestInfo();
+            for (String name: base.keySet()) {
+                Assert.assertEquals("Request info " + name, base.get(name), cmp.get(name));
+            }
+            base = request.getContextInitParameters();
+            cmp = this.getContextInitParameters();
+            for (String name: base.keySet()) {
+                Assert.assertEquals("Context parameter " + name, base.get(name), cmp.get(name));
+            }
+            base = request.getContextAttributes();
+            cmp = this.getContextAttributes();
+            for (String name: base.keySet()) {
+                Assert.assertEquals("Context attribute " + name, base.get(name), cmp.get(name));
+            }
+            base = request.getHeaders();
+            cmp = this.getHeaders();
+            for (String name: base.keySet()) {
+                Assert.assertEquals("Header " + name, base.get(name), cmp.get(name));
+            }
+            base = request.getAttributes();
+            cmp = this.getAttributes();
+            for (String name: base.keySet()) {
+                Assert.assertEquals("Attribute " + name, base.get(name), cmp.get(name));
+            }
+            base = request.getParams();
+            cmp = this.getParams();
+            for (String name: base.keySet()) {
+                Assert.assertEquals("Param " + name, base.get(name), cmp.get(name));
+            }
+            base = request.getSessionAttributes();
+            cmp = this.getSessionAttributes();
+            for (String name: base.keySet()) {
+                Assert.assertEquals("Session attribute " + name, base.get(name), cmp.get(name));
+            }
+        }
+    }
+
+
+    public static final class SnoopResult {
+
+        public static RequestDescriptor parse(String body) {
 
             int n;
             int m;
             String key;
             String value;
             String name;
+
+            RequestDescriptor request = new RequestDescriptor();
 
             for (String line: body.split("\n")) {
                 n = line.indexOf(": ");
@@ -299,25 +402,27 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                         name = key.substring(m + 1);
                         key = key.substring(0, m);
                         if (key.equals("CONTEXT-PARAM")) {
-                            contextInitParameters.put(name, value);
+                            request.putContextInitParameter(name, value);
                         } else if (key.equals("CONTEXT-ATTRIBUTE")) {
-                            contextAttributes.put(name, value);
+                            request.putContextAttribute(name, value);
                         } else if (key.equals("HEADER")) {
-                            headers.put(name, value);
+                            request.putHeader(name, value);
                         } else if (key.equals("ATTRIBUTE")) {
-                            attributes.put(name, value);
+                            request.putAttribute(name, value);
                         } else if (key.equals("PARAM")) {
-                            params.put(name, value);
+                            request.putParam(name, value);
                         } else if (key.equals("SESSION-ATTRIBUTE")) {
-                            sessionAttributes.put(name, value);
+                            request.putSessionAttribute(name, value);
                         } else {
-                            request.put(key + ":" + name, value);
+                            request.putRequestInfo(key + ":" + name, value);
                         }
                     } else {
-                        request.put(key, value);
+                        request.putRequestInfo(key, value);
                     }
                 }
             }
+
+            return request;
         }
     }
 
@@ -383,6 +488,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                         request.getPathTranslated());
             out.println("REQUEST-QUERY-STRING: " + request.getQueryString());
             out.println("REQUEST-REMOTE-USER: " + request.getRemoteUser());
+            out.println("REQUEST-AUTH-TYPE: " + request.getAuthType());
             out.println("REQUEST-USER-PRINCIPAL: " +
                         request.getUserPrincipal());
             out.println("REQUEST-CHARACTER-ENCODING: " +
