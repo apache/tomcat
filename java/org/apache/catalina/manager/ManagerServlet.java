@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.naming.Binding;
 import javax.naming.NamingEnumeration;
@@ -53,7 +54,6 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.RequestUtil;
@@ -575,22 +575,33 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     /**
      * Store server configuration.
      *
-     * @param path Optional context path to save
+     * @param writer   Destination for any user message(s) during this operation
+     * @param path     Optional context path to save
+     * @param smClient i18n support for current client's locale
      */
-    protected synchronized void save(PrintWriter writer, String path,
-            StringManager smClient) {
+    protected synchronized void save(PrintWriter writer, String path, StringManager smClient) {
 
-        Server server = ((Engine)host.getParent()).getService().getServer();
+        ObjectName storeConfigOname;
+        try {
+            // Note that there is only ever one StoreConfig per JVM and the
+            // name of the MBean is hard-coded.
+            storeConfigOname = new ObjectName("Catalina:type=StoreConfig");
+        } catch (MalformedObjectNameException e) {
+            // Should never happen. The name above is valid.
+            log(sm.getString("managerServlet.exception"), e);
+            writer.println(smClient.getString("managerServlet.exception", e.toString()));
+            return;
+        }
 
-        if (!(server instanceof StandardServer)) {
-            writer.println(smClient.getString("managerServlet.saveFail",
-                    server));
+        if (!mBeanServer.isRegistered(storeConfigOname)) {
+            writer.println(smClient.getString(
+                    "managerServlet.storeConfig.noMBean", storeConfigOname));
             return;
         }
 
         if ((path == null) || path.length() == 0 || !path.startsWith("/")) {
             try {
-                ((StandardServer) server).storeConfig();
+                mBeanServer.invoke(storeConfigOname, "storeConfig", null, null);
                 writer.println(smClient.getString("managerServlet.saved"));
             } catch (Exception e) {
                 log("managerServlet.storeConfig", e);
@@ -610,7 +621,9 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
             try {
-                ((StandardServer) server).storeContext(context);
+                mBeanServer.invoke(storeConfigOname, "store",
+                        new Object[] {context},
+                        new String [] { "java.lang.String"});
                 writer.println(smClient.getString("managerServlet.savedContext",
                         path));
             } catch (Exception e) {
@@ -620,7 +633,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 return;
             }
         }
-
     }
 
 
