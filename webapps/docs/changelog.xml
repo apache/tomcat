@@ -170,6 +170,13 @@
         <bug>57265</bug>: Fix some potential concurrency issues with sendFile
         and the NIO connector. (markt)
       </fix>
+      <fix>
+        <bug>57324</bug>: If the client uses <code>Expect: 100-continue</code>
+        and Tomcat responds with a non-2xx response code, Tomcat also closes the
+        connection. If Tomcat knows the connection is going to be closed when
+        committing the response, Tomcat will now also send the
+        <code>Connection: close</code> response header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -195,6 +195,59 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
 
     /**
+<<<<<<< .working
+=======
+     * Simple servlet that dumps request information. Tests using this should
+     * note that additional information may be added to in the future and should
+     * therefore test return values accordingly.
+     */
+    public static final class SnoopServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            PrintWriter out = resp.getWriter();
+            out.println("00-RequestURI-" + req.getRequestURI());
+        }
+    }
+
+
+    /**
+     * Servlet that simply echos the request body back as the response body.
+     */
+    public static class EchoBodyServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // NO-OP - No body to echo
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // Beware of clients that try to send the whole request body before
+            // reading any of the response. They may cause this test to lock up.
+            byte[] buffer = new byte[8096];
+            int read = 0;
+            try (InputStream is = req.getInputStream();
+                    OutputStream os = resp.getOutputStream()) {
+                while (read > -1) {
+                    os.write(buffer, 0, read);
+                    read = is.read(buffer);
+                }
+            }
+        }
+    }
+
+
+    /*
+>>>>>>> .merge-right.r1645627
      *  Wrapper for getting the response.
      */
     public static ByteChunk getUrl(String path) throws IOException {
@@ -326,6 +379,10 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             if (body != null) {
                 os.write(body, 0, body.length);
             }
+        } catch (IOException ioe) {
+            // Failed to write the request body. Server may have closed the
+            // connection.
+            ioe.printStackTrace();
         } finally {
             if (os != null) {
                 try {
