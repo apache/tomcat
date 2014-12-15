@@ -339,6 +339,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
         List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
         listenersCopy.addAll(listeners);
+        listeners.clear();
         for (AsyncListenerWrapper listener : listenersCopy) {
             try {
                 listener.fireOnStartAsync(event);
@@ -348,7 +349,6 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                         listener.getClass().getName() + "]", t);
             }
         }
-        listeners.clear();
     }
 
     @Override
