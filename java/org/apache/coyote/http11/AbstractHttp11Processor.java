@@ -1098,16 +1098,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     // input. This way uploading a 100GB file doesn't tie up the
                     // thread if the servlet has rejected it.
                     getInputBuffer().setSwallowInput(false);
-                } else if (expectation &&
-                        (response.getStatus() < 200 || response.getStatus() > 299)) {
-                    // Client sent Expect: 100-continue but received a
-                    // non-2xx final response. Disable keep-alive (if enabled)
-                    // to ensure that the connection is closed. Some clients may
-                    // still send the body, some may send the next request.
-                    // No way to differentiate, so close the connection to
-                    // force the client to send the next request.
-                    getInputBuffer().setSwallowInput(false);
-                    keepAlive = false;
+                } else {
+                    // Need to check this again here in case the response was
+                    // committed before the error that requires the connection
+                    // to be closed occurred.
+                    checkExpectationAndResponseStatus();
                 }
                 endRequest();
             }
@@ -1165,6 +1160,20 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     return SocketState.CLOSED;
                 }
             }
+        }
+    }
+
+
+    private void checkExpectationAndResponseStatus() {
+        if (expectation && (response.getStatus() < 200 || response.getStatus() > 299)) {
+            // Client sent Expect: 100-continue but received a
+            // non-2xx final response. Disable keep-alive (if enabled)
+            // to ensure that the connection is closed. Some clients may
+            // still send the body, some may send the next request.
+            // No way to differentiate, so close the connection to
+            // force the client to send the next request.
+            getInputBuffer().setSwallowInput(false);
+            keepAlive = false;
         }
     }
 
@@ -1492,6 +1501,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // connection: close header
             keepAlive = false;
         }
+
+        // This may disabled keep-alive to check before working out the
+        // Connection header.
+        checkExpectationAndResponseStatus();
 
         // If we know that the request is bad this early, add the
         // Connection: close header.

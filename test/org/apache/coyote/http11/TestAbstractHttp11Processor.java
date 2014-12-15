@@ -23,8 +23,10 @@ import java.io.Writer;
 import java.net.Socket;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -49,6 +51,8 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
@@ -533,6 +537,59 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         bug55772Latch3.await();
         if (bug55772RequestStateLeaked) {
             Assert.fail("State leaked between requests!");
+        }
+    }
+
+
+    // https://issues.apache.org/bugzilla/show_bug.cgi?id=57324
+    @Test
+    public void testNon2xxResponseWithExpectation() throws Exception {
+        doTestNon2xxResponseAndExpectation(true);
+    }
+
+    @Test
+    public void testNon2xxResponseWithoutExpectation() throws Exception {
+        doTestNon2xxResponseAndExpectation(false);
+    }
+
+    private void doTestNon2xxResponseAndExpectation(boolean useExpectation) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
+        ctx.addServletMapping("/echo", "echo");
+
+        SecurityCollection collection = new SecurityCollection("All", "");
+        collection.addPattern("/*");
+        SecurityConstraint constraint = new SecurityConstraint();
+        constraint.addAuthRole("Any");
+        constraint.addCollection(collection);
+        ctx.addConstraint(constraint);
+
+        tomcat.start();
+
+        byte[] requestBody = "HelloWorld".getBytes(StandardCharsets.UTF_8);
+        Map<String,List<String>> reqHeaders = null;
+        if (useExpectation) {
+            reqHeaders = new HashMap<>();
+            List<String> expectation = new ArrayList<>();
+            expectation.add("100-continue");
+            reqHeaders.put("Expect", expectation);
+        }
+        ByteChunk responseBody = new ByteChunk();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
+        int rc = postUrl(requestBody, "http://localhost:" + getPort() + "/echo",
+                responseBody, reqHeaders, responseHeaders);
+
+        Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, rc);
+        List<String> connectionHeaders = responseHeaders.get("Connection");
+        if (useExpectation) {
+            Assert.assertEquals(1, connectionHeaders.size());
+            Assert.assertEquals("close", connectionHeaders.get(0).toLowerCase(Locale.ENGLISH));
+        } else {
+            Assert.assertNull(connectionHeaders);
         }
     }
 
