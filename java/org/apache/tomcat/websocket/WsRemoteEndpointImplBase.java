@@ -894,6 +894,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                         sm.getString("wsRemoteEndpoint.closedOutputStream"));
             }
 
+            used = true;
             if (buffer.remaining() == 0) {
                 flush();
             }
