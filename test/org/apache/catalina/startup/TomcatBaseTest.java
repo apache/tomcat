@@ -239,46 +239,46 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     public static final class RequestDescriptor {
 
-        private final HashMap<String, String> requestInfo =
+        private final Map<String, String> requestInfo =
             new HashMap<String, String>();
-        private final HashMap<String, String> contextInitParameters =
+        private final Map<String, String> contextInitParameters =
             new HashMap<String, String>();
-        private final HashMap<String, String> contextAttributes =
+        private final Map<String, String> contextAttributes =
             new HashMap<String, String>();
-        private final HashMap<String, String> headers =
+        private final Map<String, String> headers =
             new HashMap<String, String>();
-        private final HashMap<String, String> attributes =
+        private final Map<String, String> attributes =
             new HashMap<String, String>();
-        private final HashMap<String, String> params =
+        private final Map<String, String> params =
             new HashMap<String, String>();
-        private final HashMap<String, String> sessionAttributes =
+        private final Map<String, String> sessionAttributes =
             new HashMap<String, String>();
 
-        public HashMap<String, String> getRequestInfo() {
+        public Map<String, String> getRequestInfo() {
             return requestInfo;
         }
 
-        public HashMap<String, String> getContextInitParameters() {
+        public Map<String, String> getContextInitParameters() {
             return contextInitParameters;
         }
 
-        public HashMap<String, String> getContextAttributes() {
+        public Map<String, String> getContextAttributes() {
             return contextAttributes;
         }
 
-        public HashMap<String, String> getHeaders() {
+        public Map<String, String> getHeaders() {
             return headers;
         }
 
-        public HashMap<String, String> getAttributes() {
+        public Map<String, String> getAttributes() {
             return attributes;
         }
 
-        public HashMap<String, String> getParams() {
+        public Map<String, String> getParams() {
             return params;
         }
 
-        public HashMap<String, String> getSessionAttributes() {
+        public Map<String, String> getSessionAttributes() {
             return sessionAttributes;
         }
 
@@ -339,8 +339,8 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         }
 
         public void compare (RequestDescriptor request) {
-            HashMap<String, String> base;
-            HashMap<String, String> cmp;
+            Map<String, String> base;
+            Map<String, String> cmp;
             base = request.getRequestInfo();
             cmp = this.getRequestInfo();
             for (String name: base.keySet()) {
