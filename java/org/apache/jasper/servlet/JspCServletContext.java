@@ -45,6 +45,7 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
+import org.apache.jasper.JasperException;
 import org.apache.jasper.util.ExceptionUtils;
 
 
@@ -88,7 +89,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Web application class loader.
      */
-    private ClassLoader loader;
+    private final ClassLoader loader;
 
 
     // ----------------------------------------------------------- Constructors
@@ -99,12 +100,14 @@ public class JspCServletContext implements ServletContext {
      * @param aLogWriter PrintWriter which is used for <code>log()</code> calls
      * @param aResourceBaseURL Resource base URL
      */
-    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL) {
+    public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL, ClassLoader classLoader)
+            throws JasperException {
 
         myAttributes = new Hashtable<String,Object>();
         myParameters = new ConcurrentHashMap<String,String>();
         myLogWriter = aLogWriter;
         myResourceBaseURL = aResourceBaseURL;
+        this.loader = classLoader;
 
     }
 
@@ -622,11 +625,6 @@ public class JspCServletContext implements ServletContext {
     @Override
     public ClassLoader getClassLoader() {
         return loader;
-    }
-
-
-    public void setClassLoader(ClassLoader loader) {
-        this.loader = loader;
     }
 
 

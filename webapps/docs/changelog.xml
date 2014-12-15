@@ -179,6 +179,10 @@
         manager. Some classes may not be accessible but may have accessible
         interfaces. (markt)
       </fix>
+      <fix>
+        <bug>57316</bug>: Fix JspC when directory name contains a character
+        sequence that appears to be URL encoded. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

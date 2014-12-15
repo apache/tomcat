@@ -155,7 +155,7 @@ public class JspC extends Task implements Options {
     }
 
     protected String classPath = null;
-    protected URLClassLoader loader = null;
+    protected ClassLoader loader = null;
     protected boolean trimSpaces = false;
     protected boolean genStringAsCharArray = false;
     protected boolean validateTld;
@@ -1194,9 +1194,6 @@ public class JspC extends Task implements Options {
             }
 
             originalClassLoader = Thread.currentThread().getContextClassLoader();
-            if( loader==null ) {
-                initClassLoader( clctxt );
-            }
             Thread.currentThread().setContextClassLoader(loader);
 
             clctxt.setClassLoader(loader);
@@ -1328,8 +1325,11 @@ public class JspC extends Task implements Options {
                     Localizer.getMessage("jsp.error.jspc.uriroot_not_dir"));
             }
 
-            if(context == null) {
-                initServletContext();
+            if (loader == null) {
+                loader = initClassLoader();
+            }
+            if (context == null) {
+                initServletContext(loader);
             }
 
             // No explicit pages, we'll process all .jsp in the webapp
@@ -1452,11 +1452,12 @@ public class JspC extends Task implements Options {
         }
     }
 
-    protected void initServletContext() throws IOException {
-     // TODO: should we use the Ant Project's log?
+    protected void initServletContext(ClassLoader classLoader)
+            throws IOException, JasperException {
+        // TODO: should we use the Ant Project's log?
         PrintWriter log = new PrintWriter(System.out);
         URL resourceBase = new File(uriRoot).getCanonicalFile().toURI().toURL();
-        context = new JspCServletContext(log, resourceBase);
+        context = new JspCServletContext(log, resourceBase, classLoader);
         if (isValidateTld()) {
             context.setInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM, "true");
         }
@@ -1475,11 +1476,9 @@ public class JspC extends Task implements Options {
      * Initializes the classloader as/if needed for the given
      * compilation context.
      *
-     * @param clctxt The compilation context
      * @throws IOException If an error occurs
      */
-    protected void initClassLoader(JspCompilationContext clctxt)
-        throws IOException {
+    protected ClassLoader initClassLoader() throws IOException {
 
         classPath = getClassPath();
 
@@ -1549,14 +1548,10 @@ public class JspC extends Task implements Options {
             }
         }
 
-        // What is this ??
-        urls.add(new File(
-                clctxt.getRealPath("/")).getCanonicalFile().toURI().toURL());
-
         URL urlsA[]=new URL[urls.size()];
         urls.toArray(urlsA);
         loader = new URLClassLoader(urlsA, this.getClass().getClassLoader());
-        context.setClassLoader(loader);
+        return loader;
     }
 
     /**
