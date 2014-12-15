@@ -445,6 +445,66 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
     @Test
+    public void testSecret() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setProperty("requiredSecret", "RIGHTSECRET");
+        tomcat.start();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
+        ctx.addServletMapping("/", "helloWorld");
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient();
+
+        ajpClient.setPort(getPort());
+
+        ajpClient.connect();
+        validateCpong(ajpClient.cping());
+
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.end();
+
+        TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage);
+        // Expect 3 packets: headers, body, end
+        validateResponseHeaders(responseHeaders, 403, "Forbidden");
+        //TesterAjpMessage responseBody = ajpClient.readMessage();
+        //validateResponseBody(responseBody, HelloWorldServlet.RESPONSE_TEXT);
+        validateResponseEnd(ajpClient.readMessage(), false);
+
+        ajpClient.connect();
+        validateCpong(ajpClient.cping());
+
+        forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.addAttribute(0x0C, "WRONGSECRET");
+        forwardMessage.end();
+
+        responseHeaders = ajpClient.sendMessage(forwardMessage);
+        // Expect 3 packets: headers, body, end
+        validateResponseHeaders(responseHeaders, 403, "Forbidden");
+        //responseBody = ajpClient.readMessage();
+        //validateResponseBody(responseBody, HelloWorldServlet.RESPONSE_TEXT);
+        validateResponseEnd(ajpClient.readMessage(), false);
+
+        ajpClient.connect();
+        validateCpong(ajpClient.cping());
+
+        forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.addAttribute(0x0C, "RIGHTSECRET");
+        forwardMessage.end();
+
+        responseHeaders = ajpClient.sendMessage(forwardMessage);
+        // Expect 3 packets: headers, body, end
+        validateResponseHeaders(responseHeaders, 200, "OK");
+        TesterAjpMessage responseBody = ajpClient.readMessage();
+        validateResponseBody(responseBody, HelloWorldServlet.RESPONSE_TEXT);
+        validateResponseEnd(ajpClient.readMessage(), true);
+
+        ajpClient.disconnect();
+    }
+
+    @Test
     public void testKeepAlive() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.getConnector().setProperty("connectionTimeout", "-1");
