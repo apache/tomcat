@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -64,12 +65,12 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
     private void doSnoopTest(RequestDescriptor desc) throws Exception {
 
-        HashMap<String, String> requestInfo = desc.getRequestInfo();
-        HashMap<String, String> contextInitParameters = desc.getContextInitParameters();
-        HashMap<String, String> contextAttributes = desc.getContextAttributes();
-        HashMap<String, String> headers = desc.getHeaders();
-        HashMap<String, String> attributes = desc.getAttributes();
-        HashMap<String, String> params = desc.getParams();
+        Map<String, String> requestInfo = desc.getRequestInfo();
+        Map<String, String> contextInitParameters = desc.getContextInitParameters();
+        Map<String, String> contextAttributes = desc.getContextAttributes();
+        Map<String, String> headers = desc.getHeaders();
+        Map<String, String> attributes = desc.getAttributes();
+        Map<String, String> params = desc.getParams();
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -89,7 +90,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         }
 
         String value;
-        HashMap<String, String> savedRequestInfo = new HashMap<String, String>();
+        Map<String, String> savedRequestInfo = new HashMap<String, String>();
         for (String name: requestInfo.keySet()) {
             value = requestInfo.get(name);
             switch (name) {
