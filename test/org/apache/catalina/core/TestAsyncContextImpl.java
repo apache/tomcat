@@ -32,6 +32,7 @@ import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.GenericServlet;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestEvent;
@@ -470,8 +471,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
 
-        TimeoutServlet timeout =
-                new TimeoutServlet(completeOnTimeout, dispatchUrl);
+        TimeoutServlet timeout = new TimeoutServlet(completeOnTimeout, dispatchUrl);
 
         Wrapper wrapper = Tomcat.addServlet(ctx, "time", timeout);
         wrapper.setAsyncSupported(true);
@@ -870,6 +870,21 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+    private static class StickyTrackingListener extends TrackingListener {
+
+        public StickyTrackingListener(boolean completeOnError,
+                boolean completeOnTimeout, String dispatchUrl) {
+            super(completeOnError, completeOnTimeout, dispatchUrl);
+        }
+
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+            super.onStartAsync(event);
+            // Re-add this listener to the new AsyncContext
+            event.getAsyncContext().addListener(this);
+        }
+    }
+
     public static class TrackingRequestListener
             implements ServletRequestListener {
 
@@ -1120,8 +1135,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         tomcat.start();
 
         // Call the servlet once
-        Map<String,List<String>> headers =
-            new LinkedHashMap<String,List<String>>();
+        Map<String,List<String>> headers = new LinkedHashMap<String,List<String>>();
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, headers);
         assertEquals(200, rc);
@@ -2099,5 +2113,69 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         public AsyncContext getAsyncContext() {
             return asyncContext;
         }
+    }
+
+
+    // https://issues.apache.org/bugzilla/show_bug.cgi?id=57326
+    @Test
+    public void testAsyncContextListenerClearing() throws Exception {
+        resetTracker();
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        File docBase = new File(System.getProperty("java.io.tmpdir"));
+        Context ctx = tomcat.addContext("", docBase.getAbsolutePath());
+
+        Servlet stage1 = new DispatchingServletTracking("/stage2", true);
+        Wrapper wrapper1 = Tomcat.addServlet(ctx, "stage1", stage1);
+        wrapper1.setAsyncSupported(true);
+        ctx.addServletMapping("/stage1", "stage1");
+
+        Servlet stage2 = new DispatchingServletTracking("/stage3", false);
+        Wrapper wrapper2 = Tomcat.addServlet(ctx, "stage2", stage2);
+        wrapper2.setAsyncSupported(true);
+        ctx.addServletMapping("/stage2", "stage2");
+
+        Servlet stage3 = new NonAsyncServlet();
+        Tomcat.addServlet(ctx, "stage3", stage3);
+        ctx.addServletMapping("/stage3", "stage3");
+
+        TesterAccessLogValve alv = new TesterAccessLogValve();
+        ctx.getPipeline().addValve(alv);
+
+        tomcat.start();
+
+        getUrl("http://localhost:" + getPort()+ "/stage1");
+
+        assertEquals("doGet-startAsync-doGet-startAsync-onStartAsync-NonAsyncServletGet-onComplete-", getTrack());
+
+        // Check the access log
+        alv.validateAccessLog(1, 200, 0, REQUEST_TIME);
+    }
+
+    private static class DispatchingServletTracking extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final String target;
+        private final boolean addTrackingListener;
+
+        public DispatchingServletTracking(String target, boolean addTrackingListener) {
+            this.target = target;
+            this.addTrackingListener = addTrackingListener;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            track("doGet-startAsync-");
+            AsyncContext ac = req.startAsync();
+            if (addTrackingListener) {
+                ac.addListener(new StickyTrackingListener(false, false, null));
+            }
+            ac.dispatch(target);
+         }
     }
 }
