@@ -50,11 +50,10 @@ class DirectJDKLog implements Log {
                 // it is also possible that the user modified jre/lib/logging.properties -
                 // but that's really stupid in most cases
                 Logger root=Logger.getLogger("");
-                Handler handlers[]=root.getHandlers();
-                for( int i=0; i< handlers.length; i++ ) {
+                for (Handler handler : root.getHandlers()) {
                     // I only care about console - that's what's used in default config anyway
-                    if( handlers[i] instanceof  ConsoleHandler ) {
-                        handlers[i].setFormatter(fmt);
+                    if (handler instanceof  ConsoleHandler) {
+                        handler.setFormatter(fmt);
                     }
                 }
             } catch( Throwable t ) {
