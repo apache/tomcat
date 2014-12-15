@@ -21,9 +21,7 @@ package org.apache.catalina.ha.authenticator;
 
 import java.security.Principal;
 
-import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
@@ -31,6 +29,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
+import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.ha.session.SerializablePrincipal;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -58,7 +57,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  */
 
 public class ClusterSingleSignOn
-    extends SingleSignOn {
+    extends SingleSignOn implements ClusterValve {
 
 
     // ----------------------------------------------------- Instance Variables
@@ -91,12 +90,14 @@ public class ClusterSingleSignOn
 
     }
 
+    @Override
     public CatalinaCluster getCluster() {
 
         return cluster;
 
     }
 
+    @Override
     public void setCluster(CatalinaCluster cluster) {
 
         this.cluster = cluster;
@@ -122,33 +123,19 @@ public class ClusterSingleSignOn
 
         // Load the cluster component, if any
         try {
-            //the channel is already running
-            Cluster cluster = getCluster();
-            // stop remove cluster binding
             if(cluster == null) {
                 Container host = getContainer();
-                if(host != null && host instanceof Host) {
-                    cluster = host.getCluster();
-                    if(cluster != null && cluster instanceof CatalinaCluster) {
-                        setCluster((CatalinaCluster) cluster);
-                        getCluster().addClusterListener(clusterSSOListener);
-                    } else {
-                        Container engine = host.getParent();
-                        if(engine != null && engine instanceof Engine) {
-                            cluster = engine.getCluster();
-                            if(cluster != null && cluster instanceof CatalinaCluster) {
-                                setCluster((CatalinaCluster) cluster);
-                                getCluster().addClusterListener(clusterSSOListener);
-                            }
-                        } else {
-                            cluster = null;
-                        }
+                if(host instanceof Host) {
+                    if(host.getCluster() instanceof CatalinaCluster) {
+                        setCluster((CatalinaCluster) host.getCluster());
                     }
                 }
             }
             if (cluster == null) {
                 throw new LifecycleException(
                         "There is no Cluster for ClusterSingleSignOn");
+            } else {
+                getCluster().addClusterListener(clusterSSOListener);
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);

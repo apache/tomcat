@@ -181,6 +181,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        In order to enable define in <code>Cluster</code> element,
+        <code>ClusterSingleSignOn</code> implements <code>ClusterValve</code>.
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
