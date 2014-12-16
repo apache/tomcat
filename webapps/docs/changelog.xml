@@ -163,6 +163,9 @@
         <bug>57331</bug>: Allow ExpiresFilter to use "year" as synonym for
         "years" in its configuration. (kkolinko)
       </fix>
+      <update>
+          Improve SnoopServlet in unit tests. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
