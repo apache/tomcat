@@ -106,7 +106,7 @@ public class UpgradeUtil {
 
 
         // Origin check
-        String origin = req.getHeader("Origin");
+        String origin = req.getHeader(Constants.ORIGIN_HEADER_NAME);
         if (!sec.getConfigurator().checkOrigin(origin)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
@@ -128,8 +128,16 @@ public class UpgradeUtil {
         // Negotiation phase 1. By default this simply filters out the
         // extensions that the server does not support but applications could
         // use a custom configurator to do more than this.
+        List<Extension> installedExtensions = null;
+        if (sec.getExtensions().size() == 0) {
+            installedExtensions = Constants.INSTALLED_EXTENSIONS;
+        } else {
+            installedExtensions = new ArrayList<Extension>();
+            installedExtensions.addAll(sec.getExtensions());
+            installedExtensions.addAll(Constants.INSTALLED_EXTENSIONS);
+        }
         List<Extension> negotiatedExtensionsPhase1 = sec.getConfigurator().getNegotiatedExtensions(
-                Constants.INSTALLED_EXTENSIONS, extensionsRequested);
+                installedExtensions, extensionsRequested);
 
         // Negotiation phase 2. Create the Transformations that will be applied
         // to this connection. Note than an extension may be dropped at this
@@ -186,7 +194,7 @@ public class UpgradeUtil {
             resp.setHeader(Constants.WS_EXTENSIONS_HEADER_NAME, responseHeaderExtensions.toString());
         }
 
-        WsHandshakeRequest wsRequest = new WsHandshakeRequest(req);
+        WsHandshakeRequest wsRequest = new WsHandshakeRequest(req, pathParams);
         WsHandshakeResponse wsResponse = new WsHandshakeResponse();
         WsPerSessionServerEndpointConfig perSessionServerEndpointConfig =
                 new WsPerSessionServerEndpointConfig(sec);

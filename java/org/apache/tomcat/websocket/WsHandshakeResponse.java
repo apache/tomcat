@@ -16,9 +16,10 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.websocket.HandshakeResponse;
 
@@ -27,16 +28,22 @@ import javax.websocket.HandshakeResponse;
  */
 public class WsHandshakeResponse implements HandshakeResponse {
 
-    private final Map<String,List<String>> headers;
+    private final Map<String,List<String>> headers = new CaseInsensitiveKeyMap<List<String>>();
 
 
     public WsHandshakeResponse() {
-        this(new HashMap<String,List<String>>());
     }
 
 
     public WsHandshakeResponse(Map<String,List<String>> headers) {
-        this.headers = headers;
+        for (Entry<String,List<String>> entry : headers.entrySet()) {
+            if (this.headers.containsKey(entry.getKey())) {
+                this.headers.get(entry.getKey()).addAll(entry.getValue());
+            } else {
+                List<String> values = new ArrayList<String>(entry.getValue());
+                this.headers.put(entry.getKey(), values);
+            }
+        }
     }
 
 

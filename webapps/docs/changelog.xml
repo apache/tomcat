@@ -212,6 +212,27 @@
         Correct multiple issues with the flushing of batched messages that could
         lead to duplicate and/or corrupt messages. (markt)
       </fix>
+      <fix>
+        Correctly implement headers case insensitivity. (markt/remm)
+      </fix>
+      <fix>
+        Allow optional use of user extensions. (remm)
+      </fix>
+      <fix>
+        Allow using partial binary message handlers. (remm)
+      </fix>
+      <fix>
+        Limit ping/pong message size. (remm)
+      </fix>
+      <fix>
+        Allow configuration of the time interval for the periodic event. (remm)
+      </fix>
+      <fix>
+        More accurate annotations processing. (remm)
+      </fix>
+      <fix>
+        Allow optional default for origin header in the client. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

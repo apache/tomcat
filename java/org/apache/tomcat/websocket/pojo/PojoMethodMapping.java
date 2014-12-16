@@ -22,6 +22,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,7 +66,7 @@ public class PojoMethodMapping {
     private final PojoPathParam[] onOpenParams;
     private final PojoPathParam[] onCloseParams;
     private final PojoPathParam[] onErrorParams;
-    private final Set<MessageHandlerInfo> onMessage = new HashSet<MessageHandlerInfo>();
+    private final List<MessageHandlerInfo> onMessage = new ArrayList<MessageHandlerInfo>();
     private final String wsPath;
 
 
@@ -78,43 +80,105 @@ public class PojoMethodMapping {
         Method open = null;
         Method close = null;
         Method error = null;
-        for (Method method : clazzPojo.getDeclaredMethods()) {
-            if (method.getAnnotation(OnOpen.class) != null) {
-                checkPublic(method);
-                if (open == null) {
-                    open = method;
-                } else {
-                    // Duplicate annotation
-                    throw new DeploymentException(sm.getString(
-                            "pojoMethodMapping.duplicateAnnotation",
-                            OnOpen.class, clazzPojo));
-                }
-            } else if (method.getAnnotation(OnClose.class) != null) {
-                checkPublic(method);
-                if (close == null) {
-                    close = method;
-                } else {
-                    // Duplicate annotation
-                    throw new DeploymentException(sm.getString(
-                            "pojoMethodMapping.duplicateAnnotation",
-                            OnClose.class, clazzPojo));
-                }
-            } else if (method.getAnnotation(OnError.class) != null) {
-                checkPublic(method);
-                if (error == null) {
-                    error = method;
-                } else {
-                    // Duplicate annotation
-                    throw new DeploymentException(sm.getString(
-                            "pojoMethodMapping.duplicateAnnotation",
-                            OnError.class, clazzPojo));
-                }
-            } else if (method.getAnnotation(OnMessage.class) != null) {
-                checkPublic(method);
-                onMessage.add(new MessageHandlerInfo(method, decoders));
-            } else {
-                // Method not annotated
+        Method[] clazzPojoMethods = null;
+        Class<?> currentClazz = clazzPojo;
+        while (!currentClazz.equals(Object.class)) {
+            Method[] currentClazzMethods = currentClazz.getDeclaredMethods();
+            if (currentClazz == clazzPojo) {
+                clazzPojoMethods = currentClazzMethods;
             }
+            for (Method method : currentClazzMethods) {
+                if (method.getAnnotation(OnOpen.class) != null) {
+                    checkPublic(method);
+                    if (open == null) {
+                        open = method;
+                    } else {
+                        if (currentClazz == clazzPojo ||
+                                (currentClazz != clazzPojo && !isMethodOverride(open, method))) {
+                            // Duplicate annotation
+                            throw new DeploymentException(sm.getString(
+                                    "pojoMethodMapping.duplicateAnnotation",
+                                    OnOpen.class, currentClazz));
+                        }
+                    }
+                } else if (method.getAnnotation(OnClose.class) != null) {
+                    checkPublic(method);
+                    if (close == null) {
+                        close = method;
+                    } else {
+                        if (currentClazz == clazzPojo ||
+                                (currentClazz != clazzPojo && !isMethodOverride(close, method))) {
+                            // Duplicate annotation
+                            throw new DeploymentException(sm.getString(
+                                    "pojoMethodMapping.duplicateAnnotation",
+                                    OnClose.class, currentClazz));
+                        }
+                    }
+                } else if (method.getAnnotation(OnError.class) != null) {
+                    checkPublic(method);
+                    if (error == null) {
+                        error = method;
+                    } else {
+                        if (currentClazz == clazzPojo ||
+                                (currentClazz != clazzPojo && !isMethodOverride(error, method))) {
+                            // Duplicate annotation
+                            throw new DeploymentException(sm.getString(
+                                    "pojoMethodMapping.duplicateAnnotation",
+                                    OnError.class, currentClazz));
+                        }
+                    }
+                } else if (method.getAnnotation(OnMessage.class) != null) {
+                    checkPublic(method);
+                    MessageHandlerInfo messageHandler = new MessageHandlerInfo(method, decoders);
+                    boolean found = false;
+                    for (MessageHandlerInfo otherMessageHandler : onMessage) {
+                        if (messageHandler.targetsSameWebSocketMessageType(otherMessageHandler)) {
+                            found = true;
+                            if (currentClazz == clazzPojo ||
+                                    (currentClazz != clazzPojo
+                                    && !isMethodOverride(messageHandler.m, otherMessageHandler.m))) {
+                                // Duplicate annotation
+                                throw new DeploymentException(sm.getString(
+                                        "pojoMethodMapping.duplicateAnnotation",
+                                        OnMessage.class, currentClazz));
+                            }
+                        }
+                    }
+                    if (!found) {
+                        onMessage.add(messageHandler);
+                    }
+                } else {
+                    // Method not annotated
+                }
+            }
+            currentClazz = currentClazz.getSuperclass();
+        }
+        // If the methods are not on clazzPojo and they are overridden
+        // by a non annotated method in clazzPojo, they should be ignored
+        if (open != null && open.getDeclaringClass() != clazzPojo) {
+            if (isOverridenWithoutAnnotation(clazzPojoMethods, open, OnOpen.class)) {
+                open = null;
+            }
+        }
+        if (close != null && close.getDeclaringClass() != clazzPojo) {
+            if (isOverridenWithoutAnnotation(clazzPojoMethods, close, OnClose.class)) {
+                close = null;
+            }
+        }
+        if (error != null && error.getDeclaringClass() != clazzPojo) {
+            if (isOverridenWithoutAnnotation(clazzPojoMethods, error, OnError.class)) {
+                error = null;
+            }
+        }
+        List<MessageHandlerInfo> overriddenOnMessage = new ArrayList<MessageHandlerInfo>();
+        for (MessageHandlerInfo messageHandler : onMessage) {
+            if (messageHandler.m.getDeclaringClass() != clazzPojo
+                    && isOverridenWithoutAnnotation(clazzPojoMethods, messageHandler.m, OnMessage.class)) {
+                overriddenOnMessage.add(messageHandler);
+            }
+        }
+        for (MessageHandlerInfo messageHandler : overriddenOnMessage) {
+            onMessage.remove(messageHandler);
         }
         this.onOpen = open;
         this.onClose = close;
@@ -130,6 +194,25 @@ public class PojoMethodMapping {
             throw new DeploymentException(sm.getString(
                     "pojoMethodMapping.methodNotPublic", m.getName()));
         }
+    }
+
+
+    private boolean isMethodOverride(Method method1, Method method2) {
+        return (method1.getName().equals(method2.getName())
+                && method1.getReturnType().equals(method2.getReturnType())
+                && Arrays.equals(method1.getParameterTypes(), method2.getParameterTypes()));
+    }
+
+
+    private boolean isOverridenWithoutAnnotation(Method[] methods,
+            Method superclazzMethod, Class<? extends Annotation> annotation) {
+        for (Method method : methods) {
+            if (isMethodOverride(method, superclazzMethod)
+                    && (method.getAnnotation(annotation) == null)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -288,7 +371,8 @@ public class PojoMethodMapping {
         private int indexInputStream = -1;
         private int indexReader = -1;
         private int indexPrimitive = -1;
-        private Map<Integer,PojoPathParam> indexPathParams = new HashMap<Integer, PojoPathParam>();
+        private Class<?> primitiveType = null;
+        private Map<Integer,PojoPathParam> indexPathParams = new HashMap<Integer,PojoPathParam>();
         private int indexPayload = -1;
         private DecoderMatch decoderMatch = null;
         private long maxMessageSize = -1;
@@ -366,6 +450,7 @@ public class PojoMethodMapping {
                 } else if (Util.isPrimitive(types[i])) {
                     if (indexPrimitive == -1) {
                         indexPrimitive = i;
+                        primitiveType = types[i];
                     } else {
                         throw new IllegalArgumentException(sm.getString(
                                 "pojoMethodMapping.duplicateMessageParam",
@@ -470,6 +555,7 @@ public class PojoMethodMapping {
                 // The boolean we found is a payload, not a last flag
                 indexPayload = indexBoolean;
                 indexPrimitive = indexBoolean;
+                primitiveType = Boolean.TYPE;
                 indexBoolean = -1;
             }
             if (indexPayload == -1) {
@@ -500,6 +586,40 @@ public class PojoMethodMapping {
             }
 
             maxMessageSize = m.getAnnotation(OnMessage.class).maxMessageSize();
+        }
+
+
+        public boolean targetsSameWebSocketMessageType(MessageHandlerInfo otherHandler) {
+            if (otherHandler == null) {
+                return false;
+            }
+            if (indexByteArray >= 0 && otherHandler.indexByteArray >= 0) {
+                return true;
+            }
+            if (indexByteBuffer >= 0 && otherHandler.indexByteBuffer >= 0) {
+                return true;
+            }
+            if (indexInputStream >= 0 && otherHandler.indexInputStream >= 0) {
+                return true;
+            }
+            if (indexPong >= 0 && otherHandler.indexPong >= 0) {
+                return true;
+            }
+            if (indexPrimitive >= 0 && otherHandler.indexPrimitive >= 0
+                    && primitiveType == otherHandler.primitiveType) {
+                return true;
+            }
+            if (indexReader >= 0 && otherHandler.indexReader >= 0) {
+                return true;
+            }
+            if (indexString >= 0 && otherHandler.indexString >= 0) {
+                return true;
+            }
+            if (decoderMatch != null && otherHandler.decoderMatch != null
+                    && decoderMatch.getTarget().equals(otherHandler.decoderMatch.getTarget())) {
+                return true;
+            }
+            return false;
         }
 
 

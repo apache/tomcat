@@ -562,6 +562,47 @@
 
 </section>
 
+<section name="Websockets">
+
+  <properties>
+
+    <property name="org.apache.tomcat .websocket.ALLOW_UNSUPPORTED_EXTENSIONS">
+      <p>If <code>true</code>, allow unknown extensions to be declared by
+      the user.</p>
+      <p>The default value is <code>false</code>.</p>
+    </property>
+
+    <property name="org.apache.tomcat. websocket.DEFAULT_ORIGIN_HEADER_VALUE">
+      <p>Default value of the origin header that will be sent by the client
+         during the upgrade handshake.</p>
+      <p>The default is null so that no origin header is sent.</p>
+    </property>
+
+    <property name="org.apache.tomcat. websocket.DEFAULT_PROCESS_PERIOD">
+      <p>The number of periodic ticks between periodic processing which
+         involves in particular session expiration checks.</p>
+      <p>The default value is <code>10</code> which corresponds to 10
+         seconds.</p>
+    </property>
+
+    <property name="org.apache.tomcat. websocket.DISABLE_BUILTIN_EXTENSIONS">
+      <p>If <code>true</code>, disable all built-in extensions provided by the
+         server, such as message compression.</p>
+      <p>The default value is <code>false</code>.</p>
+    </property>
+
+    <property name="org.apache.tomcat. websocket.STREAMS_DROP_EMPTY_MESSAGES">
+      <p>If <code>true</code>, streams provided to the user (writer and output
+      stream) will not send an empty message when flushing and there is no
+      data to flush, or when it is closed without having been used (for
+      example if an error occurs).</p>
+      <p>The default value is <code>false</code>.</p>
+    </property>
+
+  </properties>
+
+</section>
+
 <section name="Other">
 
   <properties>

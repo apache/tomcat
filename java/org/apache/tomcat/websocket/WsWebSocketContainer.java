@@ -119,7 +119,7 @@ public class WsWebSocketContainer
     private int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long defaultMaxSessionIdleTimeout = 0;
     private int backgroundProcessCount = 0;
-    private int processPeriod = 10;
+    private int processPeriod = Constants.DEFAULT_PROCESS_PERIOD;
 
 
     @Override
@@ -235,8 +235,6 @@ public class WsWebSocketContainer
         clientEndpointConfiguration.getConfigurator().
                 beforeRequest(reqHeaders);
 
-        ByteBuffer request = createRequest(path, reqHeaders);
-
         SocketAddress sa;
         if (port == -1) {
             if ("ws".equalsIgnoreCase(scheme)) {
@@ -254,6 +252,16 @@ public class WsWebSocketContainer
             }
             sa = new InetSocketAddress(host, port);
         }
+
+        // Origin header
+        if (Constants.DEFAULT_ORIGIN_HEADER_VALUE != null &&
+                !reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
+            List<String> originValues = new ArrayList<String>(1);
+            originValues.add(Constants.DEFAULT_ORIGIN_HEADER_VALUE);
+            reqHeaders.put(Constants.ORIGIN_HEADER_NAME, originValues);
+        }
+
+        ByteBuffer request = createRequest(path, reqHeaders);
 
         AsynchronousSocketChannel socketChannel;
         try {
@@ -285,6 +293,7 @@ public class WsWebSocketContainer
         ByteBuffer response;
         String subProtocol;
         boolean success = false;
+
         try {
             fConnect.get(timeout, TimeUnit.MILLISECONDS);
 
@@ -311,9 +320,8 @@ public class WsWebSocketContainer
                     afterResponse(handshakeResponse);
 
             // Sub-protocol
-            // Header names are always stored in lower case
             List<String> values = handshakeResponse.getHeaders().get(
-                    Constants.WS_PROTOCOL_HEADER_NAME_LOWER);
+                    Constants.WS_PROTOCOL_HEADER_NAME);
             if (values == null || values.size() == 0) {
                 subProtocol = null;
             } else if (values.size() == 1) {
@@ -361,6 +369,16 @@ public class WsWebSocketContainer
         endpoint.onOpen(wsSession, clientEndpointConfiguration);
         registerSession(endpoint, wsSession);
 
+        /* It is possible that the server sent one or more messages as soon as
+         * the WebSocket connection was established. Depending on the exact
+         * timing of when those messages were sent they could be sat in the
+         * input buffer waiting to be read and will not trigger a "data
+         * available to read" event. Therefore, it is necessary to process the
+         * input buffer here. Note that this happens on the current thread which
+         * means that this thread will be used for any onMessage notifications.
+         * This is a special case. Subsequent "data available to read" events
+         * will be handled by threads from the AsyncChannelGroup's executor.
+         */
         wsFrameClient.startInputProcessing();
 
         return wsSession;
@@ -561,7 +579,7 @@ public class WsWebSocketContainer
             ExecutionException, DeploymentException, EOFException,
             TimeoutException {
 
-        Map<String,List<String>> headers = new HashMap<String, List<String>>();
+        Map<String,List<String>> headers = new CaseInsensitiveKeyMap<List<String>>();
 
         boolean readStatus = false;
         boolean readHeaders = false;

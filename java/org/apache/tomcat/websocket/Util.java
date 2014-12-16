@@ -49,6 +49,7 @@ import javax.websocket.PongMessage;
 import javax.websocket.Session;
 
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.websocket.pojo.PojoMessageHandlerPartialBinary;
 import org.apache.tomcat.websocket.pojo.PojoMessageHandlerWholeBinary;
 import org.apache.tomcat.websocket.pojo.PojoMessageHandlerWholeText;
 
@@ -308,8 +309,7 @@ public class Util {
             return Boolean.valueOf(value);
         } else if (type.equals(byte.class) || type.equals(Byte.class)) {
             return Byte.valueOf(value);
-        } else if (value.length() == 1 &&
-                (type.equals(char.class) || type.equals(Character.class))) {
+        } else if (type.equals(char.class) || type.equals(Character.class)) {
             return Character.valueOf(value.charAt(0));
         } else if (type.equals(double.class) || type.equals(Double.class)) {
             return Double.valueOf(value);
@@ -382,45 +382,40 @@ public class Util {
                     new MessageHandlerResult(listener,
                             MessageHandlerResultType.PONG);
             results.add(result);
-        // Relatively simple cases - handler needs wrapping but no decoder to
-        // convert it to one of the types expected by the frame handling code
+        // Handler needs wrapping and optional decoder to convert it to one of
+        // the types expected by the frame handling code
         } else if (byte[].class.isAssignableFrom(target)) {
+            boolean whole = MessageHandler.Whole.class.isAssignableFrom(listener.getClass());
             MessageHandlerResult result = new MessageHandlerResult(
-                    new PojoMessageHandlerWholeBinary(listener,
-                            getOnMessageMethod(listener), session,
-                            endpointConfig, null, new Object[1], 0, true, -1,
-                            false, -1),
+                    whole ? new PojoMessageHandlerWholeBinary(listener,
+                                    getOnMessageMethod(listener), session,
+                                    endpointConfig, matchDecoders(target, endpointConfig, true),
+                                    new Object[1], 0, true, -1, false, -1) :
+                            new PojoMessageHandlerPartialBinary(listener,
+                                    getOnMessagePartialMethod(listener), session,
+                                    new Object[2], 0, true, 1, -1, -1),
                     MessageHandlerResultType.BINARY);
             results.add(result);
         } else if (InputStream.class.isAssignableFrom(target)) {
             MessageHandlerResult result = new MessageHandlerResult(
                     new PojoMessageHandlerWholeBinary(listener,
                             getOnMessageMethod(listener), session,
-                            endpointConfig, null, new Object[1], 0, true, -1,
-                            true, -1),
+                            endpointConfig, matchDecoders(target, endpointConfig, true),
+                            new Object[1], 0, true, -1, true, -1),
                     MessageHandlerResultType.BINARY);
             results.add(result);
         } else if (Reader.class.isAssignableFrom(target)) {
             MessageHandlerResult result = new MessageHandlerResult(
                     new PojoMessageHandlerWholeText(listener,
                             getOnMessageMethod(listener), session,
-                            endpointConfig, null, new Object[1], 0, true, -1,
-                            -1),
+                            endpointConfig, matchDecoders(target, endpointConfig, false),
+                            new Object[1], 0, true, -1, -1),
                     MessageHandlerResultType.TEXT);
             results.add(result);
         } else {
-        // More complex case - listener that requires a decoder
-            DecoderMatch decoderMatch;
-            try {
-                List<Class<? extends Decoder>> decoders =
-                        endpointConfig.getDecoders();
-                @SuppressWarnings("unchecked")
-                List<DecoderEntry> decoderEntries = getDecoders(
-                        decoders.toArray(new Class[decoders.size()]));
-                decoderMatch = new DecoderMatch(target, decoderEntries);
-            } catch (DeploymentException e) {
-                throw new IllegalArgumentException(e);
-            }
+            // Handler needs wrapping and requires decoder to convert it to one
+            // of the types expected by the frame handling code
+            DecoderMatch decoderMatch = matchDecoders(target, endpointConfig);
             Method m = getOnMessageMethod(listener);
             if (decoderMatch.getBinaryDecoders().size() > 0) {
                 MessageHandlerResult result = new MessageHandlerResult(
@@ -428,7 +423,7 @@ public class Util {
                                 endpointConfig,
                                 decoderMatch.getBinaryDecoders(), new Object[1],
                                 0, false, -1, false, -1),
-                        MessageHandlerResultType.BINARY);
+                                MessageHandlerResultType.BINARY);
                 results.add(result);
             }
             if (decoderMatch.getTextDecoders().size() > 0) {
@@ -437,7 +432,7 @@ public class Util {
                                 endpointConfig,
                                 decoderMatch.getTextDecoders(), new Object[1],
                                 0, false, -1, -1),
-                        MessageHandlerResultType.TEXT);
+                                MessageHandlerResultType.TEXT);
                 results.add(result);
             }
         }
@@ -450,6 +445,34 @@ public class Util {
         return results;
     }
 
+    private static List<Class<? extends Decoder>> matchDecoders(Class<?> target,
+            EndpointConfig endpointConfig, boolean binary) {
+        DecoderMatch decoderMatch = matchDecoders(target, endpointConfig);
+        if (binary) {
+            if (decoderMatch.getBinaryDecoders().size() > 0) {
+                return decoderMatch.getBinaryDecoders();
+            }
+        } else if (decoderMatch.getTextDecoders().size() > 0) {
+            return decoderMatch.getTextDecoders();
+        }
+        return null;
+    }
+
+    private static DecoderMatch matchDecoders(Class<?> target,
+            EndpointConfig endpointConfig) {
+        DecoderMatch decoderMatch;
+        try {
+            List<Class<? extends Decoder>> decoders =
+                    endpointConfig.getDecoders();
+            @SuppressWarnings("unchecked")
+            List<DecoderEntry> decoderEntries = getDecoders(
+                    decoders.toArray(new Class[decoders.size()]));
+            decoderMatch = new DecoderMatch(target, decoderEntries);
+        } catch (DeploymentException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return decoderMatch;
+    }
 
     public static void parseExtensionHeader(List<Extension> extensions,
             String header) {
@@ -543,15 +566,30 @@ public class Util {
     }
 
 
+    private static Method getOnMessagePartialMethod(MessageHandler listener) {
+        try {
+            return listener.getClass().getMethod("onMessage", Object.class, Boolean.TYPE);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(
+                    sm.getString("util.invalidMessageHandler"), e);
+        } catch (SecurityException e) {
+            throw new IllegalArgumentException(
+                    sm.getString("util.invalidMessageHandler"), e);
+        }
+    }
+
+
     public static class DecoderMatch {
 
         private final List<Class<? extends Decoder>> textDecoders =
                 new ArrayList<Class<? extends Decoder>>();
         private final List<Class<? extends Decoder>> binaryDecoders =
                 new ArrayList<Class<? extends Decoder>>();
+        private final Class<?> target;
 
 
         public DecoderMatch(Class<?> target, List<DecoderEntry> decoderEntries) {
+            this.target = target;
             for (DecoderEntry decoderEntry : decoderEntries) {
                 if (decoderEntry.getClazz().isAssignableFrom(target)) {
                     if (Binary.class.isAssignableFrom(
@@ -594,6 +632,11 @@ public class Util {
 
         public List<Class<? extends Decoder>> getBinaryDecoders() {
             return binaryDecoders;
+        }
+
+
+        public Class<?> getTarget() {
+            return target;
         }
 
 

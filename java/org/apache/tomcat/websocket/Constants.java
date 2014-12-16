@@ -19,7 +19,6 @@ package org.apache.tomcat.websocket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import javax.websocket.Extension;
 
@@ -44,12 +43,15 @@ public class Constants {
     static final byte INTERNAL_OPCODE_FLUSH = 0x18;
 
     // Buffers
-    static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
+    static final int DEFAULT_BUFFER_SIZE = Integer.getInteger(
+            "org.apache.tomcat.websocket.DEFAULT_BUFFER_SIZE", 8 * 1024)
+            .intValue();
 
     // Client connection
     public static final String HOST_HEADER_NAME = "Host";
     public static final String UPGRADE_HEADER_NAME = "Upgrade";
     public static final String UPGRADE_HEADER_VALUE = "websocket";
+    public static final String ORIGIN_HEADER_NAME = "Origin";
     public static final String CONNECTION_HEADER_NAME = "Connection";
     public static final String CONNECTION_HEADER_VALUE = "upgrade";
     public static final String WS_VERSION_HEADER_NAME = "Sec-WebSocket-Version";
@@ -57,10 +59,32 @@ public class Constants {
     public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";
     public static final String WS_PROTOCOL_HEADER_NAME =
             "Sec-WebSocket-Protocol";
-    public static final String WS_PROTOCOL_HEADER_NAME_LOWER =
-            WS_PROTOCOL_HEADER_NAME.toLowerCase(Locale.ENGLISH);
     public static final String WS_EXTENSIONS_HEADER_NAME =
             "Sec-WebSocket-Extensions";
+
+    // Configuration for Origin header in client
+    static final String DEFAULT_ORIGIN_HEADER_VALUE =
+            System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
+
+    // Configuration for background processing checks intervals
+    static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
+            "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
+            .intValue();
+
+    /* Configuration for extensions
+     * Note: These options are primarily present to enable this implementation
+     *       to pass compliance tests. They are expected to be removed once
+     *       the WebSocket API includes a mechanism for adding custom extensions
+     *       and disabling built-in extensions.
+     */
+    static final boolean DISABLE_BUILTIN_EXTENSIONS =
+            Boolean.getBoolean("org.apache.tomcat.websocket.DISABLE_BUILTIN_EXTENSIONS");
+    static final boolean ALLOW_UNSUPPORTED_EXTENSIONS =
+            Boolean.getBoolean("org.apache.tomcat.websocket.ALLOW_UNSUPPORTED_EXTENSIONS");
+
+    // Configuration for stream behavior
+    static final boolean STREAMS_DROP_EMPTY_MESSAGES =
+            Boolean.getBoolean("org.apache.tomcat.websocket.STREAMS_DROP_EMPTY_MESSAGES");
 
     public static final boolean STRICT_SPEC_COMPLIANCE =
             Boolean.getBoolean(
@@ -69,9 +93,13 @@ public class Constants {
     public static final List<Extension> INSTALLED_EXTENSIONS;
 
     static {
-        List<Extension> installed = new ArrayList<Extension>(1);
-        installed.add(new WsExtension("permessage-deflate"));
-        INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
+        if (DISABLE_BUILTIN_EXTENSIONS) {
+            INSTALLED_EXTENSIONS = Collections.unmodifiableList(new ArrayList<Extension>());
+        } else {
+            List<Extension> installed = new ArrayList<Extension>(1);
+            installed.add(new WsExtension("permessage-deflate"));
+            INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
+        }
     }
 
     private Constants() {

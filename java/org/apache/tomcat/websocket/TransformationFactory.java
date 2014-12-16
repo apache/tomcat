@@ -40,7 +40,11 @@ public class TransformationFactory {
         if (PerMessageDeflate.NAME.equals(name)) {
             return PerMessageDeflate.negotiate(preferences);
         }
-        throw new IllegalArgumentException(
-                sm.getString("transformerFactory.unsupportedExtension", name));
+        if (Constants.ALLOW_UNSUPPORTED_EXTENSIONS) {
+            return null;
+        } else {
+            throw new IllegalArgumentException(
+                    sm.getString("transformerFactory.unsupportedExtension", name));
+        }
     }
 }
