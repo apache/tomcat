@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.authenticator;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.security.Principal;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,14 +37,18 @@ import org.apache.catalina.Session;
  * @see SingleSignOn
  * @see AuthenticatorBase#reauthenticateFromSSO
  */
-public class SingleSignOnEntry {
+public class SingleSignOnEntry implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     // ------------------------------------------------------  Instance Fields
 
     protected String authType = null;
 
     protected String password = null;
 
-    protected Principal principal = null;
+    // Marked as transient so special handling can be applied to serialization
+    protected transient Principal principal = null;
 
     protected ConcurrentHashMap<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys =
             new ConcurrentHashMap<>();
@@ -175,5 +181,25 @@ public class SingleSignOnEntry {
         this.password = password;
         this.canReauthenticate = (HttpServletRequest.BASIC_AUTH.equals(authType) ||
                 HttpServletRequest.FORM_AUTH.equals(authType));
+    }
+
+
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        if (principal instanceof Serializable) {
+            out.writeBoolean(true);
+            out.writeObject(principal);
+        } else {
+            out.writeBoolean(false);
+        }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        in.defaultReadObject();
+        boolean hasPrincipal = in.readBoolean();
+        if (hasPrincipal) {
+            principal = (Principal) in.readObject();
+        }
     }
 }
