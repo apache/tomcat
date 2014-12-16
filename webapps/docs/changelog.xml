@@ -166,6 +166,10 @@
       <update>
           Improve SnoopServlet in unit tests. (rjung)
       </update>
+      <add>
+          Add RequestDescriptor class to unit tests.
+          Adjust TestRewriteValve to use RequestDescriptor. (rjung)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
