@@ -33,8 +33,7 @@ import org.apache.catalina.Session;
  * @see SingleSignOn
  * @see AuthenticatorBase#reauthenticateFromSSO
  */
-public class SingleSignOnEntry
-{
+public class SingleSignOnEntry {
     // ------------------------------------------------------  Instance Fields
 
     protected String authType = null;
