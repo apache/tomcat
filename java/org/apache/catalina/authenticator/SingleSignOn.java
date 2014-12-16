@@ -230,7 +230,6 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             // associated sessions
             deregister(ssoId);
         }
-
     }
 
 
@@ -291,7 +290,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         if (containerLog.isDebugEnabled()) {
             containerLog.debug(" Checking for cached principal for " + cookie.getValue());
         }
-        SingleSignOnEntry entry = lookup(cookie.getValue());
+        SingleSignOnEntry entry = cache.get(cookie.getValue());
         if (entry != null) {
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug(" Found cached principal '" +
@@ -333,7 +332,6 @@ public class SingleSignOn extends ValveBase implements SessionListener {
 
         // Invoke the next Valve in our pipeline
         getNext().invoke(request, response);
-
     }
 
 
@@ -352,7 +350,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             containerLog.debug("Associate sso id " + ssoId + " with session " + session);
         }
 
-        SingleSignOnEntry sso = lookup(ssoId);
+        SingleSignOnEntry sso = cache.get(ssoId);
         if (sso != null) {
             sso.addSession(this, session);
         }
@@ -371,7 +369,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
 
         reverse.remove(session);
 
-        SingleSignOnEntry sso = lookup(ssoId);
+        SingleSignOnEntry sso = cache.get(ssoId);
         if (sso == null) {
             return;
         }
@@ -454,7 +452,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
 
         boolean reauthenticated = false;
 
-        SingleSignOnEntry entry = lookup(ssoId);
+        SingleSignOnEntry entry = cache.get(ssoId);
         if (entry != null && entry.getCanReauthenticate()) {
 
             String username = entry.getUsername();
@@ -525,7 +523,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
     protected void update(String ssoId, Principal principal, String authType,
                           String username, String password) {
 
-        SingleSignOnEntry sso = lookup(ssoId);
+        SingleSignOnEntry sso = cache.get(ssoId);
         if (sso != null && !sso.getCanReauthenticate()) {
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug("Update sso id " + ssoId + " to auth type " + authType);
@@ -534,19 +532,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             synchronized(sso) {
                 sso.updateCredentials(principal, authType, username, password);
             }
-
         }
-    }
-
-
-    /**
-     * Look up and return the cached SingleSignOn entry associated with this
-     * sso id value, if there is one; otherwise return <code>null</code>.
-     *
-     * @param ssoId Single sign on identifier to look up
-     */
-    protected SingleSignOnEntry lookup(String ssoId) {
-        return cache.get(ssoId);
     }
 
 
@@ -565,7 +551,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         }
 
         // Get a reference to the SingleSignOn
-        SingleSignOnEntry entry = lookup(ssoId);
+        SingleSignOnEntry entry = cache.get(ssoId);
         if (entry == null) {
             return;
         }
