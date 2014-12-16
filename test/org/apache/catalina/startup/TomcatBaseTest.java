@@ -195,8 +195,6 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
 
     /**
-<<<<<<< .working
-=======
      * Simple servlet that dumps request information. Tests using this should
      * note that additional information may be added to in the future and should
      * therefore test return values accordingly.
@@ -235,11 +233,31 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             // reading any of the response. They may cause this test to lock up.
             byte[] buffer = new byte[8096];
             int read = 0;
-            try (InputStream is = req.getInputStream();
-                    OutputStream os = resp.getOutputStream()) {
+            InputStream is = null;
+            OutputStream os = null;
+            try {
+                is = req.getInputStream();
+                os = resp.getOutputStream();
                 while (read > -1) {
                     os.write(buffer, 0, read);
                     read = is.read(buffer);
+                }
+            } catch (IOException ex) {
+                // Ignore
+            } finally {
+                if (os != null) {
+                    try {
+                        os.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
+                }
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        // Ignore
+                    }
                 }
             }
         }
@@ -247,7 +265,6 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
 
     /*
->>>>>>> .merge-right.r1645627
      *  Wrapper for getting the response.
      */
     public static ByteChunk getUrl(String path) throws IOException {

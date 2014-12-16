@@ -630,13 +630,13 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         byte[] requestBody = "HelloWorld".getBytes("UTF-8");
         Map<String,List<String>> reqHeaders = null;
         if (useExpectation) {
-            reqHeaders = new HashMap<>();
-            List<String> expectation = new ArrayList<>();
+            reqHeaders = new HashMap<String,List<String>>();
+            List<String> expectation = new ArrayList<String>();
             expectation.add("100-continue");
             reqHeaders.put("Expect", expectation);
         }
         ByteChunk responseBody = new ByteChunk();
-        Map<String,List<String>> responseHeaders = new HashMap<>();
+        Map<String,List<String>> responseHeaders = new HashMap<String,List<String>>();
         int rc = postUrl(requestBody, "http://localhost:" + getPort() + "/echo",
                 responseBody, reqHeaders, responseHeaders);
 
