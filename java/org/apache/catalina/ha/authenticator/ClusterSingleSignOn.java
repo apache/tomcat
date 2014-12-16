@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ha.authenticator;
-
 
 import java.security.Principal;
 
@@ -32,8 +29,6 @@ import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.ExceptionUtils;
-
-
 
 /**
  * A <strong>Valve</strong> that supports a "single sign on" user experience on
@@ -75,7 +70,6 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
 
 
     // ------------------------------------------------------ Lifecycle Methods
-
 
     /**
      * Start this component and implement the requirements
@@ -135,7 +129,6 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
 
     // ------------------------------------------------------ Protected Methods
 
-
     /**
      * Notify the cluster of the addition of a Session to
      * an SSO session and associate the specified single
@@ -169,14 +162,13 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
         }
 
         associateLocal(ssoId, session);
-
     }
+
 
     protected void associateLocal(String ssoId, Session session) {
-
         super.associate(ssoId, session);
-
     }
+
 
     /**
      * Notify the cluster of the removal of a Session from an
@@ -210,14 +202,13 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
         }
 
         deregisterLocal(ssoId, session);
-
     }
+
 
     protected void deregisterLocal(String ssoId, Session session) {
-
         super.deregister(ssoId, session);
-
     }
+
 
     /**
      * Notifies the cluster that a single sign on session
@@ -245,14 +236,13 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
         }
 
         deregisterLocal(ssoId);
-
     }
+
 
     protected void deregisterLocal(String ssoId) {
-
         super.deregister(ssoId);
-
     }
+
 
     /**
      * Notifies the cluster of the creation of a new SSO entry
@@ -292,14 +282,12 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
         }
 
         registerLocal(ssoId, principal, authType, username, password);
-
     }
+
 
     protected void registerLocal(String ssoId, Principal principal, String authType,
                   String username, String password) {
-
         super.register(ssoId, principal, authType, username, password);
-
     }
 
 
@@ -355,14 +343,12 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
         }
 
         updateLocal(ssoId, principal, authType, username, password);
-
     }
+
 
     protected void updateLocal(String ssoId, Principal principal, String authType,
                           String username, String password) {
-
         super.update(ssoId, principal, authType, username, password);
-
     }
 
 
@@ -399,10 +385,8 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
         removeSessionLocal(ssoId, session);
     }
 
+
     protected void removeSessionLocal(String ssoId, Session session) {
-
         super.removeSession(ssoId, session);
-
     }
-
 }
