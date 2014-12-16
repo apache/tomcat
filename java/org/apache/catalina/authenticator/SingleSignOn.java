@@ -37,6 +37,9 @@ import org.apache.catalina.SessionListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A <strong>Valve</strong> that supports a "single sign on" user experience,
@@ -58,6 +61,9 @@ import org.apache.catalina.valves.ValveBase;
  * @author Craig R. McClanahan
  */
 public class SingleSignOn extends ValveBase implements SessionListener {
+
+    private static final Log log = LogFactory.getLog(SingleSignOn.class);
+    private static final StringManager sm = StringManager.getManager(SingleSignOn.class);
 
     /* The engine at the top of the container hierarchy in which this SSO Valve
      * has been placed. It is used to get back to a session object from a
@@ -434,33 +440,33 @@ public class SingleSignOn extends ValveBase implements SessionListener {
 
     private void expire(SingleSignOnSessionKey key) {
         if (engine == null) {
-            // TODO Log error
+            log.warn(sm.getString("singleSignOn.sessionExpire.engineNull", key));
             return;
         }
         Container host = engine.findChild(key.getHostName());
         if (host == null) {
-            // TODO Log error
+            log.warn(sm.getString("singleSignOn.sessionExpire.hostNotFound", key));
             return;
         }
         Context context = (Context) host.findChild(key.getContextName());
         if (context == null) {
-            // TODO Log error
+            log.warn(sm.getString("singleSignOn.sessionExpire.contextNotFound", key));
             return;
         }
         Manager manager = context.getManager();
         if (manager == null) {
-            // TODO Log error
+            log.warn(sm.getString("singleSignOn.sessionExpire.managerNotFound", key));
             return;
         }
         Session session = null;
         try {
             session = manager.findSession(key.getSessionId());
         } catch (IOException e) {
-            // TODO Log error
+            log.warn(sm.getString("singleSignOn.sessionExpire.managerError", key), e);
             return;
         }
         if (session == null) {
-            // TODO Log error
+            log.warn(sm.getString("singleSignOn.sessionExpire.sessionNotFound", key));
             return;
         }
         session.expire();
