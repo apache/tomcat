@@ -104,6 +104,39 @@
   </subsection>
 </section>
 
+<section name="org.apache.catalina.ha.authenticator.ClusterSingleSignOn">
+  The <code>ClusterSingleSignOn</code> supports feature of single sign on in cluster.
+  By using <code>ClusterSingleSignOn</code>, the security identity authenticated
+  by one web application is recognized by other web applications on the same virtual host,
+  and it is propagated to other nodes in the cluster.
+
+  <p>See the <a href="host.html#Single_Sign_On">Single Sign On</a> special
+    feature on the <strong>Host</strong> element for more information.</p>
+
+  <p><strong>Note: </strong>ClusterSingleSignOn can be configured at host level cluster only.
+  </p>
+
+  <subsection name="Attributes">
+    <attributes>
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.ha.authenticator.ClusterSingleSignOn</strong>.</p>
+      </attribute>
+      <attribute name="requireReauthentication" required="false">
+        <p>Default false. Flag to determine whether each request needs to be
+        reauthenticated to the security <strong>Realm</strong>. If "true", this
+        Valve uses cached security credentials (username and password) to
+        reauthenticate to the <strong>Realm</strong> each request associated
+        with an SSO session.  If "false", the Valve can itself authenticate
+        requests based on the presence of a valid SSO cookie, without
+        rechecking with the <strong>Realm</strong>.</p>
+      </attribute>
+      <attribute name="cookieDomain" required="false">
+        <p>Sets the host domain to be used for sso cookies.</p>
+      </attribute>
+    </attributes>
+  </subsection>
+</section>
 
 </body>
 
