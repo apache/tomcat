@@ -17,6 +17,8 @@
 package org.apache.catalina.authenticator;
 
 import java.security.Principal;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,7 +44,8 @@ public class SingleSignOnEntry {
 
     protected Principal principal = null;
 
-    protected Session sessions[] = new Session[0];
+    protected ConcurrentHashMap<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys =
+            new ConcurrentHashMap<>();
 
     protected String username = null;
 
@@ -76,16 +79,13 @@ public class SingleSignOnEntry {
      *                  the SSO session.
      * @param session   The <code>Session</code> being associated with the SSO.
      */
-    public synchronized void addSession(SingleSignOn sso, Session session) {
-        for (int i = 0; i < sessions.length; i++) {
-            if (session == sessions[i])
-                return;
+    public void addSession(SingleSignOn sso, Session session) {
+        SingleSignOnSessionKey key = new SingleSignOnSessionKey(session);
+        SingleSignOnSessionKey currentKey = sessionKeys.putIfAbsent(key, key);
+        if (currentKey == null) {
+            // Session not previously added
+            session.addSessionListener(sso);
         }
-        Session results[] = new Session[sessions.length + 1];
-        System.arraycopy(sessions, 0, results, 0, sessions.length);
-        results[sessions.length] = session;
-        sessions = results;
-        session.addSessionListener(sso);
     }
 
     /**
@@ -94,21 +94,16 @@ public class SingleSignOnEntry {
      *
      * @param session  the <code>Session</code> to remove.
      */
-    public synchronized void removeSession(Session session) {
-        Session[] nsessions = new Session[sessions.length - 1];
-        for (int i = 0, j = 0; i < sessions.length; i++) {
-            if (session == sessions[i])
-                continue;
-            nsessions[j++] = sessions[i];
-        }
-        sessions = nsessions;
+    public void removeSession(Session session) {
+        SingleSignOnSessionKey key = new SingleSignOnSessionKey(session);
+        sessionKeys.remove(key);
     }
 
     /**
      * Returns the <code>Session</code>s associated with this SSO.
      */
-    public synchronized Session[] findSessions() {
-        return (this.sessions);
+    public Set<SingleSignOnSessionKey> findSessions() {
+        return sessionKeys.keySet();
     }
 
     /**
