@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.realm;
-
 
 import java.security.Principal;
 import java.util.Arrays;
@@ -28,7 +25,6 @@ import javax.security.auth.login.LoginContext;
 import org.apache.catalina.TomcatPrincipal;
 import org.ietf.jgss.GSSCredential;
 
-
 /**
  * Generic implementation of <strong>java.security.Principal</strong> that
  * is available for use by <code>Realm</code> implementations.
@@ -36,7 +32,6 @@ import org.ietf.jgss.GSSCredential;
  * @author Craig R. McClanahan
  */
 public class GenericPrincipal implements TomcatPrincipal {
-
 
     // ----------------------------------------------------------- Constructors
 
@@ -112,16 +107,16 @@ public class GenericPrincipal implements TomcatPrincipal {
             this.roles = new String[0];
         } else {
             this.roles = roles.toArray(new String[roles.size()]);
-            if (this.roles.length > 1)
+            if (this.roles.length > 1) {
                 Arrays.sort(this.roles);
+            }
         }
         this.loginContext = loginContext;
         this.gssCredential = gssCredential;
     }
 
 
-    // ------------------------------------------------------------- Properties
-
+    // -------------------------------------------------------------- Properties
 
     /**
      * The username of the user represented by this Principal.
@@ -130,7 +125,7 @@ public class GenericPrincipal implements TomcatPrincipal {
 
     @Override
     public String getName() {
-        return (this.name);
+        return this.name;
     }
 
 
@@ -141,7 +136,7 @@ public class GenericPrincipal implements TomcatPrincipal {
     protected final String password;
 
     public String getPassword() {
-        return (this.password);
+        return this.password;
     }
 
 
@@ -151,7 +146,7 @@ public class GenericPrincipal implements TomcatPrincipal {
     protected final String roles[];
 
     public String[] getRoles() {
-        return (this.roles);
+        return this.roles;
     }
 
 
@@ -190,22 +185,26 @@ public class GenericPrincipal implements TomcatPrincipal {
         this.gssCredential = gssCredential;
     }
 
-    // --------------------------------------------------------- Public Methods
 
+    // ---------------------------------------------------------- Public Methods
 
     /**
      * Does the user represented by this Principal possess the specified role?
      *
      * @param role Role to be tested
+     *
+     * @return <code>true</code> if this Principal has been assigned the given
+     *         role, otherwise <code>false</code>
      */
     public boolean hasRole(String role) {
 
-        if("*".equals(role)) // Special 2.4 role meaning everyone
+        if ("*".equals(role)) {// Special 2.4 role meaning everyone
             return true;
-        if (role == null)
-            return (false);
-        return (Arrays.binarySearch(roles, role) >= 0);
-
+        }
+        if (role == null) {
+            return false;
+        }
+        return Arrays.binarySearch(roles, role) >= 0;
     }
 
 
@@ -215,16 +214,14 @@ public class GenericPrincipal implements TomcatPrincipal {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("GenericPrincipal[");
         sb.append(this.name);
         sb.append("(");
-        for( int i=0;i<roles.length; i++ ) {
+        for (int i = 0; i < roles.length; i++ ) {
             sb.append( roles[i]).append(",");
         }
         sb.append(")]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 
@@ -244,7 +241,4 @@ public class GenericPrincipal implements TomcatPrincipal {
             loginContext.logout();
         }
     }
-
-
-
 }
