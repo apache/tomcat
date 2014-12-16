@@ -16,18 +16,14 @@
  */
 package org.apache.catalina.ha.authenticator;
 
-import java.security.Principal;
-
 import org.apache.catalina.Container;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Manager;
-import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.ha.CatalinaCluster;
-import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterValve;
-import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
+import org.apache.catalina.tribes.tipis.ReplicatedMap;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
@@ -49,16 +45,9 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Fabien Carrion
  */
-public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
+public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, MapOwner {
 
-    // ----------------------------------------------------- Instance Variables
-
-    protected int messageNumber = 0;
-
-    private ClusterSingleSignOnListener clusterSSOListener = null;
-
-
-    // ------------------------------------------------------------- Properties
+    // -------------------------------------------------------------- Properties
 
     private CatalinaCluster cluster = null;
     @Override
@@ -69,7 +58,24 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
     }
 
 
-    // ------------------------------------------------------ Lifecycle Methods
+    private long rpcTimeout = 15000;
+    public long getRpcTimeout() {
+        return rpcTimeout;
+    }
+    public void setRpcTimeout(long rpcTimeout) {
+        this.rpcTimeout = rpcTimeout;
+    }
+
+
+    // -------------------------------------------------------- MapOwner Methods
+
+    @Override
+    public void objectMadePrimary(Object key, Object value) {
+        // NO-OP
+    }
+
+
+    // ------------------------------------------------------- Lifecycle Methods
 
     /**
      * Start this component and implement the requirements
@@ -80,8 +86,6 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-
-        clusterSSOListener = new ClusterSingleSignOnListener(this);
 
         // Load the cluster component, if any
         try {
@@ -96,9 +100,15 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
             if (cluster == null) {
                 throw new LifecycleException(
                         "There is no Cluster for ClusterSingleSignOn");
-            } else {
-                getCluster().addClusterListener(clusterSSOListener);
             }
+
+            ClassLoader[] cls = new ClassLoader[] { this.getClass().getClassLoader() };
+
+            cache = new ReplicatedMap<>(this, cluster.getChannel(), rpcTimeout,
+                    cluster.getClusterName() + "-SSO-cache", cls);
+            reverse = new ReplicatedMap<>(this, cluster.getChannel(), rpcTimeout,
+                    cluster.getClusterName() + "-SSO-reverse", cls);
+
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             throw new LifecycleException(
@@ -122,271 +132,8 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve {
         super.stopInternal();
 
         if (getCluster() != null) {
-            getCluster().removeClusterListener(clusterSSOListener);
+            ((ReplicatedMap<?,?>) cache).breakdown();
+            ((ReplicatedMap<?,?>) reverse).breakdown();
         }
-    }
-
-
-    // ------------------------------------------------------ Protected Methods
-
-    /**
-     * Notify the cluster of the addition of a Session to
-     * an SSO session and associate the specified single
-     * sign on identifier with the specified Session on the
-     * local node.
-     *
-     * @param ssoId Single sign on identifier
-     * @param session Session to be associated
-     */
-    @Override
-    protected void associate(String ssoId, Session session) {
-
-        if (cluster != null && cluster.getMembers().length > 0) {
-            messageNumber++;
-            SingleSignOnMessage msg =
-                new SingleSignOnMessage(cluster.getLocalMember(),
-                                        ssoId, session.getId());
-            Manager mgr = session.getManager();
-            if (mgr instanceof ClusterManager) {
-                msg.setContextName(((ClusterManager) mgr).getName());
-            }
-
-            msg.setAction(SingleSignOnMessage.ADD_SESSION);
-
-            cluster.send(msg);
-
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("SingleSignOnMessage Send with action "
-                                   + msg.getAction());
-            }
-        }
-
-        associateLocal(ssoId, session);
-    }
-
-
-    protected void associateLocal(String ssoId, Session session) {
-        super.associate(ssoId, session);
-    }
-
-
-    /**
-     * Notify the cluster of the removal of a Session from an
-     * SSO session and deregister the specified session. If it is the last
-     * session, then also get rid of the single sign on identifier on the
-     * local node.
-     *
-     * @param ssoId Single sign on identifier
-     * @param session Session to be deregistered
-     */
-    @Override
-    protected void deregister(String ssoId, Session session) {
-
-        if (cluster != null && cluster.getMembers().length > 0) {
-            messageNumber++;
-            SingleSignOnMessage msg =
-                new SingleSignOnMessage(cluster.getLocalMember(),
-                                        ssoId, session.getId());
-            Manager mgr = session.getManager();
-            if (mgr instanceof ClusterManager) {
-                msg.setContextName(((ClusterManager) mgr).getName());
-            }
-
-            msg.setAction(SingleSignOnMessage.DEREGISTER_SESSION);
-
-            cluster.send(msg);
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("SingleSignOnMessage Send with action "
-                                   + msg.getAction());
-            }
-        }
-
-        deregisterLocal(ssoId, session);
-    }
-
-
-    protected void deregisterLocal(String ssoId, Session session) {
-        super.deregister(ssoId, session);
-    }
-
-
-    /**
-     * Notifies the cluster that a single sign on session
-     * has been terminated due to a user logout, deregister
-     * the specified single sign on identifier, and invalidate
-     * any associated sessions on the local node.
-     *
-     * @param ssoId Single sign on identifier to deregister
-     */
-    @Override
-    protected void deregister(String ssoId) {
-
-        if (cluster != null && cluster.getMembers().length > 0) {
-            messageNumber++;
-            SingleSignOnMessage msg =
-                new SingleSignOnMessage(cluster.getLocalMember(),
-                                        ssoId, null);
-            msg.setAction(SingleSignOnMessage.LOGOUT_SESSION);
-
-            cluster.send(msg);
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("SingleSignOnMessage Send with action "
-                                   + msg.getAction());
-            }
-        }
-
-        deregisterLocal(ssoId);
-    }
-
-
-    protected void deregisterLocal(String ssoId) {
-        super.deregister(ssoId);
-    }
-
-
-    /**
-     * Notifies the cluster of the creation of a new SSO entry
-     * and register the specified Principal as being associated
-     * with the specified value for the single sign on identifier.
-     *
-     * @param ssoId Single sign on identifier to register
-     * @param principal Associated user principal that is identified
-     * @param authType Authentication type used to authenticate this
-     *  user principal
-     * @param username Username used to authenticate this user
-     * @param password Password used to authenticate this user
-     */
-    @Override
-    protected void register(String ssoId, Principal principal, String authType,
-                  String username, String password) {
-
-        if (cluster != null && cluster.getMembers().length > 0) {
-            messageNumber++;
-            SingleSignOnMessage msg =
-                new SingleSignOnMessage(cluster.getLocalMember(),
-                                        ssoId, null);
-            msg.setAction(SingleSignOnMessage.REGISTER_SESSION);
-            msg.setAuthType(authType);
-            msg.setUsername(username);
-            msg.setPassword(password);
-
-            if (principal instanceof GenericPrincipal) {
-                msg.setPrincipal((GenericPrincipal) principal);
-            }
-
-            cluster.send(msg);
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("SingleSignOnMessage Send with action "
-                                   + msg.getAction());
-            }
-        }
-
-        registerLocal(ssoId, principal, authType, username, password);
-    }
-
-
-    protected void registerLocal(String ssoId, Principal principal, String authType,
-                  String username, String password) {
-        super.register(ssoId, principal, authType, username, password);
-    }
-
-
-    /**
-     * Notifies the cluster of an update of the security credentials
-     * associated with an SSO session. Updates any <code>SingleSignOnEntry</code>
-     * found under key <code>ssoId</code> with the given authentication data.
-     * <p>
-     * The purpose of this method is to allow an SSO entry that was
-     * established without a username/password combination (i.e. established
-     * following DIGEST or CLIENT-CERT authentication) to be updated with
-     * a username and password if one becomes available through a subsequent
-     * BASIC or FORM authentication.  The SSO entry will then be usable for
-     * reauthentication.
-     * <p>
-     * <b>NOTE:</b> Only updates the SSO entry if a call to
-     * <code>SingleSignOnEntry.getCanReauthenticate()</code> returns
-     * <code>false</code>; otherwise, it is assumed that the SSO entry already
-     * has sufficient information to allow reauthentication and that no update
-     * is needed.
-     *
-     * @param ssoId     identifier of Single sign to be updated
-     * @param principal the <code>Principal</code> returned by the latest
-     *                  call to <code>Realm.authenticate</code>.
-     * @param authType  the type of authenticator used (BASIC, CLIENT-CERT,
-     *                  DIGEST or FORM)
-     * @param username  the username (if any) used for the authentication
-     * @param password  the password (if any) used for the authentication
-     */
-    @Override
-    protected void update(String ssoId, Principal principal, String authType,
-                          String username, String password) {
-
-        if (cluster != null && cluster.getMembers().length > 0) {
-            messageNumber++;
-            SingleSignOnMessage msg =
-                new SingleSignOnMessage(cluster.getLocalMember(),
-                                        ssoId, null);
-            msg.setAction(SingleSignOnMessage.UPDATE_SESSION);
-            msg.setAuthType(authType);
-            msg.setUsername(username);
-            msg.setPassword(password);
-
-            if (principal instanceof GenericPrincipal) {
-                msg.setPrincipal((GenericPrincipal) principal);
-            }
-
-            cluster.send(msg);
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("SingleSignOnMessage Send with action "
-                                   + msg.getAction());
-            }
-        }
-
-        updateLocal(ssoId, principal, authType, username, password);
-    }
-
-
-    protected void updateLocal(String ssoId, Principal principal, String authType,
-                          String username, String password) {
-        super.update(ssoId, principal, authType, username, password);
-    }
-
-
-    /**
-     * Remove a single Session from a SingleSignOn and notify the cluster
-     * of the removal. Called when a session is timed out and no longer active.
-     *
-     * @param ssoId Single sign on identifier from which to remove the session.
-     * @param session the session to be removed.
-     */
-    @Override
-    protected void removeSession(String ssoId, Session session) {
-
-        if (cluster != null && cluster.getMembers().length > 0) {
-            messageNumber++;
-            SingleSignOnMessage msg =
-                new SingleSignOnMessage(cluster.getLocalMember(),
-                                        ssoId, session.getId());
-
-            Manager mgr = session.getManager();
-            if (mgr instanceof ClusterManager) {
-                msg.setContextName(((ClusterManager) mgr).getName());
-            }
-
-            msg.setAction(SingleSignOnMessage.REMOVE_SESSION);
-
-            cluster.send(msg);
-            if (containerLog.isDebugEnabled()) {
-                containerLog.debug("SingleSignOnMessage Send with action "
-                                   + msg.getAction());
-            }
-        }
-
-        removeSessionLocal(ssoId, session);
-    }
-
-
-    protected void removeSessionLocal(String ssoId, Session session) {
-        super.removeSession(ssoId, session);
     }
 }
