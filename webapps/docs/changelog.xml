@@ -170,6 +170,9 @@
           Add RequestDescriptor class to unit tests.
           Adjust TestRewriteValve to use RequestDescriptor. (rjung)
       </add>
+      <update>
+          Add more AJP unit tests. (rjung)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -18,7 +18,9 @@ package org.apache.coyote.ajp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +58,350 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         return protocol;
     }
 
+    private void doSnoopTest(RequestDescriptor desc) throws Exception {
+
+        HashMap<String, String> requestInfo = desc.getRequestInfo();
+        HashMap<String, String> contextInitParameters = desc.getContextInitParameters();
+        HashMap<String, String> contextAttributes = desc.getContextAttributes();
+        HashMap<String, String> headers = desc.getHeaders();
+        HashMap<String, String> attributes = desc.getAttributes();
+        HashMap<String, String> params = desc.getParams();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // Must have a real docBase - just use temp
+        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMapping("/", "snoop");
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient();
+
+        if (requestInfo.get("REQUEST-QUERY-STRING") != null &&
+            params.size() > 0) {
+            throw(new IllegalArgumentException("Request setting " +
+                "'REQUEST-QUERY-STRING' and explicit params not allowed " +
+                "together"));
+        }
+
+        String value;
+        HashMap<String, String> savedRequestInfo = new HashMap<String, String>();
+        for (String name: requestInfo.keySet()) {
+            value = requestInfo.get(name);
+            if (name.equals("REQUEST-METHOD")) {
+                ajpClient.setMethod(value);
+            } else if (name.equals("REQUEST-PROTOCOL")) {
+                ajpClient.setProtocol(value);
+            } else if (name.equals("REQUEST-URI")) {
+                ajpClient.setUri(value);
+            } else if (name.equals("REQUEST-REMOTE-HOST")) {
+                /* request.getRemoteHost() will default to
+                 * request.getRemoteAddr() unless enableLookups is set. */
+                tomcat.getConnector().setEnableLookups(true);
+                ajpClient.setRemoteHost(value);
+            } else if (name.equals("REQUEST-REMOTE-ADDR")) {
+                ajpClient.setRemoteAddr(value);
+            } else if (name.equals("REQUEST-SERVER-NAME")) {
+                ajpClient.setServerName(value);
+            } else if (name.equals("REQUEST-SERVER-PORT")) {
+                ajpClient.setServerPort(Integer.valueOf(value));
+            } else if (name.equals("REQUEST-IS-SECURE")) {
+                ajpClient.setSsl(Boolean.parseBoolean(value));
+            } else if (name.equals("REQUEST-LOCAL-ADDR")) {
+                savedRequestInfo.put(name, value);
+            } else if (name.equals("REQUEST-REMOTE-PORT")) {
+                savedRequestInfo.put(name, value);
+            } else if (name.equals("REQUEST-REMOTE-USER") ||
+                       name.equals("REQUEST-ROUTE") ||
+                       name.equals("REQUEST-SECRET") ||
+                       name.equals("REQUEST-AUTH-TYPE") ||
+                       name.equals("REQUEST-QUERY-STRING")) {
+                savedRequestInfo.put(name, value);
+            } else if (name.equals("REQUEST-CONTENT-LENGTH")) {
+                headers.put("CONTENT-LENGTH", value);
+            } else if (name.equals("REQUEST-CONTENT-TYPE")) {
+                headers.put("CONTENT-TYPE", value);
+            /* Not yet implemented or not (easily) possible to implement
+             * "REQUEST-LOCAL-NAME"
+             * "REQUEST-LOCAL-PORT"
+             * "REQUEST-SCHEME"
+             * "REQUEST-URL"
+             * "REQUEST-CONTEXT-PATH"
+             * "REQUEST-SERVLET-PATH"
+             * "REQUEST-PATH-INFO"
+             * "REQUEST-PATH-TRANSLATED"
+             * "REQUEST-USER-PRINCIPAL"
+             * "REQUEST-CHARACTER-ENCODING"
+             * "REQUEST-LOCALE"
+             * "SESSION-REQUESTED-ID"
+             * "SESSION-REQUESTED-ID-COOKIE"
+             * "SESSION-REQUESTED-ID-URL"
+             * "SESSION-REQUESTED-ID-VALID"
+             */
+            } else {
+                throw(new IllegalArgumentException("Request setting '" + name + "' not supported"));
+            }
+        }
+
+        ServletContext sc = ctx.getServletContext();
+        for (String name: contextInitParameters.keySet()) {
+            sc.setInitParameter(name, contextInitParameters.get(name));
+        }
+        for (String name: contextAttributes.keySet()) {
+            sc.setAttribute(name, contextAttributes.get(name));
+        }
+
+        /* Basic request properties must be set before this call */
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+
+        for (String name: savedRequestInfo.keySet()) {
+            value = savedRequestInfo.get(name);
+            if (name.equals("REQUEST-LOCAL-ADDR")) {
+                forwardMessage.addAttribute("AJP_LOCAL_ADDR", value);
+            } else if (name.equals("REQUEST-REMOTE-PORT")) {
+                forwardMessage.addAttribute("AJP_REMOTE_PORT", value);
+            } else if (name.equals("REQUEST-REMOTE-USER")) {
+                /* request.getRemoteUser() will not trust the AJP
+                 * info if tomcatAuthentication is set. */
+                tomcat.getConnector().setProperty("tomcatAuthentication", "false");
+                forwardMessage.addAttribute(0x03, value);
+            } else if (name.equals("REQUEST-AUTH-TYPE")) {
+                /* request.getAuthType() will not trust the AJP
+                 * info if tomcatAuthentication is set. */
+                tomcat.getConnector().setProperty("tomcatAuthentication", "false");
+                forwardMessage.addAttribute(0x04, value);
+            } else if (name.equals("REQUEST-QUERY-STRING")) {
+                forwardMessage.addAttribute(0x05, value);
+            } else if (name.equals("REQUEST-ROUTE")) {
+                forwardMessage.addAttribute(0x06, value);
+            } else if (name.equals("REQUEST-SECRET")) {
+                forwardMessage.addAttribute(0x0C, value);
+            } else {
+                throw(new IllegalArgumentException("Request setting '" + name + "' not supported"));
+            }
+        }
+
+        if (params.size() > 0) {
+            StringBuilder query = new StringBuilder();
+            boolean sep = false;
+            for (String name: params.keySet()) {
+                if (sep) {
+                    query.append("&");
+                } else {
+                    sep = true;
+                }
+                query.append(name);
+                query.append("=");
+                query.append(params.get(name));
+            }
+            forwardMessage.addAttribute(0x05, query.toString());
+        }
+
+        for (String name: headers.keySet()) {
+            value = headers.get(name);
+            name = name.toUpperCase();
+            if (name.equals("ACCEPT")) {
+                forwardMessage.addHeader(0xA001, value);
+            } else if (name.equals("ACCEPT-CHARSET")) {
+                forwardMessage.addHeader(0xA002, value);
+            } else if (name.equals("ACCEPT-ENCODING")) {
+                forwardMessage.addHeader(0xA003, value);
+            } else if (name.equals("ACCEPT-LANGUAGE")) {
+                forwardMessage.addHeader(0xA004, value);
+            } else if (name.equals("AUTHORIZATION")) {
+                forwardMessage.addHeader(0xA005, value);
+            } else if (name.equals("CONNECTION")) {
+                forwardMessage.addHeader(0xA006, value);
+            } else if (name.equals("CONTENT-TYPE")) {
+                forwardMessage.addHeader(0xA007, value);
+            } else if (name.equals("CONTENT-LENGTH")) {
+                forwardMessage.addHeader(0xA008, value);
+            } else if (name.equals("COOKIE")) {
+                forwardMessage.addHeader(0xA009, value);
+            } else if (name.equals("COOKIE2")) {
+                forwardMessage.addHeader(0xA00A, value);
+            } else if (name.equals("HOST")) {
+                forwardMessage.addHeader(0xA00B, value);
+            } else if (name.equals("PRAGMA")) {
+                forwardMessage.addHeader(0xA00C, value);
+            } else if (name.equals("REFERER")) {
+                forwardMessage.addHeader(0xA00D, value);
+            } else if (name.equals("USER-AGENT")) {
+                forwardMessage.addHeader(0xA00E, value);
+            } else {
+                forwardMessage.addHeader(name, value);
+            }
+        }
+        for (String name: attributes.keySet()) {
+            value = attributes.get(name);
+            forwardMessage.addAttribute(name, value);
+        }
+        // Complete the message
+        forwardMessage.end();
+
+        tomcat.start();
+        ajpClient.setPort(getPort());
+        ajpClient.connect();
+
+        // Expect 3 packets: headers, body, end
+        TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage);
+        validateResponseHeaders(responseHeaders, 200, "OK");
+
+        String body = extractResponseBody(ajpClient.readMessage());
+        RequestDescriptor result = SnoopResult.parse(body);
+
+        /* AJP attributes result in Coyote Request attributes, which are
+         * not listed by request.getAttributeNames(), so SnoopServlet
+         * does not see them. Delete attributes before result comparison. */
+        desc.getAttributes().clear();
+
+        result.compare(desc);
+
+        validateResponseEnd(ajpClient.readMessage(), true);
+    }
+
+    @Test
+    public void testServerName() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-SERVER-NAME", "MYSERVER");
+        desc.putRequestInfo("REQUEST-URI", "/testServerName");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testServerPort() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-SERVER-PORT", "8888");
+        desc.putRequestInfo("REQUEST-URI", "/testServerPort");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testLocalAddr() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-LOCAL-ADDR", "10.3.2.1");
+        desc.putRequestInfo("REQUEST-URI", "/testLocalAddr");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testRemoteHost() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-REMOTE-HOST", "MYCLIENT");
+        desc.putRequestInfo("REQUEST-URI", "/testRemoteHost");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testRemoteAddr() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-REMOTE-ADDR", "10.1.2.3");
+        desc.putRequestInfo("REQUEST-URI", "/testRemoteAddr");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testRemotePort() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-REMOTE-PORT", "34567");
+        desc.putRequestInfo("REQUEST-URI", "/testRemotePort");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testMethod() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-METHOD", "LOCK");
+        desc.putRequestInfo("REQUEST-URI", "/testMethod");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testUri() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-URI", "/a/b/c");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testProtocol() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-PROTOCOL", "HTTP/1.x");
+        desc.putRequestInfo("REQUEST-URI", "/testProtocol");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testSecure() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-IS-SECURE", "true");
+        desc.putRequestInfo("REQUEST-URI", "/testSecure");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testQueryString() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-QUERY-STRING", "p1=1&p2=12&p3=123");
+        desc.putRequestInfo("REQUEST-URI", "/testQueryString");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testRemoteUser() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-REMOTE-USER", "MYUSER");
+        desc.putRequestInfo("REQUEST-URI", "/testRemoteUser");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testAuthType() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-AUTH-TYPE", "MyAuth");
+        desc.putRequestInfo("REQUEST-URI", "/testAuthType");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testOneHeader() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putHeader("MYHEADER", "MYHEADER-VALUE");
+        desc.putRequestInfo("REQUEST-URI", "/testOneHeader");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testOneAttribute() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putAttribute("MYATTRIBUTE", "MYATTRIBUTE-VALUE");
+        desc.putRequestInfo("REQUEST-URI", "/testOneAttribute");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testMulti() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-SERVER-NAME", "MYSERVER");
+        desc.putRequestInfo("REQUEST-SERVER-PORT", "8888");
+        desc.putRequestInfo("REQUEST-LOCAL-ADDR", "10.3.2.1");
+        desc.putRequestInfo("REQUEST-REMOTE-HOST", "MYCLIENT");
+        desc.putRequestInfo("REQUEST-REMOTE-ADDR", "10.1.2.3");
+        desc.putRequestInfo("REQUEST-REMOTE-PORT", "34567");
+        desc.putRequestInfo("REQUEST-METHOD", "LOCK");
+        desc.putRequestInfo("REQUEST-URI", "/a/b/c");
+        desc.putRequestInfo("REQUEST-PROTOCOL", "HTTP/1.x");
+        desc.putRequestInfo("REQUEST-IS-SECURE", "true");
+        desc.putRequestInfo("REQUEST-QUERY-STRING", "p1=1&p2=12&p3=123");
+        desc.putRequestInfo("REQUEST-REMOTE-USER", "MYUSER");
+        desc.putRequestInfo("REQUEST-AUTH-TYPE", "MyAuth");
+        desc.putHeader("MYHEADER1", "MYHEADER1-VALUE");
+        desc.putHeader("MYHEADER2", "MYHEADER2-VALUE");
+        desc.putAttribute("MYATTRIBUTE1", "MYATTRIBUTE-VALUE1");
+        desc.putAttribute("MYATTRIBUTE2", "MYATTRIBUTE-VALUE2");
+        doSnoopTest(desc);
+    }
+
     @Test
     public void testKeepAlive() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -75,7 +421,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         validateCpong(ajpClient.cping());
 
-        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage("/");
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.addHeader("X-DUMMY-HEADER", "IGNORE");
         // Complete the message - no extra headers required.
         forwardMessage.end();
 
@@ -83,7 +430,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         for (int i = 0; i < 2; i++) {
             TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage);
             // Expect 3 packets: headers, body, end
-            validateResponseHeaders(responseHeaders, 200);
+            validateResponseHeaders(responseHeaders, 200, "OK");
             TesterAjpMessage responseBody = ajpClient.readMessage();
             validateResponseBody(responseBody, HelloWorldServlet.RESPONSE_TEXT);
             validateResponseEnd(ajpClient.readMessage(), true);
@@ -100,18 +447,19 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
     @Test
     public void testPost() throws Exception {
-        doTestPost(false, HttpServletResponse.SC_OK);
+        doTestPost(false, HttpServletResponse.SC_OK, "OK");
     }
 
 
     @Test
     public void testPostMultipleContentLength() throws Exception {
         // Multiple content lengths
-        doTestPost(true, HttpServletResponse.SC_BAD_REQUEST);
+        doTestPost(true, HttpServletResponse.SC_BAD_REQUEST, "Bad Request");
     }
 
 
-    public void doTestPost(boolean multipleCL, int expectedStatus) throws Exception {
+    public void doTestPost(boolean multipleCL, int expectedStatus,
+                           String expectedMessage) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -127,8 +475,9 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         validateCpong(ajpClient.cping());
 
-        TesterAjpMessage forwardMessage =
-                ajpClient.createForwardMessage("/echo-params.jsp", 4);
+        ajpClient.setUri("/echo-params.jsp");
+        ajpClient.setMethod("POST");
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
         forwardMessage.addHeader(0xA008, "9");
         if (multipleCL) {
             forwardMessage.addHeader(0xA008, "99");
@@ -142,7 +491,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         TesterAjpMessage responseHeaders =
                 ajpClient.sendMessage(forwardMessage, bodyMessage);
 
-        validateResponseHeaders(responseHeaders, expectedStatus);
+        validateResponseHeaders(responseHeaders, expectedStatus, expectedMessage);
         if (expectedStatus == HttpServletResponse.SC_OK) {
             // Expect 3 messages: headers, body, end for a valid request
             TesterAjpMessage responseBody = ajpClient.readMessage();
@@ -182,14 +531,14 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         validateCpong(ajpClient.cping());
 
-        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage("/");
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
         forwardMessage.end();
 
         TesterAjpMessage responseHeaders =
                 ajpClient.sendMessage(forwardMessage, null);
 
         // Expect 2 messages: headers, end
-        validateResponseHeaders(responseHeaders, 304);
+        validateResponseHeaders(responseHeaders, 304, "Not Modified");
         validateResponseEnd(ajpClient.readMessage(), true);
 
         // Double check the connection is still open
@@ -204,7 +553,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
      * ignored.
      */
     private void validateResponseHeaders(TesterAjpMessage message,
-            int expectedStatus) throws Exception {
+            int expectedStatus, String expectedMessage) throws Exception {
         // First two bytes should always be AB
         Assert.assertEquals((byte) 'A', message.buf[0]);
         Assert.assertEquals((byte) 'B', message.buf[1]);
@@ -221,8 +570,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         // Check status
         Assert.assertEquals(expectedStatus, message.readInt());
 
-        // Read the status message
-        message.readString();
+        // Check the reason phrase
+        Assert.assertEquals(expectedMessage, message.readString());
 
         // Get the number of headers
         int headerCount = message.readInt();
@@ -236,11 +585,10 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
     /**
-     * Validates that the response message is valid and contains the expected
-     * content.
+     * Extract the content from a response message.
      */
-    private void validateResponseBody(TesterAjpMessage message,
-            String expectedBody) throws Exception {
+    private String extractResponseBody(TesterAjpMessage message)
+            throws Exception {
 
         Assert.assertEquals((byte) 'A', message.buf[0]);
         Assert.assertEquals((byte) 'B', message.buf[1]);
@@ -253,8 +601,17 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         int len = message.readInt();
         Assert.assertTrue(len > 0);
-        String body = message.readString(len);
+        return message.readString(len);
+    }
 
+    /**
+     * Validates that the response message is valid and contains the expected
+     * content.
+     */
+    private void validateResponseBody(TesterAjpMessage message,
+            String expectedBody) throws Exception {
+
+        String body = extractResponseBody(message);
         Assert.assertTrue(body.contains(expectedBody));
     }
 

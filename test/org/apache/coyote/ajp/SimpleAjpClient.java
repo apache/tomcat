@@ -44,6 +44,15 @@ public class SimpleAjpClient {
 
     private String host = "localhost";
     private int port = -1;
+    /* GET == 2 */
+    private int method = 2;
+    private String protocol = "http";
+    private String uri = "/";
+    private String remoteAddr = "192.168.0.1";
+    private String remoteHost = "client.example.com";
+    private String serverName = "www.example.com";
+    private int serverPort = 80;
+    private boolean ssl = false;
     private Socket socket = null;
 
     public void setPort(int port) {
@@ -52,6 +61,184 @@ public class SimpleAjpClient {
 
     public int getPort() {
         return port;
+    }
+
+    public void setMethod(String method) {
+        method = method.toUpperCase();
+        if (method.equals("OPTIONS")) {
+            this.method = 1;
+        } else if (method.equals("GET")) {
+            this.method = 2;
+        } else if (method.equals("HEAD")) {
+            this.method = 3;
+        } else if (method.equals("POST")) {
+            this.method = 4;
+        } else if (method.equals("PUT")) {
+            this.method = 5;
+        } else if (method.equals("DELETE")) {
+            this.method = 6;
+        } else if (method.equals("TRACE")) {
+            this.method = 7;
+        } else if (method.equals("PROPFIND")) {
+            this.method = 8;
+        } else if (method.equals("PROPPATCH")) {
+            this.method = 9;
+        } else if (method.equals("MKCOL")) {
+            this.method = 10;
+        } else if (method.equals("COPY")) {
+            this.method = 11;
+        } else if (method.equals("MOVE")) {
+            this.method = 12;
+        } else if (method.equals("LOCK")) {
+            this.method = 13;
+        } else if (method.equals("UNLOCK")) {
+            this.method = 14;
+        } else if (method.equals("ACL")) {
+            this.method = 15;
+        } else if (method.equals("REPORT")) {
+            this.method = 16;
+        } else if (method.equals("VERSION-CONTROL")) {
+            this.method = 17;
+        } else if (method.equals("CHECKIN")) {
+            this.method = 18;
+        } else if (method.equals("CHECKOUT")) {
+            this.method = 19;
+        } else if (method.equals("UNCHECKOUT")) {
+            this.method = 20;
+        } else if (method.equals("SEARCH")) {
+            this.method = 21;
+        } else if (method.equals("MKWORKSPACE")) {
+            this.method = 22;
+        } else if (method.equals("UPDATE")) {
+            this.method = 23;
+        } else if (method.equals("LABEL")) {
+            this.method = 24;
+        } else if (method.equals("MERGE")) {
+            this.method = 25;
+        } else if (method.equals("BASELINE-CONTROL")) {
+            this.method = 26;
+        } else if (method.equals("MKACTIVITY")) {
+            this.method = 27;
+        } else {
+            this.method = 99;
+        }
+    }
+
+    public String getMethod() {
+        switch (method) {
+            case 1:
+                return "OPTIONS";
+            case 2:
+                return "GET";
+            case 3:
+                return "HEAD";
+            case 4:
+                return "POST";
+            case 5:
+                return "PUT";
+            case 6:
+                return "DELETE";
+            case 7:
+                return "TRACE";
+            case 8:
+                return "PROPFIND";
+            case 9:
+                return "PROPPATCH";
+            case 10:
+                return "MKCOL";
+            case 11:
+                return "COPY";
+            case 12:
+                return "MOVE";
+            case 13:
+                return "LOCK";
+            case 14:
+                return "UNLOCK";
+            case 15:
+                return "ACL";
+            case 16:
+                return "REPORT";
+            case 17:
+                return "VERSION-CONTROL";
+            case 18:
+                return "CHECKIN";
+            case 19:
+                return "CHECKOUT";
+            case 20:
+                return "UNCHECKOUT";
+            case 21:
+                return "SEARCH";
+            case 22:
+                return "MKWORKSPACE";
+            case 23:
+                return "UPDATE";
+            case 24:
+                return "LABEL";
+            case 25:
+                return "MERGE";
+            case 26:
+                return "BASELINE-CONTROL";
+            case 27:
+                return "MKACTIVITY";
+            default:
+                return "UNKNOWN";
+        }
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setRemoteAddr(String remoteAddr) {
+        this.remoteAddr = remoteAddr;
+    }
+
+    public String getRemoteAddr() {
+        return remoteAddr;
+    }
+
+    public void setRemoteHost(String remoteHost) {
+        this.remoteHost = remoteHost;
+    }
+
+    public String getRemoteHost() {
+        return remoteHost;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setSsl(boolean ssl) {
+        this.ssl = ssl;
+    }
+
+    public boolean isSsl() {
+        return ssl;
     }
 
     public void connect() throws IOException {
@@ -66,11 +253,7 @@ public class SimpleAjpClient {
     /**
      * Create a message to request the given URL.
      */
-    public TesterAjpMessage createForwardMessage(String url) {
-        return createForwardMessage(url, 2);
-    }
-
-    public TesterAjpMessage createForwardMessage(String url, int method) {
+    public TesterAjpMessage createForwardMessage() {
 
         TesterAjpMessage message = new TesterAjpMessage(AJP_PACKET_SIZE);
         message.reset();
@@ -86,29 +269,28 @@ public class SimpleAjpClient {
         message.appendByte(method);
 
         // Protocol
-        message.appendString("http");
+        message.appendString(protocol);
 
         // Request URI
-        message.appendString(url);
+        message.appendString(uri);
 
-        // Remote address
-        message.appendString("10.0.0.1");
+        // Client address
+        message.appendString(remoteAddr);
 
-        // Remote host
-        message.appendString("client.dev.local");
+        // Client host
+        message.appendString(remoteHost);
 
         // Server name
-        message.appendString(host);
+        message.appendString(serverName);
 
-        // Port
-        message.appendInt(port);
+        // Server port
+        message.appendInt(serverPort);
 
         // Is ssl
-        message.appendByte(0x00);
+        message.appendByte(ssl ? 0x01 : 0x00);
 
         return message;
     }
-
 
     public TesterAjpMessage createBodyMessage(byte[] data) {
 
