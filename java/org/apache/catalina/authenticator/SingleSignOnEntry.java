@@ -172,16 +172,14 @@ public class SingleSignOnEntry
      * @param username  the username (if any) used for the authentication
      * @param password  the password (if any) used for the authentication
      */
-    public void updateCredentials(Principal principal, String authType,
+    public synchronized void updateCredentials(Principal principal, String authType,
                                   String username, String password) {
 
         this.principal = principal;
         this.authType = authType;
         this.username = username;
         this.password = password;
-        this.canReauthenticate =
-            (HttpServletRequest.BASIC_AUTH.equals(authType)
-                || HttpServletRequest.FORM_AUTH.equals(authType));
+        this.canReauthenticate = (HttpServletRequest.BASIC_AUTH.equals(authType) ||
+                HttpServletRequest.FORM_AUTH.equals(authType));
     }
-
 }
