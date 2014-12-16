@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
-
 
 import java.io.IOException;
 import java.security.Principal;
@@ -34,7 +31,6 @@ import org.apache.catalina.SessionListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
-
 
 /**
  * A <strong>Valve</strong> that supports a "single sign on" user experience,
@@ -58,12 +54,13 @@ import org.apache.catalina.valves.ValveBase;
 public class SingleSignOn extends ValveBase implements SessionListener {
 
     //------------------------------------------------------ Constructor
+
     public SingleSignOn() {
         super(true);
     }
 
-    // ----------------------------------------------------- Instance Variables
 
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * The cache of SingleSignOnEntry instances for authenticated Principals,
@@ -91,6 +88,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      */
     private String cookieDomain;
 
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -102,6 +100,8 @@ public class SingleSignOn extends ValveBase implements SessionListener {
     public String getCookieDomain() {
         return cookieDomain;
     }
+
+
     /**
      * Sets the domain to be used for sso cookies.
      *
@@ -114,6 +114,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             this.cookieDomain = cookieDomain;
         }
     }
+
 
     /**
      * Gets whether each request needs to be reauthenticated (by an
@@ -132,8 +133,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      *
      * @see #setRequireReauthentication
      */
-    public boolean getRequireReauthentication()
-    {
+    public boolean getRequireReauthentication() {
         return requireReauthentication;
     }
 
@@ -178,14 +178,12 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      *
      * @see AuthenticatorBase#reauthenticateFromSSO
      */
-    public void setRequireReauthentication(boolean required)
-    {
+    public void setRequireReauthentication(boolean required) {
         this.requireReauthentication = required;
     }
 
 
     // ------------------------------------------------ SessionListener Methods
-
 
     /**
      * Acknowledge the occurrence of the specified event.
@@ -344,7 +342,6 @@ public class SingleSignOn extends ValveBase implements SessionListener {
 
     // ------------------------------------------------------ Protected Methods
 
-
     /**
      * Associate the specified single sign on identifier with the
      * specified Session.
@@ -367,6 +364,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         }
 
     }
+
 
     /**
      * Deregister the specified session.  If it is the last session,
@@ -440,6 +438,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         // in the cache
 
     }
+
 
     /**
      * Attempts reauthentication to the given <code>Realm</code> using
@@ -609,5 +608,4 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             deregister(ssoId);
         }
     }
-
 }
