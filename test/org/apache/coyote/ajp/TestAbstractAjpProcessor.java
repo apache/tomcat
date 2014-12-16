@@ -90,7 +90,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         }
 
         String value;
-        Map<String, String> savedRequestInfo = new HashMap<String, String>();
+        Map<String, String> savedRequestInfo = new HashMap<>();
         for (String name: requestInfo.keySet()) {
             value = requestInfo.get(name);
             switch (name) {
@@ -116,7 +116,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                     ajpClient.setServerName(value);
                     break;
                 case "REQUEST-SERVER-PORT":
-                    ajpClient.setServerPort(Integer.valueOf(value));
+                    ajpClient.setServerPort(Integer.valueOf(value).intValue());
                     break;
                 case "REQUEST-IS-SECURE":
                     ajpClient.setSsl(Boolean.parseBoolean(value));

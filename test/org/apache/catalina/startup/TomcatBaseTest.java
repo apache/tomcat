@@ -239,20 +239,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     public static final class RequestDescriptor {
 
-        private final Map<String, String> requestInfo =
-            new HashMap<String, String>();
-        private final Map<String, String> contextInitParameters =
-            new HashMap<String, String>();
-        private final Map<String, String> contextAttributes =
-            new HashMap<String, String>();
-        private final Map<String, String> headers =
-            new HashMap<String, String>();
-        private final Map<String, String> attributes =
-            new HashMap<String, String>();
-        private final Map<String, String> params =
-            new HashMap<String, String>();
-        private final Map<String, String> sessionAttributes =
-            new HashMap<String, String>();
+        private final Map<String, String> requestInfo = new HashMap<>();
+        private final Map<String, String> contextInitParameters = new HashMap<>();
+        private final Map<String, String> contextAttributes = new HashMap<>();
+        private final Map<String, String> headers = new HashMap<>();
+        private final Map<String, String> attributes = new HashMap<>();
+        private final Map<String, String> params = new HashMap<>();
+        private final Map<String, String> sessionAttributes = new HashMap<>();
 
         public Map<String, String> getRequestInfo() {
             return requestInfo;
@@ -435,6 +428,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        @SuppressWarnings("deprecation")
         @Override
         public void service(HttpServletRequest request,
                             HttpServletResponse response)
