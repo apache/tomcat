@@ -197,7 +197,6 @@ public class GenericPrincipal implements TomcatPrincipal {
      *         role, otherwise <code>false</code>
      */
     public boolean hasRole(String role) {
-
         if ("*".equals(role)) {// Special 2.4 role meaning everyone
             return true;
         }
@@ -233,7 +232,6 @@ public class GenericPrincipal implements TomcatPrincipal {
      *                   to allow for future expansion of this method to cover
      *                   other logout mechanisms that might throw a different
      *                   exception to LoginContext
-     *
      */
     @Override
     public void logout() throws Exception {
