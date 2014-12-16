@@ -100,16 +100,16 @@ public class DeltaRequest implements Externalizable {
      */
     public void setPrincipal(Principal p) {
         int action = (p==null)?ACTION_REMOVE:ACTION_SET;
-        SerializablePrincipal sp = null;
-        if ( p != null ) {
-            if(p instanceof GenericPrincipal) {
-                sp = SerializablePrincipal.createPrincipal((GenericPrincipal)p);
+        GenericPrincipal gp = null;
+        if (p != null) {
+            if (p instanceof GenericPrincipal) {
+                gp = (GenericPrincipal) p;
                 if(log.isDebugEnabled())
                     log.debug(sm.getString("deltaRequest.showPrincipal", p.getName() , getSessionId()));
             } else
                 log.error(sm.getString("deltaRequest.wrongPrincipalClass",p.getClass().getName()));
         }
-        addAction(TYPE_PRINCIPAL,action,NAME_PRINCIPAL,sp);
+        addAction(TYPE_PRINCIPAL, action, NAME_PRINCIPAL, gp);
     }
 
     public void setNew(boolean n) {
@@ -178,9 +178,8 @@ public class DeltaRequest implements Externalizable {
                     break;
                 case TYPE_PRINCIPAL:
                     Principal p = null;
-                    if ( info.getAction() == ACTION_SET ) {
-                        SerializablePrincipal sp = (SerializablePrincipal)info.getValue();
-                        p = sp.getPrincipal();
+                    if (info.getAction() == ACTION_SET) {
+                        p = (Principal) info.getValue();
                     }
                     session.setPrincipal(p,false);
                     break;

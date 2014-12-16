@@ -38,7 +38,6 @@ import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterSession;
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.tribes.io.ReplicationStream;
@@ -721,7 +720,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         boolean hasPrincipal = stream.readBoolean();
         principal = null;
         if (hasPrincipal) {
-            principal = SerializablePrincipal.readPrincipal(stream);
+            principal = (Principal) stream.readObject();
         }
 
         //        setId((String) stream.readObject());
@@ -799,9 +798,9 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         stream.writeObject(Boolean.valueOf(isValid));
         stream.writeObject(Long.valueOf(thisAccessedTime));
         stream.writeObject(Long.valueOf(version));
-        stream.writeBoolean(getPrincipal() != null);
-        if (getPrincipal() != null) {
-            SerializablePrincipal.writePrincipal((GenericPrincipal) principal,stream);
+        stream.writeBoolean(getPrincipal() instanceof Serializable);
+        if (getPrincipal() instanceof Serializable) {
+            stream.writeObject(getPrincipal());
         }
 
         stream.writeObject(id);

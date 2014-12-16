@@ -86,14 +86,14 @@ public class ClusterSingleSignOnListener extends ClusterListener {
                 break;
             case SingleSignOnMessage.REGISTER_SESSION:
                 if (msg.getPrincipal() != null) {
-                    principal = msg.getPrincipal().getPrincipal();
+                    principal = msg.getPrincipal();
                 }
                 clusterSSO.registerLocal(msg.getSsoId(), principal, msg.getAuthType(),
                                          msg.getUsername(), msg.getPassword());
                 break;
             case SingleSignOnMessage.UPDATE_SESSION:
                 if (msg.getPrincipal() != null) {
-                    principal = msg.getPrincipal().getPrincipal();
+                    principal = msg.getPrincipal();
                 }
                 clusterSSO.updateLocal(msg.getSsoId(), principal, msg.getAuthType(),
                                        msg.getUsername(), msg.getPassword());
