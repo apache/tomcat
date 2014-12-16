@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.realm;
 
+import java.io.Serializable;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +32,10 @@ import org.ietf.jgss.GSSCredential;
  *
  * @author Craig R. McClanahan
  */
-public class GenericPrincipal implements TomcatPrincipal {
+public class GenericPrincipal implements TomcatPrincipal, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
 
     // ----------------------------------------------------------- Constructors
 
@@ -237,6 +241,38 @@ public class GenericPrincipal implements TomcatPrincipal {
     public void logout() throws Exception {
         if (loginContext != null) {
             loginContext.logout();
+        }
+    }
+
+
+    // ----------------------------------------------------------- Serialization
+
+    private Object writeReplace() {
+        return new SerializablePrincipal(name, password, roles, userPrincipal);
+    }
+
+    private static class SerializablePrincipal implements Serializable {
+        private static final long serialVersionUID = 1L;
+
+        private final String name;
+        private final String password;
+        private final String[] roles;
+        private final Principal principal;
+
+        public SerializablePrincipal(String name, String password, String[] roles,
+                Principal principal) {
+            this.name = name;
+            this.password = password;
+            this.roles = roles;
+            if (principal instanceof Serializable) {
+                this.principal = principal;
+            } else {
+                this.principal = null;
+            }
+        }
+
+        private Object readResolve() {
+            return new GenericPrincipal(name, password, Arrays.asList(roles), principal);
         }
     }
 }
