@@ -299,11 +299,6 @@ public class AjpMessage {
     }
 
 
-    public int getHeaderLength() {
-        return Constants.H_SIZE;
-    }
-
-
     public int getPacketSize() {
         return buf.length;
     }
