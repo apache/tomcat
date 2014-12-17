@@ -17,6 +17,8 @@
 package org.apache.catalina.authenticator;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Set;
@@ -106,7 +108,10 @@ public class SingleSignOnEntry implements Serializable {
     }
 
     /**
-     * Returns the <code>Session</code>s associated with this SSO.
+     * Returns the HTTP Session identifiers associated with this SSO.
+     *
+     * @return The identifiers for the HTTP sessions that are current associated
+     *         with this SSo entry
      */
     public Set<SingleSignOnSessionKey> findSessions() {
         return sessionKeys.keySet();
@@ -119,7 +124,7 @@ public class SingleSignOnEntry implements Serializable {
      * @return "BASIC", "CLIENT_CERT", "DIGEST", "FORM" or "NONE"
      */
     public String getAuthType() {
-        return (this.authType);
+        return this.authType;
     }
 
     /**
@@ -130,7 +135,7 @@ public class SingleSignOnEntry implements Serializable {
      *          "BASIC" or "FORM", <code>false</code> otherwise.
      */
     public boolean getCanReauthenticate() {
-        return (this.canReauthenticate);
+        return this.canReauthenticate;
     }
 
     /**
@@ -141,23 +146,28 @@ public class SingleSignOnEntry implements Serializable {
      *          does not involve a password.
      */
     public String getPassword() {
-        return (this.password);
+        return this.password;
     }
 
     /**
-     * Gets the <code>Principal</code> that has been authenticated by
-     * the SSO.
+     * Gets the <code>Principal</code> that has been authenticated by the SSO.
+     *
+     * @return The Principal that was created by the authentication that
+     *         triggered the creation of the SSO entry
      */
     public Principal getPrincipal() {
-        return (this.principal);
+        return this.principal;
     }
 
     /**
-     * Gets the username provided by the user as part of the authentication
+     * Gets the user name provided by the user as part of the authentication
      * process.
+     *
+     * @return The user name that was authenticated as part of the
+     *         authentication that triggered the creation of the SSO entry
      */
     public String getUsername() {
-        return (this.username);
+        return this.username;
     }
 
 
@@ -174,7 +184,6 @@ public class SingleSignOnEntry implements Serializable {
      */
     public synchronized void updateCredentials(Principal principal, String authType,
                                   String username, String password) {
-
         this.principal = principal;
         this.authType = authType;
         this.username = username;
@@ -184,7 +193,7 @@ public class SingleSignOnEntry implements Serializable {
     }
 
 
-    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
         if (principal instanceof Serializable) {
             out.writeBoolean(true);
@@ -194,7 +203,7 @@ public class SingleSignOnEntry implements Serializable {
         }
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException,
+    private void readObject(ObjectInputStream in) throws IOException,
             ClassNotFoundException {
         in.defaultReadObject();
         boolean hasPrincipal = in.readBoolean();
