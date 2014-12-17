@@ -132,10 +132,6 @@ public final class Response {
         this.req=req;
     }
 
-    public OutputBuffer getOutputBuffer() {
-        return outputBuffer;
-    }
-
 
     public void setOutputBuffer(OutputBuffer outputBuffer) {
         this.outputBuffer = outputBuffer;
