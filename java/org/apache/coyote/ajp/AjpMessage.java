@@ -299,11 +299,6 @@ public class AjpMessage {
     }
 
 
-    public int getPacketSize() {
-        return buf.length;
-    }
-
-
     public int processHeader(boolean toContainer) {
         pos = 0;
         int mark = getInt();
