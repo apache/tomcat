@@ -126,7 +126,7 @@ public class InternalNioInputBuffer extends AbstractNioInputBuffer<NioChannel> {
             }
             try {
                 NioEndpoint.NioSocketWrapper att =
-                        (NioEndpoint.NioSocketWrapper) socket.getAttachment(false);
+                        (NioEndpoint.NioSocketWrapper) socket.getAttachment();
                 if (att == null) {
                     throw new IOException("Key must be cancelled.");
                 }
