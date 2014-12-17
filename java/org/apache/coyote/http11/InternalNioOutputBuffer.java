@@ -126,7 +126,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         }
 
         int written = 0;
-        NioEndpoint.NioSocketWrapper att = (NioEndpoint.NioSocketWrapper)socket.getAttachment(false);
+        NioEndpoint.NioSocketWrapper att = (NioEndpoint.NioSocketWrapper)socket.getAttachment();
         if ( att == null ) throw new IOException("Key must be cancelled");
         long writeTimeout = att.getWriteTimeout();
         Selector selector = null;
@@ -203,7 +203,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             }
         }
 
-        NioEndpoint.NioSocketWrapper ka = (NioEndpoint.NioSocketWrapper)socket.getAttachment(false);
+        NioEndpoint.NioSocketWrapper ka = (NioEndpoint.NioSocketWrapper)socket.getAttachment();
         if (ka != null) ka.access();//prevent timeouts for just doing client writes
 
         if (!isBlocking() && length > 0) {
@@ -275,7 +275,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     @Override
     protected void registerWriteInterest() throws IOException {
-        NioEndpoint.NioSocketWrapper att = (NioEndpoint.NioSocketWrapper)socket.getAttachment(false);
+        NioEndpoint.NioSocketWrapper att = (NioEndpoint.NioSocketWrapper)socket.getAttachment();
         if (att == null) {
             throw new IOException("Key must be cancelled");
         }

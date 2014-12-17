@@ -868,7 +868,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             }
             addEvent(r);
             if (close) {
-                NioEndpoint.NioSocketWrapper ka = (NioEndpoint.NioSocketWrapper)socket.getAttachment(false);
+                NioEndpoint.NioSocketWrapper ka = (NioEndpoint.NioSocketWrapper)socket.getAttachment();
                 processSocket(ka, SocketStatus.STOP, false);
             }
         }
@@ -1487,7 +1487,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 }
                 try {
                     NioEndpoint.NioSocketWrapper att =
-                            (NioEndpoint.NioSocketWrapper) channel.getAttachment(false);
+                            (NioEndpoint.NioSocketWrapper) channel.getAttachment();
                     if (att == null) {
                         throw new IOException("Key must be cancelled.");
                     }
@@ -1541,7 +1541,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 throws IOException {
 
             NioEndpoint.NioSocketWrapper att =
-                    (NioEndpoint.NioSocketWrapper) getSocket().getAttachment(false);
+                    (NioEndpoint.NioSocketWrapper) getSocket().getAttachment();
             if (att == null) {
                 throw new IOException("Key must be cancelled");
             }
@@ -1577,7 +1577,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         @Override
         public void flush() throws IOException {
             NioEndpoint.NioSocketWrapper att =
-                    (NioEndpoint.NioSocketWrapper) getSocket().getAttachment(false);
+                    (NioEndpoint.NioSocketWrapper) getSocket().getAttachment();
             if (att == null) {
                 throw new IOException("Key must be cancelled");
             }
