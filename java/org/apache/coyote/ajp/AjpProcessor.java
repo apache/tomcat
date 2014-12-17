@@ -976,9 +976,8 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         throws IOException {
 
         byte[] buf = message.getBuffer();
-        int headerLength = message.getHeaderLength();
 
-        if (!read(buf, 0, headerLength, block)) {
+        if (!read(buf, 0, Constants.H_SIZE, block)) {
             return false;
         }
 
@@ -1001,7 +1000,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                         Integer.valueOf(messageLength),
                         Integer.valueOf(buf.length)));
             }
-            read(buf, headerLength, messageLength, true);
+            read(buf, Constants.H_SIZE, messageLength, true);
             return true;
         }
     }
