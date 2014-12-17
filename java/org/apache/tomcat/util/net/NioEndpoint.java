@@ -921,8 +921,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public void cancelledKey(SelectionKey key) {
             try {
                 if ( key == null ) return;//nothing to do
-                NioSocketWrapper ka = (NioSocketWrapper) key.attachment();
-                key.attach(null);
+                NioSocketWrapper ka = (NioSocketWrapper) key.attach(null);
                 if (ka!=null) handler.release(ka);
                 else handler.release((SocketChannel)key.channel());
                 if (key.isValid()) key.cancel();
