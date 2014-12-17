@@ -918,10 +918,11 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             addEvent(r);
         }
 
-        public void cancelledKey(SelectionKey key) {
+        public NioSocketWrapper cancelledKey(SelectionKey key) {
+            NioSocketWrapper ka = null;
             try {
-                if ( key == null ) return;//nothing to do
-                NioSocketWrapper ka = (NioSocketWrapper) key.attach(null);
+                if ( key == null ) return null;//nothing to do
+                ka = (NioSocketWrapper) key.attach(null);
                 if (ka!=null) handler.release(ka);
                 else handler.release((SocketChannel)key.channel());
                 if (key.isValid()) key.cancel();
@@ -961,6 +962,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 ExceptionUtils.handleThrowable(e);
                 if (log.isDebugEnabled()) log.error("",e);
             }
+            return ka;
         }
         /**
          * The background thread that listens for incoming TCP/IP connections and
@@ -1741,13 +1743,20 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     if (state == SocketState.CLOSED) {
                         // Close socket and pool
                         try {
-                            socket.getPoller().cancelledKey(key);
-                            if (running && !paused) {
-                                nioChannels.push(socket);
-                            }
-                            socket = null;
-                            if (running && !paused) {
-                                keyCache.push(ka);
+                            if (socket.getPoller().cancelledKey(key) != null) {
+                                // SocketWrapper (attachment) was removed from the
+                                // key - recycle both. This can only happen once
+                                // per attempted closure so it is used to determine
+                                // whether or not to return socket and ka to
+                                // their respective caches. We do NOT want to do
+                                // this more than once - see BZ 57340.
+                                if (running && !paused) {
+                                    nioChannels.push(socket);
+                                }
+                                socket = null;
+                                if (running && !paused) {
+                                    keyCache.push(ka);
+                                }
                             }
                             ka = null;
                         } catch (Exception x) {
