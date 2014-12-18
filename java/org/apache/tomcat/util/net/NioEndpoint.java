@@ -1091,10 +1091,11 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                             return; // don't close on comet timeout
                         }
                     } else {
-                        processSocket(ka.getChannel(), status, false); //don't dispatch if the lines below are cancelling the key
+                        // Don't dispatch if the lines below are cancelling the key
+                        processSocket(ka.getChannel(), status, false);
                     }
                 }
-                key.attach(null);
+                ka = (KeyAttachment) key.attach(null);
                 if (ka!=null) handler.release(ka);
                 else handler.release((SocketChannel)key.channel());
                 if (key.isValid()) key.cancel();
