@@ -286,13 +286,12 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         }
         Cookie cookie = null;
         Cookie cookies[] = request.getCookies();
-        if (cookies == null) {
-            cookies = new Cookie[0];
-        }
-        for (int i = 0; i < cookies.length; i++) {
-            if (Constants.SINGLE_SIGN_ON_COOKIE.equals(cookies[i].getName())) {
-                cookie = cookies[i];
-                break;
+        if (cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                if (Constants.SINGLE_SIGN_ON_COOKIE.equals(cookies[i].getName())) {
+                    cookie = cookies[i];
+                    break;
+                }
             }
         }
         if (cookie == null) {
