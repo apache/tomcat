@@ -436,7 +436,8 @@ public class TestCometProcessor extends TomcatBaseTest {
         } else {
             log.info(status);
         }
-        assertTrue("Comet END event not received",
+        assertTrue("Comet END event not received", servlet.getEndEventOccurred());
+        assertTrue("Comet END event not last event received",
                 EventType.END.equals(servlet.getLastEvent()));
     }
 
@@ -521,7 +522,9 @@ public class TestCometProcessor extends TomcatBaseTest {
                 response.getWriter().print("Client: " + msg + "\r\n");
                 event.close();
             } else {
-                response.getWriter().print(event.getEventSubType() + "\r\n");
+                String msg = event.getEventType() + ":" + event.getEventSubType() + "\r\n";
+                System.out.print(msg);
+                response.getWriter().print(msg);
                 event.close();
             }
             response.getWriter().flush();
