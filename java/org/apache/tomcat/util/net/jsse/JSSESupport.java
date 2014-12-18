@@ -126,7 +126,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     @Override
-    public Object[] getPeerCertificateChain(boolean force)
+    public java.security.cert.X509Certificate[] getPeerCertificateChain(boolean force)
         throws IOException {
         // Look up the current SSLSession
         if (session == null)
