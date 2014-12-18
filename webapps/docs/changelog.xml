@@ -192,6 +192,11 @@
         committing the response, Tomcat will now also send the
         <code>Connection: close</code> response header. (markt)
       </fix>
+      <fix>
+        <bug>57340</bug>: When using Comet, ensure that Socket and SocketWrapper
+        are only returned to their respective caches once on socket close (it is
+        possible for multiple threads to call close concurrently). (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
