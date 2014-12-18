@@ -112,7 +112,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         long soTimeout = endpoint.getSoTimeout();
 
         RequestInfo rp = request.getRequestProcessor();
-        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
+        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment();
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             if (!getAdapter().event(request, response, status)) {
@@ -169,7 +169,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     @Override
     protected void resetTimeouts() {
-        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
+        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment();
         if (!getErrorState().isError() && attach != null &&
                 asyncStateMachine.isAsyncDispatching()) {
             long soTimeout = endpoint.getSoTimeout();
@@ -459,10 +459,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             break;
         }
         case COMET_CLOSE: {
-            if (socketWrapper==null || socketWrapper.getSocket().getAttachment(false)==null) {
+            if (socketWrapper==null || socketWrapper.getSocket().getAttachment()==null) {
                 return;
             }
-            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment();
             attach.setCometOps(NioEndpoint.OP_CALLBACK);
             RequestInfo rp = request.getRequestProcessor();
             if (rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE) {
@@ -477,10 +477,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             if (param==null) {
                 return;
             }
-            if (socketWrapper==null || socketWrapper.getSocket().getAttachment(false)==null) {
+            if (socketWrapper==null || socketWrapper.getSocket().getAttachment()==null) {
                 return;
             }
-            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment();
             long timeout = ((Long)param).longValue();
             //if we are not piggy backing on a worker thread, set the timeout
             RequestInfo rp = request.getRequestProcessor();
@@ -500,10 +500,10 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             if (param==null) {
                 return;
             }
-            if (socketWrapper==null || socketWrapper.getSocket().getAttachment(false)==null) {
+            if (socketWrapper==null || socketWrapper.getSocket().getAttachment()==null) {
                 return;
             }
-            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment(false);
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socketWrapper.getSocket().getAttachment();
             long timeout = ((Long)param).longValue();
             //if we are not piggy backing on a worker thread, set the timeout
             attach.setTimeout(timeout);

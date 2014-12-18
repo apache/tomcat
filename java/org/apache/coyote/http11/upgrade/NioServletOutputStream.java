@@ -79,7 +79,7 @@ public class NioServletOutputStream extends AbstractServletOutputStream {
 
         int written = 0;
         NioEndpoint.KeyAttachment att =
-                (NioEndpoint.KeyAttachment) channel.getAttachment(false);
+                (NioEndpoint.KeyAttachment) channel.getAttachment();
         if (att == null) {
             throw new IOException("Key must be cancelled");
         }
@@ -108,7 +108,7 @@ public class NioServletOutputStream extends AbstractServletOutputStream {
     @Override
     protected void doFlush() throws IOException {
         NioEndpoint.KeyAttachment att =
-                (NioEndpoint.KeyAttachment) channel.getAttachment(false);
+                (NioEndpoint.KeyAttachment) channel.getAttachment();
         if (att == null) {
             throw new IOException("Key must be cancelled");
         }

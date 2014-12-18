@@ -56,7 +56,7 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
     @Override
     public void flush() throws IOException {
         NioEndpoint.KeyAttachment att =
-                (NioEndpoint.KeyAttachment) nioChannel.getAttachment(false);
+                (NioEndpoint.KeyAttachment) nioChannel.getAttachment();
         if (att == null) {
             throw new IOException("Key must be cancelled");
         }
@@ -180,7 +180,7 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
             }
             try {
                 NioEndpoint.KeyAttachment att =
-                        (NioEndpoint.KeyAttachment) nioChannel.getAttachment(false);
+                        (NioEndpoint.KeyAttachment) nioChannel.getAttachment();
                 if (att == null) {
                     throw new IOException("Key must be cancelled.");
                 }
@@ -211,7 +211,7 @@ public class UpgradeNioProcessor extends UpgradeProcessor<NioChannel> {
 
         int written = 0;
         NioEndpoint.KeyAttachment att =
-                (NioEndpoint.KeyAttachment) nioChannel.getAttachment(false);
+                (NioEndpoint.KeyAttachment) nioChannel.getAttachment();
         if (att == null) {
             throw new IOException("Key must be cancelled");
         }

@@ -739,7 +739,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
     public boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
         try {
-            KeyAttachment attachment = (KeyAttachment)socket.getAttachment(false);
+            KeyAttachment attachment = (KeyAttachment)socket.getAttachment();
             if (attachment == null) {
                 return false;
             }
@@ -1008,7 +1008,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
          */
         @Deprecated
         public void cometInterest(NioChannel socket) {
-            KeyAttachment att = (KeyAttachment)socket.getAttachment(false);
+            KeyAttachment att = (KeyAttachment)socket.getAttachment();
             add(socket,att.getCometOps());
             if ( (att.getCometOps()&OP_CALLBACK) == OP_CALLBACK ) {
                 nextExpiration = 0; //force the check for faster callback

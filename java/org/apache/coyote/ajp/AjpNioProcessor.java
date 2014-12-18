@@ -254,7 +254,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             if (param == null) return;
             long timeout = ((Long)param).longValue();
             final KeyAttachment ka =
-                    (KeyAttachment)socketWrapper.getSocket().getAttachment(false);
+                    (KeyAttachment)socketWrapper.getSocket().getAttachment();
             ka.setTimeout(timeout);
             break;
         }
@@ -275,7 +275,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         // poller. Therefore, it needs to be reset once asycn processing has
         // finished.
         final KeyAttachment attach =
-                (KeyAttachment)socketWrapper.getSocket().getAttachment(false);
+                (KeyAttachment)socketWrapper.getSocket().getAttachment();
         if (!getErrorState().isError() && attach != null &&
                 asyncStateMachine.isAsyncDispatching()) {
             long soTimeout = endpoint.getSoTimeout();
@@ -296,7 +296,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             throws IOException {
         
         KeyAttachment att =
-                (KeyAttachment) socketWrapper.getSocket().getAttachment(false);
+                (KeyAttachment) socketWrapper.getSocket().getAttachment();
         if ( att == null ) throw new IOException("Key must be cancelled");
 
         ByteBuffer writeBuffer =
@@ -363,7 +363,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             }
             try {
                 NioEndpoint.KeyAttachment att =
-                        (NioEndpoint.KeyAttachment) socketWrapper.getSocket().getAttachment(false);
+                        (NioEndpoint.KeyAttachment) socketWrapper.getSocket().getAttachment();
                 if ( att == null ) throw new IOException("Key must be cancelled.");
                 nRead = pool.read(readBuffer, socketWrapper.getSocket(),
                         selector, att.getTimeout());

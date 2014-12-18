@@ -141,12 +141,11 @@ public class NioChannel implements ByteChannel{
         return sc.read(dst);
     }
 
-    public Object getAttachment(boolean remove) {
+    public Object getAttachment() {
         Poller pol = getPoller();
         Selector sel = pol!=null?pol.getSelector():null;
         SelectionKey key = sel!=null?getIOChannel().keyFor(sel):null;
         Object att = key!=null?key.attachment():null;
-        if (key != null && att != null && remove ) key.attach(null);
         return att;
     }
     /**

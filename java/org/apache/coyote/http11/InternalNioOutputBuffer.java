@@ -150,7 +150,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         if ( flip ) bytebuffer.flip();
 
         int written = 0;
-        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment();
         if ( att == null ) throw new IOException("Key must be cancelled");
         long writeTimeout = att.getWriteTimeout();
         Selector selector = null;
@@ -219,7 +219,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             length = length - thisTime;
             offset = offset + thisTime;
         }
-        NioEndpoint.KeyAttachment ka = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+        NioEndpoint.KeyAttachment ka = (NioEndpoint.KeyAttachment)socket.getAttachment();
         if ( ka!= null ) ka.access();//prevent timeouts for just doing client writes
     }
 

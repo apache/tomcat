@@ -119,7 +119,7 @@ public class NioServletInputStream extends AbstractServletInputStream {
             }
             try {
                 NioEndpoint.KeyAttachment att =
-                        (NioEndpoint.KeyAttachment) channel.getAttachment(false);
+                        (NioEndpoint.KeyAttachment) channel.getAttachment();
                 if (att == null) {
                     throw new IOException("Key must be cancelled.");
                 }
