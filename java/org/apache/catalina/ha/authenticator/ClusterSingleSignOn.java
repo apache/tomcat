@@ -23,8 +23,10 @@ import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.authenticator.SingleSignOnEntry;
+import org.apache.catalina.authenticator.SingleSignOnSessionKey;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterValve;
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 import org.apache.catalina.tribes.tipis.ReplicatedMap;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -67,6 +69,26 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
     }
     public void setRpcTimeout(long rpcTimeout) {
         this.rpcTimeout = rpcTimeout;
+    }
+
+
+    private int mapSendOptions =
+            Channel.SEND_OPTIONS_SYNCHRONIZED_ACK | Channel.SEND_OPTIONS_USE_ACK;
+    public int getMapSendOptions() {
+        return mapSendOptions;
+    }
+    public void setMapSendOptions(int mapSendOptions) {
+        this.mapSendOptions = mapSendOptions;
+    }
+
+
+    private boolean terminateOnStartFailure = false;
+    public boolean getTerminateOnStartFailure() {
+        return terminateOnStartFailure;
+    }
+
+    public void setTerminateOnStartFailure(boolean terminateOnStartFailure) {
+        this.terminateOnStartFailure = terminateOnStartFailure;
     }
 
 
@@ -120,11 +142,17 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
 
             ClassLoader[] cls = new ClassLoader[] { this.getClass().getClassLoader() };
 
-            cache = new ReplicatedMap<>(this, cluster.getChannel(), rpcTimeout,
-                    cluster.getClusterName() + "-SSO-cache", cls);
-            reverse = new ReplicatedMap<>(this, cluster.getChannel(), rpcTimeout,
-                    cluster.getClusterName() + "-SSO-reverse", cls);
+            ReplicatedMap<String,SingleSignOnEntry> cache = new ReplicatedMap<>(
+                    this, cluster.getChannel(), rpcTimeout, cluster.getClusterName() + "-SSO-cache",
+                    cls, terminateOnStartFailure);
+            cache.setChannelSendOptions(mapSendOptions);
+            this.cache = cache;
 
+            ReplicatedMap<SingleSignOnSessionKey,String> reverse = new ReplicatedMap<>(
+                    this, cluster.getChannel(), rpcTimeout, cluster.getClusterName() + "-SSO-reverse",
+                    cls, terminateOnStartFailure);
+            reverse.setChannelSendOptions(mapSendOptions);
+            this.reverse = reverse;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             throw new LifecycleException(
