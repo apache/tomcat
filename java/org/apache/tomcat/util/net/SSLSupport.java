@@ -80,12 +80,6 @@ public interface SSLSupport {
 
     /**
      * The client certificate chain (if any).
-     */
-    public Object[] getPeerCertificateChain()
-        throws IOException;
-
-    /**
-     * The client certificate chain (if any).
      * @param force If <code>true</code>, then re-negotiate the
      *              connection if necessary.
      */
