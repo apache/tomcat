@@ -354,18 +354,24 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      *
      * @param ssoId Single sign on identifier
      * @param session Session to be associated
+     *
+     * @return <code>true</code> if the session was associated to the given SSO
+     *         session, otherwise <code>false</code>
      */
-    protected void associate(String ssoId, Session session) {
+    protected boolean associate(String ssoId, Session session) {
 
         if (containerLog.isDebugEnabled()) {
             containerLog.debug("Associate sso id " + ssoId + " with session " + session);
         }
 
         SingleSignOnEntry sso = cache.get(ssoId);
-        if (sso != null) {
+        if (sso == null) {
+            return false;
+        } else {
             sso.addSession(this, session);
+            reverse.put(new SingleSignOnSessionKey(session), ssoId);
+            return true;
         }
-        reverse.put(new SingleSignOnSessionKey(session), ssoId);
     }
 
 
