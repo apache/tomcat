@@ -214,8 +214,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         }
 
         // We only care about session destroyed events
-        if (!Session.SESSION_DESTROYED_EVENT.equals(event.getType())
-                && (!Session.SESSION_PASSIVATED_EVENT.equals(event.getType()))) {
+        if (!Session.SESSION_DESTROYED_EVENT.equals(event.getType())) {
             return;
         }
 
@@ -231,14 +230,13 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             return;
         }
 
-        // Was the session destroyed as the result of a timeout?
-        // If so, we'll just remove the expired session from the
-        // SSO.  If the session was logged out, we'll log out
-        // of all session associated with the SSO.
+        // Was the session destroyed as the result of a timeout or context stop?
+        // If so, we'll just remove the expired session from the SSO. If the
+        // session was logged out, we'll log out of all session associated with
+        // the SSO.
         if (((session.getMaxInactiveInterval() > 0)
             && (System.currentTimeMillis() - session.getThisAccessedTimeInternal() >=
                 session.getMaxInactiveInterval() * 1000))
-            || (Session.SESSION_PASSIVATED_EVENT.equals(event.getType()))
             || (!session.getManager().getContext().getState().isAvailable())) {
             removeSession(ssoId, session);
         } else {
