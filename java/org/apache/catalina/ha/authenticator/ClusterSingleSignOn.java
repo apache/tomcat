@@ -24,7 +24,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.authenticator.SingleSignOnEntry;
-import org.apache.catalina.authenticator.SingleSignOnSessionKey;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.tribes.Channel;
@@ -157,12 +156,6 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
                     cls, terminateOnStartFailure);
             cache.setChannelSendOptions(mapSendOptions);
             this.cache = cache;
-
-            ReplicatedMap<SingleSignOnSessionKey,String> reverse = new ReplicatedMap<>(
-                    this, cluster.getChannel(), rpcTimeout, cluster.getClusterName() + "-SSO-reverse",
-                    cls, terminateOnStartFailure);
-            reverse.setChannelSendOptions(mapSendOptions);
-            this.reverse = reverse;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             throw new LifecycleException(
@@ -187,7 +180,6 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
 
         if (getCluster() != null) {
             ((ReplicatedMap<?,?>) cache).breakdown();
-            ((ReplicatedMap<?,?>) reverse).breakdown();
         }
     }
 }

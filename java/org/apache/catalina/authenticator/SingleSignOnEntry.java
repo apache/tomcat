@@ -87,12 +87,12 @@ public class SingleSignOnEntry implements Serializable {
      *                  the SSO session.
      * @param session   The <code>Session</code> being associated with the SSO.
      */
-    public void addSession(SingleSignOn sso, Session session) {
+    public void addSession(SingleSignOn sso, String ssoId, Session session) {
         SingleSignOnSessionKey key = new SingleSignOnSessionKey(session);
         SingleSignOnSessionKey currentKey = sessionKeys.putIfAbsent(key, key);
         if (currentKey == null) {
             // Session not previously added
-            session.addSessionListener(sso);
+            session.addSessionListener(sso.getSessionListener(ssoId));
         }
     }
 
