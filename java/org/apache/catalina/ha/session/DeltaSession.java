@@ -500,6 +500,33 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         return (sb.toString());
     }
 
+    @Override
+    public void addSessionListener(SessionListener listener) {
+        lock();
+        try {
+            super.addSessionListener(listener);
+            if (deltaRequest != null && listener instanceof ReplicatedSessionListener) {
+                deltaRequest.addSessionListener(listener);
+            }
+        } finally {
+            unlock();
+        }
+    }
+
+    @Override
+    public void removeSessionListener(SessionListener listener) {
+        lock();
+        try {
+            super.removeSessionListener(listener);
+            if (deltaRequest != null && listener instanceof ReplicatedSessionListener) {
+                deltaRequest.removeSessionListener(listener);
+            }
+        } finally {
+            unlock();
+        }
+    }
+
+
     // ------------------------------------------------ Session Package Methods
 
     @Override
@@ -741,9 +768,14 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         }
         isValid = isValidSave;
 
-        if (listeners == null) {
-            ArrayList<SessionListener> arrayList = new ArrayList<>();
-            listeners = arrayList;
+        // Session listeners
+        n = ((Integer) stream.readObject()).intValue();
+        if (listeners == null || n > 0) {
+            listeners = new ArrayList<>();
+        }
+        for (int i = 0; i < n; i++) {
+            SessionListener listener = (SessionListener) stream.readObject();
+            listeners.add(listener);
         }
 
         if (notes == null) {
@@ -835,6 +867,17 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             }
         }
 
+        // Serializable listeners
+        ArrayList<SessionListener> saveListeners = new ArrayList<>();
+        for (SessionListener listener : listeners) {
+            if (listener instanceof ReplicatedSessionListener) {
+                saveListeners.add(listener);
+            }
+        }
+        stream.writeObject(Integer.valueOf(saveListeners.size()));
+        for (SessionListener listener : saveListeners) {
+            stream.writeObject(listener);
+        }
     }
 
 

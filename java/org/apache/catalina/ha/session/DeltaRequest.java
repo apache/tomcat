@@ -31,6 +31,7 @@ import java.io.ObjectOutputStream;
 import java.security.Principal;
 import java.util.LinkedList;
 
+import org.apache.catalina.SessionListener;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -51,6 +52,7 @@ public class DeltaRequest implements Externalizable {
     public static final int TYPE_ISNEW = 2;
     public static final int TYPE_MAXINTERVAL = 3;
     public static final int TYPE_AUTHTYPE = 4;
+    public static final int TYPE_LISTENER = 5;
 
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;
@@ -59,6 +61,7 @@ public class DeltaRequest implements Externalizable {
     public static final String NAME_MAXINTERVAL = "__SET__MAXINTERVAL__";
     public static final String NAME_ISNEW = "__SET__ISNEW__";
     public static final String NAME_AUTHTYPE = "__SET__AUTHTYPE__";
+    public static final String NAME_LISTENER = "__SET__LISTENER__";
 
     private String sessionId;
     private LinkedList<AttributeInfo> actions = new LinkedList<>();
@@ -120,6 +123,14 @@ public class DeltaRequest implements Externalizable {
     public void setAuthType(String authType) {
         int action = (authType==null)?ACTION_REMOVE:ACTION_SET;
         addAction(TYPE_AUTHTYPE,action,NAME_AUTHTYPE, authType);
+    }
+
+    public void addSessionListener(SessionListener listener) {
+        addAction(TYPE_LISTENER, ACTION_SET, NAME_LISTENER ,listener);
+    }
+
+    public void removeSessionListener(SessionListener listener) {
+        addAction(TYPE_LISTENER, ACTION_REMOVE, NAME_LISTENER ,listener);
     }
 
     protected void addAction(int type,
@@ -189,6 +200,14 @@ public class DeltaRequest implements Externalizable {
                         authType = (String)info.getValue();
                     }
                     session.setAuthType(authType,false);
+                    break;
+                case TYPE_LISTENER:
+                    SessionListener listener = (SessionListener) info.getValue();
+                    if (info.getAction() == ACTION_SET) {
+                        session.addSessionListener(listener);
+                    } else {
+                        session.removeSessionListener(listener);
+                    }
                     break;
                 default :
                     throw new java.lang.IllegalArgumentException("Invalid attribute info type="+info);
