@@ -67,11 +67,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     private Context context;
     private boolean allowLinking = false;
-    private final ArrayList<WebResourceSet> preResources = new ArrayList<>();
+    private final List<WebResourceSet> preResources = new ArrayList<>();
     private WebResourceSet main;
-    private final ArrayList<WebResourceSet> classResources = new ArrayList<>();
-    private final ArrayList<WebResourceSet> jarResources = new ArrayList<>();
-    private final ArrayList<WebResourceSet> postResources = new ArrayList<>();
+    private final List<WebResourceSet> classResources = new ArrayList<>();
+    private final List<WebResourceSet> jarResources = new ArrayList<>();
+    private final List<WebResourceSet> postResources = new ArrayList<>();
 
     private final Cache cache = new Cache(this);
     private boolean cachingAllowed = true;
@@ -82,8 +82,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             Collections.newSetFromMap(new ConcurrentHashMap<TrackedWebResource,Boolean>());
 
     // Constructs to make iteration over all WebResourceSets simpler
-    private final ArrayList<WebResourceSet> mainResources = new ArrayList<>();
-    private final ArrayList<ArrayList<WebResourceSet>> allResources =
+    private final List<WebResourceSet> mainResources = new ArrayList<>();
+    private final List<List<WebResourceSet>> allResources =
             new ArrayList<>();
     {
         allResources.add(preResources);
@@ -123,7 +123,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         // WebResourceSet that matters but it is simpler to retain the order
         // over all of the JARs.
         HashSet<String> result = new LinkedHashSet<>();
-        for (ArrayList<WebResourceSet> list : allResources) {
+        for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 if (!webResourceSet.getClassLoaderOnly()) {
                     String[] entries = webResourceSet.list(path);
@@ -143,7 +143,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
         // Set because we don't want duplicates
         HashSet<String> result = new HashSet<>();
-        for (ArrayList<WebResourceSet> list : allResources) {
+        for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 if (!webResourceSet.getClassLoaderOnly()) {
                     result.addAll(webResourceSet.listWebAppPaths(path));
@@ -274,7 +274,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         WebResource result = null;
         WebResource virtual = null;
         WebResource mainEmpty = null;
-        for (ArrayList<WebResourceSet> list : allResources) {
+        for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 if (useClassLoaderResources || !webResourceSet.getClassLoaderOnly()) {
                     result = webResourceSet.getResource(path);
@@ -319,8 +319,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     protected WebResource[] getResourcesInternal(String path,
             boolean useClassLoaderResources) {
-        ArrayList<WebResource> result = new ArrayList<>();
-        for (ArrayList<WebResourceSet> list : allResources) {
+        List<WebResource> result = new ArrayList<>();
+        for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 if (useClassLoaderResources || !webResourceSet.getClassLoaderOnly()) {
                     WebResource webResource = webResourceSet.getResource(path);
@@ -374,7 +374,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     @Override
     public void createWebResourceSet(ResourceSetType type, String webAppMount,
             String base, String archivePath, String internalPath) {
-        ArrayList<WebResourceSet> resourceList;
+        List<WebResourceSet> resourceList;
         WebResourceSet resourceSet;
 
         switch (type) {
@@ -651,7 +651,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                     sm.getString("standardRoot.noContext"));
         }
 
-        for (ArrayList<WebResourceSet> list : allResources) {
+        for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 webResourceSet.init();
             }
@@ -672,7 +672,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
         mainResources.add(main);
 
-        for (ArrayList<WebResourceSet> list : allResources) {
+        for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 webResourceSet.start();
             }
@@ -718,7 +718,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     @Override
     protected void stopInternal() throws LifecycleException {
-        for (ArrayList<WebResourceSet> list : allResources) {
+        for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 webResourceSet.stop();
             }
@@ -757,7 +757,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     @Override
     protected void destroyInternal() throws LifecycleException {
-        for (ArrayList<WebResourceSet> list : allResources) {
+        for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 webResourceSet.destroy();
             }
