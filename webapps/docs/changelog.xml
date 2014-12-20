@@ -173,6 +173,11 @@
       <update>
           Add more AJP unit tests. (rjung)
       </update>
+      <fix>
+        <bug>57363</bug>: Log to stderr if LogManager is unable to read
+        configuration files rather than swallowing the exception silently.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
