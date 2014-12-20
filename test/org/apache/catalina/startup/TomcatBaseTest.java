@@ -385,7 +385,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
             RequestDescriptor request = new RequestDescriptor();
 
-            for (String line: body.split("\n")) {
+            for (String line: body.split(System.lineSeparator())) {
                 n = line.indexOf(": ");
                 if (n > 0) {
                     key = line.substring(0, n);
