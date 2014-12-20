@@ -467,7 +467,8 @@ public class ClassLoaderLogManager extends LogManager {
                 try {
                     is = new FileInputStream(replace(configFileStr));
                 } catch (IOException e) {
-                    // Ignore
+                    System.err.println("Configuration error");
+                    e.printStackTrace();
                 }
             }
             // Try the default JVM configuration
@@ -477,7 +478,8 @@ public class ClassLoaderLogManager extends LogManager {
                 try {
                     is = new FileInputStream(defaultFile);
                 } catch (IOException e) {
-                    // Critical problem, do something ...
+                    System.err.println("Configuration error");
+                    e.printStackTrace();
                 }
             }
         }
