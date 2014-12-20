@@ -33,8 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Host;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -252,7 +252,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         if (message == null || message.length() == 0) {
             args[1] = "OK";
         } else {
-            args[1] = RequestUtil.filter(message);
+            args[1] = HttpMessages.filter(message);
         }
         writer.print(MessageFormat.format(Constants.MESSAGE_SECTION, args));
 
@@ -310,7 +310,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
             if (host != null ) {
                 args = new Object[2];
-                args[0] = RequestUtil.filter(hostName);
+                args[0] = HttpMessages.filter(hostName);
                 String[] aliases = host.findAliases();
                 StringBuilder buf = new StringBuilder();
                 if (aliases.length > 0) {
@@ -324,7 +324,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                     buf.append("&nbsp;");
                     args[1] = buf.toString();
                 } else {
-                    args[1] = RequestUtil.filter(buf.toString());
+                    args[1] = HttpMessages.filter(buf.toString());
                 }
 
                 writer.print

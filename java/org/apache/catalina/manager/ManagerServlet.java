@@ -56,10 +56,10 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.util.ContextName;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -995,7 +995,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             Context context = (Context) host.findChild(cn.getName());
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext",
-                        RequestUtil.filter(cn.getDisplayName())));
+                        HttpMessages.filter(cn.getDisplayName())));
                 return;
             }
             // It isn't possible for the manager to reload itself
@@ -1163,13 +1163,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             Context context = (Context) host.findChild(cn.getName());
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext",
-                        RequestUtil.filter(displayPath)));
+                        HttpMessages.filter(displayPath)));
                 return;
             }
             Manager manager = context.getManager() ;
             if(manager == null) {
                 writer.println(smClient.getString("managerServlet.noManager",
-                        RequestUtil.filter(displayPath)));
+                        HttpMessages.filter(displayPath)));
                 return;
             }
             int maxCount = 60;
@@ -1287,7 +1287,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             Context context = (Context) host.findChild(cn.getName());
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext",
-                        RequestUtil.filter(displayPath)));
+                        HttpMessages.filter(displayPath)));
                 return;
             }
             context.start();
@@ -1332,7 +1332,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             Context context = (Context) host.findChild(cn.getName());
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext",
-                        RequestUtil.filter(displayPath)));
+                        HttpMessages.filter(displayPath)));
                 return;
             }
             // It isn't possible for the manager to stop itself
@@ -1379,13 +1379,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             Context context = (Context) host.findChild(name);
             if (context == null) {
                 writer.println(smClient.getString("managerServlet.noContext",
-                        RequestUtil.filter(displayPath)));
+                        HttpMessages.filter(displayPath)));
                 return;
             }
 
             if (!isDeployed(name)) {
                 writer.println(smClient.getString("managerServlet.notDeployed",
-                        RequestUtil.filter(displayPath)));
+                        HttpMessages.filter(displayPath)));
                 return;
             }
 
@@ -1578,7 +1578,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         String path = null;
         if (cn != null) {
-            path = RequestUtil.filter(cn.getPath());
+            path = HttpMessages.filter(cn.getPath());
         }
         writer.println(sm.getString("managerServlet.invalidPath", path));
         return false;

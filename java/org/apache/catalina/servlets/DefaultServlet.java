@@ -66,9 +66,9 @@ import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.ResponseFacade;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
@@ -1305,7 +1305,7 @@ public class DefaultServlet extends HttpServlet {
               .append("'");
 
             sb.append(">");
-            sb.append(RequestUtil.filter(entry));
+            sb.append(HttpMessages.filter(entry));
             if (childResource.isDirectory())
                 sb.append("/");
             sb.append("</entry>");
@@ -1467,7 +1467,7 @@ public class DefaultServlet extends HttpServlet {
             if (childResource.isDirectory())
                 sb.append("/");
             sb.append("\"><tt>");
-            sb.append(RequestUtil.filter(entry));
+            sb.append(HttpMessages.filter(entry));
             if (childResource.isDirectory())
                 sb.append("/");
             sb.append("</tt></a></td>\r\n");
