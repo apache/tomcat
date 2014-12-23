@@ -44,7 +44,7 @@ public class BackupManager extends ClusterManagerBase
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(BackupManager.class);
 
     protected static final long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 
