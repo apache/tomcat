@@ -271,6 +271,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     public String getSSLCARevocationFile() { return SSLCARevocationFile; }
     public void setSSLCARevocationFile(String SSLCARevocationFile) { this.SSLCARevocationFile = SSLCARevocationFile; }
 
+    /**
+     * SSL disable TLS Session Tickets (RFC 4507).
+     */
+    protected boolean SSLDisableSessionTickets = false;
+    public boolean getSSLDisableSessionTickets() { return SSLDisableSessionTickets; }
+    public void setSSLDisableSessionTickets(boolean SSLDisableSessionTickets) { this.SSLDisableSessionTickets = SSLDisableSessionTickets; }
 
     /**
      * SSL verify client.
@@ -572,6 +578,24 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 if (!disableCompressionSupported) {
                     // OpenSSL does not support ciphers ordering.
                     log.warn(sm.getString("endpoint.warn.noDisableCompression",
+                                          SSL.versionString()));
+                }
+            }
+
+            // Disable TLS Session Tickets (RFC4507) to protect perfect forward secrecy
+            if (SSLDisableSessionTickets) {
+                boolean disableSessionTicketsSupported = false;
+                try {
+                    disableSessionTicketsSupported = SSL.hasOp(SSL.SSL_OP_NO_TICKET);
+                    if (disableSessionTicketsSupported)
+                        SSLContext.setOptions(sslContext, SSL.SSL_OP_NO_TICKET);
+                } catch (UnsatisfiedLinkError e) {
+                    // Ignore
+                }
+
+                if (!disableSessionTicketsSupported) {
+                    // OpenSSL is too old to support TLS Session Tickets.
+                    log.warn(sm.getString("endpoint.warn.noDisableSessionTickets",
                                           SSL.versionString()));
                 }
             }

@@ -183,6 +183,13 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     public boolean getSSLDisableCompression() { return ((AprEndpoint)getEndpoint()).getSSLDisableCompression(); }
     public void setSSLDisableCompression(boolean disable) { ((AprEndpoint)getEndpoint()).setSSLDisableCompression(disable); }
 
+    /**
+     * Disable TLS Session Tickets (RFC 4507).
+     */
+    public boolean getSSLDisableSessionTickets() { return ((AprEndpoint)getEndpoint()).getSSLDisableSessionTickets(); }
+    public void setSSLDisableSessionTickets(boolean enable) { ((AprEndpoint)getEndpoint()).setSSLDisableSessionTickets(enable); }
+
+
     // ----------------------------------------------------- JMX related methods
 
     @Override

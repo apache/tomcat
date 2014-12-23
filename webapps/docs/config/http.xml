@@ -1348,6 +1348,11 @@
       "10".</p>
     </attribute>
 
+    <attribute name="SSLDisableSessionTickets" required="false">
+      <p>Disables use of TLS Session Tickets (RFC 4507) if set to
+      <code>true</code>. Default is <code>false</code>.</p>
+    </attribute>
+
   </attributes>
 
   </subsection>
