@@ -26,10 +26,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -149,12 +149,12 @@ public class ErrorReportValve extends ValveBase {
         if (statusCode < 400 || response.getContentWritten() > 0 || !response.setErrorReported()) {
             return;
         }
-        String message = HttpMessages.filter(response.getMessage());
+        String message = RequestUtil.filter(response.getMessage());
         if (message == null) {
             if (throwable != null) {
                 String exceptionMessage = throwable.getMessage();
                 if (exceptionMessage != null && exceptionMessage.length() > 0) {
-                    message = HttpMessages.filter((new Scanner(exceptionMessage)).nextLine());
+                    message = RequestUtil.filter((new Scanner(exceptionMessage)).nextLine());
                 }
             }
             if (message == null) {
@@ -227,7 +227,7 @@ public class ErrorReportValve extends ValveBase {
                 sb.append("<p><b>");
                 sb.append(smClient.getString("errorReportValve.exception"));
                 sb.append("</b></p><pre>");
-                sb.append(HttpMessages.filter(stackTrace));
+                sb.append(RequestUtil.filter(stackTrace));
                 sb.append("</pre>");
 
                 int loops = 0;
@@ -237,7 +237,7 @@ public class ErrorReportValve extends ValveBase {
                     sb.append("<p><b>");
                     sb.append(smClient.getString("errorReportValve.rootCause"));
                     sb.append("</b></p><pre>");
-                    sb.append(HttpMessages.filter(stackTrace));
+                    sb.append(RequestUtil.filter(stackTrace));
                     sb.append("</pre>");
                     // In case root cause is somehow heavily nested
                     rootCause = rootCause.getCause();

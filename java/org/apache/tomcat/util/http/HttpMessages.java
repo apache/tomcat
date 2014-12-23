@@ -119,7 +119,7 @@ public class HttpMessages {
     public static String filter(String message) {
 
         if (message == null) {
-            return null;
+            return (null);
         }
 
         char content[] = new char[message.length()];
@@ -143,7 +143,7 @@ public class HttpMessages {
                 result.append(content[i]);
             }
         }
-        return result.toString();
+        return (result.toString());
     }
 
     /**

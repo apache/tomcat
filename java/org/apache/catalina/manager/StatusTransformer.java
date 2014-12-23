@@ -37,8 +37,8 @@ import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.util.RequestUtil;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.http.HttpMessages;
 
 /**
  * This is a refactoring of the servlet to externalize
@@ -504,7 +504,7 @@ public class StatusTransformer {
                         (pName, "currentQueryString");
                     if ((queryString != null) && (!queryString.equals(""))) {
                         writer.write("?");
-                        writer.print(HttpMessages.filter(queryString));
+                        writer.print(RequestUtil.filter(queryString));
                     }
                     writer.write(" ");
                     writer.write(filter(mBeanServer.getAttribute
@@ -559,7 +559,7 @@ public class StatusTransformer {
                         (pName, "currentQueryString");
                     if ((queryString != null) && (!queryString.equals(""))) {
                         writer.write(" currentQueryString=\""
-                                     + HttpMessages.filter(queryString) + "\"");
+                                     + RequestUtil.filter(queryString) + "\"");
                     } else {
                         writer.write(" currentQueryString=\"&#63;\"");
                     }
