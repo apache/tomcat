@@ -179,6 +179,8 @@ public interface ServletResponse {
      * @param length
      *            an integer specifying the length of the content being returned
      *            to the client; sets the Content-Length header
+     *
+     * @since Servlet 3.1
      */
     public void setContentLengthLong(long length);
 
