@@ -47,8 +47,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class FileMessageFactory {
     /*--Static Variables----------------------------------------*/
     private static final Log log = LogFactory.getLog(FileMessageFactory.class);
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(FileMessageFactory.class);
 
     /**
      * The number of bytes that we read from file
