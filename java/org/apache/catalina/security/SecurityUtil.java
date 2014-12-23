@@ -35,6 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Globals;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 /**
@@ -71,8 +73,7 @@ public final class SecurityUtil{
      */
     private static final Map<Class<?>,Method[]> classCache = new ConcurrentHashMap<>();
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( SecurityUtil.class );
+    private static final Log log = LogFactory.getLog(SecurityUtil.class);
 
     private static final boolean packageDefinitionEnabled =
          (System.getProperty("package.definition") == null &&

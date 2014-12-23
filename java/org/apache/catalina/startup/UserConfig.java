@@ -32,6 +32,8 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -48,8 +50,7 @@ public final class UserConfig
     implements LifecycleListener {
 
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( UserConfig.class );
+    private static final Log log = LogFactory.getLog(UserConfig.class);
 
 
     // ----------------------------------------------------- Instance Variables

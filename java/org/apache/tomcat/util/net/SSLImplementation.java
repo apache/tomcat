@@ -19,6 +19,9 @@ package org.apache.tomcat.util.net;
 
 import javax.net.ssl.SSLSession;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /* SSLImplementation:
 
  Abstract factory and base class for all SSL implementations.
@@ -26,8 +29,7 @@ import javax.net.ssl.SSLSession;
  @author EKR
  */
 public abstract class SSLImplementation {
-    private static final org.apache.juli.logging.Log logger = org.apache.juli.logging.LogFactory
-            .getLog(SSLImplementation.class);
+    private static final Log logger = LogFactory.getLog(SSLImplementation.class);
 
     // The default implementations in our search path
     private static final String JSSEImplementationClass =

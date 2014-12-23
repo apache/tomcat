@@ -37,6 +37,8 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.descriptor.JspPropertyGroupDescriptor;
 import javax.servlet.descriptor.TaglibDescriptor;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -56,8 +58,7 @@ public class WebXml {
     private static final StringManager sm =
         StringManager.getManager(Constants.PACKAGE_NAME);
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog(WebXml.class);
+    private static final Log log = LogFactory.getLog(WebXml.class);
 
     // Global defaults are overridable but Servlets and Servlet mappings need to
     // be unique. Duplicates normally trigger an error. This flag indicates if

@@ -40,6 +40,9 @@ import javax.naming.Reference;
 import javax.naming.Referenceable;
 import javax.naming.spi.NamingManager;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * Catalina JNDI Context implementation.
  *
@@ -57,8 +60,7 @@ public class NamingContext implements Context {
     protected static final NameParser nameParser = new NameParserImpl();
 
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(NamingContext.class);
+    private static final Log log = LogFactory.getLog(NamingContext.class);
 
 
     // ----------------------------------------------------------- Constructors

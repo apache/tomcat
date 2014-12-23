@@ -37,6 +37,8 @@ import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.util.ExecutorFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -47,10 +49,9 @@ import org.apache.catalina.tribes.util.ExecutorFactory;
  * Need to fix this, could use java.nio and only need one thread to send and receive, or
  * just use a timeout on the receive
  */
-public class McastServiceImpl
-{
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog( McastService.class );
+public class McastServiceImpl {
+
+    private static final Log log = LogFactory.getLog(McastService.class);
 
     protected static final int MAX_PACKET_SIZE = 65535;
     /**

@@ -27,6 +27,8 @@ import org.apache.coyote.ByteBufferHolder;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.GzipOutputFilter;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
@@ -146,8 +148,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     /**
      * Logger.
      */
-    private static final org.apache.juli.logging.Log log
-        = org.apache.juli.logging.LogFactory.getLog(AbstractOutputBuffer.class);
+    private static final Log log = LogFactory.getLog(AbstractOutputBuffer.class);
 
     // ------------------------------------------------------------- Properties
 

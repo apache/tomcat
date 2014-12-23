@@ -44,6 +44,8 @@ import org.apache.catalina.realm.UserDatabaseRealm;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -52,8 +54,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class MBeanFactory {
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(MBeanFactory.class);
+    private static final Log log = LogFactory.getLog(MBeanFactory.class);
 
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);

@@ -24,6 +24,9 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 
 /**
  * Utility class to read the bootstrap Catalina configuration.
@@ -32,8 +35,7 @@ import java.util.Properties;
  */
 public class CatalinaProperties {
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( CatalinaProperties.class );
+    private static final Log log = LogFactory.getLog(CatalinaProperties.class);
 
     private static Properties properties = null;
 

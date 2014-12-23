@@ -33,6 +33,8 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.util.UUIDGenerator;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -42,8 +44,7 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  */
 public class McastService implements MembershipService,MembershipListener,MessageListener {
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog( McastService.class );
+    private static final Log log = LogFactory.getLog(McastService.class);
 
     /**
      * The string manager for this package.

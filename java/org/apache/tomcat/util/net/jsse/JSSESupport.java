@@ -33,6 +33,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.security.cert.X509Certificate;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SSLSessionManager;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.res.StringManager;
@@ -53,8 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 class JSSESupport implements SSLSupport, SSLSessionManager {
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(JSSESupport.class);
+    private static final Log log = LogFactory.getLog(JSSESupport.class);
 
     private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");

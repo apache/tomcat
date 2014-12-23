@@ -42,6 +42,8 @@ import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.ha.session.DeltaManager;
 import org.apache.catalina.ha.session.DeltaSession;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -63,8 +65,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class ReplicationValve
     extends ValveBase implements ClusterValve {
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog( ReplicationValve.class );
+    private static final Log log = LogFactory.getLog(ReplicationValve.class);
 
     // ----------------------------------------------------- Instance Variables
 

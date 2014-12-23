@@ -27,6 +27,8 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  *
@@ -41,7 +43,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * @version 1.0
  */
 public class FragmentationInterceptor extends ChannelInterceptorBase {
-    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( FragmentationInterceptor.class );
+    private static final Log log = LogFactory.getLog(FragmentationInterceptor.class);
 
     protected final HashMap<FragKey, FragCollection> fragpieces = new HashMap<>();
     private int maxSize = 1024*100;

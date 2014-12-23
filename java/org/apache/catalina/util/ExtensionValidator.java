@@ -30,6 +30,8 @@ import java.util.jar.Manifest;
 import org.apache.catalina.Context;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -46,8 +48,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class ExtensionValidator {
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog(ExtensionValidator.class);
+    private static final Log log = LogFactory.getLog(ExtensionValidator.class);
 
     /**
      * The string resources for this package.
