@@ -49,8 +49,7 @@ public class InputBuffer extends Reader
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(InputBuffer.class);
 
 
     // -------------------------------------------------------------- Constants

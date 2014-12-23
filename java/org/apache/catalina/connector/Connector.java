@@ -163,8 +163,7 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Connector.class);
 
 
     /**
