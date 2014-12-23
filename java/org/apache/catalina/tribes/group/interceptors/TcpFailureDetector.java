@@ -36,6 +36,8 @@ import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.membership.Membership;
 import org.apache.catalina.tribes.membership.StaticMember;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * <p>Title: A perfect failure detector </p>
@@ -58,7 +60,7 @@ import org.apache.catalina.tribes.membership.StaticMember;
  */
 public class TcpFailureDetector extends ChannelInterceptorBase {
 
-    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( TcpFailureDetector.class );
+    private static final Log log = LogFactory.getLog(TcpFailureDetector.class);
 
     protected static final byte[] TCP_FAIL_DETECT = new byte[] {
         79, -89, 115, 72, 121, -126, 67, -55, -97, 111, -119, -128, -95, 91, 7, 20,

@@ -60,6 +60,8 @@ import java.util.Map;
 import java.util.logging.LogManager;
 import java.util.logging.LoggingMXBean;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 public class Diagnostics {
@@ -73,8 +75,7 @@ public class Diagnostics {
     private static final String CRLF = "\r\n";
     private static final String vminfoSystemProperty = "java.vm.info";
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog(Diagnostics.class);
+    private static final Log log = LogFactory.getLog(Diagnostics.class);
 
     private static final SimpleDateFormat timeformat =
         new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");

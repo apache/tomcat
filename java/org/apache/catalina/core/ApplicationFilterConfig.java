@@ -37,6 +37,7 @@ import javax.servlet.ServletException;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -61,8 +62,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private static final org.apache.juli.logging.Log log =
-        LogFactory.getLog(ApplicationFilterConfig.class);
+    private static final Log log = LogFactory.getLog(ApplicationFilterConfig.class);
 
     /**
      * Empty String collection to serve as the basis for empty enumerations.

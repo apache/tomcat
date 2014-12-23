@@ -34,6 +34,8 @@ import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.PersistentManager;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -81,8 +83,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
 
     /*--Static Variables----------------------------------------*/
-    public static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
-            .getLog(JvmRouteBinderValve.class);
+    public static final Log log = LogFactory.getLog(JvmRouteBinderValve.class);
 
     //------------------------------------------------------ Constructor
     public JvmRouteBinderValve() {

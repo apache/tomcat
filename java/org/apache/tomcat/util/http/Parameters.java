@@ -26,6 +26,8 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -39,8 +41,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class Parameters {
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog(Parameters.class );
+    private static final Log log = LogFactory.getLog(Parameters.class);
 
     private static final UserDataHelper userDataLog = new UserDataHelper(log);
 

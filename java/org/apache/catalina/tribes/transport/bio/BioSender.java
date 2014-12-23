@@ -30,6 +30,8 @@ import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.SenderState;
 import org.apache.catalina.tribes.util.StringManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Send cluster messages with only one socket. Ack and keep Alive Handling is
@@ -40,7 +42,7 @@ import org.apache.catalina.tribes.util.StringManager;
  */
 public class BioSender extends AbstractSender {
 
-    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(BioSender.class);
+    private static final Log log = LogFactory.getLog(BioSender.class);
 
     /**
      * The string manager for this package.

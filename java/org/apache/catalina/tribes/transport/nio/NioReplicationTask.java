@@ -37,6 +37,8 @@ import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.util.Logs;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * A worker thread class which can drain channels and echo-back the input. Each
@@ -50,7 +52,7 @@ import org.apache.catalina.tribes.util.Logs;
  */
 public class NioReplicationTask extends AbstractRxTask {
 
-    private static final org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( NioReplicationTask.class );
+    private static final Log log = LogFactory.getLog(NioReplicationTask.class);
 
     private ByteBuffer buffer = null;
     private SelectionKey key;

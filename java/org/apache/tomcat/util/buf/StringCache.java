@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * This class implements a String cache for ByteChunk and CharChunk.
  *
@@ -30,8 +33,7 @@ import java.util.TreeMap;
 public class StringCache {
 
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( StringCache.class );
+    private static final Log log = LogFactory.getLog(StringCache.class);
 
 
     // ------------------------------------------------------- Static Variables

@@ -21,6 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * Reader for UCS-2 and UCS-4 encodings.
  * (i.e., encodings from ISO-10646-UCS-(2|4)).
@@ -29,8 +32,7 @@ import java.io.Reader;
  */
 public class UCSReader extends Reader {
 
-    private final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( UCSReader.class );
+    private final Log log = LogFactory.getLog(UCSReader.class);
 
     //
     // Constants

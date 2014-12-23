@@ -23,14 +23,16 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * Utils for introspection and reflection
  */
 public final class IntrospectionUtils {
 
 
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( IntrospectionUtils.class );
+    private static final Log log = LogFactory.getLog(IntrospectionUtils.class);
 
     /*
      * Find a method with the right name If found, call the method ( if param is

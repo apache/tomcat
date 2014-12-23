@@ -27,6 +27,9 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * The XByteBuffer provides a dual functionality.
  * One, it stores message bytes and automatically extends the byte buffer if needed.<BR>
@@ -43,11 +46,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <li><b>END_DATA</b>  - 7 bytes - <i>TLF2003</i></li>
  * </ul>
  */
-public class XByteBuffer
-{
+public class XByteBuffer {
 
-    private static final org.apache.juli.logging.Log log =
-        org.apache.juli.logging.LogFactory.getLog( XByteBuffer.class );
+    private static final Log log = LogFactory.getLog(XByteBuffer.class);
 
     /**
      * This is a package header, 7 bytes (FLT2002)
