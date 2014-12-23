@@ -34,8 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class CoyoteInputStream extends ServletInputStream {
 
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(CoyoteInputStream.class);
 
 
     protected InputBuffer ib;

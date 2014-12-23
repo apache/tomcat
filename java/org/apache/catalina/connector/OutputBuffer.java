@@ -45,8 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class OutputBuffer extends Writer
     implements ByteChunk.ByteOutputChannel, CharChunk.CharOutputChannel {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(OutputBuffer.class);
 
     // -------------------------------------------------------------- Constants
 
