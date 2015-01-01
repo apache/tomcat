@@ -248,25 +248,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
 
     // ------------------------------------------------------ Protected Methods
 
-    /**
-     * Commit the response.
-     *
-     * @throws IOException an underlying I/O error occurred
-     */
-    @Override
-    protected void commit() throws IOException {
-
-        // The response is now committed
-        committed = true;
-        response.setCommitted(true);
-
-        if (pos > 0) {
-            // Sending the response header buffer
-            addToBB(headerBuffer, 0, pos);
-        }
-
-    }
-
     private static boolean arrayHasData(ByteBuffer[] byteBuffers) {
         for (ByteBuffer byteBuffer : byteBuffers) {
             if (byteBuffer.hasRemaining()) {
@@ -451,7 +432,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     }
 
     @Override
-    public void registerWriteInterest() {
+    protected void registerWriteInterest() {
         synchronized (completionHandler) {
             if (writePending.availablePermits() == 0) {
                 interest = true;
