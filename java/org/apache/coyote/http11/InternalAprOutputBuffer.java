@@ -52,8 +52,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         } else {
             socketWriteBuffer = ByteBuffer.allocateDirect((headerBufferSize / 1500 + 1) * 1500);
         }
-
-        outputStreamOutputBuffer = new SocketOutputBuffer();
     }
 
 

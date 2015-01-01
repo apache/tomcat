@@ -44,10 +44,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      * Default constructor.
      */
     public InternalNioOutputBuffer(Response response, int headerBufferSize) {
-
         super(response, headerBufferSize);
-
-        outputStreamOutputBuffer = new SocketOutputBuffer();
     }
 
 

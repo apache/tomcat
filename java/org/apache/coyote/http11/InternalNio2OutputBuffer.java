@@ -49,7 +49,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
      */
     public InternalNio2OutputBuffer(Response response, int headerBufferSize) {
         super(response, headerBufferSize);
-        outputStreamOutputBuffer = new SocketOutputBuffer();
     }
 
     private static final ByteBuffer[] EMPTY_BUF_ARRAY = new ByteBuffer[0];
