@@ -101,6 +101,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     protected long byteCount = 0;
 
     protected ByteBuffer socketWriteBuffer;
+    protected volatile boolean writeBufferFlipped;
 
     /**
      * For "non-blocking" writes use an external set of buffers. Although the
@@ -314,6 +315,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
         // Sub-classes may wish to do more than this.
         nextRequest();
         bufferedWrites.clear();
+        writeBufferFlipped = false;
     }
 
     /**

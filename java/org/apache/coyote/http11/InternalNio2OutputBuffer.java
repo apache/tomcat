@@ -67,11 +67,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     protected volatile boolean interest = false;
 
     /**
-     * Track if the byte buffer is flipped
-     */
-    protected volatile boolean flipped = false;
-
-    /**
      * The completion handler used for asynchronous write operations
      */
     protected CompletionHandler<Integer, ByteBuffer> completionHandler;
@@ -226,7 +221,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
         super.recycle();
         socket = null;
         e = null;
-        flipped = false;
         interest = false;
         if (writePending.availablePermits() != 1) {
             writePending.drainPermits();
@@ -239,8 +233,8 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     @Override
     public void nextRequest() {
         super.nextRequest();
-        flipped = false;
         interest = false;
+        writeBufferFlipped = false;
     }
 
     // ------------------------------------------------ HTTP/1.1 Output Methods
@@ -386,9 +380,9 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                     }
                     bufferedWrites.clear();
                 }
-                if (!flipped) {
+                if (!writeBufferFlipped) {
                     socketWriteBuffer.flip();
-                    flipped = true;
+                    writeBufferFlipped = true;
                 }
                 while (socketWriteBuffer.hasRemaining()) {
                     if (socket.getSocket().write(socketWriteBuffer).get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
@@ -407,14 +401,14 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                 throw new SocketTimeoutException();
             }
             socketWriteBuffer.clear();
-            flipped = false;
+            writeBufferFlipped = false;
             return false;
         } else {
             synchronized (completionHandler) {
                 if (hasPermit || writePending.tryAcquire()) {
-                    if (!flipped) {
+                    if (!writeBufferFlipped) {
                         socketWriteBuffer.flip();
-                        flipped = true;
+                        writeBufferFlipped = true;
                     }
                     Nio2Endpoint.startInline();
                     if (bufferedWrites.size() > 0) {
@@ -443,7 +437,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                     if (writePending.availablePermits() > 0) {
                         if (socketWriteBuffer.remaining() == 0) {
                             socketWriteBuffer.clear();
-                            flipped = false;
+                            writeBufferFlipped = false;
                         }
                     }
                 }
@@ -462,8 +456,8 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
 
     @Override
     protected boolean hasMoreDataToFlush() {
-        return (flipped && socketWriteBuffer.remaining() > 0) ||
-                (!flipped && socketWriteBuffer.position() > 0);
+        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
+                (!writeBufferFlipped && socketWriteBuffer.position() > 0);
     }
 
     @Override
