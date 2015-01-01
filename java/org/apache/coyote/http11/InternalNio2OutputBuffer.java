@@ -279,7 +279,8 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
         return false;
     }
 
-    private void addToBB(byte[] buf, int offset, int length)
+    @Override
+    protected void addToBB(byte[] buf, int offset, int length)
             throws IOException {
 
         if (length == 0)

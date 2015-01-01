@@ -586,6 +586,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     }
 
 
+    protected abstract void addToBB(byte[] buf, int offset, int length) throws IOException;
+
+
     //------------------------------------------------------ Non-blocking writes
 
     protected abstract void registerWriteInterest() throws IOException;

@@ -172,7 +172,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     }
 
 
-    private synchronized void addToBB(byte[] buf, int offset, int length)
+    @Override
+    protected synchronized void addToBB(byte[] buf, int offset, int length)
             throws IOException {
 
         if (length == 0) return;

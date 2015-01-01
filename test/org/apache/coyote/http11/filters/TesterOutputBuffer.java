@@ -103,6 +103,13 @@ public class TesterOutputBuffer extends AbstractOutputBuffer<Socket> {
     }
 
 
+    @Override
+    protected void addToBB(byte[] buf, int offset, int length)
+            throws IOException {
+        // NO-OP: Unused
+    }
+
+
     /*
      * Expose data written for use by unit tests.
      */
