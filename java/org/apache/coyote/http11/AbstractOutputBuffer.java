@@ -588,8 +588,13 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     //------------------------------------------------------ Non-blocking writes
 
-    protected abstract boolean hasMoreDataToFlush();
     protected abstract void registerWriteInterest() throws IOException;
+
+
+    protected boolean hasMoreDataToFlush() {
+        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
+        (!writeBufferFlipped && socketWriteBuffer.position() > 0);
+    }
 
 
     /**

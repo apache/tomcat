@@ -455,12 +455,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     }
 
     @Override
-    protected boolean hasMoreDataToFlush() {
-        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
-                (!writeBufferFlipped && socketWriteBuffer.position() > 0);
-    }
-
-    @Override
     protected boolean hasBufferedData() {
         return bufferedWrites.size() > 0;
     }

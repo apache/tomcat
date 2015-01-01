@@ -297,8 +297,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     @Override
     protected synchronized boolean hasMoreDataToFlush() {
-        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
-                (!writeBufferFlipped && socketWriteBuffer.position() > 0);
+        return super.hasMoreDataToFlush();
     }
 
 
