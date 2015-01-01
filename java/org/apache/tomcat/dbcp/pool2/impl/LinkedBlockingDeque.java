@@ -1228,6 +1228,9 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
         /**
          * Returns the successor node of the given non-null, but
          * possibly previously deleted, node.
+         *
+         * @param n node whose successor is sought
+         * @return successor node
          */
         private Node<E> succ(Node<E> n) {
             // Chains of deleted nodes ending in null or self-links
