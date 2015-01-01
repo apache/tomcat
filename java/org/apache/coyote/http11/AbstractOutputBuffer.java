@@ -373,7 +373,21 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     public abstract void sendAck() throws IOException;
 
-    protected abstract void commit() throws IOException;
+    /**
+     * Commit the response.
+     *
+     * @throws IOException an underlying I/O error occurred
+     */
+    protected void commit() throws IOException {
+        // The response is now committed
+        committed = true;
+        response.setCommitted(true);
+
+        if (pos > 0) {
+            // Sending the response header buffer
+            addToBB(headerBuffer, 0, pos);
+        }
+    }
 
 
     /**

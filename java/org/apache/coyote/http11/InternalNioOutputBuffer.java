@@ -147,26 +147,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     // ------------------------------------------------------ Protected Methods
 
-    /**
-     * Commit the response.
-     *
-     * @throws IOException an underlying I/O error occurred
-     */
-    @Override
-    protected void commit() throws IOException {
-
-        // The response is now committed
-        committed = true;
-        response.setCommitted(true);
-
-        if (pos > 0) {
-            // Sending the response header buffer
-            addToBB(headerBuffer, 0, pos);
-        }
-
-    }
-
-
     @Override
     protected synchronized void addToBB(byte[] buf, int offset, int length)
             throws IOException {
