@@ -473,11 +473,13 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
      */
     protected class SocketOutputBuffer implements OutputBuffer {
 
+
         /**
          * Write chunk.
          */
         @Override
         public int doWrite(ByteChunk chunk, Response res) throws IOException {
+
             int len = chunk.getLength();
             int start = chunk.getStart();
             byte[] b = chunk.getBuffer();
