@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Iterator;
@@ -98,6 +99,8 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      * Bytes written to client for the current request
      */
     protected long byteCount = 0;
+
+    protected ByteBuffer socketWriteBuffer;
 
     /**
      * For "non-blocking" writes use an external set of buffers. Although the

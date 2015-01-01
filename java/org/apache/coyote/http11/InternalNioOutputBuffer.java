@@ -77,6 +77,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         socket = socketWrapper.getSocket();
         pool = ((NioEndpoint)endpoint).getSelectorPool();
+        socketWriteBuffer = socket.getBufHandler().getWriteBuffer();
     }
 
 
@@ -87,11 +88,9 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     @Override
     public void recycle() {
         super.recycle();
-        if (socket != null) {
-            socket.getBufHandler().getWriteBuffer().clear();
-            socket = null;
-        }
+        socketWriteBuffer.clear();
         flipped = false;
+        socket = null;
     }
 
 
@@ -103,9 +102,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     @Override
     public void sendAck() throws IOException {
         if (!committed) {
-            socket.getBufHandler().getWriteBuffer().put(
-                    Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
-            int result = writeToSocket(socket.getBufHandler().getWriteBuffer(), true, true);
+            socketWriteBuffer.put(Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
+            int result = writeToSocket(socketWriteBuffer, true, true);
             if (result < 0) {
                 throw new IOException(sm.getString("iob.failedwrite.ack"));
             }
@@ -191,11 +189,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         // Keep writing until all the data is written or a non-blocking write
         // leaves data in the buffer
         while (!dataLeft && length > 0) {
-            int thisTime = transfer(buf,offset,length,socket.getBufHandler().getWriteBuffer());
+            int thisTime = transfer(buf,offset,length,socketWriteBuffer);
             length = length - thisTime;
             offset = offset + thisTime;
-            int written = writeToSocket(socket.getBufHandler().getWriteBuffer(),
-                    isBlocking(), true);
+            int written = writeToSocket(socketWriteBuffer, isBlocking(), true);
             if (written == 0) {
                 dataLeft = true;
             } else {
@@ -241,7 +238,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         //write to the socket, if there is anything to write
         if (dataLeft) {
-            writeToSocket(socket.getBufHandler().getWriteBuffer(),block, !flipped);
+            writeToSocket(socketWriteBuffer, block, !flipped);
         }
 
         dataLeft = hasMoreDataToFlush();
@@ -252,11 +249,11 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
                 ByteBufferHolder buffer = bufIter.next();
                 buffer.flip();
                 while (!hasMoreDataToFlush() && buffer.getBuf().remaining()>0) {
-                    transfer(buffer.getBuf(), socket.getBufHandler().getWriteBuffer());
+                    transfer(buffer.getBuf(), socketWriteBuffer);
                     if (buffer.getBuf().remaining() == 0) {
                         bufIter.remove();
                     }
-                    writeToSocket(socket.getBufHandler().getWriteBuffer(),block, true);
+                    writeToSocket(socketWriteBuffer, block, true);
                     //here we must break if we didn't finish the write
                 }
             }
@@ -268,8 +265,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     @Override
     protected boolean hasMoreDataToFlush() {
-        return (flipped && socket.getBufHandler().getWriteBuffer().remaining()>0) ||
-        (!flipped && socket.getBufHandler().getWriteBuffer().position() > 0);
+        return (flipped && socketWriteBuffer.remaining() > 0) ||
+        (!flipped && socketWriteBuffer.position() > 0);
     }
 
 
