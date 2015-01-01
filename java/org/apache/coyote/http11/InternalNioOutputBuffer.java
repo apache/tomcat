@@ -63,11 +63,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     private NioSelectorPool pool;
 
-    /**
-     * Track if the byte buffer is flipped
-     */
-    protected volatile boolean flipped = false;
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -89,7 +84,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     public void recycle() {
         super.recycle();
         socketWriteBuffer.clear();
-        flipped = false;
         socket = null;
     }
 
@@ -120,7 +114,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean block, boolean flip) throws IOException {
         if ( flip ) {
             bytebuffer.flip();
-            flipped = true;
+            writeBufferFlipped = true;
         }
 
         int written = 0;
@@ -146,7 +140,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             //blocking writes must empty the buffer
             //and if remaining==0 then we did empty it
             bytebuffer.clear();
-            flipped = false;
+            writeBufferFlipped = false;
         }
         // If there is data left in the buffer the socket will be registered for
         // write further up the stack. This is to ensure the socket is only
@@ -238,7 +232,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         //write to the socket, if there is anything to write
         if (dataLeft) {
-            writeToSocket(socketWriteBuffer, block, !flipped);
+            writeToSocket(socketWriteBuffer, block, !writeBufferFlipped);
         }
 
         dataLeft = hasMoreDataToFlush();
@@ -265,8 +259,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     @Override
     protected boolean hasMoreDataToFlush() {
-        return (flipped && socketWriteBuffer.remaining() > 0) ||
-        (!flipped && socketWriteBuffer.position() > 0);
+        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
+        (!writeBufferFlipped && socketWriteBuffer.position() > 0);
     }
 
 

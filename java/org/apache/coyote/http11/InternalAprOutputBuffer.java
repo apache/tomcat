@@ -71,13 +71,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     private SocketWrapperBase<Long> wrapper;
 
 
-    /**
-     * <code>false</code> if socketWriteBuffer is ready to be written to and
-     * <code>true</code> is ready to be read from.
-     */
-    private volatile boolean flipped = false;
-
-
     private AbstractEndpoint<Long> endpoint;
 
 
@@ -103,7 +96,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     public void recycle() {
         super.recycle();
         socketWriteBuffer.clear();
-        flipped = false;
         socket = 0;
         wrapper = null;
     }
@@ -153,7 +145,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
         // If bbuf is currently being used for writes, add this data to the
         // write buffer
-        if (flipped) {
+        if (writeBufferFlipped) {
             addToBuffers(buf, offset, length);
             return;
         }
@@ -264,8 +256,8 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
     private synchronized void writeToSocket() throws IOException {
-        if (!flipped) {
-            flipped = true;
+        if (!writeBufferFlipped) {
+            writeBufferFlipped = true;
             socketWriteBuffer.flip();
         }
 
@@ -283,7 +275,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
         if (socketWriteBuffer.remaining() == 0) {
             socketWriteBuffer.clear();
-            flipped = false;
+            writeBufferFlipped = false;
         }
         // If there is data left in the buffer the socket will be registered for
         // write further up the stack. This is to ensure the socket is only
@@ -305,8 +297,8 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     @Override
     protected synchronized boolean hasMoreDataToFlush() {
-        return (flipped && socketWriteBuffer.remaining() > 0) ||
-                (!flipped && socketWriteBuffer.position() > 0);
+        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
+                (!writeBufferFlipped && socketWriteBuffer.position() > 0);
     }
 
 
