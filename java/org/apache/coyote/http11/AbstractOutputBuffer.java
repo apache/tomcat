@@ -640,4 +640,22 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
         }
         return result;
     }
+
+
+    // --------------------------------------------------------- Utility methods
+
+    protected static int transfer(byte[] from, int offset, int length, ByteBuffer to) {
+        int max = Math.min(length, to.remaining());
+        to.put(from, offset, max);
+        return max;
+    }
+
+
+    protected static void transfer(ByteBuffer from, ByteBuffer to) {
+        int max = Math.min(from.remaining(), to.remaining());
+        int fromLimit = from.limit();
+        from.limit(from.position() + max);
+        to.put(from);
+        from.limit(fromLimit);
+    }
 }

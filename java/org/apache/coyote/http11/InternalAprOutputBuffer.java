@@ -284,15 +284,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
 
-    private void transfer(ByteBuffer from, ByteBuffer to) {
-        int max = Math.min(from.remaining(), to.remaining());
-        int fromLimit = from.limit();
-        from.limit(from.position() + max);
-        to.put(from);
-        from.limit(fromLimit);
-    }
-
-
     //-------------------------------------------------- Non-blocking IO methods
 
     @Override
