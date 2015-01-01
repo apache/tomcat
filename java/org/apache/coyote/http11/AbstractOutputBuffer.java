@@ -131,6 +131,8 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
         committed = false;
         finished = false;
 
+        outputStreamOutputBuffer = new SocketOutputBuffer();
+
         // Cause loading of HttpMessages
         HttpMessages.getInstance(response.getLocale()).getMessage(200);
     }
