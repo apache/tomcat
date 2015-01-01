@@ -258,13 +258,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
 
     @Override
-    protected boolean hasMoreDataToFlush() {
-        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
-        (!writeBufferFlipped && socketWriteBuffer.position() > 0);
-    }
-
-
-    @Override
     protected void registerWriteInterest() throws IOException {
         NioEndpoint.NioSocketWrapper att = (NioEndpoint.NioSocketWrapper)socket.getAttachment();
         if (att == null) {
