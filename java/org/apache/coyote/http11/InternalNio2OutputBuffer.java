@@ -334,13 +334,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     }
 
 
-    private int transfer(byte[] from, int offset, int length, ByteBuffer to) {
-        int max = Math.min(length, to.remaining());
-        to.put(from, offset, max);
-        return max;
-    }
-
-
     /**
      * Callback to write data from the buffer.
      */
