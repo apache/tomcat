@@ -661,4 +661,32 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
         to.put(from);
         from.limit(fromLimit);
     }
+
+
+
+    // ------------------------------------------ SocketOutputBuffer Inner Class
+
+    /**
+     * This class is an output buffer which will write data to an output stream.
+     */
+    protected class SocketOutputBuffer implements OutputBuffer {
+
+        /**
+         * Write chunk.
+         */
+        @Override
+        public int doWrite(ByteChunk chunk, Response res) throws IOException {
+            int len = chunk.getLength();
+            int start = chunk.getStart();
+            byte[] b = chunk.getBuffer();
+            addToBB(b, start, len);
+            byteCount += len;
+            return len;
+        }
+
+        @Override
+        public long getBytesWritten() {
+            return byteCount;
+        }
+    }
 }

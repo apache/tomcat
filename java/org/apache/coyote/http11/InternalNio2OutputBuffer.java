@@ -30,9 +30,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.servlet.RequestDispatcher;
 
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
@@ -462,36 +460,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                 // If no write is pending, notify
                 endpoint.processSocket(socket, SocketStatus.OPEN_WRITE, true);
             }
-        }
-    }
-
-
-    // ----------------------------------- OutputStreamOutputBuffer Inner Class
-
-    /**
-     * This class is an output buffer which will write data to an output
-     * stream.
-     */
-    protected class SocketOutputBuffer implements OutputBuffer {
-
-
-        /**
-         * Write chunk.
-         */
-        @Override
-        public int doWrite(ByteChunk chunk, Response res) throws IOException {
-
-            int len = chunk.getLength();
-            int start = chunk.getStart();
-            byte[] b = chunk.getBuffer();
-            addToBB(b, start, len);
-            byteCount += len;
-            return len;
-        }
-
-        @Override
-        public long getBytesWritten() {
-            return byteCount;
         }
     }
 }
