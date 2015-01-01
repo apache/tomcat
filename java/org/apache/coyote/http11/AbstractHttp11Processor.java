@@ -457,20 +457,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     }
 
     /**
-     * Set the socket buffer flag.
-     */
-    public void setSocketBuffer(int socketBuffer) {
-        outputBuffer.setSocketBuffer(socketBuffer);
-    }
-
-    /**
-     * Get the socket buffer flag.
-     */
-    public int getSocketBuffer() {
-        return outputBuffer.getSocketBuffer();
-    }
-
-    /**
      * Set the upload timeout.
      */
     public void setConnectionUploadTimeout(int timeout) {

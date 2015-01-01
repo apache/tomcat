@@ -100,11 +100,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     protected long byteCount = 0;
 
     /**
-     * Socket buffering.
-     */
-    protected int socketBuffer = -1;
-
-    /**
      * For "non-blocking" writes use an external set of buffers. Although the
      * API only allows one non-blocking write at a time, due to buffering and
      * the possible need to write HTTP headers, there may be more than one write
@@ -200,22 +195,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
         filter.setResponse(response);
 
-    }
-
-
-    /**
-     * Set the socket buffer flag.
-     */
-    public void setSocketBuffer(int socketBuffer) {
-        this.socketBuffer = socketBuffer;
-    }
-
-
-    /**
-     * Get the socket buffer flag.
-     */
-    public int getSocketBuffer() {
-        return socketBuffer;
     }
 
 
