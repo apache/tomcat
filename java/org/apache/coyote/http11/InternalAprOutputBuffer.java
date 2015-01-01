@@ -317,8 +317,8 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
             int start = chunk.getStart();
             byte[] b = chunk.getBuffer();
             addToBB(b, start, len);
-            byteCount += chunk.getLength();
-            return chunk.getLength();
+            byteCount += len;
+            return len;
         }
 
         @Override
