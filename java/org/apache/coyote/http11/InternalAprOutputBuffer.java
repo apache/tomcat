@@ -24,11 +24,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.coyote.ByteBufferHolder;
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -296,35 +294,5 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     @Override
     protected void registerWriteInterest() {
         ((AprEndpoint) endpoint).getPoller().add(socket, -1, false, true);
-    }
-
-
-    // ----------------------------------- OutputStreamOutputBuffer Inner Class
-
-    /**
-     * This class is an output buffer which will write data to an output
-     * stream.
-     */
-    protected class SocketOutputBuffer implements OutputBuffer {
-
-
-        /**
-         * Write chunk.
-         */
-        @Override
-        public int doWrite(ByteChunk chunk, Response res) throws IOException {
-
-            int len = chunk.getLength();
-            int start = chunk.getStart();
-            byte[] b = chunk.getBuffer();
-            addToBB(b, start, len);
-            byteCount += len;
-            return len;
-        }
-
-        @Override
-        public long getBytesWritten() {
-            return byteCount;
-        }
     }
 }
