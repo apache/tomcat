@@ -36,13 +36,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 
-    private int socketBuffer = 9000;
-    public int getSocketBuffer() { return socketBuffer; }
-    public void setSocketBuffer(int socketBuffer) {
-        this.socketBuffer = socketBuffer;
-    }
-
-
     /**
      * Maximum size of the post which will be saved when processing certain
      * requests, such as a POST.
@@ -239,7 +232,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
         processor.setCompressableMimeTypes(getCompressableMimeTypes());
         processor.setRestrictedUserAgents(getRestrictedUserAgents());
-        processor.setSocketBuffer(getSocketBuffer());
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
     }

@@ -498,12 +498,6 @@
       </p>
     </attribute>
 
-    <attribute name="socketBuffer" required="false">
-      <p>The size (in bytes) of the buffer to be provided for socket
-      output buffering. -1 can be specified to disable the use of a buffer.
-      By default, a buffers of 9000 bytes will be used.</p>
-    </attribute>
-
     <attribute name="SSLEnabled" required="false">
       <p>Use this attribute to enable SSL traffic on a connector.
       To turn on SSL handshake/encryption/decryption on a connector
