@@ -229,6 +229,7 @@ static const jint supported_ssl_opts = 0
 
 static int ssl_tmp_key_init_rsa(int bits, int idx)
 {
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(OPENSSL_USE_DEPRECATED)
     if (!(SSL_temp_keys[idx] =
           RSA_generate_key(bits, RSA_F4, NULL, NULL))) {
 #ifdef OPENSSL_FIPS
@@ -245,6 +246,9 @@ static int ssl_tmp_key_init_rsa(int bits, int idx)
     else {
         return 0;
     }
+#else
+    return 0;
+#endif
 }
 
 static int ssl_tmp_key_init_dh(int bits, int idx)
