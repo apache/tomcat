@@ -1576,33 +1576,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
-        public void flush() throws IOException {
-            NioEndpoint.NioSocketWrapper att =
-                    (NioEndpoint.NioSocketWrapper) getSocket().getAttachment();
-            if (att == null) {
-                throw new IOException("Key must be cancelled");
-            }
-            long writeTimeout = att.getWriteTimeout();
-            Selector selector = null;
-            try {
-                selector = pool.get();
-            } catch ( IOException x ) {
-                //ignore
-            }
-            try {
-                do {
-                    if (getSocket().flush(true, selector, writeTimeout)) {
-                        break;
-                    }
-                } while (true);
-            } finally {
-                if (selector != null) {
-                    pool.put(selector);
-                }
-            }
-        }
-
-        @Override
         public void regsiterForEvent(boolean read, boolean write) {
             SelectionKey key = getSocket().getIOChannel().keyFor(
                     getSocket().getPoller().getSelector());
