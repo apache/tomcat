@@ -1067,30 +1067,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
         @Override
-        public void flush() throws IOException {
-            try {
-                // Block until a possible non blocking write is done
-                if (writePending.tryAcquire(getTimeout(), TimeUnit.MILLISECONDS)) {
-                    writePending.release();
-                    getSocket().flush().get(getTimeout(), TimeUnit.MILLISECONDS);
-                } else {
-                    throw new TimeoutException();
-                }
-            } catch (ExecutionException e) {
-                if (e.getCause() instanceof IOException) {
-                    throw (IOException) e.getCause();
-                } else {
-                    throw new IOException(e);
-                }
-            } catch (InterruptedException e) {
-                throw new IOException(e);
-            } catch (TimeoutException e) {
-                SocketTimeoutException ex = new SocketTimeoutException();
-                throw ex;
-            }
-        }
-
-        @Override
         public void regsiterForEvent(boolean read, boolean write) {
             // NO-OP. Appropriate handlers will already have been registered.
         }
