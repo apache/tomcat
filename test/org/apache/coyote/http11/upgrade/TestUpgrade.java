@@ -286,7 +286,7 @@ public class TestUpgrade extends TomcatBaseTest {
                                 sos.write(buffer, 0, read);
                             } else {
                                 throw new IOException("Unable to echo data. " +
-                                        "canWrite() returned false");
+                                        "isReady() returned false");
                             }
                         }
                     }
