@@ -254,6 +254,7 @@ static unsigned char dhxxx2_g[]={
 
 static DH *get_dh(int idx)
 {
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L) || defined(OPENSSL_USE_DEPRECATED)
     DH *dh;
 
     if ((dh = DH_new()) == NULL)
@@ -279,6 +280,9 @@ static DH *get_dh(int idx)
     }
     else
         return dh;
+#else
+    return NULL;
+#endif
 }
 
 DH *SSL_dh_get_tmp_param(int key_len)

@@ -103,7 +103,7 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
             ctx = SSL_CTX_new(SSLv3_server_method());
         else
             ctx = SSL_CTX_new(SSLv3_method());
-#ifndef OPENSSL_NO_SSL2
+#if (OPENSSL_VERSION_NUMBER < 0x10100000L) && !defined(OPENSSL_NO_SSL2)
     } else if (protocol == SSL_PROTOCOL_SSLV2) {
         if (mode == SSL_MODE_CLIENT)
             ctx = SSL_CTX_new(SSLv2_client_method());
