@@ -93,7 +93,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     /**
      * Underlying output buffer.
      */
-    protected final OutputBuffer outputStreamOutputBuffer;
+    protected OutputBuffer outputStreamOutputBuffer;
 
     /**
      * Bytes written to client for the current request
