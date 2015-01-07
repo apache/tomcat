@@ -17,13 +17,18 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequestEvent;
+import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -66,6 +71,48 @@ public class TestStandardHostValve extends TomcatBaseTest {
 
         doTestErrorPageHandling(500, "/500");
         doTestErrorPageHandling(501, "/default");
+    }
+
+    @Test
+    @Ignore
+    public void testSRLAfterError() throws Exception {
+        // Set up a container
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        // Add the error page
+        Tomcat.addServlet(ctx, "error", new ErrorServlet());
+        ctx.addServletMapping("/error", "error");
+
+        final List<String> result = new ArrayList<>();
+
+        // Add the request listener
+        ServletRequestListener servletRequestListener = new ServletRequestListener() {
+
+            @Override
+            public void requestDestroyed(ServletRequestEvent sre) {
+                result.add("Visit requestDestroyed");
+            }
+
+            @Override
+            public void requestInitialized(ServletRequestEvent sre) {
+                result.add("Visit requestInitialized");
+            }
+
+        };
+        ((StandardContext) ctx).addApplicationEventListener(servletRequestListener);
+
+        tomcat.start();
+
+        // Request a page that triggers an error
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/error?errorCode=400", bc, null);
+
+        Assert.assertEquals(400, rc);
+        Assert.assertTrue(result.contains("Visit requestInitialized"));
+        Assert.assertTrue(result.contains("Visit requestDestroyed"));
     }
 
     private void doTestErrorPageHandling(int error, String report)
