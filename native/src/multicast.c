@@ -32,7 +32,7 @@ TCN_IMPLEMENT_CALL(jint, Multicast, join)(TCN_STDARGS,
     apr_sockaddr_t *sa = J2P(source, apr_sockaddr_t *);
     UNREFERENCED_STDARGS;
     return (jint)apr_mcast_join(s->sock, ja, ia, sa);
-};
+}
 
 TCN_IMPLEMENT_CALL(jint, Multicast, leave)(TCN_STDARGS,
                                            jlong sock, jlong addr,
@@ -44,7 +44,7 @@ TCN_IMPLEMENT_CALL(jint, Multicast, leave)(TCN_STDARGS,
     apr_sockaddr_t *sa = J2P(source, apr_sockaddr_t *);
     UNREFERENCED_STDARGS;
     return (jint)apr_mcast_leave(s->sock, aa, ia, sa);
-};
+}
 
 TCN_IMPLEMENT_CALL(jint, Multicast, hops)(TCN_STDARGS,
                                           jlong sock, jint ttl)
@@ -52,7 +52,7 @@ TCN_IMPLEMENT_CALL(jint, Multicast, hops)(TCN_STDARGS,
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     UNREFERENCED_STDARGS;
     return (jint)apr_mcast_hops(s->sock, (apr_byte_t)ttl);
-};
+}
 
 TCN_IMPLEMENT_CALL(jint, Multicast, loopback)(TCN_STDARGS,
                                               jlong sock, jboolean opt)
@@ -63,7 +63,7 @@ TCN_IMPLEMENT_CALL(jint, Multicast, loopback)(TCN_STDARGS,
     if (opt)
         on = 1;
     return (jint)apr_mcast_loopback(s->sock, on);
-};
+}
 
 TCN_IMPLEMENT_CALL(jint, Multicast, ointerface)(TCN_STDARGS,
                                                 jlong sock, jlong iface)
@@ -72,4 +72,4 @@ TCN_IMPLEMENT_CALL(jint, Multicast, ointerface)(TCN_STDARGS,
     apr_sockaddr_t *ia = J2P(iface, apr_sockaddr_t *);
     UNREFERENCED_STDARGS;
     return (jint)apr_mcast_interface(s->sock, ia);
-};
+}
