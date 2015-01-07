@@ -28,8 +28,6 @@ import org.apache.catalina.startup.TomcatBaseTest;
 public class TestInternalOutputBuffer extends TomcatBaseTest {
 
     @Test
-    @Ignore // Currently fails for NIO2 since that implementation writes the ACK
-            // to the buffers rather than directly to the socket.
     public void testSendAck() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
