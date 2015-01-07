@@ -243,6 +243,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     public void sendAck() throws IOException {
         if (!committed) {
             addToBB(Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
+            flushBuffer(true);
         }
     }
 
