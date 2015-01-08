@@ -23,8 +23,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Iterator;
 
-import org.apache.coyote.ByteBufferHolder;
 import org.apache.coyote.Response;
+import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
