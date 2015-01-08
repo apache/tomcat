@@ -55,18 +55,10 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
     private volatile ClassLoader applicationLoader = null;
 
-    // Writes guarded by writeLock
-    private volatile byte[] buffer;
-    private volatile int bufferPos;
-    private volatile int bufferLimit;
-    private final int asyncWriteBufferSize;
-
 
     public UpgradeServletOutputStream(SocketWrapperBase<?> socketWrapper,
             int asyncWriteBufferSize) {
         this.socketWrapper = socketWrapper;
-        this.asyncWriteBufferSize = asyncWriteBufferSize;
-        buffer = new byte[asyncWriteBufferSize];
     }
 
 
@@ -80,7 +72,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         // Make sure isReady() and onWritePossible() have a consistent view of
         // buffer and fireListener when determining if the listener should fire
         synchronized (fireListenerLock) {
-            boolean result = (bufferLimit == 0);
+            boolean result = !socketWrapper.hasDataToWrite();
             fireListener = !result;
             return result;
         }
@@ -139,7 +131,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
 
     private void preWriteChecks() {
-        if (bufferLimit != 0) {
+        if (socketWrapper.hasDataToWrite()) {
             throw new IllegalStateException(sm.getString("upgrade.sis.write.ise"));
         }
     }
@@ -153,34 +145,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             // Simple case - blocking IO
             socketWrapper.write(true, b, off, len);
         } else {
-            // Non-blocking IO
-            // If the non-blocking read does not complete, doWrite() will add
-            // the socket back into the poller. The poller may trigger a new
-            // write event before this method has finished updating buffer. The
-            // writeLock sync makes sure that buffer is updated before the next
-            // write executes.
-            int written = socketWrapper.write(false, b, off, len);
-            if (written < len) {
-                if (b == buffer) {
-                    // This is a partial write of the existing buffer. Just
-                    // increment the current position
-                    bufferPos += written;
-                } else {
-                    // This is a new partial write
-                    int bytesLeft = len - written;
-                    if (bytesLeft > buffer.length) {
-                        buffer = new byte[bytesLeft];
-                    } else if (bytesLeft < asyncWriteBufferSize &&
-                            buffer.length > asyncWriteBufferSize) {
-                        buffer = new byte[asyncWriteBufferSize];
-                    }
-                    bufferPos = 0;
-                    bufferLimit = bytesLeft;
-                    System.arraycopy(b, off + written, buffer, bufferPos, bufferLimit);
-                }
-            } else {
-                bufferLimit = 0;
-            }
+            socketWrapper.write(false, b, off, len);
         }
     }
 
@@ -188,9 +153,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     protected final void onWritePossible() throws IOException {
         try {
             synchronized (writeLock) {
-                if (bufferLimit > 0) {
-                    writeInternal(buffer, bufferPos, bufferLimit - bufferPos);
-                }
+                socketWrapper.flush(false);
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -207,7 +170,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         // should fire
         boolean fire = false;
         synchronized (fireListenerLock) {
-            if (bufferLimit == 0 && fireListener) {
+            if (!socketWrapper.hasDataToWrite() && fireListener) {
                 fireListener = false;
                 fire = true;
             }

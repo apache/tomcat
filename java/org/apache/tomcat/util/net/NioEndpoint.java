@@ -51,6 +51,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -1297,7 +1298,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     // ---------------------------------------------------- Key Attachment Class
     public static class NioSocketWrapper extends SocketWrapperBase<NioChannel> {
 
-        private final int maxWrite;
         private final NioSelectorPool pool;
 
         private Poller poller = null;
@@ -1310,7 +1310,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
-            maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
             pool = endpoint.getSelectorPool();
         }
 
@@ -1341,6 +1340,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             }
             writeLatch = null;
             setWriteTimeout(soTimeout);
+
+            socketWriteBuffer = channel.getBufHandler().getWriteBuffer();
         }
 
         public void reset() {
@@ -1509,71 +1510,127 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
-        public int write(boolean block, byte[] b, int off, int len) throws IOException {
-            int leftToWrite = len;
-            int count = 0;
-            int offset = off;
+        public void write(boolean block, byte[] b, int off, int len) throws IOException {
+            // Always flush any data remaining in the buffers
+            boolean dataLeft = flush(block);
 
-            while (leftToWrite > 0) {
-                int writeThisLoop;
-                int writtenThisLoop;
+            if (len == 0 || b == null) {
+                return;
+            }
 
-                if (leftToWrite > maxWrite) {
-                    writeThisLoop = maxWrite;
+            ByteBuffer socketWriteBuffer = getSocket().getBufHandler().getWriteBuffer();
+
+            // Keep writing until all the data is written or a non-blocking write
+            // leaves data in the buffer
+            while (!dataLeft && len > 0) {
+                int thisTime = transfer(b, off, len, socketWriteBuffer);
+                len = len - thisTime;
+                off = off + thisTime;
+                int written = writeToSocket(socketWriteBuffer, block, true);
+                if (written == 0) {
+                    dataLeft = true;
                 } else {
-                    writeThisLoop = leftToWrite;
-                }
-
-                writtenThisLoop = writeInternal(block, b, offset, writeThisLoop);
-                count += writtenThisLoop;
-                offset += writtenThisLoop;
-                leftToWrite -= writtenThisLoop;
-
-                if (writtenThisLoop < writeThisLoop) {
-                    break;
+                    dataLeft = flush(block);
                 }
             }
 
-            return count;
+            // Prevent timeouts for just doing client writes
+            access();
+
+            if (!block && len > 0) {
+                // Remaining data must be buffered
+                addToBuffers(b, off, len);
+            }
         }
 
 
-        private int writeInternal (boolean block, byte[] b, int off, int len)
-                throws IOException {
+        @Override
+        public boolean flush(boolean block) throws IOException {
 
-            NioEndpoint.NioSocketWrapper att =
-                    (NioEndpoint.NioSocketWrapper) getSocket().getAttachment();
-            if (att == null) {
-                throw new IOException("Key must be cancelled");
+            //prevent timeout for async,
+            SelectionKey key = getSocket().getIOChannel().keyFor(getSocket().getPoller().getSelector());
+            if (key != null) {
+                NioEndpoint.NioSocketWrapper attach = (NioEndpoint.NioSocketWrapper) key.attachment();
+                attach.access();
             }
 
-            ByteBuffer writeBuffer = getSocket().getBufHandler().getWriteBuffer();
-            writeBuffer.clear();
-            writeBuffer.put(b, off, len);
-            writeBuffer.flip();
+            boolean dataLeft = hasMoreDataToFlush();
+
+            //write to the socket, if there is anything to write
+            if (dataLeft) {
+                writeToSocket(socketWriteBuffer, block, !writeBufferFlipped);
+            }
+
+            dataLeft = hasMoreDataToFlush();
+
+            if (!dataLeft && bufferedWrites.size() > 0) {
+                Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
+                while (!hasMoreDataToFlush() && bufIter.hasNext()) {
+                    ByteBufferHolder buffer = bufIter.next();
+                    buffer.flip();
+                    while (!hasMoreDataToFlush() && buffer.getBuf().remaining()>0) {
+                        transfer(buffer.getBuf(), socketWriteBuffer);
+                        if (buffer.getBuf().remaining() == 0) {
+                            bufIter.remove();
+                        }
+                        writeToSocket(socketWriteBuffer, block, true);
+                        //here we must break if we didn't finish the write
+                    }
+                }
+            }
+
+            return hasMoreDataToFlush();
+        }
+
+
+        private void addToBuffers(byte[] buf, int offset, int length) {
+            ByteBufferHolder holder = bufferedWrites.peekLast();
+            if (holder==null || holder.isFlipped() || holder.getBuf().remaining()<length) {
+                ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize,length));
+                holder = new ByteBufferHolder(buffer,false);
+                bufferedWrites.add(holder);
+            }
+            holder.getBuf().put(buf,offset,length);
+        }
+
+
+        private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean block, boolean flip) throws IOException {
+            if (flip) {
+                bytebuffer.flip();
+                writeBufferFlipped = true;
+            }
 
             int written = 0;
-            long writeTimeout = att.getWriteTimeout();
+            long writeTimeout = getWriteTimeout();
             Selector selector = null;
             try {
                 selector = pool.get();
-            } catch ( IOException x ) {
-                //ignore
+            } catch (IOException x) {
+                // Ignore
             }
             try {
-                written = pool.write(writeBuffer, getSocket(), selector,
-                        writeTimeout, block);
+                written = pool.write(bytebuffer, getSocket(), selector, writeTimeout, block);
+                // Make sure we are flushed
+                do {
+                    if (getSocket().flush(true, selector, writeTimeout)) break;
+                } while (true);
             } finally {
                 if (selector != null) {
                     pool.put(selector);
                 }
             }
-            if (written < len) {
-                getSocket().getPoller().add(getSocket(), SelectionKey.OP_WRITE);
+            if (block || bytebuffer.remaining() == 0) {
+                // Blocking writes must empty the buffer
+                // and if remaining==0 then we did empty it
+                bytebuffer.clear();
+                writeBufferFlipped = false;
             }
+            // If there is data left in the buffer the socket will be registered for
+            // write further up the stack. This is to ensure the socket is only
+            // registered for write once as both container and user code can trigger
+            // write registration.
             return written;
         }
-
 
         @Override
         public void regsiterForEvent(boolean read, boolean write) {

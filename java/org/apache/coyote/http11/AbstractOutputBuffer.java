@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.coyote.ActionCode;
@@ -653,19 +652,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
 
     public boolean hasDataToWrite() {
-        return hasMoreDataToFlush() || hasBufferedData();
-    }
-
-
-    protected boolean hasBufferedData() {
-        boolean result = false;
-        if (bufferedWrites!=null) {
-            Iterator<ByteBufferHolder> iter = bufferedWrites.iterator();
-            while (!result && iter.hasNext()) {
-                result = iter.next().hasData();
-            }
-        }
-        return result;
+        return socketWrapper.hasDataToWrite();
     }
 
 

@@ -2505,7 +2505,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
-        public int write(boolean block, byte[] b, int off, int len) throws IOException {
+        public void write(boolean block, byte[] b, int off, int len) throws IOException {
 
             if (closed) {
                 throw new IOException(sm.getString("apr.closed", getSocket()));
@@ -2517,7 +2517,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             readLock.lock();
             try {
                 if (getBlockingStatus() == block) {
-                    return doWriteInternal(b, off, len);
+                    doWriteInternal(b, off, len);
+                    return;
                 }
             } finally {
                 readLock.unlock();
@@ -2537,7 +2538,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 readLock.lock();
                 try {
                     writeLock.unlock();
-                    return doWriteInternal(b, off, len);
+                    doWriteInternal(b, off, len);
+                    return;
                 } finally {
                     readLock.unlock();
                 }
@@ -2609,6 +2611,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         public void regsiterForEvent(boolean read, boolean write) {
             ((AprEndpoint) getEndpoint()).getPoller().add(
                     getSocket().longValue(), -1, read, write);
+        }
+
+
+        @Override
+        public boolean flush(boolean block) throws IOException {
+            // TODO Auto-generated method stub
+            return false;
         }
     }
 }

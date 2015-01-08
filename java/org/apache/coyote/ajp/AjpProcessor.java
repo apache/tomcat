@@ -24,8 +24,6 @@ import java.nio.ByteBuffer;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Iterator;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.RequestDispatcher;
@@ -44,7 +42,6 @@ import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -180,22 +177,6 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      * Body message.
      */
     protected final MessageBytes bodyBytes = MessageBytes.newInstance();
-
-
-    /**
-     * The max size of the buffered write buffer
-     */
-    private int bufferedWriteSize = 64*1024; //64k default write buffer
-
-
-    /**
-     * For "non-blocking" writes use an external set of buffers. Although the
-     * API only allows one non-blocking write at a time, due to buffering and
-     * the possible need to write HTTP headers, there may be more than one write
-     * to the OutputBuffer.
-     */
-    private final LinkedBlockingDeque<ByteBufferHolder> bufferedWrites =
-            new LinkedBlockingDeque<>();
 
 
     /**
@@ -605,7 +586,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean isReady = (AtomicBoolean)param;
-            boolean result = bufferedWrites.size() == 0 && responseMsgPos == -1;
+            boolean result = !socketWrapper.hasDataToWrite() && responseMsgPos == -1;
             isReady.set(result);
             if (!result) {
                 registerForEvent(false, true);
@@ -647,7 +628,8 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                 asyncStateMachine.asyncOperation();
                 try {
                     if (hasDataToWrite()) {
-                        flushBufferedData();
+                        boolean blocking = (response.getWriteListener() == null);
+                        socketWrapper.flush(blocking);
                         if (hasDataToWrite()) {
                             // There is data to write but go via Response to
                             // maintain a consistent view of non-blocking state
@@ -755,7 +737,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                     }
                     cping = true;
                     try {
-                        output(pongMessageArray, 0, pongMessageArray.length, true);
+                        socketWrapper.write(true, pongMessageArray, 0, pongMessageArray.length);
                     } catch (IOException e) {
                         setErrorState(ErrorState.CLOSE_NOW, e);
                     }
@@ -1053,7 +1035,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
 
         // Request more data immediately
         if (!waitingForBodyMessage) {
-            output(getBodyMessageArray, 0, getBodyMessageArray.length, true);
+            socketWrapper.write(true, getBodyMessageArray, 0, getBodyMessageArray.length);
             waitingForBodyMessage = true;
         }
 
@@ -1460,7 +1442,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
 
         // Write to buffer
         responseMessage.end();
-        output(responseMessage.getBuffer(), 0, responseMessage.getLen(), true);
+        socketWrapper.write(true, responseMessage.getBuffer(), 0, responseMessage.getLen());
     }
 
 
@@ -1473,7 +1455,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         // TODO Validate the assertion above
         if (explicit && !finished) {
             // Send the flush message
-            output(flushMessageArray, 0, flushMessageArray.length, true);
+            socketWrapper.write(true, flushMessageArray, 0, flushMessageArray.length);
         }
     }
 
@@ -1505,19 +1487,10 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
 
         // Add the end message
         if (getErrorState().isError()) {
-            output(endAndCloseMessageArray, 0, endAndCloseMessageArray.length, true);
+            socketWrapper.write(true, endAndCloseMessageArray, 0, endAndCloseMessageArray.length);
         } else {
-            output(endMessageArray, 0, endMessageArray.length, true);
+            socketWrapper.write(true, endMessageArray, 0, endMessageArray.length);
         }
-    }
-
-
-    private int output(byte[] src, int offset, int length,
-            boolean block) throws IOException {
-        if (socketWrapper == null || socketWrapper.getSocket() == null)
-            return -1;
-
-        return socketWrapper.write(block, src, offset, length);
     }
 
 
@@ -1569,15 +1542,12 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         socketWrapper.access();
 
         boolean blocking = (response.getWriteListener() == null);
-        if (!blocking) {
-            flushBufferedData();
-        }
 
         int len = chunk.getLength();
         int off = 0;
 
         // Write this chunk
-        while (responseMsgPos == -1 && len > 0) {
+        while (len > 0) {
             int thisTime = len;
             if (thisTime > outputMaxChunkSize) {
                 thisTime = outputMaxChunkSize;
@@ -1586,96 +1556,18 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
             responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
             responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
             responseMessage.end();
-            writeResponseMessage(blocking);
+            socketWrapper.write(blocking, responseMessage.getBuffer(), 0, responseMessage.getLen());
 
             len -= thisTime;
             off += thisTime;
         }
 
         bytesWritten += off;
-
-        if (len > 0) {
-            // Add this chunk to the buffer
-            addToBuffers(chunk.getBuffer(), off, len);
-        }
-    }
-
-
-    private void addToBuffers(byte[] buf, int offset, int length) {
-        ByteBufferHolder holder = bufferedWrites.peekLast();
-        if (holder == null || holder.isFlipped() || holder.getBuf().remaining() < length) {
-            ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize,length));
-            holder = new ByteBufferHolder(buffer, false);
-            bufferedWrites.add(holder);
-        }
-        holder.getBuf().put(buf, offset, length);
     }
 
 
     private boolean hasDataToWrite() {
-        return responseMsgPos != -1 || bufferedWrites.size() > 0;
-    }
-
-
-    private void flushBufferedData() throws IOException {
-
-        if (responseMsgPos > -1) {
-            // Must be using non-blocking IO
-            // Partially written response message. Try and complete it.
-            writeResponseMessage(false);
-        }
-
-        while (responseMsgPos == -1 && bufferedWrites.size() > 0) {
-            // Try and write any remaining buffer data
-            Iterator<ByteBufferHolder> holders = bufferedWrites.iterator();
-            ByteBufferHolder holder = holders.next();
-            holder.flip();
-            ByteBuffer buffer = holder.getBuf();
-            int initialBufferSize = buffer.remaining();
-            while (responseMsgPos == -1 && buffer.remaining() > 0) {
-                transferToResponseMsg(buffer);
-                writeResponseMessage(false);
-            }
-            bytesWritten += (initialBufferSize - buffer.remaining());
-            if (buffer.remaining() == 0) {
-                holders.remove();
-            }
-        }
-    }
-
-
-    private void transferToResponseMsg(ByteBuffer buffer) {
-
-        int thisTime = buffer.remaining();
-        if (thisTime > outputMaxChunkSize) {
-            thisTime = outputMaxChunkSize;
-        }
-
-        responseMessage.reset();
-        responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
-        buffer.get(responseMessage.getBuffer(), responseMessage.pos, thisTime);
-        responseMessage.end();
-    }
-
-
-    private void writeResponseMessage(boolean block) throws IOException {
-        int len = responseMessage.getLen();
-        int written = 1;
-        if (responseMsgPos == -1) {
-            // New message. Advance the write position to the beginning
-            responseMsgPos = 0;
-        }
-
-        while (written > 0 && responseMsgPos < len) {
-            written = output(
-                    responseMessage.getBuffer(), responseMsgPos, len - responseMsgPos, block);
-            responseMsgPos += written;
-        }
-
-        // Message fully written, reset the position for a new message.
-        if (responseMsgPos == len) {
-            responseMsgPos = -1;
-        }
+        return responseMsgPos != -1 || socketWrapper.hasDataToWrite();
     }
 
 
