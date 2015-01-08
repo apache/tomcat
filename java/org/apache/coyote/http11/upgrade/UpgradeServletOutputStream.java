@@ -72,7 +72,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         // Make sure isReady() and onWritePossible() have a consistent view of
         // buffer and fireListener when determining if the listener should fire
         synchronized (fireListenerLock) {
-            boolean result = !socketWrapper.hasDataToWrite();
+            boolean result = socketWrapper.isReadyForWrite();
             fireListener = !result;
             return result;
         }
@@ -170,7 +170,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         // should fire
         boolean fire = false;
         synchronized (fireListenerLock) {
-            if (!socketWrapper.hasDataToWrite() && fireListener) {
+            if (socketWrapper.isReadyForWrite() && fireListener) {
                 fireListener = false;
                 fire = true;
             }

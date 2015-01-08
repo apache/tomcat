@@ -1268,6 +1268,16 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
         @Override
+        public boolean isReadyForWrite() {
+            boolean result = super.isReadyForWrite();
+            if (!result) {
+                writeInterest = true;
+            }
+            return result;
+        }
+
+
+        @Override
         public void registerWriteInterest() {
             synchronized (writeCompletionHandler) {
                 if (writePending.availablePermits() == 0) {
