@@ -31,6 +31,7 @@ import java.util.concurrent.TimeoutException;
 import javax.servlet.RequestDispatcher;
 
 import org.apache.coyote.Response;
+import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
@@ -79,11 +80,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     protected AbstractEndpoint<Nio2Channel> endpoint = null;
 
     /**
-     * Used instead of the deque since it looks equivalent and simpler.
-     */
-    protected ArrayList<ByteBuffer> bufferedWrites = new ArrayList<>();
-
-    /**
      * Exception that occurred during writing.
      */
     protected IOException e = null;
@@ -109,9 +105,9 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                         if (attachment.hasRemaining()) {
                             arrayList.add(attachment);
                         }
-                        for (ByteBuffer buffer : bufferedWrites) {
+                        for (ByteBufferHolder buffer : bufferedWrites) {
                             buffer.flip();
-                            arrayList.add(buffer);
+                            arrayList.add(buffer.getBuf());
                         }
                         bufferedWrites.clear();
                         ByteBuffer[] array = arrayList.toArray(EMPTY_BUF_ARRAY);
@@ -164,9 +160,9 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                                 arrayList.add(buffer);
                             }
                         }
-                        for (ByteBuffer buffer : bufferedWrites) {
+                        for (ByteBufferHolder buffer : bufferedWrites) {
                             buffer.flip();
-                            arrayList.add(buffer);
+                            arrayList.add(buffer.getBuf());
                         }
                         bufferedWrites.clear();
                         ByteBuffer[] array = arrayList.toArray(EMPTY_BUF_ARRAY);
@@ -303,7 +299,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
     private void addToBuffers(byte[] buf, int offset, int length) {
         ByteBuffer buffer = ByteBuffer.allocate(length);
         buffer.put(buf, offset, length);
-        bufferedWrites.add(buffer);
+        bufferedWrites.add(new ByteBufferHolder(buffer, false));
     }
 
 
@@ -336,8 +332,9 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
             }
             try {
                 if (bufferedWrites.size() > 0) {
-                    for (ByteBuffer buffer : bufferedWrites) {
-                        buffer.flip();
+                    for (ByteBufferHolder holder : bufferedWrites) {
+                        holder.flip();
+                        ByteBuffer buffer = holder.getBuf();
                         while (buffer.hasRemaining()) {
                             if (socketWrapper.getSocket().write(buffer).get(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
                                 throw new EOFException(sm.getString("iob.failedwrite"));
@@ -383,9 +380,9 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
                         if (socketWriteBuffer.hasRemaining()) {
                             arrayList.add(socketWriteBuffer);
                         }
-                        for (ByteBuffer buffer : bufferedWrites) {
+                        for (ByteBufferHolder buffer : bufferedWrites) {
                             buffer.flip();
-                            arrayList.add(buffer);
+                            arrayList.add(buffer.getBuf());
                         }
                         bufferedWrites.clear();
                         ByteBuffer[] array = arrayList.toArray(EMPTY_BUF_ARRAY);
