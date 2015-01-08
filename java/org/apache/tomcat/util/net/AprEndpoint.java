@@ -2505,11 +2505,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
-        public void write(boolean block, byte[] b, int off, int len) throws IOException {
-            doWrite(block, b, off, len);
-        }
-
-        private void doWrite(boolean block, byte[] b, int off, int len) throws IOException {
+        protected int doWrite(ByteBuffer bytebuffer, boolean block, boolean flip)
+                throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("apr.closed", getSocket()));
             }
@@ -2520,8 +2517,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             readLock.lock();
             try {
                 if (getBlockingStatus() == block) {
-                    doWriteInternal(b, off, len);
-                    return;
+                    return doWriteInternal(bytebuffer, flip);
                 }
             } finally {
                 readLock.unlock();
@@ -2541,8 +2537,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 readLock.lock();
                 try {
                     writeLock.unlock();
-                    doWriteInternal(b, off, len);
-                    return;
+                    return doWriteInternal(bytebuffer, flip);
                 } finally {
                     readLock.unlock();
                 }
@@ -2556,57 +2551,66 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        private int doWriteInternal(byte[] b, int off, int len) throws IOException {
+        private int doWriteInternal(ByteBuffer bytebuffer, boolean flip)
+                throws IOException {
+            if (flip) {
+                bytebuffer.flip();
+                writeBufferFlipped = true;
+            }
 
-            int start = off;
-            int left = len;
-            int written;
+            int written = 0;
+            int thisTime;
 
             do {
+                thisTime = 0;
                 if (getEndpoint().isSSLEnabled()) {
                     if (sslOutputBuffer.remaining() == 0) {
                         // Buffer was fully written last time around
                         sslOutputBuffer.clear();
-                        if (left < SSL_OUTPUT_BUFFER_SIZE) {
-                            sslOutputBuffer.put(b, start, left);
-                        } else {
-                            sslOutputBuffer.put(b, start, SSL_OUTPUT_BUFFER_SIZE);
-                        }
+                        transfer(bytebuffer, sslOutputBuffer);
                         sslOutputBuffer.flip();
+                        thisTime = sslOutputBuffer.remaining();
                     } else {
                         // Buffer still has data from previous attempt to write
                         // APR + SSL requires that exactly the same parameters are
                         // passed when re-attempting the write
                     }
-                    written = Socket.sendb(getSocket().longValue(), sslOutputBuffer,
+                    int sslWritten = Socket.sendb(getSocket().longValue(), sslOutputBuffer,
                             sslOutputBuffer.position(), sslOutputBuffer.limit());
-                    if (written > 0) {
+                    if (sslWritten > 0) {
                         sslOutputBuffer.position(
-                                sslOutputBuffer.position() + written);
+                                sslOutputBuffer.position() + sslWritten);
                     }
                 } else {
-                    written = Socket.send(getSocket().longValue(), b, start, left);
+                    thisTime = Socket.sendb(getSocket().longValue(), bytebuffer,
+                            bytebuffer.position(), bytebuffer.limit() - bytebuffer.position());
                 }
-                if (Status.APR_STATUS_IS_EAGAIN(-written)) {
-                    written = 0;
-                } else if (-written == Status.APR_EOF) {
-                    throw new EOFException(sm.getString("apr.clientAbort"));
+                if (Status.APR_STATUS_IS_EAGAIN(-thisTime)) {
+                    thisTime = 0;
+                } else if (-thisTime == Status.APR_EOF) {
+                    throw new EOFException(sm.getString("socket.apr.clientAbort"));
                 } else if ((OS.IS_WIN32 || OS.IS_WIN64) &&
-                        (-written == Status.APR_OS_START_SYSERR + 10053)) {
+                        (-thisTime == Status.APR_OS_START_SYSERR + 10053)) {
                     // 10053 on Windows is connection aborted
-                    throw new EOFException(sm.getString("apr.clientAbort"));
-                } else if (written < 0) {
-                    throw new IOException(sm.getString("apr.write.error",
-                            Integer.valueOf(-written), getSocket(), this));
+                    throw new EOFException(sm.getString("socket.apr.clientAbort"));
+                } else if (thisTime < 0) {
+                    throw new IOException(sm.getString("socket.apr.write.error",
+                            Integer.valueOf(-thisTime), getSocket(), this));
                 }
-                start += written;
-                left -= written;
-            } while (written > 0 && left > 0);
+                written += thisTime;
+                bytebuffer.position(bytebuffer.position() + thisTime);
+            } while (thisTime > 0 && bytebuffer.hasRemaining());
 
-            if (left > 0) {
-                ((AprEndpoint) getEndpoint()).getPoller().add(getSocket().longValue(), -1, false, true);
+            if (bytebuffer.remaining() == 0) {
+                bytebuffer.clear();
+                writeBufferFlipped = false;
             }
-            return len - left;
+            // If there is data left in the buffer the socket will be registered for
+            // write further up the stack. This is to ensure the socket is only
+            // registered for write once as both container and user code can trigger
+            // write registration.
+
+            return written;
         }
 
 
@@ -2614,13 +2618,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         public void regsiterForEvent(boolean read, boolean write) {
             ((AprEndpoint) getEndpoint()).getPoller().add(
                     getSocket().longValue(), -1, read, write);
-        }
-
-
-        @Override
-        public boolean flush(boolean block) throws IOException {
-            // TODO Auto-generated method stub
-            return false;
         }
     }
 }

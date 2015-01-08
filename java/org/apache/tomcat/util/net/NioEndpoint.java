@@ -51,7 +51,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -1510,91 +1509,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
-        public void write(boolean block, byte[] b, int off, int len) throws IOException {
-            // Always flush any data remaining in the buffers
-            boolean dataLeft = flush(block);
-
-            if (len == 0 || b == null) {
-                return;
-            }
-
-            ByteBuffer socketWriteBuffer = getSocket().getBufHandler().getWriteBuffer();
-
-            // Keep writing until all the data is written or a non-blocking write
-            // leaves data in the buffer
-            while (!dataLeft && len > 0) {
-                int thisTime = transfer(b, off, len, socketWriteBuffer);
-                len = len - thisTime;
-                off = off + thisTime;
-                int written = doWrite(socketWriteBuffer, block, true);
-                if (written == 0) {
-                    dataLeft = true;
-                } else {
-                    dataLeft = flush(block);
-                }
-            }
-
-            // Prevent timeouts for just doing client writes
-            access();
-
-            if (!block && len > 0) {
-                // Remaining data must be buffered
-                addToBuffers(b, off, len);
-            }
-        }
-
-
-        @Override
-        public boolean flush(boolean block) throws IOException {
-
-            //prevent timeout for async,
-            SelectionKey key = getSocket().getIOChannel().keyFor(getSocket().getPoller().getSelector());
-            if (key != null) {
-                NioEndpoint.NioSocketWrapper attach = (NioEndpoint.NioSocketWrapper) key.attachment();
-                attach.access();
-            }
-
-            boolean dataLeft = hasMoreDataToFlush();
-
-            //write to the socket, if there is anything to write
-            if (dataLeft) {
-                doWrite(socketWriteBuffer, block, !writeBufferFlipped);
-            }
-
-            dataLeft = hasMoreDataToFlush();
-
-            if (!dataLeft && bufferedWrites.size() > 0) {
-                Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
-                while (!hasMoreDataToFlush() && bufIter.hasNext()) {
-                    ByteBufferHolder buffer = bufIter.next();
-                    buffer.flip();
-                    while (!hasMoreDataToFlush() && buffer.getBuf().remaining()>0) {
-                        transfer(buffer.getBuf(), socketWriteBuffer);
-                        if (buffer.getBuf().remaining() == 0) {
-                            bufIter.remove();
-                        }
-                        doWrite(socketWriteBuffer, block, true);
-                        //here we must break if we didn't finish the write
-                    }
-                }
-            }
-
-            return hasMoreDataToFlush();
-        }
-
-
-        private void addToBuffers(byte[] buf, int offset, int length) {
-            ByteBufferHolder holder = bufferedWrites.peekLast();
-            if (holder==null || holder.isFlipped() || holder.getBuf().remaining()<length) {
-                ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize,length));
-                holder = new ByteBufferHolder(buffer,false);
-                bufferedWrites.add(holder);
-            }
-            holder.getBuf().put(buf,offset,length);
-        }
-
-
-        private synchronized int doWrite(ByteBuffer bytebuffer, boolean block, boolean flip) throws IOException {
+        protected synchronized int doWrite(ByteBuffer bytebuffer, boolean block, boolean flip)
+                throws IOException {
             if (flip) {
                 bytebuffer.flip();
                 writeBufferFlipped = true;
@@ -1619,9 +1535,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     pool.put(selector);
                 }
             }
-            if (block || bytebuffer.remaining() == 0) {
-                // Blocking writes must empty the buffer
-                // and if remaining==0 then we did empty it
+            if (bytebuffer.remaining() == 0) {
                 bytebuffer.clear();
                 writeBufferFlipped = false;
             }
@@ -1629,6 +1543,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             // write further up the stack. This is to ensure the socket is only
             // registered for write once as both container and user code can trigger
             // write registration.
+
             return written;
         }
 
