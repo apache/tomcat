@@ -17,10 +17,8 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import org.apache.coyote.Response;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Output buffer.
@@ -35,34 +33,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
      * Default constructor.
      */
     public InternalAprOutputBuffer(Response response, int headerBufferSize) {
-
         super(response, headerBufferSize);
-
-        if (headerBufferSize < (8 * 1024)) {
-            socketWriteBuffer = ByteBuffer.allocateDirect(6 * 1500);
-        } else {
-            socketWriteBuffer = ByteBuffer.allocateDirect((headerBufferSize / 1500 + 1) * 1500);
-        }
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-    @Override
-    public void init(SocketWrapperBase<Long> socketWrapper) {
-        super.init(socketWrapper);
-        socketWrapper.socketWriteBuffer = socketWriteBuffer;
-    }
-
-
-    /**
-     * Recycle the output buffer. This should be called when closing the
-     * connection.
-     */
-    @Override
-    public void recycle() {
-        super.recycle();
-        socketWriteBuffer.clear();
     }
 
 

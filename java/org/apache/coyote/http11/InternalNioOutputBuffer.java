@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.net.NioChannel;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * Output buffer.
@@ -36,26 +35,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      */
     public InternalNioOutputBuffer(Response response, int headerBufferSize) {
         super(response, headerBufferSize);
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-    @Override
-    public void init(SocketWrapperBase<NioChannel> socketWrapper) {
-        super.init(socketWrapper);
-        socketWriteBuffer = socketWrapper.getSocket().getBufHandler().getWriteBuffer();
-    }
-
-
-    /**
-     * Recycle the output buffer. This should be called when closing the
-     * connection.
-     */
-    @Override
-    public void recycle() {
-        super.recycle();
-        socketWriteBuffer.clear();
     }
 
 
