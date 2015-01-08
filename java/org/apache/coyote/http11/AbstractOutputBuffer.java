@@ -24,12 +24,12 @@ import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.ByteBufferHolder;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.GzipOutputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;

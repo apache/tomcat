@@ -23,10 +23,10 @@ import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.apache.coyote.ByteBufferHolder;
 import org.apache.coyote.Response;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
+import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
