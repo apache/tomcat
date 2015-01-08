@@ -53,7 +53,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
 
     @Override
-    protected void registerWriteInterest() throws IOException {
+    protected void registerWriteInterest() {
         socketWrapper.registerWriteInterest();
     }
 }

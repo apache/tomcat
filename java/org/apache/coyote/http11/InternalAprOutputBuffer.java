@@ -52,7 +52,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
 
     @Override
-    protected void registerWriteInterest() throws IOException {
+    protected void registerWriteInterest() {
         socketWrapper.registerWriteInterest();
     }
 }

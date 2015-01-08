@@ -37,7 +37,7 @@ public abstract class SocketWrapperBase<E> {
     private volatile long lastAsyncStart = 0;
     private volatile long asyncTimeout = -1;
     private long timeout = -1;
-    private boolean error = false;
+    private IOException error = null;
     private volatile int keepAliveLeft = 100;
     private volatile boolean async = false;
     private boolean keptAlive = false;
@@ -152,8 +152,8 @@ public abstract class SocketWrapperBase<E> {
     void access(long access) { lastAccess = access; }
     public void setTimeout(long timeout) {this.timeout = timeout;}
     public long getTimeout() {return this.timeout;}
-    public boolean getError() { return error; }
-    public void setError(boolean error) { this.error = error; }
+    public IOException getError() { return error; }
+    public void setError(IOException error) { this.error = error; }
     public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
     public int decrementKeepAlive() { return (--keepAliveLeft);}
     public boolean isKeptAlive() {return keptAlive;}
@@ -234,7 +234,7 @@ public abstract class SocketWrapperBase<E> {
         async = false;
         blockingStatus = true;
         dispatches.clear();
-        error = false;
+        error = null;
         keepAliveLeft = 100;
         lastAccess = System.currentTimeMillis();
         lastAsyncStart = 0;
@@ -407,7 +407,7 @@ public abstract class SocketWrapperBase<E> {
         holder.getBuf().put(buf,offset,length);
     }
 
-    public abstract void registerWriteInterest() throws IOException;
+    public abstract void registerWriteInterest();
 
     public abstract void regsiterForEvent(boolean read, boolean write);
 

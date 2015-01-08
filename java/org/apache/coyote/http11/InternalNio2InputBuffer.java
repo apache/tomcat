@@ -172,12 +172,12 @@ public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel>
 
             @Override
             public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
-                attachment.setError(true);
                 if (exc instanceof IOException) {
                     e = (IOException) exc;
                 } else {
                     e = new IOException(exc);
                 }
+                attachment.setError(e);
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
                 readPending = false;
                 endpoint.processSocket(attachment, SocketStatus.OPEN_READ, true);
