@@ -19,14 +19,9 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.coyote.Response;
 import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.jni.Status;
-import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -76,6 +71,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         this.endpoint = socketWrapper.getEndpoint();
 
         Socket.setsbb(this.socket, socketWriteBuffer);
+        socketWrapper.socketWriteBuffer = socketWriteBuffer;
     }
 
 
@@ -99,8 +95,10 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     @Override
     public void sendAck() throws IOException {
         if (!committed) {
-            if (Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0)
+            addToBB(Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
+            if (flushBuffer(true)) {
                 throw new IOException(sm.getString("iob.failedwrite.ack"));
+            }
         }
     }
 
@@ -108,157 +106,14 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     // ------------------------------------------------------ Protected Methods
 
     @Override
-    protected synchronized void addToBB(byte[] buf, int offset, int length)
-            throws IOException {
-
-        if (length == 0) return;
-
-        // If bbuf is currently being used for writes, add this data to the
-        // write buffer
-        if (writeBufferFlipped) {
-            addToBuffers(buf, offset, length);
-            return;
-        }
-
-        // Keep writing until all the data is written or a non-blocking write
-        // leaves data in the buffer
-        while (length > 0) {
-            int thisTime = length;
-            if (socketWriteBuffer.position() == socketWriteBuffer.capacity()) {
-                if (flushBuffer(isBlocking())) {
-                    break;
-                }
-            }
-            if (thisTime > socketWriteBuffer.capacity() - socketWriteBuffer.position()) {
-                thisTime = socketWriteBuffer.capacity() - socketWriteBuffer.position();
-            }
-            socketWriteBuffer.put(buf, offset, thisTime);
-            length = length - thisTime;
-            offset = offset + thisTime;
-        }
-
-        if (!isBlocking() && length>0) {
-            // Buffer the remaining data
-            addToBuffers(buf, offset, length);
-        }
-    }
-
-
-    private void addToBuffers(byte[] buf, int offset, int length) {
-        ByteBufferHolder holder = bufferedWrites.peekLast();
-        if (holder==null || holder.isFlipped() || holder.getBuf().remaining()<length) {
-            ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize,length));
-            holder = new ByteBufferHolder(buffer,false);
-            bufferedWrites.add(holder);
-        }
-        holder.getBuf().put(buf,offset,length);
+    protected synchronized void addToBB(byte[] buf, int offset, int length) throws IOException {
+        socketWrapper.write(isBlocking(), buf, offset, length);
     }
 
 
     @Override
-    protected synchronized boolean flushBuffer(boolean block)
-            throws IOException {
-
-        if (hasMoreDataToFlush()) {
-            writeToSocket(block);
-        }
-
-        if (bufferedWrites.size() > 0) {
-            Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
-            while (!hasMoreDataToFlush() && bufIter.hasNext()) {
-                ByteBufferHolder buffer = bufIter.next();
-                buffer.flip();
-                while (!hasMoreDataToFlush() && buffer.getBuf().remaining()>0) {
-                    transfer(buffer.getBuf(), socketWriteBuffer);
-                    if (buffer.getBuf().remaining() == 0) {
-                        bufIter.remove();
-                    }
-                    writeToSocket(block);
-                    //here we must break if we didn't finish the write
-                }
-            }
-        }
-
-        return hasMoreDataToFlush();
-    }
-
-
-    private synchronized void writeToSocket(boolean block) throws IOException {
-
-        Lock readLock = socketWrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
-
-        readLock.lock();
-        try {
-            if (socketWrapper.getBlockingStatus() == block) {
-                writeToSocket();
-                return;
-            }
-        } finally {
-            readLock.unlock();
-        }
-
-        writeLock.lock();
-        try {
-            // Set the current settings for this socket
-            socketWrapper.setBlockingStatus(block);
-            if (block) {
-                Socket.timeoutSet(socket, endpoint.getSoTimeout() * 1000);
-            } else {
-                Socket.timeoutSet(socket, 0);
-            }
-
-            // Downgrade the lock
-            readLock.lock();
-            try {
-                writeLock.unlock();
-                writeToSocket();
-            } finally {
-                readLock.unlock();
-            }
-        } finally {
-            // Should have been released above but may not have been on some
-            // exception paths
-            if (writeLock.isHeldByCurrentThread()) {
-                writeLock.unlock();
-            }
-        }
-    }
-
-    private synchronized void writeToSocket() throws IOException {
-        if (!writeBufferFlipped) {
-            writeBufferFlipped = true;
-            socketWriteBuffer.flip();
-        }
-
-        int written;
-
-        do {
-            written = Socket.sendbb(socket, socketWriteBuffer.position(), socketWriteBuffer.remaining());
-            if (Status.APR_STATUS_IS_EAGAIN(-written)) {
-                written = 0;
-            } else if (written < 0) {
-                throw new IOException("APR error: " + written);
-            }
-            socketWriteBuffer.position(socketWriteBuffer.position() + written);
-        } while (written > 0 && socketWriteBuffer.hasRemaining());
-
-        if (socketWriteBuffer.remaining() == 0) {
-            socketWriteBuffer.clear();
-            writeBufferFlipped = false;
-        }
-        // If there is data left in the buffer the socket will be registered for
-        // write further up the stack. This is to ensure the socket is only
-        // registered for write once as both container and user code can trigger
-        // write registration.
-    }
-
-
-    //-------------------------------------------------- Non-blocking IO methods
-
-    @Override
-    protected synchronized boolean hasMoreDataToFlush() {
-        return super.hasMoreDataToFlush();
+    protected boolean flushBuffer(boolean block) throws IOException {
+        return socketWrapper.flush(block);
     }
 
 

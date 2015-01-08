@@ -70,7 +70,8 @@ public abstract class SocketWrapperBase<E> {
      */
     private final Object writeThreadLock = new Object();
 
-    protected ByteBuffer socketWriteBuffer;
+    // TODO This being public is a temporary hack to simplify refactoring
+    public volatile ByteBuffer socketWriteBuffer;
     protected volatile boolean writeBufferFlipped;
 
     /**
@@ -289,7 +290,38 @@ public abstract class SocketWrapperBase<E> {
      *
      * @throws IOException If an IO error occurs during the write
      */
-    public abstract void write(boolean block, byte[] b, int off, int len) throws IOException;
+    public void write(boolean block, byte[] b, int off, int len) throws IOException {
+        // Always flush any data remaining in the buffers
+        boolean dataLeft = flush(block);
+
+        if (len == 0 || b == null) {
+            return;
+        }
+
+        // Keep writing until all the data is written or a non-blocking write
+        // leaves data in the buffer
+        while (!dataLeft && len > 0) {
+            int thisTime = transfer(b, off, len, socketWriteBuffer);
+            len = len - thisTime;
+            off = off + thisTime;
+            int written = doWrite(socketWriteBuffer, block, true);
+            if (written == 0) {
+                dataLeft = true;
+            } else {
+                dataLeft = flush(block);
+            }
+        }
+
+        // Prevent timeouts for just doing client writes
+        access();
+
+        if (!block && len > 0) {
+            // Remaining data must be buffered
+            addToBuffers(b, off, len);
+        }
+    }
+
+
 
     /**
      * Writes as much data as possible from any that remains in the buffers.
@@ -303,7 +335,54 @@ public abstract class SocketWrapperBase<E> {
      *
      * @throws IOException If an IO error occurs during the write
      */
-    public abstract boolean flush(boolean block) throws IOException;
+    public boolean flush(boolean block) throws IOException {
+
+        // Prevent timeout for async
+        access();
+
+        boolean dataLeft = hasMoreDataToFlush();
+
+        // Write to the socket, if there is anything to write
+        if (dataLeft) {
+            doWrite(socketWriteBuffer, block, !writeBufferFlipped);
+        }
+
+        dataLeft = hasMoreDataToFlush();
+
+        if (!dataLeft && bufferedWrites.size() > 0) {
+            Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
+            while (!hasMoreDataToFlush() && bufIter.hasNext()) {
+                ByteBufferHolder buffer = bufIter.next();
+                buffer.flip();
+                while (!hasMoreDataToFlush() && buffer.getBuf().remaining()>0) {
+                    transfer(buffer.getBuf(), socketWriteBuffer);
+                    if (buffer.getBuf().remaining() == 0) {
+                        bufIter.remove();
+                    }
+                    doWrite(socketWriteBuffer, block, true);
+                    //here we must break if we didn't finish the write
+                }
+            }
+        }
+
+        return hasMoreDataToFlush();
+    }
+
+
+    protected abstract int doWrite(ByteBuffer buffer, boolean block, boolean flip)
+            throws IOException;
+
+
+    protected void addToBuffers(byte[] buf, int offset, int length) {
+        ByteBufferHolder holder = bufferedWrites.peekLast();
+        if (holder==null || holder.isFlipped() || holder.getBuf().remaining()<length) {
+            ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize,length));
+            holder = new ByteBufferHolder(buffer,false);
+            bufferedWrites.add(holder);
+        }
+        holder.getBuf().put(buf,offset,length);
+    }
+
 
     public abstract void regsiterForEvent(boolean read, boolean write);
 

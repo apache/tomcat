@@ -1025,6 +1025,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
 
+        @Override
+        protected int doWrite(ByteBuffer buffer, boolean block, boolean flip)
+                throws IOException {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
         private int writeInternal(boolean block, byte[] b, int off, int len)
                 throws IOException {
             ByteBuffer writeBuffer = getSocket().getBufHandler().getWriteBuffer();
