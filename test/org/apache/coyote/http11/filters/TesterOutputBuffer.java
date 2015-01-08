@@ -18,7 +18,6 @@ package org.apache.coyote.http11.filters;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -29,7 +28,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 /**
  * Output buffer for use in unit tests. This is a minimal implementation.
  */
-public class TesterOutputBuffer extends Http11OutputBuffer<Socket> {
+public class TesterOutputBuffer extends Http11OutputBuffer {
 
     /**
      * Underlying output stream.
@@ -46,7 +45,7 @@ public class TesterOutputBuffer extends Http11OutputBuffer<Socket> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public void init(SocketWrapperBase<Socket> socketWrapper) {
+    public void init(SocketWrapperBase<?> socketWrapper) {
         // NO-OP: Unused
     }
 
