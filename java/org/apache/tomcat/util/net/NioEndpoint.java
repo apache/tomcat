@@ -1241,7 +1241,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     NioSocketWrapper ka = (NioSocketWrapper) key.attachment();
                     if ( ka == null ) {
                         cancelledKey(key); //we don't support any keys without attachments
-                    } else if ( ka.getError() ) {
+                    } else if ( ka.getError() != null) {
                         cancelledKey(key);//TODO this is not yet being used
                     } else if (ka.getCallBackNotify() ) {
                         ka.setCallBackNotify(false);
@@ -1549,7 +1549,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
-        public void registerWriteInterest() throws IOException {
+        public void registerWriteInterest() {
             getPoller().add(getSocket(), SelectionKey.OP_WRITE);
         }
 

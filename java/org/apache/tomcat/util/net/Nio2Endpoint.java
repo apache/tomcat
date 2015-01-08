@@ -32,6 +32,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
@@ -49,6 +50,7 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SecureNio2Channel.ApplicationBufferHandler;
@@ -721,8 +723,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private volatile boolean interest = true;
 
         private final int maxWrite;
-        private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
-        private final Semaphore writePending = new Semaphore(1);
+        // TODO These are public for now to aid refactoring
+        public final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
+        public final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
+        public final Semaphore writePending = new Semaphore(1);
 
 
         public Nio2SocketWrapper(Nio2Channel channel, Nio2Endpoint endpoint) {
@@ -753,7 +757,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 }
                 @Override
                 public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
-                    attachment.setError(true);
+                    IOException ioe;
+                    if (exc instanceof IOException) {
+                        ioe = (IOException) exc;
+                    } else {
+                        ioe = new IOException(exc);
+                    }
+                    Nio2SocketWrapper.this.setError(ioe);
                     readPending = false;
                     if (exc instanceof AsynchronousCloseException) {
                         // If already closed, don't call onError and close again
@@ -766,30 +776,118 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             this.writeCompletionHandler = new CompletionHandler<Integer, ByteBuffer>() {
                 @Override
                 public void completed(Integer nBytes, ByteBuffer attachment) {
-                    if (nBytes.intValue() < 0) {
-                        failed(new EOFException(), attachment);
-                    } else if (attachment.hasRemaining()) {
-                        getSocket().write(attachment, getTimeout(),
-                                TimeUnit.MILLISECONDS, attachment, writeCompletionHandler);
-                    } else {
-                        writePending.release();
-                        if (!Nio2Endpoint.isInline()) {
-                            getEndpoint().processSocket(Nio2SocketWrapper.this, SocketStatus.OPEN_WRITE, false);
+                    boolean notify = false;
+                    synchronized (writeCompletionHandler) {
+                        if (nBytes.intValue() < 0) {
+                            failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
+                        } else if (Nio2SocketWrapper.this.bufferedWrites.size() > 0) {
+                            // Continue writing data using a gathering write
+                            ArrayList<ByteBuffer> arrayList = new ArrayList<>();
+                            if (attachment.hasRemaining()) {
+                                arrayList.add(attachment);
+                            }
+                            for (ByteBufferHolder buffer : Nio2SocketWrapper.this.bufferedWrites) {
+                                buffer.flip();
+                                arrayList.add(buffer.getBuf());
+                            }
+                            Nio2SocketWrapper.this.bufferedWrites.clear();
+                            ByteBuffer[] array = arrayList.toArray(new ByteBuffer[arrayList.size()]);
+                            Nio2SocketWrapper.this.getSocket().write(array, 0, array.length,
+                                    Nio2SocketWrapper.this.getTimeout(), TimeUnit.MILLISECONDS,
+                                    array, gatheringWriteCompletionHandler);
+                        } else if (attachment.hasRemaining()) {
+                            // Regular write
+                            Nio2SocketWrapper.this.getSocket().write(attachment, Nio2SocketWrapper.this.getTimeout(),
+                                    TimeUnit.MILLISECONDS, attachment, writeCompletionHandler);
+                        } else {
+                            // All data has been written
+                            if (interest && !Nio2Endpoint.isInline()) {
+                                interest = false;
+                                notify = true;
+                            }
+                            writePending.release();
                         }
                     }
+                    if (notify) {
+                        endpoint.processSocket(Nio2SocketWrapper.this, SocketStatus.OPEN_WRITE, false);
+                    }
                 }
+
                 @Override
                 public void failed(Throwable exc, ByteBuffer attachment) {
-                    setError(true);
-                    writePending.release();
-                    if (exc instanceof AsynchronousCloseException) {
-                        // If already closed, don't call onError and close again
-                        return;
+                    IOException ioe;
+                    if (exc instanceof IOException) {
+                        ioe = (IOException) exc;
+                    } else {
+                        ioe = new IOException(exc);
                     }
-                    getEndpoint().processSocket(Nio2SocketWrapper.this, SocketStatus.ERROR, true);
+                    Nio2SocketWrapper.this.setError(ioe);
+                    writePending.release();
+                    endpoint.processSocket(Nio2SocketWrapper.this, SocketStatus.OPEN_WRITE, true);
                 }
             };
 
+            gatheringWriteCompletionHandler = new CompletionHandler<Long, ByteBuffer[]>() {
+                @Override
+                public void completed(Long nBytes, ByteBuffer[] attachment) {
+                    boolean notify = false;
+                    synchronized (writeCompletionHandler) {
+                        if (nBytes.longValue() < 0) {
+                            failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
+                        } else if (Nio2SocketWrapper.this.bufferedWrites.size() > 0 || arrayHasData(attachment)) {
+                            // Continue writing data
+                            ArrayList<ByteBuffer> arrayList = new ArrayList<>();
+                            for (ByteBuffer buffer : attachment) {
+                                if (buffer.hasRemaining()) {
+                                    arrayList.add(buffer);
+                                }
+                            }
+                            for (ByteBufferHolder buffer : Nio2SocketWrapper.this.bufferedWrites) {
+                                buffer.flip();
+                                arrayList.add(buffer.getBuf());
+                            }
+                            Nio2SocketWrapper.this.bufferedWrites.clear();
+                            ByteBuffer[] array = arrayList.toArray(new ByteBuffer[arrayList.size()]);
+                            Nio2SocketWrapper.this.getSocket().write(array, 0, array.length,
+                                    Nio2SocketWrapper.this.getTimeout(), TimeUnit.MILLISECONDS,
+                                    array, gatheringWriteCompletionHandler);
+                        } else {
+                            // All data has been written
+                            if (interest && !Nio2Endpoint.isInline()) {
+                                interest = false;
+                                notify = true;
+                            }
+                            writePending.release();
+                        }
+                    }
+                    if (notify) {
+                        endpoint.processSocket(Nio2SocketWrapper.this, SocketStatus.OPEN_WRITE, false);
+                    }
+                }
+
+                @Override
+                public void failed(Throwable exc, ByteBuffer[] attachment) {
+                    IOException ioe;
+                    if (exc instanceof IOException) {
+                        ioe = (IOException) exc;
+                    } else {
+                        ioe = new IOException(exc);
+                    }
+                    Nio2SocketWrapper.this.setError(ioe);
+                    writePending.release();
+                    endpoint.processSocket(Nio2SocketWrapper.this, SocketStatus.OPEN_WRITE, true);
+               }
+            };
+
+        }
+
+        private static boolean arrayHasData(ByteBuffer[] byteBuffers) {
+            for (ByteBuffer byteBuffer : byteBuffers) {
+                if (byteBuffer.hasRemaining()) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         @Override
@@ -1073,21 +1171,21 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
         @Override
-        public void registerWriteInterest() throws IOException {
-            // TODO Auto-generated method stub
+        public void registerWriteInterest() {
+            synchronized (writeCompletionHandler) {
+                if (writePending.availablePermits() == 0) {
+                    interest = true;
+                } else {
+                    // If no write is pending, notify
+                    getEndpoint().processSocket(this, SocketStatus.OPEN_WRITE, true);
+                }
+            }
         }
 
 
         @Override
         public void regsiterForEvent(boolean read, boolean write) {
             // NO-OP. Appropriate handlers will already have been registered.
-        }
-
-
-        @Override
-        public boolean flush(boolean block) throws IOException {
-            // TODO Auto-generated method stub
-            return false;
         }
     }
 
