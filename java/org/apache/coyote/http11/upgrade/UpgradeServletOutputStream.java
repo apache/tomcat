@@ -131,7 +131,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
 
     private void preWriteChecks() {
-        if (socketWrapper.hasDataToWrite()) {
+        if (listener != null && socketWrapper.hasDataToWrite()) {
             throw new IllegalStateException(sm.getString("upgrade.sis.write.ise"));
         }
     }
