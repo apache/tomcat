@@ -65,7 +65,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize);
         request.setInputBuffer(getInputBuffer());
 
-        outputBuffer = new InternalNioOutputBuffer(response, maxHttpHeaderSize);
+        outputBuffer = new Http11OutputBuffer<>(response, maxHttpHeaderSize);
         response.setOutputBuffer(getOutputBuffer());
 
         initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
