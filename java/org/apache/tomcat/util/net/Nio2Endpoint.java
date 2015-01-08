@@ -722,16 +722,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private volatile boolean readPending = false;
         private volatile boolean interest = true;
 
-        private final int maxWrite;
-        // TODO These are public for now to aid refactoring
-        public final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
-        public final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
-        public final Semaphore writePending = new Semaphore(1);
+        private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
+        private final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
+        private final Semaphore writePending = new Semaphore(1);
 
 
         public Nio2SocketWrapper(Nio2Channel channel, Nio2Endpoint endpoint) {
             super(channel, endpoint);
-            maxWrite = channel.getBufHandler().getWriteBuffer().capacity();
 
             this.readCompletionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
                 @Override
@@ -1091,57 +1088,105 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
         @Override
-        public void write(boolean block, byte[] b, int off, int len) throws IOException {
-            int leftToWrite = len;
-            int offset = off;
+        public void write(boolean block, byte[] buf, int off, int len) throws IOException {
+            if (len == 0)
+                return;
+            if (getSocket() == null)
+                return;
 
-            while (leftToWrite > 0) {
-                int writeThisLoop;
-                int writtenThisLoop;
-
-                if (leftToWrite > maxWrite) {
-                    writeThisLoop = maxWrite;
+            if (block) {
+                while (len > 0) {
+                    int thisTime = transfer(buf, off, len, socketWriteBuffer);
+                    len = len - thisTime;
+                    off = off + thisTime;
+                    if (socketWriteBuffer.remaining() == 0) {
+                        flush(true);
+                    }
+                }
+            } else {
+                // FIXME: Possible new behavior:
+                // If there's non blocking abuse (like a test writing 1MB in a single
+                // "non blocking" write), then block until the previous write is
+                // done rather than continue buffering
+                // Also allows doing autoblocking
+                // Could be "smart" with coordination with the main CoyoteOutputStream to
+                // indicate the end of a write
+                // Uses: if (writePending.tryAcquire(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS))
+                if (writePending.tryAcquire()) {
+                    synchronized (writeCompletionHandler) {
+                        // No pending completion handler, so writing to the main buffer
+                        // is possible
+                        int thisTime = transfer(buf, off, len, socketWriteBuffer);
+                        len = len - thisTime;
+                        off = off + thisTime;
+                        if (len > 0) {
+                            // Remaining data must be buffered
+                            addToBuffers(buf, off, len);
+                        }
+                        flush(false, true);
+                    }
                 } else {
-                    writeThisLoop = leftToWrite;
-                }
-
-                writtenThisLoop = writeInternal(block, b, offset, writeThisLoop);
-                if (writtenThisLoop < 0) {
-                    throw new EOFException();
-                }
-                if (!block && writePending.availablePermits() == 0) {
-                    // Prevent concurrent writes in non blocking mode,
-                    // leftover data has to be buffered
-                    return;
-                }
-                offset += writtenThisLoop;
-                leftToWrite -= writtenThisLoop;
-
-                if (writtenThisLoop < writeThisLoop) {
-                    break;
+                    synchronized (writeCompletionHandler) {
+                        addToBuffers(buf, off, len);
+                    }
                 }
             }
         }
 
 
         @Override
-        protected int doWrite(ByteBuffer buffer, boolean block, boolean flip)
-                throws IOException {
-            // TODO Auto-generated method stub
+        protected int doWrite(ByteBuffer buffer, boolean block, boolean flip) throws IOException {
+            // NO-OP for NIO2 since write() is over-ridden above.
             return 0;
         }
 
-        private int writeInternal(boolean block, byte[] b, int off, int len)
-                throws IOException {
-            ByteBuffer writeBuffer = getSocket().getBufHandler().getWriteBuffer();
-            int written = 0;
+
+        @Override
+        public boolean flush(boolean block) throws IOException {
+            if (getError() != null) {
+                throw getError();
+            }
+            return super.flush(block);
+        }
+
+
+        @Override
+        protected boolean flush(boolean block, boolean hasPermit) throws IOException {
+            if (getSocket() == null)
+                return false;
+
             if (block) {
-                writeBuffer.clear();
-                writeBuffer.put(b, off, len);
-                writeBuffer.flip();
-                writeBufferFlipped = true;
                 try {
-                    written = getSocket().write(writeBuffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue();
+                    if (writePending.tryAcquire(getTimeout(), TimeUnit.MILLISECONDS)) {
+                        writePending.release();
+                    } else {
+                        // TODO
+                    }
+                } catch (InterruptedException e) {
+                    // Ignore timeout
+                }
+                try {
+                    if (bufferedWrites.size() > 0) {
+                        for (ByteBufferHolder holder : bufferedWrites) {
+                            holder.flip();
+                            ByteBuffer buffer = holder.getBuf();
+                            while (buffer.hasRemaining()) {
+                                if (getSocket().write(buffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                                    throw new EOFException(sm.getString("iob.failedwrite"));
+                                }
+                            }
+                        }
+                        bufferedWrites.clear();
+                    }
+                    if (!writeBufferFlipped) {
+                        socketWriteBuffer.flip();
+                        writeBufferFlipped = true;
+                    }
+                    while (socketWriteBuffer.hasRemaining()) {
+                        if (getSocket().write(socketWriteBuffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                            throw new EOFException(sm.getString("iob.failedwrite"));
+                        }
+                    }
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
                         throw (IOException) e.getCause();
@@ -1151,22 +1196,60 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 } catch (InterruptedException e) {
                     throw new IOException(e);
                 } catch (TimeoutException e) {
-                    SocketTimeoutException ex = new SocketTimeoutException();
-                    throw ex;
+                    throw new SocketTimeoutException();
                 }
+                socketWriteBuffer.clear();
+                writeBufferFlipped = false;
+                return false;
             } else {
-                if (writePending.tryAcquire()) {
-                    writeBuffer.clear();
-                    writeBuffer.put(b, off, len);
-                    writeBuffer.flip();
-                    writeBufferFlipped = true;
-                    Nio2Endpoint.startInline();
-                    getSocket().write(writeBuffer, getTimeout(), TimeUnit.MILLISECONDS, writeBuffer, writeCompletionHandler);
-                    Nio2Endpoint.endInline();
-                    written = len;
+                synchronized (writeCompletionHandler) {
+                    if (hasPermit || writePending.tryAcquire()) {
+                        if (!writeBufferFlipped) {
+                            socketWriteBuffer.flip();
+                            writeBufferFlipped = true;
+                        }
+                        Nio2Endpoint.startInline();
+                        if (bufferedWrites.size() > 0) {
+                            // Gathering write of the main buffer plus all leftovers
+                            ArrayList<ByteBuffer> arrayList = new ArrayList<>();
+                            if (socketWriteBuffer.hasRemaining()) {
+                                arrayList.add(socketWriteBuffer);
+                            }
+                            for (ByteBufferHolder buffer : bufferedWrites) {
+                                buffer.flip();
+                                arrayList.add(buffer.getBuf());
+                            }
+                            bufferedWrites.clear();
+                            ByteBuffer[] array = arrayList.toArray(new ByteBuffer[arrayList.size()]);
+                            getSocket().write(array, 0, array.length, getTimeout(),
+                                    TimeUnit.MILLISECONDS, array, gatheringWriteCompletionHandler);
+                        } else if (socketWriteBuffer.hasRemaining()) {
+                            // Regular write
+                            getSocket().write(socketWriteBuffer, getTimeout(),
+                                    TimeUnit.MILLISECONDS, socketWriteBuffer, writeCompletionHandler);
+                        } else {
+                            // Nothing was written
+                            writePending.release();
+                        }
+                        Nio2Endpoint.endInline();
+                        if (writePending.availablePermits() > 0) {
+                            if (socketWriteBuffer.remaining() == 0) {
+                                socketWriteBuffer.clear();
+                                writeBufferFlipped = false;
+                            }
+                        }
+                    }
+                    return hasMoreDataToFlush() || hasBufferedData() || getError() != null;
                 }
             }
-            return written;
+        }
+
+
+        @Override
+        public boolean hasDataToWrite() {
+            synchronized (writeCompletionHandler) {
+                return hasMoreDataToFlush() || hasBufferedData() || getError() != null;
+            }
         }
 
 
