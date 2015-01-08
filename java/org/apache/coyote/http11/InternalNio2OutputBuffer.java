@@ -301,7 +301,7 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
 
 
     private void addToBuffers(byte[] buf, int offset, int length) {
-        ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize, length));
+        ByteBuffer buffer = ByteBuffer.allocate(length);
         buffer.put(buf, offset, length);
         bufferedWrites.add(buffer);
     }
