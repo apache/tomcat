@@ -292,7 +292,7 @@ public abstract class SocketWrapperBase<E> {
      */
     public void write(boolean block, byte[] b, int off, int len) throws IOException {
         // Always flush any data remaining in the buffers
-        boolean dataLeft = flush(block);
+        boolean dataLeft = flush(block, true);
 
         if (len == 0 || b == null) {
             return;
@@ -308,7 +308,7 @@ public abstract class SocketWrapperBase<E> {
             if (written == 0) {
                 dataLeft = true;
             } else {
-                dataLeft = flush(block);
+                dataLeft = flush(block, true);
             }
         }
 
@@ -320,7 +320,6 @@ public abstract class SocketWrapperBase<E> {
             addToBuffers(b, off, len);
         }
     }
-
 
 
     /**
@@ -336,6 +335,28 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     public boolean flush(boolean block) throws IOException {
+        return flush(block, false);
+    }
+
+
+    /**
+     * Writes as much data as possible from any that remains in the buffers.
+     * This method exists for those implementations (e.g. NIO2) that need
+     * slightly different behaviour depending on if flush() was called directly
+     * or by another method in this class or a sub-class.
+     *
+     * @param block    <code>true<code> if a blocking write should be used,
+     *                     otherwise a non-blocking write will be used
+     * @param internal <code>true<code> if flush() was called by another method
+     *                     in class or sub-class
+     *
+     * @return <code>true</code> if data remains to be flushed after this method
+     *         completes, otherwise <code>false</code>. In blocking mode
+     *         therefore, the return value should always be <code>false</code>
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
+    protected boolean flush(boolean block, boolean internal) throws IOException {
 
         // Prevent timeout for async
         access();
