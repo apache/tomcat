@@ -262,6 +262,7 @@ public abstract class SocketWrapperBase<E> {
 
     public abstract int read(boolean block, byte[] b, int off, int len) throws IOException;
     public abstract boolean isReady() throws IOException;
+
     /**
      * Return input that has been read to the input buffer for re-reading by the
      * correct component. There are times when a component may read more data
@@ -404,6 +405,7 @@ public abstract class SocketWrapperBase<E> {
         holder.getBuf().put(buf,offset,length);
     }
 
+    public abstract void registerWriteInterest() throws IOException;
 
     public abstract void regsiterForEvent(boolean read, boolean write);
 

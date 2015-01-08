@@ -14,14 +14,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.coyote.Response;
-import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -83,8 +81,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
 
     @Override
-    protected void registerWriteInterest() {
-        ((AprEndpoint) socketWrapper.getEndpoint()).getPoller().add(
-                socketWrapper.getSocket().longValue(), -1, false, true);
+    protected void registerWriteInterest() throws IOException {
+        socketWrapper.registerWriteInterest();
     }
 }

@@ -14,15 +14,12 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.nio.channels.SelectionKey;
 
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.net.NioChannel;
-import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -78,6 +75,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     @Override
     protected void registerWriteInterest() throws IOException {
-        ((NioSocketWrapper) socketWrapper).getPoller().add(socketWrapper.getSocket(), SelectionKey.OP_WRITE);
+        socketWrapper.registerWriteInterest();
     }
 }
