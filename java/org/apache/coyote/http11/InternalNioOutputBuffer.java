@@ -25,7 +25,6 @@ import java.util.Iterator;
 
 import org.apache.coyote.ByteBufferHolder;
 import org.apache.coyote.Response;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
@@ -62,11 +61,10 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public void init(SocketWrapperBase<NioChannel> socketWrapper,
-            AbstractEndpoint<NioChannel> endpoint) throws IOException {
-
+    public void init(SocketWrapperBase<NioChannel> socketWrapper) {
+        super.init(socketWrapper);
         socket = socketWrapper.getSocket();
-        pool = ((NioEndpoint)endpoint).getSelectorPool();
+        pool = ((NioEndpoint)socketWrapper.getEndpoint()).getSelectorPool();
         socketWriteBuffer = socket.getBufHandler().getWriteBuffer();
     }
 
@@ -170,8 +168,8 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
             }
         }
 
-        NioEndpoint.NioSocketWrapper ka = (NioEndpoint.NioSocketWrapper)socket.getAttachment();
-        if (ka != null) ka.access();//prevent timeouts for just doing client writes
+        // Prevent timeouts for just doing client writes
+        socketWrapper.access();
 
         if (!isBlocking() && length > 0) {
             // Remaining data must be buffered
