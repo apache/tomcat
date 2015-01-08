@@ -350,7 +350,7 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
 
     public void sendAck() throws IOException {
         if (!committed) {
-            addToBB(Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
+            socketWrapper.write(isBlocking(), Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
             if (flushBuffer(true)) {
                 throw new IOException(sm.getString("iob.failedwrite.ack"));
             }
@@ -370,7 +370,7 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
 
         if (pos > 0) {
             // Sending the response header buffer
-            addToBB(headerBuffer, 0, pos);
+            socketWrapper.write(isBlocking(), headerBuffer, 0, pos);
         }
     }
 
@@ -587,11 +587,6 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
     }
 
 
-    protected void addToBB(byte[] buf, int offset, int length) throws IOException {
-        socketWrapper.write(isBlocking(), buf, offset, length);
-    }
-
-
     //------------------------------------------------------ Non-blocking writes
 
     protected void registerWriteInterest() {
@@ -668,7 +663,7 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
             int len = chunk.getLength();
             int start = chunk.getStart();
             byte[] b = chunk.getBuffer();
-            addToBB(b, start, len);
+            socketWrapper.write(isBlocking(), b, start, len);
             byteCount += len;
             return len;
         }
