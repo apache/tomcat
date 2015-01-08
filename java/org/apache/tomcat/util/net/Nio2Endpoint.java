@@ -720,11 +720,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> readCompletionHandler;
         private boolean flipped = false;
         private volatile boolean readPending = false;
-        private volatile boolean interest = true;
+        private volatile boolean readInterest = true;
 
         private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
         private final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
         private final Semaphore writePending = new Semaphore(1);
+        private volatile boolean writeInterest = true;
 
 
         public Nio2SocketWrapper(Nio2Channel channel, Nio2Endpoint endpoint) {
@@ -735,15 +736,15 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
                     boolean notify = false;
                     if (log.isDebugEnabled()) {
-                        log.debug("Socket: [ + " + attachment + "], Interest: [" + interest + "]");
+                        log.debug("Socket: [ + " + attachment + "], Interest: [" + readInterest + "]");
                     }
                     synchronized (readCompletionHandler) {
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attachment);
                         } else {
                             readPending = false;
-                            if (interest && !Nio2Endpoint.isInline()) {
-                                interest = false;
+                            if (readInterest && !Nio2Endpoint.isInline()) {
+                                readInterest = false;
                                 notify = true;
                             }
                         }
@@ -798,11 +799,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                                     TimeUnit.MILLISECONDS, attachment, writeCompletionHandler);
                         } else {
                             // All data has been written
-                            if (interest && !Nio2Endpoint.isInline()) {
-                                interest = false;
+                            if (writeInterest && !Nio2Endpoint.isInline()) {
+                                writeInterest = false;
                                 notify = true;
                             }
                             writePending.release();
+                            socketWriteBuffer.clear();
+                            writeBufferFlipped = false;
                         }
                     }
                     if (notify) {
@@ -850,11 +853,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                                     array, gatheringWriteCompletionHandler);
                         } else {
                             // All data has been written
-                            if (interest && !Nio2Endpoint.isInline()) {
-                                interest = false;
+                            if (writeInterest && !Nio2Endpoint.isInline()) {
+                                writeInterest = false;
                                 notify = true;
                             }
                             writePending.release();
+                            socketWriteBuffer.clear();
+                            writeBufferFlipped = false;
                         }
                     }
                     if (notify) {
@@ -923,7 +928,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public boolean isReady() throws IOException {
             synchronized (readCompletionHandler) {
                 if (readPending) {
-                    interest = true;
+                    readInterest = true;
                     return false;
                 }
                 ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
@@ -946,7 +951,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         flipped = true;
                     }
                 } else {
-                    interest = true;
+                    readInterest = true;
                 }
                 return isReady;
             }
@@ -1019,7 +1024,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             flipped = true;
                         }
                     } else {
-                        interest = true;
+                        readInterest = true;
                     }
                 } else if (nRead == -1) {
                     throw new EOFException();
@@ -1255,7 +1260,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public void registerWriteInterest() {
             synchronized (writeCompletionHandler) {
                 if (writePending.availablePermits() == 0) {
-                    interest = true;
+                    writeInterest = true;
                 } else {
                     // If no write is pending, notify
                     getEndpoint().processSocket(this, SocketStatus.OPEN_WRITE, true);
