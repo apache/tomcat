@@ -1099,9 +1099,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     int thisTime = transfer(buf, off, len, socketWriteBuffer);
                     len = len - thisTime;
                     off = off + thisTime;
-                    if (socketWriteBuffer.remaining() == 0) {
-                        flush(true);
-                    }
+                    flush(true);
                 }
             } else {
                 // FIXME: Possible new behavior:
