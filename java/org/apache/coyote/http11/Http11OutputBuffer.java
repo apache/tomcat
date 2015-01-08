@@ -288,7 +288,6 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
      * connection.
      */
     public void recycle() {
-        // Sub-classes may wish to do more than this.
         nextRequest();
         socketWrapper = null;
     }
@@ -626,7 +625,7 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
     // ------------------------------------------ SocketOutputBuffer Inner Class
 
     /**
-     * This class is an output buffer which will write data to an output stream.
+     * This class is an output buffer which will write data to a socket.
      */
     protected class SocketOutputBuffer implements OutputBuffer {
 
