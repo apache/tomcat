@@ -2615,6 +2615,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
+        public void registerWriteInterest() throws IOException {
+            ((AprEndpoint) getEndpoint()).getPoller().add(getSocket().longValue(), -1, false, true);
+        }
+
+
+        @Override
         public void regsiterForEvent(boolean read, boolean write) {
             ((AprEndpoint) getEndpoint()).getPoller().add(
                     getSocket().longValue(), -1, read, write);

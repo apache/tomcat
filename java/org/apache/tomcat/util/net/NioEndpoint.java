@@ -1547,6 +1547,13 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             return written;
         }
 
+
+        @Override
+        public void registerWriteInterest() throws IOException {
+            getPoller().add(getSocket(), SelectionKey.OP_WRITE);
+        }
+
+
         @Override
         public void regsiterForEvent(boolean read, boolean write) {
             SelectionKey key = getSocket().getIOChannel().keyFor(

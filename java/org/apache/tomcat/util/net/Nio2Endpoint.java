@@ -1070,9 +1070,16 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
         @Override
+        public void registerWriteInterest() throws IOException {
+            // TODO Auto-generated method stub
+        }
+
+
+        @Override
         public void regsiterForEvent(boolean read, boolean write) {
             // NO-OP. Appropriate handlers will already have been registered.
         }
+
 
         @Override
         public boolean flush(boolean block) throws IOException {
