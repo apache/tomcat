@@ -32,7 +32,7 @@ import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public class Http11OutputBuffer<S> implements OutputBuffer {
+public class Http11OutputBuffer implements OutputBuffer {
 
     // ----------------------------------------------------- Instance Variables
 
@@ -93,7 +93,7 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
     /**
      * Wrapper for socket where data will be written to.
      */
-    protected SocketWrapperBase<S> socketWrapper;
+    protected SocketWrapperBase<?> socketWrapper;
 
 
     /**
@@ -340,7 +340,7 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
     }
 
 
-    public void init(SocketWrapperBase<S> socketWrapper) {
+    public void init(SocketWrapperBase<?> socketWrapper) {
         this.socketWrapper = socketWrapper;
         // TODO: Ensure write buffer is >= header buffer size
     }

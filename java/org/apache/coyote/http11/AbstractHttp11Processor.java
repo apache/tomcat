@@ -78,7 +78,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Output.
      */
-    protected Http11OutputBuffer<S> outputBuffer;
+    protected Http11OutputBuffer outputBuffer;
 
 
     /**
@@ -624,7 +624,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Exposes output buffer to super class to allow better code re-use.
      * @return  The output buffer used by the processor.
      */
-    protected Http11OutputBuffer<S> getOutputBuffer() {
+    protected Http11OutputBuffer getOutputBuffer() {
         return outputBuffer;
     }
 
