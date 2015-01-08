@@ -2506,7 +2506,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         @Override
         public void write(boolean block, byte[] b, int off, int len) throws IOException {
+            doWrite(block, b, off, len);
+        }
 
+        private void doWrite(boolean block, byte[] b, int off, int len) throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("apr.closed", getSocket()));
             }
