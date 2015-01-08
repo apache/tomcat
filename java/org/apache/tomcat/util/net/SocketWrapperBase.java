@@ -199,6 +199,7 @@ public abstract class SocketWrapperBase<E> {
     }
 
     public boolean isReadyForWrite() {
+        // TODO Review use of this, hasDataForWrite() and registerWriteInterest()
         return !hasDataToWrite();
     }
 
