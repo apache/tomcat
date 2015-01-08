@@ -78,7 +78,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Output.
      */
-    protected AbstractOutputBuffer<S> outputBuffer;
+    protected Http11OutputBuffer<S> outputBuffer;
 
 
     /**
@@ -624,7 +624,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Exposes output buffer to super class to allow better code re-use.
      * @return  The output buffer used by the processor.
      */
-    protected AbstractOutputBuffer<S> getOutputBuffer() {
+    protected Http11OutputBuffer<S> getOutputBuffer() {
         return outputBuffer;
     }
 
@@ -858,12 +858,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean isReady = (AtomicBoolean)param;
-            try {
-                isReady.set(getOutputBuffer().isReady());
-            } catch (IOException e) {
-                getLog().debug("isReady() failed", e);
-                setErrorState(ErrorState.CLOSE_NOW, e);
-            }
+            isReady.set(getOutputBuffer().isReady());
             break;
         }
         case NB_READ_INTEREST: {

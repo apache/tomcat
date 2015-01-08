@@ -64,7 +64,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         inputBuffer = new InternalNio2InputBuffer(request, maxHttpHeaderSize);
         request.setInputBuffer(getInputBuffer());
 
-        outputBuffer = new InternalNio2OutputBuffer(response, maxHttpHeaderSize);
+        outputBuffer = new Http11OutputBuffer<>(response, maxHttpHeaderSize);
         response.setOutputBuffer(getOutputBuffer());
 
         initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
@@ -99,7 +99,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             ((InternalNio2InputBuffer) getInputBuffer()).registerReadInterest();
         }
         if (write) {
-            ((InternalNio2OutputBuffer) getOutputBuffer()).registerWriteInterest();
+            ((Http11OutputBuffer<?>) getOutputBuffer()).registerWriteInterest();
         }
     }
 

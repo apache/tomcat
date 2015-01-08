@@ -33,7 +33,7 @@ import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
+public class Http11OutputBuffer<S> implements OutputBuffer {
 
     // ----------------------------------------------------- Instance Variables
 
@@ -103,7 +103,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     protected long byteCount = 0;
 
 
-    protected AbstractOutputBuffer(Response response, int headerBufferSize) {
+    protected Http11OutputBuffer(Response response, int headerBufferSize) {
 
         this.response = response;
 
@@ -134,7 +134,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     /**
      * Logger.
      */
-    private static final Log log = LogFactory.getLog(AbstractOutputBuffer.class);
+    private static final Log log = LogFactory.getLog(Http11OutputBuffer.class);
 
     // ------------------------------------------------------------- Properties
 
@@ -344,6 +344,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
     public void init(SocketWrapperBase<S> socketWrapper) {
         this.socketWrapper = socketWrapper;
+        // TODO: Ensure write buffer is >= header buffer size
     }
 
 
@@ -586,12 +587,16 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     }
 
 
-    protected abstract void addToBB(byte[] buf, int offset, int length) throws IOException;
+    protected void addToBB(byte[] buf, int offset, int length) throws IOException {
+        socketWrapper.write(isBlocking(), buf, offset, length);
+    }
 
 
     //------------------------------------------------------ Non-blocking writes
 
-    protected abstract void registerWriteInterest();
+    protected void registerWriteInterest() {
+        socketWrapper.registerWriteInterest();
+    }
 
 
     /**
@@ -602,7 +607,9 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      *          happen in non-blocking mode) else <code>false</code>.
      * @throws IOException
      */
-    protected abstract boolean flushBuffer(boolean block) throws IOException;
+    protected boolean flushBuffer(boolean block) throws IOException  {
+        return socketWrapper.flush(block);
+    }
 
 
     /**
@@ -613,7 +620,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     }
 
 
-    protected final boolean isReady() throws IOException {
+    protected final boolean isReady() {
         boolean result = !hasDataToWrite();
         if (!result) {
             registerWriteInterest();
