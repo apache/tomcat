@@ -378,7 +378,15 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     }
 
 
-    public abstract void sendAck() throws IOException;
+    public void sendAck() throws IOException {
+        if (!committed) {
+            addToBB(Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
+            if (flushBuffer(true)) {
+                throw new IOException(sm.getString("iob.failedwrite.ack"));
+            }
+        }
+    }
+
 
     /**
      * Commit the response.

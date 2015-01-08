@@ -63,22 +63,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     }
 
 
-    // ------------------------------------------------ HTTP/1.1 Output Methods
-
-    /**
-     * Send an acknowledgment.
-     */
-    @Override
-    public void sendAck() throws IOException {
-        if (!committed) {
-            addToBB(Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
-            if (flushBuffer(true)) {
-                throw new IOException(sm.getString("iob.failedwrite.ack"));
-            }
-        }
-    }
-
-
     // ------------------------------------------------------ Protected Methods
 
     @Override
@@ -87,9 +71,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     }
 
 
-    /**
-     * Callback to write data from the buffer.
-     */
     @Override
     protected boolean flushBuffer(boolean block) throws IOException {
         return socketWrapper.flush(block);
