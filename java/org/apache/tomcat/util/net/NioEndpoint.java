@@ -1526,7 +1526,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 int thisTime = transfer(b, off, len, socketWriteBuffer);
                 len = len - thisTime;
                 off = off + thisTime;
-                int written = writeToSocket(socketWriteBuffer, block, true);
+                int written = doWrite(socketWriteBuffer, block, true);
                 if (written == 0) {
                     dataLeft = true;
                 } else {
@@ -1558,7 +1558,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
             //write to the socket, if there is anything to write
             if (dataLeft) {
-                writeToSocket(socketWriteBuffer, block, !writeBufferFlipped);
+                doWrite(socketWriteBuffer, block, !writeBufferFlipped);
             }
 
             dataLeft = hasMoreDataToFlush();
@@ -1573,7 +1573,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         if (buffer.getBuf().remaining() == 0) {
                             bufIter.remove();
                         }
-                        writeToSocket(socketWriteBuffer, block, true);
+                        doWrite(socketWriteBuffer, block, true);
                         //here we must break if we didn't finish the write
                     }
                 }
@@ -1594,7 +1594,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
 
 
-        private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean block, boolean flip) throws IOException {
+        private synchronized int doWrite(ByteBuffer bytebuffer, boolean block, boolean flip) throws IOException {
             if (flip) {
                 bytebuffer.flip();
                 writeBufferFlipped = true;
