@@ -21,9 +21,12 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import org.apache.tomcat.util.buf.ByteBufferHolder;
 
 public abstract class SocketWrapperBase<E> {
 
@@ -66,6 +69,23 @@ public abstract class SocketWrapperBase<E> {
      * writes.
      */
     private final Object writeThreadLock = new Object();
+
+    protected ByteBuffer socketWriteBuffer;
+    protected volatile boolean writeBufferFlipped;
+
+    /**
+     * For "non-blocking" writes use an external set of buffers. Although the
+     * API only allows one non-blocking write at a time, due to buffering and
+     * the possible need to write HTTP headers, there may be more than one write
+     * to the OutputBuffer.
+     */
+    protected final LinkedBlockingDeque<ByteBufferHolder> bufferedWrites =
+            new LinkedBlockingDeque<>();
+
+    /**
+     * The max size of the buffered write buffer
+     */
+    protected int bufferedWriteSize = 64*1024; //64k default write buffer
 
     private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
@@ -157,6 +177,28 @@ public abstract class SocketWrapperBase<E> {
         return blockingStatusWriteLock;
     }
     public Object getWriteThreadLock() { return writeThreadLock; }
+
+    protected boolean hasMoreDataToFlush() {
+        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
+        (!writeBufferFlipped && socketWriteBuffer.position() > 0);
+    }
+
+    protected boolean hasBufferedData() {
+        boolean result = false;
+        if (bufferedWrites!=null) {
+            Iterator<ByteBufferHolder> iter = bufferedWrites.iterator();
+            while (!result && iter.hasNext()) {
+                result = iter.next().hasData();
+            }
+        }
+        return result;
+    }
+
+    public boolean hasDataToWrite() {
+        return hasMoreDataToFlush() || hasBufferedData();
+    }
+
+
     public void addDispatch(DispatchType dispatchType) {
         synchronized (dispatches) {
             dispatches.add(dispatchType);
@@ -233,7 +275,52 @@ public abstract class SocketWrapperBase<E> {
     public abstract void unRead(ByteBuffer input);
     public abstract void close() throws IOException;
 
-    public abstract int write(boolean block, byte[] b, int off, int len) throws IOException;
+    /**
+     * Writes the provided data to the socket, buffering any remaining data if
+     * used in non-blocking mode. If any data remains in the buffers from a
+     * previous write then that data will be written before this data. It is
+     * therefore unnecessary to call flush() before calling this method.
+     *
+     * @param block <code>true<code> if a blocking write should be used,
+     *                  otherwise a non-blocking write will be used
+     * @param b     The byte array containing the data to be written
+     * @param off   The offset within the byte array of the data to be written
+     * @param len   The length of the data to be written
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
+    public abstract void write(boolean block, byte[] b, int off, int len) throws IOException;
+
+    /**
+     * Writes as much data as possible from any that remains in the buffers.
+     *
+     * @param block <code>true<code> if a blocking write should be used,
+     *                  otherwise a non-blocking write will be used
+     *
+     * @return <code>true</code> if data remains to be flushed after this method
+     *         completes, otherwise <code>false</code>. In blocking mode
+     *         therefore, the return value should always be <code>false</code>
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
+    public abstract boolean flush(boolean block) throws IOException;
 
     public abstract void regsiterForEvent(boolean read, boolean write);
+
+
+    // --------------------------------------------------------- Utility methods
+
+    protected static int transfer(byte[] from, int offset, int length, ByteBuffer to) {
+        int max = Math.min(length, to.remaining());
+        to.put(from, offset, max);
+        return max;
+    }
+
+    protected static void transfer(ByteBuffer from, ByteBuffer to) {
+        int max = Math.min(from.remaining(), to.remaining());
+        int fromLimit = from.limit();
+        from.limit(from.position() + max);
+        to.put(from);
+        from.limit(fromLimit);
+    }
 }

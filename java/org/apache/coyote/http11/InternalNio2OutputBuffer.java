@@ -417,7 +417,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
         }
     }
 
-    @Override
     protected boolean hasBufferedData() {
         return bufferedWrites.size() > 0;
     }

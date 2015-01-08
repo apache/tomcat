@@ -992,9 +992,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
         @Override
-        public int write(boolean block, byte[] b, int off, int len) throws IOException {
+        public void write(boolean block, byte[] b, int off, int len) throws IOException {
             int leftToWrite = len;
-            int count = 0;
             int offset = off;
 
             while (leftToWrite > 0) {
@@ -1011,11 +1010,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 if (writtenThisLoop < 0) {
                     throw new EOFException();
                 }
-                count += writtenThisLoop;
                 if (!block && writePending.availablePermits() == 0) {
                     // Prevent concurrent writes in non blocking mode,
                     // leftover data has to be buffered
-                    return count;
+                    return;
                 }
                 offset += writtenThisLoop;
                 leftToWrite -= writtenThisLoop;
@@ -1024,8 +1022,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     break;
                 }
             }
-
-            return count;
         }
 
 
@@ -1069,6 +1065,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public void regsiterForEvent(boolean read, boolean write) {
             // NO-OP. Appropriate handlers will already have been registered.
+        }
+
+        @Override
+        public boolean flush(boolean block) throws IOException {
+            // TODO Auto-generated method stub
+            return false;
         }
     }
 
