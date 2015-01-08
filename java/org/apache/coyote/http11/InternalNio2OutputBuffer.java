@@ -223,18 +223,6 @@ public class InternalNio2OutputBuffer extends AbstractOutputBuffer<Nio2Channel> 
         writeBufferFlipped = false;
     }
 
-    // ------------------------------------------------ HTTP/1.1 Output Methods
-
-    /**
-     * Send an acknowledgment.
-     */
-    @Override
-    public void sendAck() throws IOException {
-        if (!committed) {
-            addToBB(Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
-            flushBuffer(true);
-        }
-    }
 
     // ------------------------------------------------------ Protected Methods
 

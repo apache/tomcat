@@ -87,22 +87,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
 
-    // ------------------------------------------------ HTTP/1.1 Output Methods
-
-    /**
-     * Send an acknowledgment.
-     */
-    @Override
-    public void sendAck() throws IOException {
-        if (!committed) {
-            addToBB(Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
-            if (flushBuffer(true)) {
-                throw new IOException(sm.getString("iob.failedwrite.ack"));
-            }
-        }
-    }
-
-
     // ------------------------------------------------------ Protected Methods
 
     @Override
