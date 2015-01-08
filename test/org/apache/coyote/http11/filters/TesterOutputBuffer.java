@@ -80,12 +80,6 @@ public class TesterOutputBuffer extends Http11OutputBuffer<Socket> {
 
 
     @Override
-    protected void registerWriteInterest() {
-        // NO-OP: Unused
-    }
-
-
-    @Override
     protected boolean flushBuffer(boolean block) throws IOException {
         // Blocking IO so ignore block parameter as this will always use
         // blocking IO.
