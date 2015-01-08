@@ -59,7 +59,6 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     public void recycle() {
         super.recycle();
         socketWriteBuffer.clear();
-        socketWrapper = null;
     }
 
 
