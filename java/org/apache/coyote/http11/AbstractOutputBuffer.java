@@ -33,7 +33,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -94,6 +93,12 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      * Underlying output buffer.
      */
     protected OutputBuffer outputStreamOutputBuffer;
+
+    /**
+     * Wrapper for socket where data will be written to.
+     */
+    protected SocketWrapperBase<S> socketWrapper;
+
 
     /**
      * Bytes written to client for the current request
@@ -316,6 +321,7 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     public void recycle() {
         // Sub-classes may wish to do more than this.
         nextRequest();
+        socketWrapper = null;
         bufferedWrites.clear();
         writeBufferFlipped = false;
     }
@@ -368,8 +374,10 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     }
 
 
-    public abstract void init(SocketWrapperBase<S> socketWrapper,
-            AbstractEndpoint<S> endpoint) throws IOException;
+    public void init(SocketWrapperBase<S> socketWrapper) {
+        this.socketWrapper = socketWrapper;
+    }
+
 
     public abstract void sendAck() throws IOException;
 

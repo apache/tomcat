@@ -24,7 +24,6 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.AbstractOutputBuffer;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -47,8 +46,7 @@ public class TesterOutputBuffer extends AbstractOutputBuffer<Socket> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public void init(SocketWrapperBase<Socket> socketWrapper,
-            AbstractEndpoint<Socket> endpoint) throws IOException {
+    public void init(SocketWrapperBase<Socket> socketWrapper) {
         // NO-OP: Unused
     }
 

@@ -64,21 +64,16 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     private long socket;
 
 
-    private SocketWrapperBase<Long> wrapper;
-
-
     private AbstractEndpoint<Long> endpoint;
 
 
     // --------------------------------------------------------- Public Methods
 
     @Override
-    public void init(SocketWrapperBase<Long> socketWrapper,
-            AbstractEndpoint<Long> endpoint) throws IOException {
-
-        wrapper = socketWrapper;
+    public void init(SocketWrapperBase<Long> socketWrapper) {
+        super.init(socketWrapper);
         socket = socketWrapper.getSocket().longValue();
-        this.endpoint = endpoint;
+        this.endpoint = socketWrapper.getEndpoint();
 
         Socket.setsbb(this.socket, socketWriteBuffer);
     }
@@ -93,7 +88,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         super.recycle();
         socketWriteBuffer.clear();
         socket = 0;
-        wrapper = null;
     }
 
 
@@ -191,12 +185,12 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     private synchronized void writeToSocket(boolean block) throws IOException {
 
-        Lock readLock = wrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
+        Lock readLock = socketWrapper.getBlockingStatusReadLock();
+        WriteLock writeLock = socketWrapper.getBlockingStatusWriteLock();
 
         readLock.lock();
         try {
-            if (wrapper.getBlockingStatus() == block) {
+            if (socketWrapper.getBlockingStatus() == block) {
                 writeToSocket();
                 return;
             }
@@ -207,7 +201,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         writeLock.lock();
         try {
             // Set the current settings for this socket
-            wrapper.setBlockingStatus(block);
+            socketWrapper.setBlockingStatus(block);
             if (block) {
                 Socket.timeoutSet(socket, endpoint.getSoTimeout() * 1000);
             } else {
