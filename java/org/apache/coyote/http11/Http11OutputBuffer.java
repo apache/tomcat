@@ -589,11 +589,6 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
 
     //------------------------------------------------------ Non-blocking writes
 
-    protected void registerWriteInterest() {
-        socketWrapper.registerWriteInterest();
-    }
-
-
     /**
      * Writes any remaining buffered data.
      *
@@ -618,7 +613,7 @@ public class Http11OutputBuffer<S> implements OutputBuffer {
     protected final boolean isReady() {
         boolean result = !hasDataToWrite();
         if (!result) {
-            registerWriteInterest();
+            socketWrapper.registerWriteInterest();
         }
         return result;
     }

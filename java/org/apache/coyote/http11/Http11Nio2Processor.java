@@ -99,7 +99,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             ((InternalNio2InputBuffer) getInputBuffer()).registerReadInterest();
         }
         if (write) {
-            ((Http11OutputBuffer<?>) getOutputBuffer()).registerWriteInterest();
+            socketWrapper.registerWriteInterest();
         }
     }
 
