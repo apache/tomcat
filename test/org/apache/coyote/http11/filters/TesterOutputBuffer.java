@@ -94,13 +94,6 @@ public class TesterOutputBuffer extends Http11OutputBuffer<Socket> {
     }
 
 
-    @Override
-    protected void addToBB(byte[] buf, int offset, int length)
-            throws IOException {
-        // NO-OP: Unused
-    }
-
-
     /*
      * Expose data written for use by unit tests.
      */
