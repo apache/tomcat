@@ -2617,6 +2617,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
+        public boolean isReadyForWrite() {
+            boolean result = super.isReadyForWrite();
+            if (!result) {
+                registerWriteInterest();
+            }
+            return result;
+        }
+
+
+        @Override
         public void registerWriteInterest() {
             ((AprEndpoint) getEndpoint()).getPoller().add(getSocket().longValue(), -1, false, true);
         }
