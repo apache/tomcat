@@ -797,6 +797,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             super.reset(channel, soTimeout);
             upgradeInit = false;
             sendfileData = null;
+            socketWriteBuffer = channel.getBufHandler().getWriteBuffer();
         }
 
         @Override
@@ -1040,6 +1041,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 writeBuffer.clear();
                 writeBuffer.put(b, off, len);
                 writeBuffer.flip();
+                writeBufferFlipped = true;
                 try {
                     written = getSocket().write(writeBuffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue();
                 } catch (ExecutionException e) {
@@ -1059,6 +1061,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     writeBuffer.clear();
                     writeBuffer.put(b, off, len);
                     writeBuffer.flip();
+                    writeBufferFlipped = true;
                     Nio2Endpoint.startInline();
                     getSocket().write(writeBuffer, getTimeout(), TimeUnit.MILLISECONDS, writeBuffer, writeCompletionHandler);
                     Nio2Endpoint.endInline();

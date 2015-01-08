@@ -80,13 +80,6 @@ public class TesterOutputBuffer extends AbstractOutputBuffer<Socket> {
 
 
     @Override
-    protected boolean hasMoreDataToFlush() {
-        // Unused
-        return false;
-    }
-
-
-    @Override
     protected void registerWriteInterest() {
         // NO-OP: Unused
     }

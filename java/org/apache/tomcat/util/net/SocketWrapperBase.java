@@ -70,9 +70,9 @@ public abstract class SocketWrapperBase<E> {
      */
     private final Object writeThreadLock = new Object();
 
-    // TODO This being public is a temporary hack to simplify refactoring
+    // TODO These being public is a temporary hack to simplify refactoring
     public volatile ByteBuffer socketWriteBuffer;
-    protected volatile boolean writeBufferFlipped;
+    public volatile boolean writeBufferFlipped;
 
     /**
      * For "non-blocking" writes use an external set of buffers. Although the
@@ -80,7 +80,8 @@ public abstract class SocketWrapperBase<E> {
      * the possible need to write HTTP headers, there may be more than one write
      * to the OutputBuffer.
      */
-    protected final LinkedBlockingDeque<ByteBufferHolder> bufferedWrites =
+    // TODO This being public is a temporary hack to simplify refactoring
+    public final LinkedBlockingDeque<ByteBufferHolder> bufferedWrites =
             new LinkedBlockingDeque<>();
 
     /**
@@ -179,7 +180,8 @@ public abstract class SocketWrapperBase<E> {
     }
     public Object getWriteThreadLock() { return writeThreadLock; }
 
-    protected boolean hasMoreDataToFlush() {
+    // TODO This being public is a temporary hack to simplify refactoring
+    public boolean hasMoreDataToFlush() {
         return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
         (!writeBufferFlipped && socketWriteBuffer.position() > 0);
     }

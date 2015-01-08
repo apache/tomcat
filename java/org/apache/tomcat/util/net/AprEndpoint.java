@@ -2383,6 +2383,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             } else {
                 sslOutputBuffer = null;
             }
+
+            // TODO: This needs to be expandable to the header buffer size
+            socketWriteBuffer = ByteBuffer.allocateDirect(6 * 1500);
         }
 
 

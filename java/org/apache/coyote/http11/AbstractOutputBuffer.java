@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -28,7 +27,6 @@ import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.GzipOutputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
@@ -103,23 +101,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
      * Bytes written to client for the current request
      */
     protected long byteCount = 0;
-
-    protected ByteBuffer socketWriteBuffer;
-    protected volatile boolean writeBufferFlipped;
-
-    /**
-     * For "non-blocking" writes use an external set of buffers. Although the
-     * API only allows one non-blocking write at a time, due to buffering and
-     * the possible need to write HTTP headers, there may be more than one write
-     * to the OutputBuffer.
-     */
-    protected final LinkedBlockingDeque<ByteBufferHolder> bufferedWrites =
-            new LinkedBlockingDeque<>();
-
-    /**
-     * The max size of the buffered write buffer
-     */
-    protected int bufferedWriteSize = 64*1024; //64k default write buffer
 
 
     protected AbstractOutputBuffer(Response response, int headerBufferSize) {
@@ -205,16 +186,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
 
         filter.setResponse(response);
 
-    }
-
-
-    public void setBufferedWriteSize(int bufferedWriteSize) {
-        this.bufferedWriteSize = bufferedWriteSize;
-    }
-
-
-    public int getBufferedWriteSize() {
-        return bufferedWriteSize;
     }
 
 
@@ -321,8 +292,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
         // Sub-classes may wish to do more than this.
         nextRequest();
         socketWrapper = null;
-        bufferedWrites.clear();
-        writeBufferFlipped = false;
     }
 
     /**
@@ -623,12 +592,6 @@ public abstract class AbstractOutputBuffer<S> implements OutputBuffer {
     //------------------------------------------------------ Non-blocking writes
 
     protected abstract void registerWriteInterest() throws IOException;
-
-
-    protected boolean hasMoreDataToFlush() {
-        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
-        (!writeBufferFlipped && socketWriteBuffer.position() > 0);
-    }
 
 
     /**
