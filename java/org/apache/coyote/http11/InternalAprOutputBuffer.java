@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.coyote.Response;
-import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -50,27 +48,11 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * Underlying socket.
-     */
-    private long socket;
-
-
-    private AbstractEndpoint<Long> endpoint;
-
-
     // --------------------------------------------------------- Public Methods
 
     @Override
     public void init(SocketWrapperBase<Long> socketWrapper) {
         super.init(socketWrapper);
-        socket = socketWrapper.getSocket().longValue();
-        this.endpoint = socketWrapper.getEndpoint();
-
-        Socket.setsbb(this.socket, socketWriteBuffer);
         socketWrapper.socketWriteBuffer = socketWriteBuffer;
     }
 
@@ -83,7 +65,6 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
     public void recycle() {
         super.recycle();
         socketWriteBuffer.clear();
-        socket = 0;
     }
 
 
@@ -103,6 +84,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     @Override
     protected void registerWriteInterest() {
-        ((AprEndpoint) endpoint).getPoller().add(socket, -1, false, true);
+        ((AprEndpoint) socketWrapper.getEndpoint()).getPoller().add(
+                socketWrapper.getSocket().longValue(), -1, false, true);
     }
 }
