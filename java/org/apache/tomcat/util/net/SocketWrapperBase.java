@@ -198,6 +198,9 @@ public abstract class SocketWrapperBase<E> {
         return hasMoreDataToFlush() || hasBufferedData();
     }
 
+    public boolean isReadyForWrite() {
+        return !hasDataToWrite();
+    }
 
     public void addDispatch(DispatchType dispatchType) {
         synchronized (dispatches) {
