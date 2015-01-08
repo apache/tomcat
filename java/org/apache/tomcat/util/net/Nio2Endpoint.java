@@ -1139,7 +1139,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         @Override
         protected int doWrite(ByteBuffer buffer, boolean block, boolean flip) throws IOException {
-            // NO-OP for NIO2 since write() is over-ridden above.
+            // NO-OP for NIO2 since write(boolean, byte[], int, int)  and
+            // flush(boolean, boolean) are over-ridden.
             return 0;
         }
 
