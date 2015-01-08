@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -73,8 +72,8 @@ public class TestStandardHostValve extends TomcatBaseTest {
         doTestErrorPageHandling(501, "/default");
     }
 
+
     @Test
-    @Ignore
     public void testSRLAfterError() throws Exception {
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
