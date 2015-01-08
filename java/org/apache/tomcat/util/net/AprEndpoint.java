@@ -2572,7 +2572,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         sslOutputBuffer.clear();
                         transfer(bytebuffer, sslOutputBuffer);
                         sslOutputBuffer.flip();
-                        thisTime = sslOutputBuffer.remaining();
                     } else {
                         // Buffer still has data from previous attempt to write
                         // APR + SSL requires that exactly the same parameters are
