@@ -32,10 +32,29 @@ import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Provides buffering for the HTTP headers (allowing responses to be reset
+ * before they have been committed) and the link to the Socket for writing the
+ * headers (once committed) and the response body. Note that buffering of the
+ * response body happens at a higher level.
+ */
 public class Http11OutputBuffer implements OutputBuffer {
 
-    // ----------------------------------------------------- Instance Variables
+    // -------------------------------------------------------------- Variables
 
+    /**
+     * The string manager for this package.
+     */
+    protected static final StringManager sm = StringManager.getManager(Http11OutputBuffer.class);
+
+
+    /**
+     * Logger.
+     */
+    private static final Log log = LogFactory.getLog(Http11OutputBuffer.class);
+
+
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * Associated Coyote response.
@@ -62,20 +81,19 @@ public class Http11OutputBuffer implements OutputBuffer {
 
 
     /**
-     * Position in the buffer.
+     * Position in the header buffer.
      */
     protected int pos;
 
 
     /**
-     * Filter library.
-     * Note: Filter[0] is always the "chunked" filter.
+     * Filter library for processing the response body.
      */
     protected OutputFilter[] filterLibrary;
 
 
     /**
-     * Active filter (which is actually the top of the pipeline).
+     * Active filters for the current request.
      */
     protected OutputFilter[] activeFilters;
 
@@ -85,10 +103,12 @@ public class Http11OutputBuffer implements OutputBuffer {
      */
     protected int lastActiveFilter;
 
+
     /**
      * Underlying output buffer.
      */
     protected OutputBuffer outputStreamOutputBuffer;
+
 
     /**
      * Wrapper for socket where data will be written to.
@@ -122,29 +142,17 @@ public class Http11OutputBuffer implements OutputBuffer {
     }
 
 
-    // -------------------------------------------------------------- Variables
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-    /**
-     * Logger.
-     */
-    private static final Log log = LogFactory.getLog(Http11OutputBuffer.class);
-
     // ------------------------------------------------------------- Properties
 
-
     /**
-     * Add an output filter to the filter library.
+     * Add an output filter to the filter library. Note that calling this method
+     * resets the currently active filters to none.
+     *
+     * @param filter The filter to add
      */
     public void addFilter(OutputFilter filter) {
 
-        OutputFilter[] newFilterLibrary =
-            new OutputFilter[filterLibrary.length + 1];
+        OutputFilter[] newFilterLibrary = new OutputFilter[filterLibrary.length + 1];
         for (int i = 0; i < filterLibrary.length; i++) {
             newFilterLibrary[i] = filterLibrary[i];
         }
@@ -152,22 +160,28 @@ public class Http11OutputBuffer implements OutputBuffer {
         filterLibrary = newFilterLibrary;
 
         activeFilters = new OutputFilter[filterLibrary.length];
-
     }
 
 
     /**
      * Get filters.
+     *
+     * @return The current filter library containing all possible filters
      */
     public OutputFilter[] getFilters() {
-
         return filterLibrary;
-
     }
 
 
     /**
-     * Add an output filter to the filter library.
+     * Add an output filter to the active filters for the current response.
+     * <p>
+     * The filter does not have to be present in {@link #getFilters()}.
+     * <p>
+     * A filter can only be added to a response once. If the filter has already
+     * been added to this response then this method will be a NO-OP.
+     *
+     * @param filter The filter to add
      */
     public void addActiveFilter(OutputFilter filter) {
 
@@ -184,37 +198,26 @@ public class Http11OutputBuffer implements OutputBuffer {
         activeFilters[++lastActiveFilter] = filter;
 
         filter.setResponse(response);
-
     }
 
 
     // --------------------------------------------------- OutputBuffer Methods
 
-    /**
-     * Write the contents of a byte chunk.
-     *
-     * @param chunk byte chunk
-     * @return number of bytes written
-     * @throws IOException an underlying I/O error occurred
-     */
     @Override
-    public int doWrite(ByteChunk chunk, Response res)
-        throws IOException {
+    public int doWrite(ByteChunk chunk, Response res) throws IOException {
 
         if (!committed) {
-
             // Send the connector a request for commit. The connector should
             // then validate the headers, send them (using sendHeaders) and
             // set the filters accordingly.
             response.action(ActionCode.COMMIT, null);
-
         }
 
-        if (lastActiveFilter == -1)
+        if (lastActiveFilter == -1) {
             return outputStreamOutputBuffer.doWrite(chunk, res);
-        else
+        } else {
             return activeFilters[lastActiveFilter].doWrite(chunk, res);
-
+        }
     }
 
 
@@ -230,22 +233,18 @@ public class Http11OutputBuffer implements OutputBuffer {
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
      * Flush the response.
      *
      * @throws IOException an underlying I/O error occurred
      */
-    public void flush()
-        throws IOException {
+    public void flush() throws IOException {
 
         if (!committed) {
-
             // Send the connector a request for commit. The connector should
             // then validate the headers, send them (using sendHeader) and
             // set the filters accordingly.
             response.action(ActionCode.COMMIT, null);
-
         }
 
         // go through the filters and if there is gzip filter
@@ -283,6 +282,7 @@ public class Http11OutputBuffer implements OutputBuffer {
         byteCount = 0;
     }
 
+
     /**
      * Recycle the output buffer. This should be called when closing the
      * connection.
@@ -291,6 +291,7 @@ public class Http11OutputBuffer implements OutputBuffer {
         nextRequest();
         socketWrapper = null;
     }
+
 
     /**
      * End processing of current HTTP request.
@@ -328,11 +329,13 @@ public class Http11OutputBuffer implements OutputBuffer {
             response.action(ActionCode.COMMIT, null);
         }
 
-        if (finished)
+        if (finished) {
             return;
+        }
 
-        if (lastActiveFilter != -1)
+        if (lastActiveFilter != -1) {
             activeFilters[lastActiveFilter].end();
+        }
 
         flushBuffer(true);
 
@@ -377,7 +380,6 @@ public class Http11OutputBuffer implements OutputBuffer {
      * Send the response status line.
      */
     public void sendStatus() {
-
         // Write protocol name
         write(Constants.HTTP_11_BYTES);
         headerBuffer[pos++] = Constants.SP;
@@ -395,7 +397,7 @@ public class Http11OutputBuffer implements OutputBuffer {
             write(Constants._404_BYTES);
             break;
         default:
-            write(status);
+            write(String.valueOf(status));
         }
 
         headerBuffer[pos++] = Constants.SP;
@@ -414,6 +416,7 @@ public class Http11OutputBuffer implements OutputBuffer {
         }
 
         // End the response status line
+        // TODO o.a.coyoye.http11.Constants is pre-loaded. Can we drop this?
         if (org.apache.coyote.Constants.IS_SECURITY_ENABLED){
            AccessController.doPrivileged(
                 new PrivilegedAction<Void>(){
@@ -429,7 +432,6 @@ public class Http11OutputBuffer implements OutputBuffer {
             headerBuffer[pos++] = Constants.CR;
             headerBuffer[pos++] = Constants.LF;
         }
-
     }
 
 
@@ -440,14 +442,12 @@ public class Http11OutputBuffer implements OutputBuffer {
      * @param value Header value
      */
     public void sendHeader(MessageBytes name, MessageBytes value) {
-
         write(name);
         headerBuffer[pos++] = Constants.COLON;
         headerBuffer[pos++] = Constants.SP;
         write(value);
         headerBuffer[pos++] = Constants.CR;
         headerBuffer[pos++] = Constants.LF;
-
     }
 
 
@@ -455,10 +455,8 @@ public class Http11OutputBuffer implements OutputBuffer {
      * End the header block.
      */
     public void endHeaders() {
-
         headerBuffer[pos++] = Constants.CR;
         headerBuffer[pos++] = Constants.LF;
-
     }
 
 
@@ -469,8 +467,7 @@ public class Http11OutputBuffer implements OutputBuffer {
      *
      * @param mb data to be written
      */
-    protected void write(MessageBytes mb) {
-
+    private void write(MessageBytes mb) {
         if (mb.getType() != MessageBytes.T_BYTES) {
             mb.toBytes();
             ByteChunk bc = mb.getByteChunk();
@@ -495,20 +492,18 @@ public class Http11OutputBuffer implements OutputBuffer {
 
 
     /**
-     * This method will write the contents of the specified message bytes
-     * buffer to the output stream, without filtering. This method is meant to
-     * be used to write the response header.
+     * This method will write the contents of the specified byte chunk to the
+     * output stream, without filtering. This method is meant to be used to
+     * write the response header.
      *
      * @param bc data to be written
      */
-    protected void write(ByteChunk bc) {
-
+    private void write(ByteChunk bc) {
         // Writing the byte chunk to the output buffer
         int length = bc.getLength();
         checkLengthBeforeWrite(length);
         System.arraycopy(bc.getBytes(), bc.getStart(), headerBuffer, pos, length);
         pos = pos + length;
-
     }
 
 
@@ -525,7 +520,6 @@ public class Http11OutputBuffer implements OutputBuffer {
         // Writing the byte chunk to the output buffer
         System.arraycopy(b, 0, headerBuffer, pos, b.length);
         pos = pos + b.length;
-
     }
 
 
@@ -536,10 +530,10 @@ public class Http11OutputBuffer implements OutputBuffer {
      *
      * @param s data to be written
      */
-    protected void write(String s) {
-
-        if (s == null)
+    private void write(String s) {
+        if (s == null) {
             return;
+        }
 
         // From the Tomcat 3.3 HTTP/1.0 connector
         int len = s.length();
@@ -555,21 +549,6 @@ public class Http11OutputBuffer implements OutputBuffer {
             }
             headerBuffer[pos++] = (byte) c;
         }
-
-    }
-
-
-    /**
-     * This method will print the specified integer to the output stream,
-     * without filtering. This method is meant to be used to write the
-     * response header.
-     *
-     * @param i data to be written
-     */
-    protected void write(int i) {
-
-        write(String.valueOf(i));
-
     }
 
 
