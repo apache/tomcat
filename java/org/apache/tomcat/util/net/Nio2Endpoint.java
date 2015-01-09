@@ -1109,9 +1109,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         @Override
         public void write(boolean block, byte[] buf, int off, int len) throws IOException {
-            if (len == 0)
-                return;
-            if (getSocket() == null)
+            if (len == 0 || getSocket() == null)
                 return;
 
             if (block) {
@@ -1246,12 +1244,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         } else {
                             // Nothing was written
                             writePending.release();
-                        }
-                        if (writePending.availablePermits() > 0) {
-                            if (socketWriteBuffer.remaining() == 0) {
-                                socketWriteBuffer.clear();
-                                writeBufferFlipped = false;
-                            }
+                            socketWriteBuffer.clear();
+                            writeBufferFlipped = false;
                         }
                     }
                     return hasDataToWrite();
