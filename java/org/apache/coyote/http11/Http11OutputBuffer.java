@@ -17,8 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -414,23 +412,8 @@ public class Http11OutputBuffer implements OutputBuffer {
             write(message);
         }
 
-        // End the response status line
-        // TODO o.a.coyoye.http11.Constants is pre-loaded. Can we drop this?
-        if (org.apache.coyote.Constants.IS_SECURITY_ENABLED){
-           AccessController.doPrivileged(
-                new PrivilegedAction<Void>(){
-                    @Override
-                    public Void run(){
-                        headerBuffer[pos++] = Constants.CR;
-                        headerBuffer[pos++] = Constants.LF;
-                        return null;
-                    }
-                }
-           );
-        } else {
-            headerBuffer[pos++] = Constants.CR;
-            headerBuffer[pos++] = Constants.LF;
-        }
+        headerBuffer[pos++] = Constants.CR;
+        headerBuffer[pos++] = Constants.LF;
     }
 
 
