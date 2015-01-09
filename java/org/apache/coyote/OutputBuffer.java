@@ -14,13 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
 import java.io.IOException;
 
 import org.apache.tomcat.util.buf.ByteChunk;
-
 
 /**
  * Output buffer.
@@ -32,17 +30,20 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public interface OutputBuffer {
 
-
     /**
-     * Write the response. The caller ( tomcat ) owns the chunks.
+     * Write the given data to the response. The caller owns the chunks.
      *
      * @param chunk data to write
      * @param response used to allow buffers that can be shared by multiple
      *          responses.
-     * @throws IOException
+     *
+     * @return The number of bytes written which may be less than available in
+     *         the input chunk
+     *
+     * @throws IOException an underlying I/O error occurred
      */
-    public int doWrite(ByteChunk chunk, Response response)
-        throws IOException;
+    public int doWrite(ByteChunk chunk, Response response) throws IOException;
+
 
     /**
      * Bytes written to the underlying socket. This includes the effects of
