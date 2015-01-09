@@ -38,7 +38,6 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
-import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -1621,11 +1620,8 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      */
     protected class SocketOutputBuffer implements OutputBuffer {
 
-        /**
-         * Write chunk.
-         */
         @Override
-        public int doWrite(ByteChunk chunk, Response res) throws IOException {
+        public int doWrite(ByteChunk chunk) throws IOException {
 
             if (!response.isCommitted()) {
                 // Validate and write response headers

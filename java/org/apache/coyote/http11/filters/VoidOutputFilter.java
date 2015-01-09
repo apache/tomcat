@@ -35,18 +35,9 @@ public class VoidOutputFilter implements OutputFilter {
 
     // --------------------------------------------------- OutputBuffer Methods
 
-
-    /**
-     * Write some bytes.
-     *
-     * @return number of bytes written by the filter
-     */
     @Override
-    public int doWrite(ByteChunk chunk, Response res)
-        throws IOException {
-
+    public int doWrite(ByteChunk chunk) throws IOException {
         return chunk.getLength();
-
     }
 
 

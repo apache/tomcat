@@ -204,7 +204,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     // --------------------------------------------------- OutputBuffer Methods
 
     @Override
-    public int doWrite(ByteChunk chunk, Response res) throws IOException {
+    public int doWrite(ByteChunk chunk) throws IOException {
 
         if (!committed) {
             // Send the connector a request for commit. The connector should
@@ -214,9 +214,9 @@ public class Http11OutputBuffer implements OutputBuffer {
         }
 
         if (lastActiveFilter == -1) {
-            return outputStreamOutputBuffer.doWrite(chunk, res);
+            return outputStreamOutputBuffer.doWrite(chunk);
         } else {
-            return activeFilters[lastActiveFilter].doWrite(chunk, res);
+            return activeFilters[lastActiveFilter].doWrite(chunk);
         }
     }
 
@@ -612,7 +612,7 @@ public class Http11OutputBuffer implements OutputBuffer {
          * Write chunk.
          */
         @Override
-        public int doWrite(ByteChunk chunk, Response res) throws IOException {
+        public int doWrite(ByteChunk chunk) throws IOException {
             int len = chunk.getLength();
             int start = chunk.getStart();
             byte[] b = chunk.getBuffer();

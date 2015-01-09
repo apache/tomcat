@@ -101,11 +101,8 @@ public class TesterOutputBuffer extends Http11OutputBuffer {
      */
     protected class OutputStreamOutputBuffer implements OutputBuffer {
 
-        /**
-         * Write chunk.
-         */
         @Override
-        public int doWrite(ByteChunk chunk, Response res) throws IOException {
+        public int doWrite(ByteChunk chunk) throws IOException {
             int length = chunk.getLength();
             outputStream.write(chunk.getBuffer(), chunk.getStart(), length);
             byteCount += chunk.getLength();

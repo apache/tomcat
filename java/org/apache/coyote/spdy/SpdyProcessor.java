@@ -33,7 +33,6 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
-import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.spdy.SpdyConnection;
@@ -124,8 +123,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
         long byteCount;
 
         @Override
-        public int doWrite(org.apache.tomcat.util.buf.ByteChunk chunk,
-                Response response) throws IOException {
+        public int doWrite(org.apache.tomcat.util.buf.ByteChunk chunk) throws IOException {
             if (!response.isCommitted()) {
 
                 // Send the connector a request for commit. The connector should

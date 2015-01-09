@@ -63,7 +63,7 @@ public class TestGzipOutputFilter {
         ByteChunk chunk = new ByteChunk(1024);
         byte[] d = "Hello there tomcat developers, there is a bug in JDK".getBytes();
         chunk.append(d, 0, d.length);
-        tob.doWrite(chunk, res);
+        tob.doWrite(chunk);
 
         // flush the InternalOutputBuffer
         tob.flush();

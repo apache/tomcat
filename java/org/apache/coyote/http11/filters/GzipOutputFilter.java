@@ -62,15 +62,8 @@ public class GzipOutputFilter implements OutputFilter {
 
     // --------------------------------------------------- OutputBuffer Methods
 
-
-    /**
-     * Write some bytes.
-     *
-     * @return number of bytes written by the filter
-     */
     @Override
-    public int doWrite(ByteChunk chunk, Response res)
-        throws IOException {
+    public int doWrite(ByteChunk chunk) throws IOException {
         if (compressionStream == null) {
             compressionStream = new GZIPOutputStream(fakeOutputStream, true);
         }
@@ -166,13 +159,13 @@ public class GzipOutputFilter implements OutputFilter {
             // compatibility with Sun JDK 1.4.0
             singleByteBuffer[0] = (byte) (b & 0xff);
             outputChunk.setBytes(singleByteBuffer, 0, 1);
-            buffer.doWrite(outputChunk, null);
+            buffer.doWrite(outputChunk);
         }
         @Override
         public void write(byte[] b, int off, int len)
             throws IOException {
             outputChunk.setBytes(b, off, len);
-            buffer.doWrite(outputChunk, null);
+            buffer.doWrite(outputChunk);
         }
         @Override
         public void flush() throws IOException {/*NOOP*/}

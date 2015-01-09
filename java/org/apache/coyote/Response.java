@@ -493,10 +493,8 @@ public final class Response {
     /**
      * Write a chunk of bytes.
      */
-    public void doWrite(ByteChunk chunk/*byte buffer[], int pos, int count*/)
-        throws IOException
-    {
-        outputBuffer.doWrite(chunk, this);
+    public void doWrite(ByteChunk chunk) throws IOException {
+        outputBuffer.doWrite(chunk);
         contentWritten+=chunk.getLength();
     }
 
