@@ -1114,7 +1114,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
             if (block) {
                 try {
-                    while (len > 0) {
+                    do {
                         int thisTime = transfer(buf, off, len, socketWriteBuffer);
                         len = len - thisTime;
                         off = off + thisTime;
@@ -1125,7 +1125,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             }
                         }
                         socketWriteBuffer.clear();
-                    }
+                    } while (len > 0);
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
                         throw (IOException) e.getCause();
