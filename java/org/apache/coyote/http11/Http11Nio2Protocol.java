@@ -240,8 +240,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                 SocketWrapperBase<Nio2Channel> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeProcessor)
                 throws IOException {
-            return new UpgradeProcessor<>(socket, leftoverInput,
-                    httpUpgradeProcessor, proto.getUpgradeAsyncWriteBufferSize());
+            return new UpgradeProcessor<>(socket, leftoverInput, httpUpgradeProcessor);
         }
 
         @Override

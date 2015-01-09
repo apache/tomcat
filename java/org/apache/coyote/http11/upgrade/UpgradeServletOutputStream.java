@@ -56,8 +56,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private volatile ClassLoader applicationLoader = null;
 
 
-    public UpgradeServletOutputStream(SocketWrapperBase<?> socketWrapper,
-            int asyncWriteBufferSize) {
+    public UpgradeServletOutputStream(SocketWrapperBase<?> socketWrapper) {
         this.socketWrapper = socketWrapper;
     }
 

@@ -48,11 +48,10 @@ public class UpgradeProcessor<S> implements Processor<S>, WebConnection {
 
 
     public UpgradeProcessor(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
-            HttpUpgradeHandler httpUpgradeHandler, int asyncWriteBufferSize) {
+            HttpUpgradeHandler httpUpgradeHandler) {
         this.httpUpgradeHandler = httpUpgradeHandler;
         this.upgradeServletInputStream = new UpgradeServletInputStream(wrapper);
-        this.upgradeServletOutputStream =
-                new UpgradeServletOutputStream(wrapper, asyncWriteBufferSize);
+        this.upgradeServletOutputStream = new UpgradeServletOutputStream(wrapper);
 
         wrapper.unRead(leftOverInput);
         wrapper.setTimeout(INFINITE_TIMEOUT);
