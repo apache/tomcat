@@ -1113,11 +1113,29 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 return;
 
             if (block) {
-                while (len > 0) {
-                    int thisTime = transfer(buf, off, len, socketWriteBuffer);
-                    len = len - thisTime;
-                    off = off + thisTime;
-                    flush(true);
+                try {
+                    while (len > 0) {
+                        int thisTime = transfer(buf, off, len, socketWriteBuffer);
+                        len = len - thisTime;
+                        off = off + thisTime;
+                        socketWriteBuffer.flip();
+                        while (socketWriteBuffer.hasRemaining()) {
+                            if (getSocket().write(socketWriteBuffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                                throw new EOFException(sm.getString("iob.failedwrite"));
+                            }
+                        }
+                        socketWriteBuffer.clear();
+                    }
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof IOException) {
+                        throw (IOException) e.getCause();
+                    } else {
+                        throw new IOException(e);
+                    }
+                } catch (InterruptedException e) {
+                    throw new IOException(e);
+                } catch (TimeoutException e) {
+                    throw new SocketTimeoutException();
                 }
             } else {
                 // FIXME: Possible new behavior:
