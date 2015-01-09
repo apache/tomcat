@@ -187,6 +187,20 @@ public abstract class SocketWrapperBase<E> {
         return hasMoreDataToFlush() || bufferedWrites.size() > 0;
     }
 
+    /**
+     * Checks to see if there is any writes pending and if there is calls
+     * {@link #registerWriteInterest()} to trigger a callback once the pending
+     * write has completed.
+     * <p>
+     * Note: Once this method has returned <code>false</code> it <b>MUST NOT</b>
+     *       be called again until the pending write has completed and the
+     *       callback has been fired.
+     *       TODO: Modify {@link #registerWriteInterest()} so the above
+     *       restriction is enforced there rather than relying on the caller.
+     *
+     * @return <code>true</code> if no writes are pending and data can be
+     *         written otherwise <code>false</code>
+     */
     public boolean isReadyForWrite() {
         boolean result = !hasDataToWrite();
         if (!result) {
