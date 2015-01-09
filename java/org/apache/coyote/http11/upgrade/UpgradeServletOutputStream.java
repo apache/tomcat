@@ -169,7 +169,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         // should fire
         boolean fire = false;
         synchronized (fireListenerLock) {
-            if (socketWrapper.isReadyForWrite() && fireListener) {
+            if (fireListener && socketWrapper.isReadyForWrite()) {
                 fireListener = false;
                 fire = true;
             }
