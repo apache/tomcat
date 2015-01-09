@@ -911,7 +911,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             super.reset(channel, soTimeout);
             upgradeInit = false;
             sendfileData = null;
-            socketWriteBuffer = channel.getBufHandler().getWriteBuffer();
+            socketWriteBuffer = (channel == null) ? null : channel.getBufHandler().getWriteBuffer();
         }
 
         @Override
