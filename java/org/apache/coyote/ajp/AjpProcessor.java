@@ -588,11 +588,8 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean isReady = (AtomicBoolean)param;
-            boolean result = socketWrapper.isReadyForWrite() && responseMsgPos == -1;
+            boolean result = responseMsgPos == -1 && socketWrapper.isReadyForWrite();
             isReady.set(result);
-            if (!result) {
-                registerForEvent(false, true);
-            }
             break;
         }
         case REQUEST_BODY_FULLY_READ: {
