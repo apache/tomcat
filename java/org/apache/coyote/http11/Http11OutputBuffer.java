@@ -345,7 +345,6 @@ public class Http11OutputBuffer implements OutputBuffer {
 
     public void init(SocketWrapperBase<?> socketWrapper) {
         this.socketWrapper = socketWrapper;
-        // TODO: Ensure write buffer is >= header buffer size
     }
 
 
