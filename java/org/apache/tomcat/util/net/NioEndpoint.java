@@ -1339,8 +1339,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             }
             writeLatch = null;
             setWriteTimeout(soTimeout);
-
-            socketWriteBuffer = channel.getBufHandler().getWriteBuffer();
+            // Channel will be null when socket is being closed.
+            socketWriteBuffer = (channel == null) ? null : channel.getBufHandler().getWriteBuffer();
         }
 
         public void reset() {
