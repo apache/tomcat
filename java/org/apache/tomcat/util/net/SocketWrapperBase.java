@@ -185,11 +185,9 @@ public abstract class SocketWrapperBase<E> {
 
     protected boolean hasBufferedData() {
         boolean result = false;
-        if (bufferedWrites!=null) {
-            Iterator<ByteBufferHolder> iter = bufferedWrites.iterator();
-            while (!result && iter.hasNext()) {
-                result = iter.next().hasData();
-            }
+        Iterator<ByteBufferHolder> iter = bufferedWrites.iterator();
+        while (!result && iter.hasNext()) {
+            result = iter.next().hasData();
         }
         return result;
     }
