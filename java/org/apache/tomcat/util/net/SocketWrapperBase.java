@@ -183,17 +183,8 @@ public abstract class SocketWrapperBase<E> {
         (!writeBufferFlipped && socketWriteBuffer.position() > 0);
     }
 
-    protected boolean hasBufferedData() {
-        boolean result = false;
-        Iterator<ByteBufferHolder> iter = bufferedWrites.iterator();
-        while (!result && iter.hasNext()) {
-            result = iter.next().hasData();
-        }
-        return result;
-    }
-
     public boolean hasDataToWrite() {
-        return hasMoreDataToFlush() || hasBufferedData();
+        return hasMoreDataToFlush() || bufferedWrites.size() > 0;
     }
 
     public boolean isReadyForWrite() {

@@ -1253,7 +1253,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             }
                         }
                     }
-                    return hasMoreDataToFlush() || hasBufferedData() || getError() != null;
+                    return hasDataToWrite();
                 }
             }
         }
@@ -1262,7 +1262,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public boolean hasDataToWrite() {
             synchronized (writeCompletionHandler) {
-                return hasMoreDataToFlush() || hasBufferedData() || getError() != null;
+                return hasMoreDataToFlush() || bufferedWrites.size() > 0 || getError() != null;
             }
         }
 
