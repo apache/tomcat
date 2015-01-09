@@ -55,7 +55,10 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * AJP Processor implementations.
+ * AJP Processor implementation.
+ *
+ * @param <S> The socket type of the IO implementation used by this processor
+ *            instance.
  */
 public class AjpProcessor<S> extends AbstractProcessor<S> {
 
@@ -63,26 +66,26 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(AjpProcessor.class);
+    private static final StringManager sm = StringManager.getManager(AjpProcessor.class);
 
 
     /**
      * End message array.
      */
-    protected static final byte[] endMessageArray;
-    protected static final byte[] endAndCloseMessageArray;
+    private static final byte[] endMessageArray;
+    private static final byte[] endAndCloseMessageArray;
 
 
     /**
      * Flush message array.
      */
-    protected static final byte[] flushMessageArray;
+    private static final byte[] flushMessageArray;
 
 
     /**
      * Pong message array.
      */
-    protected static final byte[] pongMessageArray;
+    private static final byte[] pongMessageArray;
 
 
     static {
@@ -135,7 +138,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      * GetBody message array. Not static like the other message arrays since the
      * message varies with packetSize and that can vary per connector.
      */
-    protected final byte[] getBodyMessageArray;
+    private final byte[] getBodyMessageArray;
 
 
     /**
@@ -149,13 +152,13 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      * request header. It will stay unchanged during the processing of the whole
      * request.
      */
-    protected final AjpMessage requestHeaderMessage;
+    private final AjpMessage requestHeaderMessage;
 
 
     /**
      * Message used for response composition.
      */
-    protected final AjpMessage responseMessage;
+    private final AjpMessage responseMessage;
 
 
     /**
@@ -169,49 +172,49 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Body message.
      */
-    protected final AjpMessage bodyMessage;
+    private final AjpMessage bodyMessage;
 
 
     /**
      * Body message.
      */
-    protected final MessageBytes bodyBytes = MessageBytes.newInstance();
+    private final MessageBytes bodyBytes = MessageBytes.newInstance();
 
 
     /**
      * Host name (used to avoid useless B2C conversion on the host name).
      */
-    protected char[] hostNameC = new char[0];
+    private char[] hostNameC = new char[0];
 
 
     /**
      * Temp message bytes used for processing.
      */
-    protected final MessageBytes tmpMB = MessageBytes.newInstance();
+    private final MessageBytes tmpMB = MessageBytes.newInstance();
 
 
     /**
      * Byte chunk for certs.
      */
-    protected final MessageBytes certificates = MessageBytes.newInstance();
+    private final MessageBytes certificates = MessageBytes.newInstance();
 
 
     /**
      * End of stream flag.
      */
-    protected boolean endOfStream = false;
+    private boolean endOfStream = false;
 
 
     /**
      * Request body empty flag.
      */
-    protected boolean empty = true;
+    private boolean empty = true;
 
 
     /**
      * First read.
      */
-    protected boolean first = true;
+    private boolean first = true;
 
 
     /**
@@ -224,7 +227,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Replay read.
      */
-    protected boolean replay = false;
+    private boolean replay = false;
 
 
     /**
@@ -236,13 +239,13 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Finished response.
      */
-    protected boolean finished = false;
+    private boolean finished = false;
 
 
     /**
      * Bytes written to client for the current request.
      */
-    protected long bytesWritten = 0;
+    private long bytesWritten = 0;
 
 
     // ------------------------------------------------------------ Constructor
@@ -286,7 +289,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      * before closing the connection. The default is -1 which is an infinite
      * timeout.
      */
-    protected int keepAliveTimeout = -1;
+    private int keepAliveTimeout = -1;
     public int getKeepAliveTimeout() { return keepAliveTimeout; }
     public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
 
@@ -294,7 +297,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Use Tomcat authentication ?
      */
-    protected boolean tomcatAuthentication = true;
+    private boolean tomcatAuthentication = true;
     public boolean getTomcatAuthentication() { return tomcatAuthentication; }
     public void setTomcatAuthentication(boolean tomcatAuthentication) {
         this.tomcatAuthentication = tomcatAuthentication;
@@ -304,7 +307,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Required secret.
      */
-    protected String requiredSecret = null;
+    private String requiredSecret = null;
     public void setRequiredSecret(String requiredSecret) {
         this.requiredSecret = requiredSecret;
     }
@@ -319,7 +322,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      * {@link org.apache.catalina.valves.SSLValve}. If not specified, the
      * default provider will be used.
      */
-    protected String clientCertProvider = null;
+    private String clientCertProvider = null;
     public String getClientCertProvider() { return clientCertProvider; }
     public void setClientCertProvider(String s) { this.clientCertProvider = s; }
 
@@ -916,7 +919,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      * @return <code>true</code> if at least one body byte was read, otherwise
      *         <code>false</code>
      */
-    protected boolean receive(boolean block) throws IOException {
+    private boolean receive(boolean block) throws IOException {
 
         bodyMessage.reset();
 
@@ -953,7 +956,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      *
      * @throws IOException any other failure, including incomplete reads
      */
-    protected boolean readMessage(AjpMessage message, boolean block)
+    private boolean readMessage(AjpMessage message, boolean block)
         throws IOException {
 
         byte[] buf = message.getBuffer();
@@ -1049,7 +1052,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * After reading the request headers, we have to setup the request filters.
      */
-    protected void prepareRequest() {
+    private void prepareRequest() {
 
         // Translate the HTTP method code to a String.
         byte methodCode = requestHeaderMessage.getByte();
@@ -1290,7 +1293,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Parse host.
      */
-    protected void parseHost(MessageBytes valueMB) {
+    private void parseHost(MessageBytes valueMB) {
 
         if (valueMB == null || valueMB.isNull()) {
             // HTTP/1.0
@@ -1364,7 +1367,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
      */
-    protected void prepareResponse() throws IOException {
+    private void prepareResponse() throws IOException {
 
         response.setCommitted(true);
 
@@ -1448,7 +1451,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Callback to write data from the buffer.
      */
-    protected void flush(boolean explicit) throws IOException {
+    private void flush(boolean explicit) throws IOException {
         // Calling code should ensure that there is no data in the buffers for
         // non-blocking writes.
         // TODO Validate the assertion above
@@ -1462,7 +1465,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Finish AJP response.
      */
-    protected void finish() throws IOException {
+    private void finish() throws IOException {
 
         if (!response.isCommitted()) {
             // Validate and write response headers
