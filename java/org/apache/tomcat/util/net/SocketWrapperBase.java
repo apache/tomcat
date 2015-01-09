@@ -188,8 +188,11 @@ public abstract class SocketWrapperBase<E> {
     }
 
     public boolean isReadyForWrite() {
-        // TODO Review use of this, hasDataForWrite() and registerWriteInterest()
-        return !hasDataToWrite();
+        boolean result = !hasDataToWrite();
+        if (!result) {
+            registerWriteInterest();
+        }
+        return result;
     }
 
     public void addDispatch(DispatchType dispatchType) {
