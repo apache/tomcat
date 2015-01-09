@@ -2377,6 +2377,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         public AprSocketWrapper(Long socket, AprEndpoint endpoint) {
             super(socket, endpoint);
 
+            // TODO Make the socketWriteBuffer size configurable and align the
+            //      SSL and app buffer size settings with NIO & NIO2.
             if (endpoint.isSSLEnabled()) {
                 sslOutputBuffer = ByteBuffer.allocateDirect(SSL_OUTPUT_BUFFER_SIZE);
                 sslOutputBuffer.position(SSL_OUTPUT_BUFFER_SIZE);
@@ -2384,7 +2386,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 sslOutputBuffer = null;
             }
 
-            // TODO: This needs to be expandable to the header buffer size
             socketWriteBuffer = ByteBuffer.allocateDirect(6 * 1500);
         }
 
