@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
-import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Output filter.
@@ -29,16 +28,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * @author Remy Maucherat
  */
 public interface OutputFilter extends OutputBuffer {
-
-
-    /**
-     * Write some bytes.
-     *
-     * @return number of bytes written by the filter
-     */
-    @Override
-    public int doWrite(ByteChunk chunk, Response unused)
-        throws IOException;
 
 
     /**

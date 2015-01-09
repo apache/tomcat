@@ -34,15 +34,13 @@ public interface OutputBuffer {
      * Write the given data to the response. The caller owns the chunks.
      *
      * @param chunk data to write
-     * @param response used to allow buffers that can be shared by multiple
-     *          responses.
      *
      * @return The number of bytes written which may be less than available in
      *         the input chunk
      *
      * @throws IOException an underlying I/O error occurred
      */
-    public int doWrite(ByteChunk chunk, Response response) throws IOException;
+    public int doWrite(ByteChunk chunk) throws IOException;
 
 
     /**
