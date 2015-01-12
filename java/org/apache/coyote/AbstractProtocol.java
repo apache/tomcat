@@ -783,7 +783,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 boolean addToPoller);
         protected abstract Processor<S> createUpgradeProcessor(
                 SocketWrapperBase<S> socket, ByteBuffer leftoverInput,
-                HttpUpgradeHandler httpUpgradeProcessor) throws IOException;
+                HttpUpgradeHandler httpUpgradeHandler) throws IOException;
 
         protected void register(AbstractProcessor<S> processor) {
             if (getProtocol().getDomain() != null) {

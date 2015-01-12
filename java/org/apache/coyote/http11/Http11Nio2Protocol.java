@@ -232,9 +232,9 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         @Override
         protected Processor<Nio2Channel> createUpgradeProcessor(
                 SocketWrapperBase<Nio2Channel> socket, ByteBuffer leftoverInput,
-                HttpUpgradeHandler httpUpgradeProcessor)
+                HttpUpgradeHandler httpUpgradeHandler)
                 throws IOException {
-            return new UpgradeProcessor<>(socket, leftoverInput, httpUpgradeProcessor);
+            return new UpgradeProcessor<>(socket, leftoverInput, httpUpgradeHandler);
         }
 
         @Override
