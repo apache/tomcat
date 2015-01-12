@@ -104,15 +104,17 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
                 if (complete) {
                     sos.flush();
-                    wsWriteTimeout.unregister(this);
-                    clearHandler(null, useDispatch);
-                    if (close) {
-                        close();
+                    complete = sos.isReady();
+                    if (complete) {
+                        wsWriteTimeout.unregister(this);
+                        clearHandler(null, useDispatch);
+                        if (close) {
+                            close();
+                        }
                     }
                     break;
                 }
             }
-
         } catch (IOException ioe) {
             wsWriteTimeout.unregister(this);
             clearHandler(ioe, useDispatch);

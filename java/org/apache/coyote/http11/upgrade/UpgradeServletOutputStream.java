@@ -45,6 +45,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     // synchronization may be required (see fireListenerLock for an example).
     private final Object writeLock = new Object();
 
+    private volatile boolean flushing = false;
+
     private volatile boolean closeRequired = false;
 
     // Start in blocking-mode
@@ -69,11 +71,17 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         }
 
         // Make sure isReady() and onWritePossible() have a consistent view of
-        // buffer and fireListener when determining if the listener should fire
+        // fireListener when determining if the listener should fire
         synchronized (fireListenerLock) {
-            boolean result = socketWrapper.isReadyForWrite();
-            fireListener = !result;
-            return result;
+            if (flushing) {
+                socketWrapper.registerWriteInterest();
+                fireListener = true;
+                return false;
+            } else {
+                boolean result = socketWrapper.isReadyForWrite();
+                fireListener = !result;
+                return result;
+            }
         }
     }
 
@@ -124,9 +132,29 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
     @Override
     public void flush() throws IOException {
-        socketWrapper.flush(listener == null);
+        flushInternal(listener == null, true);
     }
 
+
+    private void flushInternal(boolean block, boolean updateFlushing) throws IOException {
+        try {
+            synchronized (writeLock) {
+                if (updateFlushing) {
+                    flushing = socketWrapper.flush(block);
+                } else {
+                    socketWrapper.flush(block);
+                }
+            }
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            onError(t);
+            if (t instanceof IOException) {
+                throw (IOException) t;
+            } else {
+                throw new IOException(t);
+            }
+        }
+    }
 
     @Override
     public void close() throws IOException {
@@ -156,18 +184,14 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
 
     protected final void onWritePossible() throws IOException {
-        try {
-            synchronized (writeLock) {
-                socketWrapper.flush(false);
+        if (flushing) {
+            flushInternal(false, true);
+            if (flushing) {
+                socketWrapper.registerWriteInterest();
+                return;
             }
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            onError(t);
-            if (t instanceof IOException) {
-                throw t;
-            } else {
-                throw new IOException(t);
-            }
+        } else {
+            flushInternal(false, false);
         }
 
         // Make sure isReady() and onWritePossible() have a consistent view
