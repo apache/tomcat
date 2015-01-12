@@ -40,6 +40,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
@@ -714,10 +715,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
     public static class Nio2SocketWrapper extends SocketWrapperBase<Nio2Channel> {
 
-        private static final ThreadLocal<Boolean> writeCompletionInProgress = new ThreadLocal<Boolean>() {
+        private static final ThreadLocal<AtomicInteger> nestedWriteCompletionCount =
+                new ThreadLocal<AtomicInteger>() {
             @Override
-            protected Boolean initialValue() {
-                return Boolean.FALSE;
+            protected AtomicInteger initialValue() {
+                return new AtomicInteger(0);
             }
         };
 
@@ -787,7 +789,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
                         } else if (Nio2SocketWrapper.this.bufferedWrites.size() > 0) {
-                            writeCompletionInProgress.set(Boolean.TRUE);
+                            nestedWriteCompletionCount.get().incrementAndGet();
                             // Continue writing data using a gathering write
                             ArrayList<ByteBuffer> arrayList = new ArrayList<>();
                             if (attachment.hasRemaining()) {
@@ -802,13 +804,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             Nio2SocketWrapper.this.getSocket().write(array, 0, array.length,
                                     Nio2SocketWrapper.this.getTimeout(), TimeUnit.MILLISECONDS,
                                     array, gatheringWriteCompletionHandler);
-                            writeCompletionInProgress.set(Boolean.FALSE);
+                            nestedWriteCompletionCount.get().decrementAndGet();
                         } else if (attachment.hasRemaining()) {
                             // Regular write
-                            writeCompletionInProgress.set(Boolean.TRUE);
+                            nestedWriteCompletionCount.get().incrementAndGet();
                             Nio2SocketWrapper.this.getSocket().write(attachment, Nio2SocketWrapper.this.getTimeout(),
                                     TimeUnit.MILLISECONDS, attachment, writeCompletionHandler);
-                            writeCompletionInProgress.set(Boolean.FALSE);
+                            nestedWriteCompletionCount.get().decrementAndGet();
                         } else {
                             // All data has been written
                             if (writeInterest) {
@@ -820,7 +822,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             writeBufferFlipped = false;
                         }
                     }
-                    if (writeNotify && !writeCompletionInProgress.get().booleanValue()) {
+                    if (writeNotify && nestedWriteCompletionCount.get().get() == 0) {
                         endpoint.processSocket(Nio2SocketWrapper.this, SocketStatus.OPEN_WRITE, false);
                     }
                 }
@@ -848,7 +850,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             failed(new EOFException(sm.getString("iob.failedwrite")), attachment);
                         } else if (Nio2SocketWrapper.this.bufferedWrites.size() > 0 || arrayHasData(attachment)) {
                             // Continue writing data
-                            writeCompletionInProgress.set(Boolean.TRUE);
+                            nestedWriteCompletionCount.get().incrementAndGet();
                             ArrayList<ByteBuffer> arrayList = new ArrayList<>();
                             for (ByteBuffer buffer : attachment) {
                                 if (buffer.hasRemaining()) {
@@ -864,7 +866,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             Nio2SocketWrapper.this.getSocket().write(array, 0, array.length,
                                     Nio2SocketWrapper.this.getTimeout(), TimeUnit.MILLISECONDS,
                                     array, gatheringWriteCompletionHandler);
-                            writeCompletionInProgress.set(Boolean.FALSE);
+                            nestedWriteCompletionCount.get().decrementAndGet();
                         } else {
                             // All data has been written
                             if (writeInterest) {
@@ -876,7 +878,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                             writeBufferFlipped = false;
                         }
                     }
-                    if (writeNotify && !writeCompletionInProgress.get().booleanValue()) {
+                    if (writeNotify && nestedWriteCompletionCount.get().get() == 0) {
                         endpoint.processSocket(Nio2SocketWrapper.this, SocketStatus.OPEN_WRITE, false);
                     }
                 }
