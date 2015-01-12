@@ -1512,9 +1512,9 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
-        protected synchronized int doWrite(boolean block, boolean flip)
+        protected synchronized int doWrite(boolean block)
                 throws IOException {
-            if (flip) {
+            if (!writeBufferFlipped) {
                 socketWriteBuffer.flip();
                 writeBufferFlipped = true;
             }
