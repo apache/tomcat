@@ -107,14 +107,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     }
 
 
-    public boolean getUseSendfile() {
-        return getEndpoint().getUseSendfile();
-    }
-
-    public void setUseSendfile(boolean useSendfile) {
-        ((NioEndpoint)getEndpoint()).setUseSendfile(useSendfile);
-    }
-
     // -------------------- Tcp setup --------------------
     public void setOomParachute(int oomParachute) {
         ((NioEndpoint)getEndpoint()).setOomParachute(oomParachute);
