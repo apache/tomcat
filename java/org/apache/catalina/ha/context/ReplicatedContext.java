@@ -83,13 +83,15 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
 
+        Map<String, Object> map = ((ReplApplContext) this.context)
+                .getAttributeMap();
+
         super.stopInternal();
 
-        Map<String,Object> map =
-                ((ReplApplContext)this.context).getAttributeMap();
         if (map instanceof ReplicatedMap) {
-            ((ReplicatedMap<?,?>)map).breakdown();
+            ((ReplicatedMap<?, ?>) map).breakdown();
         }
+
     }
 
 
@@ -160,6 +162,13 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
         @Override
         public void setAttribute(String name, Object value) {
+            if (name == null) {
+                throw new IllegalArgumentException(sm.getString("applicationContext.setAttribute.namenull"));
+            }
+            if (value == null) {
+                removeAttribute(name);
+                return;
+            }
             if ( (!getParent().getState().isAvailable()) || "org.apache.jasper.runtime.JspApplicationContextImpl".equals(name) ){
                 tomcatAttributes.put(name,value);
             } else
