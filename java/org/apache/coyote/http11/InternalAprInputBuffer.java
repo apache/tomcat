@@ -526,24 +526,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     }
 
 
-    // ---------------------------------------------------- InputBuffer Methods
-
-
-    /**
-     * Read some bytes.
-     */
-    @Override
-    public int doRead(ByteChunk chunk, Request req)
-        throws IOException {
-
-        if (lastActiveFilter == -1)
-            return inputStreamInputBuffer.doRead(chunk, req);
-        else
-            return activeFilters[lastActiveFilter].doRead(chunk,req);
-
-    }
-
-
     // ------------------------------------------------------ Protected Methods
 
     @Override
