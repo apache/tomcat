@@ -123,6 +123,12 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
 
     @Override
+    public void flush() throws IOException {
+        socketWrapper.flush(listener == null);
+    }
+
+
+    @Override
     public void close() throws IOException {
         closeRequired = true;
         socketWrapper.close();
@@ -130,7 +136,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
 
     private void preWriteChecks() {
-        if (listener != null && socketWrapper.hasDataToWrite()) {
+        if (listener != null && !socketWrapper.canWrite()) {
             throw new IllegalStateException(sm.getString("upgrade.sis.write.ise"));
         }
     }

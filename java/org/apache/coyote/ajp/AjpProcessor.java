@@ -737,6 +737,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                     cping = true;
                     try {
                         socketWrapper.write(true, pongMessageArray, 0, pongMessageArray.length);
+                        socketWrapper.flush(true);
                     } catch (IOException e) {
                         setErrorState(ErrorState.CLOSE_NOW, e);
                     }
@@ -1035,6 +1036,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         // Request more data immediately
         if (!waitingForBodyMessage) {
             socketWrapper.write(true, getBodyMessageArray, 0, getBodyMessageArray.length);
+            socketWrapper.flush(true);
             waitingForBodyMessage = true;
         }
 
@@ -1442,6 +1444,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         // Write to buffer
         responseMessage.end();
         socketWrapper.write(true, responseMessage.getBuffer(), 0, responseMessage.getLen());
+        socketWrapper.flush(true);
     }
 
 
@@ -1455,6 +1458,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         if (explicit && !finished) {
             // Send the flush message
             socketWrapper.write(true, flushMessageArray, 0, flushMessageArray.length);
+            socketWrapper.flush(true);
         }
     }
 
@@ -1490,6 +1494,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         } else {
             socketWrapper.write(true, endMessageArray, 0, endMessageArray.length);
         }
+        socketWrapper.flush(true);
     }
 
 
@@ -1556,6 +1561,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
             responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
             responseMessage.end();
             socketWrapper.write(blocking, responseMessage.getBuffer(), 0, responseMessage.getLen());
+            socketWrapper.flush(blocking);
 
             len -= thisTime;
             off += thisTime;

@@ -221,19 +221,19 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 boolean found = false;
                 for (int i = totalBodyRead; i < (totalBodyRead + line.length()); i++) {
                     if (DATA[i] != resultBytes[lineStart + i - totalBodyRead]) {
-                        int dataStart = i - 16;
+                        int dataStart = i - 64;
                         if (dataStart < 0) {
                             dataStart = 0;
                         }
-                        int dataEnd = i + 16;
+                        int dataEnd = i + 64;
                         if (dataEnd > DATA.length) {
                             dataEnd = DATA.length;
                         }
-                        int resultStart = lineStart + i - totalBodyRead - 16;
+                        int resultStart = lineStart + i - totalBodyRead - 64;
                         if (resultStart < 0) {
                             resultStart = 0;
                         }
-                        int resultEnd = lineStart + i - totalBodyRead + 16;
+                        int resultEnd = lineStart + i - totalBodyRead + 64;
                         if (resultEnd > resultString.length()) {
                             resultEnd = resultString.length();
                         }
@@ -492,25 +492,21 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 @Override
                 public void onTimeout(AsyncEvent event) throws IOException {
                     log.info("onTimeout");
-
                 }
 
                 @Override
                 public void onStartAsync(AsyncEvent event) throws IOException {
                     log.info("onStartAsync");
-
                 }
 
                 @Override
                 public void onError(AsyncEvent event) throws IOException {
                     log.info("AsyncListener.onError");
-
                 }
 
                 @Override
                 public void onComplete(AsyncEvent event) throws IOException {
                     log.info("onComplete");
-
                 }
             });
             // step 2 - notify on read

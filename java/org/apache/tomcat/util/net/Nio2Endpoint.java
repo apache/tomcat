@@ -1064,7 +1064,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         @Override
         public void close() throws IOException {
-            getSocket().close();
+            Nio2Channel socket = getSocket();
+            if (socket != null) {
+                socket.close();
+            }
         }
 
 
@@ -1107,167 +1110,128 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
 
+        /**
+         * {@inheritDoc}
+         * <p>
+         * Overridden for NIO2 to enable a gathering write to be used to write
+         * all of the remaining data in a single additional write should a
+         * non-blocking write leave data in the buffer.
+         */
         @Override
-        public void write(boolean block, byte[] buf, int off, int len) throws IOException {
-            if (len == 0 || getSocket() == null)
-                return;
-
-            if (block) {
-                try {
-                    do {
-                        int thisTime = transfer(buf, off, len, socketWriteBuffer);
-                        len = len - thisTime;
-                        off = off + thisTime;
-                        socketWriteBuffer.flip();
-                        while (socketWriteBuffer.hasRemaining()) {
-                            if (getSocket().write(socketWriteBuffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
-                                throw new EOFException(sm.getString("iob.failedwrite"));
-                            }
-                        }
-                        socketWriteBuffer.clear();
-                    } while (len > 0);
-                } catch (ExecutionException e) {
-                    if (e.getCause() instanceof IOException) {
-                        throw (IOException) e.getCause();
-                    } else {
-                        throw new IOException(e);
-                    }
-                } catch (InterruptedException e) {
-                    throw new IOException(e);
-                } catch (TimeoutException e) {
-                    throw new SocketTimeoutException();
-                }
-            } else {
-                // FIXME: Possible new behavior:
-                // If there's non blocking abuse (like a test writing 1MB in a single
-                // "non blocking" write), then block until the previous write is
-                // done rather than continue buffering
-                // Also allows doing autoblocking
-                // Could be "smart" with coordination with the main CoyoteOutputStream to
-                // indicate the end of a write
-                // Uses: if (writePending.tryAcquire(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS))
-                synchronized (writeCompletionHandler) {
-                    if (writePending.tryAcquire()) {
-                        // No pending completion handler, so writing to the main buffer
-                        // is possible
-                        int thisTime = transfer(buf, off, len, socketWriteBuffer);
-                        len = len - thisTime;
-                        off = off + thisTime;
-                        if (len > 0) {
-                            // Remaining data must be buffered
-                            addToBuffers(buf, off, len);
-                        }
-                        flush(false, true);
-                    } else {
+        protected void writeNonBlocking(byte[] buf, int off, int len) throws IOException {
+            // FIXME: Possible new behavior:
+            // If there's non blocking abuse (like a test writing 1MB in a single
+            // "non blocking" write), then block until the previous write is
+            // done rather than continue buffering
+            // Also allows doing autoblocking
+            // Could be "smart" with coordination with the main CoyoteOutputStream to
+            // indicate the end of a write
+            // Uses: if (writePending.tryAcquire(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS))
+            synchronized (writeCompletionHandler) {
+                if (writePending.tryAcquire()) {
+                    // No pending completion handler, so writing to the main buffer
+                    // is possible
+                    int thisTime = transfer(buf, off, len, socketWriteBuffer);
+                    len = len - thisTime;
+                    off = off + thisTime;
+                    if (len > 0) {
+                        // Remaining data must be buffered
                         addToBuffers(buf, off, len);
                     }
+                    flushNonBlocking(true);
+                } else {
+                    addToBuffers(buf, off, len);
                 }
             }
         }
 
 
         @Override
-        protected int doWrite(ByteBuffer buffer, boolean block, boolean flip) throws IOException {
-            // NO-OP for NIO2 since write(boolean, byte[], int, int)  and
-            // flush(boolean, boolean) are over-ridden.
-            return 0;
-        }
+        protected int doWrite(boolean block, boolean flip) throws IOException {
+            // Only called in the non-blocking case since
+            // writeNonBlocking(byte[], int, int) and flush(boolean, boolean)
+            // are over-ridden.
 
-
-        @Override
-        public boolean flush(boolean block) throws IOException {
-            if (getError() != null) {
-                throw getError();
-            }
-            return super.flush(block);
-        }
-
-
-        @Override
-        protected boolean flush(boolean block, boolean hasPermit) throws IOException {
-            if (getSocket() == null)
-                return false;
-
-            if (block) {
-                try {
-                    if (writePending.tryAcquire(getTimeout(), TimeUnit.MILLISECONDS)) {
-                        writePending.release();
-                    } else {
-                        // TODO
+            int result = -1;
+            try {
+                socketWriteBuffer.flip();
+                result = socketWriteBuffer.remaining();
+                while (socketWriteBuffer.hasRemaining()) {
+                    if (getSocket().write(socketWriteBuffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                        throw new EOFException(sm.getString("iob.failedwrite"));
                     }
-                } catch (InterruptedException e) {
-                    // Ignore timeout
                 }
-                try {
-                    if (bufferedWrites.size() > 0) {
-                        for (ByteBufferHolder holder : bufferedWrites) {
-                            holder.flip();
-                            ByteBuffer buffer = holder.getBuf();
-                            while (buffer.hasRemaining()) {
-                                if (getSocket().write(buffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
-                                    throw new EOFException(sm.getString("iob.failedwrite"));
-                                }
-                            }
-                        }
-                        bufferedWrites.clear();
-                    }
+                socketWriteBuffer.clear();
+                return result;
+            } catch (ExecutionException e) {
+                if (e.getCause() instanceof IOException) {
+                    throw (IOException) e.getCause();
+                } else {
+                    throw new IOException(e);
+                }
+            } catch (InterruptedException e) {
+                throw new IOException(e);
+            } catch (TimeoutException e) {
+                throw new SocketTimeoutException();
+            }
+        }
+
+
+        @Override
+        protected void flushBlocking() throws IOException {
+            // Before doing a blocking flush, make sure that any pending non
+            // blocking write has completed.
+            try {
+                if (writePending.tryAcquire(getTimeout(), TimeUnit.MILLISECONDS)) {
+                    writePending.release();
+                } else {
+                    throw new SocketTimeoutException();
+                }
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+
+            super.flushBlocking();
+        }
+
+        @Override
+        protected boolean flushNonBlocking() {
+            return flushNonBlocking(false);
+        }
+
+        private boolean flushNonBlocking(boolean hasPermit) {
+            synchronized (writeCompletionHandler) {
+                if (hasPermit || writePending.tryAcquire()) {
                     if (!writeBufferFlipped) {
                         socketWriteBuffer.flip();
                         writeBufferFlipped = true;
                     }
-                    while (socketWriteBuffer.hasRemaining()) {
-                        if (getSocket().write(socketWriteBuffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
-                            throw new EOFException(sm.getString("iob.failedwrite"));
+                    if (bufferedWrites.size() > 0) {
+                        // Gathering write of the main buffer plus all leftovers
+                        ArrayList<ByteBuffer> arrayList = new ArrayList<>();
+                        if (socketWriteBuffer.hasRemaining()) {
+                            arrayList.add(socketWriteBuffer);
                         }
-                    }
-                } catch (ExecutionException e) {
-                    if (e.getCause() instanceof IOException) {
-                        throw (IOException) e.getCause();
+                        for (ByteBufferHolder buffer : bufferedWrites) {
+                            buffer.flip();
+                            arrayList.add(buffer.getBuf());
+                        }
+                        bufferedWrites.clear();
+                        ByteBuffer[] array = arrayList.toArray(new ByteBuffer[arrayList.size()]);
+                        getSocket().write(array, 0, array.length, getTimeout(),
+                                TimeUnit.MILLISECONDS, array, gatheringWriteCompletionHandler);
+                    } else if (socketWriteBuffer.hasRemaining()) {
+                        // Regular write
+                        getSocket().write(socketWriteBuffer, getTimeout(),
+                                TimeUnit.MILLISECONDS, socketWriteBuffer, writeCompletionHandler);
                     } else {
-                        throw new IOException(e);
+                        // Nothing was written
+                        writePending.release();
+                        socketWriteBuffer.clear();
+                        writeBufferFlipped = false;
                     }
-                } catch (InterruptedException e) {
-                    throw new IOException(e);
-                } catch (TimeoutException e) {
-                    throw new SocketTimeoutException();
                 }
-                socketWriteBuffer.clear();
-                writeBufferFlipped = false;
-                return false;
-            } else {
-                synchronized (writeCompletionHandler) {
-                    if (hasPermit || writePending.tryAcquire()) {
-                        if (!writeBufferFlipped) {
-                            socketWriteBuffer.flip();
-                            writeBufferFlipped = true;
-                        }
-                        if (bufferedWrites.size() > 0) {
-                            // Gathering write of the main buffer plus all leftovers
-                            ArrayList<ByteBuffer> arrayList = new ArrayList<>();
-                            if (socketWriteBuffer.hasRemaining()) {
-                                arrayList.add(socketWriteBuffer);
-                            }
-                            for (ByteBufferHolder buffer : bufferedWrites) {
-                                buffer.flip();
-                                arrayList.add(buffer.getBuf());
-                            }
-                            bufferedWrites.clear();
-                            ByteBuffer[] array = arrayList.toArray(new ByteBuffer[arrayList.size()]);
-                            getSocket().write(array, 0, array.length, getTimeout(),
-                                    TimeUnit.MILLISECONDS, array, gatheringWriteCompletionHandler);
-                        } else if (socketWriteBuffer.hasRemaining()) {
-                            // Regular write
-                            getSocket().write(socketWriteBuffer, getTimeout(),
-                                    TimeUnit.MILLISECONDS, socketWriteBuffer, writeCompletionHandler);
-                        } else {
-                            // Nothing was written
-                            writePending.release();
-                            socketWriteBuffer.clear();
-                            writeBufferFlipped = false;
-                        }
-                    }
-                    return hasDataToWrite();
-                }
+                return hasDataToWrite();
             }
         }
 

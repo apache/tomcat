@@ -47,7 +47,6 @@ import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.util.IOTools;
 
 public class TestUpgrade extends TomcatBaseTest {
 
@@ -234,8 +233,12 @@ public class TestUpgrade extends TomcatBaseTest {
 
             try (ServletInputStream sis = connection.getInputStream();
                  ServletOutputStream sos = connection.getOutputStream()){
-
-                IOTools.flow(sis, sos);
+                byte[] buffer = new byte[8192];
+                int read;
+                while ((read = sis.read(buffer)) >= 0) {
+                    sos.write(buffer, 0, read);
+                    sos.flush();
+                }
             } catch (IOException ioe) {
                 throw new IllegalStateException(ioe);
             }
@@ -274,7 +277,7 @@ public class TestUpgrade extends TomcatBaseTest {
 
         private class EchoReadListener extends NoOpReadListener {
 
-            private byte[] buffer = new byte[8096];
+            private byte[] buffer = new byte[8192];
 
             @Override
             public void onDataAvailable() {
@@ -288,6 +291,7 @@ public class TestUpgrade extends TomcatBaseTest {
                                 throw new IOException("Unable to echo data. " +
                                         "isReady() returned false");
                             }
+                            sos.flush();
                         }
                     }
                 } catch (IOException ioe) {

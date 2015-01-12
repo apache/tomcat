@@ -2509,8 +2509,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
-        protected int doWrite(ByteBuffer bytebuffer, boolean block, boolean flip)
-                throws IOException {
+        protected int doWrite(boolean block, boolean flip) throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("apr.closed", getSocket()));
             }
@@ -2521,7 +2520,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             readLock.lock();
             try {
                 if (getBlockingStatus() == block) {
-                    return doWriteInternal(bytebuffer, flip);
+                    return doWriteInternal(flip);
                 }
             } finally {
                 readLock.unlock();
@@ -2541,7 +2540,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 readLock.lock();
                 try {
                     writeLock.unlock();
-                    return doWriteInternal(bytebuffer, flip);
+                    return doWriteInternal(flip);
                 } finally {
                     readLock.unlock();
                 }
@@ -2555,10 +2554,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        private int doWriteInternal(ByteBuffer bytebuffer, boolean flip)
-                throws IOException {
+        private int doWriteInternal(boolean flip) throws IOException {
             if (flip) {
-                bytebuffer.flip();
+                socketWriteBuffer.flip();
                 writeBufferFlipped = true;
             }
 
@@ -2571,7 +2569,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     if (sslOutputBuffer.remaining() == 0) {
                         // Buffer was fully written last time around
                         sslOutputBuffer.clear();
-                        transfer(bytebuffer, sslOutputBuffer);
+                        transfer(socketWriteBuffer, sslOutputBuffer);
                         sslOutputBuffer.flip();
                     } else {
                         // Buffer still has data from previous attempt to write
@@ -2585,8 +2583,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 sslOutputBuffer.position() + sslWritten);
                     }
                 } else {
-                    thisTime = Socket.sendb(getSocket().longValue(), bytebuffer,
-                            bytebuffer.position(), bytebuffer.limit() - bytebuffer.position());
+                    thisTime = Socket.sendb(getSocket().longValue(),
+                            socketWriteBuffer, socketWriteBuffer.position(),
+                            socketWriteBuffer.limit() - socketWriteBuffer.position());
                 }
                 if (Status.APR_STATUS_IS_EAGAIN(-thisTime)) {
                     thisTime = 0;
@@ -2601,11 +2600,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             Integer.valueOf(-thisTime), getSocket(), this));
                 }
                 written += thisTime;
-                bytebuffer.position(bytebuffer.position() + thisTime);
-            } while (thisTime > 0 && bytebuffer.hasRemaining());
+                socketWriteBuffer.position(socketWriteBuffer.position() + thisTime);
+            } while (thisTime > 0 && socketWriteBuffer.hasRemaining());
 
-            if (bytebuffer.remaining() == 0) {
-                bytebuffer.clear();
+            if (socketWriteBuffer.remaining() == 0) {
+                socketWriteBuffer.clear();
                 writeBufferFlipped = false;
             }
             // If there is data left in the buffer the socket will be registered for
