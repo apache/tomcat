@@ -30,6 +30,7 @@ import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -52,7 +53,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11AprProcessor(int headerBufferSize, AprEndpoint endpoint,
+    public Http11AprProcessor(int headerBufferSize, AbstractEndpoint<Long> endpoint,
             int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
 
         super(endpoint);

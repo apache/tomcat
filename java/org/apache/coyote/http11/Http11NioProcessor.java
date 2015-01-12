@@ -27,6 +27,7 @@ import org.apache.coyote.ErrorState;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
@@ -57,7 +58,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11NioProcessor(int maxHttpHeaderSize, NioEndpoint endpoint,
+    public Http11NioProcessor(int maxHttpHeaderSize, AbstractEndpoint<NioChannel> endpoint,
             int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
 
         super(endpoint);
