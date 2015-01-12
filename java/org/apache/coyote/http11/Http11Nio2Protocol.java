@@ -77,19 +77,13 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
       return ((Nio2Endpoint)getEndpoint()).getAcceptorThreadPriority();
     }
 
-    public boolean getUseSendfile() {
-        return getEndpoint().getUseSendfile();
-    }
-
-    public void setUseSendfile(boolean useSendfile) {
-        ((Nio2Endpoint)getEndpoint()).setUseSendfile(useSendfile);
-    }
 
     // -------------------- Tcp setup --------------------
 
     public void setOomParachute(int oomParachute) {
         ((Nio2Endpoint)getEndpoint()).setOomParachute(oomParachute);
     }
+
 
     // ----------------------------------------------------- JMX related methods
 

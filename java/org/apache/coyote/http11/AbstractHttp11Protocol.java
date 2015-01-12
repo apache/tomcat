@@ -184,6 +184,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    public boolean getUseSendfile() { return getEndpoint().getUseSendfile(); }
+    public void setUseSendfile(boolean useSendfile) { getEndpoint().setUseSendfile(useSendfile); }
+
+
     /**
      * Maximum number of requests which can be performed over a keepalive
      * connection. The default is the same as for Apache HTTP Server.
