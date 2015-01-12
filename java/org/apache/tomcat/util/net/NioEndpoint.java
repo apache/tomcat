@@ -1512,14 +1512,12 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
-        protected synchronized int doWrite(boolean block)
-                throws IOException {
+        protected synchronized void doWrite(boolean block) throws IOException {
             if (!writeBufferFlipped) {
                 socketWriteBuffer.flip();
                 writeBufferFlipped = true;
             }
 
-            int written = 0;
             long writeTimeout = getWriteTimeout();
             Selector selector = null;
             try {
@@ -1528,7 +1526,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 // Ignore
             }
             try {
-                written = pool.write(socketWriteBuffer, getSocket(), selector, writeTimeout, block);
+                pool.write(socketWriteBuffer, getSocket(), selector, writeTimeout, block);
                 // Make sure we are flushed
                 do {
                     if (getSocket().flush(true, selector, writeTimeout)) break;
@@ -1546,8 +1544,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             // write further up the stack. This is to ensure the socket is only
             // registered for write once as both container and user code can trigger
             // write registration.
-
-            return written;
         }
 
 
