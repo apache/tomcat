@@ -348,13 +348,7 @@ public abstract class SocketWrapperBase<E> {
         while (socketWriteBuffer.remaining() == 0) {
             len = len - thisTime;
             off = off + thisTime;
-            // TODO: There is an assumption here that the blocking write will
-            //       block until all the data is written or the write times out.
-            //       Document this assumption in the Javadoc for doWrite(),
-            //       ensure it is valid for all implementations of doWrite() and
-            //       then review all callers of doWrite() and review what
-            //       simplifications this offers.
-            doWrite(true, true);
+            doWrite(true);
             thisTime = transfer(buf, off, len, socketWriteBuffer);
         }
     }
@@ -378,7 +372,7 @@ public abstract class SocketWrapperBase<E> {
             len = len - thisTime;
             while (socketWriteBuffer.remaining() == 0) {
                 off = off + thisTime;
-                if (doWrite(false, !writeBufferFlipped) == 0) {
+                if (doWrite(false) == 0) {
                     break;
                 }
                 if (writeBufferFlipped) {
@@ -434,7 +428,7 @@ public abstract class SocketWrapperBase<E> {
 
 
     protected void flushBlocking() throws IOException {
-        doWrite(true, !writeBufferFlipped);
+        doWrite(true);
 
         if (bufferedWrites.size() > 0) {
             Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
@@ -446,7 +440,7 @@ public abstract class SocketWrapperBase<E> {
                     if (buffer.getBuf().remaining() == 0) {
                         bufIter.remove();
                     }
-                    doWrite(true, !writeBufferFlipped);
+                    doWrite(true);
                 }
             }
         }
@@ -459,7 +453,7 @@ public abstract class SocketWrapperBase<E> {
 
         // Write to the socket, if there is anything to write
         if (dataLeft) {
-            doWrite(false, !writeBufferFlipped);
+            doWrite(false);
         }
 
         dataLeft = hasMoreDataToFlush();
@@ -474,7 +468,7 @@ public abstract class SocketWrapperBase<E> {
                     if (buffer.getBuf().remaining() == 0) {
                         bufIter.remove();
                     }
-                    doWrite(false, !writeBufferFlipped);
+                    doWrite(false);
                 }
             }
         }
@@ -483,7 +477,19 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    protected abstract int doWrite(boolean block, boolean flip) throws IOException;
+    /**
+     * Write the contents of the socketWriteBuffer to the socket. For blocking
+     * writes either then entire contents of the buffer will be written or an
+     * IOException will be thrown. Partial blocking writes will not occur.
+     *
+     * @param block Should the write be blocking or not?
+     *
+     * @return The number of bytes written
+     *
+     * @throws IOException If an I/O error such as a timeout occurs during the
+     *                     write
+     */
+    protected abstract int doWrite(boolean block) throws IOException;
 
 
     protected void addToBuffers(byte[] buf, int offset, int length) {

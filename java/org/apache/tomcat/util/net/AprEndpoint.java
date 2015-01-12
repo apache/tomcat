@@ -2509,7 +2509,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
-        protected int doWrite(boolean block, boolean flip) throws IOException {
+        protected int doWrite(boolean block) throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("apr.closed", getSocket()));
             }
@@ -2520,7 +2520,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             readLock.lock();
             try {
                 if (getBlockingStatus() == block) {
-                    return doWriteInternal(flip);
+                    return doWriteInternal();
                 }
             } finally {
                 readLock.unlock();
@@ -2540,7 +2540,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 readLock.lock();
                 try {
                     writeLock.unlock();
-                    return doWriteInternal(flip);
+                    return doWriteInternal();
                 } finally {
                     readLock.unlock();
                 }
@@ -2554,8 +2554,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        private int doWriteInternal(boolean flip) throws IOException {
-            if (flip) {
+        private int doWriteInternal() throws IOException {
+            if (!writeBufferFlipped) {
                 socketWriteBuffer.flip();
                 writeBufferFlipped = true;
             }
@@ -2601,7 +2601,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 }
                 written += thisTime;
                 socketWriteBuffer.position(socketWriteBuffer.position() + thisTime);
-            } while (thisTime > 0 && socketWriteBuffer.hasRemaining());
+            } while ((thisTime > 0 || getBlockingStatus()) && socketWriteBuffer.hasRemaining());
 
             if (socketWriteBuffer.remaining() == 0) {
                 socketWriteBuffer.clear();

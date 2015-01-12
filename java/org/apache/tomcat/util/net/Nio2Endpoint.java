@@ -1148,12 +1148,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
 
+        /**
+         * @param block Ignored since this method is only called in the
+         *              blocking case
+         */
         @Override
-        protected int doWrite(boolean block, boolean flip) throws IOException {
-            // Only called in the non-blocking case since
-            // writeNonBlocking(byte[], int, int) and flush(boolean, boolean)
-            // are over-ridden.
-
+        protected int doWrite(boolean block) throws IOException {
             int result = -1;
             try {
                 socketWriteBuffer.flip();
