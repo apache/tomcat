@@ -188,9 +188,9 @@ public abstract class SocketWrapperBase<E> {
     }
 
     /**
-     * Checks to see if there is any writes pending and if there is calls
+     * Checks to see if there are any writes pending and if there are calls
      * {@link #registerWriteInterest()} to trigger a callback once the pending
-     * write has completed.
+     * writes have completed.
      * <p>
      * Note: Once this method has returned <code>false</code> it <b>MUST NOT</b>
      *       be called again until the pending write has completed and the
@@ -202,11 +202,17 @@ public abstract class SocketWrapperBase<E> {
      *         written otherwise <code>false</code>
      */
     public boolean isReadyForWrite() {
-        boolean result = !hasDataToWrite();
+        boolean result = canWrite();
         if (!result) {
             registerWriteInterest();
         }
         return result;
+    }
+
+
+    public boolean canWrite() {
+        return !writeBufferFlipped && socketWriteBuffer.hasRemaining() &&
+                bufferedWrites.size() == 0;
     }
 
     public void addDispatch(DispatchType dispatchType) {
@@ -286,48 +292,107 @@ public abstract class SocketWrapperBase<E> {
     public abstract void unRead(ByteBuffer input);
     public abstract void close() throws IOException;
 
+
     /**
      * Writes the provided data to the socket, buffering any remaining data if
-     * used in non-blocking mode. If any data remains in the buffers from a
-     * previous write then that data will be written before this data. It is
-     * therefore unnecessary to call flush() before calling this method.
+     * used in non-blocking mode.
      *
      * @param block <code>true<code> if a blocking write should be used,
      *                  otherwise a non-blocking write will be used
-     * @param b     The byte array containing the data to be written
+     * @param buf   The byte array containing the data to be written
      * @param off   The offset within the byte array of the data to be written
      * @param len   The length of the data to be written
      *
      * @throws IOException If an IO error occurs during the write
      */
-    public void write(boolean block, byte[] b, int off, int len) throws IOException {
-        // Always flush any data remaining in the buffers
-        boolean dataLeft = flush(block, true);
-
-        if (len == 0 || b == null) {
+    public void write(boolean block, byte[] buf, int off, int len) throws IOException {
+        if (len == 0 || buf == null || getSocket() == null) {
             return;
         }
 
-        // Keep writing until all the data is written or a non-blocking write
-        // leaves data in the buffer
-        while (!dataLeft && len > 0) {
-            int thisTime = transfer(b, off, len, socketWriteBuffer);
+        // While the implementations for blocking and non-blocking writes are
+        // very similar they have been split into separate methods to allow
+        // sub-classes to override them individually. NIO2, for example,
+        // overrides the non-blocking write but not the blocking write.
+        if (block) {
+            writeBlocking(buf, off, len);
+        } else {
+            writeNonBlocking(buf, off, len);
+        }
+
+        // Prevent timeouts
+        access();
+    }
+
+
+    /**
+     * Transfers the data to the socket write buffer (writing that data to the
+     * socket if the buffer fills up using a blocking write) until all the data
+     * has been transferred and space remains in the socket write buffer.
+     *
+     * @param buf   The byte array containing the data to be written
+     * @param off   The offset within the byte array of the data to be written
+     * @param len   The length of the data to be written
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
+    protected void writeBlocking(byte[] buf, int off, int len) throws IOException {
+        // Note: There is an implementation assumption that if the switch from
+        //       non-blocking to blocking has been made then any pending
+        //       non-blocking writes were flushed at the time the switch
+        //       occurred.
+
+        // Keep writing until all the data has been transferred to the socket
+        // write buffer and space remains in that buffer
+        int thisTime = transfer(buf, off, len, socketWriteBuffer);
+        while (socketWriteBuffer.remaining() == 0) {
             len = len - thisTime;
             off = off + thisTime;
-            int written = doWrite(socketWriteBuffer, block, true);
-            if (written == 0) {
-                dataLeft = true;
-            } else {
-                dataLeft = flush(block, true);
+            // TODO: There is an assumption here that the blocking write will
+            //       block until all the data is written or the write times out.
+            //       Document this assumption in the Javadoc for doWrite(),
+            //       ensure it is valid for all implementations of doWrite() and
+            //       then review all callers of doWrite() and review what
+            //       simplifications this offers.
+            doWrite(true, true);
+            thisTime = transfer(buf, off, len, socketWriteBuffer);
+        }
+    }
+
+
+    /**
+     * Transfers the data to the socket write buffer (writing that data to the
+     * socket if the buffer fills up using a non-blocking write) until either
+     * all the data has been transferred and space remains in the socket write
+     * buffer or a non-blocking write leaves data in the socket write buffer.
+     *
+     * @param buf   The byte array containing the data to be written
+     * @param off   The offset within the byte array of the data to be written
+     * @param len   The length of the data to be written
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
+    protected void writeNonBlocking(byte[] buf, int off, int len) throws IOException {
+        if (!writeBufferFlipped) {
+            int thisTime = transfer(buf, off, len, socketWriteBuffer);
+            len = len - thisTime;
+            while (socketWriteBuffer.remaining() == 0) {
+                off = off + thisTime;
+                if (doWrite(false, !writeBufferFlipped) == 0) {
+                    break;
+                }
+                if (writeBufferFlipped) {
+                    thisTime = 0;
+                } else {
+                    thisTime = transfer(buf, off, len, socketWriteBuffer);
+                }
+                len = len - thisTime;
             }
         }
 
-        // Prevent timeouts for just doing client writes
-        access();
-
-        if (!block && len > 0) {
+        if (len > 0) {
             // Remaining data must be buffered
-            addToBuffers(b, off, len);
+            addToBuffers(buf, off, len);
         }
     }
 
@@ -345,42 +410,33 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     public boolean flush(boolean block) throws IOException {
-        return flush(block, false);
+        if (getSocket() == null) {
+            return false;
+        }
+
+        if (getError() != null) {
+            throw getError();
+        }
+
+        boolean result = false;
+        if (block) {
+            // A blocking flush will always empty the buffer.
+            flushBlocking();
+        } else {
+            result = flushNonBlocking();
+        }
+
+        // Prevent timeouts
+        access();
+
+        return result;
     }
 
 
-    /**
-     * Writes as much data as possible from any that remains in the buffers.
-     * This method exists for those implementations (e.g. NIO2) that need
-     * slightly different behaviour depending on if flush() was called directly
-     * or by another method in this class or a sub-class.
-     *
-     * @param block    <code>true<code> if a blocking write should be used,
-     *                     otherwise a non-blocking write will be used
-     * @param internal <code>true<code> if flush() was called by another method
-     *                     in class or sub-class
-     *
-     * @return <code>true</code> if data remains to be flushed after this method
-     *         completes, otherwise <code>false</code>. In blocking mode
-     *         therefore, the return value should always be <code>false</code>
-     *
-     * @throws IOException If an IO error occurs during the write
-     */
-    protected boolean flush(boolean block, boolean internal) throws IOException {
+    protected void flushBlocking() throws IOException {
+        doWrite(true, !writeBufferFlipped);
 
-        // Prevent timeout for async
-        access();
-
-        boolean dataLeft = hasMoreDataToFlush();
-
-        // Write to the socket, if there is anything to write
-        if (dataLeft) {
-            doWrite(socketWriteBuffer, block, !writeBufferFlipped);
-        }
-
-        dataLeft = hasMoreDataToFlush();
-
-        if (!dataLeft && bufferedWrites.size() > 0) {
+        if (bufferedWrites.size() > 0) {
             Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
             while (!hasMoreDataToFlush() && bufIter.hasNext()) {
                 ByteBufferHolder buffer = bufIter.next();
@@ -390,8 +446,35 @@ public abstract class SocketWrapperBase<E> {
                     if (buffer.getBuf().remaining() == 0) {
                         bufIter.remove();
                     }
-                    doWrite(socketWriteBuffer, block, true);
-                    //here we must break if we didn't finish the write
+                    doWrite(true, !writeBufferFlipped);
+                }
+            }
+        }
+
+    }
+
+
+    protected boolean flushNonBlocking() throws IOException {
+        boolean dataLeft = hasMoreDataToFlush();
+
+        // Write to the socket, if there is anything to write
+        if (dataLeft) {
+            doWrite(false, !writeBufferFlipped);
+        }
+
+        dataLeft = hasMoreDataToFlush();
+
+        if (!dataLeft && bufferedWrites.size() > 0) {
+            Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
+            while (!hasMoreDataToFlush() && bufIter.hasNext()) {
+                ByteBufferHolder buffer = bufIter.next();
+                buffer.flip();
+                while (!hasMoreDataToFlush() && buffer.getBuf().remaining() > 0) {
+                    transfer(buffer.getBuf(), socketWriteBuffer);
+                    if (buffer.getBuf().remaining() == 0) {
+                        bufIter.remove();
+                    }
+                    doWrite(false, !writeBufferFlipped);
                 }
             }
         }
@@ -400,8 +483,7 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    protected abstract int doWrite(ByteBuffer buffer, boolean block, boolean flip)
-            throws IOException;
+    protected abstract int doWrite(boolean block, boolean flip) throws IOException;
 
 
     protected void addToBuffers(byte[] buf, int offset, int length) {

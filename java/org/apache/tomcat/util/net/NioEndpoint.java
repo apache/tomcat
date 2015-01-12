@@ -1472,7 +1472,10 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
         @Override
         public void close() throws IOException {
-            getSocket().close();
+            NioChannel socket = getSocket();
+            if (socket != null) {
+                socket.close();
+            }
         }
 
 
@@ -1509,10 +1512,10 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
-        protected synchronized int doWrite(ByteBuffer bytebuffer, boolean block, boolean flip)
+        protected synchronized int doWrite(boolean block, boolean flip)
                 throws IOException {
             if (flip) {
-                bytebuffer.flip();
+                socketWriteBuffer.flip();
                 writeBufferFlipped = true;
             }
 
@@ -1525,7 +1528,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 // Ignore
             }
             try {
-                written = pool.write(bytebuffer, getSocket(), selector, writeTimeout, block);
+                written = pool.write(socketWriteBuffer, getSocket(), selector, writeTimeout, block);
                 // Make sure we are flushed
                 do {
                     if (getSocket().flush(true, selector, writeTimeout)) break;
@@ -1535,8 +1538,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     pool.put(selector);
                 }
             }
-            if (bytebuffer.remaining() == 0) {
-                bytebuffer.clear();
+            if (socketWriteBuffer.remaining() == 0) {
+                socketWriteBuffer.clear();
                 writeBufferFlipped = false;
             }
             // If there is data left in the buffer the socket will be registered for

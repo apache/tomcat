@@ -88,7 +88,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             // was written
             return;
         }
-        boolean complete = true;
+        boolean complete = false;
         try {
             // If this is false there will be a call back when it is true
             while (sos.isReady()) {
@@ -103,6 +103,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     }
                 }
                 if (complete) {
+                    sos.flush();
                     wsWriteTimeout.unregister(this);
                     clearHandler(null, useDispatch);
                     if (close) {
@@ -117,9 +118,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             clearHandler(ioe, useDispatch);
             close();
         }
+
         if (!complete) {
             // Async write is in progress
-
             long timeout = getSendTimeout();
             if (timeout > 0) {
                 // Register with timeout thread
