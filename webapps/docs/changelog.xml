@@ -62,6 +62,9 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>57425</bug> Don't add attributes with null value or name to the replicated context. (fschumacher)
+      </fix>
       <add>
         <bug>57431</bug> Enable usage of custom class for context creation when using embedded tomcat. (fschumacher)
       </add>
