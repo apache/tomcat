@@ -2987,7 +2987,7 @@ public class Request
             } else {
                 contentType = contentType.trim();
             }
-
+                    
             if ("multipart/form-data".equals(contentType)) {
                 parseParts(false);
                 success = true;
@@ -2998,7 +2998,9 @@ public class Request
                 success = true;
                 return;
             }
-
+             if ("application/json".equals(contentType)) {
+                //TODO for post data type  json
+            }
             int len = getContentLength();
 
             if (len > 0) {
