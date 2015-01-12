@@ -2509,7 +2509,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
-        protected int doWrite(boolean block) throws IOException {
+        protected void doWrite(boolean block) throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("apr.closed", getSocket()));
             }
@@ -2520,7 +2520,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             readLock.lock();
             try {
                 if (getBlockingStatus() == block) {
-                    return doWriteInternal();
+                    doWriteInternal();
                 }
             } finally {
                 readLock.unlock();
@@ -2540,7 +2540,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 readLock.lock();
                 try {
                     writeLock.unlock();
-                    return doWriteInternal();
+                    doWriteInternal();
                 } finally {
                     readLock.unlock();
                 }
@@ -2554,13 +2554,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        private int doWriteInternal() throws IOException {
+        private void doWriteInternal() throws IOException {
             if (!writeBufferFlipped) {
                 socketWriteBuffer.flip();
                 writeBufferFlipped = true;
             }
 
-            int written = 0;
             int thisTime;
 
             do {
@@ -2599,7 +2598,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     throw new IOException(sm.getString("socket.apr.write.error",
                             Integer.valueOf(-thisTime), getSocket(), this));
                 }
-                written += thisTime;
                 socketWriteBuffer.position(socketWriteBuffer.position() + thisTime);
             } while ((thisTime > 0 || getBlockingStatus()) && socketWriteBuffer.hasRemaining());
 
@@ -2611,8 +2609,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             // write further up the stack. This is to ensure the socket is only
             // registered for write once as both container and user code can trigger
             // write registration.
-
-            return written;
         }
 
 

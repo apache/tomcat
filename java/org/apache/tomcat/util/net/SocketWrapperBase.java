@@ -372,9 +372,7 @@ public abstract class SocketWrapperBase<E> {
             len = len - thisTime;
             while (socketWriteBuffer.remaining() == 0) {
                 off = off + thisTime;
-                if (doWrite(false) == 0) {
-                    break;
-                }
+                doWrite(false);
                 if (writeBufferFlipped) {
                     thisTime = 0;
                 } else {
@@ -484,12 +482,10 @@ public abstract class SocketWrapperBase<E> {
      *
      * @param block Should the write be blocking or not?
      *
-     * @return The number of bytes written
-     *
      * @throws IOException If an I/O error such as a timeout occurs during the
      *                     write
      */
-    protected abstract int doWrite(boolean block) throws IOException;
+    protected abstract void doWrite(boolean block) throws IOException;
 
 
     protected void addToBuffers(byte[] buf, int offset, int length) {
