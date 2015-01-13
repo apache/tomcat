@@ -181,10 +181,11 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
         boolean readDone = false;
         int result = 0;
+        int readLimit = Math.min(bbuf.capacity(), buf.length - lastValid);
         readLock.lock();
         try {
             if (wrapper.getBlockingStatus() == block) {
-                result = Socket.recvbb(socket, 0, buf.length - lastValid);
+                result = Socket.recvbb(socket, 0, readLimit);
                 readDone = true;
             }
         } finally {
@@ -206,7 +207,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 readLock.lock();
                 try {
                     writeLock.unlock();
-                    result = Socket.recvbb(socket, 0, buf.length - lastValid);
+                    result = Socket.recvbb(socket, 0, readLimit);
                 } finally {
                     readLock.unlock();
                 }
