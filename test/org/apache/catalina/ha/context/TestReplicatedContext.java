@@ -38,7 +38,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestReplicatedContext extends TomcatBaseTest {
 
     @Test
-    public void testBug57425() throws LifecycleException, IOException, ServletException {
+    public void testBug57425() throws LifecycleException, IOException {
         Tomcat tomcat = getTomcatInstance();
         Host host = tomcat.getHost();
         if (host instanceof StandardHost) {
