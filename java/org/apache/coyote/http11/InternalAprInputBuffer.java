@@ -38,7 +38,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
-public class InternalAprInputBuffer extends AbstractNioInputBuffer<Long> {
+public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
     private static final Log log =
         LogFactory.getLog(InternalAprInputBuffer.class);
