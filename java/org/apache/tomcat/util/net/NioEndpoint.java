@@ -1588,12 +1588,9 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
 
         @Override
-        public ByteBuffer expand(ByteBuffer buffer, int remaining) {return buffer;}
-        @Override
         public ByteBuffer getReadBuffer() {return readbuf;}
         @Override
         public ByteBuffer getWriteBuffer() {return writebuf;}
-
     }
 
     // ------------------------------------------------ Handler Inner Interface

@@ -63,10 +63,6 @@ public class SecureNioChannel extends NioChannel  {
         //selector pool for blocking operations
         this.pool = pool;
 
-        //ensure that the application has a large enough read/write buffers
-        //by doing this, we should not encounter any buffer overflow errors
-        bufHandler.expand(bufHandler.getReadBuffer(), appBufSize);
-        bufHandler.expand(bufHandler.getWriteBuffer(), appBufSize);
         reset();
     }
 
@@ -531,7 +527,6 @@ public class SecureNioChannel extends NioChannel  {
      * when buffer overflow exceptions happen
      */
     public static interface ApplicationBufferHandler {
-        public ByteBuffer expand(ByteBuffer buffer, int remaining);
         public ByteBuffer getReadBuffer();
         public ByteBuffer getWriteBuffer();
     }
