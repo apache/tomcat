@@ -17,17 +17,11 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -51,31 +45,11 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
      */
     public InternalAprInputBuffer(Request request, int headerBufferSize) {
         super(request, headerBufferSize);
-
-        if (headerBufferSize < (8 * 1024)) {
-            bbuf = ByteBuffer.allocateDirect(6 * 1500);
-        } else {
-            bbuf = ByteBuffer.allocateDirect((headerBufferSize / 1500 + 1) * 1500);
-        }
-
         inputStreamInputBuffer = new SocketInputBuffer();
     }
 
 
     // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * Direct byte buffer used to perform actual reading.
-     */
-    private final ByteBuffer bbuf;
-
-
-    /**
-     * Underlying socket.
-     */
-    private long socket;
-
 
     private SocketWrapperBase<Long> wrapper;
 
@@ -88,7 +62,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
      */
     @Override
     public void recycle() {
-        socket = 0;
         wrapper = null;
         super.recycle();
     }
@@ -106,15 +79,12 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     protected void init(SocketWrapperBase<Long> socketWrapper,
             AbstractEndpoint<Long> endpoint) throws IOException {
 
-        socket = socketWrapper.getSocket().longValue();
         wrapper = socketWrapper;
 
-        int bufLength = headerBufferSize + bbuf.capacity();
+        int bufLength = Math.max(headerBufferSize, 8192);
         if (buf == null || buf.length < bufLength) {
             buf = new byte[bufLength];
         }
-
-        Socket.setrbb(this.socket, bbuf);
     }
 
 
@@ -129,98 +99,16 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                     (sm.getString("iib.requestheadertoolarge.error"));
             }
         } else {
-            if (buf.length - end < 4500) {
-                // In this case, the request header was really large, so we allocate a
-                // brand new one; the old one will get GCed when subsequent requests
-                // clear all references
-                buf = new byte[buf.length];
-                end = 0;
-            }
-            pos = end;
-            lastValid = pos;
+            lastValid = pos = end;
         }
 
-        bbuf.clear();
-
-        nRead = doReadSocket(block);
+        nRead = wrapper.read(block, buf, pos, buf.length - pos);
         if (nRead > 0) {
-            bbuf.limit(nRead);
-            bbuf.get(buf, pos, nRead);
             lastValid = pos + nRead;
-        } else if (-nRead == Status.EAGAIN) {
-            return false;
-        } else if ((-nRead) == Status.ETIMEDOUT || (-nRead) == Status.TIMEUP) {
-            if (block) {
-                throw new SocketTimeoutException(
-                        sm.getString("iib.readtimeout"));
-            } else {
-                // Attempting to read from the socket when the poller
-                // has not signalled that there is data to read appears
-                // to behave like a blocking read with a short timeout
-                // on OSX rather than like a non-blocking read. If no
-                // data is read, treat the resulting timeout like a
-                // non-blocking read that returned no data.
-                return false;
-            }
-        } else if (nRead == 0) {
-            // APR_STATUS_IS_EOF, since native 1.1.22
-            return false;
-        } else {
-            throw new IOException(sm.getString("iib.failedread.apr",
-                    Integer.valueOf(-nRead)));
+            return true;
         }
 
-        return (nRead > 0);
-    }
-
-
-    private int doReadSocket(boolean block) {
-
-        Lock readLock = wrapper.getBlockingStatusReadLock();
-        WriteLock writeLock = wrapper.getBlockingStatusWriteLock();
-
-        boolean readDone = false;
-        int result = 0;
-        int readLimit = Math.min(bbuf.capacity(), buf.length - lastValid);
-        readLock.lock();
-        try {
-            if (wrapper.getBlockingStatus() == block) {
-                result = Socket.recvbb(socket, 0, readLimit);
-                readDone = true;
-            }
-        } finally {
-            readLock.unlock();
-        }
-
-        if (!readDone) {
-            writeLock.lock();
-            try {
-                wrapper.setBlockingStatus(block);
-                // Set the current settings for this socket
-                if (block) {
-                    Socket.optSet(socket, Socket.APR_SO_NONBLOCK, 0);
-                } else {
-                    Socket.optSet(socket, Socket.APR_SO_NONBLOCK, 1);
-                    Socket.timeoutSet(socket, 0);
-                }
-                // Downgrade the lock
-                readLock.lock();
-                try {
-                    writeLock.unlock();
-                    result = Socket.recvbb(socket, 0, readLimit);
-                } finally {
-                    readLock.unlock();
-                }
-            } finally {
-                // Should have been released above but may not have been on some
-                // exception paths
-                if (writeLock.isHeldByCurrentThread()) {
-                    writeLock.unlock();
-                }
-            }
-        }
-
-        return result;
+        return false;
     }
 
 
