@@ -146,6 +146,7 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
         int bufLength = headerBufferSize + socketReadBufferSize;
         if (buf == null || buf.length < bufLength) {
             buf = new byte[bufLength];
+            readByteBuffer = ByteBuffer.wrap(buf);
         }
 
         // Initialize the completion handler
