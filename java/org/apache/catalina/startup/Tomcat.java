@@ -18,6 +18,7 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
@@ -508,7 +509,7 @@ public class Tomcat {
     public Context addContext(Host host, String contextPath, String contextName,
             String dir) {
         silence(host, contextPath);
-        Context ctx = new StandardContext();
+        Context ctx = createContext(host, contextPath);
         ctx.setName(contextName);
         ctx.setPath(contextPath);
         ctx.setDocBase(dir);
@@ -529,7 +530,7 @@ public class Tomcat {
     public Context addWebapp(Host host, String url, String name, String path) {
         silence(host, url);
 
-        Context ctx = new StandardContext();
+        Context ctx = createContext(host, url);
         ctx.setName(name);
         ctx.setPath(url);
         ctx.setDocBase(path);
@@ -699,6 +700,67 @@ public class Tomcat {
         return loggerName;
     }
     
+    /**
+     * Create the configured {@link Context} for the given <code>host</code>.
+     * The default constructor of the class that was configured with
+     * {@link StandardHost#setContextClass(String)} will be used
+     *
+     * @param host
+     *            host for which the {@link Context} should be created, or
+     *            <code>null</code> if default host should be used
+     * @param url
+     *            path of the webapp which should get the {@link Context}
+     * @return newly created {@link Context}
+     */
+    private Context createContext(Host host, String url) {
+        String contextClass = StandardContext.class.getName();
+        if (host == null) {
+            host = this.getHost();
+        }
+        if (host instanceof StandardHost) {
+            contextClass = ((StandardHost) host).getContextClass();
+        }
+        try {
+            return (Context) Class.forName(contextClass).getConstructor()
+                    .newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalArgumentException(
+                    "Can't instantiate context-class " + contextClass
+                            + " for host " + host + " and url "
+                            + url, e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalArgumentException(
+                    "Can't instantiate context-class " + contextClass
+                            + " for host " + host + " and url "
+                            + url, e);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Can't instantiate context-class " + contextClass
+                            + " for host " + host + " and url "
+                            + url, e);
+        } catch (InvocationTargetException e) {
+            throw new IllegalArgumentException(
+                    "Can't instantiate context-class " + contextClass
+                            + " for host " + host + " and url "
+                            + url, e);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException(
+                    "Can't instantiate context-class " + contextClass
+                            + " for host " + host + " and url "
+                            + url, e);
+        } catch (SecurityException e) {
+            throw new IllegalArgumentException(
+                    "Can't instantiate context-class " + contextClass
+                            + " for host " + host + " and url "
+                            + url, e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException(
+                    "Can't instantiate context-class " + contextClass
+                            + " for host " + host + " and url "
+                            + url, e);
+        }
+    }
+
     /**
      * Enables JNDI naming which is disabled by default. Server must implement
      * {@link Lifecycle} in order for the {@link NamingContextListener} to be

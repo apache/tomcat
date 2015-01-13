@@ -178,6 +178,9 @@
         configuration files rather than swallowing the exception silently.
         (markt)
       </fix>
+      <add>
+        <bug>57431</bug> Enable usage of custom class for context creation when using embedded tomcat. (fschumacher)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
