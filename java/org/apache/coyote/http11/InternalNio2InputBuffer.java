@@ -41,7 +41,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 /**
  * Output buffer implementation for NIO2.
  */
-public class InternalNio2InputBuffer extends AbstractNioInputBuffer<Nio2Channel> {
+public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
 
     private static final Log log =
             LogFactory.getLog(InternalNio2InputBuffer.class);

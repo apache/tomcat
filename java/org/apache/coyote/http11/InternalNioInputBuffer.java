@@ -36,7 +36,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  * Implementation of InputBuffer which provides HTTP request header parsing as
  * well as transfer decoding.
  */
-public class InternalNioInputBuffer extends AbstractNioInputBuffer<NioChannel> {
+public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     private static final Log log =
             LogFactory.getLog(InternalNioInputBuffer.class);
