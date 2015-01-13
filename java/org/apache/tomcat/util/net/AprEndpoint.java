@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -2471,6 +2472,19 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 }
                 eagain = true;
                 return 0;
+            } else if ((-result) == Status.ETIMEDOUT || (-result) == Status.TIMEUP) {
+                if (block) {
+                    throw new SocketTimeoutException(
+                            sm.getString("iib.readtimeout"));
+                } else {
+                    // Attempting to read from the socket when the poller
+                    // has not signalled that there is data to read appears
+                    // to behave like a blocking read with a short timeout
+                    // on OSX rather than like a non-blocking read. If no
+                    // data is read, treat the resulting timeout like a
+                    // non-blocking read that returned no data.
+                    return 0;
+                }
             } else if (-result == Status.APR_EOF) {
                 throw new EOFException(sm.getString("socket.apr.clientAbort"));
             } else if ((OS.IS_WIN32 || OS.IS_WIN64) &&
