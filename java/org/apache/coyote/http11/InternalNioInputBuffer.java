@@ -65,12 +65,6 @@ public class InternalNioInputBuffer extends AbstractNioInputBuffer<NioChannel> {
 
     // --------------------------------------------------------- Public Methods
 
-    @Override
-    protected final Log getLog() {
-        return log;
-    }
-
-
     /**
      * Recycle the input buffer. This should be called when closing the
      * connection.
@@ -82,6 +76,12 @@ public class InternalNioInputBuffer extends AbstractNioInputBuffer<NioChannel> {
     }
 
     // ------------------------------------------------------ Protected Methods
+
+    @Override
+    protected final Log getLog() {
+        return log;
+    }
+
 
     @Override
     protected void init(SocketWrapperBase<NioChannel> socketWrapper,
