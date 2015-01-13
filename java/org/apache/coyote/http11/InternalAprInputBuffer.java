@@ -16,11 +16,9 @@
  */
 package org.apache.coyote.http11;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
@@ -31,7 +29,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -41,7 +38,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
-public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
+public class InternalAprInputBuffer extends AbstractNioInputBuffer<Long> {
 
     private static final Log log =
         LogFactory.getLog(InternalAprInputBuffer.class);
@@ -53,11 +50,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
      * Alternate constructor.
      */
     public InternalAprInputBuffer(Request request, int headerBufferSize) {
+        super(request, headerBufferSize);
 
-        this.request = request;
-        headers = request.getMimeHeaders();
-
-        buf = new byte[headerBufferSize];
         if (headerBufferSize < (8 * 1024)) {
             bbuf = ByteBuffer.allocateDirect(6 * 1500);
         } else {
@@ -65,14 +59,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         }
 
         inputStreamInputBuffer = new SocketInputBuffer();
-
-        filterLibrary = new InputFilter[0];
-        activeFilters = new InputFilter[0];
-        lastActiveFilter = -1;
-
-        parsingHeader = true;
-        swallowInput = true;
-
     }
 
 
@@ -108,425 +94,13 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     }
 
 
-    /**
-     * Read the request line. This function is meant to be used during the
-     * HTTP request header parsing. Do NOT attempt to read the request body
-     * using it.
-     *
-     * @throws IOException If an exception occurs during the underlying socket
-     * read operations, or if the given buffer is not big enough to accommodate
-     * the whole line.
-     * @return true if data is properly fed; false if no data is available
-     * immediately and thread should be freed
-     */
-    @Override
-    public boolean parseRequestLine(boolean useAvailableData)
-        throws IOException {
-
-        int start = 0;
-
-        //
-        // Skipping blank lines
-        //
-
-        byte chr = 0;
-        do {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (useAvailableData) {
-                    return false;
-                }
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-            // Set the start time once we start reading data (even if it is
-            // just skipping blank lines)
-            if (request.getStartTime() < 0) {
-                request.setStartTime(System.currentTimeMillis());
-            }
-            chr = buf[pos++];
-        } while ((chr == Constants.CR) || (chr == Constants.LF));
-
-        pos--;
-
-        // Mark the current buffer position
-        start = pos;
-
-        if (pos >= lastValid) {
-            if (useAvailableData) {
-                return false;
-            }
-            if (!fill(true))
-                throw new EOFException(sm.getString("iib.eof.error"));
-        }
-
-        //
-        // Reading the method name
-        // Method name is always US-ASCII
-        //
-
-        boolean space = false;
-
-        while (!space) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-
-            // Spec says no CR or LF in method name
-            if (buf[pos] == Constants.CR || buf[pos] == Constants.LF) {
-                throw new IllegalArgumentException(
-                        sm.getString("iib.invalidmethod"));
-            }
-            // Spec says single SP but it also says be tolerant of HT
-            if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
-                space = true;
-                request.method().setBytes(buf, start, pos - start);
-            }
-
-            pos++;
-
-        }
-
-        // Spec says single SP but also says be tolerant of multiple and/or HT
-        while (space) {
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-            if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
-                pos++;
-            } else {
-                space = false;
-            }
-        }
-
-        // Mark the current buffer position
-        start = pos;
-        int end = 0;
-        int questionPos = -1;
-
-        //
-        // Reading the URI
-        //
-
-        boolean eol = false;
-
-        while (!space) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-
-            // Spec says single SP but it also says be tolerant of HT
-            if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
-                space = true;
-                end = pos;
-            } else if ((buf[pos] == Constants.CR)
-                       || (buf[pos] == Constants.LF)) {
-                // HTTP/0.9 style request
-                eol = true;
-                space = true;
-                end = pos;
-            } else if ((buf[pos] == Constants.QUESTION)
-                       && (questionPos == -1)) {
-                questionPos = pos;
-            }
-
-            pos++;
-
-        }
-
-        if (questionPos >= 0) {
-            request.queryString().setBytes(buf, questionPos + 1,
-                                           end - questionPos - 1);
-            request.requestURI().setBytes(buf, start, questionPos - start);
-        } else {
-            request.requestURI().setBytes(buf, start, end - start);
-        }
-
-        // Spec says single SP but also says be tolerant of multiple and/or HT
-        while (space) {
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-            if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
-                pos++;
-            } else {
-                space = false;
-            }
-        }
-
-
-        // Mark the current buffer position
-        start = pos;
-        end = 0;
-
-        //
-        // Reading the protocol
-        // Protocol is always US-ASCII
-        //
-
-        while (!eol) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-
-            if (buf[pos] == Constants.CR) {
-                end = pos;
-            } else if (buf[pos] == Constants.LF) {
-                if (end == 0)
-                    end = pos;
-                eol = true;
-            }
-
-            pos++;
-
-        }
-
-        if ((end - start) > 0) {
-            request.protocol().setBytes(buf, start, end - start);
-        } else {
-            request.protocol().setString("");
-        }
-
-        return true;
-
-    }
-
-
-    /**
-     * Parse the HTTP headers.
-     */
-    @Override
-    public boolean parseHeaders()
-        throws IOException {
-        if (!parsingHeader) {
-            throw new IllegalStateException(
-                    sm.getString("iib.parseheaders.ise.error"));
-        }
-
-        while (parseHeader()) {
-            // Loop until there are no more headers
-        }
-
-        parsingHeader = false;
-        end = pos;
-        return true;
-    }
-
-
-    /**
-     * Parse an HTTP header.
-     *
-     * @return false after reading a blank line (which indicates that the
-     * HTTP header parsing is done
-     */
-    @SuppressWarnings("null") // headerValue cannot be null
-    private boolean parseHeader()
-        throws IOException {
-
-        //
-        // Check for blank line
-        //
-
-        byte chr = 0;
-        while (true) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-
-            chr = buf[pos];
-
-            if (chr == Constants.CR) {
-                // Skip
-            } else if (chr == Constants.LF) {
-                pos++;
-                return false;
-            } else {
-                break;
-            }
-
-            pos++;
-
-        }
-
-        // Mark the current buffer position
-        int start = pos;
-
-        //
-        // Reading the header name
-        // Header name is always US-ASCII
-        //
-
-        boolean colon = false;
-        MessageBytes headerValue = null;
-
-        while (!colon) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-
-            if (buf[pos] == Constants.COLON) {
-                colon = true;
-                headerValue = headers.addValue(buf, start, pos - start);
-            } else if (!HTTP_TOKEN_CHAR[buf[pos]]) {
-                // If a non-token header is detected, skip the line and
-                // ignore the header
-                skipLine(start);
-                return true;
-            }
-            chr = buf[pos];
-            if ((chr >= Constants.A) && (chr <= Constants.Z)) {
-                buf[pos] = (byte) (chr - Constants.LC_OFFSET);
-            }
-
-            pos++;
-
-        }
-
-        // Mark the current buffer position
-        start = pos;
-        int realPos = pos;
-
-        //
-        // Reading the header value (which can be spanned over multiple lines)
-        //
-
-        boolean eol = false;
-        boolean validLine = true;
-
-        while (validLine) {
-
-            boolean space = true;
-
-            // Skipping spaces
-            while (space) {
-
-                // Read new bytes if needed
-                if (pos >= lastValid) {
-                    if (!fill(true))
-                        throw new EOFException(sm.getString("iib.eof.error"));
-                }
-
-                if ((buf[pos] == Constants.SP) || (buf[pos] == Constants.HT)) {
-                    pos++;
-                } else {
-                    space = false;
-                }
-
-            }
-
-            int lastSignificantChar = realPos;
-
-            // Reading bytes until the end of the line
-            while (!eol) {
-
-                // Read new bytes if needed
-                if (pos >= lastValid) {
-                    if (!fill(true))
-                        throw new EOFException(sm.getString("iib.eof.error"));
-                }
-
-                if (buf[pos] == Constants.CR) {
-                    // Skip
-                } else if (buf[pos] == Constants.LF) {
-                    eol = true;
-                } else if (buf[pos] == Constants.SP) {
-                    buf[realPos] = buf[pos];
-                    realPos++;
-                } else {
-                    buf[realPos] = buf[pos];
-                    realPos++;
-                    lastSignificantChar = realPos;
-                }
-
-                pos++;
-
-            }
-
-            realPos = lastSignificantChar;
-
-            // Checking the first character of the new line. If the character
-            // is a LWS, then it's a multiline header
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-
-            chr = buf[pos];
-            if ((chr != Constants.SP) && (chr != Constants.HT)) {
-                validLine = false;
-            } else {
-                eol = false;
-                // Copying one extra space in the buffer (since there must
-                // be at least one space inserted between the lines)
-                buf[realPos] = chr;
-                realPos++;
-            }
-
-        }
-
-        // Set the header value
-        headerValue.setBytes(buf, start, realPos - start);
-
-        return true;
-
-    }
-
-
-    private void skipLine(int start) throws IOException {
-        boolean eol = false;
-        int lastRealByte = start;
-        if (pos - 1 > start) {
-            lastRealByte = pos - 1;
-        }
-
-        while (!eol) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true))
-                    throw new EOFException(sm.getString("iib.eof.error"));
-            }
-
-            if (buf[pos] == Constants.CR) {
-                // Skip
-            } else if (buf[pos] == Constants.LF) {
-                eol = true;
-            } else {
-                lastRealByte = pos;
-            }
-            pos++;
-        }
-
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("iib.invalidheader", new String(buf, start,
-                    lastRealByte - start + 1, StandardCharsets.ISO_8859_1)));
-        }
-    }
-
-
     // ------------------------------------------------------ Protected Methods
+
+    @Override
+    protected final Log getLog() {
+        return log;
+    }
+
 
     @Override
     protected void init(SocketWrapperBase<Long> socketWrapper,
@@ -534,6 +108,12 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
         socket = socketWrapper.getSocket().longValue();
         wrapper = socketWrapper;
+
+        int bufLength = headerBufferSize + bbuf.capacity();
+        if (buf == null || buf.length < bufLength) {
+            buf = new byte[bufLength];
+        }
+
         Socket.setrbb(this.socket, bbuf);
     }
 
@@ -591,12 +171,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         }
 
         return (nRead > 0);
-    }
-
-
-    @Override
-    protected final Log getLog() {
-        return log;
     }
 
 
