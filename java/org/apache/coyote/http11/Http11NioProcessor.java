@@ -116,37 +116,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
 
     @Override
-    protected boolean handleIncompleteRequestLineRead() {
-        // Haven't finished reading the request so keep the socket
-        // open
-        openSocket = true;
-        // Check to see if we have read any of the request line yet
-        if (((InternalNioInputBuffer)
-                getInputBuffer()).getParsingRequestLinePhase() < 2) {
-            if (keptAlive) {
-                // Haven't read the request line and have previously processed a
-                // request. Must be keep-alive. Make sure poller uses keepAlive.
-                socketWrapper.setTimeout(endpoint.getKeepAliveTimeout());
-            }
-        } else {
-            if (endpoint.isPaused()) {
-                // Partially processed the request so need to respond
-                response.setStatus(503);
-                setErrorState(ErrorState.CLOSE_CLEAN, null);
-                getAdapter().log(request, response, 0);
-                return false;
-            } else {
-                // Need to keep processor associated with socket
-                readComplete = false;
-                // Make sure poller uses soTimeout from here onwards
-                socketWrapper.setTimeout(endpoint.getSoTimeout());
-            }
-        }
-        return true;
-    }
-
-
-    @Override
     protected void setSocketTimeout(int timeout) throws IOException {
         socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(timeout);
     }

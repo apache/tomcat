@@ -92,17 +92,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     // --------------------------------------------------------- Public Methods
 
-
-    @Override
-    protected boolean handleIncompleteRequestLineRead() {
-        // This means that no data is available right now
-        // (long keepalive), so that the processor should be recycled
-        // and the method should return true
-        openSocket = true;
-        return true;
-    }
-
-
     @Override
     protected void setSocketTimeout(int timeout) {
         Socket.timeoutSet(socketWrapper.getSocket().longValue(), timeout * 1000);
