@@ -49,12 +49,12 @@ import org.junit.Test;
 
 import org.apache.catalina.Host;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResourceLink;
+import org.apache.catalina.ha.context.ReplicatedContext;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
-import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.ha.context.ReplicatedContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestTomcat extends TomcatBaseTest {
