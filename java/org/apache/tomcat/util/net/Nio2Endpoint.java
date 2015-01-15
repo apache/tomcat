@@ -744,11 +744,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     failed(new ClosedChannelException(), attachment);
                     return;
                 }
+                readPending.release();
                 getEndpoint().processSocket(attachment, SocketStatus.OPEN_READ, true);
             }
 
             @Override
             public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
+                readPending.release();
                 getEndpoint().processSocket(attachment, SocketStatus.DISCONNECT, true);
             }
         };
@@ -1310,9 +1312,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 getSocket().getBufHandler().configureReadBufferForWrite();
                 getSocket().read(getSocket().getBufHandler().getReadBuffer(),
                         getTimeout(), TimeUnit.MILLISECONDS, this, awaitBytesHandler);
-                // TODO Figure out why moving this to the awaitBytesHandler
-                //      causes test failures.
-                readPending.release();
             }
         }
     }
