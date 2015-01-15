@@ -1031,8 +1031,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 }
 
                 // Copy what data there is in the read buffer to the byte array
-                int leftToWrite = len;
-                int newOffset = off;
                 if (remaining > 0) {
                     socketBufferHandler.getReadBuffer().get(b, off, remaining);
                     // This may be sufficient to complete the request and we
@@ -1046,8 +1044,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 // Fill the read buffer as best we can. Only do a blocking read if
                 // the current read is blocking AND there wasn't any data left over
                 // in the read buffer.
-                int nRead = fillReadBuffer(block && remaining == 0);
-                if (block && remaining == 0) {
+                int nRead = fillReadBuffer(block);
+                if (block) {
                     // Just did a blocking read so release the semaphore
                     readPending.release();
                 }
@@ -1056,12 +1054,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 // data that was just read
                 if (nRead > 0) {
                     socketBufferHandler.configureReadBufferForRead();
-                    if (nRead > leftToWrite) {
-                        socketBufferHandler.getReadBuffer().get(b, newOffset, leftToWrite);
-                        leftToWrite = 0;
+                    if (nRead > len) {
+                        socketBufferHandler.getReadBuffer().get(b, off, len);
                     } else {
-                        socketBufferHandler.getReadBuffer().get(b, newOffset, nRead);
-                        leftToWrite -= nRead;
+                        socketBufferHandler.getReadBuffer().get(b, off, nRead);
                     }
                 } else if (nRead == 0 && !block) {
                     readInterest = true;
@@ -1070,9 +1066,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 }
 
                 if (log.isDebugEnabled()) {
-                    log.debug("Socket: [" + this + "], Read: [" + (len - leftToWrite) + "]");
+                    log.debug("Socket: [" + this + "], Read: [" + nRead + "]");
                 }
-                return len - leftToWrite;
+                return nRead;
             }
         }
 
