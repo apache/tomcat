@@ -2387,7 +2387,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 sslOutputBuffer = null;
             }
 
-            socketWriteBuffer = ByteBuffer.allocateDirect(6 * 1500);
+            socketBufferHandler = new SocketBufferHandler(6 * 1500, 6 * 1500, true);
+        }
+
+
+        @Override
+        protected void resetSocketBufferHandler(Long socket) {
+            socketBufferHandler.reset();
         }
 
 
@@ -2571,19 +2577,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         private void doWriteInternal() throws IOException {
-            if (!writeBufferFlipped) {
-                socketWriteBuffer.flip();
-                writeBufferFlipped = true;
-            }
-
             int thisTime;
 
+            ByteBuffer socketWriteBuffer = socketBufferHandler.getWriteBuffer();
             do {
                 thisTime = 0;
                 if (getEndpoint().isSSLEnabled()) {
                     if (sslOutputBuffer.remaining() == 0) {
                         // Buffer was fully written last time around
                         sslOutputBuffer.clear();
+                        socketBufferHandler.configureWriteBufferForRead();
                         transfer(socketWriteBuffer, sslOutputBuffer);
                         sslOutputBuffer.flip();
                     } else {
@@ -2598,9 +2601,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 sslOutputBuffer.position() + sslWritten);
                     }
                 } else {
-                    thisTime = Socket.sendb(getSocket().longValue(),
-                            socketWriteBuffer, socketWriteBuffer.position(),
-                            socketWriteBuffer.limit() - socketWriteBuffer.position());
+                    socketBufferHandler.configureWriteBufferForRead();
+                    thisTime = Socket.sendb(getSocket().longValue(), socketWriteBuffer,
+                            socketWriteBuffer.position(), socketWriteBuffer.remaining());
                 }
                 if (Status.APR_STATUS_IS_EAGAIN(-thisTime)) {
                     thisTime = 0;
@@ -2617,10 +2620,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 socketWriteBuffer.position(socketWriteBuffer.position() + thisTime);
             } while ((thisTime > 0 || getBlockingStatus()) && socketWriteBuffer.hasRemaining());
 
-            if (socketWriteBuffer.remaining() == 0) {
-                socketWriteBuffer.clear();
-                writeBufferFlipped = false;
-            }
             // If there is data left in the buffer the socket will be registered for
             // write further up the stack. This is to ensure the socket is only
             // registered for write once as both container and user code can trigger

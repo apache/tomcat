@@ -54,7 +54,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.SecureNio2Channel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 
 /**
@@ -477,13 +476,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 if (sslContext != null) {
                     SSLEngine engine = createSSLEngine();
                     int appBufferSize = engine.getSession().getApplicationBufferSize();
-                    NioBufferHandler bufhandler = new NioBufferHandler(
+                    SocketBufferHandler bufhandler = new SocketBufferHandler(
                             Math.max(appBufferSize, socketProperties.getAppReadBufSize()),
                             Math.max(appBufferSize, socketProperties.getAppWriteBufSize()),
                             socketProperties.getDirectBuffer());
                     channel = new SecureNio2Channel(engine, bufhandler, this);
                 } else {
-                    NioBufferHandler bufhandler = new NioBufferHandler(
+                    SocketBufferHandler bufhandler = new SocketBufferHandler(
                             socketProperties.getAppReadBufSize(),
                             socketProperties.getAppWriteBufSize(),
                             socketProperties.getDirectBuffer());
@@ -818,8 +817,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                                 writeNotify = true;
                             }
                             writePending.release();
-                            socketWriteBuffer.clear();
-                            writeBufferFlipped = false;
                         }
                     }
                     if (writeNotify && nestedWriteCompletionCount.get().get() == 0) {
@@ -874,8 +871,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                                 writeNotify = true;
                             }
                             writePending.release();
-                            socketWriteBuffer.clear();
-                            writeBufferFlipped = false;
                         }
                     }
                     if (writeNotify && nestedWriteCompletionCount.get().get() == 0) {
@@ -913,8 +908,16 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             super.reset(channel, soTimeout);
             upgradeInit = false;
             sendfileData = null;
-            // Channel will be null when socket is being closed.
-            socketWriteBuffer = (channel == null) ? null : channel.getBufHandler().getWriteBuffer();
+        }
+
+
+        @Override
+        protected void resetSocketBufferHandler(Nio2Channel socket) {
+            if (socket == null) {
+                socketBufferHandler = null;
+            } else {
+                socketBufferHandler = socket.getBufHandler();
+            }
         }
 
         @Override
@@ -1136,7 +1139,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 if (writePending.tryAcquire()) {
                     // No pending completion handler, so writing to the main buffer
                     // is possible
-                    int thisTime = transfer(buf, off, len, socketWriteBuffer);
+                    socketBufferHandler.configureWriteBufferForWrite();
+                    int thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
                     len = len - thisTime;
                     off = off + thisTime;
                     if (len > 0) {
@@ -1158,13 +1162,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         protected void doWrite(boolean block) throws IOException {
             try {
-                socketWriteBuffer.flip();
-                while (socketWriteBuffer.hasRemaining()) {
-                    if (getSocket().write(socketWriteBuffer).get(getTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                socketBufferHandler.configureWriteBufferForRead();
+                while (socketBufferHandler.getWriteBuffer().hasRemaining()) {
+                    if (getSocket().write(socketBufferHandler.getWriteBuffer()).get(getTimeout(),
+                            TimeUnit.MILLISECONDS).intValue() < 0) {
                         throw new EOFException(sm.getString("iob.failedwrite"));
                     }
                 }
-                socketWriteBuffer.clear();
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof IOException) {
                     throw (IOException) e.getCause();
@@ -1204,15 +1208,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private boolean flushNonBlocking(boolean hasPermit) {
             synchronized (writeCompletionHandler) {
                 if (hasPermit || writePending.tryAcquire()) {
-                    if (!writeBufferFlipped) {
-                        socketWriteBuffer.flip();
-                        writeBufferFlipped = true;
-                    }
+                    socketBufferHandler.configureWriteBufferForRead();
                     if (bufferedWrites.size() > 0) {
                         // Gathering write of the main buffer plus all leftovers
                         ArrayList<ByteBuffer> arrayList = new ArrayList<>();
-                        if (socketWriteBuffer.hasRemaining()) {
-                            arrayList.add(socketWriteBuffer);
+                        if (socketBufferHandler.getWriteBuffer().hasRemaining()) {
+                            arrayList.add(socketBufferHandler.getWriteBuffer());
                         }
                         for (ByteBufferHolder buffer : bufferedWrites) {
                             buffer.flip();
@@ -1222,15 +1223,14 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         ByteBuffer[] array = arrayList.toArray(new ByteBuffer[arrayList.size()]);
                         getSocket().write(array, 0, array.length, getTimeout(),
                                 TimeUnit.MILLISECONDS, array, gatheringWriteCompletionHandler);
-                    } else if (socketWriteBuffer.hasRemaining()) {
+                    } else if (socketBufferHandler.getWriteBuffer().hasRemaining()) {
                         // Regular write
-                        getSocket().write(socketWriteBuffer, getTimeout(),
-                                TimeUnit.MILLISECONDS, socketWriteBuffer, writeCompletionHandler);
+                        getSocket().write(socketBufferHandler.getWriteBuffer(), getTimeout(),
+                                TimeUnit.MILLISECONDS, socketBufferHandler.getWriteBuffer(),
+                                writeCompletionHandler);
                     } else {
                         // Nothing was written
                         writePending.release();
-                        socketWriteBuffer.clear();
-                        writeBufferFlipped = false;
                     }
                 }
                 return hasDataToWrite();
@@ -1241,7 +1241,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public boolean hasDataToWrite() {
             synchronized (writeCompletionHandler) {
-                return hasMoreDataToFlush() || bufferedWrites.size() > 0 || getError() != null;
+                return !socketBufferHandler.isWriteBufferEmpty() ||
+                        bufferedWrites.size() > 0 || getError() != null;
             }
         }
 
@@ -1287,30 +1288,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     }
 
 
-    // ------------------------------------------------ Application Buffer Handler
-    public static class NioBufferHandler implements ApplicationBufferHandler {
-        private ByteBuffer readbuf = null;
-        private ByteBuffer writebuf = null;
-
-        public NioBufferHandler(int readsize, int writesize, boolean direct) {
-            if ( direct ) {
-                readbuf = ByteBuffer.allocateDirect(readsize);
-                writebuf = ByteBuffer.allocateDirect(writesize);
-            }else {
-                readbuf = ByteBuffer.allocate(readsize);
-                writebuf = ByteBuffer.allocate(writesize);
-            }
-        }
-
-        @Override
-        public ByteBuffer getReadBuffer() {return readbuf;}
-        @Override
-        public ByteBuffer getWriteBuffer() {return writebuf;}
-
-    }
-
     // ------------------------------------------------ Handler Inner Interface
-
 
     /**
      * Bare bones interface used for socket processing. Per thread data is to be

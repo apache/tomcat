@@ -54,7 +54,6 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 
 /**
@@ -512,16 +511,17 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 if (sslContext != null) {
                     SSLEngine engine = createSSLEngine();
                     int appbufsize = engine.getSession().getApplicationBufferSize();
-                    NioBufferHandler bufhandler = new NioBufferHandler(Math.max(appbufsize,socketProperties.getAppReadBufSize()),
-                                                                       Math.max(appbufsize,socketProperties.getAppWriteBufSize()),
-                                                                       socketProperties.getDirectBuffer());
+                    SocketBufferHandler bufhandler = new SocketBufferHandler(
+                            Math.max(appbufsize,socketProperties.getAppReadBufSize()),
+                            Math.max(appbufsize,socketProperties.getAppWriteBufSize()),
+                            socketProperties.getDirectBuffer());
                     channel = new SecureNioChannel(socket, engine, bufhandler, selectorPool);
                 } else {
                     // normal tcp setup
-                    NioBufferHandler bufhandler = new NioBufferHandler(socketProperties.getAppReadBufSize(),
-                                                                       socketProperties.getAppWriteBufSize(),
-                                                                       socketProperties.getDirectBuffer());
-
+                    SocketBufferHandler bufhandler = new SocketBufferHandler(
+                            socketProperties.getAppReadBufSize(),
+                            socketProperties.getAppWriteBufSize(),
+                            socketProperties.getDirectBuffer());
                     channel = new NioChannel(socket, bufhandler);
                 }
             } else {
@@ -1339,9 +1339,18 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             }
             writeLatch = null;
             setWriteTimeout(soTimeout);
-            // Channel will be null when socket is being closed.
-            socketWriteBuffer = (channel == null) ? null : channel.getBufHandler().getWriteBuffer();
         }
+
+
+        @Override
+        protected void resetSocketBufferHandler(NioChannel socket) {
+            if (socket == null) {
+                socketBufferHandler = null;
+            } else {
+                socketBufferHandler = socket.getBufHandler();
+            }
+        }
+
 
         public void reset() {
             reset(null,null,-1);
@@ -1392,17 +1401,16 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
         @Override
         public boolean isReady() throws IOException {
-            ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
+            socketBufferHandler.configureReadBufferForRead();
 
-            if (readBuffer.remaining() > 0) {
+            if (socketBufferHandler.getReadBuffer().remaining() > 0) {
                 return true;
             }
 
-            readBuffer.clear();
             fillReadBuffer(false);
 
-            boolean isReady = readBuffer.position() > 0;
-            readBuffer.flip();
+
+            boolean isReady = socketBufferHandler.getReadBuffer().position() > 0;
             return isReady;
         }
 
@@ -1411,7 +1419,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public int read(boolean block, byte[] b, int off, int len)
                 throws IOException {
 
-            ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
+            socketBufferHandler.configureReadBufferForRead();
+            ByteBuffer readBuffer = socketBufferHandler.getReadBuffer();
             int remaining = readBuffer.remaining();
 
             // Is there enough data in the read buffer to satisfy this request?
@@ -1430,13 +1439,12 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             }
 
             // Fill the read buffer as best we can
-            readBuffer.clear();
             int nRead = fillReadBuffer(block);
 
-            // Full as much of the remaining byte array as possible with the data
-            // that was just read
+            // Full as much of the remaining byte array as possible with the
+            // data that was just read
             if (nRead > 0) {
-                readBuffer.flip();
+                socketBufferHandler.configureReadBufferForRead();
                 if (nRead > leftToWrite) {
                     readBuffer.get(b, newOffset, leftToWrite);
                     leftToWrite = 0;
@@ -1444,8 +1452,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     readBuffer.get(b, newOffset, nRead);
                     leftToWrite -= nRead;
                 }
-            } else if (nRead == 0) {
-                readBuffer.flip();
             } else if (nRead == -1) {
                 // TODO i18n
                 throw new EOFException();
@@ -1458,14 +1464,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         @Override
         public void unRead(ByteBuffer returnedInput) {
             if (returnedInput != null) {
-                ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
-                if (readBuffer.remaining() > 0) {
-                    readBuffer.flip();
-                } else {
-                    readBuffer.clear();
-                }
-                readBuffer.put(returnedInput);
-                readBuffer.flip();
+                socketBufferHandler.configureReadBufferForWrite();
+                socketBufferHandler.getReadBuffer().put(returnedInput);
             }
         }
 
@@ -1482,6 +1482,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         private int fillReadBuffer(boolean block) throws IOException {
             int nRead;
             NioChannel channel = getSocket();
+            socketBufferHandler.configureReadBufferForWrite();
             if (block) {
                 Selector selector = null;
                 try {
@@ -1495,7 +1496,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     if (att == null) {
                         throw new IOException("Key must be cancelled.");
                     }
-                    nRead = pool.read(channel.getBufHandler().getReadBuffer(),
+                    nRead = pool.read(socketBufferHandler.getReadBuffer(),
                             channel, selector, att.getTimeout());
                 } catch (EOFException eof) {
                     nRead = -1;
@@ -1505,7 +1506,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     }
                 }
             } else {
-                nRead = channel.read(channel.getBufHandler().getReadBuffer());
+                nRead = channel.read(socketBufferHandler.getReadBuffer());
             }
             return nRead;
         }
@@ -1513,10 +1514,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
         @Override
         protected synchronized void doWrite(boolean block) throws IOException {
-            if (!writeBufferFlipped) {
-                socketWriteBuffer.flip();
-                writeBufferFlipped = true;
-            }
+            socketBufferHandler.configureWriteBufferForRead();
 
             long writeTimeout = getWriteTimeout();
             Selector selector = null;
@@ -1526,7 +1524,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 // Ignore
             }
             try {
-                pool.write(socketWriteBuffer, getSocket(), selector, writeTimeout, block);
+                pool.write(socketBufferHandler.getWriteBuffer(), getSocket(),
+                        selector, writeTimeout, block);
                 // Make sure we are flushed
                 do {
                     if (getSocket().flush(true, selector, writeTimeout)) break;
@@ -1535,10 +1534,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 if (selector != null) {
                     pool.put(selector);
                 }
-            }
-            if (socketWriteBuffer.remaining() == 0) {
-                socketWriteBuffer.clear();
-                writeBufferFlipped = false;
             }
             // If there is data left in the buffer the socket will be registered for
             // write further up the stack. This is to ensure the socket is only
@@ -1581,32 +1576,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     }
 
 
-    // ------------------------------------------------ Application Buffer Handler
-    public static class NioBufferHandler implements ApplicationBufferHandler {
-        private ByteBuffer readbuf = null;
-        private ByteBuffer writebuf = null;
-
-        public NioBufferHandler(int readsize, int writesize, boolean direct) {
-            if (direct) {
-                readbuf = ByteBuffer.allocateDirect(readsize);
-                writebuf = ByteBuffer.allocateDirect(writesize);
-            } else {
-                readbuf = ByteBuffer.allocate(readsize);
-                writebuf = ByteBuffer.allocate(writesize);
-            }
-            // TODO AJP and HTTPS have different expectations for the state of
-            // the buffer at the start of a read. These need to be reconciled.
-            readbuf.limit(0);
-        }
-
-        @Override
-        public ByteBuffer getReadBuffer() {return readbuf;}
-        @Override
-        public ByteBuffer getWriteBuffer() {return writebuf;}
-    }
-
     // ------------------------------------------------ Handler Inner Interface
-
 
     /**
      * Bare bones interface used for socket processing. Per thread data is to be

@@ -61,7 +61,7 @@ public class SecureNio2Channel extends Nio2Channel  {
     private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> handshakeReadCompletionHandler;
     private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> handshakeWriteCompletionHandler;
 
-    public SecureNio2Channel(SSLEngine engine, ApplicationBufferHandler bufHandler,
+    public SecureNio2Channel(SSLEngine engine, SocketBufferHandler bufHandler,
             Nio2Endpoint endpoint0) {
         super(bufHandler);
         sslEngine = engine;
@@ -979,20 +979,6 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
    }
 
-    /**
-     * Callback interface to be able to expand buffers
-     * when buffer overflow exceptions happen
-     */
-    public static interface ApplicationBufferHandler {
-        public ByteBuffer getReadBuffer();
-        public ByteBuffer getWriteBuffer();
-    }
-
-    @Override
-    public ApplicationBufferHandler getBufHandler() {
-        return bufHandler;
-    }
-
     @Override
     public boolean isHandshakeComplete() {
         return handshakeComplete;
@@ -1009,10 +995,6 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     public ByteBuffer getEmptyBuf() {
         return emptyBuf;
-    }
-
-    public void setBufHandler(ApplicationBufferHandler bufHandler) {
-        this.bufHandler = bufHandler;
     }
 
     @Override

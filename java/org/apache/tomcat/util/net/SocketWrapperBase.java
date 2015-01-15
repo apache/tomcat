@@ -70,8 +70,10 @@ public abstract class SocketWrapperBase<E> {
      */
     private final Object writeThreadLock = new Object();
 
-    protected volatile ByteBuffer socketWriteBuffer;
-    protected volatile boolean writeBufferFlipped;
+    /**
+     * The buffers used for communicating with the socket.
+     */
+    protected volatile SocketBufferHandler socketBufferHandler = null;
 
     /**
      * For "non-blocking" writes use an external set of buffers. Although the
@@ -180,13 +182,8 @@ public abstract class SocketWrapperBase<E> {
 
     public abstract boolean isReadPending();
 
-    protected boolean hasMoreDataToFlush() {
-        return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
-        (!writeBufferFlipped && socketWriteBuffer.position() > 0);
-    }
-
     public boolean hasDataToWrite() {
-        return hasMoreDataToFlush() || bufferedWrites.size() > 0;
+        return !socketBufferHandler.isWriteBufferEmpty() || bufferedWrites.size() > 0;
     }
 
     /**
@@ -213,8 +210,7 @@ public abstract class SocketWrapperBase<E> {
 
 
     public boolean canWrite() {
-        return !writeBufferFlipped && socketWriteBuffer.hasRemaining() &&
-                bufferedWrites.size() == 0;
+        return socketBufferHandler.isWriteBufferWritable() && bufferedWrites.size() == 0;
     }
 
     public void addDispatch(DispatchType dispatchType) {
@@ -263,7 +259,10 @@ public abstract class SocketWrapperBase<E> {
         this.socket = socket;
         this.timeout = timeout;
         upgraded = false;
+        resetSocketBufferHandler(socket);
     }
+
+    protected abstract void resetSocketBufferHandler(E socket);
 
     /**
      * Overridden for debug purposes. No guarantees are made about the format of
@@ -346,12 +345,14 @@ public abstract class SocketWrapperBase<E> {
 
         // Keep writing until all the data has been transferred to the socket
         // write buffer and space remains in that buffer
-        int thisTime = transfer(buf, off, len, socketWriteBuffer);
-        while (socketWriteBuffer.remaining() == 0) {
+        socketBufferHandler.configureWriteBufferForWrite();
+        int thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
+        while (socketBufferHandler.getWriteBuffer().remaining() == 0) {
             len = len - thisTime;
             off = off + thisTime;
             doWrite(true);
-            thisTime = transfer(buf, off, len, socketWriteBuffer);
+            socketBufferHandler.configureWriteBufferForWrite();
+            thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
         }
     }
 
@@ -369,16 +370,18 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     protected void writeNonBlocking(byte[] buf, int off, int len) throws IOException {
-        if (!writeBufferFlipped) {
-            int thisTime = transfer(buf, off, len, socketWriteBuffer);
+        if (bufferedWrites.size() == 0 && socketBufferHandler.isWriteBufferWritable()) {
+            socketBufferHandler.configureWriteBufferForWrite();
+            int thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
             len = len - thisTime;
-            while (socketWriteBuffer.remaining() == 0) {
+            while (!socketBufferHandler.isWriteBufferWritable()) {
                 off = off + thisTime;
                 doWrite(false);
-                if (writeBufferFlipped) {
-                    thisTime = 0;
+                if (len > 0 && socketBufferHandler.isWriteBufferWritable()) {
+                    socketBufferHandler.configureWriteBufferForWrite();
+                    thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
                 } else {
-                    thisTime = transfer(buf, off, len, socketWriteBuffer);
+                    thisTime = 0;
                 }
                 len = len - thisTime;
             }
@@ -432,11 +435,12 @@ public abstract class SocketWrapperBase<E> {
 
         if (bufferedWrites.size() > 0) {
             Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
-            while (!hasMoreDataToFlush() && bufIter.hasNext()) {
+            while (socketBufferHandler.isWriteBufferEmpty() && bufIter.hasNext()) {
                 ByteBufferHolder buffer = bufIter.next();
                 buffer.flip();
-                while (!hasMoreDataToFlush() && buffer.getBuf().remaining()>0) {
-                    transfer(buffer.getBuf(), socketWriteBuffer);
+                while (socketBufferHandler.isWriteBufferEmpty() && buffer.getBuf().remaining()>0) {
+                    socketBufferHandler.configureWriteBufferForWrite();
+                    transfer(buffer.getBuf(), socketBufferHandler.getWriteBuffer());
                     if (buffer.getBuf().remaining() == 0) {
                         bufIter.remove();
                     }
@@ -449,22 +453,23 @@ public abstract class SocketWrapperBase<E> {
 
 
     protected boolean flushNonBlocking() throws IOException {
-        boolean dataLeft = hasMoreDataToFlush();
+        boolean dataLeft = !socketBufferHandler.isWriteBufferEmpty();
 
         // Write to the socket, if there is anything to write
         if (dataLeft) {
             doWrite(false);
         }
 
-        dataLeft = hasMoreDataToFlush();
+        dataLeft = !socketBufferHandler.isWriteBufferEmpty();
 
         if (!dataLeft && bufferedWrites.size() > 0) {
             Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
-            while (!hasMoreDataToFlush() && bufIter.hasNext()) {
+            while (socketBufferHandler.isWriteBufferEmpty() && bufIter.hasNext()) {
                 ByteBufferHolder buffer = bufIter.next();
                 buffer.flip();
-                while (!hasMoreDataToFlush() && buffer.getBuf().remaining() > 0) {
-                    transfer(buffer.getBuf(), socketWriteBuffer);
+                while (socketBufferHandler.isWriteBufferEmpty() && buffer.getBuf().remaining() > 0) {
+                    socketBufferHandler.configureWriteBufferForWrite();
+                    transfer(buffer.getBuf(), socketBufferHandler.getWriteBuffer());
                     if (buffer.getBuf().remaining() == 0) {
                         bufIter.remove();
                     }
@@ -473,7 +478,7 @@ public abstract class SocketWrapperBase<E> {
             }
         }
 
-        return hasMoreDataToFlush();
+        return !socketBufferHandler.isWriteBufferEmpty();
     }
 
 
