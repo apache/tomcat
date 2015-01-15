@@ -2404,6 +2404,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         @Override
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
 
+            // TODO: Restore a socket level input buffer to align with NIO and
+            //       NIO2.
             if (closed) {
                 throw new IOException(sm.getString("socket.apr.closed", getSocket()));
             }
