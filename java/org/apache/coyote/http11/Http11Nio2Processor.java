@@ -54,21 +54,13 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
      */
     protected SSLSupport sslSupport;
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     public Http11Nio2Processor(int maxHttpHeaderSize, AbstractEndpoint<Nio2Channel> endpoint,
             int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
 
-        super(endpoint);
-
-        inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize);
-        request.setInputBuffer(getInputBuffer());
-
-        outputBuffer = new Http11OutputBuffer(response, maxHttpHeaderSize);
-        response.setOutputBuffer(getOutputBuffer());
-
-        initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
+        super(maxHttpHeaderSize, endpoint, maxTrailerSize, maxExtensionSize, maxSwallowSize);
     }
 
 

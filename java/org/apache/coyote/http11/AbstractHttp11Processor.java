@@ -227,9 +227,19 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     protected HttpUpgradeHandler httpUpgradeHandler = null;
 
 
-    public AbstractHttp11Processor(AbstractEndpoint<S> endpoint) {
+    public AbstractHttp11Processor(int maxHttpHeaderSize, AbstractEndpoint<S> endpoint,
+            int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
+
         super(endpoint);
         userDataHelper = new UserDataHelper(getLog());
+
+        inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize);
+        request.setInputBuffer(getInputBuffer());
+
+        outputBuffer = new Http11OutputBuffer(response, maxHttpHeaderSize);
+        response.setOutputBuffer(getOutputBuffer());
+
+        initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
     }
 
 
