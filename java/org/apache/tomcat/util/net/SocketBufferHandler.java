@@ -78,9 +78,9 @@ public class SocketBufferHandler {
 
     public boolean isReadBufferEmpty() {
         if (readBufferConfiguredForWrite) {
-            return readBuffer.position() > 0;
+            return readBuffer.position() == 0;
         } else {
-            return readBuffer.remaining() > 0;
+            return readBuffer.remaining() == 0;
         }
     }
 
