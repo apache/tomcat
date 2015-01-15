@@ -50,21 +50,13 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         return log;
     }
 
+
     // ----------------------------------------------------------- Constructors
 
-
-    public Http11AprProcessor(int headerBufferSize, AbstractEndpoint<Long> endpoint,
+    public Http11AprProcessor(int maxHttpHeaderSize, AbstractEndpoint<Long> endpoint,
             int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
 
-        super(endpoint);
-
-        inputBuffer = new Http11InputBuffer(request, headerBufferSize);
-        request.setInputBuffer(getInputBuffer());
-
-        outputBuffer = new Http11OutputBuffer(response, headerBufferSize);
-        response.setOutputBuffer(getOutputBuffer());
-
-        initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
+        super(maxHttpHeaderSize, endpoint, maxTrailerSize, maxExtensionSize, maxSwallowSize);
     }
 
 
