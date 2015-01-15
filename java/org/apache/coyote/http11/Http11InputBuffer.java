@@ -37,16 +37,16 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * <S>  The type of socket used by the underlying I/O implementation
  */
-public class AbstractInputBuffer implements InputBuffer {
+public class Http11InputBuffer implements InputBuffer {
 
     // -------------------------------------------------------------- Constants
 
-    private static final Log log = LogFactory.getLog(AbstractInputBuffer.class);
+    private static final Log log = LogFactory.getLog(Http11InputBuffer.class);
 
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(AbstractInputBuffer.class);
+    protected static final StringManager sm = StringManager.getManager(Http11InputBuffer.class);
 
 
     protected static final boolean[] HTTP_TOKEN_CHAR = new boolean[128];
@@ -207,7 +207,7 @@ public class AbstractInputBuffer implements InputBuffer {
 
     // ----------------------------------------------------------- Constructors
 
-    public AbstractInputBuffer(Request request, int headerBufferSize) {
+    public Http11InputBuffer(Request request, int headerBufferSize) {
 
         this.request = request;
         headers = request.getMimeHeaders();

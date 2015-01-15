@@ -58,7 +58,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
         super(endpoint);
 
-        inputBuffer = new AbstractInputBuffer(request, headerBufferSize);
+        inputBuffer = new Http11InputBuffer(request, headerBufferSize);
         request.setInputBuffer(getInputBuffer());
 
         outputBuffer = new Http11OutputBuffer(response, headerBufferSize);
