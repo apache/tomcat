@@ -922,7 +922,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
         // Setting up the I/O
         setSocketWrapper(socketWrapper);
-        getInputBuffer().init(socketWrapper, endpoint);
+        getInputBuffer().init(socketWrapper);
         getOutputBuffer().init(socketWrapper);
 
         // Flags
