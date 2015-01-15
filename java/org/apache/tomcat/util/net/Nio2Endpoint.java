@@ -735,7 +735,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private boolean writeInterest = true; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
 
-        private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> awaitBytes
+        private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> awaitBytesHandler
                 = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
 
             @Override
@@ -1300,7 +1300,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             if (readPending.tryAcquire()) {
                 getSocket().getBufHandler().configureReadBufferForWrite();
                 getSocket().read(getSocket().getBufHandler().getReadBuffer(),
-                        getTimeout(), TimeUnit.MILLISECONDS, this, awaitBytes);
+                        getTimeout(), TimeUnit.MILLISECONDS, this, awaitBytesHandler);
+                // TODO Figure out why moving this to the awaitBytesHandler
+                //      causes test failures.
                 readPending.release();
             }
         }
