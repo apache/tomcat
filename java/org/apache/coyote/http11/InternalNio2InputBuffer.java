@@ -118,8 +118,7 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
          * Read bytes into the specified chunk.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req )
-            throws IOException {
+        public int doRead(ByteChunk chunk, Request req ) throws IOException {
 
             if (pos >= lastValid) {
                 if (!fill(true)) //read body, must be blocking, as the thread is inside the app

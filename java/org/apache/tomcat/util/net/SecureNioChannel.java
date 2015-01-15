@@ -84,14 +84,6 @@ public class SecureNioChannel extends NioChannel  {
         handshakeStatus = sslEngine.getHandshakeStatus();
     }
 
-    @Override
-    public int getBufferSize() {
-        int size = super.getBufferSize();
-        size += netInBuffer!=null?netInBuffer.capacity():0;
-        size += netOutBuffer!=null?netOutBuffer.capacity():0;
-        return size;
-    }
-
 
 //===========================================================================================
 //                  NIO SSL METHODS
