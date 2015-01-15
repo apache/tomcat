@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -85,7 +84,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         int bufLength = Math.max(headerBufferSize, 8192);
         if (buf == null || buf.length < bufLength) {
             buf = new byte[bufLength];
-            readByteBuffer = ByteBuffer.wrap(buf);
         }
     }
 
