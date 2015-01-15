@@ -972,7 +972,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     return false;
                 }
 
-                socketBufferHandler.configureReadBufferForRead();
                 if (!socketBufferHandler.isReadBufferEmpty()) {
                     readPending.release();
                     return true;
