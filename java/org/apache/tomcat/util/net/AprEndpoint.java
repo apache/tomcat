@@ -2507,7 +2507,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
-        public boolean isReady() {
+        public boolean isReadyForRead() {
             return !eagain;
         }
 

@@ -68,7 +68,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         }
 
         try {
-            ready = Boolean.valueOf(socketWrapper.isReady());
+            ready = Boolean.valueOf(socketWrapper.isReadyForRead());
         } catch (IOException e) {
             onError(e);
         }

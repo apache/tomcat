@@ -277,7 +277,7 @@ public abstract class SocketWrapperBase<E> {
 
 
     public abstract int read(boolean block, byte[] b, int off, int len) throws IOException;
-    public abstract boolean isReady() throws IOException;
+    public abstract boolean isReadyForRead() throws IOException;
 
     /**
      * Return input that has been read to the input buffer for re-reading by the

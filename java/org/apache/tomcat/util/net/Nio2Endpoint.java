@@ -965,7 +965,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
         @Override
-        public boolean isReady() throws IOException {
+        public boolean isReadyForRead() throws IOException {
             synchronized (readCompletionHandler) {
                 if (!readPending.tryAcquire()) {
                     readInterest = true;
