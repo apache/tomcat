@@ -1053,7 +1053,7 @@ public class Http11InputBuffer implements InputBuffer {
      * This class is an input buffer which will read its data from an input
      * stream.
      */
-    protected class SocketInputBuffer implements InputBuffer {
+    private class SocketInputBuffer implements InputBuffer {
 
         /**
          * Read bytes into the specified chunk.
