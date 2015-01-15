@@ -18,14 +18,6 @@ package org.apache.coyote.http11;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
-import java.nio.channels.CompletionHandler;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import javax.servlet.RequestDispatcher;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -34,8 +26,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Nio2Channel;
-import org.apache.tomcat.util.net.Nio2Endpoint;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -46,56 +36,20 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
     private static final Log log =
             LogFactory.getLog(InternalNio2InputBuffer.class);
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     public InternalNio2InputBuffer(Request request, int headerBufferSize) {
         super(request, headerBufferSize);
         inputStreamInputBuffer = new SocketInputBuffer();
     }
 
-    /**
-     * Underlying socket.
-     */
-    private SocketWrapperBase<Nio2Channel> socket;
+    // ----------------------------------------------------- Instance Variables
 
-    /**
-     * Track write interest
-     */
-    protected volatile boolean interest = false;
+    private SocketWrapperBase<Nio2Channel> wrapper;
 
-    /**
-     * The completion handler used for asynchronous read operations
-     */
-    private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> completionHandler;
-
-    /**
-     * The associated endpoint.
-     */
-    protected AbstractEndpoint<Nio2Channel> endpoint = null;
-
-    /**
-     * Read pending flag.
-     */
-    protected volatile boolean readPending = false;
-
-    /**
-     * Exception that occurred during writing.
-     */
-    protected IOException e = null;
-
-    /**
-     * Track if the byte buffer is flipped
-     */
-    protected volatile boolean flipped = false;
 
     // --------------------------------------------------------- Public Methods
-
-    @Override
-    protected final Log getLog() {
-        return log;
-    }
-
 
     /**
      * Recycle the input buffer. This should be called when closing the
@@ -103,30 +57,18 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
      */
     @Override
     public void recycle() {
+        wrapper = null;
         super.recycle();
-        socket = null;
-        readPending = false;
-        flipped = false;
-        interest = false;
-        e = null;
     }
 
 
-    /**
-     * End processing of current HTTP request.
-     * Note: All bytes of the current request should have been already
-     * consumed. This method only resets all the pointers so that we are ready
-     * to parse the next HTTP request.
-     */
+    // ------------------------------------------------------ Protected Methods
+
     @Override
-    public void nextRequest() {
-        super.nextRequest();
-        interest = false;
+    protected final Log getLog() {
+        return log;
     }
 
-    public boolean isPending() {
-        return readPending;
-    }
 
     // ------------------------------------------------------ Protected Methods
 
@@ -134,62 +76,17 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
     protected void init(SocketWrapperBase<Nio2Channel> socketWrapper,
             AbstractEndpoint<Nio2Channel> associatedEndpoint) throws IOException {
 
-        endpoint = associatedEndpoint;
-        socket = socketWrapper;
-        if (socket == null) {
-            // Socket has been closed in another thread
-            throw new IOException(sm.getString("iib.socketClosed"));
-        }
-        socketReadBufferSize =
-            socket.getSocket().getBufHandler().getReadBuffer().capacity();
+        wrapper = socketWrapper;
 
-        int bufLength = headerBufferSize + socketReadBufferSize;
+        int bufLength = headerBufferSize + wrapper.getSocket().getBufHandler().getReadBuffer().capacity();
         if (buf == null || buf.length < bufLength) {
             buf = new byte[bufLength];
         }
-
-        // Initialize the completion handler
-        this.completionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
-
-            @Override
-            public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
-                boolean notify = false;
-                synchronized (completionHandler) {
-                    if (nBytes.intValue() < 0) {
-                        failed(new EOFException(sm.getString("iib.eof.error")), attachment);
-                    } else {
-                        readPending = false;
-                        if ((request.getReadListener() == null || interest) && !Nio2Endpoint.isInline()) {
-                            interest = false;
-                            notify = true;
-                        }
-                    }
-                }
-                if (notify) {
-                    endpoint.processSocket(attachment, SocketStatus.OPEN_READ, false);
-                }
-            }
-
-            @Override
-            public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
-                if (exc instanceof IOException) {
-                    e = (IOException) exc;
-                } else {
-                    e = new IOException(exc);
-                }
-                attachment.setError(e);
-                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, e);
-                readPending = false;
-                endpoint.processSocket(attachment, SocketStatus.OPEN_READ, true);
-            }
-        };
     }
 
     @Override
     protected boolean fill(boolean block) throws IOException, EOFException {
-        if (e != null) {
-            throw e;
-        }
+
         if (parsingHeader) {
             if (lastValid > headerBufferSize) {
                 throw new IllegalArgumentException
@@ -198,127 +95,24 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
         } else {
             lastValid = pos = end;
         }
-        // Now fill the internal buffer
-        int nRead = 0;
-        ByteBuffer byteBuffer = socket.getSocket().getBufHandler().getReadBuffer();
-        if (block) {
-            if (!flipped) {
-                byteBuffer.flip();
-                flipped = true;
-            }
-            int nBytes = byteBuffer.remaining();
-            // This case can happen when a blocking read follows a non blocking
-            // fill that completed asynchronously
-            if (nBytes > 0) {
-                expand(nBytes + pos);
-                byteBuffer.get(buf, pos, nBytes);
-                lastValid = pos + nBytes;
-                byteBuffer.clear();
-                flipped = false;
-                return true;
-            } else {
-                byteBuffer.clear();
-                flipped = false;
-                try {
-                    nRead = socket.getSocket().read(byteBuffer)
-                            .get(socket.getTimeout(), TimeUnit.MILLISECONDS).intValue();
-                } catch (ExecutionException e) {
-                    if (e.getCause() instanceof IOException) {
-                        throw (IOException) e.getCause();
-                    } else {
-                        throw new IOException(e);
-                    }
-                } catch (InterruptedException e) {
-                    throw new IOException(e);
-                } catch (TimeoutException e) {
-                    throw new SocketTimeoutException();
-                }
-                if (nRead > 0) {
-                    if (!flipped) {
-                        byteBuffer.flip();
-                        flipped = true;
-                    }
-                    expand(nRead + pos);
-                    byteBuffer.get(buf, pos, nRead);
-                    lastValid = pos + nRead;
-                    return true;
-                } else if (nRead == -1) {
-                    //return false;
-                    throw new EOFException(sm.getString("iib.eof.error"));
-                } else {
-                    return false;
-                }
-            }
-        } else {
-            synchronized (completionHandler) {
-                if (!readPending) {
-                    if (!flipped) {
-                        byteBuffer.flip();
-                        flipped = true;
-                    }
-                    int nBytes = byteBuffer.remaining();
-                    if (nBytes > 0) {
-                        expand(nBytes + pos);
-                        byteBuffer.get(buf, pos, nBytes);
-                        lastValid = pos + nBytes;
-                        byteBuffer.clear();
-                        flipped = false;
-                    } else {
-                        byteBuffer.clear();
-                        flipped = false;
-                        readPending = true;
-                        Nio2Endpoint.startInline();
-                        socket.getSocket().read(byteBuffer, socket.getTimeout(),
-                                    TimeUnit.MILLISECONDS, socket, completionHandler);
-                        Nio2Endpoint.endInline();
-                        // Return the number of bytes that have been placed into the buffer
-                        if (!readPending) {
-                            // If the completion handler completed immediately
-                            if (!flipped) {
-                                byteBuffer.flip();
-                                flipped = true;
-                            }
-                            nBytes = byteBuffer.remaining();
-                            if (nBytes > 0) {
-                                expand(nBytes + pos);
-                                byteBuffer.get(buf, pos, nBytes);
-                                lastValid = pos + nBytes;
-                            }
-                            byteBuffer.clear();
-                            flipped = false;
-                        }
-                    }
-                    return (lastValid - pos) > 0;
-                } else {
-                    return false;
-                }
-            }
-        }
-    }
 
-
-    public void registerReadInterest() {
-        synchronized (completionHandler) {
-            if (readPending) {
-                interest = true;
-            } else {
-                // If no read is pending, notify
-                endpoint.processSocket(socket, SocketStatus.OPEN_READ, true);
-            }
+        int nRead = wrapper.read(block, buf, pos, buf.length - pos);
+        if (nRead > 0) {
+            lastValid = pos + nRead;
+            return true;
         }
+
+        return false;
     }
 
 
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
-
     /**
      * This class is an input buffer which will read its data from an input
      * stream.
      */
-    protected class SocketInputBuffer
-        implements InputBuffer {
-
+    protected class SocketInputBuffer implements InputBuffer {
 
         /**
          * Read bytes into the specified chunk.
@@ -331,19 +125,12 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
                 if (!fill(true)) //read body, must be blocking, as the thread is inside the app
                     return -1;
             }
-            if (isBlocking()) {
-                int length = lastValid - pos;
-                chunk.setBytes(buf, pos, length);
-                pos = lastValid;
-                return (length);
-            } else {
-                synchronized (completionHandler) {
-                    int length = lastValid - pos;
-                    chunk.setBytes(buf, pos, length);
-                    pos = lastValid;
-                    return (length);
-                }
-            }
+
+            int length = lastValid - pos;
+            chunk.setBytes(buf, pos, length);
+            pos = lastValid;
+
+            return length;
         }
     }
 }

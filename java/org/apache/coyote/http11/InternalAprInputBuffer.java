@@ -37,12 +37,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     private static final Log log =
         LogFactory.getLog(InternalAprInputBuffer.class);
 
+
     // ----------------------------------------------------------- Constructors
 
-
-    /**
-     * Alternate constructor.
-     */
     public InternalAprInputBuffer(Request request, int headerBufferSize) {
         super(request, headerBufferSize);
         inputStreamInputBuffer = new SocketInputBuffer();
@@ -81,7 +78,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
 
         wrapper = socketWrapper;
 
-        int bufLength = Math.max(headerBufferSize, 8192);
+        int bufLength = Math.max(headerBufferSize * 2, 8192);
         if (buf == null || buf.length < bufLength) {
             buf = new byte[bufLength];
         }
@@ -116,9 +113,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
      * This class is an input buffer which will read its data from an input
      * stream.
      */
-    protected class SocketInputBuffer
-        implements InputBuffer {
-
+    protected class SocketInputBuffer implements InputBuffer {
 
         /**
          * Read bytes into the specified chunk.
@@ -136,7 +131,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             chunk.setBytes(buf, pos, length);
             pos = lastValid;
 
-            return (length);
+            return length;
         }
     }
 }

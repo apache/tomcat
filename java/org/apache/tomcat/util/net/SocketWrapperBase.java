@@ -178,6 +178,8 @@ public abstract class SocketWrapperBase<E> {
     }
     public Object getWriteThreadLock() { return writeThreadLock; }
 
+    public abstract boolean isReadPending();
+
     protected boolean hasMoreDataToFlush() {
         return (writeBufferFlipped && socketWriteBuffer.remaining() > 0) ||
         (!writeBufferFlipped && socketWriteBuffer.position() > 0);
@@ -497,6 +499,8 @@ public abstract class SocketWrapperBase<E> {
         }
         holder.getBuf().put(buf,offset,length);
     }
+
+    public abstract void registerReadInterest();
 
     public abstract void registerWriteInterest();
 

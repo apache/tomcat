@@ -977,6 +977,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         @Override
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
+            if (getError() != null) {
+                throw getError();
+            }
 
             if (log.isDebugEnabled()) {
                 log.debug("Socket: [" + this + "], block: [" + block + "], length: [" + len + "]");
@@ -1239,6 +1242,27 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public boolean hasDataToWrite() {
             synchronized (writeCompletionHandler) {
                 return hasMoreDataToFlush() || bufferedWrites.size() > 0 || getError() != null;
+            }
+        }
+
+
+        @Override
+        public boolean isReadPending() {
+            synchronized (readCompletionHandler) {
+                return readPending;
+            }
+        }
+
+
+        @Override
+        public void registerReadInterest() {
+            synchronized (readCompletionHandler) {
+                if (readPending) {
+                    readInterest = true;
+                } else {
+                    // If no read is pending, notify
+                    getEndpoint().processSocket(this, SocketStatus.OPEN_READ, true);
+                }
             }
         }
 
