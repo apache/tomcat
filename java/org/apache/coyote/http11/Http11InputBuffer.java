@@ -103,13 +103,13 @@ public class Http11InputBuffer implements InputBuffer {
     /**
      * Associated Coyote request.
      */
-    private Request request;
+    private final Request request;
 
 
     /**
      * Headers of the associated request.
      */
-    private MimeHeaders headers;
+    private final MimeHeaders headers;
 
 
     /**
@@ -224,7 +224,6 @@ public class Http11InputBuffer implements InputBuffer {
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
         headerParsePos = HeaderParsePosition.HEADER_START;
-        headerData.recycle();
         swallowInput = true;
 
         inputStreamInputBuffer = new SocketInputBuffer();
