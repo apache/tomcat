@@ -64,13 +64,6 @@ public class NioChannel implements ByteChannel {
         this.sendFile = false;
     }
 
-    public int getBufferSize() {
-        if ( bufHandler == null ) return 0;
-        int size = 0;
-        size += bufHandler.getReadBuffer().capacity();
-        size += bufHandler.getWriteBuffer().capacity();
-        return size;
-    }
 
     /**
      * Returns true if the network buffer has been flushed out and is empty.

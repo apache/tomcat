@@ -726,8 +726,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private boolean upgradeInit = false;
 
         private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> readCompletionHandler;
-        private boolean flipped = false;
-        private volatile boolean readPending = false;
+        private final Semaphore readPending = new Semaphore(1);
         private volatile boolean readInterest = true;
 
         private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
@@ -751,7 +750,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attachment);
                         } else {
-                            readPending = false;
+                            readPending.release();
                             if (readInterest && !Nio2Endpoint.isInline()) {
                                 readInterest = false;
                                 notify = true;
@@ -771,7 +770,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         ioe = new IOException(exc);
                     }
                     Nio2SocketWrapper.this.setError(ioe);
-                    readPending = false;
+                    readPending.release();
                     if (exc instanceof AsynchronousCloseException) {
                         // If already closed, don't call onError and close again
                         return;
@@ -947,30 +946,21 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public boolean isReady() throws IOException {
             synchronized (readCompletionHandler) {
-                if (readPending) {
+                if (!readPending.tryAcquire()) {
                     readInterest = true;
                     return false;
                 }
-                ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
-                if (!flipped) {
-                    readBuffer.flip();
-                    flipped = true;
-                }
-                if (readBuffer.remaining() > 0) {
+
+                socketBufferHandler.configureReadBufferForRead();
+                if (!socketBufferHandler.isReadBufferEmpty()) {
                     return true;
                 }
 
-                readBuffer.clear();
-                flipped = false;
                 int nRead = fillReadBuffer(false);
 
                 boolean isReady = nRead > 0;
-                if (isReady) {
-                    if (!flipped) {
-                        readBuffer.flip();
-                        flipped = true;
-                    }
-                } else {
+
+                if (!isReady) {
                     readInterest = true;
                 }
                 return isReady;
@@ -988,27 +978,33 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 log.debug("Socket: [" + this + "], block: [" + block + "], length: [" + len + "]");
             }
 
-            synchronized (readCompletionHandler) {
-                if (readPending) {
+            if (block) {
+                try {
+                    readPending.acquire();
+                } catch (InterruptedException e) {
+                    throw new IOException(e);
+                }
+            } else {
+                if (!readPending.tryAcquire()) {
                     if (log.isDebugEnabled()) {
                         log.debug("Socket: [" + this + "], Read: [0]");
                     }
                     return 0;
                 }
+            }
 
-                ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
+            synchronized (readCompletionHandler) {
+                socketBufferHandler.configureReadBufferForRead();
 
-                if (!flipped) {
-                    readBuffer.flip();
-                    flipped = true;
-                }
-                int remaining = readBuffer.remaining();
+                int remaining = socketBufferHandler.getReadBuffer().remaining();
+
                 // Is there enough data in the read buffer to satisfy this request?
                 if (remaining >= len) {
-                    readBuffer.get(b, off, len);
+                    socketBufferHandler.getReadBuffer().get(b, off, len);
                     if (log.isDebugEnabled()) {
                         log.debug("Socket: [" + this + "], Read from buffer: [" + len + "]");
                     }
+                    readPending.release();
                     return len;
                 }
 
@@ -1016,39 +1012,29 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 int leftToWrite = len;
                 int newOffset = off;
                 if (remaining > 0) {
-                    readBuffer.get(b, off, remaining);
+                    socketBufferHandler.getReadBuffer().get(b, off, remaining);
                     leftToWrite -= remaining;
                     newOffset += remaining;
                 }
 
-                // Fill the read buffer as best we can
-                readBuffer.clear();
-                flipped = false;
-                int nRead = fillReadBuffer(block);
+                // Fill the read buffer as best we can. Only do a blocking read if
+                // the current read is blocking AND there wasn't any data left over
+                // in the read buffer.
+                int nRead = fillReadBuffer(block && remaining == 0);
 
-                // Full as much of the remaining byte array as possible with the data
-                // that was just read
+                // Fill as much of the remaining byte array as possible with the
+                // data that was just read
                 if (nRead > 0) {
-                    if (!flipped) {
-                        readBuffer.flip();
-                        flipped = true;
-                    }
+                    socketBufferHandler.configureReadBufferForRead();
                     if (nRead > leftToWrite) {
-                        readBuffer.get(b, newOffset, leftToWrite);
+                        socketBufferHandler.getReadBuffer().get(b, newOffset, leftToWrite);
                         leftToWrite = 0;
                     } else {
-                        readBuffer.get(b, newOffset, nRead);
+                        socketBufferHandler.getReadBuffer().get(b, newOffset, nRead);
                         leftToWrite -= nRead;
                     }
-                } else if (nRead == 0) {
-                    if (block) {
-                        if (!flipped) {
-                            readBuffer.flip();
-                            flipped = true;
-                        }
-                    } else {
-                        readInterest = true;
-                    }
+                } else if (nRead == 0 && !block) {
+                    readInterest = true;
                 } else if (nRead == -1) {
                     throw new EOFException();
                 }
@@ -1056,7 +1042,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 if (log.isDebugEnabled()) {
                     log.debug("Socket: [" + this + "], Read: [" + (len - leftToWrite) + "]");
                 }
-
                 return len - leftToWrite;
             }
         }
@@ -1065,7 +1050,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public void unRead(ByteBuffer returnedInput) {
             if (returnedInput != null) {
-                getSocket().getBufHandler().getReadBuffer().put(returnedInput);
+                socketBufferHandler.configureReadBufferForWrite();
+                socketBufferHandler.getReadBuffer().put(returnedInput);
             }
         }
 
@@ -1079,17 +1065,17 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
 
+        /* Callers of this method must:
+         * - have acquired the readPending semaphore
+         * - have acquired a lock on readCompletionHandler
+         */
         private int fillReadBuffer(boolean block) throws IOException {
-            ByteBuffer readBuffer = getSocket().getBufHandler().getReadBuffer();
+            socketBufferHandler.configureReadBufferForWrite();
             int nRead = 0;
             if (block) {
-                readPending = true;
-                readBuffer.clear();
-                flipped = false;
                 try {
-                    nRead = getSocket().read(readBuffer)
-                            .get(getTimeout(), TimeUnit.MILLISECONDS).intValue();
-                    readPending = false;
+                    nRead = getSocket().read(socketBufferHandler.getReadBuffer()).get(
+                            getTimeout(), TimeUnit.MILLISECONDS).intValue();
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
                         throw (IOException) e.getCause();
@@ -1103,15 +1089,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     throw ex;
                 }
             } else {
-                readPending = true;
-                readBuffer.clear();
-                flipped = false;
                 Nio2Endpoint.startInline();
-                getSocket().read(readBuffer, getTimeout(), TimeUnit.MILLISECONDS,
+                getSocket().read(socketBufferHandler.getReadBuffer(), getTimeout(), TimeUnit.MILLISECONDS,
                         this, readCompletionHandler);
                 Nio2Endpoint.endInline();
-                if (!readPending) {
-                    nRead = readBuffer.position();
+                if (readPending.availablePermits() == 1) {
+                    nRead = socketBufferHandler.getReadBuffer().position();
                 }
             }
             return nRead;
@@ -1230,7 +1213,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                                 writeCompletionHandler);
                     } else {
                         // Nothing was written
-                        writePending.release();
+                        if (!hasPermit) {
+                            writePending.release();
+                        }
                     }
                 }
                 return hasDataToWrite();
@@ -1250,7 +1235,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public boolean isReadPending() {
             synchronized (readCompletionHandler) {
-                return readPending;
+                return readPending.availablePermits() == 0;
             }
         }
 
@@ -1258,11 +1243,13 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public void registerReadInterest() {
             synchronized (readCompletionHandler) {
-                if (readPending) {
-                    readInterest = true;
-                } else {
+                if (readPending.tryAcquire()) {
+                    readPending.release();
+
                     // If no read is pending, notify
                     getEndpoint().processSocket(this, SocketStatus.OPEN_READ, true);
+                } else {
+                    readInterest = true;
                 }
             }
         }
@@ -1352,10 +1339,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         if (socket == null || socket.getSocket() == null) {
             return;
         }
-        ByteBuffer byteBuffer = socket.getSocket().getBufHandler().getReadBuffer();
-        byteBuffer.clear();
-        socket.getSocket().read(byteBuffer, socket.getTimeout(),
-               TimeUnit.MILLISECONDS, socket, awaitBytes);
+        socket.getSocket().getBufHandler().configureReadBufferForWrite();
+        socket.getSocket().read(socket.getSocket().getBufHandler().getReadBuffer(),
+                socket.getTimeout(), TimeUnit.MILLISECONDS, socket, awaitBytes);
     }
 
     public enum SendfileState {
@@ -1449,8 +1435,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 return SendfileState.ERROR;
             }
         }
+        socket.getSocket().getBufHandler().configureReadBufferForWrite();
         ByteBuffer buffer = socket.getSocket().getBufHandler().getWriteBuffer();
-        buffer.clear();
         int nRead = -1;
         try {
             nRead = data.fchannel.read(buffer);
@@ -1459,10 +1445,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
         if (nRead >= 0) {
-            buffer.flip();
             data.socket = socket;
             data.buffer = buffer;
             data.length -= nRead;
+            socket.getSocket().getBufHandler().configureReadBufferForRead();
             socket.getSocket().write(buffer, socket.getTimeout(), TimeUnit.MILLISECONDS,
                     data, sendfile);
             if (data.doneInline) {

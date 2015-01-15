@@ -52,21 +52,13 @@ public class Nio2Channel implements AsynchronousByteChannel {
             throws IOException {
         this.sc = channel;
         this.socket = socket;
-        bufHandler.getReadBuffer().clear();
-        bufHandler.getWriteBuffer().clear();
+        bufHandler.reset();
     }
 
     public SocketWrapperBase<Nio2Channel> getSocket() {
         return socket;
     }
 
-    public int getBufferSize() {
-        if ( bufHandler == null ) return 0;
-        int size = 0;
-        size += bufHandler.getReadBuffer()!=null?bufHandler.getReadBuffer().capacity():0;
-        size += bufHandler.getWriteBuffer()!=null?bufHandler.getWriteBuffer().capacity():0;
-        return size;
-    }
 
     /**
      * Closes this channel.

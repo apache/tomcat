@@ -1438,8 +1438,10 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 newOffset += remaining;
             }
 
-            // Fill the read buffer as best we can
-            int nRead = fillReadBuffer(block);
+            // Fill the read buffer as best we can. Only do a blocking read if
+            // the current read is blocking AND there wasn't any data left over
+            // in the read buffer.
+            int nRead = fillReadBuffer(block && remaining == 0);
 
             // Full as much of the remaining byte array as possible with the
             // data that was just read
