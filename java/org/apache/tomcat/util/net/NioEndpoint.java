@@ -1400,7 +1400,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
-        public boolean isReady() throws IOException {
+        public boolean isReadyForRead() throws IOException {
             socketBufferHandler.configureReadBufferForRead();
 
             if (socketBufferHandler.getReadBuffer().remaining() > 0) {
