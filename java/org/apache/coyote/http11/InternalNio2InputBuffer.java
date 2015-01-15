@@ -44,6 +44,7 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
         inputStreamInputBuffer = new SocketInputBuffer();
     }
 
+
     // ----------------------------------------------------- Instance Variables
 
     private SocketWrapperBase<Nio2Channel> wrapper;
@@ -70,19 +71,19 @@ public class InternalNio2InputBuffer extends AbstractInputBuffer<Nio2Channel> {
     }
 
 
-    // ------------------------------------------------------ Protected Methods
-
     @Override
     protected void init(SocketWrapperBase<Nio2Channel> socketWrapper,
             AbstractEndpoint<Nio2Channel> associatedEndpoint) throws IOException {
 
         wrapper = socketWrapper;
 
-        int bufLength = headerBufferSize + wrapper.getSocket().getBufHandler().getReadBuffer().capacity();
+        int bufLength = headerBufferSize +
+                wrapper.getSocket().getBufHandler().getReadBuffer().capacity();
         if (buf == null || buf.length < bufLength) {
             buf = new byte[bufLength];
         }
     }
+
 
     @Override
     protected boolean fill(boolean block) throws IOException, EOFException {
