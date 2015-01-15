@@ -40,9 +40,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     // ----------------------------------------------------------- Constructors
 
-    /**
-     * Alternate constructor.
-     */
     public InternalNioInputBuffer(Request request, int headerBufferSize) {
         super(request, headerBufferSize);
         inputStreamInputBuffer = new SocketInputBuffer();
@@ -65,6 +62,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         wrapper = null;
         super.recycle();
     }
+
 
     // ------------------------------------------------------ Protected Methods
 
@@ -112,21 +110,17 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
     // ------------------------------------- InputStreamInputBuffer Inner Class
 
-
     /**
      * This class is an input buffer which will read its data from an input
      * stream.
      */
-    protected class SocketInputBuffer
-        implements InputBuffer {
-
+    protected class SocketInputBuffer implements InputBuffer {
 
         /**
          * Read bytes into the specified chunk.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req )
-            throws IOException {
+        public int doRead(ByteChunk chunk, Request req) throws IOException {
 
             if (pos >= lastValid) {
                 if (!fill(true)) //read body, must be blocking, as the thread is inside the app
