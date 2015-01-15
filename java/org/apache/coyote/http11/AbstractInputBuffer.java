@@ -118,26 +118,10 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
 
     /**
-     * The read buffer represented as a byte[].
-     * <p>
-     * SocketWrapper uses ByteBuffer (since reading from socket to ByteBuffer is
-     * the only API common to all current I/O implementations) but this class
-     * uses byte[] since that is more efficient for parsing. readByteBuffer
-     * therefore wraps buf. The byte[] representation is only used for reading.
-     * The ByteBuffer representation is only used for writing.
+     * The read buffer.
      */
     protected byte[] buf;
 
-    /**
-     * The read buffer represented as a ByteBuffer.
-     * <p>
-     * SocketWrapper uses ByteBuffer (since reading from socket to ByteBuffer is
-     * the only API common to all current I/O implementations) but this class
-     * uses byte[] since that is more efficient for parsing. readByteBuffer
-     * therefore wraps buf. The byte[] representation is only used for reading.
-     * The ByteBuffer representation is only used for writing.
-     */
-    protected ByteBuffer readByteBuffer;
 
     /**
      * Last valid byte.
@@ -387,7 +371,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
         // Reset pointers
         lastValid = lastValid - pos;
-        readByteBuffer.position(lastValid);
         pos = 0;
         lastActiveFilter = -1;
         parsingHeader = true;
@@ -648,8 +631,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
             byte[] tmp = new byte[newsize];
             System.arraycopy(buf,0,tmp,0,buf.length);
             buf = tmp;
-            readByteBuffer = ByteBuffer.wrap(buf);
-            readByteBuffer.position(lastValid);
         }
     }
 

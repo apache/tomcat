@@ -98,7 +98,6 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         int bufLength = headerBufferSize + socketReadBufferSize;
         if (buf == null || buf.length < bufLength) {
             buf = new byte[bufLength];
-            readByteBuffer = ByteBuffer.wrap(buf);
         }
 
         pool = ((NioEndpoint)endpoint).getSelectorPool();
