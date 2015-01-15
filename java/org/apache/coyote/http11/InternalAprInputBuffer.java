@@ -91,10 +91,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     @Override
     protected boolean fill(boolean block) throws IOException {
 
-        int nRead = 0;
-
         if (parsingHeader) {
-            if (lastValid == buf.length) {
+            if (lastValid > headerBufferSize) {
                 throw new IllegalArgumentException
                     (sm.getString("iib.requestheadertoolarge.error"));
             }
@@ -102,7 +100,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             lastValid = pos = end;
         }
 
-        nRead = wrapper.read(block, buf, pos, buf.length - pos);
+        int nRead = wrapper.read(block, buf, pos, buf.length - pos);
         if (nRead > 0) {
             lastValid = pos + nRead;
             return true;
