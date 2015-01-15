@@ -727,7 +727,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> readCompletionHandler;
         private final Semaphore readPending = new Semaphore(1);
-        private volatile boolean readInterest = true;
+        private boolean readInterest = true; // Guarded by readCompletionHandler
 
         private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
         private final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
