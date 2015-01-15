@@ -179,7 +179,7 @@ public abstract class SocketWrapperBase<E> {
         return blockingStatusWriteLock;
     }
     public Object getWriteThreadLock() { return writeThreadLock; }
-
+    public SocketBufferHandler getSocketBufferHandler() { return socketBufferHandler; }
     public abstract boolean isReadPending();
 
     public boolean hasDataToWrite() {
