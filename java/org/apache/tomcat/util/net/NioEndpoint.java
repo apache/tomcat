@@ -1548,6 +1548,18 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
+        public boolean isReadPending() {
+            return false;
+        }
+
+
+        @Override
+        public void registerReadInterest() {
+            getPoller().add(getSocket(), SelectionKey.OP_READ);
+        }
+
+
+        @Override
         public void registerWriteInterest() {
             getPoller().add(getSocket(), SelectionKey.OP_WRITE);
         }

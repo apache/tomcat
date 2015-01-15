@@ -2629,8 +2629,20 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
+        public boolean isReadPending() {
+            return false;
+        }
+
+
+        @Override
+        public void registerReadInterest() {
+            regsiterForEvent(true, false);
+        }
+
+
+        @Override
         public void registerWriteInterest() {
-            ((AprEndpoint) getEndpoint()).getPoller().add(getSocket().longValue(), -1, false, true);
+            regsiterForEvent(false, true);
         }
 
 

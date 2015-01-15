@@ -85,7 +85,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
         SocketState state = super.asyncDispatch(status);
-        if (state == SocketState.OPEN && ((InternalNio2InputBuffer) getInputBuffer()).isPending()) {
+        if (state == SocketState.OPEN && socketWrapper.isReadPending()) {
             // Following async processing, a read is still pending, so
             // keep the processor associated
             return SocketState.LONG;
@@ -97,7 +97,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     @Override
     protected void registerForEvent(boolean read, boolean write) {
         if (read) {
-            ((InternalNio2InputBuffer) getInputBuffer()).registerReadInterest();
+            socketWrapper.registerReadInterest();
         }
         if (write) {
             socketWrapper.registerWriteInterest();

@@ -80,7 +80,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
 
         wrapper = socketWrapper;
 
-        int bufLength = Math.max(headerBufferSize, 8192);
+        int bufLength = headerBufferSize + wrapper.getSocket().getBufHandler().getReadBuffer().capacity();
         if (buf == null || buf.length < bufLength) {
             buf = new byte[bufLength];
         }
