@@ -27,7 +27,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -46,10 +45,10 @@ public class Http11InputBuffer implements InputBuffer {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Http11InputBuffer.class);
+    private static final StringManager sm = StringManager.getManager(Http11InputBuffer.class);
 
 
-    protected static final boolean[] HTTP_TOKEN_CHAR = new boolean[128];
+    private static final boolean[] HTTP_TOKEN_CHAR = new boolean[128];
     static {
         for (int i = 0; i < 128; i++) {
             if (i < 32) {
@@ -104,81 +103,81 @@ public class Http11InputBuffer implements InputBuffer {
     /**
      * Associated Coyote request.
      */
-    protected Request request;
+    private Request request;
 
 
     /**
      * Headers of the associated request.
      */
-    protected MimeHeaders headers;
+    private MimeHeaders headers;
 
 
     /**
      * State.
      */
-    protected boolean parsingHeader;
+    private boolean parsingHeader;
 
 
     /**
      * Swallow input ? (in the case of an expectation)
      */
-    protected boolean swallowInput;
+    private boolean swallowInput;
 
 
     /**
      * The read buffer.
      */
-    protected byte[] buf;
+    private byte[] buf;
 
 
     /**
      * Last valid byte.
      */
-    protected int lastValid;
+    private int lastValid;
 
 
     /**
      * Position in the buffer.
      */
-    protected int pos;
+    private int pos;
 
 
     /**
      * Pos of the end of the header in the buffer, which is also the
      * start of the body.
      */
-    protected int end;
+    private int end;
 
 
     /**
      * Wrapper that provides access to the underlying socket.
      */
-    protected SocketWrapperBase<?> wrapper;
+    private SocketWrapperBase<?> wrapper;
 
 
     /**
      * Underlying input buffer.
      */
-    protected InputBuffer inputStreamInputBuffer;
+    private InputBuffer inputStreamInputBuffer;
 
 
     /**
      * Filter library.
      * Note: Filter[Constants.CHUNKED_FILTER] is always the "chunked" filter.
      */
-    protected InputFilter[] filterLibrary;
+    private InputFilter[] filterLibrary;
 
 
     /**
      * Active filters (in order).
      */
-    protected InputFilter[] activeFilters;
+    private InputFilter[] activeFilters;
 
 
     /**
      * Index of the last active filter.
      */
-    protected int lastActiveFilter;
+    private int lastActiveFilter;
 
 
     /**
@@ -197,12 +196,12 @@ public class Http11InputBuffer implements InputBuffer {
      * Maximum allowed size of the HTTP request line plus headers plus any
      * leading blank lines.
      */
-    protected final int headerBufferSize;
+    private final int headerBufferSize;
 
     /**
      * Known size of the NioChannel read buffer.
      */
-    protected int socketReadBufferSize;
+    private int socketReadBufferSize;
 
 
     // ----------------------------------------------------------- Constructors
@@ -239,7 +238,7 @@ public class Http11InputBuffer implements InputBuffer {
      *
      * @throws NullPointerException if the supplied filter is null
      */
-    public void addFilter(InputFilter filter) {
+    void addFilter(InputFilter filter) {
 
         if (filter == null) {
             throw new NullPointerException(sm.getString("iib.filter.npe"));
@@ -260,7 +259,7 @@ public class Http11InputBuffer implements InputBuffer {
     /**
      * Get filters.
      */
-    public InputFilter[] getFilters() {
+    InputFilter[] getFilters() {
         return filterLibrary;
     }
 
@@ -268,7 +267,7 @@ public class Http11InputBuffer implements InputBuffer {
     /**
      * Add an input filter to the filter library.
      */
-    public void addActiveFilter(InputFilter filter) {
+    void addActiveFilter(InputFilter filter) {
 
         if (lastActiveFilter == -1) {
             filter.setBuffer(inputStreamInputBuffer);
@@ -289,7 +288,7 @@ public class Http11InputBuffer implements InputBuffer {
     /**
      * Set the swallow input flag.
      */
-    public void setSwallowInput(boolean swallowInput) {
+    void setSwallowInput(boolean swallowInput) {
         this.swallowInput = swallowInput;
     }
 
@@ -310,13 +309,13 @@ public class Http11InputBuffer implements InputBuffer {
     }
 
 
-    // --------------------------------------------------------- Public Methods
+    // ------------------------------------------------------- Protected Methods
 
     /**
      * Recycle the input buffer. This should be called when closing the
      * connection.
      */
-    public void recycle() {
+    void recycle() {
         wrapper = null;
         request.recycle();
 
@@ -346,7 +345,7 @@ public class Http11InputBuffer implements InputBuffer {
      * consumed. This method only resets all the pointers so that we are ready
      * to parse the next HTTP request.
      */
-    public void nextRequest() {
+    void nextRequest() {
         request.recycle();
 
         // Copy leftover bytes to the beginning of the buffer
@@ -394,7 +393,7 @@ public class Http11InputBuffer implements InputBuffer {
      * @return true if data is properly fed; false if no data is available
      * immediately and thread should be freed
      */
-    public boolean parseRequestLine(boolean useAvailableDataOnly) throws IOException {
+    boolean parseRequestLine(boolean useAvailableDataOnly) throws IOException {
 
         //check state
         if ( !parsingRequestLine ) return true;
@@ -577,7 +576,7 @@ public class Http11InputBuffer implements InputBuffer {
     /**
      * Parse the HTTP headers.
      */
-    public boolean parseHeaders() throws IOException {
+    boolean parseHeaders() throws IOException {
         if (!parsingHeader) {
             throw new IllegalStateException(
                     sm.getString("iib.parseheaders.ise.error"));
@@ -611,24 +610,8 @@ public class Http11InputBuffer implements InputBuffer {
     }
 
 
-    public int getParsingRequestLinePhase() {
+    int getParsingRequestLinePhase() {
         return parsingRequestLinePhase;
-    }
-
-
-    protected void expand(int newsize) {
-        if ( newsize > buf.length ) {
-            if (parsingHeader) {
-                throw new IllegalArgumentException(
-                        sm.getString("iib.requestheadertoolarge.error"));
-            }
-            // Should not happen
-            log.warn("Expanding buffer size. Old size: " + buf.length
-                    + ", new size: " + newsize, new Exception());
-            byte[] tmp = new byte[newsize];
-            System.arraycopy(buf,0,tmp,0,buf.length);
-            buf = tmp;
-        }
     }
 
 
@@ -637,7 +620,7 @@ public class Http11InputBuffer implements InputBuffer {
      *
      * @throws IOException an underlying I/O error occurred
      */
-    public void endRequest() throws IOException {
+    void endRequest() throws IOException {
 
         if (swallowInput && (lastActiveFilter != -1)) {
             int extraBytes = (int) activeFilters[lastActiveFilter].end();
@@ -650,7 +633,7 @@ public class Http11InputBuffer implements InputBuffer {
      * Available bytes in the buffers (note that due to encoding, this may not
      * correspond).
      */
-    public int available() {
+    int available() {
         int available = lastValid - pos;
         if ((available == 0) && (lastActiveFilter >= 0)) {
             for (int i = 0; (available == 0) && (i <= lastActiveFilter); i++) {
@@ -682,7 +665,7 @@ public class Http11InputBuffer implements InputBuffer {
      * between this and available() &gt; 0 primarily because of having to handle
      * faking non-blocking reads with the blocking IO connector.
      */
-    public boolean isFinished() {
+    boolean isFinished() {
         if (lastValid > pos) {
             // Data to read in the buffer so not finished
             return false;
@@ -717,15 +700,21 @@ public class Http11InputBuffer implements InputBuffer {
         }
     }
 
-    /**
-     * Is standard Servlet blocking IO being used for input?
-     */
-    protected final boolean isBlocking() {
-        return request.getReadListener() == null;
+
+    void init(SocketWrapperBase<?> socketWrapper) {
+
+        wrapper = socketWrapper;
+
+        int bufLength = headerBufferSize +
+                wrapper.getSocketBufferHandler().getReadBuffer().capacity();
+        if (buf == null || buf.length < bufLength) {
+            buf = new byte[bufLength];
+        }
     }
 
 
-    // -------------------------------------------------------- Protected Methods
+
+    // --------------------------------------------------------- Private Methods
 
     /**
      * Attempts to read some data into the input buffer.
@@ -733,7 +722,7 @@ public class Http11InputBuffer implements InputBuffer {
      * @return <code>true</code> if more data was added to the input buffer
      *         otherwise <code>false</code>
      */
-    protected boolean fill(boolean block) throws IOException {
+    private boolean fill(boolean block) throws IOException {
 
         if (parsingHeader) {
             if (lastValid > headerBufferSize) {
@@ -753,22 +742,6 @@ public class Http11InputBuffer implements InputBuffer {
         return false;
     }
 
-
-    protected void init(SocketWrapperBase<?> socketWrapper,
-            AbstractEndpoint<?> endpoint) throws IOException {
-
-        wrapper = socketWrapper;
-
-        int bufLength = headerBufferSize +
-                wrapper.getSocketBufferHandler().getReadBuffer().capacity();
-        if (buf == null || buf.length < bufLength) {
-            buf = new byte[bufLength];
-        }
-    }
-
-
-
-    // --------------------------------------------------------- Private Methods
 
     /**
      * Parse an HTTP header.
@@ -1090,6 +1063,8 @@ public class Http11InputBuffer implements InputBuffer {
             throws IOException {
 
             if (pos >= lastValid) {
+                // The application is reading the HTTP request body which is
+                // always a blocking operation.
                 if (!fill(true))
                     return -1;
             }
