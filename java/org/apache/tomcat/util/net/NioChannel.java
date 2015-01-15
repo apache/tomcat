@@ -24,7 +24,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 
 import org.apache.tomcat.util.net.NioEndpoint.Poller;
-import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -44,13 +43,13 @@ public class NioChannel implements ByteChannel {
 
     protected SocketChannel sc = null;
 
-    protected ApplicationBufferHandler bufHandler;
+    protected final SocketBufferHandler bufHandler;
 
     protected Poller poller;
 
     protected boolean sendFile = false;
 
-    public NioChannel(SocketChannel channel, ApplicationBufferHandler bufHandler) {
+    public NioChannel(SocketChannel channel, SocketBufferHandler bufHandler) {
         this.sc = channel;
         this.bufHandler = bufHandler;
     }
@@ -61,19 +60,15 @@ public class NioChannel implements ByteChannel {
      * @throws IOException If a problem was encountered resetting the channel
      */
     public void reset() throws IOException {
-        bufHandler.getReadBuffer().clear();
-        // TODO AJP and HTTPS have different expectations for the state of
-        // the buffer at the start of a read. These need to be reconciled.
-        bufHandler.getReadBuffer().limit(0);
-        bufHandler.getWriteBuffer().clear();
+        bufHandler.reset();
         this.sendFile = false;
     }
 
     public int getBufferSize() {
         if ( bufHandler == null ) return 0;
         int size = 0;
-        size += bufHandler.getReadBuffer()!=null?bufHandler.getReadBuffer().capacity():0;
-        size += bufHandler.getWriteBuffer()!=null?bufHandler.getWriteBuffer().capacity():0;
+        size += bufHandler.getReadBuffer().capacity();
+        size += bufHandler.getWriteBuffer().capacity();
         return size;
     }
 
@@ -151,7 +146,7 @@ public class NioChannel implements ByteChannel {
         return att;
     }
 
-    public ApplicationBufferHandler getBufHandler() {
+    public SocketBufferHandler getBufHandler() {
         return bufHandler;
     }
 
