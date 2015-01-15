@@ -54,7 +54,6 @@ public class SecureNioChannel extends NioChannel  {
                             ApplicationBufferHandler bufHandler, NioSelectorPool pool) throws IOException {
         super(channel,bufHandler);
         this.sslEngine = engine;
-        int appBufSize = sslEngine.getSession().getApplicationBufferSize();
         int netBufSize = sslEngine.getSession().getPacketBufferSize();
         //allocate network buffers - TODO, add in optional direct non-direct buffers
         if ( netInBuffer == null ) netInBuffer = ByteBuffer.allocateDirect(netBufSize);
