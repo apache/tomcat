@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -30,15 +31,22 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractInputBuffer<S> implements InputBuffer{
+/**
+ * InputBuffer for HTTP that provides request header parsing as well as transfer
+ * encoding.
+ *
+ * <S>  The type of socket used by the underlying I/O implementation
+ */
+public class AbstractInputBuffer implements InputBuffer {
 
     // -------------------------------------------------------------- Constants
+
+    private static final Log log = LogFactory.getLog(AbstractInputBuffer.class);
 
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(AbstractInputBuffer.class);
 
 
     protected static final boolean[] HTTP_TOKEN_CHAR = new boolean[128];
@@ -143,6 +151,12 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
 
     /**
+     * Wrapper that provides access to the underlying socket.
+     */
+    protected SocketWrapperBase<?> wrapper;
+
+
+    /**
      * Underlying input buffer.
      */
     protected InputBuffer inputStreamInputBuffer;
@@ -213,6 +227,8 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         headerParsePos = HeaderParsePosition.HEADER_START;
         headerData.recycle();
         swallowInput = true;
+
+        inputStreamInputBuffer = new SocketInputBuffer();
     }
 
 
@@ -245,9 +261,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      * Get filters.
      */
     public InputFilter[] getFilters() {
-
         return filterLibrary;
-
     }
 
 
@@ -269,7 +283,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         activeFilters[++lastActiveFilter] = filter;
 
         filter.setRequest(request);
-
     }
 
 
@@ -287,8 +300,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      * Read some bytes.
      */
     @Override
-    public int doRead(ByteChunk chunk, Request req)
-        throws IOException {
+    public int doRead(ByteChunk chunk, Request req) throws IOException {
 
         if (lastActiveFilter == -1)
             return inputStreamInputBuffer.doRead(chunk, req);
@@ -298,22 +310,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     }
 
 
-    // ------------------------------------------------------- Abstract Methods
-
-    /**
-     * Attempts to read some data into the input buffer.
-     *
-     * @return <code>true</code> if more data was added to the input buffer
-     *         otherwise <code>false</code>
-     */
-    protected abstract boolean fill(boolean block) throws IOException;
-
-    protected abstract void init(SocketWrapperBase<S> socketWrapper,
-            AbstractEndpoint<S> endpoint) throws IOException;
-
-    protected abstract Log getLog();
-
-
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -321,6 +317,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      * connection.
      */
     public void recycle() {
+        wrapper = null;
         request.recycle();
 
         for (int i = 0; i <= lastActiveFilter; i++) {
@@ -431,8 +428,8 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
             parsingRequestLineStart = pos;
             parsingRequestLinePhase = 2;
-            if (getLog().isDebugEnabled()) {
-                getLog().debug("Received ["
+            if (log.isDebugEnabled()) {
+                log.debug("Received ["
                         + new String(buf, pos, lastValid - pos,
                                 StandardCharsets.ISO_8859_1)
                         + "]");
@@ -626,7 +623,7 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
                         sm.getString("iib.requestheadertoolarge.error"));
             }
             // Should not happen
-            getLog().warn("Expanding buffer size. Old size: " + buf.length
+            log.warn("Expanding buffer size. Old size: " + buf.length
                     + ", new size: " + newsize, new Exception());
             byte[] tmp = new byte[newsize];
             System.arraycopy(buf,0,tmp,0,buf.length);
@@ -668,8 +665,8 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
             fill(false);
             available = lastValid - pos;
         } catch (IOException ioe) {
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("iib.available.readFail"), ioe);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("iib.available.readFail"), ioe);
             }
             // Not ideal. This will indicate that data is available which should
             // trigger a read which in turn will trigger another IOException and
@@ -726,6 +723,49 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
     protected final boolean isBlocking() {
         return request.getReadListener() == null;
     }
+
+
+    // -------------------------------------------------------- Protected Methods
+
+    /**
+     * Attempts to read some data into the input buffer.
+     *
+     * @return <code>true</code> if more data was added to the input buffer
+     *         otherwise <code>false</code>
+     */
+    protected boolean fill(boolean block) throws IOException {
+
+        if (parsingHeader) {
+            if (lastValid > headerBufferSize) {
+                throw new IllegalArgumentException
+                    (sm.getString("iib.requestheadertoolarge.error"));
+            }
+        } else {
+            lastValid = pos = end;
+        }
+
+        int nRead = wrapper.read(block, buf, pos, buf.length - pos);
+        if (nRead > 0) {
+            lastValid = pos + nRead;
+            return true;
+        }
+
+        return false;
+    }
+
+
+    protected void init(SocketWrapperBase<?> socketWrapper,
+            AbstractEndpoint<?> endpoint) throws IOException {
+
+        wrapper = socketWrapper;
+
+        int bufLength = headerBufferSize +
+                wrapper.getSocketBufferHandler().getReadBuffer().capacity();
+        if (buf == null || buf.length < bufLength) {
+            buf = new byte[bufLength];
+        }
+    }
+
 
 
     // --------------------------------------------------------- Private Methods
@@ -938,8 +978,8 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
             pos++;
         }
-        if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("iib.invalidheader", new String(buf,
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("iib.invalidheader", new String(buf,
                     headerData.start,
                     headerData.lastSignificantChar - headerData.start + 1,
                     StandardCharsets.ISO_8859_1)));
@@ -1030,6 +1070,35 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
             realPos = 0;
             lastSignificantChar = 0;
             headerValue = null;
+        }
+    }
+
+
+    // ------------------------------------- InputStreamInputBuffer Inner Class
+
+    /**
+     * This class is an input buffer which will read its data from an input
+     * stream.
+     */
+    protected class SocketInputBuffer implements InputBuffer {
+
+        /**
+         * Read bytes into the specified chunk.
+         */
+        @Override
+        public int doRead(ByteChunk chunk, Request req )
+            throws IOException {
+
+            if (pos >= lastValid) {
+                if (!fill(true))
+                    return -1;
+            }
+
+            int length = lastValid - pos;
+            chunk.setBytes(buf, pos, length);
+            pos = lastValid;
+
+            return length;
         }
     }
 }

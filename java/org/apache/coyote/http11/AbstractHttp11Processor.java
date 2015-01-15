@@ -72,7 +72,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Input.
      */
-    protected AbstractInputBuffer<S> inputBuffer;
+    protected AbstractInputBuffer inputBuffer;
 
 
     /**
@@ -615,7 +615,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Exposes input buffer to super class to allow better code re-use.
      * @return  The input buffer used by the processor.
      */
-    protected AbstractInputBuffer<S> getInputBuffer() {
+    protected AbstractInputBuffer getInputBuffer() {
         return inputBuffer;
     }
 
@@ -774,9 +774,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             InputFilter savedBody = new SavedRequestInputFilter(body);
             savedBody.setRequest(request);
 
-            @SuppressWarnings("unchecked")
-            AbstractInputBuffer<S> internalBuffer = (AbstractInputBuffer<S>)
-                request.getInputBuffer();
+            AbstractInputBuffer internalBuffer = (AbstractInputBuffer) request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
             break;
         }

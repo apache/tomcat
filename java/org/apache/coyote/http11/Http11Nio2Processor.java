@@ -62,7 +62,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
         super(endpoint);
 
-        inputBuffer = new InternalNio2InputBuffer(request, maxHttpHeaderSize);
+        inputBuffer = new AbstractInputBuffer(request, maxHttpHeaderSize);
         request.setInputBuffer(getInputBuffer());
 
         outputBuffer = new Http11OutputBuffer(response, maxHttpHeaderSize);
