@@ -735,6 +735,25 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private boolean writeInterest = true; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
 
+        private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> awaitBytes
+                = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
+
+            @Override
+            public synchronized void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
+                if (nBytes.intValue() < 0) {
+                    failed(new ClosedChannelException(), attachment);
+                    return;
+                }
+                getEndpoint().processSocket(attachment, SocketStatus.OPEN_READ, true);
+            }
+
+            @Override
+            public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
+                getEndpoint().processSocket(attachment, SocketStatus.DISCONNECT, true);
+            }
+        };
+
+
 
         public Nio2SocketWrapper(Nio2Channel channel, Nio2Endpoint endpoint) {
             super(channel, endpoint);
@@ -1272,6 +1291,19 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public void regsiterForEvent(boolean read, boolean write) {
             // NO-OP. Appropriate handlers will already have been registered.
         }
+
+
+        public void awaitBytes() {
+            if (getSocket() == null) {
+                return;
+            }
+            if (readPending.tryAcquire()) {
+                getSocket().getBufHandler().configureReadBufferForWrite();
+                getSocket().read(getSocket().getBufHandler().getReadBuffer(),
+                        getTimeout(), TimeUnit.MILLISECONDS, this, awaitBytes);
+                readPending.release();
+            }
+        }
     }
 
 
@@ -1288,27 +1320,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public SSLImplementation getSslImplementation();
         public void onCreateSSLEngine(SSLEngine engine);
     }
-
-    /**
-     * The completion handler used for asynchronous read operations
-     */
-    private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> awaitBytes
-            = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
-
-        @Override
-        public synchronized void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
-            if (nBytes.intValue() < 0) {
-                failed(new ClosedChannelException(), attachment);
-                return;
-            }
-            processSocket0(attachment, SocketStatus.OPEN_READ, true);
-        }
-
-        @Override
-        public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
-            processSocket0(attachment, SocketStatus.DISCONNECT, true);
-        }
-    };
 
     public void addTimeout(SocketWrapperBase<Nio2Channel> socket) {
         waitingRequests.add(socket);
@@ -1336,12 +1347,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     }
 
     public void awaitBytes(SocketWrapperBase<Nio2Channel> socket) {
-        if (socket == null || socket.getSocket() == null) {
+        if (socket == null) {
             return;
         }
-        socket.getSocket().getBufHandler().configureReadBufferForWrite();
-        socket.getSocket().read(socket.getSocket().getBufHandler().getReadBuffer(),
-                socket.getTimeout(), TimeUnit.MILLISECONDS, socket, awaitBytes);
+        ((Nio2SocketWrapper) socket).awaitBytes();
     }
 
     public enum SendfileState {
