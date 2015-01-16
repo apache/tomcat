@@ -1171,12 +1171,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         protected void doWrite(boolean block) throws IOException {
             try {
                 socketBufferHandler.configureWriteBufferForRead();
-                while (socketBufferHandler.getWriteBuffer().hasRemaining()) {
+                do {
                     if (getSocket().write(socketBufferHandler.getWriteBuffer()).get(getTimeout(),
                             TimeUnit.MILLISECONDS).intValue() < 0) {
                         throw new EOFException(sm.getString("iob.failedwrite"));
                     }
-                }
+                } while (socketBufferHandler.getWriteBuffer().hasRemaining());
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof IOException) {
                     throw (IOException) e.getCause();
