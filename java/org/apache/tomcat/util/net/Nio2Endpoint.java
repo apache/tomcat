@@ -1014,38 +1014,34 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 }
             }
 
+            socketBufferHandler.configureReadBufferForRead();
+
+            int remaining = socketBufferHandler.getReadBuffer().remaining();
+
+            // Is there enough data in the read buffer to satisfy this request?
+            if (remaining >= len) {
+                socketBufferHandler.getReadBuffer().get(b, off, len);
+                if (log.isDebugEnabled()) {
+                    log.debug("Socket: [" + this + "], Read from buffer: [" + len + "]");
+                }
+                readPending.release();
+                return len;
+            }
+
+            // Copy what data there is in the read buffer to the byte array
+            if (remaining > 0) {
+                socketBufferHandler.getReadBuffer().get(b, off, remaining);
+                // This may be sufficient to complete the request and we
+                // don't want to trigger another read since if there is no
+                // more data to read and this request takes a while to
+                // process the read will timeout triggering an error.
+                readPending.release();
+                return remaining;
+            }
+
             synchronized (readCompletionHandler) {
-                socketBufferHandler.configureReadBufferForRead();
-
-                int remaining = socketBufferHandler.getReadBuffer().remaining();
-
-                // Is there enough data in the read buffer to satisfy this request?
-                if (remaining >= len) {
-                    socketBufferHandler.getReadBuffer().get(b, off, len);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Socket: [" + this + "], Read from buffer: [" + len + "]");
-                    }
-                    readPending.release();
-                    return len;
-                }
-
-                // Copy what data there is in the read buffer to the byte array
-                if (remaining > 0) {
-                    socketBufferHandler.getReadBuffer().get(b, off, remaining);
-                    // This may be sufficient to complete the request and we
-                    // don't want to trigger another read since if there is no
-                    // more data to read and this request takes a while to
-                    // process the read will timeout triggering an error.
-                    readPending.release();
-                    return remaining;
-                }
-
                 // Fill the read buffer as best we can.
                 int nRead = fillReadBuffer(block);
-                if (block) {
-                    // Just did a blocking read so release the semaphore
-                    readPending.release();
-                }
 
                 // Fill as much of the remaining byte array as possible with the
                 // data that was just read
@@ -1091,6 +1087,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         /* Callers of this method must:
          * - have acquired the readPending semaphore
          * - have acquired a lock on readCompletionHandler
+         *
+         * This method will release (or arrange for the release of) the
+         * readPending semaphore once the read has completed.
          */
         private int fillReadBuffer(boolean block) throws IOException {
             socketBufferHandler.configureReadBufferForWrite();
@@ -1099,6 +1098,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 try {
                     nRead = getSocket().read(socketBufferHandler.getReadBuffer()).get(
                             getTimeout(), TimeUnit.MILLISECONDS).intValue();
+                    readPending.release();
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
                         throw (IOException) e.getCause();
