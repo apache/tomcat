@@ -229,19 +229,9 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
             return log;
         }
 
-        /**
-         * Expected to be used by the handler once the processor is no longer
-         * required.
-         *
-         * @param socket
-         * @param processor
-         * @param isSocketClosing   Not used in HTTP
-         * @param addToPoller
-         */
         @Override
         public void release(SocketWrapperBase<Long> socket,
-                Processor<Long> processor, boolean isSocketClosing,
-                boolean addToPoller) {
+                Processor<Long> processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller && proto.getEndpoint().isRunning()) {
@@ -291,7 +281,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 Poller p = ((AprEndpoint) proto.getEndpoint()).getPoller();
                 if (p == null) {
                     // Connector has been stopped
-                    release(socket, processor, true, false);
+                    release(socket, processor, false);
                 } else {
                     p.add(socket.getSocket().longValue(), -1, true, false);
                 }
