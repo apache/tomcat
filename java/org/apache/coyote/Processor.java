@@ -49,7 +49,11 @@ public interface Processor<S> {
 
     Request getRequest();
 
-    void recycle(boolean socketClosing);
+    /**
+     * Recycle the processor, ready for the next request which may be on the
+     * same connection or a different connection.
+     */
+    void recycle();
 
     void setSslSupport(SSLSupport sslSupport);
 

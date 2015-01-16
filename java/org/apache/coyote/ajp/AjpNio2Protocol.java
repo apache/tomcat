@@ -87,7 +87,7 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
             Processor<Nio2Channel> processor =
                     connections.remove(socket.getSocket());
             if (processor != null) {
-                processor.recycle(true);
+                processor.recycle();
                 recycledProcessors.push(processor);
             }
         }
@@ -105,7 +105,7 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
                         "], isSocketClosing: [" + isSocketClosing +
                         "], addToPoller: [" + addToPoller + "]");
             }
-            processor.recycle(isSocketClosing);
+            processor.recycle();
             recycledProcessors.push(processor);
         }
 

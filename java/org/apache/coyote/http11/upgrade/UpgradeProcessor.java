@@ -125,7 +125,7 @@ public class UpgradeProcessor<S> implements Processor<S>, WebConnection {
 
 
     @Override
-    public final void recycle(boolean socketClosing) {
+    public final void recycle() {
         // Currently a NO-OP as upgrade processors are not recycled.
     }
 
