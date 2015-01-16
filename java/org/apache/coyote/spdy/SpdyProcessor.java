@@ -616,7 +616,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
     }
 
     @Override
-    public void recycle(boolean socketClosing) {
+    public void recycle() {
     }
 
     @Override

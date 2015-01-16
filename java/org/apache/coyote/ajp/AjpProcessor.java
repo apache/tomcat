@@ -731,7 +731,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                 int type = requestHeaderMessage.getByte();
                 if (type == Constants.JK_AJP13_CPING_REQUEST) {
                     if (endpoint.isPaused()) {
-                        recycle(true);
+                        recycle();
                         break;
                     }
                     cping = true;
@@ -741,7 +741,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                     } catch (IOException e) {
                         setErrorState(ErrorState.CLOSE_NOW, e);
                     }
-                    recycle(false);
+                    recycle();
                     continue;
                 } else if(type != Constants.JK_AJP13_FORWARD_REQUEST) {
                     // Unexpected packet type. Unread body packets should have
@@ -833,7 +833,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                 socketWrapper.setTimeout(keepAliveTimeout);
             }
 
-            recycle(false);
+            recycle();
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
@@ -874,16 +874,8 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
     }
 
 
-    /**
-     * Recycle the processor, ready for the next request which may be on the
-     * same connection or a different connection.
-     *
-     * @param socketClosing Indicates if the socket is about to be closed
-     *                      allowing the processor to perform any additional
-     *                      clean-up that may be required
-     */
     @Override
-    public void recycle(boolean socketClosing) {
+    public void recycle() {
         getAdapter().checkRecycled(request, response);
 
         asyncStateMachine.recycle();

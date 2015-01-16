@@ -134,7 +134,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
             Processor<Nio2Channel> processor =
                 connections.remove(socket.getSocket());
             if (processor != null) {
-                processor.recycle(true);
+                processor.recycle();
                 recycledProcessors.push(processor);
             }
         }
@@ -165,7 +165,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         public void release(SocketWrapperBase<Nio2Channel> socket,
                 Processor<Nio2Channel> processor, boolean isSocketClosing,
                 boolean addToPoller) {
-            processor.recycle(isSocketClosing);
+            processor.recycle();
             recycledProcessors.push(processor);
             if (socket.isAsync()) {
                 ((Nio2Endpoint) proto.getEndpoint()).removeTimeout(socket);
