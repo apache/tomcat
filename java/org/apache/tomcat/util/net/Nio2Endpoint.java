@@ -1040,9 +1040,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     return remaining;
                 }
 
-                // Fill the read buffer as best we can. Only do a blocking read if
-                // the current read is blocking AND there wasn't any data left over
-                // in the read buffer.
+                // Fill the read buffer as best we can.
                 int nRead = fillReadBuffer(block);
                 if (block) {
                     // Just did a blocking read so release the semaphore
