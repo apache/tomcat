@@ -204,19 +204,9 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
 
 
-        /**
-         * Expected to be used by the handler once the processor is no longer
-         * required.
-         *
-         * @param socket
-         * @param processor
-         * @param isSocketClosing   Not used in HTTP
-         * @param addToPoller
-         */
         @Override
         public void release(SocketWrapperBase<NioChannel> socket,
-                Processor<NioChannel> processor, boolean isSocketClosing,
-                boolean addToPoller) {
+                Processor<NioChannel> processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller) {

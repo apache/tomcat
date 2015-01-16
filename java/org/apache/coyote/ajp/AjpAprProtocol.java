@@ -84,14 +84,9 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
             return log;
         }
 
-        /**
-         * Expected to be used by the handler once the processor is no longer
-         * required.
-         */
         @Override
         public void release(SocketWrapperBase<Long> socket,
-                Processor<Long> processor, boolean isSocketClosing,
-                boolean addToPoller) {
+                Processor<Long> processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller) {

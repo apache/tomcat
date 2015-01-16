@@ -106,6 +106,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
                         socket, Boolean.valueOf(released)));
         }
 
+
         /**
          * Expected to be used by the Poller to release resources on socket
          * close, errors etc.
@@ -120,14 +121,10 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
             }
         }
 
-        /**
-         * Expected to be used by the handler once the processor is no longer
-         * required.
-         */
+
         @Override
         public void release(SocketWrapperBase<NioChannel> socket,
-                Processor<NioChannel> processor, boolean isSocketClosing,
-                boolean addToPoller) {
+               Processor<NioChannel> processor,  boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller) {

@@ -92,17 +92,11 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
             }
         }
 
-        /**
-         * Expected to be used by the handler once the processor is no longer
-         * required.
-         */
         @Override
         public void release(SocketWrapperBase<Nio2Channel> socket,
-                Processor<Nio2Channel> processor, boolean isSocketClosing,
-                boolean addToPoller) {
+                Processor<Nio2Channel> processor, boolean addToPoller) {
             if (getLog().isDebugEnabled()) {
                 log.debug("Socket: [" + socket + "], Processor: [" + processor +
-                        "], isSocketClosing: [" + isSocketClosing +
                         "], addToPoller: [" + addToPoller + "]");
             }
             processor.recycle();
