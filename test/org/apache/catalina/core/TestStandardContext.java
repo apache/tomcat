@@ -871,7 +871,8 @@ public class TestStandardContext extends TomcatBaseTest {
         ctx.stop();
 
         String log = TesterTldListener.getLog();
-        Assert.assertTrue(log, log.contains("PASS"));
+        Assert.assertTrue(log, log.contains("PASS-01"));
+        Assert.assertTrue(log, log.contains("PASS-02"));
         Assert.assertFalse(log, log.contains("FAIL"));
     }
 
