@@ -230,6 +230,9 @@
         <code>ClusterSingleSignOn</code> implements <code>ClusterValve</code>.
         (kfujino)
       </fix>
+      <fix>
+        Fix mbean descriptor of <code>ClusterSingleSignOn</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

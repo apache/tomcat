@@ -21,7 +21,12 @@
     description="A Valve that supports a 'single signon' user experience on a whole cluster"
     domain="Catalina"
     group="Valve"
-    type="org.apache.catalina.cluster.authenticator.ClusterSingleSignOn">
+    type="org.apache.catalina.ha.authenticator.ClusterSingleSignOn">
+    <attribute
+      name="asyncSupported"
+      description="Does this valve support async reporting?"
+      is="true"
+      type="boolean"/>
     <attribute
       name="className"
       description="Fully qualified class name of the managed object"
