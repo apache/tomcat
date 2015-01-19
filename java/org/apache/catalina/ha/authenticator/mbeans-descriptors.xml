@@ -21,7 +21,12 @@
     description="A Valve that supports a 'single signon' user experience on a whole cluster"
     domain="Catalina"
     group="Valve"
-    type="org.apache.catalina.cluster.authenticator.ClusterSingleSignOn">
+    type="org.apache.catalina.ha.authenticator.ClusterSingleSignOn">
+    <attribute
+      name="asyncSupported"
+      description="Does this valve support async reporting?"
+      is="true"
+      type="boolean"/>
     <attribute
       name="className"
       description="Fully qualified class name of the managed object"
@@ -35,5 +40,18 @@
       name="cookieDomain"
       description="(Optiona) Domain to be used by sso cookies"
       type="java.lang.String"/>
+    <attribute
+      name="mapSendOptions"
+      description="mapSendOptions"
+      type="int"
+      writeable="false"/>
+    <attribute
+      name="rpcTimeout"
+      description="Timeout for RPC messages, how long we will wait for a reply"
+      type="long"/>
+    <attribute
+      name="terminateOnStartFailure"
+      description="Flag for whether to terminate this map that failed to start."
+      type="boolean"/>
   </mbean>
 </mbeans-descriptors>
