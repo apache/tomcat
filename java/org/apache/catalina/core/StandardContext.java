@@ -250,6 +250,12 @@ public class StandardContext extends ContainerBase
     
     private final Object applicationListenersLock = new Object();
 
+    /**
+     * The set of application listeners that are required to have limited access
+     * to ServletContext methods. See Servlet 3.0 section 4.4.
+     */
+
+    private final Set<Object> noPluggabilityListeners = new HashSet<Object>();
 
     /**
      * The set of instantiated application event listener objects. Note that
@@ -328,6 +334,13 @@ public class StandardContext extends ContainerBase
      * The ServletContext implementation associated with this Context.
      */
     protected ApplicationContext context = null;
+
+    /**
+     * The wrapped version of the associated ServletContext that is presented
+     * to listeners that are required to have limited access to ServletContext
+     * methods. See Servlet 3.0 section 4.4.
+     */
+    private NoPluggabilityServletContext noPluggabilityServletContext = null;
 
 
     /**
@@ -4910,7 +4923,6 @@ public class StandardContext extends ContainerBase
         ApplicationListener listeners[] = applicationListeners;
         Object results[] = new Object[listeners.length];
         boolean ok = true;
-        Set<Object> noPluggabilityListeners = new HashSet<Object>();
         for (int i = 0; i < results.length; i++) {
             if (getLogger().isDebugEnabled())
                 getLogger().debug(" Configuring event listener class '" +
@@ -4983,12 +4995,11 @@ public class StandardContext extends ContainerBase
             return ok;
         }
 
-        ServletContextEvent event =
-                new ServletContextEvent(getServletContext());
+        ServletContextEvent event = new ServletContextEvent(getServletContext());
         ServletContextEvent tldEvent = null;
         if (noPluggabilityListeners.size() > 0) {
-            tldEvent = new ServletContextEvent(new NoPluggabilityServletContext(
-                    getServletContext()));
+            noPluggabilityServletContext = new NoPluggabilityServletContext(getServletContext());
+            tldEvent = new ServletContextEvent(noPluggabilityServletContext);
         }
         for (int i = 0; i < instances.length; i++) {
             if (instances[i] == null)
@@ -5032,8 +5043,11 @@ public class StandardContext extends ContainerBase
         boolean ok = true;
         Object listeners[] = getApplicationLifecycleListeners();
         if (listeners != null) {
-            ServletContextEvent event =
-                new ServletContextEvent(getServletContext());
+            ServletContextEvent event = new ServletContextEvent(getServletContext());
+            ServletContextEvent tldEvent = null;
+            if (noPluggabilityServletContext != null) {
+                tldEvent = new ServletContextEvent(noPluggabilityServletContext);
+            }
             for (int i = 0; i < listeners.length; i++) {
                 int j = (listeners.length - 1) - i;
                 if (listeners[j] == null)
@@ -5043,7 +5057,11 @@ public class StandardContext extends ContainerBase
                         (ServletContextListener) listeners[j];
                     try {
                         fireContainerEvent("beforeContextDestroyed", listener);
-                        listener.contextDestroyed(event);
+                        if (noPluggabilityListeners.contains(listener)) {
+                            listener.contextDestroyed(tldEvent);
+                        } else {
+                            listener.contextDestroyed(event);
+                        }
                         fireContainerEvent("afterContextDestroyed", listener);
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
@@ -5090,8 +5108,10 @@ public class StandardContext extends ContainerBase
         setApplicationEventListeners(null);
         setApplicationLifecycleListeners(null);
 
-        return (ok);
+        noPluggabilityServletContext = null;
+        noPluggabilityListeners.clear();
 
+        return ok;
     }
 
 

@@ -184,6 +184,13 @@
       <add>
         <bug>57431</bug> Enable usage of custom class for context creation when using embedded tomcat. (fschumacher)
       </add>
+      <fix>
+        <bug>57446</bug>: Ensure that <code>ServletContextListener</code>s that
+        have limited access to <code>ServletContext</code> methods are called
+        with the same <code>ServletContext</code> instance for both
+        <code>contextInitialized()</code> and <code>contextDestroyed()</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -207,6 +214,13 @@
         <bug>57340</bug>: When using Comet, ensure that Socket and SocketWrapper
         are only returned to their respective caches once on socket close (it is
         possible for multiple threads to call close concurrently). (markt)
+      </fix>
+      <fix>
+        <bug>57446</bug>: Ensure that <code>ServletContextListener</code>s that
+        have limited access to <code>ServletContext</code> methods are called
+        with the same <code>ServletContext</code> instance for both
+        <code>contextInitialized()</code> and <code>contextDestroyed()</code>.
+        (markt)
       </fix>
     </changelog>
   </subsection>
