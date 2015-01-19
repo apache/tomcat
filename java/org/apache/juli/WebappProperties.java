@@ -26,19 +26,29 @@ package org.apache.juli;
 public interface WebappProperties {
 
     /**
-     * Returns a name for the web application or null if none is available.
+     * Returns a name for the logging system to use for the web application, if
+     * any, associated with the class loader.
+     *
+     * @return The name to use for the web application or null if none is
+     *         available.
      */
     String getWebappName();
 
     /**
-     * Returns a name for the Host where the web application is deployed or null
-     * if none is available.
+     * Returns a name for the logging system to use for the Host where the
+     * web application, if any, associated with the class loader is deployed.
+     *
+     * @return The name to use for the Host where the web application is
+     * deployed or null if none is available.
      */
     String getHostName();
 
     /**
-     * Returns a name for the service where the Host is deployed or null if none
-     * is available.
+     * Returns a name for the logging system to use for the Service where the
+     * Host, if any, associated with the class loader is deployed.
+     *
+     * @return The name to use for the Service where the Host is deployed or
+     * null if none is available.
      */
     String getServiceName();
 }
