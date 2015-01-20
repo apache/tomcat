@@ -76,7 +76,9 @@ public class FormAuthenticator
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the character encoding to use to read the username and password.
+     * Return the character encoding to use to read the user name and password.
+     *
+     * @return The name of the character encoding
      */
     public String getCharacterEncoding() {
         return characterEncoding;
@@ -84,7 +86,9 @@ public class FormAuthenticator
 
 
     /**
-     * Set the character encoding to be used to read the username and password.
+     * Set the character encoding to be used to read the user name and password.
+     *
+     * @param encoding The name of the encoding to use
      */
     public void setCharacterEncoding(String encoding) {
         characterEncoding = encoding;
@@ -93,6 +97,8 @@ public class FormAuthenticator
 
     /**
      * Return the landing page to use when FORM auth is mis-used.
+     *
+     * @return The path to the landing page relative to the web application root
      */
     public String getLandingPage() {
         return landingPage;
@@ -101,6 +107,9 @@ public class FormAuthenticator
 
     /**
      * Set the landing page to use when the FORM auth is mis-used.
+     *
+     * @param landingPage The path to the landing page relative to the web
+     *                    application root
      */
     public void setLandingPage(String landingPage) {
         this.landingPage = landingPage;

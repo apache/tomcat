@@ -85,6 +85,7 @@ public class SingleSignOnEntry implements Serializable {
      *
      * @param sso       The <code>SingleSignOn</code> valve that is managing
      *                  the SSO session.
+     * @param ssoId     The ID of the SSO session.
      * @param session   The <code>Session</code> being associated with the SSO.
      */
     public void addSession(SingleSignOn sso, String ssoId, Session session) {
