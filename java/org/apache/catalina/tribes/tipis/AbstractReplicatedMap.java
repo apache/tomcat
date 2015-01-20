@@ -916,10 +916,6 @@ public abstract class AbstractReplicatedMap<K,V>
                     msg = (MapMessage) resp[0].getMessage();
                     msg.deserialize(getExternalLoaders());
                     backup = entry.getBackupNodes();
-                    if ( entry.getValue() instanceof ReplicatedMapEntry ) {
-                        ReplicatedMapEntry val = (ReplicatedMapEntry)entry.getValue();
-                        val.setOwner(getMapOwner());
-                    }
                     if ( msg.getValue()!=null ) entry.setValue((V) msg.getValue());
 
                     //invalidate the previous primary
