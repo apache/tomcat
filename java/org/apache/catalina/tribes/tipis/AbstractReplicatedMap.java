@@ -75,7 +75,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     protected abstract int getStateMessageType();
 
-    protected abstract int getRplicateMessageType();
+    protected abstract int getReplicateMessageType();
 
 
     /**
@@ -428,7 +428,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 rentry.lock();
                 try {
                     //construct a diff message
-                    msg = new MapMessage(mapContextName, getRplicateMessageType(),
+                    msg = new MapMessage(mapContextName, getReplicateMessageType(),
                                          true, (Serializable) entry.getKey(), null,
                                          rentry.getDiff(),
                                          entry.getPrimary(),
@@ -442,7 +442,7 @@ public abstract class AbstractReplicatedMap<K,V>
             }
             if (msg == null && complete) {
                 //construct a complete
-                msg = new MapMessage(mapContextName, getRplicateMessageType(),
+                msg = new MapMessage(mapContextName, getReplicateMessageType(),
                                      false, (Serializable) entry.getKey(),
                                      (Serializable) entry.getValue(),
                                      null, entry.getPrimary(),entry.getBackupNodes());
