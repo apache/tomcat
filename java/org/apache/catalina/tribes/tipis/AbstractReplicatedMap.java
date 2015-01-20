@@ -75,6 +75,8 @@ public abstract class AbstractReplicatedMap<K,V>
 
     protected abstract int getStateMessageType();
 
+    protected abstract int getRplicateMessageType();
+
 
     /**
      * Timeout for RPC messages, how long we will wait for a reply
@@ -426,7 +428,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 rentry.lock();
                 try {
                     //construct a diff message
-                    msg = new MapMessage(mapContextName, MapMessage.MSG_BACKUP,
+                    msg = new MapMessage(mapContextName, getRplicateMessageType(),
                                          true, (Serializable) entry.getKey(), null,
                                          rentry.getDiff(),
                                          entry.getPrimary(),
@@ -440,7 +442,7 @@ public abstract class AbstractReplicatedMap<K,V>
             }
             if (msg == null && complete) {
                 //construct a complete
-                msg = new MapMessage(mapContextName, MapMessage.MSG_BACKUP,
+                msg = new MapMessage(mapContextName, getRplicateMessageType(),
                                      false, (Serializable) entry.getKey(),
                                      (Serializable) entry.getValue(),
                                      null, entry.getPrimary(),entry.getBackupNodes());

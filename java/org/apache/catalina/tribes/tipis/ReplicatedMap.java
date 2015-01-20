@@ -105,6 +105,11 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         return AbstractReplicatedMap.MapMessage.MSG_STATE_COPY;
     }
 
+    @Override
+    protected int getRplicateMessageType() {
+        return AbstractReplicatedMap.MapMessage.MSG_COPY;
+    }
+
     /**
      * publish info about a map pair (key/value) to other nodes in the cluster
      * @param key Object
