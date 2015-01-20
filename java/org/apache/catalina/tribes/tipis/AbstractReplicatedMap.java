@@ -695,6 +695,14 @@ public abstract class AbstractReplicatedMap<K,V>
                 }
             }
         }
+
+        if (mapmsg.getMsgType() == MapMessage.MSG_NOTIFY_MAPMEMBER) {
+            MapEntry<K, V> entry = innerMap.get(mapmsg.getKey());
+            if (entry != null) {
+                entry.setBackupNodes(mapmsg.getBackupNodes());
+                entry.setPrimary(mapmsg.getPrimary());
+            }
+        }
     }
 
     @Override
@@ -929,8 +937,12 @@ public abstract class AbstractReplicatedMap<K,V>
                         val.setOwner(getMapOwner());
                     }
                 } else if ( entry.isCopy() ) {
-                    // TODO no need to send the entry data.
-                    backup = publishEntryInfo(key, entry.getValue());
+                    backup = getMapMembers();
+                    if (backup.length > 0) {
+                        msg = new MapMessage(getMapContextName(), MapMessage.MSG_NOTIFY_MAPMEMBER,false,
+                                (Serializable)key,null,null,channel.getLocalMember(false),backup);
+                        getChannel().send(backup, msg, getChannelSendOptions());
+                    }
                 }
                 entry.setPrimary(channel.getLocalMember(false));
                 entry.setBackupNodes(backup);
@@ -1319,6 +1331,7 @@ public abstract class AbstractReplicatedMap<K,V>
         public static final int MSG_COPY = 9;
         public static final int MSG_STATE_COPY = 10;
         public static final int MSG_ACCESS = 11;
+        public static final int MSG_NOTIFY_MAPMEMBER = 12;
 
         private final byte[] mapId;
         private final int msgtype;
@@ -1357,6 +1370,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 case MSG_STATE_COPY: return "MSG_STATE_COPY";
                 case MSG_COPY: return "MSG_COPY";
                 case MSG_ACCESS: return "MSG_ACCESS";
+                case MSG_NOTIFY_MAPMEMBER: return "MSG_NOTIFY_MAPMEMBER";
                 default : return "UNKNOWN";
             }
         }
