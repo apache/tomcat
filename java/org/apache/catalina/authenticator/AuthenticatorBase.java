@@ -223,6 +223,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
     /**
      * Return the cache authenticated Principals flag.
+     *
+     * @return <code>true</code> if authenticated Principals will be cached,
+     *         otherwise <code>false</code>
      */
     public boolean getCache() {
         return this.cache;
@@ -270,6 +273,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     /**
      * Return the flag that states if we add headers to disable caching by
      * proxies.
+     *
+     * @return <code>true</code> if the headers will be added, otherwise
+     *         <code>false</code>
      */
     public boolean getDisableProxyCaching() {
         return disableProxyCaching;
@@ -288,6 +294,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     /**
      * Return the flag that states, if proxy caching is disabled, what headers
      * we add to disable the caching.
+     *
+     * @return <code>true</code> if a Pragma header should be used, otherwise
+     *         <code>false</code>
      */
     public boolean getSecurePagesWithPragma() {
         return securePagesWithPragma;
@@ -296,6 +305,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     /**
      * Set the value of the flag that states what headers we add to disable
      * proxy caching.
+     *
      * @param securePagesWithPragma <code>true</code> if we add headers which
      * are incompatible with downloading office documents in IE under SSL but
      * which fix a caching problem in Mozilla.
@@ -331,11 +341,12 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
     /**
      * Return the secure random number generator class name.
+     *
+     * @return The fully qualified name of the SecureRandom implementation to
+     *         use
      */
     public String getSecureRandomClass() {
-
-        return (this.secureRandomClass);
-
+        return this.secureRandomClass;
     }
 
 
@@ -352,6 +363,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
     /**
      * Return the secure random number generator algorithm name.
+     *
+     * @return The name of the SecureRandom algorithm used
      */
     public String getSecureRandomAlgorithm() {
         return secureRandomAlgorithm;
@@ -371,6 +384,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
     /**
      * Return the secure random number generator provider name.
+     *
+     * @return The name of the SecureRandom provider
      */
     public String getSecureRandomProvider() {
         return secureRandomProvider;
