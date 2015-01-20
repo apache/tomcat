@@ -112,7 +112,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     }
 
     @Override
-    protected int getRplicateMessageType() {
+    protected int getReplicateMessageType() {
         return AbstractReplicatedMap.MapMessage.MSG_COPY;
     }
 
