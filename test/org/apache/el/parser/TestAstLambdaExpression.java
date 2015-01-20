@@ -223,4 +223,14 @@ public class TestAstLambdaExpression {
                         Integer.class);
         Assert.assertEquals(Integer.valueOf(1), result);
     }
+
+
+    @Test(expected=javax.el.ELException.class)
+    public void testLambdaAsFunction08() {
+        // Using a name space for the function is not allowed
+        ELProcessor processor = new ELProcessor();
+        Object result =
+                processor.getValue("foo:v = (x)->x+1; foo:v(0)", Integer.class);
+        Assert.assertEquals(Integer.valueOf(1), result);
+    }
 }
