@@ -81,6 +81,13 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Clarify the handling of Copy message and Copy nodes. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 </body>
 </document>
