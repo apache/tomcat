@@ -900,7 +900,10 @@ public abstract class AbstractReplicatedMap<K,V>
             try {
                 Member[] backup = null;
                 MapMessage msg = null;
-                if ( entry.isProxy() ) {
+                if (entry.isBackup()) {
+                    //select a new backup node
+                    backup = publishEntryInfo(key, entry.getValue());
+                } else if ( entry.isProxy() ) {
                     //make sure we don't retrieve from ourselves
                     msg = new MapMessage(getMapContextName(), MapMessage.MSG_RETRIEVE_BACKUP, false,
                                          (Serializable) key, null, null, null,null);
@@ -918,11 +921,7 @@ public abstract class AbstractReplicatedMap<K,V>
                         val.setOwner(getMapOwner());
                     }
                     if ( msg.getValue()!=null ) entry.setValue((V) msg.getValue());
-                }
-                if (entry.isBackup()) {
-                    //select a new backup node
-                    backup = publishEntryInfo(key, entry.getValue());
-                } else if ( entry.isProxy() ) {
+
                     //invalidate the previous primary
                     msg = new MapMessage(getMapContextName(),MapMessage.MSG_PROXY,false,(Serializable)key,null,null,channel.getLocalMember(false),backup);
                     Member[] dest = getMapMembersExcl(backup);
