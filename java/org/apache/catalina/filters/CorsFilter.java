@@ -95,6 +95,12 @@ public final class CorsFilter implements Filter {
     private boolean anyOriginAllowed;
 
     /**
+     * The null origin allowed flag indicates whether requests with the
+     * Origin header value 'null' should be allowed.
+     */
+    private boolean nullOriginAllowed;
+
+    /**
      * A {@link Collection} of methods consisting of zero or more methods that
      * are supported by the resource.
      */
@@ -188,14 +194,16 @@ public final class CorsFilter implements Filter {
     @Override
     public void init(final FilterConfig filterConfig) throws ServletException {
         // Initialize defaults
-        parseAndStore(DEFAULT_ALLOWED_ORIGINS, DEFAULT_ALLOWED_HTTP_METHODS,
-                DEFAULT_ALLOWED_HTTP_HEADERS, DEFAULT_EXPOSED_HEADERS,
-                DEFAULT_SUPPORTS_CREDENTIALS, DEFAULT_PREFLIGHT_MAXAGE,
-                DEFAULT_DECORATE_REQUEST);
+        parseAndStore(DEFAULT_ALLOWED_ORIGINS, DEFAULT_ALLOW_NULL_ORIGIN,
+                DEFAULT_ALLOWED_HTTP_METHODS, DEFAULT_ALLOWED_HTTP_HEADERS,
+                DEFAULT_EXPOSED_HEADERS, DEFAULT_SUPPORTS_CREDENTIALS,
+                DEFAULT_PREFLIGHT_MAXAGE, DEFAULT_DECORATE_REQUEST);
 
         if (filterConfig != null) {
             String configAllowedOrigins = filterConfig
                     .getInitParameter(PARAM_CORS_ALLOWED_ORIGINS);
+            String configAllowNullOrigin = filterConfig
+                    .getInitParameter(PARAM_CORS_ALLOW_NULL_ORIGIN);
             String configAllowedHttpMethods = filterConfig
                     .getInitParameter(PARAM_CORS_ALLOWED_METHODS);
             String configAllowedHttpHeaders = filterConfig
@@ -209,10 +217,10 @@ public final class CorsFilter implements Filter {
             String configDecorateRequest = filterConfig
                     .getInitParameter(PARAM_CORS_REQUEST_DECORATE);
 
-            parseAndStore(configAllowedOrigins, configAllowedHttpMethods,
-                    configAllowedHttpHeaders, configExposedHeaders,
-                    configSupportsCredentials, configPreflightMaxAge,
-                    configDecorateRequest);
+            parseAndStore(configAllowedOrigins, configAllowNullOrigin,
+                    configAllowedHttpMethods, configAllowedHttpHeaders,
+                    configExposedHeaders, configSupportsCredentials,
+                    configPreflightMaxAge, configDecorateRequest);
         }
     }
 
@@ -703,9 +711,10 @@ public final class CorsFilter implements Filter {
      * @throws ServletException
      */
     private void parseAndStore(final String allowedOrigins,
-            final String allowedHttpMethods, final String allowedHttpHeaders,
-            final String exposedHeaders, final String supportsCredentials,
-            final String preflightMaxAge, final String decorateRequest)
+            final String allowNullOrigin, final String allowedHttpMethods,
+            final String allowedHttpHeaders, final String exposedHeaders,
+            final String supportsCredentials, final String preflightMaxAge,
+            final String decorateRequest)
                     throws ServletException {
         if (allowedOrigins != null) {
             if (allowedOrigins.trim().equals("*")) {
@@ -717,6 +726,10 @@ public final class CorsFilter implements Filter {
                 this.allowedOrigins.clear();
                 this.allowedOrigins.addAll(setAllowedOrigins);
             }
+        }
+
+        if (allowNullOrigin != null) {
+            this.nullOriginAllowed = Boolean.parseBoolean(allowNullOrigin);
         }
 
         if (allowedHttpMethods != null) {
@@ -806,10 +819,16 @@ public final class CorsFilter implements Filter {
      * @param origin
      * @see <a href="http://tools.ietf.org/html/rfc952">RFC952</a>
      */
-    protected static boolean isValidOrigin(String origin) {
+    protected boolean isValidOrigin(String origin) {
         // Checks for encoded characters. Helps prevent CRLF injection.
         if (origin.contains("%")) {
             return false;
+        }
+
+        // If allowed by configuration, requests with Origin header value 
+        // 'null' are valid
+        if (this.nullOriginAllowed && origin.equals("null")) {
+            return true;
         }
 
         URI originURI;
@@ -1078,6 +1097,12 @@ public final class CorsFilter implements Filter {
     public static final String DEFAULT_ALLOWED_ORIGINS = "*";
 
     /**
+     * By default, don't allow processing of requests with the Origin header 
+     * set to 'null'.
+     */
+    public static final String DEFAULT_ALLOW_NULL_ORIGIN = "false";
+
+    /**
      * By default, following methods are supported: GET, POST, HEAD and OPTIONS.
      */
     public static final String DEFAULT_ALLOWED_HTTP_METHODS =
@@ -1118,6 +1143,13 @@ public final class CorsFilter implements Filter {
      */
     public static final String PARAM_CORS_ALLOWED_ORIGINS =
             "cors.allowed.origins";
+
+    /**
+     * Key to determine if request with Origin header value 'null' should be
+     * allowed.
+     */
+    public static final String PARAM_CORS_ALLOW_NULL_ORIGIN =
+            "cors.allow.nullorigin";
 
     /**
      * Key to retrieve support credentials from {@link FilterConfig}.
