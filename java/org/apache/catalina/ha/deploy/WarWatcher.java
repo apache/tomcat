@@ -79,10 +79,10 @@ public class WarWatcher {
      */
     public void check() {
         if (log.isDebugEnabled())
-            log.debug(sm.getString("warWatcher.checking-wars", watchDir));
+            log.debug(sm.getString("warWatcher.checkingWars", watchDir));
         File[] list = watchDir.listFiles(new WarFilter());
         if (list == null) {
-            log.warn(sm.getString("warWatcher.cant-list-watchDir",
+            log.warn(sm.getString("warWatcher.cantListWatchDir",
                                   watchDir));
 
             list = new File[0];
@@ -90,7 +90,7 @@ public class WarWatcher {
         //first make sure all the files are listed in our current status
         for (int i = 0; i < list.length; i++) {
             if(!list[i].exists())
-                log.warn(sm.getString("warWatcher.listed-file-does-not-exist",
+                log.warn(sm.getString("warWatcher.listedFileDoesNotExist",
                                       list[i], watchDir));
 
             addWarInfo(list[i]);
@@ -102,7 +102,7 @@ public class WarWatcher {
             Map.Entry<String,WarInfo> entry = i.next();
             WarInfo info = entry.getValue();
             if(log.isTraceEnabled())
-                log.trace(sm.getString("warWatcher.checking-war",
+                log.trace(sm.getString("warWatcher.checkingWar",
                                        info.getWar()));
             int check = info.check();
             if (check == 1) {
@@ -113,7 +113,7 @@ public class WarWatcher {
                 i.remove();
             }
             if(log.isTraceEnabled())
-                log.trace(sm.getString("warWatcher.check-war.result",
+                log.trace(sm.getString("warWatcher.checkWarResult",
                                        Integer.valueOf(check),
                                        info.getWar()));
         }
