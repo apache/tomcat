@@ -568,14 +568,28 @@ public final class Bootstrap {
             String path = value.substring(matcher.start(), matcher.end());
 
             path = path.trim();
-
-            if (path.startsWith("\"") && path.length() > 1) {
-                path = path.substring(1, path.length() - 1);
-                path = path.trim();
-            }
-
             if (path.length() == 0) {
                 continue;
+            }
+
+            char first = path.charAt(0);
+            char last = path.charAt(path.length() - 1);
+
+            if (first == '"' && last == '"' && path.length() > 1) {
+                path = path.substring(1, path.length() - 1);
+                path = path.trim();
+                if (path.length() == 0) {
+                    continue;
+                }
+            } else if (path.contains("\"")) {
+                // Unbalanced quotes
+                // Too early to use standard i18n support. The class path hasn't
+                // been configured.
+                throw new IllegalArgumentException(
+                        "The double quote [\"] character only be used to quote paths. It must " +
+                        "not appear in a path. This loader path is not valid: [" + value + "]");
+            } else {
+                // Not quoted - NO-OP
             }
 
             result.add(path);
