@@ -113,6 +113,66 @@ public class TestBootstrap {
         doTest("aaa,\"bbb,\"", "aaa", "bbb,");
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes01() {
+        doTest("\"", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes02() {
+        doTest("\"aaa", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes03() {
+        doTest("aaa\"", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes04() {
+        doTest("a\"a", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes05() {
+        doTest("b,\"", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes06() {
+        doTest("b,\"aaa", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes07() {
+        doTest("b,aaa\"", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes08() {
+        doTest("b,a\"a", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes09() {
+        doTest("\",b", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes10() {
+        doTest("\"aaa,b", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes11() {
+        doTest("aaa\",b", "ignored");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testUnbalancedQuotes12() {
+        doTest("a\"a,b", "ignored");
+    }
+
     private void doTest(String input, String... expected) {
         String[] result = Bootstrap.getPaths(input);
 
