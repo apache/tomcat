@@ -193,13 +193,14 @@
         <code>contextInitialized()</code> and <code>contextDestroyed()</code>.
         (markt)
       </fix>
-     <fix>
+      <fix>
         <bug>57461</bug>: When an instance of
         <code>org.apache.catalina.startup.VersionLoggerListener</code> logs the
         result of <code>System.getProperty("java.home")</code> don't report it
         in a manner that makes it look like the <code>JAVA_HOME</code>
         environment variable. (markt)
       </fix>
+    </changelog>
   </subsection>
   <subsection name="Coyote">
     <changelog>
