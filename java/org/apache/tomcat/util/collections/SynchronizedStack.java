@@ -22,6 +22,8 @@ package org.apache.tomcat.util.collections;
  * create a pool of re-usable objects with no requirement to shrink the pool.
  * The aim is to provide the bare minimum of required functionality as quickly
  * as possible with minimum garbage.
+ *
+ * @param <T> The type of object managed by this stack
  */
 public class SynchronizedStack<T> {
 

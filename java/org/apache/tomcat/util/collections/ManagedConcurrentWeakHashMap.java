@@ -33,6 +33,9 @@ import java.util.concurrent.ConcurrentMap;
  * <code>WeakHashMap</code> this class does not handle dead keys during common
  * access operations, but expects you to call its {@link #maintain()} method
  * periodically. Both keys and values are expected to be not-<code>null</code>.
+ *
+ * @param <K> The type of keys used with the Map instance
+ * @param <V> The type of values used with the Map instance
  */
 public class ManagedConcurrentWeakHashMap<K, V> extends AbstractMap<K, V> implements
         ConcurrentMap<K, V> {

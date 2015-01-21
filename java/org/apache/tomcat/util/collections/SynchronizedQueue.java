@@ -22,6 +22,8 @@ package org.apache.tomcat.util.collections;
  * create an unbounded queue with no requirement to shrink the queue. The aim is
  * to provide the bare minimum of required functionality as quickly as possible
  * with minimum garbage.
+ *
+ * @param <T> The type of object managed by this queue
  */
 public class SynchronizedQueue<T> {
 
