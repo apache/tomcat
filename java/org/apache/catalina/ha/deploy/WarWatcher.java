@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
@@ -41,6 +42,8 @@ public class WarWatcher {
 
     /*--Static Variables----------------------------------------*/
     private static final Log log = LogFactory.getLog(WarWatcher.class);
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
 
     /*--Instance Variables--------------------------------------*/
     /**
@@ -76,20 +79,31 @@ public class WarWatcher {
      */
     public void check() {
         if (log.isDebugEnabled())
-            log.debug("check cluster wars at " + watchDir);
+            log.debug(sm.getString("warWatcher.checking-wars", watchDir));
         File[] list = watchDir.listFiles(new WarFilter());
-        if (list == null)
+        if (list == null) {
+            log.warn(sm.getString("warWatcher.cant-list-watchDir",
+                                  watchDir));
+
             list = new File[0];
+        }
         //first make sure all the files are listed in our current status
         for (int i = 0; i < list.length; i++) {
+            if(!list[i].exists())
+                log.warn(sm.getString("warWatcher.listed-file-does-not-exist",
+                                      list[i], watchDir));
+
             addWarInfo(list[i]);
         }
 
-        //check all the status codes and update the FarmDeployer
+        // Check all the status codes and update the FarmDeployer
         for (Iterator<Map.Entry<String,WarInfo>> i =
                 currentStatus.entrySet().iterator(); i.hasNext();) {
             Map.Entry<String,WarInfo> entry = i.next();
             WarInfo info = entry.getValue();
+            if(log.isTraceEnabled())
+                log.trace(sm.getString("warWatcher.checking-war",
+                                       info.getWar()));
             int check = info.check();
             if (check == 1) {
                 listener.fileModified(info.getWar());
@@ -98,6 +112,10 @@ public class WarWatcher {
                 //no need to keep in memory
                 i.remove();
             }
+            if(log.isTraceEnabled())
+                log.trace(sm.getString("warWatcher.check-war.result",
+                                       Integer.valueOf(check),
+                                       info.getWar()));
         }
 
     }

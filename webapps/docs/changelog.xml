@@ -200,7 +200,6 @@
         in a manner that makes it look like the <code>JAVA_HOME</code>
         environment variable. (markt)
       </fix>
-     </changelog>
   </subsection>
   <subsection name="Coyote">
     <changelog>
@@ -255,6 +254,10 @@
       </fix>
       <fix>
         Fix mbean descriptor of <code>ClusterSingleSignOn</code>. (kfujino)
+      </fix>
+      <fix>
+        <bug>57473</bug>: Add sanity check to FarmWebDeployer's WarWatcher to
+        detect suspected incorrect permissions on the watch directory. (schultz)
       </fix>
     </changelog>
   </subsection>
