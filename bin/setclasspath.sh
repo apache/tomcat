@@ -16,9 +16,8 @@
 # limitations under the License.
 
 # -----------------------------------------------------------------------------
-#  Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
-#  are valid and consistent with the selected start-up options and set up the
-#  endorsed directory.
+#  Set JAVA_HOME or JRE_HOME if not already set and ensure any provided
+#  settings are valid and consistent with the selected start-up options.
 # -----------------------------------------------------------------------------
 
 # Make sure prerequisite environment variables are set
@@ -75,12 +74,6 @@ if [ "$1" = "debug" ] ; then
       exit 1
     fi
   fi
-fi
-
-# Don't override the endorsed dir if the user has set it previously
-if [ -z "$JAVA_ENDORSED_DIRS" ]; then
-  # Set the default -Djava.endorsed.dirs argument
-  JAVA_ENDORSED_DIRS="$CATALINA_HOME"/endorsed
 fi
 
 # Set standard commands for invoking Java, if not already set.

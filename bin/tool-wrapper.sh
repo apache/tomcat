@@ -32,12 +32,6 @@
 #                   are both set, JRE_HOME is used.
 #
 #   JAVA_OPTS       (Optional) Java runtime options.
-#
-#   JAVA_ENDORSED_DIRS (Optional) Lists of of colon separated directories
-#                   containing some jars in order to allow replacement of APIs
-#                   created outside of the JCP (i.e. DOM and SAX from W3C).
-#                   It can also be used to update the XML parser implementation.
-#                   Defaults to $CATALINA_HOME/endorsed.
 # -----------------------------------------------------------------------------
 
 # OS specific support.  $var _must_ be set to either true or false.
@@ -126,7 +120,6 @@ if $cygwin; then
   JRE_HOME=`cygpath --absolute --windows "$JRE_HOME"`
   CATALINA_HOME=`cygpath --absolute --windows "$CATALINA_HOME"`
   CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
-  JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
 
 JAVA_OPTS="$JAVA_OPTS -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
@@ -134,6 +127,6 @@ JAVA_OPTS="$JAVA_OPTS -Djava.util.logging.manager=org.apache.juli.ClassLoaderLog
 # ----- Execute The Requested Command -----------------------------------------
 
 exec "$_RUNJAVA" $JAVA_OPTS $TOOL_OPTS \
-  -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" -classpath "$CLASSPATH" \
+  -classpath "$CLASSPATH" \
   -Dcatalina.home="$CATALINA_HOME" \
   org.apache.catalina.startup.Tool "$@"
