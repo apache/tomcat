@@ -186,7 +186,6 @@ case "$1" in
       -errfile "&2" \
       -classpath "$CLASSPATH" \
       "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
-      -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" \
       -Dcatalina.base="$CATALINA_BASE" \
       -Dcatalina.home="$CATALINA_HOME" \
       -Djava.io.tmpdir="$CATALINA_TMP" \
@@ -203,7 +202,6 @@ case "$1" in
       -errfile "&1" \
       -classpath "$CLASSPATH" \
       "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
-      -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" \
       -Dcatalina.base="$CATALINA_BASE" \
       -Dcatalina.home="$CATALINA_HOME" \
       -Djava.io.tmpdir="$CATALINA_TMP" \
@@ -215,7 +213,6 @@ case "$1" in
       -stop \
       -pidfile "$CATALINA_PID" \
       -classpath "$CLASSPATH" \
-      -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" \
       -Dcatalina.base="$CATALINA_BASE" \
       -Dcatalina.home="$CATALINA_HOME" \
       -Djava.io.tmpdir="$CATALINA_TMP" \
