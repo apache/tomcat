@@ -37,8 +37,7 @@ public class WarWatcher {
 
     /*--Static Variables----------------------------------------*/
     private static final Log log = LogFactory.getLog(WarWatcher.class);
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(WarWatcher.class);
 
     /*--Instance Variables--------------------------------------*/
     /**
