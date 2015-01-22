@@ -402,6 +402,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             wrapper.getLogger().debug(" Disabling the response for futher output");
 
         if  (response instanceof ResponseFacade) {
+            response.flushBuffer();
             ((ResponseFacade) response).finish();
         } else {
             // Servlet SRV.6.2.2. The Request/Response may have been wrapped
