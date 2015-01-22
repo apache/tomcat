@@ -160,6 +160,11 @@ final class StandardHostValve extends ValveBase {
                 }
             }
 
+            // Now that the request/response pair is back under container
+            // control lift the suspension so that the error handling can
+            // complete and/or the container can flush any remaining data
+            response.setSuspended(false);
+
             Throwable t = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
             // Protect against NPEs if the context was destroyed during a
@@ -170,9 +175,6 @@ final class StandardHostValve extends ValveBase {
 
             // Look for (and render if found) an application level error page
             if (response.isErrorReportRequired()) {
-                // Error page processing
-                response.setSuspended(false);
-
                 if (t != null) {
                     throwable(request, response, t);
                 } else {
