@@ -31,6 +31,7 @@ public abstract class AbstractResourceSet extends LifecycleBase
     private String internalPath = "";
     private String webAppMount;
     private boolean classLoaderOnly;
+    private boolean staticOnly;
 
 
     protected static final StringManager sm =
@@ -98,6 +99,16 @@ public abstract class AbstractResourceSet extends LifecycleBase
     @Override
     public void setClassLoaderOnly(boolean classLoaderOnly) {
         this.classLoaderOnly = classLoaderOnly;
+    }
+
+    @Override
+    public boolean getStaticOnly() {
+        return staticOnly;
+    }
+
+    @Override
+    public void setStaticOnly(boolean staticOnly) {
+        this.staticOnly = staticOnly;
     }
 
     //-------------------------------------------------------- Lifecycle methods

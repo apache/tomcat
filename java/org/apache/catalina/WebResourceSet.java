@@ -92,16 +92,31 @@ public interface WebResourceSet extends Lifecycle {
     void setRoot(WebResourceRoot root);
 
     /**
-     * Are resources provided by this resource set only intended for use by
-     * calls to {@link WebResourceRoot#getClassLoaderResource(String)}.
+     * Should resources returned by this resource set only be included in any
+     * results when the lookup is explicitly looking for class loader resources.
+     * i.e. should these resources be excluded from look ups that are explicitly
+     * looking for static (non-class loader) resources.
      *
      * @return <code>true</code> if these resources should only be used for
-     *         calls to {@link WebResourceRoot#getClassLoaderResource(String)},
-     *         otherwise <code>false</code>
+     *         class loader resource lookups, otherwise <code>false</code>
      */
     boolean getClassLoaderOnly();
 
     void setClassLoaderOnly(boolean classLoaderOnly);
+
+    /**
+     * Should resources returned by this resource set only be included in any
+     * results when the lookup is explicitly looking for static (non-class
+     * loader) resources. i.e. should these resources be excluded from look ups
+     * that are explicitly looking for class loader resources.
+     *
+     * @return <code>true</code> if these resources should only be used for
+     *         static (non-class loader) resource lookups, otherwise
+     *         <code>false</code>
+     */
+    boolean getStaticOnly();
+
+    void setStaticOnly(boolean staticOnly);
 
     /**
      * Obtain the base URL for this set of resources. One of the uses of this is
