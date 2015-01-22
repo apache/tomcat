@@ -21,6 +21,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.servlet.jsp.tagext.FunctionInfo;
 
@@ -166,14 +169,12 @@ public class ELFunctionMapper {
 
             // Only care about functions in ELNode's
             class Fvisitor extends ELNode.Visitor {
-                private final ArrayList<ELNode.Function> funcs =
-                        new ArrayList<>();
-                private final HashMap<String, String> keyMap = new HashMap<>();
+                private final List<ELNode.Function> funcs = new ArrayList<>();
+                private final Set<String> keySet = new HashSet<>();
                 @Override
                 public void visit(ELNode.Function n) throws JasperException {
                     String key = n.getPrefix() + ":" + n.getName();
-                    if (! keyMap.containsKey(key)) {
-                        keyMap.put(key,"");
+                    if (keySet.add(key)) {
                         funcs.add(n);
                     }
                 }
@@ -186,7 +187,7 @@ public class ELFunctionMapper {
             // First locate all unique functions in this EL
             Fvisitor fv = new Fvisitor();
             el.visit(fv);
-            ArrayList<ELNode.Function> functions = fv.funcs;
+            List<ELNode.Function> functions = fv.funcs;
 
             if (functions.size() == 0) {
                 return;
@@ -219,13 +220,13 @@ public class ELFunctionMapper {
             for (int i = 0; i < functions.size(); i++) {
                 ELNode.Function f = functions.get(i);
                 FunctionInfo funcInfo = f.getFunctionInfo();
-                String key = f.getPrefix()+ ":" + f.getName();
+                String fnQName = f.getPrefix() + ":" + f.getName();
                 if (funcInfo == null) {
                     // Added via Lambda or ImportHandler. EL will expect a
                     // function mapper even if one isn't used so just pass null
                     ds.append(funcMethod + "(null, null, null, null);\n");
                 } else {
-                    ds.append(funcMethod + "(\"" + key + "\", " +
+                    ds.append(funcMethod + "(\"" + fnQName + "\", " +
                             getCanonicalName(funcInfo.getFunctionClass()) +
                             ".class, " + '\"' + f.getMethodName() + "\", " +
                             "new Class[] {");
@@ -261,8 +262,7 @@ public class ELFunctionMapper {
                     ds.append("});\n");
                 }
                 // Put the current name in the global function map
-                gMap.put(f.getPrefix() + ':' + f.getName() + ':' + f.getUri(),
-                         decName);
+                gMap.put(fnQName + ':' + f.getUri(), decName);
             }
             el.setMapName(decName);
         }
@@ -270,16 +270,15 @@ public class ELFunctionMapper {
         /**
          * Find the name of the function mapper for an EL.  Reuse a
          * previously generated one if possible.
-         * @param functions An ArrayList of ELNode.Function instances that
+         * @param functions A List of ELNode.Function instances that
          *                  represents the functions in an EL
          * @return A previous generated function mapper name that can be used
          *         by this EL; null if none found.
          */
-        private String matchMap(ArrayList<ELNode.Function> functions) {
+        private String matchMap(List<ELNode.Function> functions) {
 
             String mapName = null;
-            for (int i = 0; i < functions.size(); i++) {
-                ELNode.Function f = functions.get(i);
+            for (ELNode.Function f : functions) {
                 String temName = gMap.get(f.getPrefix() + ':' + f.getName() +
                         ':' + f.getUri());
                 if (temName == null) {
