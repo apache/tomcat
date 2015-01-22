@@ -214,7 +214,6 @@ public class StandardContext extends ContainerBase
      * The set of application listeners that are required to have limited access
      * to ServletContext methods. See Servlet 3.1 section 4.4.
      */
-
     private final Set<Object> noPluggabilityListeners = new HashSet<>();
 
     /**
