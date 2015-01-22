@@ -205,6 +205,10 @@
         in a manner that makes it look like the <code>JAVA_HOME</code>
         environment variable. (markt)
       </fix>
+      <fix>
+        <bug>57476</bug>: Ensure the resposnes written as part of a forward are
+        fully written before the forward method returns. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
