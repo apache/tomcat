@@ -276,7 +276,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         WebResource mainEmpty = null;
         for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
-                if (useClassLoaderResources || !webResourceSet.getClassLoaderOnly()) {
+                if (!useClassLoaderResources &&  !webResourceSet.getClassLoaderOnly() ||
+                        useClassLoaderResources && !webResourceSet.getStaticOnly()) {
                     result = webResourceSet.getResource(path);
                     if (result.exists()) {
                         return result;
@@ -421,6 +422,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
         if (type.equals(ResourceSetType.CLASSES_JAR)) {
             resourceSet.setClassLoaderOnly(true);
+        } else if (type.equals(ResourceSetType.RESOURCE_JAR)) {
+            resourceSet.setStaticOnly(true);
         }
 
         resourceList.add(resourceSet);

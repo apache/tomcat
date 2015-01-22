@@ -19,7 +19,6 @@ package org.apache.catalina.webresources;
 import java.io.File;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.WebResource;
@@ -27,7 +26,6 @@ import org.apache.catalina.WebResourceSet;
 
 public class TestResourceJars {
 
-    @Ignore // This test currenty fails. A fix is in hand...
     @Test
     public void testNonStaticResources() {
         File empty = new File("test/webresources/dir3");
@@ -43,6 +41,7 @@ public class TestResourceJars {
         // would be added
         JarResourceSet test =
                 new JarResourceSet(root, "/", jar.getAbsolutePath(), "/META-INF/resources");
+        test.setStaticOnly(true);
         root.addJarResources(test);
 
         WebResource resource = root.getClassLoaderResource("/org/apache/tomcat/unittest/foo.txt");
