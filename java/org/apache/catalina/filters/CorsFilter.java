@@ -800,6 +800,7 @@ public final class CorsFilter implements Filter {
      * Checks if a given origin is valid or not. Criteria:
      * <ul>
      * <li>If an encoded character is present in origin, it's not valid.</li>
+     * <li>If origin is "null", it's valid.</li>
      * <li>Origin should be a valid {@link URI}</li>
      * </ul>
      *
@@ -810,6 +811,11 @@ public final class CorsFilter implements Filter {
         // Checks for encoded characters. Helps prevent CRLF injection.
         if (origin.contains("%")) {
             return false;
+        }
+
+        // "null" is a valid origin
+        if ("null".equals(origin)) {
+            return true;
         }
 
         URI originURI;
