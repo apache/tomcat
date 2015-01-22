@@ -20,6 +20,9 @@ package org.apache.tomcat.util.buf;
 import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.junit.Test;
 
 /**
@@ -45,4 +48,27 @@ public class TestUEncoder {
         assertTrue(urlEncoder.encodeURL(s, 0, s.length())
                 .equals("%f0%90%90%81"));
     }
+
+    @Test
+    public void testEncodeURLWithSlashInit() throws IOException {
+        UEncoder urlEncoder = new UEncoder(SafeCharsSet.WITH_SLASH);
+
+        String s = "a+b/c/d+e.class";
+        assertTrue(urlEncoder.encodeURL(s, 0, s.length()).equals(
+                "a%2bb/c/d%2be.class"));
+        assertTrue(urlEncoder.encodeURL(s, 2, s.length() - 2).equals(
+                "b/c/d%2be.cla"));
+
+        try {
+            urlEncoder.addSafeCharacter('+');
+            fail();
+        } catch (IllegalStateException e) {
+            // OK
+        }
+
+        s = new String(new char[] { 0xD801, 0xDC01 });
+        assertTrue(urlEncoder.encodeURL(s, 0, s.length())
+                .equals("%f0%90%90%81"));
+    }
+
 }
