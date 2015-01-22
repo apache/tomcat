@@ -34,10 +34,10 @@ public class TesterTldListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
 
         ServletContext sc = sce.getServletContext();
+        servletContext = sc;
 
         // Try and use one of the Servlet 3.0 methods that should be blocked
         try {
-            servletContext = sce.getServletContext();
             sc.getEffectiveMajorVersion();
             log.append("FAIL-01");
         } catch (UnsupportedOperationException uoe) {
