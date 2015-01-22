@@ -63,6 +63,11 @@
         annotation scanning in some cases. (markt)
       </fix>
       <fix>
+        <bug>57178</bug>: The CORS filter now treats <code>null</code> as a
+        valid origin that matches <code>*</code>. Patch provided by Gregor
+        Zurowski. (markt)
+      </fix>
+      <fix>
         <bug>57180</bug>: Do not limit the CORS filter to only accepting
         requests that use an HTTP method defined in RFC 7231. (markt)
       </fix>
