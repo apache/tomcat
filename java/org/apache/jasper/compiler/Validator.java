@@ -1582,8 +1582,10 @@ class Validator {
 
                     if (uri == null) {
                         if (prefix == null) {
-                            err.jspError(n, "jsp.error.noFunctionPrefix",
-                                    function);
+                            // This can occur when lambda expressions define
+                            // functions and when functions are imported. No
+                            // longer able to be sure this is an error.
+                            return;
                         } else {
                             err.jspError(n, "jsp.error.attribute.invalidPrefix",
                                     prefix);
@@ -1715,6 +1717,11 @@ class Validator {
                 @SuppressWarnings("null") // c can't be null after catch block
                 @Override
                 public void visit(ELNode.Function n) throws JasperException {
+
+                    // Lambda / ImportHandler defined fucntion
+                    if (n.getFunctionInfo() == null) {
+                        return;
+                    }
 
                     Class<?> c = null;
                     Method method = null;

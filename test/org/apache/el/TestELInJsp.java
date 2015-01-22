@@ -430,6 +430,22 @@ public class TestELInJsp extends TomcatBaseTest {
     }
 
 
+    /*
+     * BZ https://issues.apache.org/bugzilla/show_bug.cgi?id=57441
+     * Can't validate function names defined in lambdas (or via imports)
+     */
+    @Test
+    public void testBug57441() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/bug5nnnn/bug57441.jsp");
+
+        String result = res.toString();
+        assertEcho(result, "00-11");
+    }
+
+
     // Assertion for text contained with <p></p>, e.g. printed by tags:echo
     private static void assertEcho(String result, String expected) {
         Assert.assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);

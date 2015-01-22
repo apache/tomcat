@@ -97,6 +97,12 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
      */
     public void mapFunction(String fnQName, final Class<?> c,
             final String methodName, final Class<?>[] args) {
+        // Skip if null values were passed in. They indicate a function
+        // added via a lambda or ImportHandler; nether of which need to be
+        // placed in the Map.
+        if (fnQName == null) {
+            return;
+        }
         java.lang.reflect.Method method;
         if (SecurityUtil.isPackageProtectionEnabled()) {
             try {
@@ -143,7 +149,7 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
      */
     public static ProtectedFunctionMapper getMapForFunction(String fnQName,
             final Class<?> c, final String methodName, final Class<?>[] args) {
-        java.lang.reflect.Method method;
+        java.lang.reflect.Method method = null;
         ProtectedFunctionMapper funcMapper;
         if (SecurityUtil.isPackageProtectionEnabled()) {
             funcMapper = AccessController.doPrivileged(
@@ -153,28 +159,37 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
                             return new ProtectedFunctionMapper();
                         }
                     });
-
-            try {
-                method = AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<Method>() {
-                            @Override
-                            public Method run() throws Exception {
-                                return c.getDeclaredMethod(methodName, args);
-                            }
-                        });
-            } catch (PrivilegedActionException ex) {
-                throw new RuntimeException(
-                        "Invalid function mapping - no such method: "
-                                + ex.getException().getMessage());
+            // Skip if null values were passed in. They indicate a function
+            // added via a lambda or ImportHandler; nether of which need to be
+            // placed in the Map.
+            if (fnQName != null) {
+                try {
+                    method = AccessController.doPrivileged(
+                            new PrivilegedExceptionAction<Method>() {
+                                @Override
+                                public Method run() throws Exception {
+                                    return c.getDeclaredMethod(methodName, args);
+                                }
+                            });
+                } catch (PrivilegedActionException ex) {
+                    throw new RuntimeException(
+                            "Invalid function mapping - no such method: "
+                                    + ex.getException().getMessage());
+                }
             }
         } else {
             funcMapper = new ProtectedFunctionMapper();
-            try {
-                method = c.getDeclaredMethod(methodName, args);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(
-                        "Invalid function mapping - no such method: "
-                                + e.getMessage());
+            // Skip if null values were passed in. They indicate a function
+            // added via a lambda or ImportHandler; nether of which need to be
+            // placed in the Map.
+            if (fnQName != null) {
+                try {
+                    method = c.getDeclaredMethod(methodName, args);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException(
+                            "Invalid function mapping - no such method: "
+                                    + e.getMessage());
+                }
             }
         }
         funcMapper.theMethod = method;
