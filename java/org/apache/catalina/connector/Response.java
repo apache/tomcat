@@ -50,6 +50,7 @@ import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
+import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.MediaTypeCache;
@@ -89,7 +90,6 @@ public class Response
     }
 
     public Response() {
-        urlEncoder.addSafeCharacter('/');
     }
 
 
@@ -241,7 +241,7 @@ public class Response
     /**
      * URL encoder.
      */
-    protected final UEncoder urlEncoder = new UEncoder();
+    protected final UEncoder urlEncoder = new UEncoder(SafeCharsSet.WITH_SLASH);
 
 
     /**
