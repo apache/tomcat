@@ -586,7 +586,7 @@ class Generator {
                 out.println("\");");
             }
         }
-        if (packages.size() == 0) {
+        if (classes.size() == 0) {
             out.printin("_jspx_imports_classes = null;");
             out.println();
         } else {
