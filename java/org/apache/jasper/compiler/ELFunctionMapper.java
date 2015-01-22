@@ -220,40 +220,46 @@ public class ELFunctionMapper {
                 ELNode.Function f = functions.get(i);
                 FunctionInfo funcInfo = f.getFunctionInfo();
                 String key = f.getPrefix()+ ":" + f.getName();
-                ds.append(funcMethod + "(\"" + key + "\", " +
-                        getCanonicalName(funcInfo.getFunctionClass()) +
-                        ".class, " + '\"' + f.getMethodName() + "\", " +
-                        "new Class[] {");
-                String params[] = f.getParameters();
-                for (int k = 0; k < params.length; k++) {
-                    if (k != 0) {
-                        ds.append(", ");
-                    }
-                    int iArray = params[k].indexOf('[');
-                    if (iArray < 0) {
-                        ds.append(params[k] + ".class");
-                    }
-                    else {
-                        String baseType = params[k].substring(0, iArray);
-                        ds.append("java.lang.reflect.Array.newInstance(");
-                        ds.append(baseType);
-                        ds.append(".class,");
+                if (funcInfo == null) {
+                    // Added via Lambda or ImportHandler. EL will expect a
+                    // function mapper even if one isn't used so just pass null
+                    ds.append(funcMethod + "(null, null, null, null);\n");
+                } else {
+                    ds.append(funcMethod + "(\"" + key + "\", " +
+                            getCanonicalName(funcInfo.getFunctionClass()) +
+                            ".class, " + '\"' + f.getMethodName() + "\", " +
+                            "new Class[] {");
+                    String params[] = f.getParameters();
+                    for (int k = 0; k < params.length; k++) {
+                        if (k != 0) {
+                            ds.append(", ");
+                        }
+                        int iArray = params[k].indexOf('[');
+                        if (iArray < 0) {
+                            ds.append(params[k] + ".class");
+                        }
+                        else {
+                            String baseType = params[k].substring(0, iArray);
+                            ds.append("java.lang.reflect.Array.newInstance(");
+                            ds.append(baseType);
+                            ds.append(".class,");
 
-                        // Count the number of array dimension
-                        int aCount = 0;
-                        for (int jj = iArray; jj < params[k].length(); jj++ ) {
-                            if (params[k].charAt(jj) == '[') {
-                                aCount++;
+                            // Count the number of array dimension
+                            int aCount = 0;
+                            for (int jj = iArray; jj < params[k].length(); jj++ ) {
+                                if (params[k].charAt(jj) == '[') {
+                                    aCount++;
+                                }
+                            }
+                            if (aCount == 1) {
+                                ds.append("0).getClass()");
+                            } else {
+                                ds.append("new int[" + aCount + "]).getClass()");
                             }
                         }
-                        if (aCount == 1) {
-                            ds.append("0).getClass()");
-                        } else {
-                            ds.append("new int[" + aCount + "]).getClass()");
-                        }
                     }
+                    ds.append("});\n");
                 }
-                ds.append("});\n");
                 // Put the current name in the global function map
                 gMap.put(f.getPrefix() + ':' + f.getName() + ':' + f.getUri(),
                          decName);
