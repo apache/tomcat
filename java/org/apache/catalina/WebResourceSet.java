@@ -107,6 +107,8 @@ public interface WebResourceSet extends Lifecycle {
      * Obtain the base URL for this set of resources. One of the uses of this is
      * to grant read permissions to the resources when running under a security
      * manager.
+     *
+     * @return The base URL for this set of resources
      */
     URL getBaseUrl();
 
