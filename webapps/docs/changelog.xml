@@ -206,8 +206,13 @@
         environment variable. (markt)
       </fix>
       <fix>
-        <bug>57476</bug>: Ensure the resposnes written as part of a forward are
+        <bug>57476</bug>: Ensure the responses written as part of a forward are
         fully written before the forward method returns. (markt)
+      </fix>
+      <fix>
+        While closing streams for given resources ensure that if an exception
+        happens it will be handled properly. Issue is reported by Coverity Scan.
+        (violetagg)
       </fix>
     </changelog>
   </subsection>

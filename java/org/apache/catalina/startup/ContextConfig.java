@@ -1459,7 +1459,7 @@ public class ContextConfig implements LifecycleListener {
                         uc.getInputStream().close();
                     } catch (IOException e) {
                         ExceptionUtils.handleThrowable(e);
-                        globalTimeStamp = -1;
+                        hostTimeStamp = -1;
                     }
                 }
             }
