@@ -31,6 +31,22 @@ import java.util.BitSet;
  */
 public final class UEncoder {
 
+    public enum SafeCharsSet {
+        WITH_SLASH("/"), DEFAULT("");
+        private final BitSet safeChars;
+
+        private BitSet getSafeChars() {
+            return this.safeChars;
+        }
+
+        private SafeCharsSet(String additionalSafeChars) {
+            safeChars = initialSafeChars();
+            for (char c : additionalSafeChars.toCharArray()) {
+                safeChars.set(c);
+            }
+        }
+    }
+
     // Not static - the set may differ ( it's better than adding
     // an extra check for "/", "+", etc
     private BitSet safeChars=null;
@@ -38,14 +54,31 @@ public final class UEncoder {
     private ByteChunk bb=null;
     private CharChunk cb=null;
     private CharChunk output=null;
+    private final boolean readOnlySafeChars;
 
     private String encoding="UTF8";
 
     public UEncoder() {
-        initSafeChars();
+        this.safeChars = initialSafeChars();
+        readOnlySafeChars = false;
     }
 
     /**
+     * Create a UEncoder with an unmodifiable safe character set.
+     * <p>
+     * Calls to {@link UEncoder#addSafeCharacter(char) addSafeCharacter(char)}
+     * on instances created by this constructor will throw an
+     * {@link IllegalStateException}.
+     * 
+     * @param safeCharsSet
+     *            safe characters for this encoder
+     */
+    public UEncoder(SafeCharsSet safeCharsSet) {
+        this.safeChars = safeCharsSet.getSafeChars();
+        readOnlySafeChars = true;
+    }
+
+     /**
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -54,6 +87,9 @@ public final class UEncoder {
     }
 
     public void addSafeCharacter( char c ) {
+        if (readOnlySafeChars) {
+            throw new IllegalStateException("UEncoders safeChararacters are read only");
+        }
         safeChars.set( c );
     }
 
@@ -123,33 +159,34 @@ public final class UEncoder {
    
     // -------------------- Internal implementation --------------------
 
-    private void initSafeChars() {
-        safeChars=new BitSet(128);
+    private static BitSet initialSafeChars() {
+        BitSet initialSafeChars=new BitSet(128);
         int i;
         for (i = 'a'; i <= 'z'; i++) {
-            safeChars.set(i);
+            initialSafeChars.set(i);
         }
         for (i = 'A'; i <= 'Z'; i++) {
-            safeChars.set(i);
+            initialSafeChars.set(i);
         }
         for (i = '0'; i <= '9'; i++) {
-            safeChars.set(i);
+            initialSafeChars.set(i);
         }
         //safe
-        safeChars.set('$');
-        safeChars.set('-');
-        safeChars.set('_');
-        safeChars.set('.');
+        initialSafeChars.set('$');
+        initialSafeChars.set('-');
+        initialSafeChars.set('_');
+        initialSafeChars.set('.');
 
         // Dangerous: someone may treat this as " "
         // RFC1738 does allow it, it's not reserved
-        //    safeChars.set('+');
+        //    initialSafeChars.set('+');
         //extra
-        safeChars.set('!');
-        safeChars.set('*');
-        safeChars.set('\'');
-        safeChars.set('(');
-        safeChars.set(')');
-        safeChars.set(',');
+        initialSafeChars.set('!');
+        initialSafeChars.set('*');
+        initialSafeChars.set('\'');
+        initialSafeChars.set('(');
+        initialSafeChars.set(')');
+        initialSafeChars.set(',');
+        return initialSafeChars;
     }
 }

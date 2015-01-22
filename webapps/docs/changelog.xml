@@ -210,6 +210,10 @@
         happens it will be handled properly. Issue is reported by Coverity Scan.
         (violetagg)
       </fix>
+      <fix>
+        Change Response to use UEncoder instances with shared safeChars.
+        (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
