@@ -184,6 +184,11 @@
         (markt)
       </fix>
       <fix>
+        <bug>57420</bug>: Make UEncoder a local variable in
+        DirContextURLConnection to make it threadsafe. Based on ideas from
+        kkolinko and violetagg. (fschumacher)
+      </fix>
+      <fix>
         <bug>57425</bug>: Don't add attributes with null value or name to the
         replicated context. (fschumacher)
       </fix>
