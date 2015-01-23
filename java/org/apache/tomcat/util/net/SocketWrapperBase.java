@@ -511,6 +511,16 @@ public abstract class SocketWrapperBase<E> {
 
     public abstract void regsiterForEvent(boolean read, boolean write);
 
+    /**
+     * Starts the sendfile process. It is expected that if the sendfile process
+     * does not complete during this call that the caller <b>will not</b> add
+     * the socket to the poller (or equivalent). That is the responsibility of
+     * this method.
+     *
+     * @param sendfileData Data representing the file to send
+     *
+     * @return The state of the sendfile process after the first write.
+     */
     public abstract SendfileState processSendfile(SendfileDataBase sendfileData);
 
 

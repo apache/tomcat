@@ -1196,15 +1196,13 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     }
                     return SendfileState.DONE;
                 } else {
-                    if (!calledByProcessor) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("OP_WRITE for sendfile: " + sd.fileName);
-                        }
-                        if (event) {
-                            add(socketWrapper.getSocket(),SelectionKey.OP_WRITE);
-                        } else {
-                            reg(sk,socketWrapper,SelectionKey.OP_WRITE);
-                        }
+                    if (log.isDebugEnabled()) {
+                        log.debug("OP_WRITE for sendfile: " + sd.fileName);
+                    }
+                    if (event) {
+                        add(socketWrapper.getSocket(),SelectionKey.OP_WRITE);
+                    } else {
+                        reg(sk,socketWrapper,SelectionKey.OP_WRITE);
                     }
                     return SendfileState.PENDING;
                 }
