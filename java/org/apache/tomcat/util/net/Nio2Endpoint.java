@@ -1353,10 +1353,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         ((Nio2SocketWrapper) socket).awaitBytes();
     }
 
-    public enum SendfileState {
-        PENDING, DONE, ERROR
-    }
-
     private CompletionHandler<Integer, SendfileData> sendfile = new CompletionHandler<Integer, SendfileData>() {
 
         @Override
