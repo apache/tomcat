@@ -1559,7 +1559,22 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         return connection.equals(Constants.CLOSE);
     }
 
-    abstract boolean prepareSendfile(OutputFilter[] outputFilters);
+    private boolean prepareSendfile(OutputFilter[] outputFilters) {
+        String fileName = (String) request.getAttribute(
+                org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
+        if (fileName != null) {
+            // No entity body sent here
+            getOutputBuffer().addActiveFilter(outputFilters[Constants.VOID_FILTER]);
+            contentDelimitation = true;
+            sendfileData = socketWrapper.createSendfileData(fileName,
+                    ((Long) request.getAttribute(
+                            org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue(),
+                    ((Long) request.getAttribute(
+                            org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue() - sendfileData.pos);
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Parse host.
@@ -1772,7 +1787,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      *
      * @return true if the keep-alive loop should be broken
      */
-    protected boolean breakKeepAliveLoop(SocketWrapperBase<S> socketWrapper) {
+    private boolean breakKeepAliveLoop(SocketWrapperBase<S> socketWrapper) {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {
