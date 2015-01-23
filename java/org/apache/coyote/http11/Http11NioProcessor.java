@@ -118,8 +118,8 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {
-            ((NioSocketWrapper) socketWrapper).setSendfileData(sendfileData);
             sendfileData.keepAlive = keepAlive;
+            ((NioSocketWrapper) socketWrapper).setSendfileData(sendfileData);
             SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
                     socketWrapper.getSocket().getPoller().getSelector());
             //do the first write on this thread, might as well
