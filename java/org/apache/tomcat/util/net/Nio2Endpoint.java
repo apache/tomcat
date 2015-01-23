@@ -1617,7 +1617,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
      */
     public static class SendfileData extends SendfileDataBase {
         public FileChannel fchannel;
-        public long length;
         // Internal use only
         private Nio2SocketWrapper socket;
         private ByteBuffer buffer;

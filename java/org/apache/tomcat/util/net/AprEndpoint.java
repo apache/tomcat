@@ -1921,8 +1921,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         // File
         public long fd;
         public long fdpool;
-        // Range information
-        public long length;
         // Socket and socket pool
         public long socket;
     }
