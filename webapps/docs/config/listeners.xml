@@ -446,6 +446,12 @@
         <code>false</code> will be used.</p>
       </attribute>
 
+      <attribute name="logProps" required="false">
+        <p>If <code>true</code>, the current Java system properties will be
+        logged. If not specified, the default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>

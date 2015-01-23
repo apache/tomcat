@@ -19,8 +19,8 @@ package org.apache.catalina.startup;
 import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -44,6 +44,7 @@ public class VersionLoggerListener implements LifecycleListener {
 
     private boolean logArgs = true;
     private boolean logEnv = false;
+    private boolean logProps = false;
 
 
     public boolean getLogArgs() {
@@ -63,6 +64,16 @@ public class VersionLoggerListener implements LifecycleListener {
 
     public void setLogEnv(boolean logEnv) {
         this.logEnv = logEnv;
+    }
+
+
+    public boolean getLogProps() {
+        return logProps;
+    }
+
+
+    public void setLogProps(boolean logProps) {
+        this.logProps = logProps;
     }
 
 
@@ -106,10 +117,19 @@ public class VersionLoggerListener implements LifecycleListener {
         }
 
         if (logEnv) {
-            Map<String,String> envs = System.getenv();
-            SortedSet<String> keys = new TreeSet<>(envs.keySet());
-            for (String key : keys) {
-                log.info(sm.getString("versionLoggerListener.env", key, envs.get(key)));
+            SortedMap<String, String> sortedMap = new TreeMap<>(System.getenv());
+            for (Map.Entry<String, String> e : sortedMap.entrySet()) {
+                log.info(sm.getString("versionLoggerListener.env", e.getKey(), e.getValue()));
+            }
+        }
+
+        if (logProps) {
+            SortedMap<String, String> sortedMap = new TreeMap<>();
+            for (Map.Entry<Object, Object> e : System.getProperties().entrySet()) {
+                sortedMap.put(String.valueOf(e.getKey()), String.valueOf(e.getValue()));
+            }
+            for (Map.Entry<String, String> e : sortedMap.entrySet()) {
+                log.info(sm.getString("versionLoggerListener.prop", e.getKey(), e.getValue()));
             }
         }
     }
