@@ -95,8 +95,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {
-            sendfileData.socket = socketWrapper.getSocket().longValue();
             sendfileData.keepAlive = keepAlive;
+            sendfileData.socket = socketWrapper.getSocket().longValue();
             if (!((AprEndpoint)endpoint).getSendfile().add(sendfileData)) {
                 // Didn't send all of the data to sendfile.
                 if (sendfileData.socket == 0) {

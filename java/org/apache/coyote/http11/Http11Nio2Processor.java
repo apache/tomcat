@@ -125,8 +125,8 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {
-            ((Nio2Endpoint.Nio2SocketWrapper) socketWrapper).setSendfileData(sendfileData);
             sendfileData.keepAlive = keepAlive;
+            ((Nio2Endpoint.Nio2SocketWrapper) socketWrapper).setSendfileData(sendfileData);
             switch (((Nio2Endpoint) endpoint)
                     .processSendfile((Nio2Endpoint.Nio2SocketWrapper) socketWrapper)) {
             case DONE:
