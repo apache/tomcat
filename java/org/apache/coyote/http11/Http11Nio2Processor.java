@@ -23,7 +23,6 @@ import java.net.InetSocketAddress;
 import javax.net.ssl.SSLEngine;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.ErrorState;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -34,7 +33,6 @@ import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SecureNio2Channel;
 import org.apache.tomcat.util.net.SocketStatus;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -62,14 +60,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
         super(maxHttpHeaderSize, endpoint, maxTrailerSize, maxExtensionSize, maxSwallowSize);
     }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * Sendfile data.
-     */
-    protected Nio2Endpoint.SendfileData sendfileData = null;
 
 
     // --------------------------------------------------------- Public Methods
@@ -116,38 +106,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     @Override
     protected void setSocketTimeout(int timeout) throws IOException {
         socketWrapper.setTimeout(timeout);
-    }
-
-
-    @Override
-    protected boolean breakKeepAliveLoop(SocketWrapperBase<Nio2Channel> socketWrapper) {
-        openSocket = keepAlive;
-        // Do sendfile as needed: add socket to sendfile and end
-        if (sendfileData != null && !getErrorState().isError()) {
-            sendfileData.keepAlive = keepAlive;
-            switch (socketWrapper.processSendfile(sendfileData)) {
-            case DONE:
-                // If sendfile is complete, no need to break keep-alive loop
-                return false;
-            case PENDING:
-                sendfileInProgress = true;
-                return true;
-            case ERROR:
-                // Write failed
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http11processor.sendfile.error"));
-                }
-                setErrorState(ErrorState.CLOSE_NOW, null);
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    @Override
-    public void recycleInternal() {
-        sendfileData = null;
     }
 
 
