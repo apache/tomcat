@@ -1922,7 +1922,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         public long fd;
         public long fdpool;
         // Range information
-        public long end;
+        public long length;
         // Socket and socket pool
         public long socket;
     }
@@ -2024,7 +2024,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 Socket.timeoutSet(data.socket, 0);
                 while (true) {
                     long nw = Socket.sendfilen(data.socket, data.fd,
-                                               data.pos, data.end - data.pos, 0);
+                                               data.pos, data.length, 0);
                     if (nw < 0) {
                         if (!(-nw == Status.EAGAIN)) {
                             Pool.destroy(data.fdpool);
@@ -2035,8 +2035,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             break;
                         }
                     } else {
-                        data.pos = data.pos + nw;
-                        if (data.pos >= data.end) {
+                        data.pos += nw;
+                        data.length -= nw;
+                        if (data.length == 0) {
                             // Entire file has been sent
                             Pool.destroy(data.fdpool);
                             // Set back socket to blocking mode
@@ -2153,7 +2154,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             // Write some data using sendfile
                             long nw = Socket.sendfilen(state.socket, state.fd,
                                                        state.pos,
-                                                       state.end - state.pos, 0);
+                                                       state.length, 0);
                             if (nw < 0) {
                                 // Close socket and clear pool
                                 remove(state);
@@ -2163,8 +2164,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 continue;
                             }
 
-                            state.pos = state.pos + nw;
-                            if (state.pos >= state.end) {
+                            state.pos += nw;
+                            state.length -= nw;
+                            if (state.length == 0) {
                                 remove(state);
                                 if (state.keepAlive) {
                                     // Destroy file descriptor pool, which should close the file
