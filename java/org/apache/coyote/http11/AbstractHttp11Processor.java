@@ -877,7 +877,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             break;
         }
         case NB_READ_INTEREST: {
-            registerForEvent(true, false);
+            socketWrapper.registerReadInterest();
             break;
         }
         case REQUEST_BODY_FULLY_READ: {
