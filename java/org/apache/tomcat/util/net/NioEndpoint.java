@@ -1114,45 +1114,51 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             return result;
         }
 
-        public boolean processSendfile(SelectionKey sk, NioSocketWrapper attachment, boolean event) {
+        public SendfileState processSendfile(SelectionKey sk, NioSocketWrapper socketWrapper, boolean event) {
             NioChannel sc = null;
             try {
-                unreg(sk, attachment, sk.readyOps());
-                SendfileData sd = attachment.getSendfileData();
+                unreg(sk, socketWrapper, sk.readyOps());
+                SendfileData sd = socketWrapper.getSendfileData();
 
                 if (log.isTraceEnabled()) {
                     log.trace("Processing send file for: " + sd.fileName);
                 }
 
-                //setup the file channel
-                if ( sd.fchannel == null ) {
+                // This method is called by the Http11Processor for the first
+                // execution and then subsequent executions are via the Poller.
+                // This boolean keeps track of the current caller as the
+                // required behaviour varies slightly.
+                boolean calledByProcessor = (sd.fchannel == null);
+
+                if (calledByProcessor) {
+                    // Setup the file channel
                     File f = new File(sd.fileName);
-                    if ( !f.exists() ) {
+                    if (!f.exists()) {
                         cancelledKey(sk);
-                        return false;
+                        return SendfileState.ERROR;
                     }
                     @SuppressWarnings("resource") // Closed when channel is closed
                     FileInputStream fis = new FileInputStream(f);
                     sd.fchannel = fis.getChannel();
                 }
 
-                //configure output channel
-                sc = attachment.getSocket();
+                // Configure output channel
+                sc = socketWrapper.getSocket();
                 sc.setSendFile(true);
-                //ssl channel is slightly different
+                // TLS/SSL channel is slightly different
                 WritableByteChannel wc = ((sc instanceof SecureNioChannel)?sc:sc.getIOChannel());
 
-                //we still have data in the buffer
+                // We still have data in the buffer
                 if (sc.getOutboundRemaining()>0) {
                     if (sc.flushOutbound()) {
-                        attachment.access();
+                        socketWrapper.access();
                     }
                 } else {
                     long written = sd.fchannel.transferTo(sd.pos,sd.length,wc);
-                    if ( written > 0 ) {
+                    if (written > 0) {
                         sd.pos += written;
                         sd.length -= written;
-                        attachment.access();
+                        socketWrapper.access();
                     } else {
                         // Unusual not to be able to transfer any bytes
                         // Check the length was set correctly
@@ -1162,53 +1168,57 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         }
                     }
                 }
-                if ( sd.length <= 0 && sc.getOutboundRemaining()<=0) {
+                if (sd.length <= 0 && sc.getOutboundRemaining()<=0) {
                     if (log.isDebugEnabled()) {
                         log.debug("Send file complete for: "+sd.fileName);
                     }
-                    attachment.setSendfileData(null);
+                    socketWrapper.setSendfileData(null);
                     try {
                         sd.fchannel.close();
                     } catch (Exception ignore) {
                     }
-                    if ( sd.keepAlive ) {
+                    if (!calledByProcessor) {
+                        if (sd.keepAlive) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Connection is keep alive, registering back for OP_READ");
                             }
                             if (event) {
-                                this.add(attachment.getSocket(),SelectionKey.OP_READ);
+                                this.add(socketWrapper.getSocket(),SelectionKey.OP_READ);
                             } else {
-                                reg(sk,attachment,SelectionKey.OP_READ);
+                                reg(sk,socketWrapper,SelectionKey.OP_READ);
                             }
-                    } else {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Send file connection is being closed");
+                        } else {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Send file connection is being closed");
+                            }
+                            cancelledKey(sk);
                         }
-                        cancelledKey(sk);
-                        return false;
                     }
+                    return SendfileState.DONE;
                 } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("OP_WRITE for sendfile: " + sd.fileName);
+                    if (!calledByProcessor) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("OP_WRITE for sendfile: " + sd.fileName);
+                        }
+                        if (event) {
+                            add(socketWrapper.getSocket(),SelectionKey.OP_WRITE);
+                        } else {
+                            reg(sk,socketWrapper,SelectionKey.OP_WRITE);
+                        }
                     }
-                    if (event) {
-                        add(attachment.getSocket(),SelectionKey.OP_WRITE);
-                    } else {
-                        reg(sk,attachment,SelectionKey.OP_WRITE);
-                    }
+                    return SendfileState.PENDING;
                 }
-            }catch ( IOException x ) {
-                if ( log.isDebugEnabled() ) log.debug("Unable to complete sendfile request:", x);
+            } catch (IOException x) {
+                if (log.isDebugEnabled()) log.debug("Unable to complete sendfile request:", x);
                 cancelledKey(sk);
-                return false;
-            }catch ( Throwable t ) {
-                log.error("",t);
+                return SendfileState.ERROR;
+            } catch (Throwable t) {
+                log.error("", t);
                 cancelledKey(sk);
-                return false;
-            }finally {
+                return SendfileState.ERROR;
+            } finally {
                 if (sc!=null) sc.setSendFile(false);
             }
-            return true;
         }
 
         protected void unreg(SelectionKey sk, NioSocketWrapper attachment, int readyOps) {
@@ -1575,6 +1585,16 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 key.interestOps(key.interestOps() | SelectionKey.OP_READ);
             }
         }
+
+
+        @Override
+        public SendfileState processSendfile(SendfileDataBase sendfileData) {
+            setSendfileData((SendfileData) sendfileData);
+            SelectionKey key = getSocket().getIOChannel().keyFor(
+                    getSocket().getPoller().getSelector());
+            // Might as well do the first write on this thread
+            return getSocket().getPoller().processSendfile(key, this, true);
+        }
     }
 
 
@@ -1756,6 +1776,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
      * SendfileData class.
      */
     public static class SendfileData extends SendfileDataBase {
-        public volatile FileChannel fchannel;
+        protected volatile FileChannel fchannel;
     }
 }

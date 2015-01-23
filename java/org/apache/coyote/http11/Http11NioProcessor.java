@@ -30,7 +30,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -119,21 +118,21 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {
             sendfileData.keepAlive = keepAlive;
-            ((NioSocketWrapper) socketWrapper).setSendfileData(sendfileData);
-            SelectionKey key = socketWrapper.getSocket().getIOChannel().keyFor(
-                    socketWrapper.getSocket().getPoller().getSelector());
-            //do the first write on this thread, might as well
-            if (socketWrapper.getSocket().getPoller().processSendfile(key,
-                    (NioSocketWrapper) socketWrapper, true)) {
+            switch (socketWrapper.processSendfile(sendfileData)) {
+            case DONE:
+                // If sendfile is complete, no need to break keep-alive loop
+                return false;
+            case PENDING:
                 sendfileInProgress = true;
-            } else {
+                return true;
+            case ERROR:
                 // Write failed
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.sendfile.error"));
                 }
                 setErrorState(ErrorState.CLOSE_NOW, null);
+                return true;
             }
-            return true;
         }
         return false;
     }

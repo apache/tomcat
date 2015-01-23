@@ -511,6 +511,8 @@ public abstract class SocketWrapperBase<E> {
 
     public abstract void regsiterForEvent(boolean read, boolean write);
 
+    public abstract SendfileState processSendfile(SendfileDataBase sendfileData);
+
 
     // --------------------------------------------------------- Utility methods
 
