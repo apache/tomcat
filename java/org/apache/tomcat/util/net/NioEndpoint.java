@@ -1585,6 +1585,12 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
 
 
+
+        @Override
+        public SendfileDataBase createSendfileData(String filename, long pos, long length) {
+            return new SendfileData(filename, pos, length);
+        }
+
         @Override
         public SendfileState processSendfile(SendfileDataBase sendfileData) {
             setSendfileData((SendfileData) sendfileData);
@@ -1774,6 +1780,11 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
      * SendfileData class.
      */
     public static class SendfileData extends SendfileDataBase {
+
+        public SendfileData(String filename, long pos, long length) {
+            super(filename, pos, length);
+        }
+
         protected volatile FileChannel fchannel;
     }
 }
