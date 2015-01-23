@@ -1923,7 +1923,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         public long fd;
         public long fdpool;
         // Range information
-        public long start;
         public long end;
         // Socket and socket pool
         public long socket;
@@ -2024,7 +2023,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     (data.fileName, File.APR_FOPEN_READ
                      | File.APR_FOPEN_SENDFILE_ENABLED | File.APR_FOPEN_BINARY,
                      0, data.fdpool);
-                data.pos = data.start;
                 // Set the socket to nonblocking mode
                 Socket.timeoutSet(data.socket, 0);
                 while (true) {
