@@ -1755,7 +1755,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     /**
      * SendfileData class.
      */
-    public static class SendfileData {
+    public static class SendfileData extends SendfileDataBase {
         // File
         public volatile String fileName;
         public volatile FileChannel fchannel;
