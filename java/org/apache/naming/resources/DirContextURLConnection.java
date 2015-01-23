@@ -42,7 +42,6 @@ import javax.naming.directory.DirContext;
 import org.apache.naming.JndiPermission;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.buf.UEncoder;
-import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 /**
@@ -432,7 +431,7 @@ public class DirContextURLConnection extends URLConnection {
             try {
                 NamingEnumeration<NameClassPair> enumeration =
                     collection.list("/");
-                UEncoder urlEncoder = new UEncoder(SafeCharsSet.WITH_SLASH);
+                UEncoder urlEncoder = new UEncoder(UEncoder.SafeCharsSet.WITH_SLASH);
                 while (enumeration.hasMoreElements()) {
                     NameClassPair ncp = enumeration.nextElement();
                     String s = ncp.getName();
