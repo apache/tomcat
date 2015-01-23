@@ -53,6 +53,7 @@ import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
+import org.apache.tomcat.util.net.SendfileDataBase;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -225,6 +226,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * upgraded.
      */
     protected HttpUpgradeHandler httpUpgradeHandler = null;
+
+
+    /**
+     * Sendfile data.
+     */
+    protected SendfileDataBase sendfileData = null;
 
 
     public AbstractHttp11Processor(int maxHttpHeaderSize, AbstractEndpoint<S> endpoint,
@@ -1769,10 +1776,32 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * Checks to see if the keep-alive loop should be broken, performing any
      * processing (e.g. sendfile handling) that may have an impact on whether
      * or not the keep-alive loop should be broken.
+     *
      * @return true if the keep-alive loop should be broken
      */
-    protected abstract boolean breakKeepAliveLoop(
-            SocketWrapperBase<S> socketWrapper);
+    protected boolean breakKeepAliveLoop(SocketWrapperBase<S> socketWrapper) {
+        openSocket = keepAlive;
+        // Do sendfile as needed: add socket to sendfile and end
+        if (sendfileData != null && !getErrorState().isError()) {
+            sendfileData.keepAlive = keepAlive;
+            switch (socketWrapper.processSendfile(sendfileData)) {
+            case DONE:
+                // If sendfile is complete, no need to break keep-alive loop
+                return false;
+            case PENDING:
+                sendfileInProgress = true;
+                return true;
+            case ERROR:
+                // Write failed
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(sm.getString("http11processor.sendfile.error"));
+                }
+                setErrorState(ErrorState.CLOSE_NOW, null);
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     @Override
@@ -1791,10 +1820,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         httpUpgradeHandler = null;
         resetErrorState();
         socketWrapper = null;
-        recycleInternal();
+        sendfileData = null;
     }
-
-    protected abstract void recycleInternal();
 
 
     @Override

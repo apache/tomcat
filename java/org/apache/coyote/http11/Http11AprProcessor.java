@@ -21,7 +21,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.ErrorState;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -33,7 +32,6 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -63,12 +61,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * Sendfile data.
-     */
-    protected AprEndpoint.SendfileData sendfileData = null;
-
-
-    /**
      * When client certificate information is presented in a form other than
      * instances of {@link java.security.cert.X509Certificate} it needs to be
      * converted before it can be used and this property controls which JSSE
@@ -91,32 +83,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     @Override
-    protected boolean breakKeepAliveLoop(SocketWrapperBase<Long> socketWrapper) {
-        openSocket = keepAlive;
-        // Do sendfile as needed: add socket to sendfile and end
-        if (sendfileData != null && !getErrorState().isError()) {
-            sendfileData.keepAlive = keepAlive;
-            switch (socketWrapper.processSendfile(sendfileData)) {
-            case DONE:
-                // If sendfile is complete, no need to break keep-alive loop
-                return false;
-            case PENDING:
-                sendfileInProgress = true;
-                return true;
-            case ERROR:
-                // Write failed
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http11processor.sendfile.error"));
-                }
-                setErrorState(ErrorState.CLOSE_NOW, null);
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    @Override
     protected void registerForEvent(boolean read, boolean write) {
         ((AprEndpoint) endpoint).getPoller().add(
                 socketWrapper.getSocket().longValue(), -1, read, write);
@@ -126,12 +92,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     @Override
     protected void resetTimeouts() {
         // NO-OP for APR
-    }
-
-
-    @Override
-    public void recycleInternal() {
-        sendfileData = null;
     }
 
 
