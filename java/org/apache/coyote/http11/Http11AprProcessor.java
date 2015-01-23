@@ -375,7 +375,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             contentDelimitation = true;
             sendfileData = new AprEndpoint.SendfileData();
             sendfileData.fileName = fileName;
-            sendfileData.start = ((Long) request.getAttribute(
+            sendfileData.pos = ((Long) request.getAttribute(
                     org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
             sendfileData.end = ((Long) request.getAttribute(
                     org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue();
