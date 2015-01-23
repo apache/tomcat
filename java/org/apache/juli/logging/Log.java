@@ -71,6 +71,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than debug. </p>
+     *
+     * @return <code>true</code> if debug level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isDebugEnabled();
 
@@ -81,6 +84,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than error. </p>
+     *
+     * @return <code>true</code> if error level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isErrorEnabled();
 
@@ -91,6 +97,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than fatal. </p>
+     *
+     * @return <code>true</code> if fatal level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isFatalEnabled();
 
@@ -101,6 +110,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than info. </p>
+     *
+     * @return <code>true</code> if info level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isInfoEnabled();
 
@@ -111,6 +123,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than trace. </p>
+     *
+     * @return <code>true</code> if trace level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isTraceEnabled();
 
@@ -121,6 +136,9 @@ public interface Log {
      * <p> Call this method to prevent having to perform expensive operations
      * (for example, <code>String</code> concatenation)
      * when the log level is more than warn. </p>
+     *
+     * @return <code>true</code> if warn level logging is enabled, otherwise
+     *         <code>false</code>
      */
     public boolean isWarnEnabled();
 
