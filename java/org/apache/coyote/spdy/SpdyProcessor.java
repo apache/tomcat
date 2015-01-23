@@ -531,11 +531,6 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
         return null;
     }
 
-    @Override
-    protected void registerForEvent(boolean read, boolean write) {
-        // NO-OP
-    }
-
     public void onSynStream(SpdyStream str) throws IOException {
         this.spdyStream = str;
         SpdyFrame frame = str.reqFrame;

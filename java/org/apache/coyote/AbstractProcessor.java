@@ -205,14 +205,5 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     @Override
     public abstract HttpUpgradeHandler getHttpUpgradeHandler();
 
-
-    /**
-     * Register the socket for the specified events.
-     *
-     * @param read  Register the socket for read events
-     * @param write Register the socket for write events
-     */
-    protected abstract void registerForEvent(boolean read, boolean write);
-
     protected abstract Log getLog();
 }

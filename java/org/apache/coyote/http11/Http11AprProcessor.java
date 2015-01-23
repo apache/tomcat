@@ -83,13 +83,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
 
     @Override
-    protected void registerForEvent(boolean read, boolean write) {
-        ((AprEndpoint) endpoint).getPoller().add(
-                socketWrapper.getSocket().longValue(), -1, read, write);
-    }
-
-
-    @Override
     protected void resetTimeouts() {
         // NO-OP for APR
     }
