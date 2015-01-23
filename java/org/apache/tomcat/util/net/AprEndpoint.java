@@ -1919,15 +1919,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
      */
     public static class SendfileData extends SendfileDataBase {
         // File
-        public String fileName;
         public long fd;
         public long fdpool;
         // Range information
         public long end;
         // Socket and socket pool
         public long socket;
-        // Position
-        public long pos;
     }
 
 
