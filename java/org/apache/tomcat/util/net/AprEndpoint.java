@@ -1929,8 +1929,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         public long socket;
         // Position
         public long pos;
-        // KeepAlive flag
-        public boolean keepAlive;
     }
 
 

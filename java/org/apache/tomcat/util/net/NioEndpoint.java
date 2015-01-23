@@ -1761,7 +1761,5 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public volatile FileChannel fchannel;
         public volatile long pos;
         public volatile long length;
-        // KeepAlive flag
-        public volatile boolean keepAlive;
     }
 }
