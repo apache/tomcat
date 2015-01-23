@@ -120,26 +120,24 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
 
     @Override
-    protected boolean breakKeepAliveLoop(
-            SocketWrapperBase<Nio2Channel> socketWrapper) {
+    protected boolean breakKeepAliveLoop(SocketWrapperBase<Nio2Channel> socketWrapper) {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {
             sendfileData.keepAlive = keepAlive;
-            ((Nio2Endpoint.Nio2SocketWrapper) socketWrapper).setSendfileData(sendfileData);
-            switch (((Nio2Endpoint) endpoint)
-                    .processSendfile((Nio2Endpoint.Nio2SocketWrapper) socketWrapper)) {
+            switch (socketWrapper.processSendfile(sendfileData)) {
             case DONE:
+                // If sendfile is complete, no need to break keep-alive loop
                 return false;
+            case PENDING:
+                sendfileInProgress = true;
+                return true;
             case ERROR:
                 // Write failed
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.sendfile.error"));
                 }
                 setErrorState(ErrorState.CLOSE_NOW, null);
-                return true;
-            case PENDING:
-                sendfileInProgress = true;
                 return true;
             }
         }
@@ -154,7 +152,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
 
     // ----------------------------------------------------- ActionHook Methods
-
 
     /**
      * Send an action to the connector.

@@ -1291,6 +1291,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             // NO-OP. Appropriate handlers will already have been registered.
         }
 
+
         public void awaitBytes() {
             if (getSocket() == null) {
                 return;
@@ -1304,6 +1305,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             }
         }
 
+
+        @Override
+        public SendfileState processSendfile(SendfileDataBase sendfileData) {
+            setSendfileData((SendfileData) sendfileData);
+            return ((Nio2Endpoint) getEndpoint()).processSendfile(this);
+        }
     }
 
 
@@ -1612,7 +1619,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
      * SendfileData class.
      */
     public static class SendfileData extends SendfileDataBase {
-        public FileChannel fchannel;
+        protected FileChannel fchannel;
         // Internal use only
         private Nio2SocketWrapper socket;
         private ByteBuffer buffer;
