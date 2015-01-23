@@ -217,8 +217,7 @@ public class ELFunctionMapper {
             }
 
             // Setup arguments for either getMapForFunction or mapFunction
-            for (int i = 0; i < functions.size(); i++) {
-                ELNode.Function f = functions.get(i);
+            for (ELNode.Function f : functions) {
                 FunctionInfo funcInfo = f.getFunctionInfo();
                 String fnQName = f.getPrefix() + ":" + f.getName();
                 if (funcInfo == null) {
