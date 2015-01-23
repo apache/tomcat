@@ -22,8 +22,9 @@ import java.io.IOException;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.junit.Test;
+
+import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 
 /**
  * Test cases for {@link UEncoder}.
