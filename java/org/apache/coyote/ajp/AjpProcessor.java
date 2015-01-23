@@ -1569,12 +1569,6 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
 
 
     @Override
-    protected void registerForEvent(boolean read, boolean write) {
-        socketWrapper.regsiterForEvent(read, write);
-    }
-
-
-    @Override
     protected Log getLog() {
         return log;
     }

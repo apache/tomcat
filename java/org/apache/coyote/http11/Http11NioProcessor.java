@@ -18,7 +18,6 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.channels.SelectionKey;
 
 import javax.net.ssl.SSLEngine;
 
@@ -62,22 +61,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     }
 
 
-    // --------------------------------------------------------- Public Methods
-
-    @Override
-    protected void registerForEvent(boolean read, boolean write) {
-        final NioChannel socket = socketWrapper.getSocket();
-
-        int interestOps = 0;
-        if (read) {
-            interestOps = SelectionKey.OP_READ;
-        }
-        if (write) {
-            interestOps = interestOps | SelectionKey.OP_WRITE;
-        }
-        socket.getPoller().add(socket, interestOps);
-    }
-
+    // ------------------------------------------------------ Protected Methods
 
     @Override
     protected void resetTimeouts() {

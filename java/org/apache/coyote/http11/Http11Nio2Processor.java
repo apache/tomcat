@@ -76,16 +76,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
         }
     }
 
-    @Override
-    protected void registerForEvent(boolean read, boolean write) {
-        if (read) {
-            socketWrapper.registerReadInterest();
-        }
-        if (write) {
-            socketWrapper.registerWriteInterest();
-        }
-    }
-
 
     @Override
     protected void resetTimeouts() {
