@@ -69,7 +69,7 @@ public final class UEncoder {
      * Calls to {@link UEncoder#addSafeCharacter(char) addSafeCharacter(char)}
      * on instances created by this constructor will throw an
      * {@link IllegalStateException}.
-     * 
+     *
      * @param safeCharsSet
      *            safe characters for this encoder
      */
