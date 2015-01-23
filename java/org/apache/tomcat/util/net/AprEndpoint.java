@@ -1917,7 +1917,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     /**
      * SendfileData class.
      */
-    public static class SendfileData {
+    public static class SendfileData extends SendfileDataBase {
         // File
         public String fileName;
         public long fd;
