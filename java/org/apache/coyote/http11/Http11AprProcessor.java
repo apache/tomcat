@@ -324,12 +324,11 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
             // No entity body sent here
             getOutputBuffer().addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
-            sendfileData = new AprEndpoint.SendfileData();
-            sendfileData.fileName = fileName;
-            sendfileData.pos = ((Long) request.getAttribute(
-                    org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
-            sendfileData.length = ((Long) request.getAttribute(
-                    org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue() - sendfileData.pos;
+            sendfileData = socketWrapper.createSendfileData(fileName,
+                    ((Long) request.getAttribute(
+                            org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue(),
+                    ((Long) request.getAttribute(
+                            org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue() - sendfileData.pos);
             return true;
         }
         return false;

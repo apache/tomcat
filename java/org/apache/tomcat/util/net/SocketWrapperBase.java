@@ -511,6 +511,8 @@ public abstract class SocketWrapperBase<E> {
 
     public abstract void regsiterForEvent(boolean read, boolean write);
 
+    public abstract SendfileDataBase createSendfileData(String filename, long pos, long length);
+
     /**
      * Starts the sendfile process. It is expected that if the sendfile process
      * does not complete during this call that the caller <b>will not</b> add

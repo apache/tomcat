@@ -30,7 +30,7 @@ public abstract class SendfileDataBase {
      * The full path to the file that contains the data to be written to the
      * socket.
      */
-    public String fileName;
+    public final String fileName;
 
     /**
      * The position of the next byte in the file to be written to the socket.
@@ -45,4 +45,10 @@ public abstract class SendfileDataBase {
      * point and then updated as the file is written.
      */
     public long length;
+
+    public SendfileDataBase(String filename, long pos, long length) {
+        this.fileName = filename;
+        this.pos = pos;
+        this.length = length;
+    }
 }

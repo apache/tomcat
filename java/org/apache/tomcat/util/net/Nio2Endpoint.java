@@ -1307,6 +1307,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
         @Override
+        public SendfileDataBase createSendfileData(String filename, long pos, long length) {
+            return new SendfileData(filename, pos, length);
+        }
+
+
+        @Override
         public SendfileState processSendfile(SendfileDataBase sendfileData) {
             setSendfileData((SendfileData) sendfileData);
             return ((Nio2Endpoint) getEndpoint()).processSendfile(this);
@@ -1625,5 +1631,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         private ByteBuffer buffer;
         private boolean doneInline = false;
         private boolean error = false;
+
+        public SendfileData(String filename, long pos, long length) {
+            super(filename, pos, length);
+        }
     }
 }

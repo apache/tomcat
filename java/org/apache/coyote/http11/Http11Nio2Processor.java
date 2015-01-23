@@ -318,12 +318,11 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             // No entity body sent here
             getOutputBuffer().addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
-            sendfileData = new Nio2Endpoint.SendfileData();
-            sendfileData.fileName = fileName;
-            sendfileData.pos = ((Long) request.getAttribute(
-                    org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
-            sendfileData.length = ((Long) request.getAttribute(
-                    org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue() - sendfileData.pos;
+            sendfileData = socketWrapper.createSendfileData(fileName,
+                    ((Long) request.getAttribute(
+                            org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue(),
+                    ((Long) request.getAttribute(
+                            org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue() - sendfileData.pos);
             return true;
         }
         return false;

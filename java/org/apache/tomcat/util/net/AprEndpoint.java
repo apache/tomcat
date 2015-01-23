@@ -1913,7 +1913,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
     // ----------------------------------------------- SendfileData Inner Class
 
-
     /**
      * SendfileData class.
      */
@@ -1923,11 +1922,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         protected long fdpool;
         // Socket and socket pool
         protected long socket;
+
+        public SendfileData(String filename, long pos, long length) {
+            super(filename, pos, length);
+        }
     }
 
 
     // --------------------------------------------------- Sendfile Inner Class
-
 
     public class Sendfile implements Runnable {
 
@@ -2641,6 +2643,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         public void regsiterForEvent(boolean read, boolean write) {
             ((AprEndpoint) getEndpoint()).getPoller().add(
                     getSocket().longValue(), -1, read, write);
+        }
+
+
+        @Override
+        public SendfileDataBase createSendfileData(String filename, long pos, long length) {
+            return new SendfileData(filename, pos, length);
         }
 
 
