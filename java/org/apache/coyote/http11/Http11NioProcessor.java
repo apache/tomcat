@@ -276,24 +276,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     // ------------------------------------------------------ Protected Methods
 
-    @Override
-    protected boolean prepareSendfile(OutputFilter[] outputFilters) {
-        String fileName = (String) request.getAttribute(
-                org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
-        if (fileName != null) {
-            // No entity body sent here
-            getOutputBuffer().addActiveFilter(outputFilters[Constants.VOID_FILTER]);
-            contentDelimitation = true;
-            sendfileData = socketWrapper.createSendfileData(fileName,
-                    ((Long) request.getAttribute(
-                            org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue(),
-                    ((Long) request.getAttribute(
-                            org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue() - sendfileData.pos);
-            return true;
-        }
-        return false;
-    }
-
     /**
      * Set the SSL information for this HTTP connection.
      */
