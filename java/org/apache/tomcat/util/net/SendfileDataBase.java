@@ -25,4 +25,17 @@ public abstract class SendfileDataBase {
      * for that next request to arrive).
      */
     public boolean keepAlive;
+
+    /**
+     * The full path to the file that contains the data to be written to the
+     * socket.
+     */
+    public String fileName;
+
+    /**
+     * The position of the next byte in the file to be written to the socket.
+     * This is initialised to the start point and then updated as the file is
+     * written.
+     */
+    public long pos;
 }
