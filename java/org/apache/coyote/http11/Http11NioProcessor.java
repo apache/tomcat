@@ -276,12 +276,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     // ------------------------------------------------------ Protected Methods
 
-
-    @Override
-    protected void prepareRequestInternal() {
-        sendfileData = null;
-    }
-
     @Override
     protected boolean prepareSendfile(OutputFilter[] outputFilters) {
         String fileName = (String) request.getAttribute(
@@ -308,5 +302,4 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     public void setSslSupport(SSLSupport sslSupport) {
         this.sslSupport = sslSupport;
     }
-
 }

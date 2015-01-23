@@ -310,12 +310,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
     // ------------------------------------------------------ Protected Methods
 
-
-    @Override
-    protected void prepareRequestInternal() {
-        sendfileData = null;
-    }
-
     @Override
     protected boolean prepareSendfile(OutputFilter[] outputFilters) {
         String fileName = (String) request.getAttribute(

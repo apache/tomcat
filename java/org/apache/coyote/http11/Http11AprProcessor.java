@@ -316,12 +316,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     // ------------------------------------------------------ Protected Methods
 
-
-    @Override
-    protected void prepareRequestInternal() {
-        sendfileData = null;
-    }
-
     @Override
     protected boolean prepareSendfile(OutputFilter[] outputFilters) {
         String fileName = (String) request.getAttribute(
