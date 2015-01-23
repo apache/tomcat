@@ -1621,8 +1621,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public FileChannel fchannel;
         public long pos;
         public long length;
-        // KeepAlive flag
-        public boolean keepAlive;
         // Internal use only
         private Nio2SocketWrapper socket;
         private ByteBuffer buffer;
