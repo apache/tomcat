@@ -1538,9 +1538,11 @@ public class DefaultServlet extends HttpServlet {
                     directory.getWebappPath() + readmeFile);
             if (resource.isFile()) {
                 StringWriter buffer = new StringWriter();
-                InputStream is = resource.getInputStream();
-                copyRange(new InputStreamReader(is),
-                        new PrintWriter(buffer));
+                try (InputStream is = resource.getInputStream();
+                        InputStreamReader reader = new InputStreamReader(is)) {
+                    copyRange(reader, new PrintWriter(buffer));
+                } catch (IOException ignored) {
+                }
                 return buffer.toString();
             } else {
                 if (debug > 10)
