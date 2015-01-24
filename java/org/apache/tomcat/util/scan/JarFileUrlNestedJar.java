@@ -178,7 +178,7 @@ public class JarFileUrlNestedJar implements Jar {
     @Override
     public InputStream getEntryInputStream() throws IOException {
         if (jarInputStream == null) {
-            createJarInputStream();
+            jarInputStream = createJarInputStream();
         }
         return jarInputStream;
     }
