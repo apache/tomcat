@@ -351,6 +351,10 @@
       <add>
         Add document of <code>ClusterSingleSignOn</code>. (kfujino)
       </add>
+      <update>
+        Clarify documentation for <code>useBodyEncodingForURI</code>
+        attribute of a connector. (kkolinko)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
