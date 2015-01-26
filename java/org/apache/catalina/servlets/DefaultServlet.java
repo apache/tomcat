@@ -1541,7 +1541,8 @@ public class DefaultServlet extends HttpServlet {
                 try (InputStream is = resource.getInputStream();
                         InputStreamReader reader = new InputStreamReader(is)) {
                     copyRange(reader, new PrintWriter(buffer));
-                } catch (IOException ignored) {
+                } catch (IOException e) {
+                    log("Failure to close reader", e);
                 }
                 return buffer.toString();
             } else {
