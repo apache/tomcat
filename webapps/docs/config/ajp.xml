@@ -238,6 +238,8 @@
       Request.setCharacterEncoding method was also used for the parameters from
       the URL. The default value is <code>false</code>.
       </p>
+      <p><em>Notes:</em> See notes on this attribute in
+      <a href="http.html">HTTP Connector</a> documentation.</p>
     </attribute>
 
     <attribute name="useIPVHosts" required="false">
