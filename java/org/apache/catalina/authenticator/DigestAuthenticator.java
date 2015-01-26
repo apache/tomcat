@@ -637,10 +637,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
     private static class NonceInfo {
-        private volatile long timestamp;
-        private volatile boolean seen[];
-        private volatile int offset;
-        private volatile int count = 0;
+        private final long timestamp;
+        private final boolean seen[];
+        private final int offset;
+        private int count = 0;
 
         public NonceInfo(long currentTime, int seenWindowSize) {
             this.timestamp = currentTime;
