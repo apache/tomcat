@@ -317,6 +317,10 @@
         within a web application when running under a SecurityManager. Based on
         a patch by Mikael Sterner. (markt)
       </fix>
+      <add>
+        Add some debug logging to the WebSocket session to track session
+        creation and session closure. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
