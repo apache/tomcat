@@ -179,6 +179,10 @@ public class WsSession implements Session {
 
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("wsSession.created", id));
+        }
     }
 
 
@@ -459,6 +463,9 @@ public class WsSession implements Session {
                 return;
             }
 
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("wsSession.doClose", id));
+            }
             try {
                 wsRemoteEndpoint.setBatchingAllowed(false);
             } catch (IOException e) {
@@ -566,7 +573,7 @@ public class WsSession implements Session {
             // Failed to send close message. Close the socket and let the caller
             // deal with the Exception
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("wsSession.sendCloseFail"), ioe);
+                log.debug(sm.getString("wsSession.sendCloseFail", id), ioe);
             }
             wsRemoteEndpoint.close();
             // Failure to send a close message is not unexpected in the case of
