@@ -1467,6 +1467,7 @@ public class JspC extends Task implements Options {
         context.setInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM,
                 String.valueOf(isBlockExternal()));
 
+        tldLocationsCache = TldLocationsCache.getInstance(context);
         rctxt = new JspRuntimeContext(context, this);
         jspConfig = new JspConfig(context);
         tagPluginManager = new TagPluginManager(context);
