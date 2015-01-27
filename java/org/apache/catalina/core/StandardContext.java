@@ -5216,7 +5216,11 @@ public class StandardContext extends ContainerBase
             broadcaster.sendNotification(notification);
         }
 
-        // Trigger clean-up of the resources
+        // The WebResources implementation caches references to JAR files. On
+        // some platforms these references may lock the JAR files. The
+        // WebResources implementaion cleans-up unused JAR file references every
+        // run of background processing but since web application start is
+        // likely to have read from lots of JARs, trigger a clean-up now.
         getResources().backgroundProcess();
 
         // Reinitializing if something went wrong

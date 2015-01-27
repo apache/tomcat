@@ -126,8 +126,19 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This is a NO-OP by default for File based resource sets.
+     */
+    @Override
+    public void backgroundProcess() {
+        // NO-OP
+    }
+
 
     //-------------------------------------------------------- Lifecycle methods
+
     @Override
     protected void initInternal() throws LifecycleException {
         fileBase = new File(getBase(), getInternalPath());

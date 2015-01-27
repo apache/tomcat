@@ -42,7 +42,6 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     private JarFile archive = null;
     private final Object archiveLock = new Object();
     private long archiveUseCount = 0;
-    private long archiveLastUsed = 0;
 
 
     protected final void setManifest(Manifest manifest) {
@@ -284,7 +283,6 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 archive = new JarFile(getBase());
             }
             archiveUseCount++;
-            archiveLastUsed = System.currentTimeMillis();
             return archive;
         }
     }
