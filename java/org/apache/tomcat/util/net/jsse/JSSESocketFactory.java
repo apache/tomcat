@@ -177,7 +177,7 @@ public class JSSESocketFactory implements SSLUtil {
             try {
                 socket.close();
             } catch (IOException e) {
-                log.warn(sm.getString("jsse.exceptionOnClose", "socket"), e);
+                log.warn(sm.getString("jsse.exceptionOnClose"), e);
             }
         }
     }
