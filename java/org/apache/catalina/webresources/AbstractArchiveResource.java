@@ -27,10 +27,10 @@ import java.util.jar.Manifest;
 
 public abstract class AbstractArchiveResource extends AbstractResource {
 
+    private final AbstractArchiveResourceSet archiveResourceSet;
     private final String base;
     private final String baseUrl;
     private final JarEntry resource;
-    private final Manifest manifest;
     private final String codeBaseUrl;
     private final String name;
     private boolean readCerts = false;
@@ -38,12 +38,12 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet,
             String webAppPath, String base, String baseUrl, JarEntry jarEntry,
-            Manifest manifest, String codeBaseUrl) {
+            String codeBaseUrl) {
         super(archiveResourceSet.getRoot(), webAppPath);
+        this.archiveResourceSet = archiveResourceSet;
         this.base = base;
         this.baseUrl = baseUrl;
         this.resource = jarEntry;
-        this.manifest = manifest;
         this.codeBaseUrl = codeBaseUrl;
 
         String resourceName = resource.getName();
@@ -204,7 +204,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     @Override
     public Manifest getManifest() {
-        return manifest;
+        return archiveResourceSet.getManifest();
     }
 
     @Override

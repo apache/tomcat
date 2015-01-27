@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -34,9 +33,9 @@ public class JarResource extends AbstractArchiveResource {
     private static final Log log = LogFactory.getLog(JarResource.class);
 
     public JarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
-            String base, String baseUrl, JarEntry jarEntry, Manifest manifest) {
+            String base, String baseUrl, JarEntry jarEntry) {
         super(archiveResourceSet, webAppPath, base, "jar:" + baseUrl, jarEntry,
-                manifest, baseUrl);
+                baseUrl);
     }
 
     @Override
