@@ -5216,6 +5216,9 @@ public class StandardContext extends ContainerBase
             broadcaster.sendNotification(notification);
         }
 
+        // Trigger clean-up of the resources
+        getResources().backgroundProcess();
+
         // Reinitializing if something went wrong
         if (!ok) {
             setState(LifecycleState.FAILED);
