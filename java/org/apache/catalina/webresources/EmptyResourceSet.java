@@ -152,6 +152,13 @@ public class EmptyResourceSet extends LifecycleBase implements WebResourceSet {
         return true;
     }
 
+
+    @Override
+    public void backgroundProcess() {
+        // NO-OP
+    }
+
+
     @Override
     protected void initInternal() throws LifecycleException {
         // NO-OP
