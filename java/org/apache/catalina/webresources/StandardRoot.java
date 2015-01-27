@@ -591,9 +591,15 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         mainResources.add(main);
     }
 
+
     @Override
     public void backgroundProcess() {
         cache.backgroundProcess();
+        for (List<WebResourceSet> list : allResources) {
+            for (WebResourceSet webResourceSet : list) {
+                webResourceSet.backgroundProcess();
+            }
+        }
     }
 
 
