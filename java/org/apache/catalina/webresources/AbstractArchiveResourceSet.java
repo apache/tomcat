@@ -298,8 +298,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     @Override
     public void backgroundProcess() {
         synchronized (archiveLock) {
-            if (archive != null && archiveUseCount == 0 &&
-                    (System.currentTimeMillis() - archiveLastUsed) > 1000) {
+            if (archive != null && archiveUseCount == 0) {
                 try {
                     archive.close();
                 } catch (IOException e) {
