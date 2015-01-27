@@ -81,7 +81,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     @Override
     protected WebResource createArchiveResource(JarEntry jarEntry,
             String webAppPath, Manifest manifest) {
-        return new JarWarResource(getRoot(), webAppPath, getBase(), getBaseUrlString(),
+        return new JarWarResource(this, webAppPath, getBase(), getBaseUrlString(),
                 jarEntry, archivePath, getInternalPath(), manifest);
     }
 

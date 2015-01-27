@@ -23,7 +23,6 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
 
-import org.apache.catalina.WebResourceRoot;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -37,10 +36,10 @@ public class JarWarResource extends AbstractArchiveResource {
 
     private final String archivePath;
 
-    public JarWarResource(WebResourceRoot root, String webAppPath, String base,
-            String baseUrl, JarEntry jarEntry, String archivePath,
+    public JarWarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
+            String base, String baseUrl, JarEntry jarEntry, String archivePath,
             String internalPath, Manifest manifest) {
-        super(root, webAppPath, base, "jar:war:" + baseUrl + "^/" + archivePath,
+        super(archiveResourceSet, webAppPath, base, "jar:war:" + baseUrl + "^/" + archivePath,
                 jarEntry, internalPath, manifest, "jar:" + baseUrl + "!/" + archivePath);
         this.archivePath = archivePath;
     }
