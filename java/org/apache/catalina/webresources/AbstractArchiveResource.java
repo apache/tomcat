@@ -38,7 +38,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet,
             String webAppPath, String base, String baseUrl, JarEntry jarEntry,
-            String internalPath, Manifest manifest, String codeBaseUrl) {
+            Manifest manifest, String codeBaseUrl) {
         super(archiveResourceSet.getRoot(), webAppPath);
         this.base = base;
         this.baseUrl = baseUrl;
@@ -50,6 +50,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         if (resourceName.charAt(resourceName.length() - 1) == '/') {
             resourceName = resourceName.substring(0, resourceName.length() - 1);
         }
+        String internalPath = archiveResourceSet.getInternalPath();
         if (internalPath.length() > 0 && resourceName.equals(
                 internalPath.subSequence(1, internalPath.length()))) {
             name = "";
