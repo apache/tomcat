@@ -22,7 +22,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import org.apache.catalina.WebResourceRoot;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -34,10 +33,10 @@ public class JarResource extends AbstractArchiveResource {
 
     private static final Log log = LogFactory.getLog(JarResource.class);
 
-    public JarResource(WebResourceRoot root, String webAppPath, String base,
-            String baseUrl, JarEntry jarEntry, String internalPath,
+    public JarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
+            String base, String baseUrl, JarEntry jarEntry, String internalPath,
             Manifest manifest) {
-        super(root, webAppPath, base, "jar:" + baseUrl, jarEntry, internalPath,
+        super(archiveResourceSet, webAppPath, base, "jar:" + baseUrl, jarEntry, internalPath,
                 manifest, baseUrl);
     }
 

@@ -25,8 +25,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import org.apache.catalina.WebResourceRoot;
-
 public abstract class AbstractArchiveResource extends AbstractResource {
 
     private final String base;
@@ -38,10 +36,10 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private boolean readCerts = false;
     private Certificate[] certificates;
 
-    protected AbstractArchiveResource(WebResourceRoot root, String webAppPath,
-            String base, String baseUrl, JarEntry jarEntry,
+    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet,
+            String webAppPath, String base, String baseUrl, JarEntry jarEntry,
             String internalPath, Manifest manifest, String codeBaseUrl) {
-        super(root, webAppPath);
+        super(archiveResourceSet.getRoot(), webAppPath);
         this.base = base;
         this.baseUrl = baseUrl;
         this.resource = jarEntry;
