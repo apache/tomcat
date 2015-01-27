@@ -45,7 +45,7 @@ public class JarWarResource extends AbstractArchiveResource {
     @Override
     protected JarInputStreamWrapper getJarInputStreamWrapper() {
         try {
-            JarFile warFile = new JarFile(getBase());
+            JarFile warFile = getArchiveResourceSet().openJarFile();
             JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
             InputStream isInWar = warFile.getInputStream(jarFileInWar);
 
@@ -70,7 +70,7 @@ public class JarWarResource extends AbstractArchiveResource {
                 return null;
             }
 
-            return new JarInputStreamWrapper(warFile, entry, jarIs);
+            return new JarInputStreamWrapper(entry, jarIs);
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getInputStreamFail",
