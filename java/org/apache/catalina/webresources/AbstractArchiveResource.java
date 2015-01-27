@@ -28,7 +28,6 @@ import java.util.jar.Manifest;
 public abstract class AbstractArchiveResource extends AbstractResource {
 
     private final AbstractArchiveResourceSet archiveResourceSet;
-    private final String base;
     private final String baseUrl;
     private final JarEntry resource;
     private final String codeBaseUrl;
@@ -37,11 +36,9 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private Certificate[] certificates;
 
     protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet,
-            String webAppPath, String base, String baseUrl, JarEntry jarEntry,
-            String codeBaseUrl) {
+            String webAppPath, String baseUrl, JarEntry jarEntry, String codeBaseUrl) {
         super(archiveResourceSet.getRoot(), webAppPath);
         this.archiveResourceSet = archiveResourceSet;
-        this.base = base;
         this.baseUrl = baseUrl;
         this.resource = jarEntry;
         this.codeBaseUrl = codeBaseUrl;
@@ -65,7 +62,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     }
 
     protected final String getBase() {
-        return base;
+        return archiveResourceSet.getBase();
     }
 
     protected final String getBaseUrl() {
