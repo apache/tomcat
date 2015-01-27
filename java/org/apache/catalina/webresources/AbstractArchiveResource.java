@@ -22,7 +22,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 public abstract class AbstractArchiveResource extends AbstractResource {
@@ -59,6 +58,10 @@ public abstract class AbstractArchiveResource extends AbstractResource {
                 name = resourceName.substring(index + 1);
             }
         }
+    }
+
+    protected AbstractArchiveResourceSet getArchiveResourceSet() {
+        return archiveResourceSet;
     }
 
     protected final String getBase() {
@@ -213,13 +216,11 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     protected class JarInputStreamWrapper extends InputStream {
 
-        private final JarFile jarFile;
         private final JarEntry jarEntry;
         private final InputStream is;
 
 
-        public JarInputStreamWrapper(JarFile jarFile, JarEntry jarEntry, InputStream is) {
-            this.jarFile = jarFile;
+        public JarInputStreamWrapper(JarEntry jarEntry, InputStream is) {
             this.jarEntry = jarEntry;
             this.is = is;
         }
@@ -259,7 +260,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         public void close() throws IOException {
             // Closing the JarFile releases the file lock on the JAR and also
             // closes all input streams created from the JarFile.
-            jarFile.close();
+            archiveResourceSet.closeJarFile();
         }
 
 

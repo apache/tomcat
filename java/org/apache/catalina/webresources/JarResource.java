@@ -40,11 +40,11 @@ public class JarResource extends AbstractArchiveResource {
     @Override
     protected JarInputStreamWrapper getJarInputStreamWrapper() {
         try {
-            JarFile jarFile = new JarFile(getBase());
+            JarFile jarFile = getArchiveResourceSet().openJarFile();
             // Need to create a new JarEntry so the certificates can be read
             JarEntry jarEntry = jarFile.getJarEntry(getResource().getName());
             InputStream is = jarFile.getInputStream(jarEntry);
-            return new JarInputStreamWrapper(jarFile, jarEntry, is);
+            return new JarInputStreamWrapper(jarEntry, is);
         } catch (IOException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("jarResource.getInputStreamFail",
