@@ -214,6 +214,12 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     protected abstract JarInputStreamWrapper getJarInputStreamWrapper();
 
+    /**
+     * This wrapper assumes that the InputStream was created from a JarFile
+     * obtained from a call to getArchiveResourceSet().getJarFile(). If this is
+     * not the case then the usage counting in AbstractArchiveResourceSet will
+     * break and the JarFile may be unexpectedly closed.
+     */
     protected class JarInputStreamWrapper extends InputStream {
 
         private final JarEntry jarEntry;
@@ -258,8 +264,6 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
         @Override
         public void close() throws IOException {
-            // Closing the JarFile releases the file lock on the JAR and also
-            // closes all input streams created from the JarFile.
             archiveResourceSet.closeJarFile();
         }
 
