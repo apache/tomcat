@@ -34,9 +34,8 @@ public class JarResource extends AbstractArchiveResource {
     private static final Log log = LogFactory.getLog(JarResource.class);
 
     public JarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
-            String base, String baseUrl, JarEntry jarEntry, String internalPath,
-            Manifest manifest) {
-        super(archiveResourceSet, webAppPath, base, "jar:" + baseUrl, jarEntry, internalPath,
+            String base, String baseUrl, JarEntry jarEntry, Manifest manifest) {
+        super(archiveResourceSet, webAppPath, base, "jar:" + baseUrl, jarEntry,
                 manifest, baseUrl);
     }
 
