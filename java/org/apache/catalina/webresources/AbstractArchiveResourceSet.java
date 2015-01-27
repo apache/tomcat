@@ -42,6 +42,10 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         this.manifest = manifest;
     }
 
+    protected final Manifest getManifest() {
+        return manifest;
+    }
+
     protected final void setBaseUrl(URL baseUrl) {
         this.baseUrl = baseUrl;
         if (baseUrl == null) {
