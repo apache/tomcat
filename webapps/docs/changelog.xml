@@ -55,6 +55,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues to not "pop up" wrt. others).
 -->
+<section name="Tomcat 7.0.59 (violetagg)">
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Fix a possible deadlock when receiver thread invokes
+        <code>mapMemberAdded()</code> while ping thread invokes
+        <code>memberAlive()</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 7.0.58 (violetagg)">
   <subsection name="Catalina">
     <changelog>
