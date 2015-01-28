@@ -81,13 +81,12 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     protected void resetTimeouts() {
         if (!getErrorState().isError() && socketWrapper != null &&
                 asyncStateMachine.isAsyncDispatching()) {
-            long soTimeout = endpoint.getSoTimeout();
 
-            //reset the timeout
+            // Reset the timeout
             if (keepAlive) {
-                socketWrapper.setTimeout(keepAliveTimeout);
+                socketWrapper.setTimeout(endpoint.getKeepAliveTimeout());
             } else {
-                socketWrapper.setTimeout(soTimeout);
+                socketWrapper.setTimeout(endpoint.getSoTimeout());
             }
         }
     }
