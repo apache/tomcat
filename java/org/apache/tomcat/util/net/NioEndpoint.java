@@ -839,11 +839,9 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
          * however).
          *
          * @param socket to add to the poller
+         * @param interestOps Operations for which to register this socket with
+         *                    the Poller
          */
-        public void add(final NioChannel socket) {
-            add(socket,SelectionKey.OP_READ);
-        }
-
         public void add(final NioChannel socket, final int interestOps) {
             PollerEvent r = eventCache.pop();
             if ( r==null) r = new PollerEvent(socket,null,interestOps);
