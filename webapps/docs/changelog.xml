@@ -59,6 +59,10 @@
   <subsection name="Tribes">
     <changelog>
       <fix>
+        <bug>57504</bug>: Initialize TLD locations cache when creating the
+        ServletContext. (jboynes)
+      </fix>
+      <fix>
         Fix a possible deadlock when receiver thread invokes
         <code>mapMemberAdded()</code> while ping thread invokes
         <code>memberAlive()</code>. (kfujino)
