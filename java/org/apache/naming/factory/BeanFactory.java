@@ -20,9 +20,12 @@ package org.apache.naming.factory;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.Name;
@@ -143,21 +146,71 @@ public class BeanFactory
 
                 Object bean = beanClass.newInstance();
 
+                RefAddr ra = ref.get("forceString");
+                Map<String, Method> forced = new HashMap<String, Method>();
+                String value;
+
+                if (ra != null) {
+                    value = (String)ra.getContent();
+                    Class<?> paramTypes[] = new Class[1];
+                    paramTypes[0] = String.class;
+                    String setterName;
+                    int index;
+
+                    for (String param: value.split(",")) {
+                        param = param.trim();
+                        index = param.indexOf('=');
+                        if (index>= 0) {
+                            setterName = param.substring(index + 1).trim();
+                            param = param.substring(0, index).trim();
+                        } else {
+                            setterName = "set" +
+                                         param.substring(0, 1).toUpperCase() +
+                                         param.substring(1);
+                        }
+                        try {
+                            forced.put(param,
+                                       beanClass.getMethod(setterName, paramTypes));
+                        } catch (NoSuchMethodException|SecurityException ex) {
+                            throw new NamingException
+                                ("Forced String setter " + setterName +
+                                 " not found for property " + param);
+                        }
+                    }
+                }
+
                 Enumeration<RefAddr> e = ref.getAll();
+
                 while (e.hasMoreElements()) {
 
-                    RefAddr ra = e.nextElement();
+                    ra = e.nextElement();
                     String propName = ra.getType();
 
                     if (propName.equals(Constants.FACTORY) ||
                         propName.equals("scope") || propName.equals("auth") ||
+                        propName.equals("forceString") ||
                         propName.equals("singleton")) {
                         continue;
                     }
 
-                    String value = (String)ra.getContent();
+                    value = (String)ra.getContent();
 
                     Object[] valueArray = new Object[1];
+
+                    Method method = forced.get(propName);
+                    if (method != null) {
+                        valueArray[0] = value;
+                        try {
+                            method.invoke(bean, valueArray);
+                        } catch (IllegalAccessException|
+                                 IllegalArgumentException|
+                                 InvocationTargetException ex) {
+                            throw new NamingException
+                                ("Forced String setter " + method.getName() +
+                                 " threw exception for property " + propName);
+                        }
+                        continue;
+                    }
 
                     int i = 0;
                     for (i = 0; i<pda.length; i++) {
@@ -195,8 +248,9 @@ public class BeanFactory
                                 valueArray[0] = Boolean.valueOf(value);
                             } else {
                                 throw new NamingException
-                                    ("String conversion for property type '"
-                                     + propType.getName() + "' not available");
+                                    ("String conversion for property " + propName +
+                                     " of type '" + propType.getName() +
+                                     "' not available");
                             }
 
                             Method setProp = pda[i].getWriteMethod();
