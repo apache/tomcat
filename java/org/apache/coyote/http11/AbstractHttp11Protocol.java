@@ -217,7 +217,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected void configureProcessor(AbstractHttp11Processor<S> processor) {
         processor.setAdapter(getAdapter());
         processor.setMaxKeepAliveRequests(getMaxKeepAliveRequests());
-        processor.setKeepAliveTimeout(getKeepAliveTimeout());
         processor.setConnectionUploadTimeout(getConnectionUploadTimeout());
         processor.setDisableUploadTimeout(getDisableUploadTimeout());
         processor.setCompressionMinSize(getCompressionMinSize());
