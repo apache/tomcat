@@ -509,8 +509,6 @@ public abstract class SocketWrapperBase<E> {
 
     public abstract void registerWriteInterest();
 
-    public abstract void regsiterForEvent(boolean read, boolean write);
-
     public abstract SendfileDataBase createSendfileData(String filename, long pos, long length);
 
     /**

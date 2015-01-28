@@ -582,7 +582,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         }
         case NB_READ_INTEREST: {
             if (!endOfStream) {
-                socketWrapper.regsiterForEvent(true, false);
+                socketWrapper.registerReadInterest();
             }
             break;
         }
@@ -644,7 +644,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
             } catch (IllegalStateException x) {
-                socketWrapper.regsiterForEvent(false, true);
+                socketWrapper.registerWriteInterest();
             }
         } else if (status == SocketStatus.OPEN_READ &&
                 request.getReadListener() != null) {
@@ -653,7 +653,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                     asyncStateMachine.asyncOperation();
                 }
             } catch (IllegalStateException x) {
-                socketWrapper.regsiterForEvent(true, false);
+                socketWrapper.registerReadInterest();
             }
         }
 
