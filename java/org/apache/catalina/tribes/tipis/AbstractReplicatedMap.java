@@ -293,10 +293,8 @@ public abstract class AbstractReplicatedMap<K,V>
      * @param member Member
      */
     protected void memberAlive(Member member) {
+        mapMemberAdded(member);
         synchronized (mapMembers) {
-            if (!mapMembers.containsKey(member)) {
-                mapMemberAdded(member);
-            } //end if
             mapMembers.put(member, new Long(System.currentTimeMillis()));
         }
     }
