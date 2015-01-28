@@ -148,7 +148,7 @@ public class BeanFactory
 
                 /* Look for properties with explicitly configured setter */
                 RefAddr ra = ref.get("forceString");
-                Map<String, Method> forced = new HashMap<String, Method>();
+                Map<String, Method> forced = new HashMap<>();
                 String value;
 
                 if (ra != null) {
