@@ -1261,13 +1261,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         @Override
         public void registerReadInterest() {
             synchronized (readCompletionHandler) {
-                if (readPending.tryAcquire()) {
-                    readPending.release();
-
+                if (readPending.availablePermits() == 0) {
+                    readInterest = true;
+                } else {
                     // If no read is pending, notify
                     getEndpoint().processSocket(this, SocketStatus.OPEN_READ, true);
-                } else {
-                    readInterest = true;
                 }
             }
         }
@@ -1359,13 +1357,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
     }
 
-    public void awaitBytes(SocketWrapperBase<Nio2Channel> socket) {
-        if (socket == null) {
-            return;
-        }
-        ((Nio2SocketWrapper) socket).awaitBytes();
-    }
-
     private CompletionHandler<Integer, SendfileData> sendfile = new CompletionHandler<Integer, SendfileData>() {
 
         @Override
@@ -1388,7 +1379,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                     }
                     if (attachment.keepAlive) {
                         if (!isInline()) {
-                            awaitBytes(attachment.socket);
+                            attachment.socket.awaitBytes();
                         } else {
                             attachment.doneInline = true;
                         }

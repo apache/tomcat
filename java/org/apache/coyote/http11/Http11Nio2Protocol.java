@@ -161,7 +161,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                 ((Nio2Endpoint) proto.getEndpoint()).removeTimeout(socket);
             }
             if (addToPoller) {
-                ((Nio2Endpoint) proto.getEndpoint()).awaitBytes(socket);
+                ((Nio2SocketWrapper) socket).awaitBytes();
             }
         }
 
@@ -191,7 +191,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
             } else if (processor.isUpgrade()) {
                 if (((Nio2SocketWrapper) socket).isUpgradeInit()) {
                     try {
-                        ((Nio2Endpoint) proto.getEndpoint()).awaitBytes(socket);
+                        ((Nio2SocketWrapper) socket).awaitBytes();
                     } catch (ReadPendingException e) {
                         // Ignore, the initial state after upgrade is
                         // impossible to predict, and a read must be pending
