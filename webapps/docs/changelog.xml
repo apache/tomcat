@@ -56,12 +56,16 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.59 (violetagg)">
-  <subsection name="Tribes">
+  <subsection name="Jasper">
     <changelog>
       <fix>
         <bug>57504</bug>: Initialize TLD locations cache when creating the
         ServletContext. (jboynes)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Tribes">
+    <changelog>
       <fix>
         Fix a possible deadlock when receiver thread invokes
         <code>mapMemberAdded()</code> while ping thread invokes
