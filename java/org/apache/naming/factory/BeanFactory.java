@@ -146,6 +146,7 @@ public class BeanFactory
 
                 Object bean = beanClass.newInstance();
 
+                /* Look for properties with explicitly configured setter */
                 RefAddr ra = ref.get("forceString");
                 Map<String, Method> forced = new HashMap<String, Method>();
                 String value;
@@ -157,10 +158,14 @@ public class BeanFactory
                     String setterName;
                     int index;
 
+                    /* Items are given as comma separated list */
                     for (String param: value.split(",")) {
                         param = param.trim();
+                        /* A single item can either be of the form name=method
+                         * or just a property name (and we will use a standard
+                         * setter) */
                         index = param.indexOf('=');
-                        if (index>= 0) {
+                        if (index >= 0) {
                             setterName = param.substring(index + 1).trim();
                             param = param.substring(0, index).trim();
                         } else {
@@ -197,6 +202,7 @@ public class BeanFactory
 
                     Object[] valueArray = new Object[1];
 
+                    /* Shortcut for properties with explicitly configured setter */
                     Method method = forced.get(propName);
                     if (method != null) {
                         valueArray[0] = value;
