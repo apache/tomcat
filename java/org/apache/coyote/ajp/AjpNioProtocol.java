@@ -128,7 +128,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller) {
-                socket.getSocket().getPoller().add(socket.getSocket());
+                socket.registerReadInterest();
             }
         }
 

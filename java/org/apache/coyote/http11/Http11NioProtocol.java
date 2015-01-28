@@ -210,7 +210,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller) {
-                socket.getSocket().getPoller().add(socket.getSocket());
+                socket.registerReadInterest();
             }
         }
 
@@ -242,7 +242,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                 //  - this is an upgraded connection
                 //  - the request line/headers have not been completely
                 //    read
-                socket.getSocket().getPoller().add(socket.getSocket());
+                socket.registerReadInterest();
             }
         }
 
