@@ -1050,8 +1050,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             stopLatch.countDown();
         }
 
-        protected boolean processKey(SelectionKey sk, NioSocketWrapper attachment) {
-            boolean result = true;
+        protected void processKey(SelectionKey sk, NioSocketWrapper attachment) {
             try {
                 if ( close ) {
                     cancelledKey(sk);
@@ -1078,8 +1077,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                                 if (closeSocket) {
                                     cancelledKey(sk);
                                 }
-                            } else {
-                                result = false;
                             }
                         }
                     }
@@ -1093,7 +1090,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 ExceptionUtils.handleThrowable(t);
                 log.error("",t);
             }
-            return result;
         }
 
         public SendfileState processSendfile(SelectionKey sk, NioSocketWrapper socketWrapper,
