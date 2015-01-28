@@ -1090,8 +1090,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
 
             if (!disableUploadTimeout) {
-                if(endpoint.getSoTimeout() > 0) {
-                    setSocketTimeout(endpoint.getSoTimeout());
+                int soTimeout = endpoint.getSoTimeout();
+                if(soTimeout > 0) {
+                    setSocketTimeout(soTimeout);
                 } else {
                     setSocketTimeout(0);
                 }
