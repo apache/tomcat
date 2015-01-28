@@ -1096,7 +1096,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             return result;
         }
 
-        public SendfileState processSendfile(SelectionKey sk, NioSocketWrapper socketWrapper, boolean event) {
+        public SendfileState processSendfile(SelectionKey sk, NioSocketWrapper socketWrapper,
+                boolean calledByProcessor) {
             NioChannel sc = null;
             try {
                 unreg(sk, socketWrapper, sk.readyOps());
@@ -1106,13 +1107,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     log.trace("Processing send file for: " + sd.fileName);
                 }
 
-                // This method is called by the Http11Processor for the first
-                // execution and then subsequent executions are via the Poller.
-                // This boolean keeps track of the current caller as the
-                // required behaviour varies slightly.
-                boolean calledByProcessor = (sd.fchannel == null);
-
-                if (calledByProcessor) {
+                if (sd.fchannel == null) {
                     // Setup the file channel
                     File f = new File(sd.fileName);
                     if (!f.exists()) {
@@ -1159,16 +1154,15 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         sd.fchannel.close();
                     } catch (Exception ignore) {
                     }
+                    // For calls from outside the Poller, the caller is
+                    // responsible for registering the socket for the
+                    // appropriate event(s) if sendfile completes.
                     if (!calledByProcessor) {
                         if (sd.keepAlive) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Connection is keep alive, registering back for OP_READ");
                             }
-                            if (event) {
-                                this.add(socketWrapper.getSocket(),SelectionKey.OP_READ);
-                            } else {
-                                reg(sk,socketWrapper,SelectionKey.OP_READ);
-                            }
+                            reg(sk,socketWrapper,SelectionKey.OP_READ);
                         } else {
                             if (log.isDebugEnabled()) {
                                 log.debug("Send file connection is being closed");
@@ -1181,7 +1175,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     if (log.isDebugEnabled()) {
                         log.debug("OP_WRITE for sendfile: " + sd.fileName);
                     }
-                    if (event) {
+                    if (calledByProcessor) {
                         add(socketWrapper.getSocket(),SelectionKey.OP_WRITE);
                     } else {
                         reg(sk,socketWrapper,SelectionKey.OP_WRITE);
