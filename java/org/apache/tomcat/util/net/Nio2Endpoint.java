@@ -1284,12 +1284,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
 
-        @Override
-        public void regsiterForEvent(boolean read, boolean write) {
-            // NO-OP. Appropriate handlers will already have been registered.
-        }
-
-
         public void awaitBytes() {
             if (getSocket() == null) {
                 return;

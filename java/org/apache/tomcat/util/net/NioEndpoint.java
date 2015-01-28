@@ -1571,22 +1571,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
 
         @Override
-        public void regsiterForEvent(boolean read, boolean write) {
-            SelectionKey key = getSocket().getIOChannel().keyFor(
-                    getSocket().getPoller().getSelector());
-            if (read) {
-                this.interestOps(this.interestOps() | SelectionKey.OP_READ);
-                key.interestOps(key.interestOps() | SelectionKey.OP_READ);
-            }
-            if (write) {
-                this.interestOps(this.interestOps() | SelectionKey.OP_WRITE);
-                key.interestOps(key.interestOps() | SelectionKey.OP_READ);
-            }
-        }
-
-
-
-        @Override
         public SendfileDataBase createSendfileData(String filename, long pos, long length) {
             return new SendfileData(filename, pos, length);
         }
