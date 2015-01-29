@@ -22,7 +22,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ServerSocket;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -48,7 +47,6 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSessionContext;
@@ -96,21 +94,6 @@ public class JSSESocketFactory implements SSLUtil {
 
     private final String[] defaultServerProtocols;
     private final String[] defaultServerCipherSuites;
-
-    protected SSLServerSocketFactory sslProxy = null;
-    protected String[] enabledCiphers;
-    protected String[] enabledProtocols;
-    protected boolean allowUnsafeLegacyRenegotiation = false;
-
-    /**
-     * Flag to state that we require client authentication.
-     */
-    protected boolean requireClientAuth = false;
-
-    /**
-     * Flag to state that we would like client authentication.
-     */
-    protected boolean wantClientAuth    = false;
 
 
     public JSSESocketFactory (AbstractEndpoint<?> endpoint) {
@@ -227,10 +210,6 @@ public class JSSESocketFactory implements SSLUtil {
         }
 
         return ciphers.toArray(new String[ciphers.size()]);
-    }
-
-    public String[] getEnabledCiphers() {
-        return enabledCiphers;
     }
 
     /*
@@ -383,50 +362,6 @@ public class JSSESocketFactory implements SSLUtil {
         }
 
         return ks;
-    }
-
-    /**
-     * Reads the keystore and initializes the SSL socket factory.
-     */
-    void init() throws IOException {
-        try {
-
-            String clientAuthStr = endpoint.getClientAuth();
-            if("true".equalsIgnoreCase(clientAuthStr) ||
-               "yes".equalsIgnoreCase(clientAuthStr)) {
-                requireClientAuth = true;
-            } else if("want".equalsIgnoreCase(clientAuthStr)) {
-                wantClientAuth = true;
-            }
-
-            SSLContext context = createSSLContext();
-            context.init(getKeyManagers(), getTrustManagers(), null);
-
-            // Configure SSL session cache
-            SSLSessionContext sessionContext =
-                context.getServerSessionContext();
-            if (sessionContext != null) {
-                configureSessionContext(sessionContext);
-            }
-
-            // create proxy
-            sslProxy = context.getServerSocketFactory();
-
-            // Determine which cipher suites to enable
-            enabledCiphers = getEnableableCiphers(context);
-            enabledProtocols = getEnableableProtocols(context);
-
-            allowUnsafeLegacyRenegotiation = "true".equals(
-                    endpoint.getAllowUnsafeLegacyRenegotiation());
-
-            // Check the SSL config is OK
-            checkConfig();
-
-        } catch(Exception e) {
-            if( e instanceof IOException )
-                throw (IOException)e;
-            throw new IOException(e.getMessage(), e);
-        }
     }
 
     @Override
@@ -680,78 +615,5 @@ public class JSSESocketFactory implements SSLUtil {
             }
         }
         return protocols.toArray(new String[protocols.size()]);
-    }
-
-    /**
-     * Configure Client authentication for this version of JSSE.  The
-     * JSSE included in Java 1.4 supports the 'want' value.  Prior
-     * versions of JSSE will treat 'want' as 'false'.
-     * @param socket the SSLServerSocket
-     */
-    protected void configureClientAuth(SSLServerSocket socket){
-        if (wantClientAuth){
-            socket.setWantClientAuth(wantClientAuth);
-        } else {
-            socket.setNeedClientAuth(requireClientAuth);
-        }
-    }
-
-    /**
-     * Configures the given SSL server socket with the requested cipher suites,
-     * protocol versions, and need for client authentication
-     */
-    private void initServerSocket(ServerSocket ssocket) {
-
-        SSLServerSocket socket = (SSLServerSocket) ssocket;
-
-        socket.setEnabledCipherSuites(enabledCiphers);
-        socket.setEnabledProtocols(enabledProtocols);
-
-        // we don't know if client auth is needed -
-        // after parsing the request we may re-handshake
-        configureClientAuth(socket);
-    }
-
-    /**
-     * Checks that the certificate is compatible with the enabled cipher suites.
-     * If we don't check now, the JIoEndpoint can enter a nasty logging loop.
-     * See bug 45528.
-     */
-    private void checkConfig() throws IOException {
-        // Create an unbound server socket
-        ServerSocket socket = sslProxy.createServerSocket();
-        initServerSocket(socket);
-
-        try {
-            // Set the timeout to 1ms as all we care about is if it throws an
-            // SSLException on accept.
-            socket.setSoTimeout(1);
-
-            socket.accept();
-            // Will never get here - no client can connect to an unbound port
-        } catch (SSLException ssle) {
-            // SSL configuration is invalid. Possibly cert doesn't match ciphers
-            IOException ioe = new IOException(sm.getString(
-                    "jsse.invalid_ssl_conf", ssle.getMessage()));
-            ioe.initCause(ssle);
-            throw ioe;
-        } catch (Exception e) {
-            /*
-             * Possible ways of getting here
-             * socket.accept() throws a SecurityException
-             * socket.setSoTimeout() throws a SocketException
-             * socket.accept() throws some other exception (after a JDK change)
-             *      In these cases the test won't work so carry on - essentially
-             *      the behaviour before this patch
-             * socket.accept() throws a SocketTimeoutException
-             *      In this case all is well so carry on
-             */
-        } finally {
-            // Should be open here but just in case
-            if (!socket.isClosed()) {
-                socket.close();
-            }
-        }
-
     }
 }
