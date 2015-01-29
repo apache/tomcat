@@ -176,6 +176,12 @@ public class UpgradeProcessor<S> implements Processor<S>, WebConnection {
 
 
     @Override
+    public String getClientCertProvider() {
+        return null;
+    }
+
+
+    @Override
     public final void setSslSupport(SSLSupport sslSupport) {
         // NOOP
     }

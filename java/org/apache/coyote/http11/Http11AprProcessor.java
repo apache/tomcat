@@ -55,30 +55,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * When client certificate information is presented in a form other than
-     * instances of {@link java.security.cert.X509Certificate} it needs to be
-     * converted before it can be used and this property controls which JSSE
-     * provider is used to perform the conversion. For example it is used with
-     * the AJP connectors, the HTTP APR connector and with the
-     * {@link org.apache.catalina.valves.SSLValve}. If not specified, the
-     * default provider will be used.
-     */
-    protected String clientCertProvider = null;
-    public String getClientCertProvider() { return clientCertProvider; }
-    public void setClientCertProvider(String s) { this.clientCertProvider = s; }
-
-
-    // --------------------------------------------------------- Public Methods
-
-    @Override
-    public void setSslSupport(SSLSupport sslSupport) {
-        // NOOP for APR
-    }
-
-
     // ----------------------------------------------------- ActionHook Methods
 
     /**
@@ -94,55 +70,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         long socketRef = socketWrapper.getSocket().longValue();
 
         switch (actionCode) {
-        case REQ_SSL_ATTRIBUTE: {
-            if (endpoint.isSSLEnabled() && (socketRef != 0)) {
-                try {
-                    // Cipher suite
-                    Object sslO = SSLSocket.getInfoS(socketRef, SSL.SSL_INFO_CIPHER);
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
-                    }
-                    // Get client certificate and the certificate chain if present
-                    // certLength == -1 indicates an error
-                    int certLength = SSLSocket.getInfoI(socketRef, SSL.SSL_INFO_CLIENT_CERT_CHAIN);
-                    byte[] clientCert = SSLSocket.getInfoB(socketRef, SSL.SSL_INFO_CLIENT_CERT);
-                    X509Certificate[] certs = null;
-                    if (clientCert != null  && certLength > -1) {
-                        certs = new X509Certificate[certLength + 1];
-                        CertificateFactory cf;
-                        if (clientCertProvider == null) {
-                            cf = CertificateFactory.getInstance("X.509");
-                        } else {
-                            cf = CertificateFactory.getInstance("X.509",
-                                    clientCertProvider);
-                        }
-                        certs[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(clientCert));
-                        for (int i = 0; i < certLength; i++) {
-                            byte[] data = SSLSocket.getInfoB(socketRef, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
-                            certs[i+1] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(data));
-                        }
-                    }
-                    if (certs != null) {
-                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, certs);
-                    }
-                    // User key size
-                    sslO = Integer.valueOf(SSLSocket.getInfoI(socketRef,
-                            SSL.SSL_INFO_CIPHER_USEKEYSIZE));
-                    request.setAttribute(SSLSupport.KEY_SIZE_KEY, sslO);
-
-                    // SSL session ID
-                    sslO = SSLSocket.getInfoS(socketRef, SSL.SSL_INFO_SESSION_ID);
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
-                    }
-                    //TODO provide a hook to enable the SSL session to be
-                    // invalidated. Set AprEndpoint.SESSION_MGR req attr
-                } catch (Exception e) {
-                    log.warn(sm.getString("http11processor.socket.ssl"), e);
-                }
-            }
-            break;
-        }
         case REQ_SSL_CERTIFICATE: {
             if (endpoint.isSSLEnabled() && (socketRef != 0)) {
                 // Consume and buffer the request body, so that it does not

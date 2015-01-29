@@ -28,6 +28,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Poller;
+import org.apache.tomcat.util.net.AprSSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -264,9 +265,14 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         }
 
         @Override
-        protected void initSsl(SocketWrapperBase<Long> socket,
-                Processor<Long> processor) {
-            // NOOP for APR
+        protected void initSsl(SocketWrapperBase<Long> socket, Processor<Long> processor) {
+            if (proto.isSSLEnabled()) {
+                AprSSLSupport sslSupport =
+                        new AprSSLSupport(socket, processor.getClientCertProvider());
+                processor.setSslSupport(sslSupport);
+            } else {
+                processor.setSslSupport(null);
+            }
         }
 
         @Override
