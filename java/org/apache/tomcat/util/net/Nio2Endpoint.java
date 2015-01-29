@@ -1002,6 +1002,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 }
             }
 
+            if (socketBufferHandler == null) {
+                throw new IOException(sm.getString("socket.closed"));
+            }
             socketBufferHandler.configureReadBufferForRead();
 
             int remaining = socketBufferHandler.getReadBuffer().remaining();
