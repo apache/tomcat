@@ -27,8 +27,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.tomcat.util.buf.ByteBufferHolder;
+import org.apache.tomcat.util.res.StringManager;
 
 public abstract class SocketWrapperBase<E> {
+
+    protected static final StringManager sm = StringManager.getManager(
+            SocketWrapperBase.class.getPackage().getName());
 
     private volatile E socket;
     private final AbstractEndpoint<E> endpoint;
@@ -284,6 +288,9 @@ public abstract class SocketWrapperBase<E> {
 
 
     public boolean canWrite() {
+        if (socketBufferHandler == null) {
+            throw new IllegalStateException(sm.getString("socket.closed"));
+        }
         return socketBufferHandler.isWriteBufferWritable() && bufferedWrites.size() == 0;
     }
 

@@ -115,9 +115,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     break;
                 }
             }
-        } catch (IOException ioe) {
+        } catch (IOException | IllegalStateException e) {
             wsWriteTimeout.unregister(this);
-            clearHandler(ioe, useDispatch);
+            clearHandler(e, useDispatch);
             close();
         }
 
