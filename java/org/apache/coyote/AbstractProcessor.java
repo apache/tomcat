@@ -42,6 +42,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected final Request request;
     protected final Response response;
     protected SocketWrapperBase<S> socketWrapper = null;
+    private String clientCertProvider = null;
 
     /**
      * Error state for the request/response currently being processed.
@@ -134,6 +135,16 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      */
     public Adapter getAdapter() {
         return adapter;
+    }
+
+
+    public String getClientCertProvider() {
+        return clientCertProvider;
+    }
+
+
+    public void setClientCertProvider(String s) {
+        this.clientCertProvider = s;
     }
 
 

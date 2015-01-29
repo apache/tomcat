@@ -45,12 +45,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     }
 
 
-    /**
-     * SSL information.
-     */
-    protected SSLSupport sslSupport;
-
-
     // ----------------------------------------------------------- Constructors
 
     public Http11Nio2Processor(int maxHttpHeaderSize, AbstractEndpoint<Nio2Channel> endpoint,
@@ -61,15 +55,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
 
     // --------------------------------------------------------- Public Methods
-
-    /**
-     * Set the SSL information for this HTTP connection.
-     */
-    @Override
-    public void setSslSupport(SSLSupport sslSupport) {
-        this.sslSupport = sslSupport;
-    }
-
 
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
@@ -97,36 +82,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     public void actionInternal(ActionCode actionCode, Object param) {
 
         switch (actionCode) {
-        case REQ_SSL_ATTRIBUTE: {
-            try {
-                if (sslSupport != null) {
-                    Object sslO = sslSupport.getCipherSuite();
-                    if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.CIPHER_SUITE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getPeerCertificateChain(false);
-                    if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getKeySize();
-                    if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.KEY_SIZE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getSessionId();
-                    if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.SESSION_ID_KEY, sslO);
-                    }
-                    request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
-                }
-            } catch (Exception e) {
-                log.warn(sm.getString("http11processor.socket.ssl"), e);
-            }
-            break;
-        }
         case REQ_SSL_CERTIFICATE: {
             if (sslSupport != null && socketWrapper.getSocket() != null) {
                 /*
