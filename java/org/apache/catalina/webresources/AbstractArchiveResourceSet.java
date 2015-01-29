@@ -294,7 +294,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     }
 
     @Override
-    public void backgroundProcess() {
+    public void gc() {
         synchronized (archiveLock) {
             if (archive != null && archiveUseCount == 0) {
                 try {
