@@ -63,13 +63,12 @@ public enum ActionCode {
     DISABLE_SWALLOW_INPUT,
 
     /**
-     * Callback for lazy evaluation - extract the remote host address.
+     * Callback for lazy evaluation - extract the remote host name and address.
      */
     REQ_HOST_ATTRIBUTE,
 
     /**
-     * Callback for lazy evaluation - extract the remote host infos (address,
-     * name, port) and local address.
+     * Callback for lazy evaluation - extract the remote host address.
      */
     REQ_HOST_ADDR_ATTRIBUTE,
 
