@@ -683,7 +683,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         } else {
             // Set keep alive timeout for next request if enabled
             if (keepAliveTimeout > 0) {
-                socketWrapper.setTimeout(keepAliveTimeout);
+                socketWrapper.setReadTimeout(keepAliveTimeout);
             }
             request.updateCounters();
             if (getErrorState().isError()) {
@@ -724,7 +724,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
                 }
                 // Set back timeout if keep alive timeout is enabled
                 if (keepAliveTimeout > 0) {
-                    socketWrapper.setTimeout(soTimeout);
+                    socketWrapper.setReadTimeout(soTimeout);
                 }
                 // Check message type, process right away and break if
                 // not regular request processing
@@ -830,7 +830,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
             // Set keep alive timeout for next request if enabled
             if (keepAliveTimeout > 0) {
-                socketWrapper.setTimeout(keepAliveTimeout);
+                socketWrapper.setReadTimeout(keepAliveTimeout);
             }
 
             recycle();
@@ -1534,9 +1534,6 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
 
 
     private void writeData(ByteChunk chunk) throws IOException {
-        // Prevent timeout
-        socketWrapper.access();
-
         boolean blocking = (response.getWriteListener() == null);
 
         int len = chunk.getLength();

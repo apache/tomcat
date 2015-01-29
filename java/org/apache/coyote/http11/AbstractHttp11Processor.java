@@ -945,12 +945,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Set the socket timeout.
-     */
-    protected abstract void setSocketTimeout(int timeout) throws IOException;
-
-
-    /**
      * Process pipelined HTTP requests using the specified input and output
      * streams.
      *
@@ -1004,7 +998,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                         break;
                     }
                     if (!disableUploadTimeout) {
-                        setSocketTimeout(connectionUploadTimeout);
+                        socketWrapper.setReadTimeout(connectionUploadTimeout);
                     }
                 }
             } catch (IOException e) {
@@ -1140,9 +1134,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (!disableUploadTimeout) {
                 int soTimeout = endpoint.getSoTimeout();
                 if(soTimeout > 0) {
-                    setSocketTimeout(soTimeout);
+                    socketWrapper.setReadTimeout(soTimeout);
                 } else {
-                    setSocketTimeout(0);
+                    socketWrapper.setReadTimeout(0);
                 }
             }
 
@@ -1188,7 +1182,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (keptAlive) {
                 // Haven't read the request line and have previously processed a
                 // request. Must be keep-alive. Make sure poller uses keepAlive.
-                socketWrapper.setTimeout(endpoint.getKeepAliveTimeout());
+                socketWrapper.setReadTimeout(endpoint.getKeepAliveTimeout());
             }
         } else {
             // Started to read request line.
@@ -1205,7 +1199,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 // Need to keep processor associated with socket
                 readComplete = false;
                 // Make sure poller uses soTimeout from here onwards
-                socketWrapper.setTimeout(endpoint.getSoTimeout());
+                socketWrapper.setReadTimeout(endpoint.getSoTimeout());
             }
         }
         return true;

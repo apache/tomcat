@@ -33,10 +33,12 @@ public abstract class SocketWrapperBase<E> {
     private volatile E socket;
     private final AbstractEndpoint<E> endpoint;
 
-    private volatile long lastAccess = System.currentTimeMillis();
+    private volatile long lastRead = 0;
+    private volatile long lastWrite = 0;
     private volatile long lastAsyncStart = 0;
     private volatile long asyncTimeout = -1;
-    private long timeout = -1;
+    private long readTimeout = -1;
+    private long writeTimeout = -1;
     private IOException error = null;
     private volatile int keepAliveLeft = 100;
     private volatile boolean async = false;
@@ -145,13 +147,44 @@ public abstract class SocketWrapperBase<E> {
     public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
     public boolean isSecure() { return secure; }
     public void setSecure(boolean secure) { this.secure = secure; }
-    public long getLastAccess() { return lastAccess; }
-    public void access() {
-        access(System.currentTimeMillis());
+
+    /**
+     * Set the timeout for reading. Values of zero or less will be changed to]
+     * -1.
+     *
+     * @param readTimeout The timeout in milliseconds. A value of -1 indicates
+     *                    an infinite timeout.
+     */
+    public void setReadTimeout(long readTimeout) {
+        if (readTimeout > 0) {
+            this.readTimeout = readTimeout;
+        } else {
+            this.readTimeout = -1;
+        }
     }
-    void access(long access) { lastAccess = access; }
-    public void setTimeout(long timeout) {this.timeout = timeout;}
-    public long getTimeout() {return this.timeout;}
+
+    public long getReadTimeout() {return this.readTimeout;}
+
+    /**
+     * Set the timeout for writing. Values of zero or less will be changed to
+     * -1.
+     *
+     * @param writeTimeout The timeout in milliseconds. A value of zero or less
+     *                    indicates an infinite timeout.
+     */
+    public void setWriteTimeout(long writeTimeout) {
+        if (writeTimeout > 0) {
+            this.writeTimeout = writeTimeout;
+        } else {
+            this.writeTimeout = -1;
+        }
+    }
+
+    public long getWriteTimeout() {return this.writeTimeout;}
+
+    public void updateLastWrite() { lastWrite = System.currentTimeMillis(); }
+    public long getLastWrite() { return lastWrite; }
+    public long getLastRead() { return lastRead; }
     public IOException getError() { return error; }
     public void setError(IOException error) { this.error = error; }
     public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
@@ -278,13 +311,14 @@ public abstract class SocketWrapperBase<E> {
         }
     }
 
-    public void reset(E socket, long timeout) {
+    public void reset(E socket, long soTimeout) {
         async = false;
         blockingStatus = true;
         dispatches.clear();
         error = null;
         keepAliveLeft = 100;
-        lastAccess = System.currentTimeMillis();
+        lastRead = 0;
+        lastWrite = 0;
         lastAsyncStart = 0;
         asyncTimeout = -1;
         localAddr = null;
@@ -294,7 +328,8 @@ public abstract class SocketWrapperBase<E> {
         remoteHost = null;
         remotePort = -1;
         this.socket = socket;
-        this.timeout = timeout;
+        this.readTimeout = soTimeout;
+        this.writeTimeout = soTimeout;
         upgraded = false;
         resetSocketBufferHandler(socket);
     }
@@ -343,10 +378,12 @@ public abstract class SocketWrapperBase<E> {
      *
      * @throws IOException If an IO error occurs during the write
      */
-    public void write(boolean block, byte[] buf, int off, int len) throws IOException {
+    public final void write(boolean block, byte[] buf, int off, int len) throws IOException {
         if (len == 0 || buf == null || getSocket() == null) {
             return;
         }
+
+        lastWrite = System.currentTimeMillis();
 
         // While the implementations for blocking and non-blocking writes are
         // very similar they have been split into separate methods to allow
@@ -357,9 +394,6 @@ public abstract class SocketWrapperBase<E> {
         } else {
             writeNonBlocking(buf, off, len);
         }
-
-        // Prevent timeouts
-        access();
     }
 
 
@@ -460,9 +494,6 @@ public abstract class SocketWrapperBase<E> {
             result = flushNonBlocking();
         }
 
-        // Prevent timeouts
-        access();
-
         return result;
     }
 
@@ -518,6 +549,20 @@ public abstract class SocketWrapperBase<E> {
         return !socketBufferHandler.isWriteBufferEmpty();
     }
 
+    /**
+     * Write the contents of the socketWriteBuffer to the socket. For blocking
+     * writes either then entire contents of the buffer will be written or an
+     * IOException will be thrown. Partial blocking writes will not occur.
+     *
+     * @param block Should the write be blocking or not?
+     *
+     * @throws IOException If an I/O error such as a timeout occurs during the
+     *                     write
+     */
+    protected final void doWrite(boolean block) throws IOException {
+        lastWrite = System.currentTimeMillis();
+        doWriteInternal(block);
+    }
 
     /**
      * Write the contents of the socketWriteBuffer to the socket. For blocking
@@ -529,7 +574,7 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an I/O error such as a timeout occurs during the
      *                     write
      */
-    protected abstract void doWrite(boolean block) throws IOException;
+    protected abstract void doWriteInternal(boolean block) throws IOException;
 
 
     protected void addToBuffers(byte[] buf, int offset, int length) {

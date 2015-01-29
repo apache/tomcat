@@ -366,7 +366,6 @@ public class NioBlockingSelector {
                         SelectionKey sk = iterator.next();
                         NioSocketWrapper attachment = (NioSocketWrapper)sk.attachment();
                         try {
-                            attachment.access();
                             iterator.remove();
                             sk.interestOps(sk.interestOps() & (~sk.readyOps()));
                             if ( sk.isReadable() ) {
