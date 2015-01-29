@@ -158,14 +158,6 @@ public abstract class SocketWrapperBase<E> {
     public int decrementKeepAlive() { return (--keepAliveLeft);}
     public boolean isKeptAlive() {return keptAlive;}
     public void setKeptAlive(boolean keptAlive) {this.keptAlive = keptAlive;}
-    public int getLocalPort() { return localPort; }
-    public void setLocalPort(int localPort) {this.localPort = localPort; }
-    public String getLocalName() { return localName; }
-    public void setLocalName(String localName) {this.localName = localName; }
-    public String getLocalAddr() { return localAddr; }
-    public void setLocalAddr(String localAddr) {this.localAddr = localAddr; }
-    public int getRemotePort() { return remotePort; }
-    public void setRemotePort(int remotePort) {this.remotePort = remotePort; }
 
     public String getRemoteHost() {
         if (remoteHost == null) {
@@ -182,6 +174,38 @@ public abstract class SocketWrapperBase<E> {
         return remoteAddr;
     }
     protected abstract void populateRemoteAddr();
+
+    public int getRemotePort() {
+        if (remotePort == -1) {
+            populateRemotePort();
+        }
+        return remotePort;
+    }
+    protected abstract void populateRemotePort();
+
+    public String getLocalName() {
+        if (localName == null) {
+            populateLocalName();
+        }
+        return localName;
+    }
+    protected abstract void populateLocalName();
+
+    public String getLocalAddr() {
+        if (localAddr == null) {
+            populateLocalAddr();
+        }
+        return localAddr;
+    }
+    protected abstract void populateLocalAddr();
+
+    public int getLocalPort() {
+        if (localPort == -1) {
+            populateLocalPort();
+        }
+        return localPort;
+    }
+    protected abstract void populateLocalPort();
 
     public boolean getBlockingStatus() { return blockingStatus; }
     public void setBlockingStatus(boolean blockingStatus) {

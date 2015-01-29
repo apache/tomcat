@@ -17,7 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 import javax.net.ssl.SSLEngine;
 
@@ -98,54 +97,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     public void actionInternal(ActionCode actionCode, Object param) {
 
         switch (actionCode) {
-        case REQ_LOCAL_NAME_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.localName().recycle();
-            } else {
-                if (socketWrapper.getLocalName() == null) {
-                    InetAddress inetAddr = socketWrapper.getSocket().getIOChannel().socket().getLocalAddress();
-                    if (inetAddr != null) {
-                        socketWrapper.setLocalName(inetAddr.getHostName());
-                    }
-                }
-                request.localName().setString(socketWrapper.getLocalName());
-            }
-            break;
-        }
-        case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.localAddr().recycle();
-            } else {
-                if (socketWrapper.getLocalAddr() == null) {
-                    socketWrapper.setLocalAddr(
-                            socketWrapper.getSocket().getIOChannel().socket().getLocalAddress().getHostAddress());
-                }
-                request.localAddr().setString(socketWrapper.getLocalAddr());
-            }
-            break;
-        }
-        case REQ_REMOTEPORT_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.setRemotePort(0);
-            } else {
-                if (socketWrapper.getRemotePort() == -1) {
-                    socketWrapper.setRemotePort(socketWrapper.getSocket().getIOChannel().socket().getPort());
-                }
-                request.setRemotePort(socketWrapper.getRemotePort());
-            }
-            break;
-        }
-        case REQ_LOCALPORT_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.setLocalPort(0);
-            } else {
-                if (socketWrapper.getLocalPort() == -1) {
-                    socketWrapper.setLocalPort(socketWrapper.getSocket().getIOChannel().socket().getLocalPort());
-                }
-                request.setLocalPort(socketWrapper.getLocalPort());
-            }
-            break;
-        }
         case REQ_SSL_ATTRIBUTE: {
             try {
                 if (sslSupport != null) {

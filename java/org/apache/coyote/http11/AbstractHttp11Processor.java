@@ -902,6 +902,38 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
             break;
         }
+        case REQ_REMOTEPORT_ATTRIBUTE: {
+            if (socketWrapper == null) {
+                request.setRemotePort(0);
+            } else {
+                request.setRemotePort(socketWrapper.getRemotePort());
+            }
+            break;
+        }
+        case REQ_LOCAL_NAME_ATTRIBUTE: {
+            if (socketWrapper == null) {
+                request.localName().recycle();
+            } else {
+                request.localName().setString(socketWrapper.getLocalName());
+            }
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
+            if (socketWrapper == null) {
+                request.localAddr().recycle();
+            } else {
+                request.localAddr().setString(socketWrapper.getLocalAddr());
+            }
+            break;
+        }
+        case REQ_LOCALPORT_ATTRIBUTE: {
+            if (socketWrapper == null) {
+                request.setLocalPort(0);
+            } else {
+                request.setLocalPort(socketWrapper.getLocalPort());
+            }
+            break;
+        }
         default: {
             actionInternal(actionCode, param);
             break;

@@ -24,10 +24,8 @@ import org.apache.coyote.ActionCode;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLSocket;
-import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint;
@@ -109,72 +107,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         long socketRef = socketWrapper.getSocket().longValue();
 
         switch (actionCode) {
-        case REQ_LOCAL_NAME_ATTRIBUTE: {
-            if (socketRef == 0) {
-                request.localName().recycle();
-            } else {
-                if (socketWrapper.getLocalName() == null) {
-                    try {
-                        long sa = Address.get(Socket.APR_LOCAL, socketRef);
-                        socketWrapper.setLocalName(Address.getnameinfo(sa, 0));
-                    } catch (Exception e) {
-                        log.warn(sm.getString("http11processor.socket.info"), e);
-                    }
-                }
-                request.localName().setString(socketWrapper.getLocalName());
-            }
-            break;
-        }
-        case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            if (socketRef == 0) {
-                request.localAddr().recycle();
-            } else {
-                if (socketWrapper.getLocalAddr() == null) {
-                    try {
-                        long sa = Address.get(Socket.APR_LOCAL, socketRef);
-                        socketWrapper.setLocalAddr(Address.getip(sa));
-                    } catch (Exception e) {
-                        log.warn(sm.getString("http11processor.socket.info"), e);
-                    }
-                }
-                request.localAddr().setString(socketWrapper.getLocalAddr());
-            }
-            break;
-        }
-        case REQ_REMOTEPORT_ATTRIBUTE: {
-            if (socketRef == 0) {
-                request.setRemotePort(0);
-            } else {
-                if (socketWrapper.getRemotePort() == -1) {
-                    try {
-                        long sa = Address.get(Socket.APR_REMOTE, socketRef);
-                        Sockaddr addr = Address.getInfo(sa);
-                        socketWrapper.setRemotePort(addr.port);
-                    } catch (Exception e) {
-                        log.warn(sm.getString("http11processor.socket.info"), e);
-                    }
-                }
-                request.setRemotePort(socketWrapper.getRemotePort());
-            }
-            break;
-        }
-        case REQ_LOCALPORT_ATTRIBUTE: {
-            if (socketRef == 0) {
-                request.setLocalPort(0);
-            } else {
-                if (socketWrapper.getLocalPort() == -1) {
-                    try {
-                        long sa = Address.get(Socket.APR_LOCAL, socketRef);
-                        Sockaddr addr = Address.getInfo(sa);
-                        socketWrapper.setLocalPort(addr.port);
-                    } catch (Exception e) {
-                        log.warn(sm.getString("http11processor.socket.info"), e);
-                    }
-                }
-                request.setLocalPort(socketWrapper.getLocalPort());
-            }
-            break;
-        }
         case REQ_SSL_ATTRIBUTE: {
             if (endpoint.isSSLEnabled() && (socketRef != 0)) {
                 try {
