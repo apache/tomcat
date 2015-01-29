@@ -1505,10 +1505,12 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             try {
                 pool.write(socketBufferHandler.getWriteBuffer(), getSocket(),
                         selector, writeTimeout, block);
-                // Make sure we are flushed
-                do {
-                    if (getSocket().flush(true, selector, writeTimeout)) break;
-                } while (true);
+                if (block) {
+                    // Make sure we are flushed
+                    do {
+                        if (getSocket().flush(true, selector, writeTimeout)) break;
+                    } while (true);
+                }
             } finally {
                 if (selector != null) {
                     pool.put(selector);
