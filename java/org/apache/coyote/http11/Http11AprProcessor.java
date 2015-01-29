@@ -109,22 +109,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         long socketRef = socketWrapper.getSocket().longValue();
 
         switch (actionCode) {
-        case REQ_HOST_ADDR_ATTRIBUTE: {
-            if (socketRef == 0) {
-                request.remoteAddr().recycle();
-            } else {
-                if (socketWrapper.getRemoteAddr() == null) {
-                    try {
-                        long sa = Address.get(Socket.APR_REMOTE, socketRef);
-                        socketWrapper.setRemoteAddr(Address.getip(sa));
-                    } catch (Exception e) {
-                        log.warn(sm.getString("http11processor.socket.info"), e);
-                    }
-                }
-                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
-            }
-            break;
-        }
         case REQ_LOCAL_NAME_ATTRIBUTE: {
             if (socketRef == 0) {
                 request.localName().recycle();
@@ -138,31 +122,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                     }
                 }
                 request.localName().setString(socketWrapper.getLocalName());
-            }
-            break;
-        }
-        case REQ_HOST_ATTRIBUTE: {
-            if (socketRef == 0) {
-                request.remoteHost().recycle();
-            } else {
-                if (socketWrapper.getRemoteHost() == null) {
-                    try {
-                        long sa = Address.get(Socket.APR_REMOTE, socketRef);
-                        socketWrapper.setRemoteHost(Address.getnameinfo(sa, 0));
-                        if (socketWrapper.getRemoteHost() == null) {
-                            if (socketWrapper.getRemoteAddr() == null) {
-                                socketWrapper.setRemoteAddr(Address.getip(sa));
-                            }
-                            if (socketWrapper.getRemoteAddr() != null) {
-                                socketWrapper.setRemoteHost(socketWrapper.getRemoteAddr());
-                            }
-                        }
-                    } catch (Exception e) {
-                        log.warn(sm.getString("http11processor.socket.info"), e);
-                    }
-                } else {
-                    request.remoteHost().setString(socketWrapper.getRemoteHost());
-                }
             }
             break;
         }

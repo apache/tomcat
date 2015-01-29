@@ -98,20 +98,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     public void actionInternal(ActionCode actionCode, Object param) {
 
         switch (actionCode) {
-        case REQ_HOST_ADDR_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.remoteAddr().recycle();
-            } else {
-                if (socketWrapper.getRemoteAddr() == null) {
-                    InetAddress inetAddr = socketWrapper.getSocket().getIOChannel().socket().getInetAddress();
-                    if (inetAddr != null) {
-                        socketWrapper.setRemoteAddr(inetAddr.getHostAddress());
-                    }
-                }
-                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
-            }
-            break;
-        }
         case REQ_LOCAL_NAME_ATTRIBUTE: {
             if (socketWrapper == null) {
                 request.localName().recycle();
@@ -123,29 +109,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
                     }
                 }
                 request.localName().setString(socketWrapper.getLocalName());
-            }
-            break;
-        }
-        case REQ_HOST_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.remoteHost().recycle();
-            } else {
-                if (socketWrapper.getRemoteHost() == null) {
-                    InetAddress inetAddr = socketWrapper.getSocket().getIOChannel().socket().getInetAddress();
-                    if (inetAddr != null) {
-                        socketWrapper.setRemoteHost(inetAddr.getHostName());
-                    }
-                    if (socketWrapper.getRemoteHost() == null) {
-                        if (socketWrapper.getRemoteAddr() == null &&
-                                inetAddr != null) {
-                            socketWrapper.setRemoteAddr(inetAddr.getHostAddress());
-                        }
-                        if (socketWrapper.getRemoteAddr() != null) {
-                            socketWrapper.setRemoteHost(socketWrapper.getRemoteAddr());
-                        }
-                    }
-                }
-                request.remoteHost().setString(socketWrapper.getRemoteHost());
             }
             break;
         }

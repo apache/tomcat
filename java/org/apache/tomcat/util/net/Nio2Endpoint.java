@@ -1309,6 +1309,37 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             setSendfileData((SendfileData) sendfileData);
             return ((Nio2Endpoint) getEndpoint()).processSendfile(this);
         }
+
+
+        @Override
+        protected void populateRemoteAddr() {
+            SocketAddress socketAddress = null;
+            try {
+                socketAddress = getSocket().getIOChannel().getRemoteAddress();
+            } catch (IOException e) {
+                // Ignore
+            }
+            if (socketAddress instanceof InetSocketAddress) {
+                remoteAddr = ((InetSocketAddress) socketAddress).getAddress().getHostAddress();
+            }
+        }
+
+
+        @Override
+        protected void populateRemoteHost() {
+            SocketAddress socketAddress = null;
+            try {
+                socketAddress = getSocket().getIOChannel().getRemoteAddress();
+            } catch (IOException e) {
+                log.warn(sm.getString("endpoint.warn.noRemoteHost", getSocket()), e);
+            }
+            if (socketAddress instanceof InetSocketAddress) {
+                remoteHost = ((InetSocketAddress) socketAddress).getAddress().getHostName();
+                if (remoteAddr == null) {
+                    remoteAddr = ((InetSocketAddress) socketAddress).getAddress().getHostAddress();
+                }
+            }
+        }
     }
 
 

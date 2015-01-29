@@ -2652,5 +2652,38 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             ((SendfileData) sendfileData).socket = getSocket().longValue();
             return ((AprEndpoint) getEndpoint()).getSendfile().add((SendfileData) sendfileData);
         }
+
+
+        @Override
+        protected void populateRemoteAddr() {
+            long socket = getSocket().longValue();
+            if (socket == 0) {
+                return;
+            }
+            try {
+                long sa = Address.get(Socket.APR_REMOTE, socket);
+                remoteAddr = Address.getip(sa);
+            } catch (Exception e) {
+                log.warn(sm.getString("endpoint.warn.noRemoteAddr", getSocket()), e);
+            }
+        }
+
+
+        @Override
+        protected void populateRemoteHost() {
+            long socket = getSocket().longValue();
+            if (socket == 0) {
+                return;
+            }
+            try {
+                long sa = Address.get(Socket.APR_REMOTE, socket);
+                remoteHost = Address.getnameinfo(sa, 0);
+                if (remoteAddr == null) {
+                    remoteAddr = Address.getip(sa);
+                }
+            } catch (Exception e) {
+                log.warn(sm.getString("endpoint.warn.noRemoteHost", getSocket()), e);
+            }
+        }
     }
 }

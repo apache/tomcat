@@ -46,12 +46,12 @@ public abstract class SocketWrapperBase<E> {
     /*
      * Following cached for speed / reduced GC
      */
-    private String localAddr = null;
-    private String localName = null;
-    private int localPort = -1;
-    private String remoteAddr = null;
-    private String remoteHost = null;
-    private int remotePort = -1;
+    protected String localAddr = null;
+    protected String localName = null;
+    protected int localPort = -1;
+    protected String remoteAddr = null;
+    protected String remoteHost = null;
+    protected int remotePort = -1;
     /*
      * Used if block/non-blocking is set at the socket level. The client is
      * responsible for the thread-safe use of this field via the locks provided.
@@ -166,10 +166,23 @@ public abstract class SocketWrapperBase<E> {
     public void setLocalAddr(String localAddr) {this.localAddr = localAddr; }
     public int getRemotePort() { return remotePort; }
     public void setRemotePort(int remotePort) {this.remotePort = remotePort; }
-    public String getRemoteHost() { return remoteHost; }
-    public void setRemoteHost(String remoteHost) {this.remoteHost = remoteHost; }
-    public String getRemoteAddr() { return remoteAddr; }
-    public void setRemoteAddr(String remoteAddr) {this.remoteAddr = remoteAddr; }
+
+    public String getRemoteHost() {
+        if (remoteHost == null) {
+            populateRemoteHost();
+        }
+        return remoteHost;
+    }
+    protected abstract void populateRemoteHost();
+
+    public String getRemoteAddr() {
+        if (remoteAddr == null) {
+            populateRemoteAddr();
+        }
+        return remoteAddr;
+    }
+    protected abstract void populateRemoteAddr();
+
     public boolean getBlockingStatus() { return blockingStatus; }
     public void setBlockingStatus(boolean blockingStatus) {
         this.blockingStatus = blockingStatus;
