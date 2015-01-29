@@ -1781,7 +1781,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             } else {
                 getInputBuffer().nextRequest();
                 getOutputBuffer().nextRequest();
-                return SocketState.OPEN;
+                if (socketWrapper.isReadPending()) {
+                    return SocketState.LONG;
+                } else {
+                    return SocketState.OPEN;
+                }
             }
         }
     }

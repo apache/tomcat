@@ -25,12 +25,10 @@ import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
-import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SecureNio2Channel;
-import org.apache.tomcat.util.net.SocketStatus;
 
 
 /**
@@ -51,21 +49,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
 
         super(maxHttpHeaderSize, endpoint, maxTrailerSize, maxExtensionSize, maxSwallowSize);
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
-    @Override
-    public SocketState asyncDispatch(SocketStatus status) {
-        SocketState state = super.asyncDispatch(status);
-        if (state == SocketState.OPEN && socketWrapper.isReadPending()) {
-            // Following async processing, a read is still pending, so
-            // keep the processor associated
-            return SocketState.LONG;
-        } else {
-            return state;
-        }
     }
 
 
