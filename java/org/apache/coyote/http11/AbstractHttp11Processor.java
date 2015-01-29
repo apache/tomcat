@@ -1715,7 +1715,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (!getAdapter().asyncDispatch(request, response, status)) {
                 setErrorState(ErrorState.CLOSE_NOW, null);
             }
-            resetTimeouts();
         } catch (InterruptedIOException e) {
             setErrorState(ErrorState.CLOSE_NOW, e);
         } catch (Throwable t) {
@@ -1761,14 +1760,6 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     public HttpUpgradeHandler getHttpUpgradeHandler() {
         return httpUpgradeHandler;
     }
-
-
-    /**
-     * Provides a mechanism for those connector implementations (currently only
-     * NIO) that need to reset timeouts from Async timeouts to standard HTTP
-     * timeouts once async processing completes.
-     */
-    protected abstract void resetTimeouts();
 
 
     public void endRequest() {

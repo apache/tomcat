@@ -75,12 +75,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    protected void resetTimeouts() {
-        // NO-OP for APR
-    }
-
-
-    @Override
     public void setSslSupport(SSLSupport sslSupport) {
         // NOOP for APR
     }
