@@ -92,9 +92,7 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
                 }
 
                 try {
-                    // use force=false since re-negotiation is handled above
-                    // (and it is a NO-OP for NIO anyway)
-                    Object sslO = sslSupport.getPeerCertificateChain(false);
+                    Object sslO = sslSupport.getPeerCertificateChain();
                     if( sslO != null) {
                         request.setAttribute
                             (SSLSupport.CERTIFICATE_KEY, sslO);

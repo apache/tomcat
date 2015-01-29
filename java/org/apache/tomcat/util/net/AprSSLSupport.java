@@ -57,7 +57,7 @@ public class AprSSLSupport implements SSLSupport {
 
 
     @Override
-    public X509Certificate[] getPeerCertificateChain(boolean force) throws IOException {
+    public X509Certificate[] getPeerCertificateChain() throws IOException {
         long socketRef = socketWrapper.getSocket().longValue();
         if (socketRef == 0) {
             return null;

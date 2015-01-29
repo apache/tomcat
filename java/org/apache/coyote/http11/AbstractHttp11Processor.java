@@ -958,7 +958,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                         request.setAttribute
                             (SSLSupport.CIPHER_SUITE_KEY, sslO);
                     }
-                    sslO = sslSupport.getPeerCertificateChain(false);
+                    sslO = sslSupport.getPeerCertificateChain();
                     if (sslO != null) {
                         request.setAttribute
                             (SSLSupport.CERTIFICATE_KEY, sslO);

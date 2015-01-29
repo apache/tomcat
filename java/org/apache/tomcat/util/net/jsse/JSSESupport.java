@@ -19,19 +19,12 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.SocketException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.net.ssl.HandshakeCompletedEvent;
-import javax.net.ssl.HandshakeCompletedListener;
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import javax.security.cert.X509Certificate;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -60,19 +53,10 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
     private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
-    private static final Map<SSLSession,Integer> keySizeCache =
-            new WeakHashMap<>();
+    private static final Map<SSLSession,Integer> keySizeCache = new WeakHashMap<>();
 
-    protected SSLSocket ssl;
     protected SSLSession session;
 
-    Listener listener = new Listener();
-
-    JSSESupport(SSLSocket sock){
-        ssl=sock;
-        session = sock.getSession();
-        sock.addHandshakeCompletedListener(listener);
-    }
 
     JSSESupport(SSLSession session) {
         this.session = session;
@@ -86,8 +70,12 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         return session.getCipherSuite();
     }
 
-    protected java.security.cert.X509Certificate [] getX509Certificates(
-            SSLSession session) {
+    @Override
+    public java.security.cert.X509Certificate[] getPeerCertificateChain() throws IOException {
+        // Look up the current SSLSession
+        if (session == null)
+            return null;
+
         Certificate [] certs=null;
         try {
             certs = session.getPeerCertificates();
@@ -126,81 +114,6 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         return x509Certs;
     }
 
-    @Override
-    public java.security.cert.X509Certificate[] getPeerCertificateChain(boolean force)
-        throws IOException {
-        // Look up the current SSLSession
-        if (session == null)
-            return null;
-
-        // Convert JSSE's certificate format to the ones we need
-        X509Certificate [] jsseCerts = null;
-        try {
-            jsseCerts = session.getPeerCertificateChain();
-        } catch(Exception bex) {
-            // ignore.
-        }
-        if (jsseCerts == null)
-            jsseCerts = new X509Certificate[0];
-        if(jsseCerts.length <= 0 && force && ssl != null) {
-            session.invalidate();
-            handShake();
-            session = ssl.getSession();
-        }
-        return getX509Certificates(session);
-    }
-
-    protected void handShake() throws IOException {
-        if( ssl.getWantClientAuth() ) {
-            log.debug(sm.getString("jsseSupport.noCertWant"));
-        } else {
-            ssl.setNeedClientAuth(true);
-        }
-
-        if (ssl.getEnabledCipherSuites().length == 0) {
-            // Handshake is never going to be successful.
-            // Assume this is because handshakes are disabled
-            log.warn(sm.getString("jsseSupport.serverRenegDisabled"));
-            session.invalidate();
-            ssl.close();
-            return;
-        }
-
-        InputStream in = ssl.getInputStream();
-        int oldTimeout = ssl.getSoTimeout();
-        ssl.setSoTimeout(1000);
-        byte[] b = new byte[1];
-        listener.reset();
-        ssl.startHandshake();
-        int maxTries = 60; // 60 * 1000 = example 1 minute time out
-        for (int i = 0; i < maxTries; i++) {
-            if (log.isTraceEnabled())
-                log.trace("Reading for try #" + i);
-            try {
-                int read = in.read(b);
-                if (read > 0) {
-                    // Shouldn't happen as all input should have been swallowed
-                    // before trying to do the handshake. If it does, something
-                    // went wrong so lets bomb out now.
-                    throw new SSLException(
-                            sm.getString("jsseSupport.unexpectedData"));
-                }
-            } catch(SSLException sslex) {
-                log.info(sm.getString("jsseSupport.clientCertError"), sslex);
-                throw sslex;
-            } catch (IOException e) {
-                // ignore - presumably the timeout
-            }
-            if (listener.completed) {
-                break;
-            }
-        }
-        ssl.setSoTimeout(oldTimeout);
-        if (listener.completed == false) {
-            throw new SocketException("SSL Cert handshake timeout");
-        }
-
-    }
 
     /**
      * Copied from <code>org.apache.catalina.valves.CertificateValve</code>
@@ -255,17 +168,6 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         return buf.toString();
     }
 
-
-    private static class Listener implements HandshakeCompletedListener {
-        volatile boolean completed = false;
-        @Override
-        public void handshakeCompleted(HandshakeCompletedEvent event) {
-            completed = true;
-        }
-        void reset() {
-            completed = false;
-        }
-    }
 
     /**
      * Invalidate the session this support object is associated with.
