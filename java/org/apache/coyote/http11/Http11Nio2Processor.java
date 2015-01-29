@@ -62,6 +62,15 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
 
     // --------------------------------------------------------- Public Methods
 
+    /**
+     * Set the SSL information for this HTTP connection.
+     */
+    @Override
+    public void setSslSupport(SSLSupport sslSupport) {
+        this.sslSupport = sslSupport;
+    }
+
+
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
         SocketState state = super.asyncDispatch(status);
@@ -71,21 +80,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             return SocketState.LONG;
         } else {
             return state;
-        }
-    }
-
-
-    @Override
-    protected void resetTimeouts() {
-        if (!getErrorState().isError() && socketWrapper != null &&
-                asyncStateMachine.isAsyncDispatching()) {
-
-            // Reset the timeout
-            if (keepAlive) {
-                socketWrapper.setReadTimeout(endpoint.getKeepAliveTimeout());
-            } else {
-                socketWrapper.setReadTimeout(endpoint.getSoTimeout());
-            }
         }
     }
 
@@ -174,16 +168,5 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
             break;
         }
         }
-    }
-
-
-    // ------------------------------------------------------ Protected Methods
-
-    /**
-     * Set the SSL information for this HTTP connection.
-     */
-    @Override
-    public void setSslSupport(SSLSupport sslSupport) {
-        this.sslSupport = sslSupport;
     }
 }

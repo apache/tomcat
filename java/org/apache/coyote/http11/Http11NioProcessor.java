@@ -60,22 +60,14 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
     }
 
 
-    // ------------------------------------------------------ Protected Methods
+    // --------------------------------------------------------- Public Methods
 
+    /**
+     * Set the SSL information for this HTTP connection.
+     */
     @Override
-    protected void resetTimeouts() {
-        final NioEndpoint.NioSocketWrapper attach =
-                (NioEndpoint.NioSocketWrapper)socketWrapper.getSocket().getAttachment();
-        if (!getErrorState().isError() && attach != null &&
-                asyncStateMachine.isAsyncDispatching()) {
-
-            // Reset the timeout
-            if (keepAlive) {
-                attach.setReadTimeout(endpoint.getKeepAliveTimeout());
-            } else {
-                attach.setReadTimeout(endpoint.getSoTimeout());
-            }
-        }
+    public void setSslSupport(SSLSupport sslSupport) {
+        this.sslSupport = sslSupport;
     }
 
 
@@ -163,16 +155,5 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
             break;
         }
         }
-    }
-
-
-    // ------------------------------------------------------ Protected Methods
-
-    /**
-     * Set the SSL information for this HTTP connection.
-     */
-    @Override
-    public void setSslSupport(SSLSupport sslSupport) {
-        this.sslSupport = sslSupport;
     }
 }
