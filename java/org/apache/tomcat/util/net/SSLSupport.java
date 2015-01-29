@@ -81,12 +81,8 @@ public interface SSLSupport {
 
     /**
      * The client certificate chain (if any).
-     *
-     * @param force If <code>true</code>, then re-negotiate the connection and
-     *              request a client certificate if a client certificate has not
-     *              already been requested.
      */
-    public X509Certificate[] getPeerCertificateChain(boolean force) throws IOException;
+    public X509Certificate[] getPeerCertificateChain() throws IOException;
 
     /**
      * Get the keysize.
