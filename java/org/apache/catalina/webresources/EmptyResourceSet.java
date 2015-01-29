@@ -153,7 +153,7 @@ public class EmptyResourceSet extends LifecycleBase implements WebResourceSet {
     }
 
     @Override
-    public void backgroundProcess() {
+    public void gc() {
         // NO-OP
     }
 

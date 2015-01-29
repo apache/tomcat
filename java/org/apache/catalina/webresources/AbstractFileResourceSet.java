@@ -132,7 +132,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
      * This is a NO-OP by default for File based resource sets.
      */
     @Override
-    public void backgroundProcess() {
+    public void gc() {
         // NO-OP
     }
 

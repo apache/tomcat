@@ -407,6 +407,12 @@ public interface WebResourceRoot extends Lifecycle {
      */
     List<URL> getBaseUrls();
 
+    /**
+     * Implementations may cache some information to improve performance. This
+     * method triggers the clean-up of those resources.
+     */
+    void gc();
+
     static enum ResourceSetType {
         PRE,
         RESOURCE_JAR,

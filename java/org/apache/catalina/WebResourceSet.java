@@ -149,8 +149,8 @@ public interface WebResourceSet extends Lifecycle {
     boolean isReadOnly();
 
     /**
-     * Hook to allow the WebResourceRoot to trigger regular tasks on this set of
-     * resources.
+     * Implementations may cache some information to improve performance. This
+     * method triggers the clean-up of those resources.
      */
-    void backgroundProcess();
+    void gc();
 }
