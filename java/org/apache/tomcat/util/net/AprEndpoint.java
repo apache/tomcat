@@ -2391,16 +2391,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        // TODO Can this be removed once all reads and writes are handled within
-        // this class?
-        @Override
-        public void setTimeout(long timeout) {
-            super.setTimeout(timeout);
-            Socket.timeoutSet(getSocket().longValue(), timeout * 1000);
-        }
-
-
-
         @Override
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
 
@@ -2429,6 +2419,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             readLock.lock();
             try {
                 if (getBlockingStatus() == block) {
+                    if (block) {
+                        Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
+                    }
                     result = Socket.recv(getSocket().longValue(), b, off, len);
                     readDone = true;
                 }
@@ -2439,9 +2432,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             if (!readDone) {
                 writeLock.lock();
                 try {
-                    setBlockingStatus(block);
                     // Set the current settings for this socket
-                    Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, (block ? 0 : 1));
+                    setBlockingStatus(block);
+                    if (block) {
+                        Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
+                    } else {
+                        Socket.timeoutSet(getSocket().longValue(), 0);
+                    }
                     // Downgrade the lock
                     readLock.lock();
                     try {
@@ -2525,7 +2522,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
-        protected void doWrite(boolean block) throws IOException {
+        protected void doWriteInternal(boolean block) throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("apr.closed", getSocket()));
             }
@@ -2536,6 +2533,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             readLock.lock();
             try {
                 if (getBlockingStatus() == block) {
+                    if (block) {
+                        Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
+                    }
                     doWriteInternal();
                 }
             } finally {
@@ -2547,7 +2547,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 // Set the current settings for this socket
                 setBlockingStatus(block);
                 if (block) {
-                    Socket.timeoutSet(getSocket().longValue(), getEndpoint().getSoTimeout() * 1000);
+                    Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
                 } else {
                     Socket.timeoutSet(getSocket().longValue(), 0);
                 }

@@ -75,12 +75,6 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     // --------------------------------------------------------- Public Methods
 
     @Override
-    protected void setSocketTimeout(int timeout) {
-        Socket.timeoutSet(socketWrapper.getSocket().longValue(), timeout * 1000);
-    }
-
-
-    @Override
     protected void resetTimeouts() {
         // NO-OP for APR
     }
@@ -91,8 +85,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         // NOOP for APR
     }
 
-    // ----------------------------------------------------- ActionHook Methods
 
+    // ----------------------------------------------------- ActionHook Methods
 
     /**
      * Send an action to the connector.

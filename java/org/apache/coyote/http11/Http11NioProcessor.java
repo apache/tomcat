@@ -64,23 +64,18 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
 
     @Override
     protected void resetTimeouts() {
-        final NioEndpoint.NioSocketWrapper attach = (NioEndpoint.NioSocketWrapper)socketWrapper.getSocket().getAttachment();
+        final NioEndpoint.NioSocketWrapper attach =
+                (NioEndpoint.NioSocketWrapper)socketWrapper.getSocket().getAttachment();
         if (!getErrorState().isError() && attach != null &&
                 asyncStateMachine.isAsyncDispatching()) {
 
             // Reset the timeout
             if (keepAlive) {
-                attach.setTimeout(endpoint.getKeepAliveTimeout());
+                attach.setReadTimeout(endpoint.getKeepAliveTimeout());
             } else {
-                attach.setTimeout(endpoint.getSoTimeout());
+                attach.setReadTimeout(endpoint.getSoTimeout());
             }
         }
-    }
-
-
-    @Override
-    protected void setSocketTimeout(int timeout) throws IOException {
-        socketWrapper.getSocket().getIOChannel().socket().setSoTimeout(timeout);
     }
 
 
