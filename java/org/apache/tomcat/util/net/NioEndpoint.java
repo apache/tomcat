@@ -193,7 +193,9 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     private Poller[] pollers = null;
     private AtomicInteger pollerRotater = new AtomicInteger(0);
     /**
-     * Return an available poller in true round robin fashion
+     * Return an available poller in true round robin fashion.
+     *
+     * @return The next poller in sequence
      */
     public Poller getPoller0() {
         int idx = Math.abs(pollerRotater.incrementAndGet()) % pollers.length;
@@ -290,7 +292,10 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
     // --------------------------------------------------------- Public Methods
     /**
-     * Number of keepalive sockets.
+     * Number of keep-alive sockets.
+     *
+     * @return The number of sockets currently in the keep-alive state waiting
+     *         for the next request to be received on the socket
      */
     public int getKeepAliveCount() {
         if (pollers == null) {
@@ -1565,6 +1570,36 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     remoteAddr = inetAddr.getHostAddress();
                 }
             }
+        }
+
+
+        @Override
+        protected void populateRemotePort() {
+            remotePort = getSocket().getIOChannel().socket().getPort();
+        }
+
+
+        @Override
+        protected void populateLocalName() {
+            InetAddress inetAddr = getSocket().getIOChannel().socket().getLocalAddress();
+            if (inetAddr != null) {
+                localName = inetAddr.getHostName();
+            }
+        }
+
+
+        @Override
+        protected void populateLocalAddr() {
+            InetAddress inetAddr = getSocket().getIOChannel().socket().getLocalAddress();
+            if (inetAddr != null) {
+                localAddr = inetAddr.getHostAddress();
+            }
+        }
+
+
+        @Override
+        protected void populateLocalPort() {
+            localPort = getSocket().getIOChannel().socket().getLocalPort();
         }
     }
 

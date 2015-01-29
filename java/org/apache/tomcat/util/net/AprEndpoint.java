@@ -2685,5 +2685,67 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 log.warn(sm.getString("endpoint.warn.noRemoteHost", getSocket()), e);
             }
         }
+
+
+        @Override
+        protected void populateRemotePort() {
+            long socket = getSocket().longValue();
+            if (socket == 0) {
+                return;
+            }
+            try {
+                long sa = Address.get(Socket.APR_REMOTE, socket);
+                Sockaddr addr = Address.getInfo(sa);
+                remotePort = addr.port;
+            } catch (Exception e) {
+                log.warn(sm.getString("endpoint.warn.noRemotePort", getSocket()), e);
+            }
+        }
+
+
+        @Override
+        protected void populateLocalName() {
+            long socket = getSocket().longValue();
+            if (socket == 0) {
+                return;
+            }
+            try {
+                long sa = Address.get(Socket.APR_LOCAL, socket);
+                localName =Address.getnameinfo(sa, 0);
+            } catch (Exception e) {
+                log.warn(sm.getString("endpoint.warn.noLocalName"), e);
+            }
+        }
+
+
+        @Override
+        protected void populateLocalAddr() {
+            long socket = getSocket().longValue();
+            if (socket == 0) {
+                return;
+            }
+            try {
+                long sa = Address.get(Socket.APR_LOCAL, socket);
+                localAddr = Address.getip(sa);
+            } catch (Exception e) {
+                log.warn(sm.getString("endpoint.warn.noLocalAddr"), e);
+            }
+        }
+
+
+        @Override
+        protected void populateLocalPort() {
+            long socket = getSocket().longValue();
+            if (socket == 0) {
+                return;
+            }
+            try {
+                long sa = Address.get(Socket.APR_LOCAL, socket);
+                Sockaddr addr = Address.getInfo(sa);
+                localPort = addr.port;
+            } catch (Exception e) {
+                log.warn(sm.getString("endpoint.warn.noLocalPort"), e);
+            }
+        }
     }
 }

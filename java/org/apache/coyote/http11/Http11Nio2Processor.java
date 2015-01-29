@@ -17,8 +17,6 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
 import javax.net.ssl.SSLEngine;
 
@@ -111,71 +109,6 @@ public class Http11Nio2Processor extends AbstractHttp11Processor<Nio2Channel> {
     public void actionInternal(ActionCode actionCode, Object param) {
 
         switch (actionCode) {
-        case REQ_LOCAL_NAME_ATTRIBUTE: {
-            if (socketWrapper == null || socketWrapper.getSocket() == null) {
-                request.localName().recycle();
-            } else {
-                if (socketWrapper.getLocalName() == null) {
-                    InetAddress inetAddr = null;
-                    try {
-                        inetAddr = ((InetSocketAddress) socketWrapper.getSocket().getIOChannel().getLocalAddress()).getAddress();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                    if (inetAddr != null) {
-                        socketWrapper.setLocalName(inetAddr.getHostName());
-                    }
-                }
-                request.localName().setString(socketWrapper.getLocalName());
-            }
-            break;
-        }
-        case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            if (socketWrapper == null || socketWrapper.getSocket() == null) {
-                request.localAddr().recycle();
-            } else {
-                if (socketWrapper.getLocalAddr() == null) {
-                    try {
-                        socketWrapper.setLocalAddr(
-                                ((InetSocketAddress) socketWrapper.getSocket().getIOChannel().getLocalAddress()).getAddress().getHostAddress());
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
-                request.localAddr().setString(socketWrapper.getLocalAddr());
-            }
-            break;
-        }
-        case REQ_REMOTEPORT_ATTRIBUTE: {
-            if (socketWrapper == null || socketWrapper.getSocket() == null) {
-                request.setRemotePort(0);
-            } else {
-                if (socketWrapper.getRemotePort() == -1) {
-                    try {
-                        socketWrapper.setRemotePort(((InetSocketAddress) socketWrapper.getSocket().getIOChannel().getRemoteAddress()).getPort());
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
-                request.setRemotePort(socketWrapper.getRemotePort());
-            }
-            break;
-        }
-        case REQ_LOCALPORT_ATTRIBUTE: {
-            if (socketWrapper == null || socketWrapper.getSocket() == null) {
-                request.setLocalPort(0);
-            } else {
-                if (socketWrapper.getLocalPort() == -1) {
-                    try {
-                        socketWrapper.setLocalPort(((InetSocketAddress) socketWrapper.getSocket().getIOChannel().getLocalAddress()).getPort());
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                }
-                request.setLocalPort(socketWrapper.getLocalPort());
-            }
-            break;
-        }
         case REQ_SSL_ATTRIBUTE: {
             try {
                 if (sslSupport != null) {
