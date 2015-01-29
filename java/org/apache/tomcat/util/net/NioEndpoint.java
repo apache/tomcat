@@ -21,6 +21,7 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -1535,6 +1536,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             return new SendfileData(filename, pos, length);
         }
 
+
         @Override
         public SendfileState processSendfile(SendfileDataBase sendfileData) {
             setSendfileData((SendfileData) sendfileData);
@@ -1542,6 +1544,27 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     getSocket().getPoller().getSelector());
             // Might as well do the first write on this thread
             return getSocket().getPoller().processSendfile(key, this, true);
+        }
+
+
+        @Override
+        protected void populateRemoteAddr() {
+            InetAddress inetAddr = getSocket().getIOChannel().socket().getInetAddress();
+            if (inetAddr != null) {
+                remoteAddr = inetAddr.getHostAddress();
+            }
+        }
+
+
+        @Override
+        protected void populateRemoteHost() {
+            InetAddress inetAddr = getSocket().getIOChannel().socket().getInetAddress();
+            if (inetAddr != null) {
+                remoteHost = inetAddr.getHostName();
+                if (remoteAddr == null) {
+                    remoteAddr = inetAddr.getHostAddress();
+                }
+            }
         }
     }
 
