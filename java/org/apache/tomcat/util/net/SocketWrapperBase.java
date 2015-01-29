@@ -33,8 +33,8 @@ public abstract class SocketWrapperBase<E> {
     private volatile E socket;
     private final AbstractEndpoint<E> endpoint;
 
-    private volatile long lastRead = 0;
-    private volatile long lastWrite = 0;
+    private volatile long lastRead = System.currentTimeMillis();
+    private volatile long lastWrite = lastRead;
     private volatile long lastAsyncStart = 0;
     private volatile long asyncTimeout = -1;
     private long readTimeout = -1;
@@ -163,7 +163,9 @@ public abstract class SocketWrapperBase<E> {
         }
     }
 
-    public long getReadTimeout() {return this.readTimeout;}
+    public long getReadTimeout() {
+        return this.readTimeout;
+    }
 
     /**
      * Set the timeout for writing. Values of zero or less will be changed to
@@ -180,7 +182,9 @@ public abstract class SocketWrapperBase<E> {
         }
     }
 
-    public long getWriteTimeout() {return this.writeTimeout;}
+    public long getWriteTimeout() {
+        return this.writeTimeout;
+    }
 
     public void updateLastWrite() { lastWrite = System.currentTimeMillis(); }
     public long getLastWrite() { return lastWrite; }
@@ -317,8 +321,8 @@ public abstract class SocketWrapperBase<E> {
         dispatches.clear();
         error = null;
         keepAliveLeft = 100;
-        lastRead = 0;
-        lastWrite = 0;
+        lastRead = System.currentTimeMillis();
+        lastWrite = lastRead;
         lastAsyncStart = 0;
         asyncTimeout = -1;
         localAddr = null;

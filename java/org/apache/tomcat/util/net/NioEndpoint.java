@@ -1321,6 +1321,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 }
             }
             writeLatch = null;
+            setReadTimeout(soTimeout);
             setWriteTimeout(soTimeout);
         }
 
