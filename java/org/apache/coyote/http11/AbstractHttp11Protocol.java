@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import org.apache.coyote.AbstractProtocol;
+
 import org.apache.tomcat.util.net.AbstractEndpoint;
 
 public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
@@ -227,5 +228,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
         processor.setClientCertProvider(getClientCertProvider());
+    }
+
+
+    protected abstract static class AbstractHttp11ConnectionHandler<S>
+            extends AbstractConnectionHandler<S,Http11Processor> {
+
     }
 }

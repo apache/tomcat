@@ -212,7 +212,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
-            extends AbstractConnectionHandler<Long,Http11Processor> {
+            extends AbstractHttp11ConnectionHandler<Long> {
 
         protected Http11AprProtocol proto;
 

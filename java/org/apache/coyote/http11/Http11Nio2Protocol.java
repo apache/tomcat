@@ -100,7 +100,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
-            extends AbstractConnectionHandler<Nio2Channel,Http11Processor>
+            extends AbstractHttp11ConnectionHandler<Nio2Channel>
             implements Handler {
 
         protected Http11Nio2Protocol proto;
