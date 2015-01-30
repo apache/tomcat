@@ -35,7 +35,7 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public class UpgradeProcessor<S> implements Processor<S>, WebConnection {
+public class UpgradeProcessor implements Processor, WebConnection {
 
     private static final int INFINITE_TIMEOUT = -1;
 
@@ -140,7 +140,7 @@ public class UpgradeProcessor<S> implements Processor<S>, WebConnection {
 
 
     @Override
-    public final SocketState process(SocketWrapperBase<S> socketWrapper) throws IOException {
+    public final SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException {
         return null;
     }
 

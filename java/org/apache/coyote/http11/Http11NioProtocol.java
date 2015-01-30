@@ -127,7 +127,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
-            extends AbstractConnectionHandler<NioChannel,Http11Processor<NioChannel>>
+            extends AbstractConnectionHandler<NioChannel,Http11Processor>
             implements Handler {
 
         protected Http11NioProtocol proto;
@@ -161,12 +161,12 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
             if (log.isDebugEnabled())
                 log.debug("Iterating through our connections to release a socket channel:"+socket);
             boolean released = false;
-            Iterator<java.util.Map.Entry<NioChannel, Processor<NioChannel>>> it = connections.entrySet().iterator();
+            Iterator<java.util.Map.Entry<NioChannel, Processor>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
-                java.util.Map.Entry<NioChannel, Processor<NioChannel>> entry = it.next();
+                java.util.Map.Entry<NioChannel, Processor> entry = it.next();
                 if (entry.getKey().getIOChannel()==socket) {
                     it.remove();
-                    Processor<NioChannel> result = entry.getValue();
+                    Processor result = entry.getValue();
                     result.recycle();
                     unregister(result);
                     released = true;
@@ -183,8 +183,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
          */
         @Override
         public void release(SocketWrapperBase<NioChannel> socket) {
-            Processor<NioChannel> processor =
-                connections.remove(socket.getSocket());
+            Processor processor = connections.remove(socket.getSocket());
             if (processor != null) {
                 processor.recycle();
                 recycledProcessors.push(processor);
@@ -206,7 +205,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
         @Override
         public void release(SocketWrapperBase<NioChannel> socket,
-                Processor<NioChannel> processor, boolean addToPoller) {
+                Processor processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller) {
@@ -216,8 +215,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
 
         @Override
-        protected void initSsl(SocketWrapperBase<NioChannel> socket,
-                Processor<NioChannel> processor) {
+        protected void initSsl(SocketWrapperBase<NioChannel> socket, Processor processor) {
             if (proto.isSSLEnabled() &&
                     (proto.sslImplementation != null)
                     && (socket.getSocket() instanceof SecureNioChannel)) {
@@ -232,8 +230,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
 
         @Override
-        protected void longPoll(SocketWrapperBase<NioChannel> socket,
-                Processor<NioChannel> processor) {
+        protected void longPoll(SocketWrapperBase<NioChannel> socket, Processor processor) {
 
             if (processor.isAsync()) {
                 socket.setAsync(true);
@@ -247,8 +244,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
 
         @Override
-        public Http11Processor<NioChannel> createProcessor() {
-            Http11Processor<NioChannel> processor = new Http11Processor<>(
+        public Http11Processor createProcessor() {
+            Http11Processor processor = new Http11Processor(
                     proto.getMaxHttpHeaderSize(), proto.getEndpoint(),
                     proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize());
@@ -258,11 +255,11 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
 
         @Override
-        protected Processor<NioChannel> createUpgradeProcessor(
-                SocketWrapperBase<NioChannel> socket, ByteBuffer leftoverInput,
+        protected Processor createUpgradeProcessor(
+                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeHandler)
                 throws IOException {
-            return new UpgradeProcessor<>(socket, leftoverInput, httpUpgradeHandler);
+            return new UpgradeProcessor(socket, leftoverInput, httpUpgradeHandler);
         }
 
         @Override

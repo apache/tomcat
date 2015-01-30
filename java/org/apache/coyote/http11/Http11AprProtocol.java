@@ -212,7 +212,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
-            extends AbstractConnectionHandler<Long,Http11Processor<Long>> {
+            extends AbstractConnectionHandler<Long,Http11Processor> {
 
         protected Http11AprProtocol proto;
 
@@ -232,7 +232,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
         @Override
         public void release(SocketWrapperBase<Long> socket,
-                Processor<Long> processor, boolean addToPoller) {
+                Processor processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller && proto.getEndpoint().isRunning()) {
@@ -246,7 +246,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         public SocketState process(SocketWrapperBase<Long> socket,
                 SocketStatus status) {
             if (proto.npnHandler != null) {
-                Processor<Long> processor = null;
+                Processor processor = null;
                 if (status == SocketStatus.OPEN_READ) {
                     processor = connections.get(socket.getSocket());
 
@@ -265,7 +265,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         }
 
         @Override
-        protected void initSsl(SocketWrapperBase<Long> socket, Processor<Long> processor) {
+        protected void initSsl(SocketWrapperBase<Long> socket, Processor processor) {
             if (proto.isSSLEnabled()) {
                 AprSSLSupport sslSupport =
                         new AprSSLSupport(socket, processor.getClientCertProvider());
@@ -276,8 +276,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         }
 
         @Override
-        protected void longPoll(SocketWrapperBase<Long> socket,
-                Processor<Long> processor) {
+        protected void longPoll(SocketWrapperBase<Long> socket, Processor processor) {
 
             if (processor.isAsync()) {
                 // Async
@@ -295,8 +294,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         }
 
         @Override
-        protected Http11Processor<Long> createProcessor() {
-            Http11Processor<Long> processor = new Http11Processor<>(
+        protected Http11Processor createProcessor() {
+            Http11Processor processor = new Http11Processor(
                     proto.getMaxHttpHeaderSize(), proto.getEndpoint(),
                     proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize());
@@ -308,11 +307,11 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         }
 
         @Override
-        protected Processor<Long> createUpgradeProcessor(
-                SocketWrapperBase<Long> socket, ByteBuffer leftoverInput,
+        protected Processor createUpgradeProcessor(
+                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeHandler)
                 throws IOException {
-            return new UpgradeProcessor<>(socket, leftoverInput, httpUpgradeHandler);
+            return new UpgradeProcessor(socket, leftoverInput, httpUpgradeHandler);
         }
     }
 }

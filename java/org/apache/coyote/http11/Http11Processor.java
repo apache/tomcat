@@ -61,9 +61,9 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public class Http11Processor<S> extends AbstractProcessor<S> {
+public class Http11Processor extends AbstractProcessor {
 
-    private static final Log log = LogFactory.getLog(Http11AprProtocol.class);
+    private static final Log log = LogFactory.getLog(Http11Processor.class);
 
     /**
      * The string manager for this package.
@@ -238,7 +238,7 @@ public class Http11Processor<S> extends AbstractProcessor<S> {
     protected SSLSupport sslSupport;
 
 
-    public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<S> endpoint,
+    public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<?> endpoint,
             int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
 
         super(endpoint);
@@ -841,7 +841,7 @@ public class Http11Processor<S> extends AbstractProcessor<S> {
         case ASYNC_COMPLETE: {
             socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
+                socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
             }
             break;
         }
@@ -855,7 +855,7 @@ public class Http11Processor<S> extends AbstractProcessor<S> {
         }
         case ASYNC_DISPATCH: {
             if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocket(this.socketWrapper, SocketStatus.OPEN_READ, true);
+                socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
             }
             break;
         }
@@ -892,9 +892,9 @@ public class Http11Processor<S> extends AbstractProcessor<S> {
             break;
         }
         case DISPATCH_EXECUTE: {
-            SocketWrapperBase<S> wrapper = socketWrapper;
+            SocketWrapperBase<?> wrapper = socketWrapper;
             if (wrapper != null) {
-                getEndpoint().executeNonBlockingDispatches(wrapper);
+                wrapper.executeNonBlockingDispatches();
             }
             break;
         }
@@ -1017,7 +1017,7 @@ public class Http11Processor<S> extends AbstractProcessor<S> {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState process(SocketWrapperBase<S> socketWrapper)
+    public SocketState process(SocketWrapperBase<?> socketWrapper)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
@@ -1869,7 +1869,7 @@ public class Http11Processor<S> extends AbstractProcessor<S> {
      *
      * @return true if the keep-alive loop should be broken
      */
-    private boolean breakKeepAliveLoop(SocketWrapperBase<S> socketWrapper) {
+    private boolean breakKeepAliveLoop(SocketWrapperBase<?> socketWrapper) {
         openSocket = keepAlive;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {
