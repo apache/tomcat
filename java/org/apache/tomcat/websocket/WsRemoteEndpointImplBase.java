@@ -853,7 +853,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
 
     /**
-     * Ensures that tne output buffer is cleared after it has been flushed.
+     * Ensures that the output buffer is cleared after it has been flushed.
      */
     private static class OutputBufferFlushSendHandler implements SendHandler {
 
