@@ -328,6 +328,103 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     <code>foo</code> property (although we could have), the bean will
     contain whatever default value is set up by its constructor.</p>
 
+    <p>Some beans have properties with types that can not automatically be
+    converted from a string value. Setting such properties using the Tomcat
+    BeanFactory will fail with a NamingException. In cases were those beans
+    provide methods to set the properties from a string value, the Tomcat
+    BeanFactory can be configured to use these methods. The configuration is
+    done with the <code>forceString</code> attribute.</p>
+
+    <p>Assume our bean looks like this:</p>
+
+<source><![CDATA[package com.mycompany;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+public class MyBean2 {
+
+  private InetAddress local = null;
+
+  public InetAddress getLocal() {
+    return local;
+  }
+
+  public void setLocal(InetAddress ip) {
+    local = ip;
+  }
+
+  public void setLocal(String localHost) {
+    try {
+      local = InetAddress.getByName(localHost);
+    } catch (UnknownHostException ex) {
+    }
+  }
+
+  private InetAddress remote = null;
+
+  public InetAddress getRemote() {
+    return remote;
+  }
+
+  public void setRemote(InetAddress ip) {
+    remote = ip;
+  }
+
+  public void host(String remoteHost) {
+    try {
+      remote = InetAddress.getByName(remoteHost);
+    } catch (UnknownHostException ex) {
+    }
+  }
+
+}]]></source>
+
+    <p>The bean has two properties, both are of type <code>InetAddress</code>.
+    The first property <code>local</code> has an additional setter taking a
+    string argument. By default the Tomcat BeanFactory would try to use the
+    automatically detected setter with the same argument type as the property
+    type and then throw a NamingException, because it is not prepared to convert
+    the given string attribute value to <code>InetAddress</code>.
+    We can tell the Tomcat BeanFactory to use the other setter like that:</p>
+
+<source><![CDATA[<Context ...>
+  ...
+  <Resource name="bean/MyBeanFactory" auth="Container"
+            type="com.mycompany.MyBean2"
+            factory="org.apache.naming.factory.BeanFactory"
+            forceString="local"
+            local="localhost"/>
+  ...
+</Context>]]></source>
+
+    <p>The bean property <code>remote</code> can also be set from a string,
+    but one has to use the non-standard method name <code>host</code>.
+    To set <code>local</code> and <code>remote</code> use the following
+    configuration:</p>
+
+<source><![CDATA[<Context ...>
+  ...
+  <Resource name="bean/MyBeanFactory" auth="Container"
+            type="com.mycompany.MyBean2"
+            factory="org.apache.naming.factory.BeanFactory"
+            forceString="local,remote=host"
+            local="localhost"
+            remote="tomcat.apache.org"/>
+  ...
+</Context>]]></source>
+
+    <p>Multiple property descriptions can be combined in
+    <code>forceString</code> by concatenation with comma as a separator.
+    Each property description consists of either only the property name
+    in which case the BeanFactory calls the setter method. Or it consist
+    of <code>name=method</code> in which case the property named
+    <code>name</code> is set by calling method <code>method</code>.
+    For properties of types <code>String</code> or of primitive type
+    or of their associated primitive wrapper classes using
+    <code>forceString</code> is not needed. The correct setter will be
+    automatically detected and argument conversion will be applied.</p>
+
   </subsection>
 
 

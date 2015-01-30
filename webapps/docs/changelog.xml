@@ -56,6 +56,15 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.60 (violetagg)">
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Enhance bean factory used for JNDI resources. New attribute
+        <code>forceString</code> allows to support non-standard
+        string argument property setters. (rjung)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.59 (violetagg)">
   <subsection name="Jasper">
