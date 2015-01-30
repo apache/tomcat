@@ -58,23 +58,12 @@ public abstract class SSLImplementation {
             return getInstance();
 
         try {
-            // Workaround for the J2SE 1.4.x classloading problem (under
-            // Solaris).
-            // Class.forName(..) fails without creating class using new.
-            // This is an ugly workaround.
-            if (JSSEImplementationClass.equals(className)) {
-                return new org.apache.tomcat.util.net.jsse.JSSEImplementation();
-            }
             Class<?> clazz = Class.forName(className);
             return (SSLImplementation) clazz.newInstance();
         } catch (Exception e) {
             if (logger.isDebugEnabled())
-                logger
-                        .debug("Error loading SSL Implementation " + className,
-                                e);
-            throw new ClassNotFoundException(
-                    "Error loading SSL Implementation " + className + " :"
-                            + e.toString());
+                logger.debug("Error loading SSL Implementation " + className, e);
+            throw new ClassNotFoundException("Error loading SSL Implementation " + className, e);
         }
     }
 
