@@ -212,7 +212,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
-            extends AbstractConnectionHandler<Long,Http11AprProcessor> {
+            extends AbstractConnectionHandler<Long,Http11Processor<Long>> {
 
         protected Http11AprProtocol proto;
 
@@ -295,8 +295,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         }
 
         @Override
-        protected Http11AprProcessor createProcessor() {
-            Http11AprProcessor processor = new Http11AprProcessor(
+        protected Http11Processor<Long> createProcessor() {
+            Http11Processor<Long> processor = new Http11Processor<>(
                     proto.getMaxHttpHeaderSize(), proto.getEndpoint(),
                     proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize());

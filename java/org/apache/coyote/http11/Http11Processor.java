@@ -42,6 +42,8 @@ import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Ascii;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -59,17 +61,17 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
+public class Http11Processor<S> extends AbstractProcessor<S> {
 
-    private final UserDataHelper userDataHelper;
-
+    private static final Log log = LogFactory.getLog(Http11AprProtocol.class);
 
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Http11AprProtocol.class);
 
+
+    private final UserDataHelper userDataHelper;
 
     /**
      * Input.
@@ -236,11 +238,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     protected SSLSupport sslSupport;
 
 
-    public AbstractHttp11Processor(int maxHttpHeaderSize, AbstractEndpoint<S> endpoint,
+    public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<S> endpoint,
             int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
 
         super(endpoint);
-        userDataHelper = new UserDataHelper(getLog());
+        userDataHelper = new UserDataHelper(log);
 
         inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize);
         request.setInputBuffer(getInputBuffer());
@@ -689,8 +691,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // 501 - Unimplemented
             response.setStatus(501);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("http11processor.request.prepare") +
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.prepare") +
                           " Unsupported transfer encoding [" + encodingName + "]");
             }
         }
@@ -976,7 +978,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
                 }
             } catch (Exception e) {
-                getLog().warn(sm.getString("http11processor.socket.ssl"), e);
+                log.warn(sm.getString("http11processor.socket.ssl"), e);
             }
             break;
         }
@@ -996,15 +998,13 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                         request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
                     }
                 } catch (IOException ioe) {
-                    getLog().warn(sm.getString("http11processor.socket.ssl"), ioe);
+                    log.warn(sm.getString("http11processor.socket.ssl"), ioe);
                 }
             }
             break;
         }
         }
     }
-
-    abstract void actionInternal(ActionCode actionCode, Object param);
 
 
     /**
@@ -1065,9 +1065,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     }
                 }
             } catch (IOException e) {
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug(
-                            sm.getString("http11processor.header.parse"), e);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("http11processor.header.parse"), e);
                 }
                 setErrorState(ErrorState.CLOSE_NOW, e);
                 break;
@@ -1075,18 +1074,16 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 ExceptionUtils.handleThrowable(t);
                 UserDataHelper.Mode logMode = userDataHelper.getNextMode();
                 if (logMode != null) {
-                    String message = sm.getString(
-                            "http11processor.header.parse");
+                    String message = sm.getString("http11processor.header.parse");
                     switch (logMode) {
                         case INFO_THEN_DEBUG:
-                            message += sm.getString(
-                                    "http11processor.fallToDebug");
+                            message += sm.getString("http11processor.fallToDebug");
                             //$FALL-THROUGH$
                         case INFO:
-                            getLog().info(message);
+                            log.info(message);
                             break;
                         case DEBUG:
-                            getLog().debug(message);
+                            log.debug(message);
                     }
                 }
                 // 400 - Bad Request
@@ -1102,9 +1099,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     prepareRequest();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug(sm.getString(
-                                "http11processor.request.prepare"), t);
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("http11processor.request.prepare"), t);
                     }
                     // 500 - Internal Server Error
                     response.setStatus(500);
@@ -1151,8 +1147,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    getLog().error(sm.getString(
-                            "http11processor.request.process"), t);
+                    log.error(sm.getString("http11processor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
                     setErrorState(ErrorState.CLOSE_CLEAN, t);
@@ -1316,8 +1311,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // Send 505; Unsupported HTTP version
             response.setStatus(505);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("http11processor.request.prepare")+
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.prepare")+
                           " Unsupported HTTP version \""+protocolMB+"\"");
             }
         }
@@ -1447,8 +1442,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             // 400 - Bad request
             response.setStatus(400);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("http11processor.request.prepare")+
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.prepare")+
                           " host header missing");
             }
         }
@@ -1750,8 +1745,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             } catch (IOException | IllegalStateException x) {
                 // IOE - Problem writing to socket
                 // ISE - Request/Response not in correct state for async write
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Unable to write async data.",x);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to write async data.",x);
                 }
                 status = SocketStatus.ASYNC_WRITE_ERROR;
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
@@ -1764,8 +1759,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 }
             } catch (IllegalStateException x) {
                 // ISE - Request/Response not in correct state for async read
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Unable to read async data.",x);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to read async data.",x);
                 }
                 status = SocketStatus.ASYNC_READ_ERROR;
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
@@ -1783,7 +1778,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             setErrorState(ErrorState.CLOSE_NOW, t);
-            getLog().error(sm.getString("http11processor.request.process"), t);
+            log.error(sm.getString("http11processor.request.process"), t);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
@@ -1829,6 +1824,12 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     }
 
 
+    @Override
+    protected Log getLog() {
+        return log;
+    }
+
+
     public void endRequest() {
 
         // Finish the handling of the request
@@ -1844,7 +1845,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 // written in the Adapter.service method.
                 response.setStatus(500);
                 setErrorState(ErrorState.CLOSE_NOW, t);
-                getLog().error(sm.getString("http11processor.request.finish"), t);
+                log.error(sm.getString("http11processor.request.finish"), t);
             }
         }
         if (getErrorState().isIoAllowed()) {
@@ -1855,7 +1856,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 setErrorState(ErrorState.CLOSE_NOW, t);
-                getLog().error(sm.getString("http11processor.response.finish"), t);
+                log.error(sm.getString("http11processor.response.finish"), t);
             }
         }
     }
@@ -1882,8 +1883,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 return true;
             case ERROR:
                 // Write failed
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug(sm.getString("http11processor.sendfile.error"));
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("http11processor.sendfile.error"));
                 }
                 setErrorState(ErrorState.CLOSE_NOW, null);
                 return true;
