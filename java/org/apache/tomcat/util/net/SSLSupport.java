@@ -76,11 +76,23 @@ public interface SSLSupport {
 
     /**
      * The cipher suite being used on this connection.
+     *
+     * @return The name of the cipher suite as returned by the SSL/TLS
+     *        implementation
+     *
+     * @throws IOException If an error occurs trying to obtain the cipher suite
      */
     public String getCipherSuite() throws IOException;
 
     /**
      * The client certificate chain (if any).
+     *
+     * @return The certificate chain presented by the client with the peer's
+     *         certificate first, followed by those of any certificate
+     *         authorities
+     *
+     * @throws IOException If an error occurs trying to obtain the certificate
+     *                     chain
      */
     public X509Certificate[] getPeerCertificateChain() throws IOException;
 
@@ -97,15 +109,22 @@ public interface SSLSupport {
      * (d) The size of the signature key used by the server
      *
      * Unfortunately, all of these values are nonsensical.
-     **/
-    public Integer getKeySize()
-        throws IOException;
+     *
+     * @return The effective key size for the current cipher suite
+     *
+     * @throws IOException If an error occurs trying to obtain the key size
+     */
+    public Integer getKeySize() throws IOException;
 
     /**
      * The current session Id.
+     *
+     * @return The current SSL/TLS session ID
+     *
+     * @throws IOException If an error occurs trying to obtain the session ID
      */
-    public String getSessionId()
-        throws IOException;
+    public String getSessionId() throws IOException;
+
     /**
      * Simple data class that represents the cipher being used, along with the
      * corresponding effective key size.  The specified phrase must appear in the

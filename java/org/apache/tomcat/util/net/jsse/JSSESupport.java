@@ -55,7 +55,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
 
     private static final Map<SSLSession,Integer> keySizeCache = new WeakHashMap<>();
 
-    protected SSLSession session;
+    private SSLSession session;
 
 
     JSSESupport(SSLSession session) {
@@ -116,7 +116,9 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
 
 
     /**
-     * Copied from <code>org.apache.catalina.valves.CertificateValve</code>
+     * {@inheritDoc}
+     * <p>
+     * This returns the effective bits for the current cipher suite.
      */
     @Override
     public Integer getKeySize()
