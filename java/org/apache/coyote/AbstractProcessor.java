@@ -138,6 +138,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     }
 
 
+    @Override
     public String getClientCertProvider() {
         return clientCertProvider;
     }
