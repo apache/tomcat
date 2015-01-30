@@ -27,8 +27,6 @@ import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.Nio2Endpoint.Handler;
 import org.apache.tomcat.util.net.Nio2Endpoint.Nio2SocketWrapper;
-import org.apache.tomcat.util.net.SSLImplementation;
-import org.apache.tomcat.util.net.SecureNio2Channel;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -108,12 +106,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
             return log;
         }
 
-
-        @Override
-        public SSLImplementation getSslImplementation() {
-            return ((Http11Nio2Protocol) getProtocol()).sslImplementation;
-        }
-
         /**
          * Expected to be used by the Poller to release resources on socket
          * close, errors etc.
@@ -153,19 +145,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
             }
         }
 
-
-        @Override
-        protected void initSsl(SocketWrapperBase<Nio2Channel> socket, Processor processor) {
-            if (getProtocol().isSSLEnabled() && getSslImplementation() != null
-                    && (socket.getSocket() instanceof SecureNio2Channel)) {
-                SecureNio2Channel ch = (SecureNio2Channel)socket.getSocket();
-                processor.setSslSupport(getSslImplementation().getSSLSupport(
-                            ch.getSslEngine().getSession()));
-            } else {
-                processor.setSslSupport(null);
-            }
-
-        }
 
         @Override
         protected void longPoll(SocketWrapperBase<Nio2Channel> socket, Processor processor) {

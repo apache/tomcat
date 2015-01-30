@@ -135,11 +135,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         }
 
         @Override
-        protected void initSsl(SocketWrapperBase<S> socket, Processor processor) {
-            // NOOP for AJP
-        }
-
-        @Override
         protected void longPoll(SocketWrapperBase<S> socket, Processor processor) {
             // Same requirements for all AJP connectors
             socket.setAsync(true);

@@ -45,6 +45,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.X509KeyManager;
 
@@ -230,6 +231,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     }
 
 
+    private SSLImplementation sslImplementation = null;
     private SSLContext sslContext = null;
     public SSLContext getSSLContext() { return sslContext;}
     public void setSSLContext(SSLContext c) { sslContext = c;}
@@ -252,6 +254,11 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 return s.getLocalPort();
             }
         }
+    }
+
+
+    public SSLImplementation getSslImplementation() {
+        return sslImplementation;
     }
 
 
@@ -340,7 +347,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
         // Initialize SSL if needed
         if (isSSLEnabled()) {
-            SSLUtil sslUtil = handler.getSslImplementation().getSSLUtil(this);
+            sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
+            SSLUtil sslUtil = sslImplementation.getSSLUtil(this);
 
             sslContext = sslUtil.createSSLContext();
             sslContext.init(wrap(sslUtil.getKeyManagers()),
@@ -1607,6 +1615,22 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         }
 
 
+        /**
+         * {@inheritDoc}
+         * @param clientCertProvider Ignored for this implementation
+         */
+        @Override
+        public SSLSupport getSslSupport(String clientCertProvider) {
+            if (getSocket() instanceof SecureNioChannel) {
+                SecureNioChannel ch = (SecureNioChannel) getSocket();
+                SSLSession session = ch.getSslEngine().getSession();
+                return ((NioEndpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
+            } else {
+                return null;
+            }
+        }
+
+
         @Override
         public void doClientAuth(SSLSupport sslSupport) {
             SecureNioChannel sslChannel = (SecureNioChannel) getSocket();
@@ -1635,7 +1659,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
     public interface Handler extends AbstractEndpoint.Handler<NioChannel> {
         public void release(SocketWrapperBase<NioChannel> socket);
         public void release(SocketChannel socket);
-        public SSLImplementation getSslImplementation();
         public void onCreateSSLEngine(SSLEngine engine);
     }
 

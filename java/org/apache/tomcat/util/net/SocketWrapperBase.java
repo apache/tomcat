@@ -626,6 +626,8 @@ public abstract class SocketWrapperBase<E> {
      */
     public abstract void doClientAuth(SSLSupport sslSupport);
 
+    public abstract SSLSupport getSslSupport(String clientCertProvider);
+
 
     /*
      * TODO

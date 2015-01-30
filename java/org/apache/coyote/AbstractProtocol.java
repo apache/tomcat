@@ -628,7 +628,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     processor = createProcessor();
                 }
 
-                initSsl(wrapper, processor);
+                processor.setSslSupport(
+                        wrapper.getSslSupport(getProtocol().getClientCertProvider()));
 
                 SocketState state = SocketState.CLOSED;
                 Iterator<DispatchType> dispatches = null;
@@ -774,8 +775,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
         protected abstract P createProcessor();
-        protected abstract void initSsl(SocketWrapperBase<S> socket,
-                Processor processor);
         protected abstract void longPoll(SocketWrapperBase<S> socket,
                 Processor processor);
 

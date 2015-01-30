@@ -45,6 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.X509KeyManager;
 
@@ -168,6 +169,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     }
 
 
+    private SSLImplementation sslImplementation = null;
     private SSLContext sslContext = null;
     public SSLContext getSSLContext() { return sslContext;}
     public void setSSLContext(SSLContext c) { sslContext = c;}
@@ -194,6 +196,11 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 return -1;
             }
         }
+    }
+
+
+    public SSLImplementation getSslImplementation() {
+        return sslImplementation;
     }
 
 
@@ -282,7 +289,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         // Initialize SSL if needed
         if (isSSLEnabled()) {
-            SSLUtil sslUtil = handler.getSslImplementation().getSSLUtil(this);
+            sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
+            SSLUtil sslUtil = sslImplementation.getSSLUtil(this);
 
             sslContext = sslUtil.createSSLContext();
             sslContext.init(wrap(sslUtil.getKeyManagers()),
@@ -334,6 +342,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
                         socketProperties.getBufferPool());
             }
+
+            sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
             // Create worker collection
             if ( getExecutor() == null ) {
@@ -1419,6 +1429,22 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
 
+        /**
+         * {@inheritDoc}
+         * @param clientCertProvider Ignored for this implementation
+         */
+        @Override
+        public SSLSupport getSslSupport(String clientCertProvider) {
+            if (getSocket() instanceof SecureNio2Channel) {
+                SecureNio2Channel ch = (SecureNio2Channel) getSocket();
+                SSLSession session = ch.getSslEngine().getSession();
+                return ((Nio2Endpoint) getEndpoint()).getSslImplementation().getSSLSupport(session);
+            } else {
+                return null;
+            }
+        }
+
+
         @Override
         public void doClientAuth(SSLSupport sslSupport) {
             SecureNio2Channel sslChannel = (SecureNio2Channel) getSocket();
@@ -1447,7 +1473,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     public interface Handler extends AbstractEndpoint.Handler<Nio2Channel> {
         public void release(SocketWrapperBase<Nio2Channel> socket);
         public void closeAll();
-        public SSLImplementation getSslImplementation();
         public void onCreateSSLEngine(SSLEngine engine);
     }
 

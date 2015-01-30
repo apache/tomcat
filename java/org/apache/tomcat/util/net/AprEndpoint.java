@@ -2752,6 +2752,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
+        public SSLSupport getSslSupport(String clientCertProvider) {
+            if (getEndpoint().isSSLEnabled()) {
+                return new  AprSSLSupport(this, clientCertProvider);
+            } else {
+                return null;
+            }
+        }
+
+
+        @Override
         public void doClientAuth(SSLSupport sslSupport) {
             long socket = getSocket().longValue();
             // Configure connection to require a certificate

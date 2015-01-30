@@ -27,8 +27,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.SSLImplementation;
-import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -135,11 +133,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
 
 
-        @Override
-        public SSLImplementation getSslImplementation() {
-            return ((Http11NioProtocol) getProtocol()).sslImplementation;
-        }
-
         /**
          * Expected to be used by the Poller to release resources on socket
          * close, errors etc.
@@ -199,22 +192,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
             if (addToPoller) {
                 socket.registerReadInterest();
             }
-        }
-
-
-        @Override
-        protected void initSsl(SocketWrapperBase<NioChannel> socket, Processor processor) {
-            if (getProtocol().isSSLEnabled() &&
-                    (getSslImplementation() != null)
-                    && (socket.getSocket() instanceof SecureNioChannel)) {
-                SecureNioChannel ch = (SecureNioChannel)socket.getSocket();
-                processor.setSslSupport(
-                        getSslImplementation().getSSLSupport(
-                                ch.getSslEngine().getSession()));
-            } else {
-                processor.setSslSupport(null);
-            }
-
         }
 
         @Override
