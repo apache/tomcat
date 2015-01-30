@@ -76,6 +76,4 @@ public interface Processor {
      * @return leftover bytes
      */
     ByteBuffer getLeftoverInput();
-
-
 }

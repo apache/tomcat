@@ -32,7 +32,6 @@ import org.apache.tomcat.spdy.SpdyContext.SpdyHandler;
 import org.apache.tomcat.spdy.SpdyStream;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -127,11 +126,6 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
 
             spdyContext.getNetSupport().onAccept(socket.getSocket());
             return SocketState.CLOSED;
-        }
-
-        @Override
-        public SSLImplementation getSslImplementation() {
-            return null;
         }
 
         @Override

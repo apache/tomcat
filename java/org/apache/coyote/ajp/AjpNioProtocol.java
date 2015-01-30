@@ -27,7 +27,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -72,12 +71,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
         @Override
         protected Log getLog() {
             return log;
-        }
-
-        @Override
-        public SSLImplementation getSslImplementation() {
-            // AJP does not support SSL
-            return null;
         }
 
         /**

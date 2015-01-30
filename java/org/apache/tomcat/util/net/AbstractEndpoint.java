@@ -915,6 +915,12 @@ public abstract class AbstractEndpoint<S> {
 
     // --------------------  SSL related properties --------------------
 
+    private String sslImplementationName = null;
+    public String getSslImplementationName() { return sslImplementationName; }
+    public void setSslImplementationName(String s) {
+        this.sslImplementationName = s;
+    }
+
     private String algorithm = KeyManagerFactory.getDefaultAlgorithm();
     public String getAlgorithm() { return algorithm;}
     public void setAlgorithm(String s ) { this.algorithm = s;}
