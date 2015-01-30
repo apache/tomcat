@@ -45,8 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
    Parts cribbed from JSSECertCompat
    Parts cribbed from CertificatesValve
 */
-
-class JSSESupport implements SSLSupport, SSLSessionManager {
+public class JSSESupport implements SSLSupport, SSLSessionManager {
 
     private static final Log log = LogFactory.getLog(JSSESupport.class);
 
@@ -168,6 +167,11 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
             buf.append(digit);
         }
         return buf.toString();
+    }
+
+
+    public void setSession(SSLSession session) {
+        this.session = session;
     }
 
 

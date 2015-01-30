@@ -980,8 +980,25 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
             break;
         }
-        default: {
-            actionInternal(actionCode, param);
+        case REQ_SSL_CERTIFICATE: {
+            if (sslSupport != null && socketWrapper.getSocket() != null) {
+                // Consume and buffer the request body, so that it does not
+                // interfere with the client's handshake messages
+                InputFilter[] inputFilters = getInputBuffer().getFilters();
+                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(
+                        maxSavePostSize);
+                getInputBuffer().addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
+
+                try {
+                    socketWrapper.doClientAuth(sslSupport);
+                    Object sslO = sslSupport.getPeerCertificateChain();
+                    if (sslO != null) {
+                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                    }
+                } catch (IOException ioe) {
+                    getLog().warn(sm.getString("http11processor.socket.ssl"), ioe);
+                }
+            }
             break;
         }
         }

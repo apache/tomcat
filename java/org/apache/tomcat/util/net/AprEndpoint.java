@@ -2749,5 +2749,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 log.warn(sm.getString("endpoint.warn.noLocalPort"), e);
             }
         }
+
+
+        @Override
+        public void doClientAuth(SSLSupport sslSupport) {
+            long socket = getSocket().longValue();
+            // Configure connection to require a certificate
+            SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE,
+                    ((AprEndpoint)getEndpoint()).getSSLVerifyDepth());
+            SSLSocket.renegotiate(socket);
+        }
     }
 }
