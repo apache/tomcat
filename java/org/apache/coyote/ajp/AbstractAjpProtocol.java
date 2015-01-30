@@ -103,7 +103,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         }
     }
 
-    protected void configureProcessor(AjpProcessor<S> processor) {
+    protected void configureProcessor(AjpProcessor processor) {
         processor.setAdapter(getAdapter());
         processor.setTomcatAuthentication(getTomcatAuthentication());
         processor.setRequiredSecret(requiredSecret);
@@ -112,7 +112,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
     protected abstract static class AbstractAjpConnectionHandler<S>
-            extends AbstractConnectionHandler<S,AjpProcessor<S>> {
+            extends AbstractConnectionHandler<S,AjpProcessor> {
 
         private final AbstractAjpProtocol<S> proto;
 
@@ -127,28 +127,26 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
 
         @Override
-        protected AjpProcessor<S> createProcessor() {
-            AjpProcessor<S> processor =
-                    new AjpProcessor<>(proto.getPacketSize(), proto.getEndpoint());
+        protected AjpProcessor createProcessor() {
+            AjpProcessor processor = new AjpProcessor(proto.getPacketSize(), proto.getEndpoint());
             proto.configureProcessor(processor);
             register(processor);
             return processor;
         }
 
         @Override
-        protected void initSsl(SocketWrapperBase<S> socket, Processor<S> processor) {
+        protected void initSsl(SocketWrapperBase<S> socket, Processor processor) {
             // NOOP for AJP
         }
 
         @Override
-        protected void longPoll(SocketWrapperBase<S> socket,
-                Processor<S> processor) {
+        protected void longPoll(SocketWrapperBase<S> socket, Processor processor) {
             // Same requirements for all AJP connectors
             socket.setAsync(true);
         }
 
         @Override
-        protected AjpProcessor<S> createUpgradeProcessor(SocketWrapperBase<S> socket,
+        protected AjpProcessor createUpgradeProcessor(SocketWrapperBase<?> socket,
                 ByteBuffer leftoverInput, HttpUpgradeHandler httpUpgradeHandler) {
             // TODO should fail - throw IOE
             return null;

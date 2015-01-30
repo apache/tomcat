@@ -93,7 +93,7 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
         spdyContext.setHandler(new SpdyHandler() {
             @Override
             public void onStream(SpdyConnection con, SpdyStream ch) throws IOException {
-                SpdyProcessor<NioChannel> sp = new SpdyProcessor<>(con, getEndpoint());
+                SpdyProcessor sp = new SpdyProcessor(con, getEndpoint());
                 sp.setAdapter(getAdapter());
                 sp.onSynStream(ch);
             }

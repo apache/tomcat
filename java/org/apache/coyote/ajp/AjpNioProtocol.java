@@ -89,12 +89,12 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("ajpnioprotocol.releaseStart", socket));
             boolean released = false;
-            Iterator<java.util.Map.Entry<NioChannel, Processor<NioChannel>>> it = connections.entrySet().iterator();
+            Iterator<java.util.Map.Entry<NioChannel, Processor>> it = connections.entrySet().iterator();
             while (it.hasNext()) {
-                java.util.Map.Entry<NioChannel, Processor<NioChannel>> entry = it.next();
+                java.util.Map.Entry<NioChannel, Processor> entry = it.next();
                 if (entry.getKey().getIOChannel()==socket) {
                     it.remove();
-                    Processor<NioChannel> result = entry.getValue();
+                    Processor result = entry.getValue();
                     result.recycle();
                     unregister(result);
                     released = true;
@@ -113,8 +113,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
          */
         @Override
         public void release(SocketWrapperBase<NioChannel> socket) {
-            Processor<NioChannel> processor =
-                    connections.remove(socket.getSocket());
+            Processor processor = connections.remove(socket.getSocket());
             if (processor != null) {
                 processor.recycle();
                 recycledProcessors.push(processor);
@@ -124,7 +123,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
         @Override
         public void release(SocketWrapperBase<NioChannel> socket,
-               Processor<NioChannel> processor,  boolean addToPoller) {
+               Processor processor,  boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller) {

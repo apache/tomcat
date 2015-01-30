@@ -86,7 +86,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
         @Override
         public void release(SocketWrapperBase<Long> socket,
-                Processor<Long> processor, boolean addToPoller) {
+                Processor processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller) {

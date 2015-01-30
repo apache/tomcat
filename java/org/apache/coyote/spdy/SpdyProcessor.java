@@ -57,7 +57,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  *
  * Based on the AJP processor.
  */
-public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
+public class SpdyProcessor extends AbstractProcessor implements Runnable {
 
     private static final Log log = LogFactory.getLog(SpdyProcessor.class);
 
@@ -82,7 +82,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
 
     private boolean outCommit = false;
 
-    public SpdyProcessor(SpdyConnection spdy, AbstractEndpoint<S> endpoint) {
+    public SpdyProcessor(SpdyConnection spdy, AbstractEndpoint<?> endpoint) {
         super(endpoint);
 
         this.spdy = spdy;
@@ -505,7 +505,7 @@ public class SpdyProcessor<S> extends AbstractProcessor<S> implements Runnable {
     }
 
     @Override
-    public SocketState process(SocketWrapperBase<S> socket)
+    public SocketState process(SocketWrapperBase<?> socket)
             throws IOException {
         throw new IOException("Unimplemented");
     }

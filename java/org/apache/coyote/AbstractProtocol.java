@@ -567,7 +567,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     // ------------------------------------------- Connection handler base class
 
-    protected abstract static class AbstractConnectionHandler<S,P extends Processor<S>>
+    protected abstract static class AbstractConnectionHandler<S,P extends Processor>
             implements AbstractEndpoint.Handler<S> {
 
         protected abstract Log getLog();
@@ -575,7 +575,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         protected final RequestGroupInfo global = new RequestGroupInfo();
         protected final AtomicLong registerCount = new AtomicLong(0);
 
-        protected final ConcurrentHashMap<S,Processor<S>> connections =
+        protected final ConcurrentHashMap<S,Processor> connections =
                 new ConcurrentHashMap<>();
 
         protected final RecycledProcessors<P,S> recycledProcessors =
@@ -610,7 +610,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 return SocketState.CLOSED;
             }
 
-            Processor<S> processor = connections.get(socket);
+            Processor processor = connections.get(socket);
             if (status == SocketStatus.DISCONNECT && processor == null) {
                 // Nothing to do. Endpoint requested a close and there is no
                 // longer a processor associated with this socket.
@@ -775,9 +775,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         protected abstract P createProcessor();
         protected abstract void initSsl(SocketWrapperBase<S> socket,
-                Processor<S> processor);
+                Processor processor);
         protected abstract void longPoll(SocketWrapperBase<S> socket,
-                Processor<S> processor);
+                Processor processor);
 
         /**
          * Expected to be used by the handler once the processor is no longer
@@ -791,12 +791,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
          *                    reading
          */
         protected abstract void release(SocketWrapperBase<S> socket,
-                Processor<S> processor, boolean addToPoller);
-        protected abstract Processor<S> createUpgradeProcessor(
-                SocketWrapperBase<S> socket, ByteBuffer leftoverInput,
+                Processor processor, boolean addToPoller);
+        protected abstract Processor createUpgradeProcessor(
+                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeHandler) throws IOException;
 
-        protected void register(AbstractProcessor<S> processor) {
+        protected void register(AbstractProcessor processor) {
             if (getProtocol().getDomain() != null) {
                 synchronized (this) {
                     try {
@@ -823,7 +823,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             }
         }
 
-        protected void unregister(Processor<S> processor) {
+        protected void unregister(Processor processor) {
             if (getProtocol().getDomain() != null) {
                 synchronized (this) {
                     try {
@@ -849,8 +849,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
     }
 
-    protected static class RecycledProcessors<P extends Processor<S>, S>
-            extends SynchronizedStack<Processor<S>> {
+    protected static class RecycledProcessors<P extends Processor, S>
+            extends SynchronizedStack<Processor> {
 
         private final transient AbstractConnectionHandler<S,P> handler;
         protected final AtomicInteger size = new AtomicInteger(0);
@@ -861,7 +861,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         @SuppressWarnings("sync-override") // Size may exceed cache size a bit
         @Override
-        public boolean push(Processor<S> processor) {
+        public boolean push(Processor processor) {
             int cacheSize = handler.getProtocol().getProcessorCache();
             boolean offer = cacheSize == -1 ? true : size.get() < cacheSize;
             //avoid over growing our cache or add after we have stopped
@@ -878,8 +878,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         @SuppressWarnings("sync-override") // OK if size is too big briefly
         @Override
-        public Processor<S> pop() {
-            Processor<S> result = super.pop();
+        public Processor pop() {
+            Processor result = super.pop();
             if (result != null) {
                 size.decrementAndGet();
             }
@@ -888,7 +888,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         @Override
         public synchronized void clear() {
-            Processor<S> next = pop();
+            Processor next = pop();
             while (next != null) {
                 handler.unregister(next);
                 next = pop();

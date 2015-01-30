@@ -626,6 +626,29 @@ public abstract class SocketWrapperBase<E> {
      */
     public abstract void doClientAuth(SSLSupport sslSupport);
 
+
+    /*
+     * TODO
+     * Temporary method to aid in some refactoring.
+     * It is currently expected that this method will be removed in a subsequent
+     * refactoring.
+     */
+    public void processSocket(SocketStatus socketStatus, boolean dispatch) {
+        endpoint.processSocket(this, socketStatus, dispatch);
+    }
+
+
+    /*
+     * TODO
+     * Temporary method to aid in some refactoring.
+     * It is currently expected that this method will be removed in a subsequent
+     * refactoring.
+     */
+    public void executeNonBlockingDispatches() {
+        endpoint.executeNonBlockingDispatches(this);
+    }
+
+
     // --------------------------------------------------------- Utility methods
 
     protected static int transfer(byte[] from, int offset, int length, ByteBuffer to) {

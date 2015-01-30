@@ -31,10 +31,10 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 /**
  * Common interface for processors of all protocols.
  */
-public interface Processor<S> {
+public interface Processor {
     Executor getExecutor();
 
-    SocketState process(SocketWrapperBase<S> socketWrapper) throws IOException;
+    SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException;
 
     SocketState asyncDispatch(SocketStatus status);
     SocketState asyncPostProcess();

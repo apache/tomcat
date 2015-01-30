@@ -56,11 +56,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * AJP Processor implementation.
- *
- * @param <S> The socket type of the IO implementation used by this processor
- *            instance.
  */
-public class AjpProcessor<S> extends AbstractProcessor<S> {
+public class AjpProcessor extends AbstractProcessor {
 
     private static final Log log = LogFactory.getLog(AjpProcessor.class);
     /**
@@ -250,7 +247,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
 
     // ------------------------------------------------------------ Constructor
 
-    public AjpProcessor(int packetSize, AbstractEndpoint<S> endpoint) {
+    public AjpProcessor(int packetSize, AbstractEndpoint<?> endpoint) {
 
         super(endpoint);
 
@@ -498,13 +495,13 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
         case ASYNC_COMPLETE: {
             socketWrapper.clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
-                endpoint.processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
+                socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
             }
             break;
         }
         case ASYNC_DISPATCH: {
             if (asyncStateMachine.asyncDispatch()) {
-                endpoint.processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
+                socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
             }
             break;
         }
@@ -594,7 +591,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
             break;
         }
         case DISPATCH_EXECUTE: {
-            getEndpoint().executeNonBlockingDispatches(socketWrapper);
+            socketWrapper.executeNonBlockingDispatches();
             break;
         }
         case CLOSE_NOW: {
@@ -690,7 +687,7 @@ public class AjpProcessor<S> extends AbstractProcessor<S> {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState process(SocketWrapperBase<S> socket) throws IOException {
+    public SocketState process(SocketWrapperBase<?> socket) throws IOException {
 
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
