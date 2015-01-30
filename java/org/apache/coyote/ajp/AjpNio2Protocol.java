@@ -16,8 +16,6 @@
  */
 package org.apache.coyote.ajp;
 
-import javax.net.ssl.SSLEngine;
-
 import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -93,10 +91,6 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
             }
             processor.recycle();
             recycledProcessors.push(processor);
-        }
-
-        @Override
-        public void onCreateSSLEngine(SSLEngine engine) {
         }
 
         @Override

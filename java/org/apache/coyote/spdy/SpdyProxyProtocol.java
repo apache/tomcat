@@ -19,8 +19,6 @@ package org.apache.coyote.spdy;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
-import javax.net.ssl.SSLEngine;
-
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.ajp.Constants;
 import org.apache.juli.logging.Log;
@@ -136,11 +134,6 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
         @Override
         public void release(SocketChannel socket) {
             // TODO Auto-generated method stub
-        }
-
-        @Override
-        public void onCreateSSLEngine(SSLEngine engine) {
-            // No SSL in proxy. Should be a NO-OP.
         }
     }
 }

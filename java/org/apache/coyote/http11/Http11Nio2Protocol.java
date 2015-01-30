@@ -18,8 +18,6 @@ package org.apache.coyote.http11;
 
 import java.nio.channels.ReadPendingException;
 
-import javax.net.ssl.SSLEngine;
-
 import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -168,13 +166,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                 //    read
                 // The completion handlers should be in place,
                 // so nothing to do here
-            }
-        }
-
-        @Override
-        public void onCreateSSLEngine(SSLEngine engine) {
-            if (getProtocol().npnHandler != null) {
-                getProtocol().npnHandler.onCreateEngine(engine);
             }
         }
 
