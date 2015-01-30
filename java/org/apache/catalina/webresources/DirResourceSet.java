@@ -100,7 +100,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
                 return new EmptyResource(root, path, f);
             }
             if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
-                path = path += '/';
+                path = path + '/';
             }
             return new FileResource(root, path, f, isReadOnly());
         } else {
