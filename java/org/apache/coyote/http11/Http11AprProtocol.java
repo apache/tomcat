@@ -300,8 +300,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                     proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize());
             proto.configureProcessor(processor);
-            // APR specific configuration
-            processor.setClientCertProvider(proto.getClientCertProvider());
             register(processor);
             return processor;
         }
