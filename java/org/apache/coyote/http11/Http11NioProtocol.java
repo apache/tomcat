@@ -127,7 +127,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
-            extends AbstractConnectionHandler<NioChannel,Http11NioProcessor>
+            extends AbstractConnectionHandler<NioChannel,Http11Processor<NioChannel>>
             implements Handler {
 
         protected Http11NioProtocol proto;
@@ -247,8 +247,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
 
         @Override
-        public Http11NioProcessor createProcessor() {
-            Http11NioProcessor processor = new Http11NioProcessor(
+        public Http11Processor<NioChannel> createProcessor() {
+            Http11Processor<NioChannel> processor = new Http11Processor<>(
                     proto.getMaxHttpHeaderSize(), proto.getEndpoint(),
                     proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
                     proto.getMaxSwallowSize());
