@@ -16,14 +16,7 @@
  */
 package org.apache.coyote.http11;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import javax.servlet.http.HttpUpgradeHandler;
-
-import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AprEndpoint;
@@ -214,15 +207,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     protected static class Http11ConnectionHandler
             extends AbstractHttp11ConnectionHandler<Long> {
 
-        protected Http11AprProtocol proto;
-
         Http11ConnectionHandler(Http11AprProtocol proto) {
-            this.proto = proto;
-        }
-
-        @Override
-        protected AbstractProtocol<Long> getProtocol() {
-            return proto;
+            super(proto);
         }
 
         @Override
@@ -235,17 +221,17 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 Processor processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
-            if (addToPoller && proto.getEndpoint().isRunning()) {
-                ((AprEndpoint)proto.getEndpoint()).getPoller().add(
+            if (addToPoller && getProtocol().getEndpoint().isRunning()) {
+                ((AprEndpoint)getProtocol().getEndpoint()).getPoller().add(
                         socket.getSocket().longValue(),
-                        proto.getEndpoint().getKeepAliveTimeout(), true, false);
+                        getProtocol().getEndpoint().getKeepAliveTimeout(), true, false);
             }
         }
 
         @Override
         public SocketState process(SocketWrapperBase<Long> socket,
                 SocketStatus status) {
-            if (proto.npnHandler != null) {
+            if (getProtocol().npnHandler != null) {
                 Processor processor = null;
                 if (status == SocketStatus.OPEN_READ) {
                     processor = connections.get(socket.getSocket());
@@ -253,7 +239,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 }
                 if (processor == null) {
                     // if not null - handled by http11
-                    SocketState socketState = proto.npnHandler.process(socket, status);
+                    SocketState socketState = getProtocol().npnHandler.process(socket, status);
                     // handled by npn protocol.
                     if (socketState == SocketState.CLOSED ||
                             socketState == SocketState.LONG) {
@@ -266,7 +252,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
         @Override
         protected void initSsl(SocketWrapperBase<Long> socket, Processor processor) {
-            if (proto.isSSLEnabled()) {
+            if (getProtocol().isSSLEnabled()) {
                 AprSSLSupport sslSupport =
                         new AprSSLSupport(socket, processor.getClientCertProvider());
                 processor.setSslSupport(sslSupport);
@@ -283,7 +269,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 socket.setAsync(true);
             } else {
                 // Upgraded
-                Poller p = ((AprEndpoint) proto.getEndpoint()).getPoller();
+                Poller p = ((AprEndpoint) getProtocol().getEndpoint()).getPoller();
                 if (p == null) {
                     // Connector has been stopped
                     release(socket, processor, false);
@@ -291,25 +277,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                     p.add(socket.getSocket().longValue(), -1, true, false);
                 }
             }
-        }
-
-        @Override
-        protected Http11Processor createProcessor() {
-            Http11Processor processor = new Http11Processor(
-                    proto.getMaxHttpHeaderSize(), proto.getEndpoint(),
-                    proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
-                    proto.getMaxSwallowSize());
-            proto.configureProcessor(processor);
-            register(processor);
-            return processor;
-        }
-
-        @Override
-        protected Processor createUpgradeProcessor(
-                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
-                HttpUpgradeHandler httpUpgradeHandler)
-                throws IOException {
-            return new UpgradeProcessor(socket, leftoverInput, httpUpgradeHandler);
         }
     }
 }

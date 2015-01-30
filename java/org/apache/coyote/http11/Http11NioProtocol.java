@@ -16,17 +16,12 @@
  */
 package org.apache.coyote.http11;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 import javax.net.ssl.SSLEngine;
-import javax.servlet.http.HttpUpgradeHandler;
 
-import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
@@ -130,15 +125,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
             extends AbstractHttp11ConnectionHandler<NioChannel>
             implements Handler {
 
-        protected Http11NioProtocol proto;
-
         Http11ConnectionHandler(Http11NioProtocol proto) {
-            this.proto = proto;
-        }
-
-        @Override
-        protected AbstractProtocol<NioChannel> getProtocol() {
-            return proto;
+            super(proto);
         }
 
         @Override
@@ -149,7 +137,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
         @Override
         public SSLImplementation getSslImplementation() {
-            return proto.sslImplementation;
+            return ((Http11NioProtocol) getProtocol()).sslImplementation;
         }
 
         /**
@@ -193,8 +181,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         @Override
         public SocketState process(SocketWrapperBase<NioChannel> socket,
                 SocketStatus status) {
-            if (proto.npnHandler != null) {
-                SocketState ss = proto.npnHandler.process(socket, status);
+            if (getProtocol().npnHandler != null) {
+                SocketState ss = getProtocol().npnHandler.process(socket, status);
                 if (ss != SocketState.OPEN) {
                     return ss;
                 }
@@ -216,12 +204,12 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
         @Override
         protected void initSsl(SocketWrapperBase<NioChannel> socket, Processor processor) {
-            if (proto.isSSLEnabled() &&
-                    (proto.sslImplementation != null)
+            if (getProtocol().isSSLEnabled() &&
+                    (getSslImplementation() != null)
                     && (socket.getSocket() instanceof SecureNioChannel)) {
                 SecureNioChannel ch = (SecureNioChannel)socket.getSocket();
                 processor.setSslSupport(
-                        proto.sslImplementation.getSSLSupport(
+                        getSslImplementation().getSSLSupport(
                                 ch.getSslEngine().getSession()));
             } else {
                 processor.setSslSupport(null);
@@ -244,28 +232,9 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
 
         @Override
-        public Http11Processor createProcessor() {
-            Http11Processor processor = new Http11Processor(
-                    proto.getMaxHttpHeaderSize(), proto.getEndpoint(),
-                    proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
-                    proto.getMaxSwallowSize());
-            proto.configureProcessor(processor);
-            register(processor);
-            return processor;
-        }
-
-        @Override
-        protected Processor createUpgradeProcessor(
-                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
-                HttpUpgradeHandler httpUpgradeHandler)
-                throws IOException {
-            return new UpgradeProcessor(socket, leftoverInput, httpUpgradeHandler);
-        }
-
-        @Override
         public void onCreateSSLEngine(SSLEngine engine) {
-            if (proto.npnHandler != null) {
-                proto.npnHandler.onCreateEngine(engine);
+            if (getProtocol().npnHandler != null) {
+                getProtocol().npnHandler.onCreateEngine(engine);
             }
         }
     }
