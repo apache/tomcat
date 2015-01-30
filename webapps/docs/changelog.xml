@@ -63,6 +63,10 @@
         <code>forceString</code> allows to support non-standard
         string argument property setters. (rjung)
       </add>
+      <fix>
+        Fix <code>TestAbstractAjpProcessor</code> unit test failures on
+        Windows. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -353,8 +353,9 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             String name;
 
             RequestDescriptor request = new RequestDescriptor();
+            String lineSeparator = System.getProperty("line.separator");
 
-            for (String line: body.split("\n")) {
+            for (String line: body.split(lineSeparator)) {
                 n = line.indexOf(": ");
                 if (n > 0) {
                     key = line.substring(0, n);
@@ -397,6 +398,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        @SuppressWarnings("deprecation")
         @Override
         public void service(HttpServletRequest request,
                             HttpServletResponse response)
