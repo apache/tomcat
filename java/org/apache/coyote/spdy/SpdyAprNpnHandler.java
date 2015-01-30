@@ -104,9 +104,4 @@ public class SpdyAprNpnHandler implements NpnHandler<Long> {
         // No need to keep tomcat thread busy - but socket will be handled by apr socket context.
         return SocketState.LONG;
     }
-
-
-    @Override
-    public void onCreateEngine(Object socket) {
-    }
 }

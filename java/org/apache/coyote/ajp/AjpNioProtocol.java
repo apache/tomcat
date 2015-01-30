@@ -19,8 +19,6 @@ package org.apache.coyote.ajp;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
-import javax.net.ssl.SSLEngine;
-
 import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -122,11 +120,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
             if (addToPoller) {
                 socket.registerReadInterest();
             }
-        }
-
-
-        @Override
-        public void onCreateSSLEngine(SSLEngine engine) {
         }
     }
 }

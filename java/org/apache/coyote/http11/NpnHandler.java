@@ -47,12 +47,4 @@ public interface NpnHandler<S> {
      * @param adapter
      */
     public void init(final AbstractEndpoint<S> ep, long sslContext, Adapter adapter);
-
-    /**
-     * Called when a SSLSocket or SSLEngine are first used, to initialize
-     * NPN extension.
-     *
-     * @param socket SSLEngine or SSLSocket
-     */
-    void onCreateEngine(Object socket);
 }
