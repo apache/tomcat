@@ -55,6 +55,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.jsse.JSSESupport;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 
 /**
@@ -1603,6 +1604,23 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         @Override
         protected void populateLocalPort() {
             localPort = getSocket().getIOChannel().socket().getLocalPort();
+        }
+
+
+        @Override
+        public void doClientAuth(SSLSupport sslSupport) {
+            SecureNioChannel sslChannel = (SecureNioChannel) getSocket();
+            SSLEngine engine = sslChannel.getSslEngine();
+            if (!engine.getNeedClientAuth()) {
+                // Need to re-negotiate SSL connection
+                engine.setNeedClientAuth(true);
+                try {
+                    sslChannel.rehandshake(getEndpoint().getSoTimeout());
+                    ((JSSESupport) sslSupport).setSession(engine.getSession());
+                } catch (IOException ioe) {
+                    log.warn(sm.getString("http11processor.socket.sslreneg",ioe));
+                }
+            }
         }
     }
 

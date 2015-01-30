@@ -616,6 +616,15 @@ public abstract class SocketWrapperBase<E> {
      */
     public abstract SendfileState processSendfile(SendfileDataBase sendfileData);
 
+    /**
+     * Require the client to perform CLIENT-CERT authentication if it hasn't
+     * already done so.
+     *
+     * @param sslSupport The SSL/TLS support instance currently being used by
+     *                   the connection that may need updating after the client
+     *                   authentication
+     */
+    public abstract void doClientAuth(SSLSupport sslSupport);
 
     // --------------------------------------------------------- Utility methods
 

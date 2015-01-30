@@ -16,19 +16,11 @@
  */
 package org.apache.coyote.http11;
 
-import java.io.IOException;
-
-import javax.net.ssl.SSLEngine;
-
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.NioChannel;
-import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SecureNioChannel;
 
 
 /**
@@ -63,48 +55,7 @@ public class Http11NioProcessor extends AbstractHttp11Processor<NioChannel> {
      * @param param Action parameter
      */
     @Override
-    @SuppressWarnings("incomplete-switch") // Other cases are handled by action()
     public void actionInternal(ActionCode actionCode, Object param) {
-
-        switch (actionCode) {
-        case REQ_SSL_CERTIFICATE: {
-            if (sslSupport != null) {
-                /*
-                 * Consume and buffer the request body, so that it does not
-                 * interfere with the client's handshake messages
-                 */
-                InputFilter[] inputFilters = getInputBuffer().getFilters();
-                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
-                    .setLimit(maxSavePostSize);
-                getInputBuffer().addActiveFilter
-                    (inputFilters[Constants.BUFFERED_FILTER]);
-                SecureNioChannel sslChannel = (SecureNioChannel) socketWrapper.getSocket();
-                SSLEngine engine = sslChannel.getSslEngine();
-                if (!engine.getNeedClientAuth()) {
-                    // Need to re-negotiate SSL connection
-                    engine.setNeedClientAuth(true);
-                    try {
-                        sslChannel.rehandshake(endpoint.getSoTimeout());
-                        sslSupport = ((NioEndpoint)endpoint).getHandler()
-                                .getSslImplementation().getSSLSupport(
-                                        engine.getSession());
-                    } catch (IOException ioe) {
-                        log.warn(sm.getString("http11processor.socket.sslreneg",ioe));
-                    }
-                }
-
-                try {
-                    Object sslO = sslSupport.getPeerCertificateChain();
-                    if( sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                } catch (Exception e) {
-                    log.warn(sm.getString("http11processor.socket.ssl"), e);
-                }
-            }
-            break;
-        }
-        }
+        // Unused
     }
 }
