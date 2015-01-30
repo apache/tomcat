@@ -16,9 +16,16 @@
  */
 package org.apache.coyote.http11;
 
-import org.apache.coyote.AbstractProtocol;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 
+import javax.servlet.http.HttpUpgradeHandler;
+
+import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Processor;
+import org.apache.coyote.http11.upgrade.UpgradeProcessor;
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
@@ -31,6 +38,17 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     @Override
     protected String getProtocolName() {
         return "Http";
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Over-ridden here to make the method visible to nested classes.
+     */
+    @Override
+    protected AbstractEndpoint<S> getEndpoint() {
+        return super.getEndpoint();
     }
 
 
@@ -234,5 +252,38 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected abstract static class AbstractHttp11ConnectionHandler<S>
             extends AbstractConnectionHandler<S,Http11Processor> {
 
+        private final AbstractHttp11Protocol<S> proto;
+
+
+        protected AbstractHttp11ConnectionHandler(AbstractHttp11Protocol<S> proto) {
+            this.proto = proto;
+        }
+
+
+        @Override
+        protected AbstractHttp11Protocol<S> getProtocol() {
+            return proto;
+        }
+
+
+        @Override
+        public Http11Processor createProcessor() {
+            Http11Processor processor = new Http11Processor(
+                    proto.getMaxHttpHeaderSize(), proto.getEndpoint(),
+                    proto.getMaxTrailerSize(), proto.getMaxExtensionSize(),
+                    proto.getMaxSwallowSize());
+            proto.configureProcessor(processor);
+            register(processor);
+            return processor;
+        }
+
+
+        @Override
+        protected Processor createUpgradeProcessor(
+                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
+                HttpUpgradeHandler httpUpgradeHandler)
+                throws IOException {
+            return new UpgradeProcessor(socket, leftoverInput, httpUpgradeHandler);
+        }
     }
 }
