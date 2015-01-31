@@ -45,19 +45,16 @@ public class ShowSource extends TagSupport {
             (jspFile.toUpperCase(Locale.ENGLISH).indexOf("/META-INF/") != 0))
             throw new JspTagException("Invalid JSP file " + jspFile);
 
-        InputStream in
-            = pageContext.getServletContext().getResourceAsStream(jspFile);
-
+        InputStream in = pageContext.getServletContext().getResourceAsStream(
+                jspFile);
         if (in == null)
-            throw new JspTagException("Unable to find JSP file: "+jspFile);
-
-        JspWriter out = pageContext.getOut();
-
+            throw new JspTagException("Unable to find JSP file: " + jspFile);
 
         try {
+            JspWriter out = pageContext.getOut();
             out.println("<body>");
             out.println("<pre>");
-            for(int ch = in.read(); ch != -1; ch = in.read())
+            for (int ch = in.read(); ch != -1; ch = in.read())
                 if (ch == '<')
                     out.print("&lt;");
                 else
@@ -65,7 +62,13 @@ public class ShowSource extends TagSupport {
             out.println("</pre>");
             out.println("</body>");
         } catch (IOException ex) {
-            throw new JspTagException("IOException: "+ex.toString());
+            throw new JspTagException("IOException: " + ex.toString());
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                throw new JspTagException("Can't close inputstream: ", e);
+            }
         }
         return super.doEndTag();
     }

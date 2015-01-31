@@ -64,6 +64,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Fix possible resource leaks by closing streams properly. Issues
+        reported by Coverity Scan. (fschumacher)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
