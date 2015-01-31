@@ -1135,6 +1135,11 @@ public final class CGIServlet extends HttpServlet {
 
             File f = new File(destPath.toString());
             if (f.exists()) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    log("Could not close is", e);
+                }
                 // Don't need to expand if it already exists
                 return;
             }
@@ -1164,10 +1169,17 @@ public final class CGIServlet extends HttpServlet {
                     }
                     FileOutputStream fos = new FileOutputStream(f);
 
-                    // copy data
-                    IOTools.flow(is, fos);
-                    is.close();
-                    fos.close();
+                    try {
+                        // copy data
+                        IOTools.flow(is, fos);
+                    } finally {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            log("Could not close is.", e);
+                        }
+                        fos.close();
+                    }
                     if (debug >= 2) {
                         log("expandCGIScript: expanded '" + srcPath + "' to '" + destPath + "'");
                     }
