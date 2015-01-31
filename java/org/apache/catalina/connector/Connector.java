@@ -922,7 +922,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Pause the connector.
+     * Resume the connector.
      */
     public void resume() {
         try {
