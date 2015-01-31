@@ -1613,8 +1613,22 @@ public class DefaultServlet
                 if ((obj != null) && (obj instanceof Resource)) {
                     StringWriter buffer = new StringWriter();
                     InputStream is = ((Resource) obj).streamContent();
-                    copyRange(new InputStreamReader(is),
-                            new PrintWriter(buffer));
+                    Reader reader = new InputStreamReader(is);
+                    try {
+                        copyRange(reader,
+                                new PrintWriter(buffer));
+                    } finally {
+                        try {
+                            reader.close();
+                        } catch (IOException e) {
+                            log("Could not close reader", e);
+                        }
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            log("Could not close is", e);
+                        }
+                    }
                     return buffer.toString();
                 }
             } catch (NamingException e) {
