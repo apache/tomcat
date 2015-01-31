@@ -170,24 +170,32 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
             return;
         }
 
-        defaultServerCipherSuites = socket.getEnabledCipherSuites();
-        if (defaultServerCipherSuites.length == 0) {
-            log.warn(sm.getString("jsse.noDefaultCiphers", endpoint.getName()));
-        }
-
-        // Filter out all the SSL protocols (SSLv2 and SSLv3) from the defaults
-        // since they are no longer considered secure
-        List<String> filteredProtocols = new ArrayList<String>();
-        for (String protocol : socket.getEnabledProtocols()) {
-            if (protocol.toUpperCase(Locale.ENGLISH).contains("SSL")) {
-                log.debug(sm.getString("jsse.excludeDefaultProtocol", protocol));
-                continue;
+        try {
+            defaultServerCipherSuites = socket.getEnabledCipherSuites();
+            if (defaultServerCipherSuites.length == 0) {
+                log.warn(sm.getString("jsse.noDefaultCiphers", endpoint.getName()));
             }
-            filteredProtocols.add(protocol);
-        }
-        defaultServerProtocols = filteredProtocols.toArray(new String[filteredProtocols.size()]);
-        if (defaultServerProtocols.length == 0) {
-            log.warn(sm.getString("jsse.noDefaultProtocols", endpoint.getName()));
+    
+            // Filter out all the SSL protocols (SSLv2 and SSLv3) from the defaults
+            // since they are no longer considered secure
+            List<String> filteredProtocols = new ArrayList<String>();
+            for (String protocol : socket.getEnabledProtocols()) {
+                if (protocol.toUpperCase(Locale.ENGLISH).contains("SSL")) {
+                    log.debug(sm.getString("jsse.excludeDefaultProtocol", protocol));
+                    continue;
+                }
+                filteredProtocols.add(protocol);
+            }
+            defaultServerProtocols = filteredProtocols.toArray(new String[filteredProtocols.size()]);
+            if (defaultServerProtocols.length == 0) {
+                log.warn(sm.getString("jsse.noDefaultProtocols", endpoint.getName()));
+            }
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                log.warn(sm.getString("jsse.exceptionOnClose"), e);
+            }
         }
     }
 
