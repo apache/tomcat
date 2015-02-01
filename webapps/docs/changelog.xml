@@ -70,6 +70,10 @@
         Fix possible resource leaks by closing streams properly. Issues
         reported by Coverity Scan. (fschumacher)
       </fix>
+      <fix>
+        <bug>57503</bug>: Make clear that the JULI integration for log4j only
+        works with log4j 1.2.x. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
