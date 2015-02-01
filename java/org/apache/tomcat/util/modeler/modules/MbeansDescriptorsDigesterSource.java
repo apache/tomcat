@@ -36,10 +36,11 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 {
     private static final Log log =
             LogFactory.getLog(MbeansDescriptorsDigesterSource.class);
+    private static final Object dLock = new Object();
 
     private Registry registry;
     private final List<ObjectName> mbeans = new ArrayList<>();
-    private static volatile Digester digester = null;
+    private static Digester digester = null;
 
     private static Digester createDigester() {
 
@@ -156,12 +157,11 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
         InputStream stream = (InputStream) source;
 
-        if (digester == null) {
-            digester = createDigester();
-        }
         ArrayList<ManagedBean> loadedMbeans = new ArrayList<>();
-
-        synchronized (digester) {
+        synchronized(dLock) {
+            if (digester == null) {
+                digester = createDigester();
+            }
 
             // Process the input file to configure our registry
             try {
