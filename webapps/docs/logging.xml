@@ -480,7 +480,7 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
   INFO, HOST-MANAGER]]></source>
     <ol start="2">
         <li><a href="http://logging.apache.org/log4j">Download Log4J</a>
-        (v1.2 or later).</li>
+        (Tomcat requires v1.2.x).</li>
 
         <li><p>Download or build <code>tomcat-juli.jar</code> and
         <code>tomcat-juli-adapters.jar</code> that are available as an "extras"
