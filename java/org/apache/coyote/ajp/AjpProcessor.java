@@ -837,9 +837,11 @@ public class AjpProcessor extends AbstractProcessor {
 
     @Override
     public void setSslSupport(SSLSupport sslSupport) {
-        // Should never reach this code but in case we do...
-        throw new IllegalStateException(
-                sm.getString("ajpprocessor.ssl.notsupported"));
+        if (sslSupport != null) {
+            // Should never reach this code but in case we do...
+            throw new IllegalStateException(
+                    sm.getString("ajpprocessor.ssl.notsupported"));
+        }
     }
 
 
