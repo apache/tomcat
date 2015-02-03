@@ -1762,9 +1762,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         } catch (Exception x) {
                             log.error("",x);
                         }
-                    } else if (state == SocketState.LONG && ka.isAsync() && ka.interestOps() > 0) {
-                        //we are async, and we are interested in operations
-                        ka.getPoller().add(socket, ka.interestOps());
                     }
                 } else if (handshake == -1 ) {
                     if (key != null) {
