@@ -617,7 +617,7 @@ public class AjpProcessor extends AbstractProcessor {
                         if (hasDataToWrite()) {
                             // There is data to write but go via Response to
                             // maintain a consistent view of non-blocking state
-                            response.checkRegisterForWrite(true);
+                            response.checkRegisterForWrite();
                             return SocketState.LONG;
                         }
                     }

@@ -607,16 +607,16 @@ public final class Response {
                 fireListener = true;
                 return false;
             }
-            ready = checkRegisterForWrite(false);
+            ready = checkRegisterForWrite();
             fireListener = !ready;
         }
         return ready;
     }
 
-    public boolean checkRegisterForWrite(boolean internal) {
+    public boolean checkRegisterForWrite() {
         AtomicBoolean ready = new AtomicBoolean(false);
         synchronized (nonBlockingStateLock) {
-            if (!registeredForWrite || internal) {
+            if (!registeredForWrite) {
                 action(ActionCode.NB_WRITE_INTEREST, ready);
                 registeredForWrite = !ready.get();
             }
