@@ -582,9 +582,14 @@ public final class Response {
         // written.
         if (isReady()) {
             action(ActionCode.DISPATCH_WRITE, null);
-            // Need to set the fireListener flag otherwise when the container
-            // tries to trigger onWritePossible, nothing will happen
             synchronized (nonBlockingStateLock) {
+                // Ensure we don't get multiple write registrations if
+                // ServletOutoutStream.isReady() returns false during a call to
+                // onDataAvailable()
+                registeredForWrite = true;
+                // Need to set the fireListener flag otherwise when the
+                // container tries to trigger onWritePossible, nothing will
+                // happen
                 fireListener = true;
             }
         }
