@@ -148,7 +148,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         if (handler == null) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullHandler"));
         }
-        StateUpdateSendHandler sush = new StateUpdateSendHandler(handler);
+        StateUpdateSendHandler sush = new StateUpdateSendHandler(handler, stateMachine);
         stateMachine.binaryStart();
         startMessage(Constants.OPCODE_BINARY, data, true, sush);
     }
@@ -1151,12 +1151,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private class StateUpdateSendHandler implements SendHandler {
+    private static class StateUpdateSendHandler implements SendHandler {
 
         private final SendHandler handler;
+        private final StateMachine stateMachine;
 
-        public StateUpdateSendHandler(SendHandler handler) {
+        public StateUpdateSendHandler(SendHandler handler, StateMachine stateMachine) {
             this.handler = handler;
+            this.stateMachine = stateMachine;
         }
 
         @Override
