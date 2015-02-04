@@ -1730,7 +1730,8 @@ public class Http11Processor extends AbstractProcessor {
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
 
-        if (status == SocketStatus.OPEN_WRITE) {
+        if (status == SocketStatus.OPEN_WRITE &&
+                response.getWriteListener() != null) {
             try {
                 asyncStateMachine.asyncOperation();
 
