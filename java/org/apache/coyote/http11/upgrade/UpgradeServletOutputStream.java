@@ -74,8 +74,14 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         // fireListener when determining if the listener should fire
         synchronized (fireListenerLock) {
             if (flushing) {
-                socketWrapper.registerWriteInterest();
+                // Since flushing is true the socket must already be registered
+                // for write and multiple registrations will cause problems.
                 fireListener = true;
+                return false;
+            } else if (fireListener){
+                // If the listener is configured to fire then the socket must
+                // already be registered for write and multiple registrations
+                // will cause problems.
                 return false;
             } else {
                 boolean result = socketWrapper.isReadyForWrite();
@@ -141,6 +147,9 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             synchronized (writeLock) {
                 if (updateFlushing) {
                     flushing = socketWrapper.flush(block);
+                    if (flushing) {
+                        socketWrapper.registerWriteInterest();
+                    }
                 } else {
                     socketWrapper.flush(block);
                 }
@@ -187,7 +196,6 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         if (flushing) {
             flushInternal(false, true);
             if (flushing) {
-                socketWrapper.registerWriteInterest();
                 return;
             }
         } else {
