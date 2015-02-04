@@ -36,7 +36,7 @@ PATCHES PROPOSED TO BACKPORT:
   believe there is any harm in this - the interface isn't really usable prior to
   this patch - but I'd prefer this change to be RTC.
   http://svn.apache.org/viewvc?rev=1430602&view=rev
-  +1: markt
+  +1: markt, fhanik
   -1:
 
 * Back-port r1437083 from trunk.
