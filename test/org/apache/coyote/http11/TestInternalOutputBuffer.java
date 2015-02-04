@@ -41,6 +41,10 @@ public class TestInternalOutputBuffer extends TomcatBaseTest {
         ExpectationClient client = new ExpectationClient();
 
         client.setPort(tomcat.getConnector().getLocalPort());
+        // Expected content doesn't end with a CR-LF so if it isn't chunked make
+        // sure the content length is used as reading it line-by-line will fail
+        // since there is no "line".
+        client.setUseContentLength(true);
 
         client.connect();
 
