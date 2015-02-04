@@ -62,6 +62,10 @@
         Clarify threaded usage of variables by removing volatile marker
         in NonceInfo. Issue reported by Coverity Scan. (fschumacher)
       </fix>
+      <fix>
+        <bug>57180</bug>: Further fixes to support the use of arbitrary HTTP
+        methods with the CORS filter. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
