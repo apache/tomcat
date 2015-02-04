@@ -99,6 +99,7 @@ public class UpgradeProcessor implements Processor, WebConnection {
     public final SocketState upgradeDispatch(SocketStatus status) throws IOException {
         if (status == SocketStatus.OPEN_READ) {
             upgradeServletInputStream.onDataAvailable();
+            upgradeServletOutputStream.checkWriteDispatch();
         } else if (status == SocketStatus.OPEN_WRITE) {
             upgradeServletOutputStream.onWritePossible();
         } else if (status == SocketStatus.STOP) {
