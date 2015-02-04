@@ -1737,9 +1737,14 @@ public class Http11Processor extends AbstractProcessor {
 
                 if (outputBuffer.hasDataToWrite()) {
                     if (outputBuffer.flushBuffer(false)) {
-                        // There is data to write but go via Response to
-                        // maintain a consistent view of non-blocking state
-                        response.checkRegisterForWrite();
+                        // The buffer wasn't fully flushed so re-register the
+                        // socket for write. Note this does not go via the
+                        // Response since the write registration state at
+                        // that level should remain unchanged. Once the buffer
+                        // has been emptied then the code below will call
+                        // Adaptor.asyncDispatch() which will enable the
+                        // Response to respond to this event.
+                        outputBuffer.registerWriteInterest();
                         return SocketState.LONG;
                     }
                 }

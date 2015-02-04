@@ -583,6 +583,11 @@ public class Http11OutputBuffer implements OutputBuffer {
     }
 
 
+    public void registerWriteInterest() {
+        socketWrapper.registerWriteInterest();
+    }
+
+
     // ------------------------------------------ SocketOutputBuffer Inner Class
 
     /**
