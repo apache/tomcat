@@ -1028,15 +1028,6 @@ public final class CorsFilter implements Filter {
     }
 
     /**
-     * {@link Collection} of HTTP methods. Case sensitive.
-     * @deprecated Not used. Will be removed in Tomcat 9.0.x onwards.
-     */
-    @Deprecated
-    public static final Collection<String> HTTP_METHODS =
-            new HashSet<>(Arrays.asList("OPTIONS", "GET", "HEAD", "POST", "PUT",
-                    "DELETE", "TRACE", "CONNECT"));
-
-    /**
      * {@link Collection} of Simple HTTP methods. Case sensitive.
      *
      * @see  <a href="http://www.w3.org/TR/cors/#terminology"
