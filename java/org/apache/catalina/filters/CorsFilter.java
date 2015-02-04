@@ -338,8 +338,7 @@ public final class CorsFilter implements Filter {
         // Section 6.2.3
         String accessControlRequestMethod = request.getHeader(
                 CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
-        if (accessControlRequestMethod == null ||
-                !HTTP_METHODS.contains(accessControlRequestMethod.trim())) {
+        if (accessControlRequestMethod == null) {
             handleInvalidCORS(request, response, filterChain);
             return;
         } else {
@@ -623,7 +622,7 @@ public final class CorsFilter implements Filter {
                 requestType = CORSRequestType.INVALID_CORS;
             } else {
                 String method = request.getMethod();
-                if (method != null && HTTP_METHODS.contains(method)) {
+                if (method != null) {
                     if ("OPTIONS".equals(method)) {
                         String accessControlRequestMethodHeader =
                                 request.getHeader(
@@ -1030,14 +1029,13 @@ public final class CorsFilter implements Filter {
 
     /**
      * {@link Collection} of HTTP methods. Case sensitive.
-     *
-     * @see  <a href="http://tools.ietf.org/html/rfc2616#section-5.1.1"
-     *       >http://tools.ietf.org/html/rfc2616#section-5.1.1</a>
-     *
+     * @deprecated Not used. Will be removed in Tomcat 9.0.x onwards.
      */
+    @Deprecated
     public static final Collection<String> HTTP_METHODS =
             new HashSet<>(Arrays.asList("OPTIONS", "GET", "HEAD", "POST", "PUT",
                     "DELETE", "TRACE", "CONNECT"));
+
     /**
      * {@link Collection} of Simple HTTP methods. Case sensitive.
      *
