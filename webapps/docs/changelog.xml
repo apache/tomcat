@@ -66,6 +66,9 @@
         <bug>57180</bug>: Further fixes to support the use of arbitrary HTTP
         methods with the CORS filter. (markt)
       </fix>
+      <add>
+        Warn about problematic setting of appBase. (fschumacher)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

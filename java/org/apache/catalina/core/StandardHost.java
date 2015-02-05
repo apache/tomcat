@@ -222,6 +222,9 @@ public class StandardHost extends ContainerBase implements Host {
     @Override
     public void setAppBase(String appBase) {
 
+        if (appBase.trim().equals("")) {
+            log.warn(sm.getString("standardHost.problematicAppBase", getName()));
+        }
         String oldAppBase = this.appBase;
         this.appBase = appBase;
         support.firePropertyChange("appBase", oldAppBase, this.appBase);
