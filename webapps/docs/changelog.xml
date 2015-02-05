@@ -68,6 +68,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>57509</bug>: Improve length check when writing HTTP/1.1
+        response headers: reserve space for 4 extra bytes. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
