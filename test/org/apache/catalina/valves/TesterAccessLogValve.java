@@ -32,7 +32,7 @@ import org.apache.catalina.connector.Response;
 public class TesterAccessLogValve extends ValveBase implements AccessLog {
 
     // Timing tests need a small error margin to prevent failures
-    private static final long ERROR_MARGIN = 100;
+    private static final long ERROR_MARGIN = 500;
 
     private final List<Entry> entries = new ArrayList<>();
 
