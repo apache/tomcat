@@ -18,10 +18,12 @@ package org.apache.catalina.connector;
 
 import java.net.URI;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class TestResponsePerformance {
+import org.apache.catalina.startup.LoggingBaseTest;
+
+public class TestResponsePerformance extends LoggingBaseTest {
 
     private final int ITERATIONS = 100000;
 
@@ -46,13 +48,13 @@ public class TestResponsePerformance {
         while (count < attempts && !homebrewWin) {
             long homebrew = doHomebrew(resp);
             long uri = doUri();
-            System.out.println("Current 'home-brew': " + homebrew + "ms, Using URI: " + uri + "ms");
+            log.info("Current 'home-brew': " + homebrew + "ms, Using URI: " + uri + "ms");
             if (homebrew < uri) {
                 homebrewWin = true;
             }
             count++;
         }
-        assertTrue(homebrewWin);
+        Assert.assertTrue(homebrewWin);
     }
 
 
