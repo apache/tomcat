@@ -37,24 +37,23 @@ public class TestResponsePerformance extends LoggingBaseTest {
         doHomebrew(resp);
         doUri();
 
-        // Performance varies significantly between local testing and CI system.
-        // This test regularly causes CI failures. Therefore one homebrew win is
-        // sufficient for this test to pass.
-
-        final int attempts = 5;
-        boolean homebrewWin = false;
+        // To allow for timing differences between runs, a "best of n" approach
+        // is taken for this test
+        final int bestOf = 5;
+        final int winTarget = (bestOf + 1) / 2;
+        int homebrewWin = 0;
         int count = 0;
 
-        while (count < attempts && !homebrewWin) {
+        while (count < bestOf && homebrewWin < winTarget) {
             long homebrew = doHomebrew(resp);
             long uri = doUri();
             log.info("Current 'home-brew': " + homebrew + "ms, Using URI: " + uri + "ms");
             if (homebrew < uri) {
-                homebrewWin = true;
+                homebrewWin++;
             }
             count++;
         }
-        Assert.assertTrue(homebrewWin);
+        Assert.assertTrue(homebrewWin == winTarget);
     }
 
 
