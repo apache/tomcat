@@ -1414,7 +1414,7 @@
         <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
         <sysproperty key="tomcat.test.reports" value="${test.reports}" />
         <sysproperty key="tomcat.test.openssl.path" value="${test.openssl.path}" />
-      	<sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" /> 
+        <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
         <!-- File for Cobertura to write coverage results to -->
         <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
 
@@ -1439,8 +1439,8 @@
             <exclude name="org/apache/catalina/tribes/test/**" />
             <!-- Exclude the OpenSSL tests unless OpenSSL is available -->
             <exclude name="org/apache/tomcat/util/net/jsse/openssl/**" unless="${test.openssl.exists}" />
-          	<!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
-          	<exclude name="**/*Performance.java" if="${test.excludePerformance}" />
+            <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
+            <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
           </fileset>
         </batchtest>
       </junit>
