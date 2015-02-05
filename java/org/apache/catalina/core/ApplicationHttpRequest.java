@@ -373,15 +373,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         parseParameters();
 
-        Object value = parameters.get(name);
-        if (value == null)
-            return (null);
-        else if (value instanceof String[])
-            return (((String[]) value)[0]);
-        else if (value instanceof String)
-            return ((String) value);
-        else
-            return (value.toString());
+        String[] value = parameters.get(name);
+        if (value == null) {
+            return null;
+        }
+        return value[0];
 
     }
 
@@ -421,20 +417,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     public String[] getParameterValues(String name) {
 
         parseParameters();
-        Object value = parameters.get(name);
-        if (value == null)
-            return null;
-        else if (value instanceof String[])
-            return ((String[]) value);
-        else if (value instanceof String) {
-            String values[] = new String[1];
-            values[0] = (String) value;
-            return (values);
-        } else {
-            String values[] = new String[1];
-            values[0] = value.toString();
-            return (values);
-        }
+        return parameters.get(name);
 
     }
 
