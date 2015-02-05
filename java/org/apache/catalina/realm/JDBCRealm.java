@@ -522,8 +522,8 @@ public class JDBCRealm
                 // Ensure that we have an open database connection
                 open();
 
-                try (PreparedStatement stmt = credentials(dbConnection, username);
-                        ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = credentials(dbConnection, username);
+                try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         dbCredentials = rs.getString(1);
                     }
@@ -551,7 +551,6 @@ public class JDBCRealm
 
         return null;
     }
-
 
     /**
      * Return the Principal associated with the given user name.
@@ -591,8 +590,8 @@ public class JDBCRealm
                 // Ensure that we have an open database connection
                 open();
 
-                try (PreparedStatement stmt = roles(dbConnection, username);
-                        ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = roles(dbConnection, username);
+                try (ResultSet rs = stmt.executeQuery()) {
                     // Accumulate the user's roles
                     ArrayList<String> roleList = new ArrayList<>();
 
