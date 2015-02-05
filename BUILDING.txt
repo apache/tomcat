@@ -404,6 +404,20 @@ For example:
   Apache License v1.1. See http://cobertura.sf.net for details. Using it
   during Tomcat build is optional and is off by default.
 
+ 6. The performance tests are written to run reasonably powerful machines (such
+    as a developer may use day to day) assuming no other resource hungry
+    processes are running. These assumptions are not always true (e.g. on CI
+    systems running ina virtual machine) so the performance tests may be
+    disabled by using the following property:
+
+        test.excludePerformance=true
+
+ 7. Some tests include checks that the access log valve entries are as expected.
+    These checks include timings. On slower / loaded systems these checks will
+    often fail. The checks may be relaxed by using the following proeprty:
+
+        test.relaxTiming=true
+
 
 (8) Source code checks
 
