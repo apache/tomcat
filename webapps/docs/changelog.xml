@@ -102,6 +102,10 @@
         Fix <code>TestAbstractAjpProcessor</code> unit test failures on
         Windows. (kkolinko)
       </fix>
+      <fix>
+        Guard the digester from MbeansDescriptorsDigesterSource with its own
+        lock object. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -36,6 +36,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 {
     private static final Log log =
             LogFactory.getLog(MbeansDescriptorsDigesterSource.class);
+    private static final Object dLock = new Object();
 
     Registry registry;
     String type;
@@ -224,13 +225,13 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
         InputStream stream = (InputStream) source;
 
-        if (digester == null) {
-            digester = createDigester();
-        }
         ArrayList<ManagedBean> loadedMbeans = new ArrayList<ManagedBean>();
-        
-        synchronized (digester) {
-            
+
+        synchronized(dLock) {
+            if (digester == null) {
+                digester = createDigester();
+            }
+
             // Process the input file to configure our registry
             try {
                 // Push our registry object onto the stack
@@ -242,7 +243,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
             } finally {
                 digester.reset();
             }
-        
+
         }
         Iterator<ManagedBean> iter = loadedMbeans.iterator();
         while (iter.hasNext()) {
