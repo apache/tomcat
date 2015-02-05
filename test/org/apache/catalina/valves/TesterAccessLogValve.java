@@ -31,8 +31,10 @@ import org.apache.catalina.connector.Response;
 
 public class TesterAccessLogValve extends ValveBase implements AccessLog {
 
-    // Timing tests need a small error margin to prevent failures
-    private static final long ERROR_MARGIN = 500;
+    private static boolean RELAX_TIMING = Boolean.getBoolean("tomcat.test.relaxTiming");
+
+    // Timing tests need an error margin to prevent failures.
+    private static final long ERROR_MARGIN = RELAX_TIMING ? 1000 : 100;
 
     private final List<Entry> entries = new ArrayList<>();
 
