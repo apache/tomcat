@@ -62,7 +62,7 @@ import org.xml.sax.SAXException;
  * <p>
  * Mapping a subpath (e.g. <code>/webdav/*</code> to this servlet has the effect
  * of re-mounting the entire web application under that sub-path, with WebDAV
- * access to all the resources. This <code>WEB-INF</code> and <code>META-INF</code>
+ * access to all the resources. The <code>WEB-INF</code> and <code>META-INF</code>
  * directories are protected in this re-mounted resource tree.
  * <p>
  * To enable WebDAV for a context add the following to web.xml:
