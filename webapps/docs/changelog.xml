@@ -77,6 +77,10 @@
         <bug>57509</bug>: Improve length check when writing HTTP/1.1
         response headers: reserve space for 4 extra bytes. (kkolinko)
       </fix>
+      <fix>
+        <bug>57544</bug>: Fix potential infinite loop when preparing a kept
+        alive HTTP connection for the next request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
