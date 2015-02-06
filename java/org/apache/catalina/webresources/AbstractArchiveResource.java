@@ -172,6 +172,10 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
         int pos = 0;
         try (JarInputStreamWrapper jisw = getJarInputStreamWrapper()) {
+            if (jisw == null) {
+                // An error occurred, don't return corrupted content
+                return null;
+            }
             while (pos < size) {
                 int n = jisw.read(result, pos, size - pos);
                 if (n < 0) {
@@ -187,6 +191,8 @@ public abstract class AbstractArchiveResource extends AbstractResource {
                 getLog().debug(sm.getString("abstractResource.getContentFail",
                         getWebappPath()), ioe);
             }
+            // Don't return corrupted content
+            return null;
         }
 
         return result;
