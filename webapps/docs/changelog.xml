@@ -191,7 +191,7 @@
       </add>
       <add>
         Back-port clarification from Servlet 3.1 specification that during
-        aysnc processing an <code>IllegalStateException</code> should be thrown
+        async processing an <code>IllegalStateException</code> should be thrown
         if <code>getRequest()</code> or <code>getResponse()</code> is called
         after <code>complete()</code> or <code>dispatch()</code>. (markt)
       </add>
