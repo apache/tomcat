@@ -280,9 +280,10 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
         // Copy leftover bytes to the beginning of the buffer
         if (lastValid - pos > 0 && pos > 0) {
             System.arraycopy(buf, pos, buf, 0, lastValid - pos);
-            lastValid = lastValid - pos;
-            pos = 0;
         }
+        // Always reset pos to zero
+        lastValid = lastValid - pos;
+        pos = 0;
 
         // Recycle filters
         for (int i = 0; i <= lastActiveFilter; i++) {
