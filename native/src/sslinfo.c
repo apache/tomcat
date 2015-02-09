@@ -218,8 +218,9 @@ TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
         {
             SSL_SESSION *session  = SSL_get_session(s->ssl);
             if (session) {
-                array = tcn_new_arrayb(e, &session->session_id[0],
-                                       session->session_id_length);
+                unsigned int len;
+                const unsigned char *id = SSL_SESSION_get_id(session, &len);
+                array = tcn_new_arrayb(e, id, len);
             }
         }
         break;
@@ -298,8 +299,9 @@ TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
         {
             SSL_SESSION *session  = SSL_get_session(s->ssl);
             if (session) {
-                char *hs = convert_to_hex(&session->session_id[0],
-                                          session->session_id_length);
+                unsigned int len;
+                const unsigned char *id = SSL_SESSION_get_id(session, &len);
+                char *hs = convert_to_hex(id, len);
                 if (hs) {
                     value = tcn_new_string(e, hs);
                     free(hs);

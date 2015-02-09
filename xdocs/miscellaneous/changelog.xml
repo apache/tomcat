@@ -36,6 +36,14 @@
   new documentation project for Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.32 and 1.1.33">
+  <changelog>
+    <fix>
+      Fix compilation failures with master branch of OpenSSL. Replace access
+      to OpenSSL session internals by accessor function. (rjung)
+    </fix>
+  </changelog>
+</section>
 <section name="Changes between 1.1.31 and 1.1.32">
   <changelog>
     <fix>
