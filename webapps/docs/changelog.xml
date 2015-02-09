@@ -83,6 +83,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>57136</bug>: Ensure only <code>\${</code> and <code>\#{</code> are
+        treated as escapes for <code>${</code> and <code>#{</code> rather than
+        <code>\$</code> and <code>\#</code> being treated as escapes for
+        <code>$</code> and <code>#</code> when processing literal expressions in
+        expression language. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

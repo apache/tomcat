@@ -18,13 +18,15 @@
 <p>01-\${1+1}</p>
 <p>02-\\${1+1}</p>
 <p>03-\\\${1+1}</p>
-<tags:echo echo="04-${1+1}" />
-<tags:echo echo="05-\${1+1}" />
-<tags:echo echo="06-\\${1+1}" />
-<tags:echo echo="07-\\\${1+1}" />
-<tags:echo echo="08-\\\\${1+1}" />
-<tags:echo-deferred echo="09-#{1+1}" />
-<tags:echo-deferred echo="10-\#{1+1}" />
-<tags:echo-deferred echo="11-\\#{1+1}" />
-<tags:echo-deferred echo="12-\\\#{1+1}" />
-<tags:echo-deferred echo="13-\\\\#{1+1}" />
+<p>04-\$500</p>
+<tags:echo echo="10-${1+1}" />
+<tags:echo echo="11-\${1+1}" />
+<tags:echo echo="12-\\${1+1}" />
+<tags:echo echo="13-\\\${1+1}" />
+<tags:echo echo="14-\\\\${1+1}" />
+<tags:echo echo="15-\$500" />
+<tags:echo-deferred echo="20-#{1+1}" />
+<tags:echo-deferred echo="21-\#{1+1}" />
+<tags:echo-deferred echo="22-\\#{1+1}" />
+<tags:echo-deferred echo="23-\\\#{1+1}" />
+<tags:echo-deferred echo="24-\\\\#{1+1}" />

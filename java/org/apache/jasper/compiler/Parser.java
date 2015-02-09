@@ -1262,7 +1262,7 @@ class Parser implements TagConstants {
 
     /*
      * Parse for a template text string until '<' or "${" or "#{" is encountered,
-     * recognizing escape sequences "<\%", "\$", and "\#".
+     * recognizing escape sequences "<\%", "\${", and "\#{".
      */
     private void parseTemplateText(Node parent) throws JasperException {
 
@@ -1279,39 +1279,53 @@ class Parser implements TagConstants {
         }
 
         while (reader.hasMoreInput()) {
-            int prev = ch;
             ch = reader.nextChar();
             if (ch == '<') {
-                reader.pushChar();
-                break;
-            } else if ((ch == '$' || ch == '#') && !pageInfo.isELIgnored()) {
-                if (!reader.hasMoreInput()) {
-                    ttext.write(ch);
+                // Check for "<\%"
+                if (reader.nextChar() == '\\') {
+                    if (reader.nextChar() == '%') {
+                        ttext.append('<');
+                        ttext.append('%');
+                    } else {
+                        reader.pushChar();
+                        reader.pushChar();
+                        reader.pushChar();
+                        break;
+                    }
+                } else {
+                    reader.pushChar();
+                    reader.pushChar();
                     break;
                 }
+            } else if (ch == '\\' && !pageInfo.isELIgnored()) {
+                int next = reader.nextChar();
+                if (next == '$' || next == '#') {
+                    if (reader.nextChar() == '{') {
+                        ttext.write(next);
+                        ttext.append('{');
+                    } else {
+                        ttext.append('\\');
+                        ttext.write(next);
+                        reader.pushChar();
+                    }
+                } else {
+                    ttext.append('\\');
+                    reader.pushChar();
+                }
+            } else if ((ch == '$' || ch == '#') && !pageInfo.isELIgnored()) {
                 if (reader.nextChar() == '{') {
                     reader.pushChar();
                     reader.pushChar();
                     break;
+                } else {
+                    reader.pushChar();
+                    ttext.write(ch);
                 }
+            } else {
                 ttext.write(ch);
-                reader.pushChar();
-                continue;
-            } else if (ch == '\\') {
-                if (!reader.hasMoreInput()) {
-                    ttext.write('\\');
-                    break;
-                }
-                char next = (char) reader.peekChar();
-                // Looking for \% or \$ or \#
-                if ((prev == '<' && next == '%') ||
-                        ((next == '$' || next == '#') &&
-                                !pageInfo.isELIgnored())) {
-                    ch = reader.nextChar();
-                }
             }
-            ttext.write(ch);
         }
+
         new Node.TemplateText(ttext.toString(), start, parent);
     }
 
