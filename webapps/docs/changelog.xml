@@ -92,6 +92,12 @@
         <code>$</code> and <code>#</code> when processing literal expressions in
         expression language. (markt)
       </fix>
+      <fix>
+        <bug>57148</bug>: When coercing an object to a given type and a
+        <code>PropertyEditor</code> has been registered for the type correctly
+        coerce the empty string to <code>null</code> if the
+        <code>PropertyEditor</code> throws an exception. (kkolinko/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
