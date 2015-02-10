@@ -28,20 +28,7 @@
   <typedef resource="org/apache/catalina/ant/catalina.tasks">
     <classpath>
       <fileset file="${catalina.home}/bin/tomcat-juli.jar"/>
-      <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
-      <fileset file="${catalina.home}/lib/catalina.jar"/>
-      <fileset file="${catalina.home}/lib/el-api.jar"/>
-      <fileset file="${catalina.home}/lib/jasper.jar"/>
-      <fileset file="${catalina.home}/lib/jasper-el.jar"/>
-      <fileset file="${catalina.home}/lib/jsp-api.jar"/>
-      <fileset file="${catalina.home}/lib/servlet-api.jar"/>
-      <fileset file="${catalina.home}/lib/tomcat-api.jar"/>
-      <fileset file="${catalina.home}/lib/tomcat-coyote.jar"/>
-      <fileset file="${catalina.home}/lib/tomcat-util.jar"/>
-      <fileset file="${catalina.home}/lib/tomcat-i18n-es.jar"/>
-      <fileset file="${catalina.home}/lib/tomcat-i18n-fr.jar"/>
-      <fileset file="${catalina.home}/lib/tomcat-i18n-ja.jar"/>
-      <fileset file="${catalina.home}/lib/tomcat-util-scan.jar"/>
+      <fileset dir="${catalina.home}/lib" includes="*.jar"/>
     </classpath>
   </typedef>
   <typedef resource="org/apache/catalina/ant/jmx/jmxaccessor.tasks">
