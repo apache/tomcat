@@ -21,12 +21,16 @@ import java.io.IOException;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 public class UpgradeServletInputStream extends ServletInputStream {
 
-    protected static final StringManager sm =
+    private static final Log log = LogFactory.getLog(UpgradeServletInputStream.class);
+    private static final StringManager sm =
             StringManager.getManager(UpgradeServletInputStream.class);
 
     private final SocketWrapperBase<?> socketWrapper;
@@ -176,7 +180,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
     }
 
 
-    protected final void onDataAvailable() throws IOException {
+    final void onDataAvailable() {
         if (listener == null) {
             return;
         }
@@ -186,13 +190,16 @@ public class UpgradeServletInputStream extends ServletInputStream {
         try {
             thread.setContextClassLoader(applicationLoader);
             listener.onDataAvailable();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            onError(t);
         } finally {
             thread.setContextClassLoader(originalClassLoader);
         }
     }
 
 
-    protected final void onError(Throwable t) {
+    private final void onError(Throwable t) {
         if (listener == null) {
             return;
         }
@@ -201,14 +208,24 @@ public class UpgradeServletInputStream extends ServletInputStream {
         try {
             thread.setContextClassLoader(applicationLoader);
             listener.onError(t);
+        } catch (Throwable t2) {
+            ExceptionUtils.handleThrowable(t2);
+            log.warn(sm.getString("upgrade.sis.onErrorFail"), t2);
         } finally {
             thread.setContextClassLoader(originalClassLoader);
+        }
+        try {
+            close();
+        } catch (IOException ioe) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgrade.sis.errorCloseFail"), ioe);
+            }
         }
         ready = Boolean.FALSE;
     }
 
 
-    protected final boolean isCloseRequired() {
+    final boolean isCloseRequired() {
         return closeRequired;
     }
 }

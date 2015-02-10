@@ -21,6 +21,8 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -28,10 +30,11 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class UpgradeServletOutputStream extends ServletOutputStream {
 
-    protected static final StringManager sm =
+    private static final Log log = LogFactory.getLog(UpgradeServletOutputStream.class);
+    private static final StringManager sm =
             StringManager.getManager(UpgradeServletOutputStream.class);
 
-    protected final SocketWrapperBase<?> socketWrapper;
+    private final SocketWrapperBase<?> socketWrapper;
 
     // Used to ensure that isReady() and onWritePossible() have a consistent
     // view of buffer and registered.
@@ -114,7 +117,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     }
 
 
-    protected final boolean isCloseRequired() {
+    final boolean isCloseRequired() {
         return closeRequired;
     }
 
@@ -193,17 +196,22 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     }
 
 
-    protected final void onWritePossible() throws IOException {
-        if (flushing) {
-            flushInternal(false, true);
+    final void onWritePossible() {
+        try {
             if (flushing) {
-                return;
+                flushInternal(false, true);
+                if (flushing) {
+                    return;
+                }
+            } else {
+                // This may fill the write buffer in which case the
+                // isReadyForWrite() call below will re-register the socket for
+                // write
+                flushInternal(false, false);
             }
-        } else {
-            // This may fill the write buffer in which case the
-            // isReadyForWrite() call below will re-register the socket for
-            // write
-            flushInternal(false, false);
+        } catch (IOException ioe) {
+            onError(ioe);
+            return;
         }
 
         // Make sure isReady() and onWritePossible() have a consistent view
@@ -225,6 +233,9 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             try {
                 thread.setContextClassLoader(applicationLoader);
                 listener.onWritePossible();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                onError(t);
             } finally {
                 thread.setContextClassLoader(originalClassLoader);
             }
@@ -232,7 +243,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     }
 
 
-    protected final void onError(Throwable t) {
+    private final void onError(Throwable t) {
         if (listener == null) {
             return;
         }
@@ -241,8 +252,18 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         try {
             thread.setContextClassLoader(applicationLoader);
             listener.onError(t);
+        } catch (Throwable t2) {
+            ExceptionUtils.handleThrowable(t2);
+            log.warn(sm.getString("upgrade.sos.onErrorFail"), t2);
         } finally {
             thread.setContextClassLoader(originalClassLoader);
+        }
+        try {
+            close();
+        } catch (IOException ioe) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgrade.sos.errorCloseFail"), ioe);
+            }
         }
     }
 
