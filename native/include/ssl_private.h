@@ -295,12 +295,6 @@ typedef struct {
 } tcn_ssl_conn_t;
 
 
-#define SSL_CTX_get_extra_certs(ctx)        ((ctx)->extra_certs)
-#define SSL_CTX_set_extra_certs(ctx, value) \
-    TCN_BEGIN_MACRO                         \
-        (ctx)->extra_certs = (value);       \
-    TCN_END_MACRO
-
 /*
  *  Additional Functions
  */

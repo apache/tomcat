@@ -40,7 +40,7 @@
   <changelog>
     <fix>
       Fix compilation failures with master branch of OpenSSL. Replace access
-      to OpenSSL session internals by accessor function. (rjung)
+      to OpenSSL internals by accessor functions. (rjung/kkolinko)
     </fix>
   </changelog>
 </section>

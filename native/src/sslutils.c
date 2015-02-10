@@ -420,7 +420,6 @@ int SSL_CTX_use_certificate_chain(SSL_CTX *ctx, const char *file,
     X509 *x509;
     unsigned long err;
     int n;
-    STACK_OF(X509) *extra_certs;
 
     if ((bio = BIO_new(BIO_s_file_internal())) == NULL)
         return -1;
@@ -436,12 +435,10 @@ int SSL_CTX_use_certificate_chain(SSL_CTX *ctx, const char *file,
         }
         X509_free(x509);
     }
+
     /* free a perhaps already configured extra chain */
-    extra_certs = SSL_CTX_get_extra_certs(ctx);
-    if (extra_certs != NULL) {
-        sk_X509_pop_free(extra_certs, X509_free);
-        SSL_CTX_set_extra_certs(ctx,NULL);
-    }
+    SSL_CTX_clear_extra_chain_certs(ctx);
+
     /* create new extra chain by loading the certs */
     n = 0;
     while ((x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL)) != NULL) {
