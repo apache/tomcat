@@ -2144,4 +2144,46 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             ac.dispatch(target);
          }
     }
+
+    // https://issues.apache.org/bugzilla/show_bug.cgi?id=57559
+    @Test
+    public void testAsyncRequestURI() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Servlet servlet = new AsyncRequestUriServlet();
+        Wrapper wrapper1 = Tomcat.addServlet(ctx, "bug57559", servlet);
+        wrapper1.setAsyncSupported(true);
+        ctx.addServletMapping("/", "bug57559");
+
+        tomcat.start();
+
+        String uri = "/foo/%24/bar";
+        String uriDecoded = "/foo/$/bar";
+
+        ByteChunk body = getUrl("http://localhost:" + getPort()+ uri);
+
+        Assert.assertEquals(uriDecoded, body.toString());
+    }
+
+    private static class AsyncRequestUriServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            if (DispatcherType.ASYNC.equals(req.getDispatcherType())) {
+                resp.setContentType("text/plain");
+                resp.setCharacterEncoding("UTF-8");
+                resp.getWriter().write(req.getRequestURI());
+            } else {
+                req.startAsync().dispatch();
+            }
+        }
+    }
 }
