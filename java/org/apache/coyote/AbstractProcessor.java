@@ -212,7 +212,7 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
      * upgrade.
      */
     @Override
-    public abstract SocketState upgradeDispatch(SocketStatus status) throws IOException;
+    public abstract SocketState upgradeDispatch(SocketStatus status);
 
     @Override
     public abstract HttpUpgradeHandler getHttpUpgradeHandler();

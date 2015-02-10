@@ -40,7 +40,7 @@ public interface Processor {
     SocketState asyncPostProcess();
 
     HttpUpgradeHandler getHttpUpgradeHandler();
-    SocketState upgradeDispatch(SocketStatus status) throws IOException;
+    SocketState upgradeDispatch(SocketStatus status);
 
     void errorDispatch();
 

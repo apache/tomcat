@@ -527,7 +527,7 @@ public class SpdyProcessor extends AbstractProcessor implements Runnable {
     }
 
     @Override
-    public SocketState upgradeDispatch(SocketStatus status) throws IOException {
+    public SocketState upgradeDispatch(SocketStatus status) {
         return null;
     }
 

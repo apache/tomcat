@@ -96,7 +96,7 @@ public class UpgradeProcessor implements Processor, WebConnection {
 
 
     @Override
-    public final SocketState upgradeDispatch(SocketStatus status) throws IOException {
+    public final SocketState upgradeDispatch(SocketStatus status) {
         if (status == SocketStatus.OPEN_READ) {
             try {
                 upgradeServletInputStream.onDataAvailable();
