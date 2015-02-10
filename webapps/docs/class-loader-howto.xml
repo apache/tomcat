@@ -192,8 +192,10 @@ loading looks in the following repositories, in this order:</p>
 <li>Common class loader classes (described above)</li>
 </ul>
 
-<p>If the web application class loader is configuered with
-<code>delegate=&quot;true&quot;</code> then the order becomes:</p>
+<p>If the web application class loader is
+<a href="config/loader.html">configured</a> with
+<code>&lt;Loader delegate=&quot;true&quot;/&gt;</code>
+then the order becomes:</p>
 <ul>
 <li>Bootstrap classes of your JVM</li>
 <li>System class loader classes (described above)</li>
