@@ -52,9 +52,12 @@ to the wider audience, or if you feel we can improve this section in anyway.</p>
 
 <p>
 <b>Please note that JNDI resource configuration changed somewhat between
-Tomcat 5.0.x and Tomcat 5.5.x.</b>  You will most likely need to modify older
+Tomcat 7.x and Tomcat 8.x as they are using different versions of
+Apache Commons DBCP library.</b>  You will most likely need to modify older
 JNDI resource configurations to match the syntax in the example below in order
 to make them work in Tomcat <version-major/>.
+See <a href="http://tomcat.apache.org/migration.html">Tomcat Migration Guide</a>
+for details.
 </p>
 
 <p>
