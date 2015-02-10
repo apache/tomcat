@@ -132,6 +132,10 @@
         Guard the digester from MbeansDescriptorsDigesterSource with its own
         lock object. (fschumacher)
       </fix>
+      <fix>
+        <bug>57558</bug>: Add missing JAR in Ant task definition required by
+        the validate task. (markt/kkolinko)
+      </fix>
     </changelog>
   </subsection>
 </section>
