@@ -937,6 +937,32 @@ public class TestStandardContext extends TomcatBaseTest {
         Assert.assertNull(realPath);
     }
 
+    /*
+     * Check real path for directories ends with File.separator for consistency
+     * with previous major versions.
+     */
+    @Test
+    public void testBug57556() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+        Context testContext = ((Context) tomcat.getHost().findChildren()[0]);
+        doTestBug57556(testContext, "/", true);
+        doTestBug57556(testContext, "/jsp", true);
+        doTestBug57556(testContext, "/jsp/", true);
+        doTestBug57556(testContext, "/index.html", false);
+        // Doesn't exist so Tomcat will assume it is a file, not a directory.
+        doTestBug57556(testContext, "/foo", false);
+    }
+
+    private void doTestBug57556(Context testContext, String path, boolean endsInSeparator) throws Exception {
+        String realPath = testContext.getRealPath(path);
+        Assert.assertNotNull(realPath);
+        if (endsInSeparator) {
+            Assert.assertTrue(realPath, realPath.endsWith(File.separator));
+        } else {
+            Assert.assertFalse(realPath, realPath.endsWith(File.separator));
+        }
+    }
+
     @Test
     public void testBug56903() {
         Context context = new StandardContext();
