@@ -1817,7 +1817,7 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    public SocketState upgradeDispatch(SocketStatus status) throws IOException {
+    public SocketState upgradeDispatch(SocketStatus status) {
         // Should never reach this code but in case we do...
         throw new IllegalStateException(
                 sm.getString("http11Processor.upgrade"));

@@ -846,9 +846,9 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    public SocketState upgradeDispatch(SocketStatus status) throws IOException {
+    public SocketState upgradeDispatch(SocketStatus status) {
         // Should never reach this code but in case we do...
-        throw new IOException(
+        throw new IllegalStateException(
                 sm.getString("ajpprocessor.httpupgrade.notsupported"));
     }
 
