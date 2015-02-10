@@ -81,6 +81,11 @@
         <bug>57544</bug>: Fix potential infinite loop when preparing a kept
         alive HTTP connection for the next request. (markt)
       </fix>
+      <fix>
+        <bug>57546</bug>: Ensure that a dropped network connection does not
+        leave references to the UpgradeProcessor associated with the connection
+        in memory. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
