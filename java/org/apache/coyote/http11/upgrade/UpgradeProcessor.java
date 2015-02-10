@@ -98,24 +98,10 @@ public class UpgradeProcessor implements Processor, WebConnection {
     @Override
     public final SocketState upgradeDispatch(SocketStatus status) {
         if (status == SocketStatus.OPEN_READ) {
-            try {
-                upgradeServletInputStream.onDataAvailable();
-                upgradeServletOutputStream.checkWriteDispatch();
-            } catch (IOException ioe) {
-                // The error handling within the ServletInputStream should have
-                // marked the stream for closure which will get picked up below,
-                // triggering the clean-up of this processor.
-                log.debug(sm.getString("upgradeProcessor.onDataAvailableFail"), ioe);
-            }
+            upgradeServletInputStream.onDataAvailable();
+            upgradeServletOutputStream.checkWriteDispatch();
         } else if (status == SocketStatus.OPEN_WRITE) {
-            try {
-                upgradeServletOutputStream.onWritePossible();
-            } catch (IOException ioe) {
-                // The error handling within the ServletOutputStream should have
-                // marked the stream for closure which will get picked up below,
-                // triggering the clean-up of this processor.
-                log.debug(sm.getString("upgradeProcessor.onWritePossibleFail"), ioe);
-            }
+            upgradeServletOutputStream.onWritePossible();
         } else if (status == SocketStatus.STOP) {
             try {
                 upgradeServletInputStream.close();
