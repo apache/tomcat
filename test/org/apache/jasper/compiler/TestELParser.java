@@ -238,13 +238,13 @@ public class TestELParser {
 
     @Test
     public void testEscape04() throws JasperException {
-        doTestParser("\\$", "$");
+        doTestParser("\\$", "\\$");
     }
 
 
     @Test
     public void testEscape05() throws JasperException {
-        doTestParser("\\#", "#");
+        doTestParser("\\#", "\\#");
     }
 
 

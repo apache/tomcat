@@ -196,7 +196,7 @@ public class ELParser {
 
     /**
      * Skip until an EL expression ('${' || '#{') is reached, allowing escape
-     * sequences '\$' and '\#'.
+     * sequences '\${' and '\#{'.
      * 
      * @return The text string up to the EL expression
      */
@@ -244,13 +244,15 @@ public class ELParser {
         for (int i = 0; i < len; i++) {
             char ch = input.charAt(i);
             if (ch =='$' || (!isDeferredSyntaxAllowedAsLiteral && ch == '#')) {
-                if (output == null) {
-                    output = new StringBuilder(len + 20);
+                if (i + 1 < len && input.charAt(i + 1) == '{') {
+                    if (output == null) {
+                        output = new StringBuilder(len + 20);
+                    }
+                    output.append(input.substring(lastAppend, i));
+                    lastAppend = i + 1;
+                    output.append('\\');
+                    output.append(ch);
                 }
-                output.append(input.substring(lastAppend, i));
-                lastAppend = i + 1;
-                output.append('\\');
-                output.append(ch);
             }
         }
         if (output == null) {

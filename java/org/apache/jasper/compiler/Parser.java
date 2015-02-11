@@ -1270,16 +1270,9 @@ class Parser implements TagConstants {
             return;
 
         CharArrayWriter ttext = new CharArrayWriter();
-        // Output the first character
-        int ch = reader.nextChar();
-        if (ch == '\\') {
-            reader.pushChar();
-        } else {
-            ttext.write(ch);
-        }
 
         while (reader.hasMoreInput()) {
-            ch = reader.nextChar();
+            int ch = reader.nextChar();
             if (ch == '<') {
                 // Check for "<\%"
                 if (reader.nextChar() == '\\') {
@@ -1289,13 +1282,21 @@ class Parser implements TagConstants {
                     } else {
                         reader.pushChar();
                         reader.pushChar();
-                        reader.pushChar();
-                        break;
+                        if (ttext.size() == 0) {
+                            ttext.append('<');
+                        } else {
+                            reader.pushChar();
+                            break;
+                        }
                     }
                 } else {
                     reader.pushChar();
-                    reader.pushChar();
-                    break;
+                    if (ttext.size() == 0) {
+                        ttext.append('<');
+                    } else {
+                        reader.pushChar();
+                        break;
+                    }
                 }
             } else if (ch == '\\' && !pageInfo.isELIgnored()) {
                 int next = reader.nextChar();
@@ -1312,7 +1313,8 @@ class Parser implements TagConstants {
                     ttext.append('\\');
                     reader.pushChar();
                 }
-            } else if ((ch == '$' || ch == '#') && !pageInfo.isELIgnored()) {
+            } else if ((ch == '$' || ch == '#' && !pageInfo.isDeferredSyntaxAllowedAsLiteral()) &&
+                    !pageInfo.isELIgnored()) {
                 if (reader.nextChar() == '{') {
                     reader.pushChar();
                     reader.pushChar();

@@ -404,9 +404,9 @@ public class TestParser extends TomcatBaseTest {
         Assert.assertTrue(result, result.contains("<set data-value=\"03b\\\\x\\?resize03b\"/>"));
         Assert.assertTrue(result, result.contains("<04a\\?resize04a/>"));
         Assert.assertTrue(result, result.contains("<04b\\\\x\\?resize04b/>"));
-        Assert.assertTrue(result, result.contains("<set data-value=\"05a$${&amp;\"/>"));
-        Assert.assertTrue(result, result.contains("<set data-value=\"05b$${&amp;2\"/>"));
-        Assert.assertTrue(result, result.contains("<set data-value=\"05c##{&gt;hello&lt;\"/>"));
+        Assert.assertTrue(result, result.contains("<set data-value=\"05a\\$${&amp;\"/>"));
+        Assert.assertTrue(result, result.contains("<set data-value=\"05b\\$${&amp;2\"/>"));
+        Assert.assertTrue(result, result.contains("<set data-value=\"05c\\##{&gt;hello&lt;\"/>"));
         Assert.assertTrue(result, result.contains("05x:<set data-value=\"\"/>"));
         Assert.assertTrue(result, result.contains("<set xmlns:foo=\"urn:06a\\bar\\baz\"/>"));
         Assert.assertTrue(result, result.contains("07a:<set data-value=\"\\?resize\"/>"));
