@@ -1466,9 +1466,28 @@ public class TestCorsFilter {
                 .getAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_REQUEST_TYPE));
     }
 
+    /*
+     * A CORS request arrives with a "null" origin which is allowed by default.
+     */
     @Test
-    public void testDestroy() {
-        // Nothing to test.
-        // NO-OP
+    public void testContentTypeWithParameter() throws IOException,
+            ServletException {
+        TesterHttpServletRequest request = new TesterHttpServletRequest();
+
+        request.setMethod("POST");
+        request.setContentType("text/plain;charset=UTF-8");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "null");
+        TesterHttpServletResponse response = new TesterHttpServletResponse();
+
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
+        CorsFilter.CORSRequestType requestType =
+                corsFilter.checkRequestType(request);
+        Assert.assertEquals(CorsFilter.CORSRequestType.SIMPLE, requestType);
+
+        corsFilter.doFilter(request, response, filterChain);
+
+        Assert.assertTrue(((Boolean) request.getAttribute(
+                CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST)).booleanValue());
     }
 }
