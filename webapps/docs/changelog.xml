@@ -69,6 +69,10 @@
       <add>
         Warn about problematic setting of appBase. (fschumacher)
       </add>
+      <fix>
+       <bug>57534</bug>: CORS Filter should only look at media type component of
+       Content-Type request header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

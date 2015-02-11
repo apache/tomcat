@@ -639,11 +639,10 @@ public final class CorsFilter implements Filter {
                     } else if ("GET".equals(method) || "HEAD".equals(method)) {
                         requestType = CORSRequestType.SIMPLE;
                     } else if ("POST".equals(method)) {
-                        String contentType = request.getContentType();
-                        if (contentType != null) {
-                            contentType = contentType.toLowerCase().trim();
+                        String mediaType = getMediaType(request.getContentType());
+                        if (mediaType != null) {
                             if (SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES
-                                    .contains(contentType)) {
+                                    .contains(mediaType)) {
                                 requestType = CORSRequestType.SIMPLE;
                             } else {
                                 requestType = CORSRequestType.ACTUAL;
@@ -661,6 +660,23 @@ public final class CorsFilter implements Filter {
         return requestType;
     }
 
+
+    /*
+     * Return the lower case, trimmed value of the media type from the content
+     * type.
+     */
+    private String getMediaType(String contentType) {
+        if (contentType == null) {
+            return null;
+        }
+        String result = contentType.toLowerCase();
+        int firstSemiColonIndex = result.indexOf(';');
+        if (firstSemiColonIndex > -1) {
+            result = result.substring(0, firstSemiColonIndex);
+        }
+        result = result.trim();
+        return result;
+    }
 
     /**
      * Checks if the Origin is allowed to make a CORS request.
@@ -1077,7 +1093,9 @@ public final class CorsFilter implements Filter {
                     "Last-Modified", "Pragma"));
 
     /**
-     * {@link Collection} of Simple HTTP request headers. Case in-sensitive.
+     * {@link Collection} of media type values for the Content-Type header that
+     * will be treated as 'simple'. Note media-type values are compared ignoring
+     * parameters and in a case-insensitive manner.
      *
      * @see  <a href="http://www.w3.org/TR/cors/#terminology"
      *       >http://www.w3.org/TR/cors/#terminology</a>
