@@ -252,6 +252,8 @@ public class JspC extends Task implements Options {
     protected JspConfig jspConfig = null;
     protected TagPluginManager tagPluginManager = null;
 
+    protected TldScanner scanner = null;
+
     protected boolean verbose = false;
     protected boolean listErrors = false;
     protected boolean showSuccess = false;
@@ -1461,6 +1463,23 @@ public class JspC extends Task implements Options {
         }
     }
 
+
+    protected void initTldScanner(JspCServletContext context, ClassLoader classLoader) {
+        if (scanner != null) {
+            return;
+        }
+
+        scanner = newTldScanner(context, true, isValidateTld(), isBlockExternal());
+        scanner.setClassLoader(classLoader);
+    }
+
+
+    protected TldScanner newTldScanner(JspCServletContext context, boolean namespaceAware,
+            boolean validate, boolean blockExternal) {
+        return new TldScanner(context, namespaceAware, validate, blockExternal);
+    }
+
+
     protected void initServletContext(ClassLoader classLoader)
             throws IOException, JasperException {
         // TODO: should we use the Ant Project's log?
@@ -1473,9 +1492,8 @@ public class JspC extends Task implements Options {
             context.setInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM, "true");
         }
 
-        TldScanner scanner = new TldScanner(
-                context, true, isValidateTld(), isBlockExternal());
-        scanner.setClassLoader(classLoader);
+
+        initTldScanner(context, classLoader);
 
         try {
             scanner.scan();
