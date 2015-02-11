@@ -21,7 +21,7 @@ package org.apache.coyote;
  * {@link javax.servlet.AsyncContext} implementation that an action, such as
  * firing event listeners needs to be taken. It is implemented in this manner
  * so that the org.apache.coyote package does not have a dependency on the
- * org.apache.coyote package.
+ * org.apache.catalina package.
  */
 public interface AsyncContextCallback {
     public void fireOnComplete();
