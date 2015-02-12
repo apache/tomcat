@@ -202,19 +202,18 @@ public class AprLifecycleListener
         } catch (LibraryNotFoundError lnfe) {
             // Library not on path
             if (log.isDebugEnabled()) {
-                initInfoLogMessages.add(sm.getString("aprListener.aprInitDebug",
+                log.debug(sm.getString("aprListener.aprInitDebug",
                         lnfe.getLibraryNames(), System.getProperty("java.library.path"),
-                        lnfe.getMessage()));
-            } else {
-                initInfoLogMessages.add(sm.getString("aprListener.aprInit",
-                        System.getProperty("java.library.path")));
+                        lnfe.getMessage()), lnfe);
             }
+            initInfoLogMessages.add(sm.getString("aprListener.aprInit",
+                    System.getProperty("java.library.path")));
             return;
         } catch (Throwable t) {
             // Library present but failed to load
             t = ExceptionUtils.unwrapInvocationTargetException(t);
             ExceptionUtils.handleThrowable(t);
-            initInfoLogMessages.add(sm.getString("aprListener.aprInitError", t.getMessage()));
+            log.warn(sm.getString("aprListener.aprInitError", t.getMessage()), t);
             return;
         }
         if (apver < rqver) {
