@@ -80,7 +80,12 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
             Thread.sleep(100);
         }
 
-        assertEquals(count, entries.size());
+        StringBuilder entriesLog = new StringBuilder();
+        for (Entry entry : entries) {
+            entriesLog.append(entry.toString());
+            entriesLog.append(System.lineSeparator());
+        }
+        assertEquals(entriesLog.toString(), count, entries.size());
         for (int j = 0; j < count; j++) {
             Entry entry = entries.get(j);
             assertEquals(status, entry.getStatus());
