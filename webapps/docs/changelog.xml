@@ -95,6 +95,11 @@
         leave references to the UpgradeProcessor associated with the connection
         in memory. (markt)
       </fix>
+      <fix>
+        When applying the <code>maxSwallowSize</code> limit to a connection read
+        that many bytes first before closing the connection to give the client a
+        chance to read the reponse. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
