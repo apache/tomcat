@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
+import java.util.Locale;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -124,7 +125,7 @@ public final class TesterSupport {
     }
 
     protected static boolean isMacOs() {
-        return System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+        return System.getProperty("os.name").toLowerCase(Locale.ENGLISH).startsWith("mac os x");
     }
 
     protected static boolean isRenegotiationSupported(Tomcat tomcat) {

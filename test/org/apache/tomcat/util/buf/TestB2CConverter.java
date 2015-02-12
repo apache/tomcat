@@ -18,6 +18,7 @@ package org.apache.tomcat.util.buf;
 
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
+import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -71,7 +72,7 @@ public class TestB2CConverter {
         String charsetName = "UNSET";
         for (Charset charset : Charset.availableCharsets().values()) {
             float leftover;
-            if (charset.name().toLowerCase().startsWith("x-")) {
+            if (charset.name().toLowerCase(Locale.ENGLISH).startsWith("x-")) {
                 // Non-standard charset that browsers won't be using
                 // Likely something used internally by the JRE
                 continue;
