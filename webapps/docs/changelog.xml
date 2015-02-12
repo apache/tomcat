@@ -81,7 +81,7 @@
       <add>
         <bug>57021</bug>: Improve logging in AprLifecycleListener and
         jni.Library when Tomcat-Native DLL fails to load. Based on a patch by
-        Pravallika Peddi. (markt)
+        Pravallika Peddi. (markt/kkolinko)
       </add>
     </changelog>
   </subsection>
