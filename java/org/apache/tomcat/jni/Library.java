@@ -32,17 +32,14 @@ public final class Library {
      */
     private static Library _instance = null;
 
-    private Library()
-        throws Exception
-    {
+    private Library() throws Exception {
         boolean loaded = false;
         StringBuilder err = new StringBuilder();
         for (int i = 0; i < NAMES.length; i++) {
             try {
                 System.loadLibrary(NAMES[i]);
                 loaded = true;
-            }
-            catch (Throwable t) {
+            } catch (Throwable t) {
                 if (t instanceof ThreadDeath) {
                     throw (ThreadDeath) t;
                 }
@@ -52,18 +49,20 @@ public final class Library {
                 String name = System.mapLibraryName(NAMES[i]);
                 String path = System.getProperty("java.library.path");
                 String [] paths = path.split(File.pathSeparator);
-                for (int j=0; j<paths.length; j++) {
+                for (int j = 0; j < paths.length; j++) {
                     java.io.File fd = new java.io.File(paths[j] , name);
                     if (fd.exists()) {
                         t.printStackTrace();
                     }
                 }
-                if ( i > 0)
+                if (i > 0) {
                     err.append(", ");
+                }
                 err.append(t.getMessage());
             }
-            if (loaded)
+            if (loaded) {
                 break;
+            }
         }
         if (!loaded) {
             err.append('(');
