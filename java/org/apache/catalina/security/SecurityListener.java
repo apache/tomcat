@@ -18,6 +18,7 @@ package org.apache.catalina.security;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 import org.apache.catalina.Lifecycle;
@@ -70,7 +71,7 @@ public class SecurityListener implements LifecycleListener {
      * default, only root is prevented from running Tomcat. Calling this method
      * with null or the empty string will clear the list of users and
      * effectively disables this check. User names will always be checked in a
-     * case insensitive manner.
+     * case insensitive manner using the system default Locale.
      *
      * @param userNameList  A comma separated list of operating system users not
      *                      permitted to run Tomcat
@@ -82,7 +83,7 @@ public class SecurityListener implements LifecycleListener {
             String[] userNames = userNameList.split(",");
             for (String userName : userNames) {
                 if (userName.length() > 0) {
-                    checkedOsUsers.add(userName);
+                    checkedOsUsers.add(userName.toLowerCase(Locale.getDefault()));
                 }
             }
         }
@@ -147,7 +148,7 @@ public class SecurityListener implements LifecycleListener {
     protected void checkOsUser() {
         String userName = System.getProperty("user.name");
         if (userName != null) {
-            String userNameLC = userName.toLowerCase();
+            String userNameLC = userName.toLowerCase(Locale.getDefault());
 
             if (checkedOsUsers.contains(userNameLC)) {
                 // Have to throw Error to force start process to be aborted
