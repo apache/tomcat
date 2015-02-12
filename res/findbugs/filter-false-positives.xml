@@ -448,7 +448,7 @@
   <Match>
     <!-- Return value is ignored at this point but logic further up call     -->
     <!-- stack will ensure that a SocketTimeoutException is thrown           -->
-    <Class name="org.apache.tomcat.util.net.NioEndpoint$KeyAttachment"/>
+    <Class name="org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper"/>
     <Method name="awaitLatch"/>
     <Bug code="RV"/>
   </Match>
