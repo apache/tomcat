@@ -129,7 +129,7 @@ public class Tomcat {
     // Some logging implementations use weak references for loggers so there is
     // the possibility that logging configuration could be lost if GC runs just
     // after Loggers are configured but before they are used. The purpose of
-    // this Sety is to retain strong references to explicitly configured loggers
+    // this Set is to retain strong references to explicitly configured loggers
     // so that configuration is not lost.
     private final Set<Logger> pinnedLoggers = new HashSet<>();
 
