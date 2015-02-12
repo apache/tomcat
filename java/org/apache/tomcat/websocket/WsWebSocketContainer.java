@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -648,7 +649,7 @@ public class WsWebSocketContainer
             return;
         }
         // Header names are case insensitive so always use lower case
-        String headerName = line.substring(0, index).trim().toLowerCase();
+        String headerName = line.substring(0, index).trim().toLowerCase(Locale.ENGLISH);
         // Multi-value headers are stored as a single header and the client is
         // expected to handle splitting into individual values
         String headerValue = line.substring(index + 1).trim();
