@@ -117,6 +117,10 @@
         coerce the empty string to <code>null</code> if the
         <code>PropertyEditor</code> throws an exception. (kkolinko/markt)
       </fix>
+      <fix>
+        Simplify code in <code>ProtectedFunctionMapper</code> class of
+        Jasper runtime. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
