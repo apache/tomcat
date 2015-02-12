@@ -19,6 +19,7 @@ package org.apache.coyote.ajp;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -200,7 +201,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         for (String name: headers.keySet()) {
             value = headers.get(name);
-            name = name.toUpperCase();
+            name = name.toUpperCase(Locale.ENGLISH);
             if (name.equals("ACCEPT")) {
                 forwardMessage.addHeader(0xA001, value);
             } else if (name.equals("ACCEPT-CHARSET")) {
