@@ -110,10 +110,13 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
          */
         @Override
         public void release(SocketWrapperBase<Nio2Channel> socket) {
-            Processor processor = connections.remove(socket.getSocket());
-            if (processor != null) {
-                processor.recycle();
-                recycledProcessors.push(processor);
+            Nio2Channel channel = socket.getSocket();
+            if (channel != null) {
+                Processor processor = connections.remove(channel);
+                if (processor != null) {
+                    processor.recycle();
+                    recycledProcessors.push(processor);
+                }
             }
         }
 
