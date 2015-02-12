@@ -147,21 +147,25 @@ public class IdentityInputFilter implements InputFilter {
     }
 
 
-    /**
-     * End the current request.
-     */
     @Override
-    public long end()  throws IOException {
+    public long end() throws IOException {
 
-        if (maxSwallowSize > -1 && remaining > maxSwallowSize) {
-            throw new IOException(sm.getString("inputFilter.maxSwallow"));
-        }
+        final boolean maxSwallowSizeExceeded = (maxSwallowSize > -1 && remaining > maxSwallowSize);
+        long swallowed = 0;
 
         // Consume extra bytes.
         while (remaining > 0) {
+
             int nread = buffer.doRead(endChunk, null);
             if (nread > 0 ) {
+                swallowed += nread;
                 remaining = remaining - nread;
+                if (maxSwallowSizeExceeded && swallowed > maxSwallowSize) {
+                    // Note: We do not fail early so the client has a chance to
+                    // read the response before the connection is closed. See:
+                    // http://httpd.apache.org/docs/2.0/misc/fin_wait_2.html#appendix
+                    throw new IOException(sm.getString("inputFilter.maxSwallow"));
+                }
             } else { // errors are handled higher up.
                 remaining = 0;
             }
