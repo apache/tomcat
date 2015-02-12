@@ -20,6 +20,8 @@ import java.net.URI;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
@@ -41,9 +43,10 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
 
 public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
 
-
     @Test
     public void testConnectToServerEndpoint() throws Exception {
+        Logger logger = Logger.getLogger("org.apache.tomcat.util.net.Nio2Endpoint");
+        logger.setLevel(Level.ALL);
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
