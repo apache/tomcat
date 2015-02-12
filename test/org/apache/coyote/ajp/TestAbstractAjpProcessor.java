@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -225,7 +226,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         for (String name: headers.keySet()) {
             value = headers.get(name);
-            name = name.toUpperCase();
+            name = name.toUpperCase(Locale.ENGLISH);
             switch (name) {
                 case "ACCEPT":
                     forwardMessage.addHeader(0xA001, value);

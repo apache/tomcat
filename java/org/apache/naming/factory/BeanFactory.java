@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -170,7 +171,7 @@ public class BeanFactory
                             param = param.substring(0, index).trim();
                         } else {
                             setterName = "set" +
-                                         param.substring(0, 1).toUpperCase() +
+                                         param.substring(0, 1).toUpperCase(Locale.ENGLISH) +
                                          param.substring(1);
                         }
                         try {
