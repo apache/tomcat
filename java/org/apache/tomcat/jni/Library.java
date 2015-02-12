@@ -49,7 +49,7 @@ public final class Library {
                 String name = System.mapLibraryName(NAMES[i]);
                 String path = System.getProperty("java.library.path");
                 String [] paths = path.split(File.pathSeparator);
-                for (int j=0; j<paths.length; j++) {
+                for (int j = 0; j < paths.length; j++) {
                     java.io.File fd = new java.io.File(paths[j] , name);
                     if (fd.exists()) {
                         t.printStackTrace();
