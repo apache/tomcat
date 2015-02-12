@@ -19,6 +19,7 @@ package org.apache.coyote.ajp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import java.util.Locale;
 
 import javax.net.SocketFactory;
 
@@ -64,7 +65,7 @@ public class SimpleAjpClient {
     }
 
     public void setMethod(String method) {
-        method = method.toUpperCase();
+        method = method.toUpperCase(Locale.ENGLISH);
         switch (method) {
             case "OPTIONS":
                 this.method = 1;
