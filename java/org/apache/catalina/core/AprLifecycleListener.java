@@ -29,6 +29,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Library;
+import org.apache.tomcat.jni.LibraryNotFoundError;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
@@ -193,23 +194,27 @@ public class AprLifecycleListener
         aprInitialized = true;
 
         try {
-            String methodName = "initialize";
-            Class<?> paramTypes[] = new Class[1];
-            paramTypes[0] = String.class;
-            Object paramValues[] = new Object[1];
-            paramValues[0] = null;
-            Class<?> clazz = Class.forName("org.apache.tomcat.jni.Library");
-            Method method = clazz.getMethod(methodName, paramTypes);
-            method.invoke(null, paramValues);
-            major = clazz.getField("TCN_MAJOR_VERSION").getInt(null);
-            minor = clazz.getField("TCN_MINOR_VERSION").getInt(null);
-            patch = clazz.getField("TCN_PATCH_VERSION").getInt(null);
+            Library.initialize(null);
+            major = Library.TCN_MAJOR_VERSION;
+            minor = Library.TCN_MINOR_VERSION;
+            patch = Library.TCN_PATCH_VERSION;
             apver = major * 1000 + minor * 100 + patch;
+        } catch (LibraryNotFoundError lnfe) {
+            // Library not on path
+            if (log.isDebugEnabled()) {
+                initInfoLogMessages.add(sm.getString("aprListener.aprInitDebug",
+                        lnfe.getLibraryNames(), System.getProperty("java.library.path"),
+                        lnfe.getMessage()));
+            } else {
+                initInfoLogMessages.add(sm.getString("aprListener.aprInit",
+                        System.getProperty("java.library.path")));
+            }
+            return;
         } catch (Throwable t) {
+            // Library present but failed to load
             t = ExceptionUtils.unwrapInvocationTargetException(t);
             ExceptionUtils.handleThrowable(t);
-            initInfoLogMessages.add(sm.getString("aprListener.aprInit",
-                    System.getProperty("java.library.path")));
+            initInfoLogMessages.add(sm.getString("aprListener.aprInitError", t.getMessage()));
             return;
         }
         if (apver < rqver) {
