@@ -173,13 +173,13 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      * The JAAS LoginContext, if any, used to authenticate this Principal.
      * Kept so we can call logout().
      */
-    protected final LoginContext loginContext;
+    protected final transient LoginContext loginContext;
 
 
     /**
      * The user's delegated credentials.
      */
-    protected GSSCredential gssCredential = null;
+    protected transient GSSCredential gssCredential = null;
 
     @Override
     public GSSCredential getGssCredential() {
