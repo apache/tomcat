@@ -32,7 +32,7 @@ public final class Library {
      */
     private static Library _instance = null;
 
-    private Library() throws Exception {
+    private Library() throws Throwable {
         boolean loaded = false;
         String path = System.getProperty("java.library.path");
         String [] paths = path.split(File.pathSeparator);
@@ -41,7 +41,9 @@ public final class Library {
             try {
                 System.loadLibrary(NAMES[i]);
                 loaded = true;
-            } catch (ThreadDeath | VirtualMachineError t) {
+            } catch (ThreadDeath t) {
+                throw t;
+            } catch (VirtualMachineError t) {
                 throw t;
             } catch (Throwable t) {
                 String name = System.mapLibraryName(NAMES[i]);
@@ -164,7 +166,7 @@ public final class Library {
      * @param libraryName the name of the library to load
      */
     public static boolean initialize(String libraryName)
-        throws Exception
+        throws Throwable
     {
         if (_instance == null) {
             if (libraryName == null)
