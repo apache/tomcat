@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.servlet.Filter;
@@ -321,9 +322,8 @@ public final class CorsFilter implements Filter {
 
         CORSRequestType requestType = checkRequestType(request);
         if (requestType != CORSRequestType.PRE_FLIGHT) {
-            throw new IllegalArgumentException(
-                    sm.getString("corsFilter.wrongType1",
-                            CORSRequestType.PRE_FLIGHT.name().toLowerCase()));
+            throw new IllegalArgumentException(sm.getString("corsFilter.wrongType1",
+                    CORSRequestType.PRE_FLIGHT.name().toLowerCase(Locale.ENGLISH)));
         }
 
         final String origin = request
@@ -354,7 +354,7 @@ public final class CorsFilter implements Filter {
             String[] headers = accessControlRequestHeadersHeader.trim().split(
                     ",");
             for (String header : headers) {
-                accessControlRequestHeaders.add(header.trim().toLowerCase());
+                accessControlRequestHeaders.add(header.trim().toLowerCase(Locale.ENGLISH));
             }
         }
 
@@ -523,7 +523,7 @@ public final class CorsFilter implements Filter {
                     request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN));
             request.setAttribute(
                     CorsFilter.HTTP_REQUEST_ATTRIBUTE_REQUEST_TYPE,
-                    corsRequestType.name().toLowerCase());
+                    corsRequestType.name().toLowerCase(Locale.ENGLISH));
             break;
         case ACTUAL:
             request.setAttribute(
@@ -533,7 +533,7 @@ public final class CorsFilter implements Filter {
                     request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN));
             request.setAttribute(
                     CorsFilter.HTTP_REQUEST_ATTRIBUTE_REQUEST_TYPE,
-                    corsRequestType.name().toLowerCase());
+                    corsRequestType.name().toLowerCase(Locale.ENGLISH));
             break;
         case PRE_FLIGHT:
             request.setAttribute(
@@ -543,7 +543,7 @@ public final class CorsFilter implements Filter {
                     request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN));
             request.setAttribute(
                     CorsFilter.HTTP_REQUEST_ATTRIBUTE_REQUEST_TYPE,
-                    corsRequestType.name().toLowerCase());
+                    corsRequestType.name().toLowerCase(Locale.ENGLISH));
             String headers = request.getHeader(
                     REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
             if (headers == null) {
@@ -669,7 +669,7 @@ public final class CorsFilter implements Filter {
         if (contentType == null) {
             return null;
         }
-        String result = contentType.toLowerCase();
+        String result = contentType.toLowerCase(Locale.ENGLISH);
         int firstSemiColonIndex = result.indexOf(';');
         if (firstSemiColonIndex > -1) {
             result = result.substring(0, firstSemiColonIndex);
@@ -746,7 +746,7 @@ public final class CorsFilter implements Filter {
                     parseStringToSet(allowedHttpHeaders);
             Set<String> lowerCaseHeaders = new HashSet<String>();
             for (String header : setAllowedHttpHeaders) {
-                String lowerCase = header.toLowerCase();
+                String lowerCase = header.toLowerCase(Locale.ENGLISH);
                 lowerCaseHeaders.add(lowerCase);
             }
             this.allowedHttpHeaders.clear();
