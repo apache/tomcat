@@ -35,6 +35,7 @@ import org.apache.jasper.security.SecurityUtil;
  * @author Mark Roth
  * @author Kin-man Chung
  */
+@SuppressWarnings("deprecation") // Have to support old JSP EL API
 public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
         implements FunctionMapper {
 
@@ -191,7 +192,6 @@ public final class ProtectedFunctionMapper extends javax.el.FunctionMapper
      * @return the result of the method mapping. Null means no entry found.
      */
     @Override
-    @Deprecated
     public Method resolveFunction(String prefix, String localName) {
         if (this.fnmap != null) {
             return this.fnmap.get(prefix + ":" + localName);
