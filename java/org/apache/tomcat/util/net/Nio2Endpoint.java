@@ -929,6 +929,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         @Override
         public void reset(Nio2Channel channel, long soTimeout) {
+            if (log.isDebugEnabled()) {
+                log.debug("Calling [" + this + "].reset([" + channel + "],[" + soTimeout + "])",
+                        new Exception());
+            }
             super.reset(channel, soTimeout);
             upgradeInit = false;
             sendfileData = null;
