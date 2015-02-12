@@ -78,6 +78,11 @@
         case-insensitive (as documented) and than the case-insensitive
         comparison is performed using the system default Locale. (markt)
       </fix>
+      <add>
+        <bug>57021</bug>: Improve logging in AprLifecycleListener and
+        jni.Library when Tomcat-Native DLL fails to load. Based on a patch by
+        Pravallika Peddi. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
