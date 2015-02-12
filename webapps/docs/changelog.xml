@@ -73,6 +73,11 @@
        <bug>57534</bug>: CORS Filter should only look at media type component of
        Content-Type request header. (markt)
       </fix>
+      <fix>
+        Ensure that user name chekcing in the optional SecurityListener is
+        case-insensitive (as documented) and than the case-insensitive
+        comparison is performed using the system default Locale. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
