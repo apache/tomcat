@@ -34,7 +34,7 @@ import java.util.Set;
  * @see <a href="https://www.openssl.org/docs/apps/ciphers.html"
  *      >Mapping of OpenSSL cipher suites names to registry names</a>
  */
-enum Cipher {
+public enum Cipher {
     /* The RSA ciphers */
     // Cipher 01
     TLS_RSA_WITH_NULL_MD5(

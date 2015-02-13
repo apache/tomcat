@@ -21,8 +21,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import javax.net.ssl.SSLSession;
 
@@ -30,6 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SSLSessionManager;
 import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.jsse.openssl.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 
 /** JSSESupport
@@ -52,7 +53,24 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
-    private static final Map<SSLSession,Integer> keySizeCache = new WeakHashMap<>();
+    private static final Map<String,Integer> keySizeCache = new HashMap<>();
+
+    static {
+        for (Cipher cipher : Cipher.values()) {
+            for (String jsseName : cipher.getJsseNames()) {
+                keySizeCache.put(jsseName, Integer.valueOf(cipher.getStrength_bits()));
+            }
+        }
+    }
+
+    /*
+     * NO-OP method provided to make it easy for other classes in this package
+     * to trigger the loading of this class and the population of the
+     * keySizeCache.
+     */
+    static void init() {
+        // NO-OP
+    }
 
     private SSLSession session;
 
@@ -120,33 +138,13 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
      * This returns the effective bits for the current cipher suite.
      */
     @Override
-    public Integer getKeySize()
-        throws IOException {
+    public Integer getKeySize() throws IOException {
         // Look up the current SSLSession
-        SSLSupport.CipherData c_aux[]=ciphers;
-        if (session == null)
+        if (session == null) {
             return null;
-
-        Integer keySize = null;
-        synchronized(keySizeCache) {
-            keySize = keySizeCache.get(session);
         }
 
-        if (keySize == null) {
-            int size = 0;
-            String cipherSuite = session.getCipherSuite();
-            for (int i = 0; i < c_aux.length; i++) {
-                if (cipherSuite.indexOf(c_aux[i].phrase) >= 0) {
-                    size = c_aux[i].keySize;
-                    break;
-                }
-            }
-            keySize = Integer.valueOf(size);
-            synchronized(keySizeCache) {
-                keySizeCache.put(session, keySize);
-            }
-        }
-        return keySize;
+        return keySizeCache.get(session.getCipherSuite());
     }
 
     @Override
