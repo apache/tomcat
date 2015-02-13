@@ -58,14 +58,6 @@ public final class SecurityClassLoad {
 
             loader.loadClass( basePackage +
                 "runtime.ProtectedFunctionMapper");
-            loader.loadClass( basePackage +
-                "runtime.ProtectedFunctionMapper$1");
-            loader.loadClass( basePackage +
-                "runtime.ProtectedFunctionMapper$2"); 
-            loader.loadClass( basePackage +
-                "runtime.ProtectedFunctionMapper$3");
-            loader.loadClass( basePackage +
-                "runtime.ProtectedFunctionMapper$4"); 
 
             loader.loadClass( basePackage +
                 "runtime.PageContextImpl");      
