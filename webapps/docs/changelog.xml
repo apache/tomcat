@@ -109,6 +109,10 @@
         Prevent an async timeout being processed multiple times for the same
         socket when running on slow and/or heavily loaded systems. (markt)
       </fix>
+      <fix>
+        <bug>57581</bug>: Change statistics byte counter in coyote Request
+        object to be long to allow values above 2Gb. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
