@@ -298,9 +298,7 @@ public class AsyncStateMachine {
         boolean doDispatch = false;
         if (state == AsyncState.STARTING) {
             state = AsyncState.MUST_DISPATCH;
-        } else if (state == AsyncState.STARTED ||
-                state == AsyncState.TIMING_OUT ||
-                state == AsyncState.ERROR) {
+        } else if (state == AsyncState.STARTED) {
             state = AsyncState.DISPATCHING;
             // A dispatch is always required.
             // If on a non-container thread, need to get back onto a container
@@ -309,7 +307,9 @@ public class AsyncStateMachine {
             // request/response associated with the AsyncContext so need a new
             // container thread to process the different request/response.
             doDispatch = true;
-        } else if (state == AsyncState.READ_WRITE_OP) {
+        } else if (state == AsyncState.READ_WRITE_OP ||
+                state == AsyncState.TIMING_OUT ||
+                state == AsyncState.ERROR) {
             state = AsyncState.DISPATCHING;
             // If on a container thread then the socket will be added to the
             // poller poller when the thread exits the
