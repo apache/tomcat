@@ -144,6 +144,8 @@ public abstract class AbstractEndpoint<S> {
                 for (SocketWrapperBase<S> socket : waitingRequests) {
                     long asyncTimeout = socket.getAsyncTimeout();
                     if (asyncTimeout > 0) {
+                        // Avoid multiple timeouts
+                        socket.setAsyncTimeout(-1);
                         long asyncStart = socket.getLastAsyncStart();
                         if ((now - asyncStart) > asyncTimeout) {
                             processSocket(socket, SocketStatus.TIMEOUT, true);
