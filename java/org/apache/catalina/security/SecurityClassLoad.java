@@ -287,7 +287,6 @@ public final class SecurityClassLoad {
                 "util.net.NioBlockingSelector$BlockPoller$2");
         loader.loadClass(basePackage +
                 "util.net.NioBlockingSelector$BlockPoller$3");
-        loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
         // security
         loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");
         loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");
