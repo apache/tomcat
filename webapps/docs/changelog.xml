@@ -105,6 +105,10 @@
         that many bytes first before closing the connection to give the client a
         chance to read the reponse. (markt)
       </fix>
+      <fix>
+        Prevent an async timeout being processed multiple times for the same
+        socket when running on slow and/or heavily loaded systems. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

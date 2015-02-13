@@ -161,6 +161,8 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
                     long access = socket.getLastAccess();
                     if (socket.getTimeout() > 0 &&
                             (now-access)>socket.getTimeout()) {
+                        // Prevent multiple timeouts
+                        socket.setTimeout(-1);
                         processSocketAsync(socket,SocketStatus.TIMEOUT);
                     }
                 }
