@@ -1142,6 +1142,12 @@
         chain of "elseif"s. (kkolinko)
       </scode>
       <fix>
+        Fix CVE-2014-0227:
+        Various improvements to ChunkedInputFilter including clean-up, i18n for
+        error messages and adding an error flag to allow subsequent attempts at
+        reading after an error to fail fast. (markt)
+      </fix>
+      <fix>
         If request contains an unrecognized Expect header, respond with error
         417 (Expectation Failed), according to RFC2616 chapter 14.20. (markt)
       </fix>
