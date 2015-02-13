@@ -61,7 +61,7 @@
       <td>XML+EW</td>
       <td>An XML configuration file located in the Host&apos;s
           <em>configBase</em>. It must contain a single &lt;Context&gt; element
-          and may contain optional nested elements. If includes an explicit
+          and may contain optional nested elements. It includes an explicit
           <em>docBase</em> attribute that points to an external WAR. It
           represents a single web application. It is often referred to as a
           context.xml file.</td>
@@ -69,8 +69,8 @@
       <td>XML+ED</td>
       <td>An XML configuration file located in the Host&apos;s
           <em>configBase</em>. It must contain a single &lt;Context&gt; element
-          and may contain optional nested elements. If includes an explicit
-          <em>docBase</em> attribute that points to an external WAR. It
+          and may contain optional nested elements. It includes an explicit
+          <em>docBase</em> attribute that points to an external directory. It
           represents a single web application. It is often referred to as a
           context.xml file.</td>
     </tr><tr>
@@ -87,12 +87,12 @@
           does not include an embedded context.xml file.</td>
     </tr><tr>
       <td>DIR+XML</td>
-      <td>A directory located in the Host&apos;s <em>appBase</em>. The director
+      <td>A directory located in the Host&apos;s <em>appBase</em>. The directory
           does include an embedded context.xml file.</td>
     </tr><tr>
       <td>redeploy</td>
       <td>The Context object that represents the web application is destroyed
-          and a new Context object created. If present and permitted by the
+          and a new Context object is created. If present and permitted by the
           configuration, this new Context object is created by parsing the
           context.xml file. The web.xml file is parsed during the application
           start process. Any sessions stored in the standard Manager in the
@@ -512,7 +512,7 @@
     <li>If a WAR is added to the <em>appBase</em> when an external WAR already
         exists, the WAR in the <em>appBase</em> will be ignored but a warning
         will be logged when the WAR in the <em>appBase</em> is first detected.
-        If the external WAR is removed, the WAR in the <em>appBaase</em> will be
+        If the external WAR is removed, the WAR in the <em>appBase</em> will be
         left and may be deployed via automatic deployment.</li>
     <li>If an XML file is added to the META-INF directory of an application
         deployed from that DIR, the application will always be redeployed. The
