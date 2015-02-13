@@ -183,15 +183,16 @@ public class TestImportHandler {
     }
 
 
-
     /**
      * Import an invalid package.
      */
-    @Test(expected=ELException.class)
-    public void testImportPackage01() {
+    @Test
+    public void testImportPackage01_57574() {
         ImportHandler handler = new ImportHandler();
 
         handler.importPackage("org.apache.tomcat.foo");
+
+        // No exception is expected
     }
 
 

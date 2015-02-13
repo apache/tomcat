@@ -19,7 +19,6 @@ package javax.el;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -124,18 +123,10 @@ public class ImportHandler {
 
     public void importPackage(String name) {
         // Import ambiguity is handled at resolution, not at import
-        Package p = Package.getPackage(name);
-        if (p == null) {
-            // Either the package does not exist or no class has been loaded
-            // from that package. Check if the package exists.
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            String path = name.replace('.', '/');
-            URL url = cl.getResource(path);
-            if (url == null) {
-                throw new ELException(Util.message(
-                        null, "importHandler.invalidPackage", name));
-            }
-        }
+        // Whether the package exists is not checked,
+        // a) for sake of performance when used in JSPs (BZ 57142),
+        // b) java.lang.Package.getPackage(name) is not reliable (BZ 57574),
+        // c) such check is not required by specification.
         packageNames.add(name);
     }
 
