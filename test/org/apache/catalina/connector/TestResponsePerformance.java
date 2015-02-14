@@ -37,6 +37,10 @@ public class TestResponsePerformance extends LoggingBaseTest {
         doHomebrew(resp);
         doUri();
 
+        // Note: Java 9 on my OSX laptop consistently shows doUri() is faster
+        //       than doHomebrew(). Worth a closer look for Tomcat 10 on the
+        //       assumption it will require java 9
+
         // To allow for timing differences between runs, a "best of n" approach
         // is taken for this test
         final int bestOf = 5;
