@@ -1355,8 +1355,8 @@
       <header>Testsuites with skipped tests:${line.separator}</header>
       <string>${toString:test.result.skippedtests}</string>
       <filterchain>
-        <tokenfilter>
-          <replaceregex pattern=";" replace="${line.separator}"/>
+        <tokenfilter delimOutput="${line.separator}">
+          <stringtokenizer delims=";"/>
         </tokenfilter>
       </filterchain>
     </concat>
@@ -1364,8 +1364,8 @@
       <header>Testsuites with failed tests:${line.separator}</header>
       <string>${toString:test.result.failedtests}</string>
       <filterchain>
-        <tokenfilter>
-          <replaceregex pattern=";" replace="${line.separator}"/>
+        <tokenfilter delimOutput="${line.separator}">
+          <stringtokenizer delims=";"/>
         </tokenfilter>
       </filterchain>
     </concat>
