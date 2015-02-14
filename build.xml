@@ -1341,19 +1341,19 @@
 
   <target name="test" description="Runs the JUnit test cases"
           depends="test-nio,test-nio2,test-apr,cobertura-report" >
-    <fileset id="test.result.failedtests" dir="${test.reports}" includes="*.txt">
-      <not>
-        <contains text="Failures: 0, Errors: 0" />
-      </not>
-    </fileset>
     <fileset id="test.result.skippedtests" dir="${test.reports}" includes="*.txt">
       <not>
         <contains text="Skipped: 0" />
       </not>
     </fileset>
+    <fileset id="test.result.failedtests" dir="${test.reports}" includes="*.txt">
+      <not>
+        <contains text="Failures: 0, Errors: 0" />
+      </not>
+    </fileset>
     <concat>
-      <header>Testsuites with failed tests:${line.separator}</header>
-      <string>${toString:test.result.failedtests}</string>
+      <header>Testsuites with skipped tests:${line.separator}</header>
+      <string>${toString:test.result.skippedtests}</string>
       <filterchain>
         <tokenfilter>
           <replaceregex pattern=";" replace="${line.separator}"/>
@@ -1361,8 +1361,8 @@
       </filterchain>
     </concat>
     <concat>
-      <header>Testsuites with skipped tests:${line.separator}</header>
-      <string>${toString:test.result.skippedtests}</string>
+      <header>Testsuites with failed tests:${line.separator}</header>
+      <string>${toString:test.result.failedtests}</string>
       <filterchain>
         <tokenfilter>
           <replaceregex pattern=";" replace="${line.separator}"/>
