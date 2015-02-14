@@ -113,6 +113,11 @@
         <bug>57581</bug>: Change statistics byte counter in coyote Request
         object to be long to allow values above 2Gb. (kkolinko)
       </fix>
+      <fix>
+        Fix a concurrency issue in the APR Poller that meant it was possible
+        under low load for a socket queued to be added to the Poller not to be
+        added for 10 seconds. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

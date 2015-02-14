@@ -1701,7 +1701,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             maintain();
                         }
                         synchronized (this) {
-                            this.wait(10000);
+                            // Make sure that no sockets have been placed in the
+                            // addList or closeList since the check above.
+                            // Without this check there could be a 10s pause
+                            // with no processing since the notify() call in
+                            // add()/close() would have no effect since it
+                            // happened before this sync block was entered
+                            if (addList.size() < 1 && closeList.size() < 1) {
+                                this.wait(10000);
+                            }
                         }
                     } catch (InterruptedException e) {
                         // Ignore
@@ -1719,25 +1727,25 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 try {
                     // Duplicate the add and remove lists so that the syncs are
                     // minimised
-                    if (closeList.size() > 0) {
-                        synchronized (this) {
+                    synchronized (this) {
+                        if (closeList.size() > 0) {
                             // Duplicate to another list, so that the syncing is
                             // minimal
                             closeList.duplicate(localCloseList);
                             closeList.clear();
+                        } else {
+                            localCloseList.clear();
                         }
-                    } else {
-                        localCloseList.clear();
                     }
-                    if (addList.size() > 0) {
-                        synchronized (this) {
+                    synchronized (this) {
+                        if (addList.size() > 0) {
                             // Duplicate to another list, so that the syncing is
                             // minimal
                             addList.duplicate(localAddList);
                             addList.clear();
+                        } else {
+                            localAddList.clear();
                         }
-                    } else {
-                        localAddList.clear();
                     }
 
                     // Remove sockets
