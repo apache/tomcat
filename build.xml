@@ -1341,6 +1341,21 @@
 
   <target name="test" description="Runs the JUnit test cases"
           depends="test-nio,test-nio2,test-apr,cobertura-report" >
+    <fileset id="test.result.failedtests" dir="${test.reports}" includes="*.txt">
+      <not>
+        <contains text="Failures: 0, Errors: 0" />
+      </not>
+    </fileset>
+    <concat>
+      <header>Failed tests:${line.separator}</header>
+      <string>${toString:test.result.failedtests}</string>
+      <filterchain>
+        <tokenfilter>
+          <replaceregex pattern=";" replace="${line.separator}"/>
+        </tokenfilter>
+      </filterchain>
+    </concat>
+
     <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "FAILED".' />
     <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
   </target>
