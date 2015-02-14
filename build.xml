@@ -1321,31 +1321,31 @@
 
   <target name="test" description="Runs the JUnit test cases"
           depends="test-bio,test-nio,test-apr,cobertura-report" >
-    <fileset id="test.result.failedtests" dir="${test.reports}" includes="*.txt">
-      <not>
-        <contains text="Failures: 0, Errors: 0" />
-      </not>
-    </fileset>
     <fileset id="test.result.skippedtests" dir="${test.reports}" includes="*.txt">
       <not>
         <contains text="Skipped: 0" />
       </not>
     </fileset>
-    <concat>
-      <header>Testsuites with failed tests:${line.separator}</header>
-      <string>${toString:test.result.failedtests}</string>
-      <filterchain>
-        <tokenfilter>
-          <replaceregex pattern=";" replace="${line.separator}"/>
-        </tokenfilter>
-      </filterchain>
-    </concat>
+    <fileset id="test.result.failedtests" dir="${test.reports}" includes="*.txt">
+      <not>
+        <contains text="Failures: 0, Errors: 0" />
+      </not>
+    </fileset>
     <concat>
       <header>Testsuites with skipped tests:${line.separator}</header>
       <string>${toString:test.result.skippedtests}</string>
       <filterchain>
-        <tokenfilter>
-          <replaceregex pattern=";" replace="${line.separator}"/>
+        <tokenfilter delimOutput="${line.separator}">
+          <stringtokenizer delims=";"/>
+        </tokenfilter>
+      </filterchain>
+    </concat>
+    <concat>
+      <header>Testsuites with failed tests:${line.separator}</header>
+      <string>${toString:test.result.failedtests}</string>
+      <filterchain>
+        <tokenfilter delimOutput="${line.separator}">
+          <stringtokenizer delims=";"/>
         </tokenfilter>
       </filterchain>
     </concat>
