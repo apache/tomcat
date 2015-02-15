@@ -30,7 +30,6 @@ import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 public class TesterOpenSSL {
 
-    public static final String EXPECTED_VERSION = "1.0.1j";
     public static final boolean IS_EXPECTED_VERSION;
 
     public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS =
@@ -72,13 +71,14 @@ public class TesterOpenSSL {
                     Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_MD5)));
 
     static {
+        String expected_version = System.getProperty("tomcat.test.openssl.version", "");
         String versionString = null;
         try {
             versionString = executeOpenSSLCommand("version");
         } catch (IOException e) {
             versionString = "";
         }
-        IS_EXPECTED_VERSION = versionString.contains(EXPECTED_VERSION);
+        IS_EXPECTED_VERSION = versionString.startsWith("OpenSSL " + expected_version);
     }
 
 

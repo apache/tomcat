@@ -183,6 +183,10 @@
   <!-- Location of OpenSSL binary (file name, not directory) -->
   <property name="test.openssl.path" value="" />
 
+  <!-- Accepted version of OpenSSL. The output of "openssl version"
+       must start with "OpenSSL " plus value of this property. -->
+  <property name="test.openssl.version" value="1.1.0" />
+
   <!-- Include .gitignore in src distributions. -->
   <!-- .git and .gitignore are in defaultexcludes since Ant 1.8.2 -->
   <defaultexcludes add="**/.git" />
@@ -1443,6 +1447,7 @@
         <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
         <sysproperty key="tomcat.test.reports" value="${test.reports}" />
         <sysproperty key="tomcat.test.openssl.path" value="${test.openssl.path}" />
+        <sysproperty key="tomcat.test.openssl.version" value="${test.openssl.version}" />
         <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
         <!-- File for Cobertura to write coverage results to -->
         <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
