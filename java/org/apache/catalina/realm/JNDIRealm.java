@@ -18,7 +18,6 @@
 package org.apache.catalina.realm;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
