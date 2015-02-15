@@ -412,6 +412,13 @@
         can be used. If no value is given the providers default is used.</p>
       </attribute>
 
+      <attribute name="cipherSuites" required="false">
+        <p>Specify which cipher suites are allowed when trying to open
+        a secured connection using StartTLS. The allowed cipher suites
+        are specified by a comma separated list. The default is to use the
+        cipher suites of the JVM.</p>
+      </attribute>
+
       <attribute name="commonRole" required="false">
         <p>A role name assigned to each successfully authenticated user in
         addition to the roles retrieved from LDAP. If not specified, only
@@ -466,6 +473,15 @@
         required unless <code>userPassword</code> is specified</p>
         <p>This attribute is deprecated. Set the algorithm on a nested
         <strong>CredentialHandler</strong> element instead.</p>
+      </attribute>
+
+      <attribute name="hostnameVerifierClassName" required="false">
+        <p>The name of the class to use for hostname verification when
+        using StartTLS for securing the connection to the ldap server.
+        The default constructor will be used to construct an instance of
+        the verifier class. The default is to accept only those hostnames,
+        that are valid according to the peer certificate of the ldap
+        server.</p>
       </attribute>
 
       <attribute name="protocol" required="false">
@@ -577,6 +593,19 @@
         <p>The default value is <code>auth-conf</code>.</p>
       </attribute>
 
+      <attribute name="sslProtocol" required="false">
+        <p>Specifies which ssl protocol should be used, when connecting with
+        StartTLS. The default is to let the jre decide. If you need even more
+        control, you can specify the <code>SSLSocketFactory</code> to use.</p>
+      </attribute>
+
+      <attribute name="sslSocketFactory" required="false">
+        <p>Specifies which <code>SSLSocketFactory</code> to use when connecting
+        to the ldap server using StartTLS. An instance of the class will be
+        constructed using the default constructor. If none class name is given
+        the default jre <code>SSLSocketFactory</code> will be used.</p>
+      </attribute>
+
       <attribute name="stripRealmForGss" required="false">
         <p>When processing users authenticated via the GSS-API, this attribute
         controls if any &quot;@...&quot; is removed from the end of the user
@@ -680,6 +709,12 @@
         <code>false</code> causes only the top level to be searched.
         Not used if you are using the <code>userPattern</code>
         expression.</p>
+      </attribute>
+
+      <attribute name="useStartTls" required="false">
+        <p>Set to <code>true</code> if you want to use StartTLS for securing
+        the connection to the ldap server. The default value is <code>false</code>.
+        </p>
       </attribute>
 
       <attribute name="X509UsernameRetrieverClassName" required="false">
