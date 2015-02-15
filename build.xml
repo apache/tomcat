@@ -180,7 +180,7 @@
   <available file="/dev/urandom" property="test.jvmarg.egd" value="-Djava.security.egd=file:/dev/./urandom"/>
   <property name="test.jvmarg.egd" value="" />
 
-  <!-- Location of OpenSSL binary -->
+  <!-- Location of OpenSSL binary (file name, not directory) -->
   <property name="test.openssl.path" value="" />
 
   <!-- Include .gitignore in src distributions. -->
@@ -1370,7 +1370,7 @@
       </filterchain>
     </concat>
 
-    <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "FAILED".' />
+    <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "ERROR".' />
     <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
   </target>
 
