@@ -498,7 +498,11 @@ public class TestOpenSSLCipherConfigurationParser {
 
         TesterOpenSSL.removeUnimplementedCiphersJsse(jsseCipherListFromParser);
 
-        Assert.assertEquals(listToString(jsseCipherListFromOpenSSL), listToString(jsseCipherListFromParser));
+        String listFromOpenSSL = listToString(jsseCipherListFromOpenSSL);
+        String listFromParser = listToString(jsseCipherListFromParser);
+        Assert.assertEquals("Cipher list OpenSSL: '" + listFromOpenSSL +
+                            "', from parser: '" + listFromParser + "'",
+                            listFromOpenSSL, listFromParser);
     }
 
 
