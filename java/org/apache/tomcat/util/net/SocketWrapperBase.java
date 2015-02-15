@@ -37,12 +37,15 @@ public abstract class SocketWrapperBase<E> {
     private volatile E socket;
     private final AbstractEndpoint<E> endpoint;
 
+    // Volatile because I/O and setting the timeout values occurs on a different
+    // thread to the thread checking the timeout.
     private volatile long lastRead = System.currentTimeMillis();
     private volatile long lastWrite = lastRead;
     private volatile long lastAsyncStart = 0;
     private volatile long asyncTimeout = -1;
-    private long readTimeout = -1;
-    private long writeTimeout = -1;
+    private volatile long readTimeout = -1;
+    private volatile long writeTimeout = -1;
+
     private IOException error = null;
     private volatile int keepAliveLeft = 100;
     private volatile boolean async = false;
