@@ -140,7 +140,11 @@ public class ImportHandler {
         Class<?> result = clazzes.get(name);
 
         if (result != null) {
-            return result;
+            if (NotFound.class.equals(result)) {
+                return null;
+            } else {
+                return result;
+            }
         }
 
         // Search the class imports
@@ -167,7 +171,11 @@ public class ImportHandler {
                 result = clazz;
             }
         }
-        if (result != null) {
+        if (result == null) {
+            // Cache NotFound results to save repeated calls to findClass()
+            // which is relatively slow
+            clazzes.put(name, NotFound.class);
+        } else {
             clazzes.put(name, result);
         }
 
@@ -198,5 +206,13 @@ public class ImportHandler {
         }
 
         return clazz;
+    }
+
+
+    /*
+     * Marker class used because null values are not permitted in a
+     * ConcurrentHashMap.
+     */
+    private static class NotFound {
     }
 }
