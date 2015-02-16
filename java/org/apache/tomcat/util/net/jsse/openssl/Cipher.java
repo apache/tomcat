@@ -1829,19 +1829,19 @@ public enum Cipher {
             256,
             256
     ),
-    //  + 0x00,0xC5 - ADH-CAMELLIA256-SHA256 TLSv1.2 Kx=DH Au=None Enc=Camellia(256) Mac=SHA256
+    // Cipher C5
     TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256(
-            "DHE-RSA-CAMELLIA128-SHA256",
+            "ADH-CAMELLIA256-SHA256",
             KeyExchange.EDH,
-            Authentication.RSA,
-            Encryption.CAMELLIA128,
+            Authentication.aNULL,
+            Encryption.CAMELLIA256,
             MessageDigest.SHA256,
             Protocol.TLSv1_2,
             false,
             EncryptionLevel.HIGH,
             false,
-            128,
-            128
+            256,
+            256
     ),
     /* ECC ciphersuites from draft-ietf-tls-ecc-01.txt (
             Mar 15, 2001) */
