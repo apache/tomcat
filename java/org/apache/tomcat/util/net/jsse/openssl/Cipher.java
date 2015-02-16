@@ -1731,6 +1731,62 @@ public enum Cipher {
             256,
             256
     ),
+    // Cipher BB
+    TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA256(
+            "DH-DSS-CAMELLIA128-SHA256",
+            KeyExchange.DHd,
+            Authentication.DH,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher BC
+    TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA256(
+            "DH-RSA-CAMELLIA128-SHA256",
+            KeyExchange.DHr,
+            Authentication.DH,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher BD
+    TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA256(
+            "DHE-DSS-CAMELLIA128-SHA256",
+            KeyExchange.EDH,
+            Authentication.DSS,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher BE
+    TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256(
+            "DHE-RSA-CAMELLIA128-SHA256",
+            KeyExchange.EDH,
+            Authentication.RSA,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
     /* ECC ciphersuites from draft-ietf-tls-ecc-01.txt (
             Mar 15, 2001) */
     // Cipher C001
