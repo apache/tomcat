@@ -414,7 +414,7 @@ For example:
 
  7. Some tests include checks that the access log valve entries are as expected.
     These checks include timings. On slower / loaded systems these checks will
-    often fail. The checks may be relaxed by using the following proeprty:
+    often fail. The checks may be relaxed by using the following property:
 
         test.relaxTiming=true
 
