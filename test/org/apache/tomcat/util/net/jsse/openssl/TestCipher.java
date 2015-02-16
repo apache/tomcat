@@ -383,10 +383,6 @@ public class TestCipher {
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                     "DES-CBC-MD5+SSLv2",
                     "DES-CBC3-MD5+SSLv2",
-                    "DH-DSS-CAMELLIA256-SHA256+TLSv1.2",
-                    "DH-RSA-CAMELLIA256-SHA256+TLSv1.2",
-                    "DHE-DSS-CAMELLIA256-SHA256+TLSv1.2",
-                    "DHE-RSA-CAMELLIA256-SHA256+TLSv1.2",
                     "EXP-RC2-CBC-MD5+SSLv2",
                     "EXP-RC4-MD5+SSLv2",
                     "IDEA-CBC-MD5+SSLv2",
