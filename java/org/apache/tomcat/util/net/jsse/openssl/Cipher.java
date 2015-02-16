@@ -2505,6 +2505,34 @@ public enum Cipher {
             128,
             128
     ),
+    // Cipher C073
+    TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384(
+            "ECDHE-ECDSA-CAMELLIA256-SHA384",
+            KeyExchange.ECDHe,
+            Authentication.ECDSA,
+            Encryption.CAMELLIA256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    // Cipher C074
+    TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256(
+            "ECDH-ECDSA-CAMELLIA128-SHA256",
+            KeyExchange.ECDHr,
+            Authentication.ECDSA,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
     // Cipher C075
     TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384(
             "ECDH-ECDSA-CAMELLIA256-SHA384",
@@ -2523,6 +2551,34 @@ public enum Cipher {
     TLS_ECDHE_RSA_WITH_CAMELLIA_128_CBC_SHA256(
             "ECDHE-RSA-CAMELLIA128-SHA256",
             KeyExchange.ECDHe,
+            Authentication.RSA,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher C077
+    TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384(
+            "ECDHE-RSA-CAMELLIA256-SHA384",
+            KeyExchange.ECDHe,
+            Authentication.RSA,
+            Encryption.CAMELLIA256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    // Cipher C078
+    TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256(
+            "ECDH-RSA-CAMELLIA128-SHA256",
+            KeyExchange.ECDHr,
             Authentication.RSA,
             Encryption.CAMELLIA128,
             MessageDigest.SHA256,
