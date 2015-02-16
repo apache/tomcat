@@ -1675,6 +1675,104 @@ public enum Cipher {
             256,
             256
     ),
+    // Cipher BA
+    TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256(
+            "CAMELLIA128-SHA256",
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher BB
+    TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA256(
+            "DH-DSS-CAMELLIA128-SHA256",
+            KeyExchange.DHd,
+            Authentication.DH,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher BC
+    TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA256(
+            "DH-RSA-CAMELLIA128-SHA256",
+            KeyExchange.DHr,
+            Authentication.DH,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher BD
+    TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA256(
+            "DHE-DSS-CAMELLIA128-SHA256",
+            KeyExchange.EDH,
+            Authentication.DSS,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher BE
+    TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256(
+            "DHE-RSA-CAMELLIA128-SHA256",
+            KeyExchange.EDH,
+            Authentication.RSA,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher BF
+    TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA256(
+            "ADH-CAMELLIA128-SHA256",
+            KeyExchange.EDH,
+            Authentication.aNULL,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher C0
+    TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256(
+            "CAMELLIA256-SHA256",
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.CAMELLIA256,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256
+    ),
     // Cipher C1
     TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA256(
             "DH-DSS-CAMELLIA256-SHA256",
@@ -1731,50 +1829,8 @@ public enum Cipher {
             256,
             256
     ),
-    // Cipher BB
-    TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA256(
-            "DH-DSS-CAMELLIA128-SHA256",
-            KeyExchange.DHd,
-            Authentication.DH,
-            Encryption.CAMELLIA128,
-            MessageDigest.SHA256,
-            Protocol.TLSv1_2,
-            false,
-            EncryptionLevel.HIGH,
-            false,
-            128,
-            128
-    ),
-    // Cipher BC
-    TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA256(
-            "DH-RSA-CAMELLIA128-SHA256",
-            KeyExchange.DHr,
-            Authentication.DH,
-            Encryption.CAMELLIA128,
-            MessageDigest.SHA256,
-            Protocol.TLSv1_2,
-            false,
-            EncryptionLevel.HIGH,
-            false,
-            128,
-            128
-    ),
-    // Cipher BD
-    TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA256(
-            "DHE-DSS-CAMELLIA128-SHA256",
-            KeyExchange.EDH,
-            Authentication.DSS,
-            Encryption.CAMELLIA128,
-            MessageDigest.SHA256,
-            Protocol.TLSv1_2,
-            false,
-            EncryptionLevel.HIGH,
-            false,
-            128,
-            128
-    ),
-    // Cipher BE
-    TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256(
+    //  + 0x00,0xC5 - ADH-CAMELLIA256-SHA256 TLSv1.2 Kx=DH Au=None Enc=Camellia(256) Mac=SHA256
+    TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256(
             "DHE-RSA-CAMELLIA128-SHA256",
             KeyExchange.EDH,
             Authentication.RSA,
