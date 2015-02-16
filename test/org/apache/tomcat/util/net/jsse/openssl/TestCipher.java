@@ -542,6 +542,8 @@ public class TestCipher {
                     "ADH-SEED-SHA+SSLv3",
                     "CAMELLIA128-SHA+SSLv3",
                     "CAMELLIA256-SHA+SSLv3",
+                    "CAMELLIA128-SHA256+TLSv1.2",
+                    "CAMELLIA256-SHA256+TLSv1.2",
                     "DES-CBC-MD5+SSLv2",
                     "DES-CBC3-MD5+SSLv2",
                     "DH-DSS-AES128-GCM-SHA256+TLSv1.2",
