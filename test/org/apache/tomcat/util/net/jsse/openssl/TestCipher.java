@@ -92,14 +92,6 @@ public class TestCipher {
             if (openSSLAlias.contains("GOST")) {
                 continue;
             }
-            // OpenSSL does not implement any DH-DSS or DH-RSA algorithms so
-            // exclude them from the expected list
-            if (openSSLAlias.startsWith("DH-DSS") || openSSLAlias.startsWith("EXP-DH-DSS")) {
-                continue;
-            }
-            if (openSSLAlias.startsWith("DH-RSA") || openSSLAlias.startsWith("EXP-DH-RSA")) {
-                continue;
-            }
             // OpenSSL does not enable the experimental EXP1024 and
             // DHE-DSS-RC4-SHA cipher suites unless the source is explicitly
             // patched so exclude them from the expected list
@@ -403,6 +395,10 @@ public class TestCipher {
      * http://www-01.ibm.com/support/knowledgecenter/SSYKE2_7.0.0/com.ibm.java.security.component.71.doc/security-component/jsse2Docs/ciphersuites.html?lang=en
      * on 29th July 2014.
      * <br>
+     * As of 16 February 2015 the list for IBM Java 7 was identical to that for
+     * IBM Java 8
+     * http://www-01.ibm.com/support/knowledgecenter/SSYKE2_8.0.0/com.ibm.java.security.component.80.doc/security-component/jsse2Docs/ciphersuites.html?lang=en
+     * <br>
      * Note that IBM cipher suites names can begin with TLS or SSL.
      */
     private static final Set<String> CIPHER_SUITE_STANDARD_NAMES_IBM;
@@ -535,12 +531,36 @@ public class TestCipher {
                     "CAMELLIA256-SHA+SSLv3",
                     "DES-CBC-MD5+SSLv2",
                     "DES-CBC3-MD5+SSLv2",
+                    "DH-DSS-AES128-GCM-SHA256+TLSv1.2",
+                    "DH-DSS-AES256-GCM-SHA384+TLSv1.2",
+                    "DH-DSS-AES128-SHA+SSLv3",
+                    "DH-DSS-AES128-SHA256+TLSv1.2",
+                    "DH-DSS-AES256-SHA+SSLv3",
+                    "DH-DSS-AES256-SHA256+TLSv1.2",
+                    "DH-DSS-CAMELLIA128-SHA+SSLv3",
+                    "DH-DSS-CAMELLIA256-SHA+SSLv3",
+                    "DH-DSS-DES-CBC-SHA+SSLv3",
+                    "DH-DSS-DES-CBC3-SHA+SSLv3",
+                    "DH-DSS-SEED-SHA+SSLv3",
+                    "DH-RSA-AES128-GCM-SHA256+TLSv1.2",
+                    "DH-RSA-AES256-GCM-SHA384+TLSv1.2",
+                    "DH-RSA-AES128-SHA+SSLv3",
+                    "DH-RSA-AES128-SHA256+TLSv1.2",
+                    "DH-RSA-AES256-SHA+SSLv3",
+                    "DH-RSA-AES256-SHA256+TLSv1.2",
+                    "DH-RSA-CAMELLIA128-SHA+SSLv3",
+                    "DH-RSA-CAMELLIA256-SHA+SSLv3",
+                    "DH-RSA-DES-CBC-SHA+SSLv3",
+                    "DH-RSA-DES-CBC3-SHA+SSLv3",
+                    "DH-RSA-SEED-SHA+SSLv3",
                     "DHE-DSS-CAMELLIA128-SHA+SSLv3",
                     "DHE-DSS-CAMELLIA256-SHA+SSLv3",
                     "DHE-DSS-SEED-SHA+SSLv3",
                     "DHE-RSA-CAMELLIA128-SHA+SSLv3",
                     "DHE-RSA-CAMELLIA256-SHA+SSLv3",
                     "DHE-RSA-SEED-SHA+SSLv3",
+                    "EXP-DH-DSS-DES-CBC-SHA+SSLv3",
+                    "EXP-DH-RSA-DES-CBC-SHA+SSLv3",
                     "EXP-RC2-CBC-MD5+SSLv2",
                     "EXP-RC4-MD5+SSLv2",
                     "IDEA-CBC-MD5+SSLv2",
