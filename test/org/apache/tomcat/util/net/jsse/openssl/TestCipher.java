@@ -539,6 +539,8 @@ public class TestCipher {
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                     "ADH-CAMELLIA128-SHA+SSLv3",
                     "ADH-CAMELLIA256-SHA+SSLv3",
+                    "ADH-CAMELLIA128-SHA256+TLSv1.2",
+                    "ADH-CAMELLIA256-SHA256+TLSv1.2",
                     "ADH-SEED-SHA+SSLv3",
                     "CAMELLIA128-SHA+SSLv3",
                     "CAMELLIA256-SHA+SSLv3",
