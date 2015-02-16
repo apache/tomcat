@@ -111,11 +111,6 @@ public class TestCipher {
             if (cipher.getProtocol().equals(Protocol.SSLv2)) {
                 continue;
             }
-            // As of OpenSSl 1.1.0, EDH ciphers are not supported to exclude
-            // them from the expected list
-            if (openSSLAlias.contains("EDH-")) {
-                continue;
-            }
             expectedCipherSuites.add(openSSLAlias + "+" +
                     cipher.getProtocol().getOpenSSLName());
         }

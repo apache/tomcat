@@ -280,7 +280,7 @@ public enum Cipher {
     /* The Ephemeral DH ciphers */
     // Cipher 11
     TLS_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA(
-            "EXP-EDH-DSS-DES-CBC-SHA",
+            "EXP-DHE-DSS-DES-CBC-SHA",
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.DES,
@@ -295,7 +295,7 @@ public enum Cipher {
     ),
     // Cipher 12
     TLS_DHE_DSS_WITH_DES_CBC_SHA(
-            "EDH-DSS-DES-CBC-SHA",
+            "DHE-DSS-DES-CBC-SHA",
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.DES,
@@ -310,7 +310,7 @@ public enum Cipher {
     ),
     // Cipher 13
     TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA(
-            "EDH-DSS-DES-CBC3-SHA",
+            "DHE-DSS-DES-CBC3-SHA",
             KeyExchange.EDH,
             Authentication.DSS,
             Encryption.TRIPLE_DES,
@@ -325,7 +325,7 @@ public enum Cipher {
     ),
     // Cipher 14
     TLS_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA(
-            "EXP-EDH-RSA-DES-CBC-SHA",
+            "EXP-DHE-RSA-DES-CBC-SHA",
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.DES,
@@ -340,7 +340,7 @@ public enum Cipher {
     ),
     // Cipher 15
     TLS_DHE_RSA_WITH_DES_CBC_SHA(
-            "EDH-RSA-DES-CBC-SHA",
+            "DHE-RSA-DES-CBC-SHA",
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.DES,
@@ -355,7 +355,7 @@ public enum Cipher {
     ),
     // Cipher 16
     TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA(
-            "EDH-RSA-DES-CBC3-SHA",
+            "DHE-RSA-DES-CBC3-SHA",
             KeyExchange.EDH,
             Authentication.RSA,
             Encryption.TRIPLE_DES,
