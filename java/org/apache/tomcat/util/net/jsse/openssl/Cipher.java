@@ -2491,6 +2491,34 @@ public enum Cipher {
             256,
             256
     ),
+    // Cipher C075
+    TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384(
+            "ECDH-ECDSA-CAMELLIA256-SHA384",
+            KeyExchange.ECDHr,
+            Authentication.ECDSA,
+            Encryption.CAMELLIA256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    // Cipher C079
+    TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384(
+            "ECDH-RSA-CAMELLIA256-SHA384",
+            KeyExchange.ECDHr,
+            Authentication.RSA,
+            Encryption.CAMELLIA256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
     // RC4_128_WITH_MD5
     SSL_CK_RC4_128_WITH_MD5(
             "RC4-MD5",

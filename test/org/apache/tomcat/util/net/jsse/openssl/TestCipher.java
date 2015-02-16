@@ -383,6 +383,8 @@ public class TestCipher {
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                     "DES-CBC-MD5+SSLv2",
                     "DES-CBC3-MD5+SSLv2",
+                    "ECDH-ECDSA-CAMELLIA256-SHA384+TLSv1.2",
+                    "ECDH-RSA-CAMELLIA256-SHA384+TLSv1.2",
                     "EXP-RC2-CBC-MD5+SSLv2",
                     "EXP-RC4-MD5+SSLv2",
                     "IDEA-CBC-MD5+SSLv2",
@@ -567,6 +569,8 @@ public class TestCipher {
                     "DHE-RSA-CAMELLIA256-SHA+SSLv3",
                     "DHE-RSA-CAMELLIA256-SHA256+TLSv1.2",
                     "DHE-RSA-SEED-SHA+SSLv3",
+                    "ECDH-ECDSA-CAMELLIA256-SHA384+TLSv1.2",
+                    "ECDH-RSA-CAMELLIA256-SHA384+TLSv1.2",
                     "EXP-DH-DSS-DES-CBC-SHA+SSLv3",
                     "EXP-DH-RSA-DES-CBC-SHA+SSLv3",
                     "EXP-RC2-CBC-MD5+SSLv2",
