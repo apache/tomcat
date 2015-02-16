@@ -123,7 +123,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    @Ignore("Contrary to the docs, OpenSSL does not recognise kDHE")
     public void testkDHE() throws Exception {
         testSpecification("kDHE");
     }
@@ -136,7 +135,6 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    @Ignore("Contrary to the docs, OpenSSL does not recognise DHE")
     public void testDHE() throws Exception {
         testSpecification("DHE");
     }
