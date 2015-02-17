@@ -768,7 +768,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 public void completed(Integer nBytes, SocketWrapperBase<Nio2Channel> attachment) {
                     boolean notify = false;
                     if (log.isDebugEnabled()) {
-                        log.debug("Socket: [ + " + attachment + "], Interest: [" + readInterest + "]");
+                        log.debug("Socket: [" + attachment + "], Interest: [" + readInterest + "]");
                     }
                     synchronized (readCompletionHandler) {
                         if (nBytes.intValue() < 0) {
