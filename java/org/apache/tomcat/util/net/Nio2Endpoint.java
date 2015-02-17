@@ -736,7 +736,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         private final CompletionHandler<Integer, ByteBuffer> writeCompletionHandler;
         private final CompletionHandler<Long, ByteBuffer[]> gatheringWriteCompletionHandler;
-        private final Semaphore writePending = new Semaphore(1);
+        private final Semaphore writePending = new Semaphore(1); // Guarded by writeCompletionHandler
         private boolean writeInterest = false; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
 
@@ -1199,10 +1199,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             // Before doing a blocking flush, make sure that any pending non
             // blocking write has completed.
             try {
-                if (writePending.tryAcquire(getNio2WriteTimeout(), TimeUnit.MILLISECONDS)) {
-                    writePending.release();
-                } else {
-                    throw new SocketTimeoutException();
+                synchronized(writeCompletionHandler) {
+                    if (writePending.tryAcquire(getNio2WriteTimeout(), TimeUnit.MILLISECONDS)) {
+                        writePending.release();
+                    } else {
+                        throw new SocketTimeoutException();
+                    }
                 }
             } catch (InterruptedException e) {
                 // Ignore
