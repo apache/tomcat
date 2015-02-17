@@ -168,10 +168,10 @@ removed and recycled, add one or both of the following attributes to the
 </p>
 <source>removeAbandonedOnBorrow=true</source>
 <source>removeAbandonedOnMaintenance=true</source>
-<p> The default for both of these attributes is <code>false</code>.  Note that 
-<code>removeAbandonedOnMaintenance</code> has no effect unless pool 
-maintenance is enabled by setting <code>timeBetweenEvictionRunsMillis</code> 
-to a positive value.  See the 
+<p> The default for both of these attributes is <code>false</code>.  Note that
+<code>removeAbandonedOnMaintenance</code> has no effect unless pool
+maintenance is enabled by setting <code>timeBetweenEvictionRunsMillis</code>
+to a positive value.  See the
 <a href="http://commons.apache.org/dbcp/configuration.html">
 DBCP documentation</a> for full documentation on these attributes.
 </p>
