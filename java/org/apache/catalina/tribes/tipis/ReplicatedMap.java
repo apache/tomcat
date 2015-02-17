@@ -221,7 +221,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                     Map.Entry<K,MapEntry<K,V>> e = i.next();
                     MapEntry<K,V> entry = innerMap.get(e.getKey());
                     if ( entry == null ) continue;
-                    if (entry.isPrimary() && !inSet(member,entry.getBackupNodes())) {    
+                    if (entry.isPrimary() && !inSet(member,entry.getBackupNodes())) {
                         entry.setBackupNodes(backup);
                     }
                 }
