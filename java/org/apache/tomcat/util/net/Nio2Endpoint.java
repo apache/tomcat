@@ -1010,7 +1010,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             } else {
                 if (!readPending.tryAcquire()) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Socket: [" + this + "], Read: [0]");
+                        log.debug("Socket: [" + this + "], Read in progress. Returning [0]");
                     }
                     return 0;
                 }
