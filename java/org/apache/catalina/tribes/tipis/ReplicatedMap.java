@@ -204,6 +204,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         if (log.isInfoEnabled()) log.info("Relocation of map entries was complete in " + complete + " ms.");
     }
 
+    @Override
     public void mapMemberAdded(Member member) {
         if ( member.equals(getChannel().getLocalMember(false)) ) return;
         boolean memberAdded = false;
