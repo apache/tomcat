@@ -103,6 +103,9 @@ public class UpgradeProcessor implements Processor, WebConnection {
         } else if (status == SocketStatus.OPEN_WRITE) {
             upgradeServletOutputStream.onWritePossible();
         } else if (status == SocketStatus.STOP) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeProcessor.stop"));
+            }
             try {
                 upgradeServletInputStream.close();
             } catch (IOException ioe) {
@@ -116,10 +119,18 @@ public class UpgradeProcessor implements Processor, WebConnection {
             return SocketState.CLOSED;
         } else {
             // Unexpected state
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeProcessor.unexpectedState"));
+            }
             return SocketState.CLOSED;
         }
         if (upgradeServletInputStream.isCloseRequired() ||
                 upgradeServletOutputStream.isCloseRequired()) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeProcessor.requiredClose",
+                        Boolean.valueOf(upgradeServletInputStream.isCloseRequired()),
+                        Boolean.valueOf(upgradeServletOutputStream.isCloseRequired())));
+            }
             return SocketState.CLOSED;
         }
         return SocketState.UPGRADED;

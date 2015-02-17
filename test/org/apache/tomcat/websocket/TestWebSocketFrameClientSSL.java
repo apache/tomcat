@@ -47,6 +47,8 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
     public void testConnectToServerEndpoint() throws Exception {
         Logger logger = Logger.getLogger("org.apache.tomcat.util.net.Nio2Endpoint");
         logger.setLevel(Level.ALL);
+        logger = Logger.getLogger("org.apache.coyote.http11.upgrade.UpgradeProcessor");
+        logger.setLevel(Level.ALL);
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
