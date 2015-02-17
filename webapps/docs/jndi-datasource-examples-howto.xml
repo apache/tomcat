@@ -163,15 +163,17 @@ which opened these resources and never closed them.</p>
 
 <p>
 To configure a DBCP DataSource so that abandoned database connections are
-removed and recycled add the following attribute to the
+removed and recycled, add one or both of the following attributes to the
 <code>Resource</code> configuration for your DBCP DataSource:
 </p>
-
-<source>removeAbandoned="true"</source>
-
-<p>
-When available database connections run low DBCP will recover and recycle
-any abandoned database connections it finds. The default is <code>false</code>.
+<source>removeAbandonedOnBorrow=true</source>
+<source>removeAbandonedOnMaintenance=true</source>
+<p> The default for both of these attributes is <code>false</code>.  Note that 
+<code>removeAbandonedOnMaintenance</code> has no effect unless pool 
+maintenance is enabled by setting <code>timeBetweenEvictionRunsMillis</code> 
+to a positive value.  See the 
+<a href="http://commons.apache.org/dbcp/configuration.html">
+DBCP documentation</a> for full documentation on these attributes.
 </p>
 
 <p>
