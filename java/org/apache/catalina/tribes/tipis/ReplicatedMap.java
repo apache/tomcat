@@ -203,4 +203,29 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         long complete = System.currentTimeMillis() - start;
         if (log.isInfoEnabled()) log.info("Relocation of map entries was complete in " + complete + " ms.");
     }
+
+    public void mapMemberAdded(Member member) {
+        if ( member.equals(getChannel().getLocalMember(false)) ) return;
+        boolean memberAdded = false;
+        synchronized (mapMembers) {
+            if (!mapMembers.containsKey(member) ) {
+                mapMembers.put(member, new Long(System.currentTimeMillis()));
+                memberAdded = true;
+            }
+        }
+        if ( memberAdded ) {
+            synchronized (stateMutex) {
+                Member[] backup = getMapMembers();
+                Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
+                while (i.hasNext()) {
+                    Map.Entry<K,MapEntry<K,V>> e = i.next();
+                    MapEntry<K,V> entry = innerMap.get(e.getKey());
+                    if ( entry == null ) continue;
+                    if (entry.isPrimary() && !inSet(member,entry.getBackupNodes())) {    
+                        entry.setBackupNodes(backup);
+                    }
+                }
+            }
+        }
+    }
 }
