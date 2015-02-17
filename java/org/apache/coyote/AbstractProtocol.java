@@ -601,12 +601,18 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 SocketStatus status) {
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Wrapper is null. Closing connection.");
+                }
                 return SocketState.CLOSED;
             }
 
             S socket = wrapper.getSocket();
             if (socket == null) {
                 // Nothing to do. Socket has been closed.
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Socket is null. Closing connection.");
+                }
                 return SocketState.CLOSED;
             }
 
@@ -614,6 +620,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             if (status == SocketStatus.DISCONNECT && processor == null) {
                 // Nothing to do. Endpoint requested a close and there is no
                 // longer a processor associated with this socket.
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("SocketStatus.DISCONNECT && processor == null. Closing connection.");
+                }
                 return SocketState.CLOSED;
             }
 
@@ -636,6 +645,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 do {
                     if (status == SocketStatus.CLOSE_NOW) {
                         processor.errorDispatch();
+                        if (getLog().isDebugEnabled()) {
+                            getLog().debug("SocketStatus.CLOSE_NOW. Closing connection.");
+                        }
                         state = SocketState.CLOSED;
                     } else if (dispatches != null) {
                         // Associate the processor with the connection as
@@ -738,6 +750,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         processor.getHttpUpgradeHandler().destroy();
                     } else {
                         release(wrapper, processor, false);
+                    }
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug("Closing connection.");
                     }
                 }
                 return state;
