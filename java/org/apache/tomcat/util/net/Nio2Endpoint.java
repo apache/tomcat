@@ -562,6 +562,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     }
 
     protected boolean processSocket0(SocketWrapperBase<Nio2Channel> socketWrapper, SocketStatus status, boolean dispatch) {
+        if (log.isDebugEnabled()) {
+            log.debug("processSocket0 [" + socketWrapper + "], [" + status + "], [" + dispatch + "]", new Exception());
+        }
         try {
             SocketProcessor sc = (useCaches) ? processorCache.pop() : null;
             if (sc == null) {
