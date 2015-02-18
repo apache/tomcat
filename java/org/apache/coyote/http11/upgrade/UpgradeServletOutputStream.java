@@ -55,12 +55,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private volatile WriteListener listener = null;
 
     // Guarded by registeredLock
-    private volatile boolean registered = false;
-
-    // Use to track if a dispatch needs to be arranged to trigger the first call
-    // to onWritePossible. If the socket gets registered for write while this is
-    // set then this will be ignored.
-    private volatile boolean writeDispatchRequired = false;
+    private boolean registered = false;
 
     private volatile ClassLoader applicationLoader = null;
 
@@ -110,7 +105,10 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         }
         // Container is responsible for first call to onWritePossible() but only
         // need to do this if setting the listener for the first time.
-        writeDispatchRequired = true;
+        synchronized (registeredLock) {
+            registered = true;
+            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+        }
 
         this.listener = listener;
         this.applicationLoader = Thread.currentThread().getContextClassLoader();
@@ -262,18 +260,6 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("upgrade.sos.errorCloseFail"), ioe);
-            }
-        }
-    }
-
-
-    void checkWriteDispatch() {
-        synchronized (registeredLock) {
-            if (writeDispatchRequired) {
-                writeDispatchRequired = false;
-                if (!registered) {
-                    socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
-                }
             }
         }
     }
