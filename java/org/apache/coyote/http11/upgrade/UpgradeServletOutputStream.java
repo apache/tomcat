@@ -172,7 +172,6 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     @Override
     public void close() throws IOException {
         closeRequired = true;
-        socketWrapper.close();
     }
 
 
