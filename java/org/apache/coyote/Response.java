@@ -584,7 +584,7 @@ public final class Response {
             action(ActionCode.DISPATCH_WRITE, null);
             synchronized (nonBlockingStateLock) {
                 // Ensure we don't get multiple write registrations if
-                // ServletOutoutStream.isReady() returns false during a call to
+                // ServletOutputStream.isReady() returns false during a call to
                 // onDataAvailable()
                 registeredForWrite = true;
                 // Need to set the fireListener flag otherwise when the
