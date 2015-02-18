@@ -589,6 +589,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
     }
 
     public void closeSocket(SocketWrapperBase<Nio2Channel> socket) {
+        if (log.isDebugEnabled()) {
+            log.debug("Calling [" + this + "].closeSocket([" + socket + "],[" + socket.getSocket() + "])",
+                    new Exception());
+        }
         if (socket == null) {
             return;
         }
