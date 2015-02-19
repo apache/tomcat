@@ -975,6 +975,11 @@ public class Http11Processor extends AbstractProcessor {
                         request.setAttribute
                             (SSLSupport.SESSION_ID_KEY, sslO);
                     }
+                    sslO = sslSupport.getProtocol();
+                    if (sslO != null) {
+                        request.setAttribute
+                            (SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                    }
                     request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
                 }
             } catch (Exception e) {

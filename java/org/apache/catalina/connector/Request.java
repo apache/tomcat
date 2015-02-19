@@ -98,6 +98,7 @@ import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import org.apache.tomcat.util.http.parser.AcceptLanguage;
+import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.res.StringManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -853,7 +854,7 @@ public class Request
         if(attr != null) {
             return attr;
         }
-        if( isSSLAttribute(name) ) {
+        if( isSSLAttribute(name) || name.equals(SSLSupport.PROTOCOL_VERSION_KEY)) {
             coyoteRequest.action(ActionCode.REQ_SSL_ATTRIBUTE,
                                  coyoteRequest);
             attr = coyoteRequest.getAttribute(Globals.CERTIFICATES_ATTR);
@@ -875,6 +876,10 @@ public class Request
             attr = coyoteRequest.getAttribute(Globals.SSL_SESSION_MGR_ATTR);
             if(attr != null) {
                 attributes.put(Globals.SSL_SESSION_MGR_ATTR, attr);
+            }
+            attr = coyoteRequest.getAttribute(SSLSupport.PROTOCOL_VERSION_KEY);
+            if(attr != null) {
+                attributes.put(SSLSupport.PROTOCOL_VERSION_KEY, attr);
             }
             attr = attributes.get(name);
             sslAttributesParsed = true;

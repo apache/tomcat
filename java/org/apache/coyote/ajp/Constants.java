@@ -76,6 +76,7 @@ public final class Constants {
      */
     public static final String SC_A_REQ_LOCAL_ADDR  = "AJP_LOCAL_ADDR";
     public static final String SC_A_REQ_REMOTE_PORT = "AJP_REMOTE_PORT";
+    public static final String SC_A_SSL_PROTOCOL    = "AJP_SSL_PROTOCOL";
 
     // Terminates list of attributes
     public static final byte SC_A_ARE_DONE      = (byte)0xFF;
