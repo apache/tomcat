@@ -54,6 +54,12 @@ public interface SSLSupport {
     public static final String SESSION_MGR =
             "javax.servlet.request.ssl_session_mgr";
 
+    /**
+     * The request attribute key under which the String indicating the protocol
+     * that created the SSL socket is recorded - e.g. TLSv1 or TLSv1.2 etc.
+     */
+    public static final String PROTOCOL_VERSION_KEY =
+            "org.apache.tomcat.util.net.secure_protocol_version";
 
     /**
      * A mapping table to determine the number of effective bits in the key
@@ -133,5 +139,11 @@ public interface SSLSupport {
 
     }
 
+
+    /**
+     * @return the protocol String indicating how the SSL socket was created
+     *  e.g. TLSv1 or TLSv1.2 etc.
+     */
+    public String getProtocol() throws IOException;
 }
 

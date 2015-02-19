@@ -812,6 +812,8 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                     } catch (NumberFormatException nfe) {
                         // Ignore invalid value
                     }
+                } else if(n.equals(Constants.SC_A_SSL_PROTOCOL)) {
+                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, v);
                 } else {
                     request.setAttribute(n, v );
                 }

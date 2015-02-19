@@ -392,6 +392,11 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                     if (sslO != null) {
                         request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
                     }
+                    sslO = SSLSocket.getInfoS(socketRef, SSL.SSL_INFO_PROTOCOL);
+                    if (sslO != null) {
+                        request.setAttribute
+                        (SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                    }
                     //TODO provide a hook to enable the SSL session to be
                     // invalidated. Set AprEndpoint.SESSION_MGR req attr
                 } catch (Exception e) {

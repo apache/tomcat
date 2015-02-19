@@ -56,6 +56,20 @@
   issues to not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.60 (violetagg)">
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>57540</bug>: Make TLS/SSL protocol available in a new request
+        attribute
+        (<code>org.apache.tomcat.util.net.secure_protocol_version</code>).
+        (Note that AJP connectors will require <tt>mod_jk</tt> 1.2.41 or later,
+        or an as-yet-unknown version of mod_proxy_ajp, or configure the proxy
+        to send the AJP_SSL_PROTOCOL request attribute to Tomcat. Please see
+        the bug comments for details.)
+        Based upon a patch provided by Ralf Hauser. (schultz)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
