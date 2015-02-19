@@ -117,4 +117,18 @@ public class AprSSLSupport implements SSLSupport {
             throw new IOException(e);
         }
     }
+
+    @Override
+    public String getProtocol() throws IOException {
+        long socketRef = socketWrapper.getSocket().longValue();
+        if (socketRef == 0) {
+            return null;
+        }
+
+        try {
+            return SSLSocket.getInfoS(socketRef, SSL.SSL_INFO_PROTOCOL);
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+   }
 }

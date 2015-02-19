@@ -1140,6 +1140,8 @@ public class AjpProcessor extends AbstractProcessor {
                     } catch (NumberFormatException nfe) {
                         // Ignore invalid value
                     }
+                } else if(n.equals(Constants.SC_A_SSL_PROTOCOL)) {
+                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, v);
                 } else {
                     request.setAttribute(n, v );
                 }

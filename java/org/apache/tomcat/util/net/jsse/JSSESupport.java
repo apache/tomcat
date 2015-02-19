@@ -180,5 +180,13 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     public void invalidateSession() {
         session.invalidate();
     }
+
+    @Override
+    public String getProtocol() throws IOException {
+        if (session == null) {
+           return null;
+        }
+       return session.getProtocol();
+   }
 }
 
