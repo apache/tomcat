@@ -83,6 +83,10 @@
         jni.Library when Tomcat-Native DLL fails to load. Based on a patch by
         Pravallika Peddi. (markt/kkolinko)
       </add>
+      <add>
+        <bug>49785</bug>: Enable StartTLS connections for JNDIRealm.
+        (fschumacher)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
