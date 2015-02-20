@@ -900,7 +900,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         s.getBasicRemote().sendText(msg.toString());
 
-        // Wait for up to 5 seconds for session to close
+        // Wait for up to 5 seconds for the client session to close
         boolean open = s.isOpen();
         int count = 0;
         while (open != expectOpen && count < 50) {
@@ -911,6 +911,23 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Assert.assertEquals(Boolean.valueOf(expectOpen),
                 Boolean.valueOf(s.isOpen()));
+
+        // Close the session if it is expected to be open
+        if (expectOpen) {
+            s.close();
+        }
+
+        // Wait for up to 5 seconds for the server session to close and the
+        // background process to stop
+        count = 0;
+        while (count < 50) {
+            if (BackgroundProcessManager.getInstance().getProcessCount() == 0) {
+                break;
+            }
+            Thread.sleep(100);
+        }
+
+        Assert.assertEquals(0, BackgroundProcessManager.getInstance().getProcessCount());
     }
 
 
