@@ -180,7 +180,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
     private void preWriteChecks() {
         if (listener != null && !socketWrapper.canWrite()) {
-            throw new IllegalStateException(sm.getString("upgrade.sis.write.ise"));
+            throw new IllegalStateException(sm.getString("upgrade.sos.write.ise"));
         }
     }
 
