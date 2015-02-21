@@ -2055,6 +2055,7 @@ public enum Cipher {
             256,
             256
     ),
+    // Cipher C010
     TLS_ECDHE_RSA_WITH_NULL_SHA(
             "ECDHE-RSA-NULL-SHA",
             KeyExchange.EECDH,
@@ -2550,7 +2551,7 @@ public enum Cipher {
     // Cipher C072
     TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_CBC_SHA256(
             "ECDHE-ECDSA-CAMELLIA128-SHA256",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.CAMELLIA128,
             MessageDigest.SHA256,
@@ -2564,7 +2565,7 @@ public enum Cipher {
     // Cipher C073
     TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384(
             "ECDHE-ECDSA-CAMELLIA256-SHA384",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.CAMELLIA256,
             MessageDigest.SHA384,
@@ -2578,7 +2579,7 @@ public enum Cipher {
     // Cipher C074
     TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256(
             "ECDH-ECDSA-CAMELLIA128-SHA256",
-            KeyExchange.ECDHr,
+            KeyExchange.ECDHe,
             Authentication.ECDSA,
             Encryption.CAMELLIA128,
             MessageDigest.SHA256,
@@ -2592,7 +2593,7 @@ public enum Cipher {
     // Cipher C075
     TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384(
             "ECDH-ECDSA-CAMELLIA256-SHA384",
-            KeyExchange.ECDHr,
+            KeyExchange.ECDHe,
             Authentication.ECDSA,
             Encryption.CAMELLIA256,
             MessageDigest.SHA384,
@@ -2606,7 +2607,7 @@ public enum Cipher {
     // Cipher C076
     TLS_ECDHE_RSA_WITH_CAMELLIA_128_CBC_SHA256(
             "ECDHE-RSA-CAMELLIA128-SHA256",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.CAMELLIA128,
             MessageDigest.SHA256,
@@ -2620,7 +2621,7 @@ public enum Cipher {
     // Cipher C077
     TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384(
             "ECDHE-RSA-CAMELLIA256-SHA384",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.CAMELLIA256,
             MessageDigest.SHA384,
