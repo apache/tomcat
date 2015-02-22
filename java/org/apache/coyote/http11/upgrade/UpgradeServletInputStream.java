@@ -38,6 +38,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
     private final SocketWrapperBase<?> socketWrapper;
 
     private volatile boolean closed = false;
+    private volatile boolean eof = false;
     // Start in blocking-mode
     private volatile Boolean ready = Boolean.TRUE;
     private volatile ReadListener listener = null;
@@ -55,9 +56,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
             throw new IllegalStateException(
                     sm.getString("upgrade.sis.isFinished.ise"));
         }
-        // The only way to finish an HTTP Upgrade connection is to close the
-        // socket.
-        return false;
+        return eof;
     }
 
 
@@ -68,7 +67,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
                     sm.getString("upgrade.sis.isReady.ise"));
         }
 
-        if (closed) {
+        if (eof || closed) {
             return false;
         }
 
@@ -147,7 +146,11 @@ public class UpgradeServletInputStream extends ServletInputStream {
         preReadChecks();
 
         try {
-            return socketWrapper.read(listener == null, b, off, len);
+            int result =  socketWrapper.read(listener == null, b, off, len);
+            if (result == -1) {
+                eof = true;
+            }
+            return result;
         } catch (IOException ioe) {
             close();
             throw ioe;
@@ -158,6 +161,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
     @Override
     public void close() throws IOException {
+        eof = true;
         closed = true;
     }
 
@@ -188,9 +192,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         if (result == 0) {
             return -1;
         } else if (result == -1) {
-            // Will never happen with a network socket. An IOException will be
-            // thrown when the client closes the connection.
-            // Echo back the -1 to be safe.
+            eof = true;
             return -1;
         } else {
             return b[0] & 0xFF;
@@ -207,7 +209,12 @@ public class UpgradeServletInputStream extends ServletInputStream {
         ClassLoader originalClassLoader = thread.getContextClassLoader();
         try {
             thread.setContextClassLoader(applicationLoader);
-            listener.onDataAvailable();
+            if (!eof) {
+                listener.onDataAvailable();
+            }
+            if (eof) {
+                listener.onAllDataRead();
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             onError(t);
