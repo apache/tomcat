@@ -1685,10 +1685,9 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             SelectionKey key = socket.getIOChannel().keyFor(
                     socket.getPoller().getSelector());
 
-            // Upgraded connections need to allow multiple threads to access the
-            // connection at the same time to enable blocking IO to be used when
-            // NIO has been configured
-            if (ka.isUpgraded() && SocketStatus.OPEN_WRITE == status) {
+            // Upgraded connections using an internal upgrade handler are
+            // allowed concurrent read/writes
+            if (ka.isInternalUpgrade() && SocketStatus.OPEN_WRITE == status) {
                 synchronized (ka.getWriteThreadLock()) {
                     doRun(key, ka);
                 }

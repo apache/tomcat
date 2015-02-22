@@ -56,6 +56,10 @@ public class UpgradeProcessor implements Processor, WebConnection {
         wrapper.unRead(leftOverInput);
         wrapper.setReadTimeout(INFINITE_TIMEOUT);
         wrapper.setWriteTimeout(INFINITE_TIMEOUT);
+
+        if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
+            wrapper.setInternalUpgrade(true);
+        }
     }
 
 

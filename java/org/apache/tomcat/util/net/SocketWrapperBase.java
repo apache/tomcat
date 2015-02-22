@@ -51,6 +51,7 @@ public abstract class SocketWrapperBase<E> {
     private volatile boolean async = false;
     private boolean keptAlive = false;
     private volatile boolean upgraded = false;
+    private volatile boolean internalUpgrade = false;
     private boolean secure = false;
     /*
      * Following cached for speed / reduced GC
@@ -152,6 +153,10 @@ public abstract class SocketWrapperBase<E> {
     }
     public boolean isUpgraded() { return upgraded; }
     public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
+    public boolean isInternalUpgrade() {return internalUpgrade; }
+    public void setInternalUpgrade(boolean internalUpgrade) {
+        this.internalUpgrade = internalUpgrade;
+    }
     public boolean isSecure() { return secure; }
     public void setSecure(boolean secure) { this.secure = secure; }
 
@@ -345,6 +350,7 @@ public abstract class SocketWrapperBase<E> {
         this.readTimeout = soTimeout;
         this.writeTimeout = soTimeout;
         upgraded = false;
+        internalUpgrade = false;
         resetSocketBufferHandler(socket);
     }
 

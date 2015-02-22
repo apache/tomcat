@@ -2326,11 +2326,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         @Override
         public void run() {
-
-            // Upgraded connections need to allow multiple threads to access the
-            // connection at the same time to enable blocking IO to be used when
-            // Servlet 3.1 NIO has been configured
-            if (socket.isUpgraded() && SocketStatus.OPEN_WRITE == status) {
+            // Upgraded connections using an internal upgrade handler are
+            // allowed concurrent read/writes
+            if (socket.isInternalUpgrade() && SocketStatus.OPEN_WRITE == status) {
                 synchronized (socket.getWriteThreadLock()) {
                     doRun();
                 }
