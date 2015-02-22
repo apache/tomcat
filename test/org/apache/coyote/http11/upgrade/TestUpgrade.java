@@ -320,16 +320,16 @@ public class TestUpgrade extends TomcatBaseTest {
                     sis.close();
                     sos.close();
                 }
-                    while (sis.isReady()) {
-                        int read = sis.read(buffer);
-                        if (read > 0) {
-                                sos.write(buffer, 0, read);
-                        if (!sos.isReady()) {
-                            break;
-                            }
+                while (sis.isReady()) {
+                    int read = sis.read(buffer);
+                    if (read > 0) {
+                            sos.write(buffer, 0, read);
+                    if (!sos.isReady()) {
+                        break;
                         }
                     }
                 }
+            }
 
             @Override
             public void onDataAvailable() throws IOException {
