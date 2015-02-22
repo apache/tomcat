@@ -732,7 +732,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         };
 
         private SendfileData sendfileData = null;
-        private boolean upgradeInit = false;
 
         private final CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> readCompletionHandler;
         private final Semaphore readPending = new Semaphore(1);
@@ -938,7 +937,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                         new Exception());
             }
             super.reset(channel, soTimeout);
-            upgradeInit = false;
             sendfileData = null;
         }
 
@@ -952,19 +950,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             }
         }
 
-        @Override
-        public void setUpgraded(boolean upgraded) {
-            if (upgraded && !isUpgraded()) {
-                upgradeInit = true;
-            }
-            super.setUpgraded(upgraded);
-        }
-
-        public boolean isUpgradeInit() {
-            boolean value = upgradeInit;
-            upgradeInit = false;
-            return value;
-        }
 
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf; }
         public SendfileData getSendfileData() { return this.sendfileData; }
