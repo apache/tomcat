@@ -123,12 +123,12 @@ public class UpgradeProcessor implements Processor, WebConnection {
             }
             return SocketState.CLOSED;
         }
-        if (upgradeServletInputStream.isCloseRequired() ||
-                upgradeServletOutputStream.isCloseRequired()) {
+        if (upgradeServletInputStream.isClosed() ||
+                upgradeServletOutputStream.isClosed()) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("upgradeProcessor.requiredClose",
-                        Boolean.valueOf(upgradeServletInputStream.isCloseRequired()),
-                        Boolean.valueOf(upgradeServletOutputStream.isCloseRequired())));
+                        Boolean.valueOf(upgradeServletInputStream.isClosed()),
+                        Boolean.valueOf(upgradeServletOutputStream.isClosed())));
             }
             return SocketState.CLOSED;
         }

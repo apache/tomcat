@@ -50,7 +50,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
     private volatile boolean flushing = false;
 
-    private volatile boolean closeRequired = false;
+    private volatile boolean closed = false;
 
     // Start in blocking-mode
     private volatile WriteListener listener = null;
@@ -71,6 +71,9 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         if (listener == null) {
             throw new IllegalStateException(
                     sm.getString("upgrade.sos.canWrite.is"));
+        }
+        if (closed) {
+            return false;
         }
 
         // Make sure isReady() and onWritePossible() have a consistent view of
@@ -104,6 +107,9 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             throw new IllegalArgumentException(
                     sm.getString("upgrade.sos.writeListener.set"));
         }
+        if (closed) {
+            throw new IllegalStateException(sm.getString("upgrade.sos.write.closed"));
+        }
         // Container is responsible for first call to onWritePossible() but only
         // need to do this if setting the listener for the first time.
         synchronized (registeredLock) {
@@ -120,8 +126,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     }
 
 
-    final boolean isCloseRequired() {
-        return closeRequired;
+    final boolean isClosed() {
+        return closed;
     }
 
 
@@ -145,6 +151,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
     @Override
     public void flush() throws IOException {
+        preWriteChecks();
         flushInternal(listener == null, true);
     }
 
@@ -174,13 +181,20 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
 
     @Override
     public void close() throws IOException {
-        closeRequired = true;
+        if (closed) {
+            return;
+        }
+        closed = true;
+        flushInternal(true, true);
     }
 
 
     private void preWriteChecks() {
         if (listener != null && !socketWrapper.canWrite()) {
             throw new IllegalStateException(sm.getString("upgrade.sos.write.ise"));
+        }
+        if (closed) {
+            throw new IllegalStateException(sm.getString("upgrade.sos.write.closed"));
         }
     }
 
