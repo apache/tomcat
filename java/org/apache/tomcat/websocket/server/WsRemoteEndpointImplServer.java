@@ -24,6 +24,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
@@ -49,6 +50,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private static final Queue<OnResultRunnable> onResultRunnables =
             new ConcurrentLinkedQueue<>();
 
+    private final ServletInputStream sis;
     private final ServletOutputStream sos;
     private final WsWriteTimeout wsWriteTimeout;
     private final ExecutorService executorService;
@@ -59,7 +61,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private volatile boolean close;
 
 
-    public WsRemoteEndpointImplServer(ServletOutputStream sos, WsServerContainer serverContainer) {
+    public WsRemoteEndpointImplServer(ServletInputStream sis, ServletOutputStream sos,
+            WsServerContainer serverContainer) {
+        this.sis = sis;
         this.sos = sos;
         this.wsWriteTimeout = serverContainer.getTimeout();
         this.executorService = serverContainer.getExecutorService();
@@ -144,6 +148,13 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         }
         try {
             sos.close();
+        } catch (IOException e) {
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);
+            }
+        }
+        try {
+            sis.close();
         } catch (IOException e) {
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);

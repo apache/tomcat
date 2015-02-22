@@ -122,7 +122,7 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
         t.setContextClassLoader(applicationClassLoader);
         try {
             WsRemoteEndpointImplServer wsRemoteEndpointServer =
-                    new WsRemoteEndpointImplServer(sos, webSocketContainer);
+                    new WsRemoteEndpointImplServer(sis, sos, webSocketContainer);
             wsSession = new WsSession(ep, wsRemoteEndpointServer,
                     webSocketContainer, handshakeRequest.getRequestURI(),
                     handshakeRequest.getParameterMap(),
