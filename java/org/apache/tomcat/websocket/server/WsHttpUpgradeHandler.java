@@ -26,7 +26,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -35,6 +34,7 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Extension;
 
+import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -45,7 +45,7 @@ import org.apache.tomcat.websocket.WsSession;
 /**
  * Servlet 3.1 HTTP upgrade handler for WebSocket connections.
  */
-public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
+public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
     private static final Log log =
             LogFactory.getLog(WsHttpUpgradeHandler.class);
