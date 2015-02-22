@@ -21,9 +21,11 @@ import java.io.IOException;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
+import org.apache.coyote.ContainerThreadMarker;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -96,6 +98,13 @@ public class UpgradeServletInputStream extends ServletInputStream {
         }
         if (closed) {
             throw new IllegalStateException(sm.getString("upgrade.sis.read.closed"));
+        }
+
+        // Container is responsible for first call to onDataAvailable().
+        if (ContainerThreadMarker.isContainerThread()) {
+            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
+        } else {
+            socketWrapper.registerReadInterest();
         }
 
         this.listener = listener;
