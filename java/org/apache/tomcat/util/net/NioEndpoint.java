@@ -1438,8 +1438,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     leftToWrite -= nRead;
                 }
             } else if (nRead == -1) {
-                // TODO i18n
-                throw new EOFException();
+                return -1;
             }
 
             return len - leftToWrite;
