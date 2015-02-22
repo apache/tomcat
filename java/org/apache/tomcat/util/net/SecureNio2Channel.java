@@ -663,8 +663,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 writePending = false;
                 throw new ExecutionException(t);
             }
-            integer.get(timeout, unit);
-            if (written == 0) {
+            if (integer.get(timeout, unit).intValue() > 0 && written == 0) {
                 wrap();
                 return get(timeout, unit);
             } else {
