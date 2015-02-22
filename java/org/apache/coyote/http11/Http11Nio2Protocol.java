@@ -16,8 +16,6 @@
  */
 package org.apache.coyote.http11;
 
-import java.nio.channels.ReadPendingException;
-
 import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -152,16 +150,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
             if (processor.isAsync()) {
                 socket.setAsync(true);
                 ((Nio2Endpoint) getProtocol().getEndpoint()).addTimeout(socket);
-            } else if (processor.isUpgrade()) {
-                if (((Nio2SocketWrapper) socket).isUpgradeInit()) {
-                    try {
-                        ((Nio2SocketWrapper) socket).awaitBytes();
-                    } catch (ReadPendingException e) {
-                        // Ignore, the initial state after upgrade is
-                        // impossible to predict, and a read must be pending
-                        // to get a first notification
-                    }
-                }
             } else {
                 // Either:
                 //  - this is an upgraded connection
