@@ -35,7 +35,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
     private final SocketWrapperBase<?> socketWrapper;
 
-    private volatile boolean closeRequired = false;
+    private volatile boolean closed = false;
     // Start in blocking-mode
     private volatile Boolean ready = Boolean.TRUE;
     private volatile ReadListener listener = null;
@@ -66,6 +66,10 @@ public class UpgradeServletInputStream extends ServletInputStream {
                     sm.getString("upgrade.sis.isReady.ise"));
         }
 
+        if (closed) {
+            return false;
+        }
+
         // If we already know the current state, return it.
         if (ready != null) {
             return ready.booleanValue();
@@ -90,6 +94,10 @@ public class UpgradeServletInputStream extends ServletInputStream {
             throw new IllegalArgumentException(
                     sm.getString("upgrade.sis.readListener.set"));
         }
+        if (closed) {
+            throw new IllegalStateException(sm.getString("upgrade.sis.read.closed"));
+        }
+
         this.listener = listener;
         this.applicationLoader = Thread.currentThread().getContextClassLoader();
         // Switching to non-blocking. Don't know if data is available.
@@ -132,7 +140,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         try {
             return socketWrapper.read(listener == null, b, off, len);
         } catch (IOException ioe) {
-            closeRequired = true;
+            close();
             throw ioe;
         }
     }
@@ -141,14 +149,16 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
     @Override
     public void close() throws IOException {
-        closeRequired = true;
+        closed = true;
     }
 
 
     private void preReadChecks() {
         if (listener != null && (ready == null || !ready.booleanValue())) {
-            throw new IllegalStateException(
-                    sm.getString("upgrade.sis.read.ise"));
+            throw new IllegalStateException(sm.getString("upgrade.sis.read.ise"));
+        }
+        if (closed) {
+            throw new IllegalStateException(sm.getString("upgrade.sis.read.closed"));
         }
         // No longer know if data is available
         ready = null;
@@ -163,7 +173,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         try {
             result = socketWrapper.read(listener == null, b, 0, 1);
         } catch (IOException ioe) {
-            closeRequired = true;
+            close();
             throw ioe;
         }
         if (result == 0) {
@@ -224,7 +234,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
     }
 
 
-    final boolean isCloseRequired() {
-        return closeRequired;
+    final boolean isClosed() {
+        return closed;
     }
 }
