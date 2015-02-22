@@ -21,11 +21,9 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 
-import org.apache.coyote.ContainerThreadMarker;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -110,15 +108,18 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         if (closed) {
             throw new IllegalStateException(sm.getString("upgrade.sos.write.closed"));
         }
-        // Container is responsible for first call to onWritePossible() but only
-        // need to do this if setting the listener for the first time.
+        // Container is responsible for first call to onWritePossible().
         synchronized (registeredLock) {
             registered = true;
-            if (ContainerThreadMarker.isContainerThread()) {
-                socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
-            } else {
-                socketWrapper.registerWriteInterest();
-            }
+            // Need to get writes onto a separate thread as long as WebSocket
+            // uses Servlet non-blocking I/O as onOpen can throw an error which
+            // closes the WebSocket connection. That uses a blocking write which
+            // means onwWritePossible needs to be on a separate thread to clear
+            // the latch used in the blocking write. If
+            // socketWrapper.addDispatch() was used the current thread would
+            // block on the write and would not process the dispatch until the
+            // latch timed out triggering more errors.
+            socketWrapper.registerWriteInterest();
         }
 
         this.listener = listener;
