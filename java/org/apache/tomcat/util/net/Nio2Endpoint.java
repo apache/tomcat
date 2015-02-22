@@ -1064,7 +1064,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 } else if (nRead == 0 && !block) {
                     readInterest = true;
                 } else if (nRead == -1) {
-                    throw new EOFException();
+                    return -1;
                 }
 
                 if (log.isDebugEnabled()) {
