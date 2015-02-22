@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import java.io.EOFException;
 import java.io.IOException;
 
 import javax.servlet.ServletInputStream;
@@ -50,11 +49,8 @@ public class WsFrameServer extends WsFrameBase {
                 // Fill up the input buffer with as much data as we can
                 int read = sis.read(
                         inputBuffer, writePos, inputBuffer.length - writePos);
-                if (read == 0) {
+                if (read <= 0) {
                     return;
-                }
-                if (read == -1) {
-                    throw new EOFException();
                 }
                 writePos += read;
                 processInputBuffer();

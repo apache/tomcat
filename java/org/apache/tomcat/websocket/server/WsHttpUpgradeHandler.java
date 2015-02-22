@@ -218,8 +218,7 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
 
         @Override
         public void onAllDataRead() {
-            // Will never happen with WebSocket
-            throw new IllegalStateException();
+            // NO-OP
         }
 
 
