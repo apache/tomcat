@@ -55,12 +55,10 @@ public class UpgradeProcessor implements Processor, WebConnection {
 
         wrapper.unRead(leftOverInput);
         /*
-         * Infinite read timeouts make sense since it is unknown how quickly -
-         * or even if at all - a client will send data. However, leave the write
-         * timeout alone since when the server writes to the client that should
-         * always happen within the configured timeout.
+         * Leave timeouts in the hands of the upgraded protocol.
          */
         wrapper.setReadTimeout(INFINITE_TIMEOUT);
+        wrapper.setWriteTimeout(INFINITE_TIMEOUT);
 
         if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
             wrapper.setInternalUpgrade(true);
