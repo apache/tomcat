@@ -428,25 +428,23 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     /**
      * Factory method to create (if necessary) and return our
      * <code>MBeanServer</code> instance.
-     *
      */
     public synchronized MBeanServer getMBeanServer() {
-        long t1=System.currentTimeMillis();
-
         if (server == null) {
-            if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
+            long t1 = System.currentTimeMillis();
+            if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
                 server = MBeanServerFactory.findMBeanServer(null).get(0);
-                if( log.isDebugEnabled() ) {
-                    log.debug("Using existing MBeanServer " + (System.currentTimeMillis() - t1 ));
+                if (log.isDebugEnabled()) {
+                    log.debug("Using existing MBeanServer " + (System.currentTimeMillis() - t1));
                 }
             } else {
                 server = ManagementFactory.getPlatformMBeanServer();
-                if( log.isDebugEnabled() ) {
-                    log.debug("Creating MBeanServer"+ (System.currentTimeMillis() - t1 ));
+                if (log.isDebugEnabled()) {
+                    log.debug("Creating MBeanServer" + (System.currentTimeMillis() - t1));
                 }
             }
         }
-        return (server);
+        return server;
     }
 
     /** Find or load metadata.
