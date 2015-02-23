@@ -199,11 +199,6 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    public long getConnectiontTimeout() {
-        return getEndpoint().getSoTimeout();
-    }
-
-
     public void updateLastWrite() { lastWrite = System.currentTimeMillis(); }
     public long getLastWrite() { return lastWrite; }
     public long getLastRead() { return lastRead; }
