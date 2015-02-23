@@ -174,7 +174,7 @@ import org.ietf.jgss.GSSCredential;
  * <p><strong>WARNING</strong> - There is a reported bug against the Netscape
  * provider code (com.netscape.jndi.ldap.LdapContextFactory) with respect to
  * successfully authenticated a non-existing user. The
- * report is here: http://issues.apache.org/bugzilla/show_bug.cgi?id=11210 .
+ * report is here: http://bz.apache.org/bugzilla/show_bug.cgi?id=11210 .
  * With luck, Netscape has updated their provider code and this is not an
  * issue. </p>
  *

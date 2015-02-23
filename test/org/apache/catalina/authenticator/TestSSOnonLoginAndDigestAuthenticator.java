@@ -177,7 +177,7 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
      * Finally, wait for the non-login session to expire and try again..
      * This should be rejected with SC_FORBIDDEN 403 status.
      *
-     * (see bugfix https://issues.apache.org/bugzilla/show_bug.cgi?id=52303)
+     * (see bugfix https://bz.apache.org/bugzilla/show_bug.cgi?id=52303)
      */
     @Test
     public void testDigestExpiredAcceptProtectedWithCookies() throws Exception {

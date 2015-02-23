@@ -78,7 +78,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
     }
 
     /*
-     * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50026
+     * Test https://bz.apache.org/bugzilla/show_bug.cgi?id=50026
      * Verify protection of special paths with re-mount of web app resource root.
      */
     @Test

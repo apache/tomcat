@@ -70,7 +70,7 @@
       </tr>
       <!--
          Undefined values are to be coerced to String, to be "",
-         https://issues.apache.org/bugzilla/show_bug.cgi?id=47413
+         https://bz.apache.org/bugzilla/show_bug.cgi?id=47413
        -->
       <tr>
         <td>\${undefinedFoo}hello world\${undefinedBar}</td>

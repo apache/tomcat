@@ -2083,7 +2083,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
 
-    // https://issues.apache.org/bugzilla/show_bug.cgi?id=57326
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=57326
     @Test
     public void testAsyncContextListenerClearing() throws Exception {
         resetTracker();
@@ -2145,7 +2145,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
          }
     }
 
-    // https://issues.apache.org/bugzilla/show_bug.cgi?id=57559
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=57559
     @Test
     public void testAsyncRequestURI() throws Exception {
         // Setup Tomcat instance

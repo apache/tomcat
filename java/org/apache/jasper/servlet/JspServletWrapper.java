@@ -514,7 +514,7 @@ public class JspServletWrapper {
      * number in the generated servlet that originated the exception to a line
      * number in the JSP.  Then constructs an exception containing that
      * information, and a snippet of the JSP to help debugging.
-     * Please see http://issues.apache.org/bugzilla/show_bug.cgi?id=37062 and
+     * Please see http://bz.apache.org/bugzilla/show_bug.cgi?id=37062 and
      * http://www.tfenne.com/jasper/ for more details.
      *</p>
      *

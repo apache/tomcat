@@ -27,7 +27,7 @@ import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.test.driver.Driver;
 
 /**
- * https://issues.apache.org/bugzilla/show_bug.cgi?id=50613
+ * https://bz.apache.org/bugzilla/show_bug.cgi?id=50613
  */
 public class TestSizePreservation {
 

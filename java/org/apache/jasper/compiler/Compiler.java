@@ -83,7 +83,7 @@ public abstract class Compiler {
      * <p>
      * Retrieves the parsed nodes of the JSP page, if they are available. May
      * return null. Used in development mode for generating detailed error
-     * messages. http://issues.apache.org/bugzilla/show_bug.cgi?id=37062.
+     * messages. http://bz.apache.org/bugzilla/show_bug.cgi?id=37062.
      * </p>
      */
     public Node.Nodes getPageNodes() {
@@ -388,7 +388,7 @@ public abstract class Compiler {
             // Only get rid of the pageNodes if in production.
             // In development mode, they are used for detailed
             // error messages.
-            // http://issues.apache.org/bugzilla/show_bug.cgi?id=37062
+            // http://bz.apache.org/bugzilla/show_bug.cgi?id=37062
             if (!this.options.getDevelopment()) {
                 pageNodes = null;
             }

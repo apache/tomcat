@@ -406,7 +406,7 @@ public class TestELInJsp extends TomcatBaseTest {
 
 
     /*
-     * BZ https://issues.apache.org/bugzilla/show_bug.cgi?id=57142
+     * BZ https://bz.apache.org/bugzilla/show_bug.cgi?id=57142
      * javax.servlet, javax.servlet.http and javax.servlet.jsp should be
      * imported by default.
      */
@@ -431,7 +431,7 @@ public class TestELInJsp extends TomcatBaseTest {
 
 
     /*
-     * BZ https://issues.apache.org/bugzilla/show_bug.cgi?id=57441
+     * BZ https://bz.apache.org/bugzilla/show_bug.cgi?id=57441
      * Can't validate function names defined in lambdas (or via imports)
      */
     @Test

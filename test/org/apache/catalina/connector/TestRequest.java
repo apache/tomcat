@@ -69,7 +69,7 @@ public class TestRequest extends TomcatBaseTest {
     }
 
     /**
-     * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=37794
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=37794
      * POST parameters are not returned from a call to
      * any of the {@link HttpServletRequest} getParameterXXX() methods if the
      * request is chunked.
@@ -264,7 +264,7 @@ public class TestRequest extends TomcatBaseTest {
 
     /*
      * Test case for
-     * <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=38113">bug
+     * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=38113">bug
      * 38118</a>.
      */
     @Test
@@ -396,7 +396,7 @@ public class TestRequest extends TomcatBaseTest {
     }
 
     /**
-     * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=48692
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=48692
      * PUT requests should be able to fetch request parameters coming from
      * the request body (when properly configured using the new parseBodyMethod
      * setting).
