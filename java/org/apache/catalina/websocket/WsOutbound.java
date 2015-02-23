@@ -45,7 +45,7 @@ public class WsOutbound {
     /**
      * This state lock is used rather than synchronized methods to allow error
      * handling to be managed outside of the synchronization else deadlocks may
-     * occur such as https://issues.apache.org/bugzilla/show_bug.cgi?id=55524
+     * occur such as https://bz.apache.org/bugzilla/show_bug.cgi?id=55524
      */
     private final Object stateLock = new Object();
     

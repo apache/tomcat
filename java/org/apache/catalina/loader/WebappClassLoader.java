@@ -3232,7 +3232,7 @@ public class WebappClassLoader
                  *
                  * In all other cases do not cache the content to prevent
                  * excessive memory usage if large resources are present (see
-                 * https://issues.apache.org/bugzilla/show_bug.cgi?id=53081).
+                 * https://bz.apache.org/bugzilla/show_bug.cgi?id=53081).
                  */
                 if (binaryStream != null &&
                         (isCacheable || fileNeedConvert)) {

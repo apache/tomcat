@@ -567,7 +567,7 @@ public class SessionTrackingModeListener implements ServletContextListener {
   </code>
 <br />
 For additional discussion on this area, please see
-<a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=22679">Bugzilla</a>.
+<a href="http://bz.apache.org/bugzilla/show_bug.cgi?id=22679">Bugzilla</a>.
 </p>
 
   <p>To terminate an SSL session, use:

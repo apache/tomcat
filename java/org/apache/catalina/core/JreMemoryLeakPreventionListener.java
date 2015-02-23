@@ -292,7 +292,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 }
 
                 // Trigger the creation of the "Java2D Disposer" thread.
-                // See https://issues.apache.org/bugzilla/show_bug.cgi?id=51687
+                // See https://bz.apache.org/bugzilla/show_bug.cgi?id=51687
                 if(java2dDisposerProtection) {
                     try {
                         Class.forName("sun.java2d.Disposer");

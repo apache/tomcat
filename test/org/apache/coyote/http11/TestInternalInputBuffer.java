@@ -41,7 +41,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 public class TestInternalInputBuffer extends TomcatBaseTest {
 
     /**
-     * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=48839
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=48839
      */
     @Test
     public void testBug48839() {
@@ -416,7 +416,7 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
 
     /**
-     * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=54947
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=54947
      */
     @Test
     public void testBug54947() {

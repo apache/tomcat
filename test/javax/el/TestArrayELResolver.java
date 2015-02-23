@@ -238,7 +238,7 @@ public class TestArrayELResolver {
 
     /**
      * Tests setting arrays of primitives.
-     * https://issues.apache.org/bugzilla/show_bug.cgi?id=55691
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=55691
      */
     @Test
     public void testSetValue08() {

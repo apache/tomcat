@@ -667,7 +667,7 @@
 
         <p>Please note that setting this to <code>true</code> has some side
         effects, including the disabling of JSP reloading in a running server:
-        see <a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37668">
+        see <a href="http://bz.apache.org/bugzilla/show_bug.cgi?id=37668">
         Bugzilla 37668</a>.</p>
 
         <p>Please note that setting this flag to true in applications that are

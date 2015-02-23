@@ -103,7 +103,7 @@ public class AprLifecycleListener
     protected static final Object lock = new Object();
 
     public static boolean isAprAvailable() {
-        //https://issues.apache.org/bugzilla/show_bug.cgi?id=48613
+        //https://bz.apache.org/bugzilla/show_bug.cgi?id=48613
         if (instanceCreated) {
             synchronized (lock) {
                 init();

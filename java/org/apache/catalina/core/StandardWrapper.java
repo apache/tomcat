@@ -1157,7 +1157,7 @@ public class StandardWrapper extends ContainerBase
                 unavailable(null);
 
                 // Added extra log statement for Bugzilla 36630:
-                // http://issues.apache.org/bugzilla/show_bug.cgi?id=36630
+                // http://bz.apache.org/bugzilla/show_bug.cgi?id=36630
                 if(log.isDebugEnabled()) {
                     log.debug(sm.getString("standardWrapper.instantiate", servletClass), e);
                 }

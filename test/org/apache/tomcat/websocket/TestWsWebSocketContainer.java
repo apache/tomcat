@@ -94,7 +94,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         WebSocketContainer wsContainer =
                 ContainerProvider.getWebSocketContainer();
         // Set this artificially small to trigger
-        // https://issues.apache.org/bugzilla/show_bug.cgi?id=57054
+        // https://bz.apache.org/bugzilla/show_bug.cgi?id=57054
         wsContainer.setDefaultMaxBinaryMessageBufferSize(64);
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,

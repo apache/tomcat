@@ -598,7 +598,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     }
 
 
-    // https://issues.apache.org/bugzilla/show_bug.cgi?id=57324
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=57324
     @Test
     public void testNon2xxResponseWithExpectation() throws Exception {
         doTestNon2xxResponseAndExpectation(true);

@@ -683,7 +683,7 @@ class JspReader {
         int fileid = registerSourceFile(longName);
 
         if (fileid == -1) {
-            // Bugzilla 37407: http://issues.apache.org/bugzilla/show_bug.cgi?id=37407
+            // Bugzilla 37407: http://bz.apache.org/bugzilla/show_bug.cgi?id=37407
             if(reader != null) {
                 try {
                     reader.close();

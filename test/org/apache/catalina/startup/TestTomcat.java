@@ -389,7 +389,7 @@ public class TestTomcat extends TomcatBaseTest {
 
 
     /**
-     * Test for https://issues.apache.org/bugzilla/show_bug.cgi?id=47866
+     * Test for https://bz.apache.org/bugzilla/show_bug.cgi?id=47866
      */
     @Test
     public void testGetResource() throws Exception {

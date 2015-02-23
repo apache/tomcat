@@ -29,7 +29,7 @@ PATCHES ACCEPTED TO BACKPORT:
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* https://issues.apache.org/bugzilla/show_bug.cgi?id=54330
+* https://bz.apache.org/bugzilla/show_bug.cgi?id=54330
   Refactor Member interface to reduce dependency on concrete implementation.
   Based on a patch by Greg Turnquist.
   I have added this to the status file because it changes an interface. I don't

@@ -489,7 +489,7 @@
          and reopened with the requested credentials. This way, the pool size is still managed
          on a global level, and not on a per schema level. <br/>
          The default value is <code>false</code>.<br/>
-         This property was added as an enhancement to <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=50025">bug 50025</a>.
+         This property was added as an enhancement to <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=50025">bug 50025</a>.
       </p>
     </attribute>
     <attribute name="dataSource" required="false">
