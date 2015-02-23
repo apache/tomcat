@@ -628,12 +628,6 @@ public class HostConfig
                     addWatchedResources(deployedApp,
                             expandedDocBase.getAbsolutePath(), context);
                 } else {
-                    if (!isExternal && !unpackWARs) {
-                        // Trigger a reload if a DIR is added
-                        deployedApp.reloadResources.put(
-                                expandedDocBase.getAbsolutePath(),
-                                Long.valueOf(0));
-                    }
                     addWatchedResources(deployedApp, null, context);
                 }
                 // Add the context XML to the list of files which should trigger a redeployment
