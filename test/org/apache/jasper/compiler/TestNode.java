@@ -26,7 +26,7 @@ import org.apache.jasper.compiler.Node.PageDirective;
 public class TestNode {
 
     /*
-     * https://issues.apache.org/bugzilla/show_bug.cgi?id=57099
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=57099
      */
     @Test(expected=IllegalArgumentException.class)
     public void testPageDirectiveImport01() {

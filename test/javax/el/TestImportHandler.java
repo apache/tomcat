@@ -75,7 +75,7 @@ public class TestImportHandler {
 
     /**
      * Multiple package imports with a single match.
-     * https://issues.apache.org/bugzilla/show_bug.cgi?id=57113
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=57113
      */
     @Test
     public void testResolveClass04() {
@@ -92,7 +92,7 @@ public class TestImportHandler {
 
     /**
      * Attempting to resolve something that isn't a simple class name
-     * https://issues.apache.org/bugzilla/show_bug.cgi?id=57132
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=57132
      */
     @Test
     public void testResolveClass05() {
@@ -107,7 +107,7 @@ public class TestImportHandler {
 
     /**
      * Attempting to resolve something that isn't a simple class name
-     * https://issues.apache.org/bugzilla/show_bug.cgi?id=57132
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=57132
      */
     @Test
     public void testResolveClass06() {

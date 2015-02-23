@@ -108,7 +108,7 @@ public class AsyncChannelGroupUtil {
         static {
             // Load NewThreadPrivilegedAction since newThread() will not be able
             // to if called from an InnocuousThread.
-            // See https://issues.apache.org/bugzilla/show_bug.cgi?id=57490
+            // See https://bz.apache.org/bugzilla/show_bug.cgi?id=57490
             NewThreadPrivilegedAction.load();
         }
 
@@ -118,7 +118,7 @@ public class AsyncChannelGroupUtil {
             // Create the new Thread within a doPrivileged block to ensure that
             // the thread inherits the current ProtectionDomain which is
             // essential to be able to use this with a Java Applet. See
-            // https://issues.apache.org/bugzilla/show_bug.cgi?id=57091
+            // https://bz.apache.org/bugzilla/show_bug.cgi?id=57091
             return AccessController.doPrivileged(new NewThreadPrivilegedAction(r));
         }
 

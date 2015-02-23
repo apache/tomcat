@@ -145,7 +145,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
     }
 
     /*
-     * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50026
+     * Test https://bz.apache.org/bugzilla/show_bug.cgi?id=50026
      * Verify serving of resources from context root with subpath mapping.
      */
     @Test
@@ -216,7 +216,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
     }
 
     /*
-     * Test https://issues.apache.org/bugzilla/show_bug.cgi?id=50413 Serving a
+     * Test https://bz.apache.org/bugzilla/show_bug.cgi?id=50413 Serving a
      * custom error page
      */
     @Test
@@ -270,7 +270,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         String tomorrow = format.format(new Date(System.currentTimeMillis()
                 + 24 * 60 * 60 * 1000));
 
-        // https://issues.apache.org/bugzilla/show_bug.cgi?id=50413
+        // https://bz.apache.org/bugzilla/show_bug.cgi?id=50413
         //
         client.reset();
         client.setRequest(new String[] {
@@ -283,7 +283,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         assertTrue(client.isResponse404());
         assertEquals("It is 404.html", client.getResponseBody());
 
-        // https://issues.apache.org/bugzilla/show_bug.cgi?id=50413#c6
+        // https://bz.apache.org/bugzilla/show_bug.cgi?id=50413#c6
         //
         client.reset();
         client.setRequest(new String[] {
