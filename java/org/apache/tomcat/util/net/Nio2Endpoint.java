@@ -514,6 +514,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             socketWrapper.reset(channel, getSocketProperties().getSoTimeout());
             socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
             socketWrapper.setSecure(isSSLEnabled());
+            socketWrapper.setReadTimeout(getSoTimeout());
+            socketWrapper.setWriteTimeout(getSoTimeout());
             // Continue processing on another thread
             processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
         } catch (Throwable t) {
