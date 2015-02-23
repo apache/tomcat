@@ -686,7 +686,8 @@ public class HostConfig
 
             // default to appBase dir + name
             expandedDocBase = new File(appBase(), cn.getBaseName());
-            if (context.getDocBase() != null) {
+            if (context.getDocBase() != null
+                    && !context.getDocBase().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 // first assume docBase is absolute
                 expandedDocBase = new File(context.getDocBase());
                 if (!expandedDocBase.isAbsolute()) {
@@ -697,10 +698,14 @@ public class HostConfig
 
             // Add the eventual unpacked WAR and all the resources which will be
             // watched inside it
-            if (isExternalWar && unpackWARs) {
-                deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
-                        Long.valueOf(expandedDocBase.lastModified()));
-                addWatchedResources(deployedApp, expandedDocBase.getAbsolutePath(), context);
+            if (isExternalWar) {
+                if (unpackWARs) {
+                    deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
+                            Long.valueOf(expandedDocBase.lastModified()));
+                    addWatchedResources(deployedApp, expandedDocBase.getAbsolutePath(), context);
+                } else {
+                    addWatchedResources(deployedApp, null, context);
+                }
             } else {
                 // Find an existing matching war and expanded folder
                 if (!isExternal) {
@@ -721,12 +726,6 @@ public class HostConfig
                     addWatchedResources(deployedApp,
                             expandedDocBase.getAbsolutePath(), context);
                 } else {
-                    if (!isExternal && !unpackWARs) {
-                        // Trigger a reload if a DIR is added
-                        deployedApp.reloadResources.put(
-                                expandedDocBase.getAbsolutePath(),
-                                Long.valueOf(0));
-                    }
                     addWatchedResources(deployedApp, null, context);
                 }
                 // Add the context XML to the list of files which should trigger a redeployment

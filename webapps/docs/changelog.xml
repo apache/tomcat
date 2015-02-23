@@ -87,6 +87,15 @@
         <bug>49785</bug>: Enable StartTLS connections for JNDIRealm.
         (fschumacher)
       </add>
+      <fix>
+        When docBase refers internal war and unpackWARs is set to false, avoid
+        registration of the invalid redeploy resource that has been added ".war"
+        extension in duplicate. (kfujino)
+      </fix>
+      <fix>
+        If WAR exists, it is not necessary to trigger a reload when adding a
+        Directory. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
