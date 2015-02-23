@@ -119,7 +119,7 @@ public class WsFrameClient extends WsFrameBase {
                 // continuing to send a message after the server sent a close
                 // control message.
                 if (isOpen()) {
-                    log.debug(sm.getString("wsFrameClient.ioe", e));
+                    log.debug(sm.getString("wsFrameClient.ioe"), e);
                     close(e);
                 }
             }
