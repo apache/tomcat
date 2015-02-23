@@ -472,7 +472,10 @@ public abstract class SocketWrapperBase<E> {
                     socketBufferHandler.configureWriteBufferForWrite();
                     thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
                 } else {
-                    thisTime = 0;
+                    // Didn't write any data in the last non-blocking write.
+                    // Therefore the write buffer will still be full. Nothing
+                    // else to do here. Exit the loop.
+                    break;
                 }
                 len = len - thisTime;
             }
