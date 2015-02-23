@@ -146,7 +146,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         preReadChecks();
 
         try {
-            int result =  socketWrapper.read(listener == null, b, off, len);
+            int result = socketWrapper.read(listener == null, b, off, len);
             if (result == -1) {
                 eof = true;
             }
