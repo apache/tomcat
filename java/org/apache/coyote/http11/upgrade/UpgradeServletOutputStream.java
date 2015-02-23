@@ -186,8 +186,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             return;
         }
         closed = true;
-        socketWrapper.setWriteTimeout(socketWrapper.getConnectiontTimeout());
-        flushInternal(true, false);
+        flushInternal(false, false);
     }
 
 
