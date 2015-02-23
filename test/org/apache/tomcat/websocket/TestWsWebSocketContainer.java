@@ -925,6 +925,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 break;
             }
             Thread.sleep(100);
+            count++;
         }
 
         Assert.assertEquals(0, BackgroundProcessManager.getInstance().getProcessCount());
