@@ -473,12 +473,10 @@ public class WsSession implements Session {
                 fireEndpointOnError(e);
             }
 
-            state = State.CLOSING;
+            state = State.OUTPUT_CLOSED;
 
             sendCloseMessage(closeReasonMessage);
             fireEndpointOnClose(closeReasonLocal);
-
-            state = State.CLOSED;
         }
 
         IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
@@ -500,7 +498,7 @@ public class WsSession implements Session {
     public void onClose(CloseReason closeReason) {
 
         synchronized (stateLock) {
-            if (state == State.OPEN) {
+            if (state != State.CLOSED) {
                 try {
                     wsRemoteEndpoint.setBatchingAllowed(false);
                 } catch (IOException e) {
@@ -510,10 +508,10 @@ public class WsSession implements Session {
                 sendCloseMessage(closeReason);
                 fireEndpointOnClose(closeReason);
                 state = State.CLOSED;
-            }
 
-            // Close the socket
-            wsRemoteEndpoint.close();
+                // Close the socket
+                wsRemoteEndpoint.close();
+            }
         }
     }
 
@@ -733,13 +731,17 @@ public class WsSession implements Session {
 
     private void checkState() {
         if (state == State.CLOSED) {
+            /*
+             * As per RFC 6455, a WebSocket connection is considered to be
+             * closed once a peer has sent and received a WebSocket close frame.
+             */
             throw new IllegalStateException(sm.getString("wsSession.closed", id));
         }
     }
 
     private static enum State {
         OPEN,
-        CLOSING,
+        OUTPUT_CLOSED,
         CLOSED
     }
 }
