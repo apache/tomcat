@@ -323,9 +323,9 @@ public class TestUpgrade extends TomcatBaseTest {
                 while (sis.isReady()) {
                     int read = sis.read(buffer);
                     if (read > 0) {
-                            sos.write(buffer, 0, read);
-                    if (!sos.isReady()) {
-                        break;
+                        sos.write(buffer, 0, read);
+                        if (!sos.isReady()) {
+                            break;
                         }
                     }
                 }
