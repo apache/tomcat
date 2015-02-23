@@ -904,6 +904,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             ka.reset(this,socket,getSocketProperties().getSoTimeout());
             ka.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
             ka.setSecure(isSSLEnabled());
+            ka.setReadTimeout(getSoTimeout());
+            ka.setWriteTimeout(getSoTimeout());
             PollerEvent r = eventCache.pop();
             ka.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             if ( r==null) r = new PollerEvent(socket,ka,OP_REGISTER);
