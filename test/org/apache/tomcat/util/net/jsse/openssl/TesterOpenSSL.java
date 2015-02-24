@@ -35,6 +35,7 @@ public class TesterOpenSSL {
     public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                     Cipher.TLS_DHE_DSS_WITH_RC4_128_SHA,
+                    Cipher.SSL2_DES_64_CBC_WITH_MD5,
                     Cipher.SSL_CK_RC2_128_CBC_WITH_MD5,
                     Cipher.SSL_FORTEZZA_DMS_WITH_NULL_SHA,
                     Cipher.SSL_FORTEZZA_DMS_WITH_FORTEZZA_CBC_SHA,
