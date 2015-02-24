@@ -185,6 +185,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         bar.addLifecycleListener(new SetIdListener("bar"));
 
         Context ctx = tomcat.addContext("", null);
+        ctx.addLifecycleListener(new SetIdListener("ROOT"));
         ctx.setCrossContext(true);
 
         Tomcat.addServlet(ctx, "Bug57190Servlet", new Bug57190Servlet());
@@ -200,7 +201,10 @@ public class TestApplicationContext extends TomcatBaseTest {
         Assert.assertTrue(body, body.contains("03-foo1"));
         Assert.assertTrue(body, body.contains("04-foo2"));
         Assert.assertTrue(body, body.contains("05-foo2"));
-        Assert.assertTrue(body, body.contains("06-null"));
+        Assert.assertTrue(body, body.contains("06-ROOT"));
+        Assert.assertTrue(body, body.contains("07-ROOT"));
+        Assert.assertTrue(body, body.contains("08-foo2"));
+        Assert.assertTrue(body, body.contains("09-ROOT"));
     }
 
 
@@ -219,7 +223,10 @@ public class TestApplicationContext extends TomcatBaseTest {
             pw.println("03-" + sc.getContext("/foo##1").getInitParameter("id"));
             pw.println("04-" + sc.getContext("/foo##2").getInitParameter("id"));
             pw.println("05-" + sc.getContext("/foo##3").getInitParameter("id"));
-            pw.println("06-" + sc.getContext("/unknown"));
+            pw.println("06-" + sc.getContext("/unknown").getInitParameter("id"));
+            pw.println("07-" + sc.getContext("/").getInitParameter("id"));
+            pw.println("08-" + sc.getContext("/foo/bar").getInitParameter("id"));
+            pw.println("09-" + sc.getContext("/football").getInitParameter("id"));
         }
     }
 
