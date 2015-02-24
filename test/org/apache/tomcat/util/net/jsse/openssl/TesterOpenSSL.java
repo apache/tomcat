@@ -34,8 +34,9 @@ public class TesterOpenSSL {
 
     public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+                    // The following ciphers are not implemented in an OpenSSL
+                    // version
                     Cipher.TLS_DHE_DSS_WITH_RC4_128_SHA,
-                    Cipher.SSL2_DES_64_CBC_WITH_MD5,
                     Cipher.SSL_CK_RC2_128_CBC_WITH_MD5,
                     Cipher.SSL_FORTEZZA_DMS_WITH_NULL_SHA,
                     Cipher.SSL_FORTEZZA_DMS_WITH_FORTEZZA_CBC_SHA,
@@ -45,7 +46,12 @@ public class TesterOpenSSL {
                     Cipher.TLS_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5,
                     Cipher.TLS_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA,
                     Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_SHA,
-                    Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_MD5)));
+                    Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_MD5,
+                    // The following are not implemented in 1.1.x onwards. They
+                    // are implemented in 1.0.x and earlier
+                    Cipher.SSL_CK_RC2_128_CBC_EXPORT40_WITH_MD5,
+                    Cipher.SSL2_DES_64_CBC_WITH_MD5,
+                    Cipher.SSL2_RC4_128_EXPORT40_WITH_MD5)));
 
     static {
         // Note: The tests are configured for OpenSSL 1.1.0. Running with a
