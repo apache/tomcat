@@ -488,6 +488,15 @@ public class OpenSSLCipherConfigurationParser {
         ciphers.addAll(movedCiphers);
     }
 
+    static void moveToStart(final LinkedHashSet<Cipher> ciphers, final Collection<Cipher> toBeMovedCiphers) {
+        List<Cipher> movedCiphers = new ArrayList<>(toBeMovedCiphers);
+        List<Cipher> originalCiphers = new ArrayList<>(ciphers);
+        movedCiphers.retainAll(ciphers);
+        ciphers.clear();
+        ciphers.addAll(movedCiphers);
+        ciphers.addAll(originalCiphers);
+    }
+
     static void add(final LinkedHashSet<Cipher> ciphers, final String alias) {
         ciphers.addAll(aliases.get(alias));
     }
@@ -523,6 +532,8 @@ public class OpenSSLCipherConfigurationParser {
         /* Everything else being equal, prefer ephemeral ECDH over other key exchange mechanisms */
         result.addAll(filterByKeyExchange(ciphers, Collections.singleton(KeyExchange.EECDH)));
         /* AES is our preferred symmetric cipher */
+        moveToStart(result, filterByEncryption(result, new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128GCM,
+                Encryption.AES256, Encryption.AES256GCM))));
         result.addAll(filterByEncryption(ciphers, new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128GCM,
                 Encryption.AES256, Encryption.AES256GCM))));
         /* Temporarily enable everything else for sorting */
