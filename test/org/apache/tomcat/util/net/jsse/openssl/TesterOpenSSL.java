@@ -50,7 +50,11 @@ public class TesterOpenSSL {
                     // The following are not implemented in 1.1.x onwards. They
                     // are implemented in 1.0.x and earlier
                     Cipher.SSL_CK_RC2_128_CBC_EXPORT40_WITH_MD5,
+                    Cipher.SSL_CK_RC4_128_WITH_MD5,
                     Cipher.SSL2_DES_64_CBC_WITH_MD5,
+                    Cipher.SSL2_DES_192_EDE3_CBC_WITH_MD5,
+                    Cipher.SSL2_IDEA_128_CBC_WITH_MD5,
+                    Cipher.SSL2_RC2_CBC_128_CBC_WITH_MD5,
                     Cipher.SSL2_RC4_128_EXPORT40_WITH_MD5)));
 
     static {
