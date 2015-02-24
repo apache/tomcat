@@ -137,7 +137,11 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
             wsRemoteEndpointServer.setTransformation(wsFrame.getTransformation());
             ep.onOpen(wsSession, endpointConfig);
             webSocketContainer.registerSession(ep, wsSession);
-            sis.setReadListener(new WsReadListener(this, wsFrame));
+            try {
+                sis.setReadListener(new WsReadListener(this, wsFrame));
+            } catch (IllegalStateException e) {
+                // It is not impossible that the stream is already closed during onOpen
+            }
         } catch (DeploymentException e) {
             throw new IllegalArgumentException(e);
         } finally {
