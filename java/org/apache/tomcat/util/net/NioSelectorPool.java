@@ -247,10 +247,9 @@ public class NioSelectorPool {
                     cnt = socket.read(buf);
                     if (cnt == -1) {
                         if (read == 0) {
-                            throw new EOFException();
-                        } else {
-                            break;
+                            read = -1;
                         }
+                        break;
                     }
                     read += cnt;
                     if (cnt > 0) continue; //read some more
