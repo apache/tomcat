@@ -1415,8 +1415,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             }
 
             // Copy what data there is in the read buffer to the byte array
-            int leftToWrite = len;
-            int newOffset = off;
             if (remaining > 0) {
                 readBuffer.get(b, off, remaining);
                 return remaining;
@@ -1436,18 +1434,16 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             // data that was just read
             if (nRead > 0) {
                 socketBufferHandler.configureReadBufferForRead();
-                if (nRead > leftToWrite) {
-                    readBuffer.get(b, newOffset, leftToWrite);
-                    leftToWrite = 0;
+                if (nRead > len) {
+                    readBuffer.get(b, off, len);
+                    return len;
                 } else {
-                    readBuffer.get(b, newOffset, nRead);
-                    leftToWrite -= nRead;
+                    readBuffer.get(b, off, nRead);
+                    return nRead;
                 }
-            } else if (nRead == -1) {
-                return -1;
+            } else {
+                return nRead;
             }
-
-            return len - leftToWrite;
         }
 
 
