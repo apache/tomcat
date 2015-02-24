@@ -1681,6 +1681,9 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         @Override
         public void run() {
             NioChannel socket = ka.getSocket();
+            if (socket == null) {
+                return;
+            }
             SelectionKey key = socket.getIOChannel().keyFor(
                     socket.getPoller().getSelector());
 
@@ -1704,7 +1707,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 int handshake = -1;
 
                 try {
-                    if (key != null) {
+                    if (key != null && socket != null) {
                         // For STOP there is no point trying to handshake as the
                         // Poller has been stopped.
                         if (socket.isHandshakeComplete() ||
@@ -1761,13 +1764,15 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         }
                     }
                 } else if (handshake == -1 ) {
-                    if (key != null) {
-                        socket.getPoller().cancelledKey(key);
+                    if (socket != null) {
+                        if (key != null) {
+                            socket.getPoller().cancelledKey(key);
+                        }
+                        if (running && !paused) {
+                            nioChannels.push(socket);
+                        }
+                        socket = null;
                     }
-                    if (running && !paused) {
-                        nioChannels.push(socket);
-                    }
-                    socket = null;
                     if (running && !paused) {
                         keyCache.push(ka);
                     }
