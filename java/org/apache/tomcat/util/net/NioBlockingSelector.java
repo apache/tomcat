@@ -171,10 +171,9 @@ public class NioBlockingSelector {
             while(!timedout) {
                 if (keycount > 0) { //only read if we were registered for a read
                     read = socket.read(buf);
-                    if (read == -1)
-                        throw new EOFException();
-                    if (read > 0)
+                    if (read != 0) {
                         break;
+                    }
                 }
                 try {
                     if ( att.getReadLatch()==null || att.getReadLatch().getCount()==0) att.startReadLatch(1);
