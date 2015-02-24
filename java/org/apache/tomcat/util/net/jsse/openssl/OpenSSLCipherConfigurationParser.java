@@ -351,6 +351,18 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String GOST89MAC = "GOST89MAC";
     /**
+     * Cipher suites using SRP authentication, specified in the RFC 5054.
+     */
+    private static final String aSRP = "aSRP";
+    /**
+     * Cipher suites using SRP key exchange, specified in the RFC 5054.
+     */
+    private static final String kSRP = "kSRP";
+    /**
+     * Same as kSRP
+     */
+    private static final String SRP = "SRP";
+    /**
      * Cipher suites using pre-shared keys (PSK).
      */
     private static final String PSK = "PSK";
@@ -463,6 +475,9 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(GOST89MAC, filterByMessageDigest(allCiphers, Collections.singleton(MessageDigest.GOST89MAC)));
         addListAlias(PSK, filter(allCiphers, null, Collections.singleton(KeyExchange.PSK), Collections.singleton(Authentication.PSK), null, null, null));
         addListAlias(KRB5, filter(allCiphers, null, Collections.singleton(KeyExchange.KRB5), Collections.singleton(Authentication.KRB5), null, null, null));
+        addListAlias(aSRP, filterByAuthentication(allCiphers, Collections.singleton(Authentication.SRP)));
+        addListAlias(kSRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
+        addListAlias(SRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         initialized = true;
         // Despite what the OpenSSL docs say, DEFAULT also excludes SSLv2
         addListAlias(DEFAULT, parse("ALL:!eNULL:!aNULL:!SSLv2"));
