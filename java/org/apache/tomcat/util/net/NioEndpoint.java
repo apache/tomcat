@@ -1419,14 +1419,18 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             int newOffset = off;
             if (remaining > 0) {
                 readBuffer.get(b, off, remaining);
-                leftToWrite -= remaining;
-                newOffset += remaining;
+                return remaining;
+                /*
+                 * Since more bytes may have arrived since the buffer was last
+                 * filled, it is an option at this point to perform a
+                 * non-blocking read. However correctly handling the case if
+                 * that read returns end of stream adds complexity. Therefore,
+                 * at the moment, the preference is for simplicity.
+                 */
             }
 
-            // Fill the read buffer as best we can. Only do a blocking read if
-            // the current read is blocking AND there wasn't any data left over
-            // in the read buffer.
-            int nRead = fillReadBuffer(block && remaining == 0);
+            // Fill the read buffer as best we can.
+            int nRead = fillReadBuffer(block);
 
             // Full as much of the remaining byte array as possible with the
             // data that was just read
