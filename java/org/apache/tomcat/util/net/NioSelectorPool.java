@@ -245,7 +245,13 @@ public class NioSelectorPool {
                 int cnt = 0;
                 if ( keycount > 0 ) { //only read if we were registered for a read
                     cnt = socket.read(buf);
-                    if (cnt == -1) throw new EOFException();
+                    if (cnt == -1) {
+                        if (read == 0) {
+                            throw new EOFException();
+                        } else {
+                            break;
+                        }
+                    }
                     read += cnt;
                     if (cnt > 0) continue; //read some more
                     if (cnt==0 && (read>0 || (!block) ) ) break; //we are done reading
