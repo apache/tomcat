@@ -170,7 +170,7 @@ public class TestUpgrade extends TomcatBaseTest {
         Socket socket =
                 SocketFactory.getDefault().createSocket("localhost", getPort());
 
-        socket.setSoTimeout(500000);
+        socket.setSoTimeout(5000);
 
         UpgradeConnection uc = new UpgradeConnection(socket);
 
