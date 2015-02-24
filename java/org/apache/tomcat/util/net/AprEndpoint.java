@@ -2341,7 +2341,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         private void doRun() {
             // Process the request from this socket
-            if (socket.getSocket() == null) {
+            if (socket.getSocket() == null || !connections.containsKey(socket)) {
                 // Closed in another thread
                 return;
             }
