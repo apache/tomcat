@@ -264,8 +264,9 @@ public class ApplicationContext
     public ServletContext getContext(String uri) {
 
         // Validate the format of the specified argument
-        if ((uri == null) || (!uri.startsWith("/")))
-            return (null);
+        if (uri == null || !uri.startsWith("/")) {
+            return null;
+        }
 
         Context child = null;
         try {
@@ -297,12 +298,7 @@ public class ApplicationContext
                 MappingData mappingData = new MappingData();
                 ((Engine) host.getParent()).getService().findConnectors()[0].getMapper().map(
                         hostMB, pathMB, null, mappingData);
-
-                // Must be an exact match. It is no good returning the ROOT
-                // context if the caller is looking for "/something-else"
-                if (((Context) mappingData.context).getPath().equals(uri)) {
-                    child = (Context) mappingData.context;
-                }
+                child = (Context) mappingData.context;
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);

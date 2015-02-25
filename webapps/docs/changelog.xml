@@ -96,6 +96,12 @@
         If WAR exists, it is not necessary to trigger a reload when adding a
         Directory. (kfujino)
       </fix>
+      <fix>
+        Correct a regression in the fix for <bug>57190</bug> that incorrectly
+        required the path passed to
+        <code>ServletContext.getContext(String)</code> to be an exact match to a
+        path to an existing context. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
