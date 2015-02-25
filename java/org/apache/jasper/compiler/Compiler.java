@@ -431,29 +431,30 @@ public abstract class Compiler {
             jsw.setLastModificationTest(System.currentTimeMillis());
         }
 
+        // Test the target file first. Unless there is an error checking the
+        // last modified time of the source (unlikely) the target is going to
+        // have to be checked anyway. If the target doesn't exist (likely during
+        // startup) this saves an unnecessary check of the source.
+        File targetFile;
+        if (checkClass) {
+            targetFile = new File(ctxt.getClassFileName());
+        } else {
+            targetFile = new File(ctxt.getServletJavaFileName());
+        }
+        if (!targetFile.exists()) {
+            return true;
+        }
+        long targetLastModified = targetFile.lastModified();
+        if (checkClass && jsw != null) {
+            jsw.setServletClassLastModifiedTime(targetLastModified);
+        }
+
         Long jspRealLastModified = ctxt.getLastModified(ctxt.getJspFile());
         if (jspRealLastModified.longValue() < 0) {
             // Something went wrong - assume modification
             return true;
         }
 
-        long targetLastModified = 0;
-        File targetFile;
-
-        if (checkClass) {
-            targetFile = new File(ctxt.getClassFileName());
-        } else {
-            targetFile = new File(ctxt.getServletJavaFileName());
-        }
-
-        if (!targetFile.exists()) {
-            return true;
-        }
-
-        targetLastModified = targetFile.lastModified();
-        if (checkClass && jsw != null) {
-            jsw.setServletClassLastModifiedTime(targetLastModified);
-        }
         if (targetLastModified != jspRealLastModified.longValue()) {
             if (log.isDebugEnabled()) {
                 log.debug("Compiler: outdated: " + targetFile + " "
