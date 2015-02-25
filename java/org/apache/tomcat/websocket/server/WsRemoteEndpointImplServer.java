@@ -59,7 +59,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private volatile long timeoutExpiry = -1;
     private volatile boolean close;
-
+    private volatile boolean first = true;
 
     public WsRemoteEndpointImplServer(ServletInputStream sis, ServletOutputStream sos,
             WsServerContainer serverContainer) {
@@ -87,51 +87,57 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     public void onWritePossible(boolean useDispatch) {
-        if (buffers == null) {
-            // Servlet 3.1 will call the write listener once even if nothing
-            // was written
-            return;
-        }
-        boolean complete = false;
-        try {
-            // If this is false there will be a call back when it is true
-            while (sos.isReady()) {
-                complete = true;
-                for (ByteBuffer buffer : buffers) {
-                    if (buffer.hasRemaining()) {
-                        complete = false;
-                        sos.write(buffer.array(), buffer.arrayOffset(),
-                                buffer.limit());
-                        buffer.position(buffer.limit());
+        ByteBuffer[] buffers = this.buffers;
+        if (first) {
+            // Wait for the fist message to do something
+            first = false;
+        } else {
+            if (buffers == null) {
+                // Servlet 3.1 will call the write listener once even if nothing
+                // was written
+                return;
+            }
+            boolean complete = false;
+            try {
+                // If this is false there will be a call back when it is true
+                while (sos.isReady()) {
+                    complete = true;
+                    for (ByteBuffer buffer : buffers) {
+                        if (buffer.hasRemaining()) {
+                            complete = false;
+                            sos.write(buffer.array(), buffer.arrayOffset(),
+                                    buffer.limit());
+                            buffer.position(buffer.limit());
+                            break;
+                        }
+                    }
+                    if (complete) {
+                        sos.flush();
+                        complete = sos.isReady();
+                        if (complete) {
+                            wsWriteTimeout.unregister(this);
+                            clearHandler(null, useDispatch);
+                            if (close) {
+                                close();
+                            }
+                        }
                         break;
                     }
                 }
-                if (complete) {
-                    sos.flush();
-                    complete = sos.isReady();
-                    if (complete) {
-                        wsWriteTimeout.unregister(this);
-                        clearHandler(null, useDispatch);
-                        if (close) {
-                            close();
-                        }
-                    }
-                    break;
-                }
+            } catch (IOException | IllegalStateException e) {
+                wsWriteTimeout.unregister(this);
+                clearHandler(e, useDispatch);
+                close();
             }
-        } catch (IOException | IllegalStateException e) {
-            wsWriteTimeout.unregister(this);
-            clearHandler(e, useDispatch);
-            close();
-        }
 
-        if (!complete) {
-            // Async write is in progress
-            long timeout = getSendTimeout();
-            if (timeout > 0) {
-                // Register with timeout thread
-                timeoutExpiry = timeout + System.currentTimeMillis();
-                wsWriteTimeout.register(this);
+            if (!complete) {
+                // Async write is in progress
+                long timeout = getSendTimeout();
+                if (timeout > 0) {
+                    // Register with timeout thread
+                    timeoutExpiry = timeout + System.currentTimeMillis();
+                    wsWriteTimeout.register(this);
+                }
             }
         }
     }
