@@ -89,7 +89,7 @@ public class JspCompilationContext {
     private final boolean isTagFile;
     private boolean protoTypeMode;
     private TagInfo tagInfo;
-    private final Jar tagJar;
+    private Jar tagJar;
 
     // jspURI _must_ be relative to the context
     public JspCompilationContext(String jspUri, Options options,
@@ -308,6 +308,10 @@ public class JspCompilationContext {
      */
     public Jar getTagFileJar() {
         return this.tagJar;
+    }
+
+    public void setTagFileJar(Jar tagJar) {
+        this.tagJar = tagJar;
     }
 
     /* ==================== Common implementation ==================== */

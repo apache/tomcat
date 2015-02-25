@@ -554,6 +554,10 @@ class TagFileProcessor {
                     // time the tag file was scanned for directives, and the tag
                     // file may have been modified since then.
                     wrapper.getJspEngineContext().setTagInfo(tagInfo);
+                    // The tagJar passed to to the JspCompilationContext will
+                    // have been closed (see the finally block at the end of
+                    // this method) so update the the tagJar to one opened above
+                    wrapper.getJspEngineContext().setTagFileJar(tagJar);
                 }
 
                 Class<?> tagClazz;
