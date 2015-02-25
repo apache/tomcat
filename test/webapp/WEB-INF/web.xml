@@ -28,6 +28,25 @@
      required.
   </description>
 
+  <servlet>
+    <servlet-name>jsp</servlet-name>
+      <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+      <init-param>
+        <param-name>fork</param-name>
+        <param-value>false</param-value>
+      </init-param>
+      <init-param>
+        <param-name>xpoweredBy</param-name>
+        <param-value>false</param-value>
+      </init-param>
+      <!-- Required by /jsp/tagFileInJar.jsp / TestJspCompilationContext  -->
+      <init-param>
+        <param-name>modificationTestInterval</param-name>
+        <param-value>0</param-value>
+      </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+
   <!--  Bug 49922 -->
   <filter>
     <filter-name>Bug49922</filter-name>
