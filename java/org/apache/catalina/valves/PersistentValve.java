@@ -152,7 +152,7 @@ public class PersistentValve extends ValveBase {
             // HttpSession hsess = hreq.getSession(false);
             Session hsess;
             try {
-                hsess = request.getSessionInternal();
+                hsess = request.getSessionInternal(false);
             } catch (Exception ex) {
                 hsess = null;
             }

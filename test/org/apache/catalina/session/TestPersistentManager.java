@@ -17,16 +17,20 @@
 package org.apache.catalina.session;
 
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -38,8 +42,10 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.valves.PersistentValve;
 
 public class TestPersistentManager extends TomcatBaseTest {
 
@@ -91,6 +97,69 @@ public class TestPersistentManager extends TomcatBaseTest {
             Assert.assertTrue(System.currentTimeMillis() < maxWaitTime);
             Thread.sleep(200);
         }
+    }
+
+    @Test
+    public void noSessionCreate_57637() throws IOException, LifecycleException {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0-fragments-empty-absolute-ordering");
+        StandardContext ctx = (StandardContext) tomcat.addContext("", appDir.getAbsolutePath());
+
+        Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
+        ctx.addServletMapping("/dummy", "DummyServlet");
+
+        PersistentManager manager = new PersistentManager();
+        DummyStore store = new DummyStore();
+
+        manager.setStore(store);
+        manager.setMaxIdleBackup(0);
+        manager.setDistributable(true);
+        ctx.setManager(manager);
+        ctx.addValve(new PersistentValve());
+        tomcat.start();
+        Assert.assertEquals(manager.getActiveSessions(), 0);
+        Assert.assertTrue("No sessions managed", manager.getSessionIdsFull().isEmpty());
+        Assert.assertEquals(
+                "NO_SESSION",
+                getUrl(
+                        "http://localhost:" + getPort()
+                                + "/dummy?no_create_session=true").toString());
+        Assert.assertEquals(manager.getActiveSessions(), 0);
+        Assert.assertTrue("No sessions where created", manager.getSessionIdsFull().isEmpty());
+    }
+
+    @Test
+    public void testCreateSessionAndPassivate() throws IOException, LifecycleException, ClassNotFoundException {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-3.0-fragments-empty-absolute-ordering");
+        StandardContext ctx = (StandardContext) tomcat.addContext("", appDir.getAbsolutePath());
+
+        Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
+        ctx.addServletMapping("/dummy", "DummyServlet");
+
+        PersistentManager manager = new PersistentManager();
+        DummyStore store = new DummyStore();
+
+        manager.setStore(store);
+        manager.setMaxIdleBackup(0);
+        manager.setDistributable(true);
+        ctx.setManager(manager);
+        ctx.addValve(new PersistentValve());
+        tomcat.start();
+        Assert.assertEquals("No active sessions", manager.getActiveSessions(), 0);
+        Assert.assertTrue("No sessions managed", manager.getSessionIdsFull().isEmpty());
+        String sessionId = getUrl(
+                "http://localhost:" + getPort()
+                        + "/dummy?no_create_session=false").toString();
+        Assert.assertNotNull("Session is stored", store.load(sessionId));
+        Assert.assertEquals("All sessions are passivated", manager.getActiveSessions(), 0);
+        Assert.assertTrue("One session was created", !manager.getSessionIdsFull().isEmpty());
     }
 
     @Test
@@ -165,7 +234,15 @@ public class TestPersistentManager extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            resp.getWriter().print(req.getSession().getId());
+            boolean createSession = !Boolean.parseBoolean(req
+                            .getParameter("no_create_session"));
+            HttpSession session = req.getSession(createSession);
+            if (session == null) {
+                resp.getWriter().print("NO_SESSION");
+            } else {
+                String id = session.getId();
+                resp.getWriter().print(id);
+            }
         }
 
     }
@@ -173,6 +250,7 @@ public class TestPersistentManager extends TomcatBaseTest {
     private static class DummyStore implements Store {
 
         private Manager manager;
+        private Map<String, Session> sessions = new HashMap<String, Session>();
         private List<String> savedIds = new ArrayList<String>();
 
         List<String> getSavedIds() {
@@ -200,18 +278,18 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         @Override
         public String[] keys() throws IOException {
-            return null;
+            return new ArrayList<String>(sessions.keySet()).toArray(new String[] {});
         }
 
         @Override
         public Session load(String id) throws ClassNotFoundException,
                 IOException {
-            // TODO Auto-generated method stub
-            return null;
+            return sessions.get(id);
         }
 
         @Override
         public void remove(String id) throws IOException {
+            sessions.remove(id);
         }
 
         @Override
@@ -224,6 +302,7 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         @Override
         public void save(Session session) throws IOException {
+            sessions.put(session.getId(), session);
             savedIds.add(session.getId());
         }
 

@@ -102,6 +102,10 @@
         <code>ServletContext.getContext(String)</code> to be an exact match to a
         path to an existing context. (markt)
       </fix>
+      <fix>
+        <bug>57637</bug>: Do not create unnecessary sessions when using PersistentValve.
+        (jboynes/fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
