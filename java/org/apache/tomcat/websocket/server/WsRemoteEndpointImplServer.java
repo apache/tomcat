@@ -59,7 +59,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private volatile long timeoutExpiry = -1;
     private volatile boolean close;
-    private volatile boolean first = true;
+    private final Object lock = new Object();
 
     public WsRemoteEndpointImplServer(ServletInputStream sis, ServletOutputStream sos,
             WsServerContainer serverContainer) {
@@ -87,11 +87,8 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     public void onWritePossible(boolean useDispatch) {
-        ByteBuffer[] buffers = this.buffers;
-        if (first) {
-            // Wait for the fist message to do something
-            first = false;
-        } else {
+        synchronized (lock) {
+            ByteBuffer[] buffers = this.buffers;
             if (buffers == null) {
                 // Servlet 3.1 will call the write listener once even if nothing
                 // was written
