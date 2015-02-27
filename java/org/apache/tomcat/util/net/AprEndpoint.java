@@ -2542,16 +2542,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-
-        @Override
-        public void unRead(ByteBuffer returnedInput) {
-            if (returnedInput != null) {
-                socketBufferHandler.configureReadBufferForWrite();
-                socketBufferHandler.getReadBuffer().put(returnedInput);
-            }
-        }
-
-
         @Override
         public void close() {
             closed = true;
