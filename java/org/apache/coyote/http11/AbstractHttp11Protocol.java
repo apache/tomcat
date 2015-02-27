@@ -23,7 +23,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
-import org.apache.coyote.http11.upgrade.UpgradeProcessor;
+import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -283,7 +283,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeHandler)
                 throws IOException {
-            return new UpgradeProcessor(socket, leftoverInput, httpUpgradeHandler);
+            return new UpgradeProcessorExternal(socket, leftoverInput, httpUpgradeHandler);
         }
     }
 }

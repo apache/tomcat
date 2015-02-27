@@ -25,7 +25,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
-import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -35,19 +34,19 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public class UpgradeProcessor implements Processor, WebConnection {
+public class UpgradeProcessorExternal extends UpgradeProcessorBase implements WebConnection {
 
     private static final int INFINITE_TIMEOUT = -1;
 
-    private static final Log log = LogFactory.getLog(UpgradeProcessor.class);
-    private static final StringManager sm = StringManager.getManager(UpgradeProcessor.class);
+    private static final Log log = LogFactory.getLog(UpgradeProcessorExternal.class);
+    private static final StringManager sm = StringManager.getManager(UpgradeProcessorExternal.class);
 
     private final HttpUpgradeHandler httpUpgradeHandler;
     private final UpgradeServletInputStream upgradeServletInputStream;
     private final UpgradeServletOutputStream upgradeServletOutputStream;
 
 
-    public UpgradeProcessor(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
+    public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
             HttpUpgradeHandler httpUpgradeHandler) {
         this.httpUpgradeHandler = httpUpgradeHandler;
         this.upgradeServletInputStream = new UpgradeServletInputStream(wrapper);
