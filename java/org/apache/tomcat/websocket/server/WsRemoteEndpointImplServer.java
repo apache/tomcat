@@ -24,21 +24,19 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
 
 /**
  * This is the server side {@link javax.websocket.RemoteEndpoint} implementation
- * - i.e. what the server uses to send data to the client. Communication is over
- * a {@link ServletOutputStream}.
+ * - i.e. what the server uses to send data to the client.
  */
 public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
@@ -50,8 +48,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private static final Queue<OnResultRunnable> onResultRunnables =
             new ConcurrentLinkedQueue<>();
 
-    private final ServletInputStream sis;
-    private final ServletOutputStream sos;
+    private final SocketWrapperBase<?> socketWrapper;
     private final WsWriteTimeout wsWriteTimeout;
     private final ExecutorService executorService;
     private volatile SendHandler handler = null;
@@ -60,10 +57,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     private volatile long timeoutExpiry = -1;
     private volatile boolean close;
 
-    public WsRemoteEndpointImplServer(ServletInputStream sis, ServletOutputStream sos,
+    public WsRemoteEndpointImplServer(SocketWrapperBase<?> socketWrapper,
             WsServerContainer serverContainer) {
-        this.sis = sis;
-        this.sos = sos;
+        this.socketWrapper = socketWrapper;
         this.wsWriteTimeout = serverContainer.getTimeout();
         this.executorService = serverContainer.getExecutorService();
     }
@@ -95,20 +91,20 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         boolean complete = false;
         try {
             // If this is false there will be a call back when it is true
-            while (sos.isReady()) {
+            while (socketWrapper.isReadyForWrite()) {
                 complete = true;
                 for (ByteBuffer buffer : buffers) {
                     if (buffer.hasRemaining()) {
                         complete = false;
-                        sos.write(buffer.array(), buffer.arrayOffset(),
-                                buffer.limit());
+                        socketWrapper.write(
+                                false, buffer.array(), buffer.arrayOffset(), buffer.limit());
                         buffer.position(buffer.limit());
                         break;
                     }
                 }
                 if (complete) {
-                    sos.flush();
-                    complete = sos.isReady();
+                    socketWrapper.flush(false);
+                    complete = socketWrapper.isReadyForWrite();
                     if (complete) {
                         wsWriteTimeout.unregister(this);
                         clearHandler(null, useDispatch);
@@ -147,14 +143,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             clearHandler(new EOFException(), true);
         }
         try {
-            sos.close();
-        } catch (IOException e) {
-            if (log.isInfoEnabled()) {
-                log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);
-            }
-        }
-        try {
-            sis.close();
+            socketWrapper.close();
         } catch (IOException e) {
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("wsRemoteEndpointServer.closeFailed"), e);

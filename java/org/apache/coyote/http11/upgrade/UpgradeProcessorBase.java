@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.Executor;
 
 import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
@@ -29,7 +30,7 @@ import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
-public abstract class UpgradeProcessorBase implements Processor {
+public abstract class UpgradeProcessorBase implements Processor, WebConnection {
 
     public UpgradeProcessorBase(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput) {
         wrapper.unRead(leftOverInput);
