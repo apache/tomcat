@@ -960,6 +960,17 @@
       </p>
     </attribute>
 
+    <attribute name="useServerCipherSuitesOrder" required="false">
+      <p>
+        Set to <code>true</code> to enforce the server's cipher order
+        (from the <code>ciphers</code> setting). Set to <code>false</code>
+        to choose the first acceptable cipher suite presented by the client.
+        <b>Use of this feature requires Java 8 or later.</b>
+        Default is <i>undefined</i>, leaving the choice up to the JSSE
+        implementation.
+      </p>
+    </attribute>
+
     <attribute name="ciphers" required="false">
       <p>The comma separated list of encryption ciphers to support for HTTPS
       connections. If specified, only the ciphers that are listed and supported

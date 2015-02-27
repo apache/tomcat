@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -52,6 +54,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSession;
@@ -772,6 +775,52 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
     }
 
     /**
+     * Configures SSLEngine to honor cipher suites ordering based upon
+     * endpoint configuration.
+     *
+     * @throws InvalidAlgorithmParameterException If the runtime JVM doesn't
+     *         support this setting.
+     */
+    protected void configureUseServerCipherSuitesOrder(SSLServerSocket socket) {
+        String useServerCipherSuitesOrderStr = endpoint
+                .getUseServerCipherSuitesOrder().trim();
+
+        // Only use this feature if the user explicitly requested its use.
+        if(!"".equals(useServerCipherSuitesOrderStr)) {
+            SSLParameters sslParameters = socket.getSSLParameters();
+            boolean useServerCipherSuitesOrder =
+                    ("true".equalsIgnoreCase(useServerCipherSuitesOrderStr)
+                            || "yes".equalsIgnoreCase(useServerCipherSuitesOrderStr));
+
+            try {
+                // This method is only available in Java 8+
+                // Check to see if the method exists, and then call it.
+                Method m = SSLParameters.class.getMethod("setUseCipherSuitesOrder",
+                                                         Boolean.TYPE);
+
+                m.invoke(sslParameters, Boolean.valueOf(useServerCipherSuitesOrder));
+            }
+            catch (NoSuchMethodException nsme) {
+                throw new UnsupportedOperationException(sm.getString("endpoint.jsse.cannotHonorServerCipherOrder"),
+                                                        nsme);
+            } catch (InvocationTargetException ite) {
+                // Should not happen
+                throw new UnsupportedOperationException(sm.getString("endpoint.jsse.cannotHonorServerCipherOrder"),
+                                                        ite);
+            } catch (IllegalArgumentException iae) {
+                // Should not happen
+                throw new UnsupportedOperationException(sm.getString("endpoint.jsse.cannotHonorServerCipherOrder"),
+                                                        iae);
+            } catch (IllegalAccessException e) {
+                // Should not happen
+                throw new UnsupportedOperationException(sm.getString("endpoint.jsse.cannotHonorServerCipherOrder"),
+                                                        e);
+            }
+            socket.setSSLParameters(sslParameters);
+        }
+    }
+
+    /**
      * Configures the given SSL server socket with the requested cipher suites,
      * protocol versions, and need for client authentication
      */
@@ -785,6 +834,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         // we don't know if client auth is needed -
         // after parsing the request we may re-handshake
         configureClientAuth(socket);
+        configureUseServerCipherSuitesOrder(socket);
     }
 
     /**

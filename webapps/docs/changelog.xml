@@ -63,6 +63,11 @@
         in NonceInfo. Issue reported by Coverity Scan. (fschumacher)
       </fix>
       <fix>
+        <bug>55988</bug>: Add support for Java 8 JSSE server-preferred TLS
+        cipher suite ordering. This feature requires Java 8.
+        Based upon patches provided by Ognjen Blagojevic. (schultz)
+      </fix>
+      <fix>
         <bug>57180</bug>: Further fixes to support the use of arbitrary HTTP
         methods with the CORS filter. (markt)
       </fix>
