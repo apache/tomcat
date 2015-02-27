@@ -22,7 +22,6 @@ import java.nio.ByteBuffer;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.WebConnection;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -31,7 +30,7 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public class UpgradeProcessorExternal extends UpgradeProcessorBase implements WebConnection {
+public class UpgradeProcessorExternal extends UpgradeProcessorBase {
 
     private static final int INFINITE_TIMEOUT = -1;
 

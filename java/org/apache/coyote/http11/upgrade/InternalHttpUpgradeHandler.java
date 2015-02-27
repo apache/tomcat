@@ -20,6 +20,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -34,4 +35,6 @@ import org.apache.tomcat.util.net.SocketStatus;
 public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
 
     SocketState upgradeDispatch(SocketStatus status);
+
+    void setSocketWrapper(SocketWrapperBase<?> wrapper);
 }
