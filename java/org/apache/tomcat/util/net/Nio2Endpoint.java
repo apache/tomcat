@@ -545,6 +545,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         engine.setEnabledCipherSuites(enabledCiphers);
         engine.setEnabledProtocols(enabledProtocols);
 
+        configureUseServerCipherSuitesOrder(engine);
+
         return engine;
     }
 
