@@ -94,6 +94,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 try {
                     socketWrapper.write(true, buffer.array(), buffer.arrayOffset(),
                                     buffer.limit());
+                    buffer.position(buffer.limit());
                     timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                     if (timeout < 0) {
                         // TODO i18n
