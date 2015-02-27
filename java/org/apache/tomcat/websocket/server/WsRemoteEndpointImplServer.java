@@ -20,8 +20,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 
 import javax.websocket.SendHandler;
@@ -44,9 +42,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             StringManager.getManager(Constants.PACKAGE_NAME);
     private static final Log log =
             LogFactory.getLog(WsHttpUpgradeHandler.class);
-
-    private static final Queue<OnResultRunnable> onResultRunnables =
-            new ConcurrentLinkedQueue<>();
 
     private final SocketWrapperBase<?> socketWrapper;
     private final WsWriteTimeout wsWriteTimeout;
@@ -234,11 +229,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         buffers = null;
         if (sh != null) {
             if (useDispatch) {
-                OnResultRunnable r = onResultRunnables.poll();
-                if (r == null) {
-                    r = new OnResultRunnable(onResultRunnables);
-                }
-                r.init(sh, t);
+                OnResultRunnable r = new OnResultRunnable(sh, t);
                 if (executorService == null || executorService.isShutdown()) {
                     // Can't use the executor so call the runnable directly.
                     // This may not be strictly specification compliant in all
@@ -264,16 +255,10 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private static class OnResultRunnable implements Runnable {
 
-        private final Queue<OnResultRunnable> queue;
+        private final SendHandler sh;
+        private final Throwable t;
 
-        private volatile SendHandler sh;
-        private volatile Throwable t;
-
-        private OnResultRunnable(Queue<OnResultRunnable> queue) {
-            this.queue = queue;
-        }
-
-        private void init(SendHandler sh, Throwable t) {
+        private OnResultRunnable(SendHandler sh, Throwable t) {
             this.sh = sh;
             this.t = t;
         }
@@ -285,12 +270,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             } else {
                 sh.onResult(new SendResult(t));
             }
-            t = null;
-            sh = null;
-            // Return the Runnable to the queue when it has been finished with
-            // Note if this method takes an age to finish there shouldn't be any
-            // thread safety issues as the fields are cleared above.
-            queue.add(this);
         }
     }
 }
