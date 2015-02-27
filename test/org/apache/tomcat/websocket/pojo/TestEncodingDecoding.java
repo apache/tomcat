@@ -97,8 +97,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
                     client.received.size() > 0) {
                 break;
             }
-            Thread.sleep(100);
             i++;
+            Thread.sleep(100);
         }
 
         // Check messages were received
@@ -147,6 +147,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             if (server.received.size() > 0 && client.received.size() > 0) {
                 break;
             }
+            i++;
             Thread.sleep(100);
         }
 
@@ -207,6 +208,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             if (server.received.size() > 0 && client.received.size() > 0) {
                 break;
             }
+            i++;
             Thread.sleep(100);
         }
 
@@ -252,6 +254,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             if (server.received.size() > 0 && client.received.size() > 0) {
                 break;
             }
+            i++;
             Thread.sleep(100);
         }
 
@@ -299,6 +302,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
             if (server.received.size() > 0 && client.received.size() > 0) {
                 break;
             }
+            i++;
             Thread.sleep(100);
         }
 
