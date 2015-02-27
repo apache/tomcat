@@ -2433,9 +2433,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         private int fillReadBuffer(boolean block) throws IOException {
-
-            // TODO: Restore a socket level input buffer to align with NIO and
-            //       NIO2.
             if (closed) {
                 throw new IOException(sm.getString("socket.apr.closed", getSocket()));
             }
