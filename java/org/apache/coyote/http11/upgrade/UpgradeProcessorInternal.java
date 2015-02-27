@@ -41,7 +41,6 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
         wrapper.setWriteTimeout(INFINITE_TIMEOUT);
 
         internalHttpUpgradeHandler.setSocketWrapper(wrapper);
-        wrapper.setInternalUpgrade(true);
     }
 
 

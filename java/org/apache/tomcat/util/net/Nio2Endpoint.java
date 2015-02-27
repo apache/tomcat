@@ -1640,112 +1640,100 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         @Override
         public void run() {
-            // Upgraded connections using an internal upgrade handler are
-            // allowed concurrent read/writes
-            if (socket.isInternalUpgrade() && SocketStatus.OPEN_WRITE == status) {
-                synchronized (socket.getWriteThreadLock()) {
-                    doRun();
-                }
-            } else {
-                synchronized (socket) {
-                    doRun();
-                }
-            }
-        }
-
-        private void doRun() {
-            boolean launch = false;
-            try {
-                int handshake = -1;
-
+            synchronized (socket) {
+                boolean launch = false;
                 try {
-                    if (socket.getSocket() != null) {
-                        // For STOP there is no point trying to handshake as the
-                        // Poller has been stopped.
-                        if (socket.getSocket().isHandshakeComplete() ||
-                                status == SocketStatus.STOP) {
-                            handshake = 0;
-                        } else {
-                            handshake = socket.getSocket().handshake();
-                            // The handshake process reads/writes from/to the
-                            // socket. status may therefore be OPEN_WRITE once
-                            // the handshake completes. However, the handshake
-                            // happens when the socket is opened so the status
-                            // must always be OPEN_READ after it completes. It
-                            // is OK to always set this as it is only used if
-                            // the handshake completes.
-                            status = SocketStatus.OPEN_READ;
+                    int handshake = -1;
+
+                    try {
+                        if (socket.getSocket() != null) {
+                            // For STOP there is no point trying to handshake as the
+                            // Poller has been stopped.
+                            if (socket.getSocket().isHandshakeComplete() ||
+                                    status == SocketStatus.STOP) {
+                                handshake = 0;
+                            } else {
+                                handshake = socket.getSocket().handshake();
+                                // The handshake process reads/writes from/to the
+                                // socket. status may therefore be OPEN_WRITE once
+                                // the handshake completes. However, the handshake
+                                // happens when the socket is opened so the status
+                                // must always be OPEN_READ after it completes. It
+                                // is OK to always set this as it is only used if
+                                // the handshake completes.
+                                status = SocketStatus.OPEN_READ;
+                            }
+                        }
+                    } catch (IOException x) {
+                        handshake = -1;
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("endpoint.err.handshake"), x);
                         }
                     }
-                } catch (IOException x) {
-                    handshake = -1;
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("endpoint.err.handshake"), x);
-                    }
-                }
-                if (handshake == 0) {
-                    SocketState state = SocketState.OPEN;
-                    // Process the request from this socket
-                    if (status == null) {
-                        state = handler.process(socket, SocketStatus.OPEN_READ);
-                    } else {
-                        state = handler.process(socket, status);
-                    }
-                    if (state == SocketState.CLOSED) {
-                        // Close socket and pool
+                    if (handshake == 0) {
+                        SocketState state = SocketState.OPEN;
+                        // Process the request from this socket
+                        if (status == null) {
+                            state = handler.process(socket, SocketStatus.OPEN_READ);
+                        } else {
+                            state = handler.process(socket, status);
+                        }
+                        if (state == SocketState.CLOSED) {
+                            // Close socket and pool
+                            closeSocket(socket);
+                            if (useCaches && running && !paused) {
+                                nioChannels.push(socket.getSocket());
+                                socketWrapperCache.push((Nio2SocketWrapper) socket);
+                            }
+                        } else if (state == SocketState.UPGRADING) {
+                            socket.setKeptAlive(true);
+                            launch = true;
+                        }
+                    } else if (handshake == -1 ) {
                         closeSocket(socket);
                         if (useCaches && running && !paused) {
                             nioChannels.push(socket.getSocket());
-                            socketWrapperCache.push((Nio2SocketWrapper) socket);
+                            socketWrapperCache.push(((Nio2SocketWrapper) socket));
                         }
-                    } else if (state == SocketState.UPGRADING) {
-                        socket.setKeptAlive(true);
-                        launch = true;
                     }
-                } else if (handshake == -1 ) {
-                    closeSocket(socket);
+                } catch (OutOfMemoryError oom) {
+                    try {
+                        oomParachuteData = null;
+                        log.error("", oom);
+                        closeSocket(socket);
+                        releaseCaches();
+                    } catch (Throwable oomt) {
+                        try {
+                            System.err.println(oomParachuteMsg);
+                            oomt.printStackTrace();
+                        } catch (Throwable letsHopeWeDontGetHere){
+                            ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
+                        }
+                    }
+                } catch (VirtualMachineError vme) {
+                    ExceptionUtils.handleThrowable(vme);
+                } catch (Throwable t) {
+                    log.error(sm.getString("endpoint.processing.fail"), t);
+                    if (socket != null) {
+                        closeSocket(socket);
+                    }
+                } finally {
+                    if (launch) {
+                        try {
+                            getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN_READ));
+                        } catch (NullPointerException npe) {
+                            if (running) {
+                                log.error(sm.getString("endpoint.launch.fail"),
+                                        npe);
+                            }
+                        }
+                    }
+                    socket = null;
+                    status = null;
+                    //return to cache
                     if (useCaches && running && !paused) {
-                        nioChannels.push(socket.getSocket());
-                        socketWrapperCache.push(((Nio2SocketWrapper) socket));
+                        processorCache.push(this);
                     }
-                }
-            } catch (OutOfMemoryError oom) {
-                try {
-                    oomParachuteData = null;
-                    log.error("", oom);
-                    closeSocket(socket);
-                    releaseCaches();
-                } catch (Throwable oomt) {
-                    try {
-                        System.err.println(oomParachuteMsg);
-                        oomt.printStackTrace();
-                    } catch (Throwable letsHopeWeDontGetHere){
-                        ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
-                    }
-                }
-            } catch (VirtualMachineError vme) {
-                ExceptionUtils.handleThrowable(vme);
-            } catch (Throwable t) {
-                log.error(sm.getString("endpoint.processing.fail"), t);
-                if (socket != null) {
-                    closeSocket(socket);
-                }
-            } finally {
-                if (launch) {
-                    try {
-                        getExecutor().execute(new SocketProcessor(socket, SocketStatus.OPEN_READ));
-                    } catch (NullPointerException npe) {
-                        if (running) {
-                            log.error(sm.getString("endpoint.launch.fail"),
-                                    npe);
-                        }
-                    }
-                }
-                socket = null;
-                status = null;
-                //return to cache
-                if (useCaches && running && !paused) {
-                    processorCache.push(this);
                 }
             }
         }

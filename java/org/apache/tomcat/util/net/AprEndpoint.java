@@ -2326,38 +2326,26 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         @Override
         public void run() {
-            // Upgraded connections using an internal upgrade handler are
-            // allowed concurrent read/writes
-            if (socket.isInternalUpgrade() && SocketStatus.OPEN_WRITE == status) {
-                synchronized (socket.getWriteThreadLock()) {
-                    doRun();
+            synchronized (socket) {
+                // Process the request from this socket
+                if (socket.getSocket() == null || !connections.containsKey(socket)) {
+                    // Closed in another thread
+                    return;
                 }
-            } else {
-                synchronized (socket) {
-                    doRun();
+                SocketState state = handler.process(socket, status);
+                if (state == Handler.SocketState.CLOSED) {
+                    // Close socket and pool
+                    closeSocket(socket.getSocket().longValue());
+                    socket.reset(null, 1);
+                } else if (state == Handler.SocketState.LONG) {
+                    if (socket.isAsync()) {
+                        waitingRequests.add(socket);
+                    }
+                } else if (state == Handler.SocketState.ASYNC_END) {
+                    SocketProcessor proc = new SocketProcessor(socket,
+                            SocketStatus.OPEN_READ);
+                    getExecutor().execute(proc);
                 }
-            }
-        }
-
-        private void doRun() {
-            // Process the request from this socket
-            if (socket.getSocket() == null || !connections.containsKey(socket)) {
-                // Closed in another thread
-                return;
-            }
-            SocketState state = handler.process(socket, status);
-            if (state == Handler.SocketState.CLOSED) {
-                // Close socket and pool
-                closeSocket(socket.getSocket().longValue());
-                socket.reset(null, 1);
-            } else if (state == Handler.SocketState.LONG) {
-                if (socket.isAsync()) {
-                    waitingRequests.add(socket);
-                }
-            } else if (state == Handler.SocketState.ASYNC_END) {
-                SocketProcessor proc = new SocketProcessor(socket,
-                        SocketStatus.OPEN_READ);
-                getExecutor().execute(proc);
             }
         }
     }

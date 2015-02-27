@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -39,8 +38,7 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     private final UpgradeServletOutputStream upgradeServletOutputStream;
 
 
-    public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
-            HttpUpgradeHandler httpUpgradeHandler) {
+    public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput) {
         super(wrapper, leftOverInput);
         this.upgradeServletInputStream = new UpgradeServletInputStream(wrapper);
         this.upgradeServletOutputStream = new UpgradeServletOutputStream(wrapper);
@@ -51,10 +49,6 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
          */
         wrapper.setReadTimeout(INFINITE_TIMEOUT);
         wrapper.setWriteTimeout(INFINITE_TIMEOUT);
-
-        if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
-            wrapper.setInternalUpgrade(true);
-        }
     }
 
 
