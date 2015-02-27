@@ -1395,7 +1395,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
             fillReadBuffer(false);
 
-
             boolean isReady = socketBufferHandler.getReadBuffer().position() > 0;
             return isReady;
         }
