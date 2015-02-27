@@ -63,6 +63,9 @@ public class TestStandardContextAliases extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
 
         String result = res.toString();
+        if (result == null) {
+            result = "";
+        }
 
         assertTrue(result.indexOf("00-PASS") > -1);
         assertTrue(result.indexOf("01-PASS") > -1);
@@ -86,12 +89,12 @@ public class TestStandardContextAliases extends TomcatBaseTest {
             ServletContext context = getServletContext();
 
             // Check resources individually
-            URL url = context.getResource("/WEB-INF/lib/jstl.jar");
+            URL url = context.getResource("/WEB-INF/lib/taglibs-standard-spec-1.2.3.jar");
             if (url != null) {
                 resp.getWriter().write("00-PASS\n");
             }
 
-            url = context.getResource("/WEB-INF/lib/standard.jar");
+            url = context.getResource("/WEB-INF/lib/taglibs-standard-impl-1.2.3.jar");
             if (url != null) {
                 resp.getWriter().write("01-PASS\n");
             }
@@ -102,10 +105,10 @@ public class TestStandardContextAliases extends TomcatBaseTest {
                 return;
             }
 
-            if (!libs.contains("/WEB-INF/lib/jstl.jar")) {
+            if (!libs.contains("/WEB-INF/lib/taglibs-standard-spec-1.2.3.jar")) {
                 return;
             }
-            if (!libs.contains("/WEB-INF/lib/standard.jar")) {
+            if (!libs.contains("/WEB-INF/lib/taglibs-standard-impl-1.2.3.jar")) {
                 return;
             }
 
