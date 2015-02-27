@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharsetEncoder;
@@ -297,8 +298,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         synchronized (messagePartLock) {
             try {
                 if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
-                    // TODO i18n
-                    throw new IOException();
+                    throw new SocketTimeoutException();
                 }
             } catch (InterruptedException e) {
                 // TODO i18n
