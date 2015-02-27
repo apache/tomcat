@@ -1581,6 +1581,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 }
                 removeFromPoller(socket);
                 destroySocket(socket);
+                closeList.remove(socket);
                 socket = timeouts.check(date);
             }
 
