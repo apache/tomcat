@@ -18,6 +18,9 @@ package org.apache.coyote.http11.upgrade;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SocketStatus;
+
 
 /**
  * Currently just a marker interface to enable Tomcat to identify
@@ -29,4 +32,6 @@ import javax.servlet.http.HttpUpgradeHandler;
  * Servlet API.
  */
 public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
+
+    SocketState upgradeDispatch(SocketStatus status);
 }

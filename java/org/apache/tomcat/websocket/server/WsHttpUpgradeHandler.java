@@ -37,6 +37,8 @@ import javax.websocket.Extension;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsIOException;
@@ -147,6 +149,13 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         } finally {
             t.setContextClassLoader(cl);
         }
+    }
+
+
+    @Override
+    public SocketState upgradeDispatch(SocketStatus status) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 

@@ -18,18 +18,15 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.Executor;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
-import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -41,14 +38,13 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase implements We
     private static final Log log = LogFactory.getLog(UpgradeProcessorExternal.class);
     private static final StringManager sm = StringManager.getManager(UpgradeProcessorExternal.class);
 
-    private final HttpUpgradeHandler httpUpgradeHandler;
     private final UpgradeServletInputStream upgradeServletInputStream;
     private final UpgradeServletOutputStream upgradeServletOutputStream;
 
 
     public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
             HttpUpgradeHandler httpUpgradeHandler) {
-        this.httpUpgradeHandler = httpUpgradeHandler;
+        super(wrapper, leftOverInput);
         this.upgradeServletInputStream = new UpgradeServletInputStream(wrapper);
         this.upgradeServletOutputStream = new UpgradeServletOutputStream(wrapper);
 
@@ -90,18 +86,6 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase implements We
     // ------------------------------------------- Implemented Processor methods
 
     @Override
-    public final boolean isUpgrade() {
-        return true;
-    }
-
-
-    @Override
-    public HttpUpgradeHandler getHttpUpgradeHandler() {
-        return httpUpgradeHandler;
-    }
-
-
-    @Override
     public final SocketState upgradeDispatch(SocketStatus status) {
         if (status == SocketStatus.OPEN_READ) {
             upgradeServletInputStream.onDataAvailable();
@@ -139,73 +123,5 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase implements We
             return SocketState.CLOSED;
         }
         return SocketState.UPGRADED;
-    }
-
-
-    @Override
-    public final void recycle() {
-        // Currently a NO-OP as upgrade processors are not recycled.
-    }
-
-
-    // ---------------------------- Processor methods that are NO-OP for upgrade
-
-    @Override
-    public final Executor getExecutor() {
-        return null;
-    }
-
-
-    @Override
-    public final SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException {
-        return null;
-    }
-
-
-    @Override
-    public final SocketState asyncDispatch(SocketStatus status) {
-        return null;
-    }
-
-
-    @Override
-    public void errorDispatch() {
-        // NO-OP
-    }
-
-
-    @Override
-    public final SocketState asyncPostProcess() {
-        return null;
-    }
-
-
-    @Override
-    public final boolean isAsync() {
-        return false;
-    }
-
-
-    @Override
-    public final Request getRequest() {
-        return null;
-    }
-
-
-    @Override
-    public String getClientCertProvider() {
-        return null;
-    }
-
-
-    @Override
-    public final void setSslSupport(SSLSupport sslSupport) {
-        // NOOP
-    }
-
-
-    @Override
-    public ByteBuffer getLeftoverInput() {
-        return null;
     }
 }
