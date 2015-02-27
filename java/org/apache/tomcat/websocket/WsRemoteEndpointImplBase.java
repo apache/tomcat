@@ -193,7 +193,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
         }
         stateMachine.textStart();
-        sendPartialString(CharBuffer.wrap(text), true);
+        sendMessageBlock(CharBuffer.wrap(text), true);
     }
 
 
@@ -225,7 +225,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
         }
         stateMachine.textPartialStart();
-        sendPartialString(CharBuffer.wrap(fragment), isLast);
+        sendMessageBlock(CharBuffer.wrap(fragment), isLast);
     }
 
 
@@ -241,7 +241,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    void sendPartialString(CharBuffer part, boolean last) throws IOException {
+    void sendMessageBlock(CharBuffer part, boolean last) throws IOException {
         try {
             // Get the timeout before we send the message. The message may
             // trigger a session close and depending on timing the client
@@ -1077,7 +1077,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private void doWrite(boolean last) throws IOException {
             if (!Constants.STREAMS_DROP_EMPTY_MESSAGES || used) {
                 buffer.flip();
-                endpoint.sendPartialString(buffer, last);
+                endpoint.sendMessageBlock(buffer, last);
                 buffer.clear();
             } else {
                 endpoint.stateMachine.complete(last);
