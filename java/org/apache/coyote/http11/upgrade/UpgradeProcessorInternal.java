@@ -32,7 +32,7 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
 
     public UpgradeProcessorInternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
             InternalHttpUpgradeHandler internalHttpUpgradeHandler) {
-        super(wrapper, leftOverInput);
+        super(wrapper, leftOverInput, internalHttpUpgradeHandler);
         this.internalHttpUpgradeHandler = internalHttpUpgradeHandler;
         /*
          * Leave timeouts in the hands of the upgraded protocol.

@@ -34,7 +34,11 @@ public abstract class UpgradeProcessorBase implements Processor, WebConnection {
 
     protected static final int INFINITE_TIMEOUT = -1;
 
-    public UpgradeProcessorBase(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput) {
+    private final HttpUpgradeHandler httpUpgradeHandler;
+
+    public UpgradeProcessorBase(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
+            HttpUpgradeHandler httpUpgradeHandler) {
+        this.httpUpgradeHandler = httpUpgradeHandler;
         wrapper.unRead(leftOverInput);
     }
 
@@ -48,18 +52,18 @@ public abstract class UpgradeProcessorBase implements Processor, WebConnection {
 
 
     @Override
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
+        return httpUpgradeHandler;
+    }
+
+
+    @Override
     public final void recycle() {
         // Currently a NO-OP as upgrade processors are not recycled.
     }
 
 
     // ---------------------------- Processor methods that are NO-OP for upgrade
-
-    @Override
-    public HttpUpgradeHandler getHttpUpgradeHandler() {
-        return null;
-    }
-
 
     @Override
     public final Executor getExecutor() {
