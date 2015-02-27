@@ -72,12 +72,44 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
 
     @Override
-    protected void doWrite(SendHandler handler, ByteBuffer... buffers) {
-        this.handler = handler;
-        this.buffers = buffers;
-        // This is definitely the same thread that triggered the write so a
-        // dispatch will be required.
-        onWritePossible(true);
+    protected void doWrite(SendHandler handler, long blockingWriteTimeoutExpiry,
+            ByteBuffer... buffers) {
+        if (blockingWriteTimeoutExpiry == -1) {
+            this.handler = handler;
+            this.buffers = buffers;
+            // This is definitely the same thread that triggered the write so a
+            // dispatch will be required.
+            onWritePossible(true);
+        } else {
+            // Blocking
+            for (ByteBuffer buffer : buffers) {
+                long timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
+                if (timeout < 0) {
+                    // TODO i18n
+                    SendResult sr = new SendResult(new IOException("Blocking write timeout"));
+                    handler.onResult(sr);
+                    return;
+                }
+                socketWrapper.setWriteTimeout(timeout);
+                try {
+                    socketWrapper.write(true, buffer.array(), buffer.arrayOffset(),
+                                    buffer.limit());
+                    timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
+                    if (timeout < 0) {
+                        // TODO i18n
+                        SendResult sr = new SendResult(new IOException("Blocking write timeout"));
+                        handler.onResult(sr);
+                        return;
+                    }
+                    socketWrapper.setWriteTimeout(timeout);
+                    socketWrapper.flush(true);
+                    handler.onResult(SENDRESULT_OK);
+                } catch (IOException e) {
+                    SendResult sr = new SendResult(e);
+                    handler.onResult(sr);
+                }
+            }
+        }
     }
 
 

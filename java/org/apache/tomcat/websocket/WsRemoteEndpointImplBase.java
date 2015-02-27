@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -57,6 +58,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     public static final String BLOCKING_SEND_TIMEOUT_PROPERTY =
             "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
 
+    protected static final SendResult SENDRESULT_OK = new SendResult();
+
     private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class);
 
     private final StateMachine stateMachine = new StateMachine();
@@ -65,7 +68,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             new IntermediateMessageHandler(this);
 
     private Transformation transformation = null;
-    private boolean messagePartInProgress = false;
+    private final Semaphore messagePartInProgress = new Semaphore(1);
     private final Queue<MessagePart> messagePartQueue = new ArrayDeque<>();
     private final Object messagePartLock = new Object();
 
@@ -266,21 +269,53 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         // trigger a session close and depending on timing the client
         // session may close before we can read the timeout.
         long timeout = getBlockingSendTimeout();
-        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
-        startMessage(opCode, payload, last, f2sh);
-        try {
-            if (timeout == -1) {
-                f2sh.get();
-            } else {
-                f2sh.get(timeout, TimeUnit.MILLISECONDS);
-            }
-            if (payload != null) {
-                payload.clear();
-            }
-        } catch (InterruptedException | ExecutionException |
-                TimeoutException e) {
-            throw new IOException(e);
+        long timeoutExpiry;
+        if (timeout < 0) {
+            timeoutExpiry = Long.MAX_VALUE;
+        } else {
+            timeoutExpiry = System.currentTimeMillis() + timeout;
         }
+
+        wsSession.updateLastActive();
+
+        BlockingSendHandler bsh = new BlockingSendHandler();
+
+        List<MessagePart> messageParts = new ArrayList<>();
+        messageParts.add(new MessagePart(last, 0, opCode, payload, bsh, bsh, timeoutExpiry));
+
+        messageParts = transformation.sendMessagePart(messageParts);
+
+        // Some extensions/transformations may buffer messages so it is possible
+        // that no message parts will be returned. If this is the case simply
+        // return.
+        if (messageParts.size() == 0) {
+            return;
+        }
+
+        synchronized (messagePartLock) {
+            try {
+                if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
+                    // TODO i18n
+                    throw new IOException();
+                }
+            } catch (InterruptedException e) {
+                // TODO i18n
+                throw new IOException(e);
+            }
+        }
+
+        for (MessagePart mp : messageParts) {
+            writeMessagePart(mp);
+            if (!bsh.getSendResult().isOK()) {
+                throw new IOException (bsh.getSendResult().getException());
+            }
+        }
+
+        if (payload != null) {
+            payload.clear();
+        }
+
+        endMessage(null, null);
     }
 
 
@@ -292,7 +327,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         List<MessagePart> messageParts = new ArrayList<>();
         messageParts.add(new MessagePart(last, 0, opCode, payload,
                 intermediateMessageHandler,
-                new EndMessageHandler(this, handler)));
+                new EndMessageHandler(this, handler), -1));
 
         messageParts = transformation.sendMessagePart(messageParts);
 
@@ -313,7 +348,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 // the session has been closed. Complain loudly.
                 log.warn(sm.getString("wsRemoteEndpoint.flushOnCloseFailed"));
             }
-            if (messagePartInProgress) {
+            if (messagePartInProgress.tryAcquire()) {
+                doWrite = true;
+            } else {
                 // When a control message is sent while another message is being
                 // sent, the control message is queued. Chances are the
                 // subsequent data message part will end up queued while the
@@ -324,9 +361,6 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
                 // Add it to the queue
                 messagePartQueue.add(mp);
-            } else {
-                messagePartInProgress = true;
-                doWrite = true;
             }
             // Add any remaining messages to the queue
             messagePartQueue.addAll(messageParts);
@@ -350,7 +384,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
             mpNext = messagePartQueue.poll();
             if (mpNext == null) {
-                messagePartInProgress = false;
+                messagePartInProgress.release();
             } else if (!closed){
                 // Session may have been closed unexpectedly in the middle of
                 // sending a fragmented message closing the endpoint. If this
@@ -388,7 +422,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             outputBuffer.flip();
             SendHandler flushHandler = new OutputBufferFlushSendHandler(
                     outputBuffer, mp.getEndHandler());
-            doWrite(flushHandler, outputBuffer);
+            doWrite(flushHandler, mp.getBlockingWriteTimeoutExpiry(), outputBuffer);
             return;
         }
 
@@ -442,12 +476,14 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         if (getBatchingAllowed() || isMasked()) {
             // Need to write via output buffer
             OutputBufferSendHandler obsh = new OutputBufferSendHandler(
-                    mp.getEndHandler(), headerBuffer, mp.getPayload(), mask,
+                    mp.getEndHandler(), mp.getBlockingWriteTimeoutExpiry(),
+                    headerBuffer, mp.getPayload(), mask,
                     outputBuffer, !getBatchingAllowed(), this);
             obsh.write();
         } else {
             // Can write directly
-            doWrite(mp.getEndHandler(), headerBuffer, mp.getPayload());
+            doWrite(mp.getEndHandler(), mp.getBlockingWriteTimeoutExpiry(),
+                    headerBuffer, mp.getPayload());
         }
     }
 
@@ -639,7 +675,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    protected abstract void doWrite(SendHandler handler, ByteBuffer... data);
+    protected abstract void doWrite(SendHandler handler, long blockingWrieTimeoutExpiry,
+            ByteBuffer... data);
     protected abstract boolean isMasked();
     protected abstract void doClose();
 
@@ -756,6 +793,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private static class OutputBufferSendHandler implements SendHandler {
 
         private final SendHandler handler;
+        private final long blockingWriteTimeoutExpiry;
         private final ByteBuffer headerBuffer;
         private final ByteBuffer payload;
         private final byte[] mask;
@@ -765,9 +803,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private int maskIndex = 0;
 
         public OutputBufferSendHandler(SendHandler completion,
+                long blockingWriteTimeoutExpiry,
                 ByteBuffer headerBuffer, ByteBuffer payload, byte[] mask,
                 ByteBuffer outputBuffer, boolean flushRequired,
                 WsRemoteEndpointImplBase endpoint) {
+            this.blockingWriteTimeoutExpiry = blockingWriteTimeoutExpiry;
             this.handler = completion;
             this.headerBuffer = headerBuffer;
             this.payload = payload;
@@ -785,7 +825,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             if (headerBuffer.hasRemaining()) {
                 // Still more headers to write, need to flush
                 outputBuffer.flip();
-                endpoint.doWrite(this, outputBuffer);
+                endpoint.doWrite(this, blockingWriteTimeoutExpiry, outputBuffer);
                 return;
             }
 
@@ -819,7 +859,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 payload.limit(payloadLimit);
                 // Still more headers to write, need to flush
                 outputBuffer.flip();
-                endpoint.doWrite(this, outputBuffer);
+                endpoint.doWrite(this, blockingWriteTimeoutExpiry, outputBuffer);
                 return;
             }
 
@@ -828,7 +868,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 if (outputBuffer.remaining() == 0) {
                     handler.onResult(new SendResult());
                 } else {
-                    endpoint.doWrite(this, outputBuffer);
+                    endpoint.doWrite(this, blockingWriteTimeoutExpiry, outputBuffer);
                 }
             } else {
                 handler.onResult(new SendResult());
@@ -840,7 +880,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         public void onResult(SendResult result) {
             if (result.isOK()) {
                 if (outputBuffer.hasRemaining()) {
-                    endpoint.doWrite(this, outputBuffer);
+                    endpoint.doWrite(this, blockingWriteTimeoutExpiry, outputBuffer);
                 } else {
                     outputBuffer.clear();
                     write();
@@ -1167,6 +1207,21 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 stateMachine.complete(true);
             }
             handler.onResult(result);
+        }
+    }
+
+
+    private static class BlockingSendHandler implements SendHandler {
+
+        private SendResult sendResult = null;
+
+        @Override
+        public void onResult(SendResult result) {
+            sendResult = result;
+        }
+
+        public SendResult getSendResult() {
+            return sendResult;
         }
     }
 }

@@ -343,9 +343,9 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Exception exception = null;
         try {
             while (true) {
+                lastSend = System.currentTimeMillis();
                 Future<Void> f = wsSession.getAsyncRemote().sendBinary(
                         ByteBuffer.wrap(MESSAGE_BINARY_4K));
-                lastSend = System.currentTimeMillis();
                 f.get();
             }
         } catch (Exception e) {
@@ -354,8 +354,8 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         long timeout = System.currentTimeMillis() - lastSend;
 
-        // Clear the server side block and prevent and further blocks to allow
-        // the server to shutdown cleanly
+        // Clear the server side block and prevent further blocks to allow the
+        // server to shutdown cleanly
         BlockingPojo.clearBlock();
 
         String msg = "Time out was [" + timeout + "] ms";
