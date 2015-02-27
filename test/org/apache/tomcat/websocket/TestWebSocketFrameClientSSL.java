@@ -29,6 +29,7 @@ import javax.websocket.WebSocketContainer;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
