@@ -27,7 +27,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -554,23 +553,48 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void sendObject(Object obj) throws IOException, EncodeException {
-        Future<Void> f = sendObjectByFuture(obj);
-        try {
-            f.get();
-        } catch (InterruptedException e) {
-            throw new IOException(e);
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
-            } else if (cause instanceof EncodeException) {
-                throw (EncodeException) cause;
-            } else {
-                throw new IOException(e);
+        if (obj == null) {
+            throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
+        }
+        /*
+         * Note that the implementation will convert primitives and their object
+         * equivalents by default but that users are free to specify their own
+         * encoders and decoders for this if they wish.
+         */
+        Encoder encoder = findEncoder(obj);
+        if (encoder == null && Util.isPrimitive(obj.getClass())) {
+            String msg = obj.toString();
+            sendString(msg);
+            return;
+        }
+        if (encoder == null && byte[].class.isAssignableFrom(obj.getClass())) {
+            ByteBuffer msg = ByteBuffer.wrap((byte[]) obj);
+            sendBytes(msg);
+            return;
+        }
+
+        if (encoder instanceof Encoder.Text) {
+            String msg = ((Encoder.Text) encoder).encode(obj);
+            sendString(msg);
+        } else if (encoder instanceof Encoder.TextStream) {
+            try (Writer w = getSendWriter()) {
+                ((Encoder.TextStream) encoder).encode(obj, w);
             }
+        } else if (encoder instanceof Encoder.Binary) {
+            ByteBuffer msg = ((Encoder.Binary) encoder).encode(obj);
+            sendBytes(msg);
+        } else if (encoder instanceof Encoder.BinaryStream) {
+            try (OutputStream os = getSendStream()) {
+                ((Encoder.BinaryStream) encoder).encode(obj, os);
+            }
+        } else {
+            throw new EncodeException(obj, sm.getString(
+                    "wsRemoteEndpoint.noEncoder", obj.getClass()));
         }
     }
+
 
     public Future<Void> sendObjectByFuture(Object obj) {
         FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
