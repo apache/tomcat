@@ -2629,16 +2629,18 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         // APR + SSL requires that exactly the same parameters are
                         // passed when re-attempting the write
                     }
-                    int sslWritten = Socket.sendb(getSocket().longValue(), sslOutputBuffer,
+                    thisTime = Socket.sendb(getSocket().longValue(), sslOutputBuffer,
                             sslOutputBuffer.position(), sslOutputBuffer.limit());
-                    if (sslWritten > 0) {
-                        sslOutputBuffer.position(
-                                sslOutputBuffer.position() + sslWritten);
+                    if (thisTime > 0) {
+                        sslOutputBuffer.position(sslOutputBuffer.position() + thisTime);
                     }
                 } else {
                     socketBufferHandler.configureWriteBufferForRead();
                     thisTime = Socket.sendb(getSocket().longValue(), socketWriteBuffer,
                             socketWriteBuffer.position(), socketWriteBuffer.remaining());
+                    if (thisTime > 0) {
+                        socketWriteBuffer.position(socketWriteBuffer.position() + thisTime);
+                    }
                 }
                 if (Status.APR_STATUS_IS_EAGAIN(-thisTime)) {
                     thisTime = 0;
@@ -2652,7 +2654,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     throw new IOException(sm.getString("socket.apr.write.error",
                             Integer.valueOf(-thisTime), getSocket(), this));
                 }
-                socketWriteBuffer.position(socketWriteBuffer.position() + thisTime);
             } while ((thisTime > 0 || getBlockingStatus()) && socketWriteBuffer.hasRemaining());
 
             // If there is data left in the buffer the socket will be registered for
