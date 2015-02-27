@@ -2357,8 +2357,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         private final ByteBuffer sslOutputBuffer;
 
-        private volatile ByteBuffer returnedInput;
-        private volatile boolean eagain = false;
         private volatile boolean closed = false;
 
         // This field should only be used by Poller#run()
@@ -2388,7 +2386,53 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
-        public int read(boolean block, byte[] b, int off, int len) throws IOException {
+        public int read(boolean block, byte[] b, int off, int len)
+                throws IOException {
+
+            socketBufferHandler.configureReadBufferForRead();
+            ByteBuffer readBuffer = socketBufferHandler.getReadBuffer();
+            int remaining = readBuffer.remaining();
+
+            // Is there enough data in the read buffer to satisfy this request?
+            if (remaining >= len) {
+                readBuffer.get(b, off, len);
+                return len;
+            }
+
+            // Copy what data there is in the read buffer to the byte array
+            if (remaining > 0) {
+                readBuffer.get(b, off, remaining);
+                return remaining;
+                /*
+                 * Since more bytes may have arrived since the buffer was last
+                 * filled, it is an option at this point to perform a
+                 * non-blocking read. However correctly handling the case if
+                 * that read returns end of stream adds complexity. Therefore,
+                 * at the moment, the preference is for simplicity.
+                 */
+            }
+
+            // Fill the read buffer as best we can.
+            int nRead = fillReadBuffer(block);
+
+            // Full as much of the remaining byte array as possible with the
+            // data that was just read
+            if (nRead > 0) {
+                socketBufferHandler.configureReadBufferForRead();
+                if (nRead > len) {
+                    readBuffer.get(b, off, len);
+                    return len;
+                } else {
+                    readBuffer.get(b, off, nRead);
+                    return nRead;
+                }
+            } else {
+                return nRead;
+            }
+        }
+
+
+        private int fillReadBuffer(boolean block) throws IOException {
 
             // TODO: Restore a socket level input buffer to align with NIO and
             //       NIO2.
@@ -2396,16 +2440,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 throw new IOException(sm.getString("socket.apr.closed", getSocket()));
             }
 
-            if (returnedInput != null) {
-                if (returnedInput.remaining() < len) {
-                    len = returnedInput.remaining();
-                }
-                returnedInput.get(b, off, len);
-                if (returnedInput.remaining() == 0) {
-                    returnedInput = null;
-                }
-                return len;
-            }
+            socketBufferHandler.configureReadBufferForWrite();
+            ByteBuffer socketReadBuffer = socketBufferHandler.getReadBuffer();
 
             Lock readLock = getBlockingStatusReadLock();
             WriteLock writeLock = getBlockingStatusWriteLock();
@@ -2418,7 +2454,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     if (block) {
                         Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
                     }
-                    result = Socket.recv(getSocket().longValue(), b, off, len);
+                    result = Socket.recvb(getSocket().longValue(),
+                            socketReadBuffer, socketReadBuffer.position(), socketReadBuffer.remaining());
                     readDone = true;
                 }
             } finally {
@@ -2439,7 +2476,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     readLock.lock();
                     try {
                         writeLock.unlock();
-                        result = Socket.recv(getSocket().longValue(), b, off, len);
+                        result = Socket.recvb(getSocket().longValue(),
+                                socketReadBuffer, socketReadBuffer.position(), socketReadBuffer.remaining());
                     } finally {
                         readLock.unlock();
                     }
@@ -2453,10 +2491,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             }
 
             if (result > 0) {
-                eagain = false;
+                socketReadBuffer.position(socketReadBuffer.position() + result);
                 return result;
             } else if (-result == Status.EAGAIN) {
-                eagain = true;
                 return 0;
             } else if (-result == Status.APR_EGENERAL && isSecure()) {
                 // Not entirely sure why this is necessary. Testing to date has not
@@ -2465,7 +2502,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("socket.apr.read.sslGeneralError", getSocket(), this));
                 }
-                eagain = true;
                 return 0;
             } else if ((-result) == Status.ETIMEDOUT || (-result) == Status.TIMEUP) {
                 if (block) {
@@ -2494,17 +2530,26 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
         @Override
-        public boolean isReadyForRead() {
-            return !eagain;
+        public boolean isReadyForRead() throws IOException {
+            socketBufferHandler.configureReadBufferForRead();
+
+            if (socketBufferHandler.getReadBuffer().remaining() > 0) {
+                return true;
+            }
+
+            fillReadBuffer(false);
+
+            boolean isReady = socketBufferHandler.getReadBuffer().position() > 0;
+            return isReady;
         }
 
 
 
         @Override
-        public void unRead(ByteBuffer input) {
+        public void unRead(ByteBuffer returnedInput) {
             if (returnedInput != null) {
-                this.returnedInput = ByteBuffer.allocate(returnedInput.remaining());
-                this.returnedInput.put(returnedInput);
+                socketBufferHandler.configureReadBufferForWrite();
+                socketBufferHandler.getReadBuffer().put(returnedInput);
             }
         }
 
