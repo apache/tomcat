@@ -567,7 +567,7 @@ public class WsSession implements Session {
         }
         msg.flip();
         try {
-            wsRemoteEndpoint.startMessageBlock(
+            wsRemoteEndpoint.sendMessageBlock(
                     Constants.OPCODE_CLOSE, msg, true);
         } catch (IOException ioe) {
             // Failed to send close message. Close the socket and let the caller

@@ -123,7 +123,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     @Override
     public void flushBatch() throws IOException {
-        startMessageBlock(Constants.INTERNAL_OPCODE_FLUSH, null, true);
+        sendMessageBlock(Constants.INTERNAL_OPCODE_FLUSH, null, true);
     }
 
 
@@ -132,7 +132,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
         }
         stateMachine.binaryStart();
-        startMessageBlock(Constants.OPCODE_BINARY, data, true);
+        sendMessageBlock(Constants.OPCODE_BINARY, data, true);
         stateMachine.complete(true);
     }
 
@@ -163,7 +163,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
         }
         stateMachine.binaryPartialStart();
-        startMessageBlock(Constants.OPCODE_BINARY, partialByte, last);
+        sendMessageBlock(Constants.OPCODE_BINARY, partialByte, last);
         stateMachine.complete(last);
     }
 
@@ -174,7 +174,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         if (applicationData.remaining() > 125) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.tooMuchData"));
         }
-        startMessageBlock(Constants.OPCODE_PING, applicationData, true);
+        sendMessageBlock(Constants.OPCODE_PING, applicationData, true);
     }
 
 
@@ -184,7 +184,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         if (applicationData.remaining() > 125) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.tooMuchData"));
         }
-        startMessageBlock(Constants.OPCODE_PONG, applicationData, true);
+        sendMessageBlock(Constants.OPCODE_PONG, applicationData, true);
     }
 
 
@@ -263,7 +263,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    void startMessageBlock(byte opCode, ByteBuffer payload, boolean last)
+    void sendMessageBlock(byte opCode, ByteBuffer payload, boolean last)
             throws IOException {
         // Get the timeout before we send the message. The message may
         // trigger a session close and depending on timing the client
@@ -1000,7 +1000,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         private void doWrite(boolean last) throws IOException {
             if (!Constants.STREAMS_DROP_EMPTY_MESSAGES || used) {
                 buffer.flip();
-                endpoint.startMessageBlock(Constants.OPCODE_BINARY, buffer, last);
+                endpoint.sendMessageBlock(Constants.OPCODE_BINARY, buffer, last);
             }
             endpoint.stateMachine.complete(last);
             buffer.clear();
