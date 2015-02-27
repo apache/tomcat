@@ -275,7 +275,12 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         } else {
             timeoutExpiry = System.currentTimeMillis() + timeout;
         }
+        sendMessageBlock(opCode, payload, last, timeoutExpiry);
+    }
 
+
+    private void sendMessageBlock(byte opCode, ByteBuffer payload, boolean last,
+            long timeoutExpiry) throws IOException {
         wsSession.updateLastActive();
 
         BlockingSendHandler bsh = new BlockingSendHandler();
@@ -292,6 +297,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             return;
         }
 
+        long timeout = timeoutExpiry - System.currentTimeMillis();
         synchronized (messagePartLock) {
             try {
                 if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
