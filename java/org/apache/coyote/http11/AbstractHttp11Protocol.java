@@ -289,7 +289,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 return new UpgradeProcessorInternal(socket, leftoverInput,
                         (InternalHttpUpgradeHandler) httpUpgradeHandler);
             } else {
-                return new UpgradeProcessorExternal(socket, leftoverInput, httpUpgradeHandler);
+                return new UpgradeProcessorExternal(socket, leftoverInput);
             }
         }
     }

@@ -1689,84 +1689,68 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             SelectionKey key = socket.getIOChannel().keyFor(
                     socket.getPoller().getSelector());
 
-            // Upgraded connections using an internal upgrade handler are
-            // allowed concurrent read/writes
-            if (ka.isInternalUpgrade() && SocketStatus.OPEN_WRITE == status) {
-                synchronized (ka.getWriteThreadLock()) {
-                    doRun(key, ka);
-                }
-            } else {
-                synchronized (socket) {
-                    doRun(key, ka);
-                }
-            }
-        }
-
-        private void doRun(SelectionKey key, NioSocketWrapper ka) {
-            NioChannel socket = ka.getSocket();
-
-            try {
-                int handshake = -1;
-
+            synchronized (socket) {
                 try {
-                    if (key != null && socket != null) {
-                        // For STOP there is no point trying to handshake as the
-                        // Poller has been stopped.
-                        if (socket.isHandshakeComplete() ||
-                                status == SocketStatus.STOP) {
-                            handshake = 0;
-                        } else {
-                            handshake = socket.handshake(
-                                    key.isReadable(), key.isWritable());
-                            // The handshake process reads/writes from/to the
-                            // socket. status may therefore be OPEN_WRITE once
-                            // the handshake completes. However, the handshake
-                            // happens when the socket is opened so the status
-                            // must always be OPEN_READ after it completes. It
-                            // is OK to always set this as it is only used if
-                            // the handshake completes.
-                            status = SocketStatus.OPEN_READ;
-                        }
-                    }
-                } catch (IOException x) {
-                    handshake = -1;
-                    if (log.isDebugEnabled()) log.debug("Error during SSL handshake",x);
-                } catch (CancelledKeyException ckx) {
-                    handshake = -1;
-                }
-                if (handshake == 0) {
-                    SocketState state = SocketState.OPEN;
-                    // Process the request from this socket
-                    if (status == null) {
-                        state = handler.process(ka, SocketStatus.OPEN_READ);
-                    } else {
-                        state = handler.process(ka, status);
-                    }
-                    if (state == SocketState.CLOSED) {
-                        // Close socket and pool
-                        try {
-                            if (socket.getPoller().cancelledKey(key) != null) {
-                                // SocketWrapper (attachment) was removed from the
-                                // key - recycle both. This can only happen once
-                                // per attempted closure so it is used to determine
-                                // whether or not to return socket and ka to
-                                // their respective caches. We do NOT want to do
-                                // this more than once - see BZ 57340.
-                                if (running && !paused) {
-                                    nioChannels.push(socket);
-                                }
-                                socket = null;
-                                if (running && !paused) {
-                                    keyCache.push(ka);
-                                }
+                    int handshake = -1;
+
+                    try {
+                        if (key != null) {
+                            // For STOP there is no point trying to handshake as the
+                            // Poller has been stopped.
+                            if (socket.isHandshakeComplete() ||
+                                    status == SocketStatus.STOP) {
+                                handshake = 0;
+                            } else {
+                                handshake = socket.handshake(
+                                        key.isReadable(), key.isWritable());
+                                // The handshake process reads/writes from/to the
+                                // socket. status may therefore be OPEN_WRITE once
+                                // the handshake completes. However, the handshake
+                                // happens when the socket is opened so the status
+                                // must always be OPEN_READ after it completes. It
+                                // is OK to always set this as it is only used if
+                                // the handshake completes.
+                                status = SocketStatus.OPEN_READ;
                             }
-                            ka = null;
-                        } catch (Exception x) {
-                            log.error("",x);
                         }
+                    } catch (IOException x) {
+                        handshake = -1;
+                        if (log.isDebugEnabled()) log.debug("Error during SSL handshake",x);
+                    } catch (CancelledKeyException ckx) {
+                        handshake = -1;
                     }
-                } else if (handshake == -1 ) {
-                    if (socket != null) {
+                    if (handshake == 0) {
+                        SocketState state = SocketState.OPEN;
+                        // Process the request from this socket
+                        if (status == null) {
+                            state = handler.process(ka, SocketStatus.OPEN_READ);
+                        } else {
+                            state = handler.process(ka, status);
+                        }
+                        if (state == SocketState.CLOSED) {
+                            // Close socket and pool
+                            try {
+                                if (socket.getPoller().cancelledKey(key) != null) {
+                                    // SocketWrapper (attachment) was removed from the
+                                    // key - recycle both. This can only happen once
+                                    // per attempted closure so it is used to determine
+                                    // whether or not to return socket and ka to
+                                    // their respective caches. We do NOT want to do
+                                    // this more than once - see BZ 57340.
+                                    if (running && !paused) {
+                                        nioChannels.push(socket);
+                                    }
+                                    socket = null;
+                                    if (running && !paused) {
+                                        keyCache.push(ka);
+                                    }
+                                }
+                                ka = null;
+                            } catch (Exception x) {
+                                log.error("",x);
+                            }
+                        }
+                    } else if (handshake == -1 ) {
                         if (key != null) {
                             socket.getPoller().cancelledKey(key);
                         }
@@ -1774,47 +1758,47 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                             nioChannels.push(socket);
                         }
                         socket = null;
+                        if (running && !paused) {
+                            keyCache.push(ka);
+                        }
+                        ka = null;
+                    } else {
+                        ka.getPoller().add(socket,handshake);
                     }
-                    if (running && !paused) {
-                        keyCache.push(ka);
-                    }
-                    ka = null;
-                } else {
-                    ka.getPoller().add(socket,handshake);
-                }
-            } catch (CancelledKeyException cx) {
-                if (socket != null) {
-                    socket.getPoller().cancelledKey(key);
-                }
-            } catch (OutOfMemoryError oom) {
-                try {
-                    oomParachuteData = null;
-                    log.error("", oom);
+                } catch (CancelledKeyException cx) {
                     if (socket != null) {
                         socket.getPoller().cancelledKey(key);
                     }
-                    releaseCaches();
-                } catch (Throwable oomt) {
+                } catch (OutOfMemoryError oom) {
                     try {
-                        System.err.println(oomParachuteMsg);
-                        oomt.printStackTrace();
-                    } catch (Throwable letsHopeWeDontGetHere){
-                        ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
+                        oomParachuteData = null;
+                        log.error("", oom);
+                        if (socket != null) {
+                            socket.getPoller().cancelledKey(key);
+                        }
+                        releaseCaches();
+                    } catch (Throwable oomt) {
+                        try {
+                            System.err.println(oomParachuteMsg);
+                            oomt.printStackTrace();
+                        } catch (Throwable letsHopeWeDontGetHere){
+                            ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
+                        }
                     }
-                }
-            } catch (VirtualMachineError vme) {
-                ExceptionUtils.handleThrowable(vme);
-            } catch (Throwable t) {
-                log.error("", t);
-                if (socket != null) {
-                    socket.getPoller().cancelledKey(key);
-                }
-            } finally {
-                socket = null;
-                status = null;
-                //return to cache
-                if (running && !paused) {
-                    processorCache.push(this);
+                } catch (VirtualMachineError vme) {
+                    ExceptionUtils.handleThrowable(vme);
+                } catch (Throwable t) {
+                    log.error("", t);
+                    if (socket != null) {
+                        socket.getPoller().cancelledKey(key);
+                    }
+                } finally {
+                    socket = null;
+                    status = null;
+                    //return to cache
+                    if (running && !paused) {
+                        processorCache.push(this);
+                    }
                 }
             }
         }
