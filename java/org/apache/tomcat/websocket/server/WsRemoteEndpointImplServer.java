@@ -83,13 +83,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     public void onWritePossible(boolean useDispatch) {
         ByteBuffer[] buffers = this.buffers;
-        if (buffers == null) {
-            // Servlet 3.1 will call the write listener once even if nothing
-            // was written
-            return;
-        }
         boolean complete = false;
         try {
+            socketWrapper.flush(false);
             // If this is false there will be a call back when it is true
             while (socketWrapper.isReadyForWrite()) {
                 complete = true;
