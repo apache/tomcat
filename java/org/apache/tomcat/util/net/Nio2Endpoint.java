@@ -1065,15 +1065,6 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
 
         @Override
-        public void unRead(ByteBuffer returnedInput) {
-            if (returnedInput != null) {
-                socketBufferHandler.configureReadBufferForWrite();
-                socketBufferHandler.getReadBuffer().put(returnedInput);
-            }
-        }
-
-
-        @Override
         public void close() throws IOException {
             Nio2Channel socket = getSocket();
             if (socket != null) {

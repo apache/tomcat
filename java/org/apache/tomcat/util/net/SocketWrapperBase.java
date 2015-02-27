@@ -375,9 +375,16 @@ public abstract class SocketWrapperBase<E> {
      * completes, the HTTP handler may read it. This method provides a way for
      * that data to be returned so it can be processed by the correct component.
      *
-     * @param input The input to return to the input buffer.
+     * @param returnedInput The input to return to the input buffer.
      */
-    public abstract void unRead(ByteBuffer input);
+    public void unRead(ByteBuffer returnedInput) {
+        if (returnedInput != null) {
+            socketBufferHandler.configureReadBufferForWrite();
+            socketBufferHandler.getReadBuffer().put(returnedInput);
+        }
+    }
+
+
     public abstract void close() throws IOException;
 
 
