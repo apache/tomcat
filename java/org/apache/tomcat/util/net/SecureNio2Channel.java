@@ -646,8 +646,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 writePending = false;
                 throw new ExecutionException(t);
             }
-            integer.get();
-            if (written == 0) {
+            if (integer.get().intValue() > 0 && written == 0) {
                 wrap();
                 return get();
             } else {
