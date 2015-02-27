@@ -32,6 +32,8 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public abstract class UpgradeProcessorBase implements Processor, WebConnection {
 
+    protected static final int INFINITE_TIMEOUT = -1;
+
     public UpgradeProcessorBase(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput) {
         wrapper.unRead(leftOverInput);
     }

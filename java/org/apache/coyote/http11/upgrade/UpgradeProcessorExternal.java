@@ -32,8 +32,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class UpgradeProcessorExternal extends UpgradeProcessorBase {
 
-    private static final int INFINITE_TIMEOUT = -1;
-
     private static final Log log = LogFactory.getLog(UpgradeProcessorExternal.class);
     private static final StringManager sm = StringManager.getManager(UpgradeProcessorExternal.class);
 

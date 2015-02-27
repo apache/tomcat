@@ -34,7 +34,14 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
             InternalHttpUpgradeHandler internalHttpUpgradeHandler) {
         super(wrapper, leftOverInput);
         this.internalHttpUpgradeHandler = internalHttpUpgradeHandler;
+        /*
+         * Leave timeouts in the hands of the upgraded protocol.
+         */
+        wrapper.setReadTimeout(INFINITE_TIMEOUT);
+        wrapper.setWriteTimeout(INFINITE_TIMEOUT);
+
         internalHttpUpgradeHandler.setSocketWrapper(wrapper);
+        wrapper.setInternalUpgrade(true);
     }
 
 
