@@ -671,17 +671,18 @@ public class SecureNio2Channel extends Nio2Channel  {
             }
         }
         protected void wrap() {
-            //The data buffer should be empty, we can reuse the entire buffer.
-            netOutBuffer.clear();
             try {
-                SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
-                written = result.bytesConsumed();
-                netOutBuffer.flip();
-                if (result.getStatus() == Status.OK) {
-                    if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK)
-                        tasks();
-                } else {
-                    t = new IOException(sm.getString("channel.nio.ssl.wrapFail", result.getStatus()));
+                if (!netOutBuffer.hasRemaining()) {
+                    netOutBuffer.clear();
+                    SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
+                    written = result.bytesConsumed();
+                    netOutBuffer.flip();
+                    if (result.getStatus() == Status.OK) {
+                        if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK)
+                            tasks();
+                    } else {
+                        t = new IOException(sm.getString("channel.nio.ssl.wrapFail", result.getStatus()));
+                    }
                 }
                 integer = sc.write(netOutBuffer);
             } catch (SSLException e) {
