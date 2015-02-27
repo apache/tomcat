@@ -505,7 +505,9 @@ public class WsSession implements Session {
                     log.warn(sm.getString("wsSession.flushFailOnClose"), e);
                     fireEndpointOnError(e);
                 }
-                sendCloseMessage(closeReason);
+                if (state == State.OPEN) {
+                    sendCloseMessage(closeReason);
+                }
                 fireEndpointOnClose(closeReason);
                 state = State.CLOSED;
 
