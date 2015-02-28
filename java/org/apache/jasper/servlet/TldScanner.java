@@ -277,7 +277,7 @@ public class TldScanner {
         }
     }
 
-    private class TldScannerCallback implements JarScannerCallback {
+    class TldScannerCallback implements JarScannerCallback {
         private boolean tldFound = false;
         private boolean jarFound = false;
 
@@ -381,7 +381,7 @@ public class TldScanner {
         }
 
 
-        private boolean scanFoundNoTLDs() {
+        boolean scanFoundNoTLDs() {
             return jarFound && !tldFound;
         }
     }

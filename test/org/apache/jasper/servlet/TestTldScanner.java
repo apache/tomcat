@@ -17,11 +17,15 @@
 package org.apache.jasper.servlet;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.net.JarURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -29,6 +33,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.scan.StandardJarScanner;
+import org.easymock.EasyMock;
 
 public class TestTldScanner extends TomcatBaseTest {
 
@@ -86,4 +91,30 @@ public class TestTldScanner extends TomcatBaseTest {
         Assert.assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
     }
 
+    @Ignore("Illustrates Bug 57647")
+    @Test
+    public void testBug57647() throws Exception {
+        TldScanner scanner = EasyMock.createMock(TldScanner.class);
+        Constructor<TldScanner.TldScannerCallback> constructor =
+                TldScanner.TldScannerCallback.class.getDeclaredConstructor(TldScanner.class);
+        constructor.setAccessible(true);
+        TldScanner.TldScannerCallback callback = constructor.newInstance((TldScanner) scanner);
+
+        File webappDir = new File("webapps/examples");
+        Assert.assertFalse(callback.scanFoundNoTLDs());
+        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-spec-1.2.3.jar");
+        Assert.assertTrue(callback.scanFoundNoTLDs());
+        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-impl-1.2.3.jar");
+        Assert.assertTrue(callback.scanFoundNoTLDs());
+    }
+
+    private static void scan(TldScanner.TldScannerCallback callback, File webapp, String path)
+            throws Exception {
+        String fullPath = new File(webapp, path).toURI().toString();
+        URL jarUrl = new URL("jar:" + fullPath + "!/");
+        JarURLConnection connection = (JarURLConnection) jarUrl.openConnection();
+        callback.scan(connection, path, true);
+    }
+
 }
+
