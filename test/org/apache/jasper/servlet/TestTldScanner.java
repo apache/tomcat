@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -91,14 +90,13 @@ public class TestTldScanner extends TomcatBaseTest {
         Assert.assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
     }
 
-    @Ignore("Illustrates Bug 57647")
     @Test
     public void testBug57647() throws Exception {
         TldScanner scanner = EasyMock.createMock(TldScanner.class);
         Constructor<TldScanner.TldScannerCallback> constructor =
                 TldScanner.TldScannerCallback.class.getDeclaredConstructor(TldScanner.class);
         constructor.setAccessible(true);
-        TldScanner.TldScannerCallback callback = constructor.newInstance((TldScanner) scanner);
+        TldScanner.TldScannerCallback callback = constructor.newInstance(scanner);
 
         File webappDir = new File("webapps/examples");
         Assert.assertFalse(callback.scanFoundNoTLDs());
