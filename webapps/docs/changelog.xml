@@ -62,11 +62,20 @@
         Clarify threaded usage of variables by removing volatile marker
         in NonceInfo. Issue reported by Coverity Scan. (fschumacher)
       </fix>
+      <add>
+        <bug>49785</bug>: Enable StartTLS connections for JNDIRealm.
+        (fschumacher)
+      </add>
       <fix>
         <bug>55988</bug>: Add support for Java 8 JSSE server-preferred TLS
         cipher suite ordering. This feature requires Java 8.
         Based upon patches provided by Ognjen Blagojevic. (schultz)
       </fix>
+      <add>
+        <bug>57021</bug>: Improve logging in AprLifecycleListener and
+        jni.Library when Tomcat-Native DLL fails to load. Based on a patch by
+        Pravallika Peddi. (markt/kkolinko)
+      </add>
       <fix>
         <bug>57180</bug>: Further fixes to support the use of arbitrary HTTP
         methods with the CORS filter. (markt)
@@ -83,15 +92,6 @@
         case-insensitive (as documented) and than the case-insensitive
         comparison is performed using the system default Locale. (markt)
       </fix>
-      <add>
-        <bug>57021</bug>: Improve logging in AprLifecycleListener and
-        jni.Library when Tomcat-Native DLL fails to load. Based on a patch by
-        Pravallika Peddi. (markt/kkolinko)
-      </add>
-      <add>
-        <bug>49785</bug>: Enable StartTLS connections for JNDIRealm.
-        (fschumacher)
-      </add>
       <fix>
         When docBase refers internal war and unpackWARs is set to false, avoid
         registration of the invalid redeploy resource that has been added ".war"
@@ -108,8 +108,8 @@
         path to an existing context. (markt)
       </fix>
       <fix>
-        <bug>57637</bug>: Do not create unnecessary sessions when using PersistentValve.
-        (jboynes/fschumacher)
+        <bug>57637</bug>: Do not create unnecessary sessions when using
+        PersistentValve. (jboynes/fschumacher)
       </fix>
     </changelog>
   </subsection>
