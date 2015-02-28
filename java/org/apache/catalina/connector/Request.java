@@ -85,6 +85,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.Parameters;
@@ -3346,6 +3347,8 @@ public class Request
             parser.setString(value);
         }
 
+        JreCompat jreCompat = JreCompat.getInstance();
+        
         // Process each comma-delimited language specification
         int length = parser.getLength();
         while (true) {
@@ -3386,33 +3389,11 @@ public class Request
                 continue;       // FIXME - "*" entries are not handled
             }
 
-            // Extract the language and country for this entry
-            String language = null;
-            String country = null;
-            String variant = null;
-            int dash = entry.indexOf('-');
-            if (dash < 0) {
-                language = entry;
-                country = "";
-                variant = "";
-            } else {
-                language = entry.substring(0, dash);
-                country = entry.substring(dash + 1);
-                int vDash = country.indexOf('-');
-                if (vDash > 0) {
-                    String cTemp = country.substring(0, vDash);
-                    variant = country.substring(vDash + 1);
-                    country = cTemp;
-                } else {
-                    variant = "";
-                }
-            }
-            if (!isAlpha(language) || !isAlpha(country) || !isAlpha(variant)) {
+            Locale locale = jreCompat.forLanguageTag(entry);
+            if (locale == null) {
                 continue;
             }
 
-            // Add a new Locale to the list of Locales for this quality level
-            Locale locale = new Locale(language, country, variant);
             Double key = new Double(-quality);  // Reverse the order
             ArrayList<Locale> values = locales.get(key);
             if (values == null) {
@@ -3421,17 +3402,6 @@ public class Request
             }
             values.add(locale);
         }
-    }
-
-
-    protected static final boolean isAlpha(String value) {
-        for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
-            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) {
-                return false;
-            }
-        }
-        return true;
     }
 
 

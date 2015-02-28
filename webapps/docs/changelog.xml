@@ -71,6 +71,10 @@
         cipher suite ordering. This feature requires Java 8.
         Based upon patches provided by Ognjen Blagojevic. (schultz)
       </fix>
+      <fix>
+        <bug>56848</bug>: Use <code>Locale.forLanguageTag</code> to process
+        Locale headers when running on a Java 7 or later JRE. (markt)
+      </fix>
       <add>
         <bug>57021</bug>: Improve logging in AprLifecycleListener and
         jni.Library when Tomcat-Native DLL fails to load. Based on a patch by
