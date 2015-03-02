@@ -112,6 +112,11 @@
         path to an existing context. (markt)
       </fix>
       <fix>
+        <bug>57601</bug>: Ensure that HEAD requests return the correct content
+        length (i.e. the same as for a GET) when the requested resource includes
+        a resource served by the Default servlet. (jboynes/markt)
+      </fix>
+      <fix>
         <bug>57637</bug>: Do not create unnecessary sessions when using
         PersistentValve. (jboynes/fschumacher)
       </fix>
