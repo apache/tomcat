@@ -86,9 +86,6 @@ base-maven.loc=http://repo.maven.apache.org/maven2
 # Mirror, was used when there were problems with the main SF downloads site
 # base-sf.loc=http://sunet.dl.sourceforge.net
 
-# Can be removed once we no longer require a Cobertura snapshot
-base-sonatype-snapshots=https://oss.sonatype.org/content/repositories/snapshots
-
 # ----- Commons Logging, version 1.1 or later -----
 # If this version is updated, check the versions required for the dependencies below
 # - avalon-framework
@@ -222,11 +219,11 @@ checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checks
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 
 # ----- Cobertura code coverage tool -----
-cobertura.version=2.1.0-SNAPSHOT
+cobertura.version=2.1.1
 cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
 cobertura.lib=${cobertura.home}/lib
-cobertura.loc=${base-sonatype-snapshots}/net/sourceforge/cobertura/cobertura/${cobertura.version}/cobertura-2.1.0-20141121.083251-1-bin.tar.gz
+cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.1.1-bin.tar.gz
 
 # ----- JVM settings for unit tests
 java.net.preferIPv4Stack=false
