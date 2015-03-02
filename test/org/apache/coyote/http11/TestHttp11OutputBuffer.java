@@ -24,7 +24,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestInternalOutputBuffer extends TomcatBaseTest {
+public class TestHttp11OutputBuffer extends TomcatBaseTest {
 
     @Test
     public void testSendAck() throws Exception {
