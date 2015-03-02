@@ -216,7 +216,7 @@ objenesis.loc=https://objenesis.googlecode.com/files/objenesis-${objenesis.versi
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.0 or later -----
-checkstyle.version=6.3
+checkstyle.version=6.4
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
