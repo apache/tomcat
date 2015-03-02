@@ -194,6 +194,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Correct a bug in the <code>permessage-deflate</code> implementation that
+        meant that the incorrect op-codes were used if an uncompressed message
+        was converted into more than one compressed message. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
