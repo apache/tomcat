@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -411,13 +412,13 @@ public class DefaultServlet extends HttpServlet {
      * @exception ServletException if a servlet-specified error occurs
      */
     @Override
-    protected void doHead(HttpServletRequest request,
-                          HttpServletResponse response)
-        throws IOException, ServletException {
-
-        // Serve the requested resource, without the data content
-        serveResource(request, response, false, fileEncoding);
-
+    protected void doHead(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException {
+        // Serve the requested resource, without the data content unless we are
+        // being included since in that case the content needs to be provided so
+        // the correct content length is reported for the including resource
+        boolean serveContent = DispatcherType.INCLUDE.equals(request.getDispatcherType());
+        serveResource(request, response, serveContent, fileEncoding);
     }
 
 
