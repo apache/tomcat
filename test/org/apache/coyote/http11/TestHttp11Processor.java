@@ -54,7 +54,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
-public class TestAbstractHttp11Processor extends TomcatBaseTest {
+public class TestHttp11Processor extends TomcatBaseTest {
 
     @Test
     public void testResponseWithErrorChunked() throws Exception {
