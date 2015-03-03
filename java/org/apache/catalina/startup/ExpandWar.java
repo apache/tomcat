@@ -80,6 +80,7 @@ public class ExpandWar {
         // Set up the variables used in the finally block of the following try
         boolean success = false;
         File docBase = new File(host.getAppBaseFile(), pathname);
+        File warTracker = new File(host.getAppBaseFile(), pathname + Constants.WarTracker);
 
         try (JarFile jarFile = juc.getJarFile()) {
 
@@ -92,10 +93,9 @@ public class ExpandWar {
                 // time of the expanded directory to the last modified time of
                 // the WAR so changes to the WAR while Tomcat is stopped can be
                 // detected
-                long dirLastModified = docBase.lastModified();
-
-                if (dirLastModified == warLastModified) {
-                    // No changes to the WAR
+                if (!warTracker.exists() || warTracker.lastModified() == warLastModified) {
+                    // No (detectable) changes to the WAR
+                    success = true;
                     return (docBase.getAbsolutePath());
                 }
 
@@ -157,9 +157,10 @@ public class ExpandWar {
                     }
                 }
 
-                // Align the last modified time of the directory with the WAR so
-                // changes to the WAR while Tomcat is stopped can be detected
-                docBase.setLastModified(warLastModified);
+                // Create the warTracker file and align the last modified time
+                // with the last modified time of the WAR
+                warTracker.createNewFile();
+                warTracker.setLastModified(warLastModified);
             }
             success = true;
         } catch (IOException e) {

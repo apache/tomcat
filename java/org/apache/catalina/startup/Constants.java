@@ -31,6 +31,7 @@ public final class Constants {
     public static final String DefaultWebXml = "conf/web.xml";
     public static final String HostContextXml = "context.xml.default";
     public static final String HostWebXml = "web.xml.default";
+    public static final String WarTracker = "/META-INF/war-tracker";
 
     /**
      * A dummy value used to suppress loading the default web.xml file.
