@@ -791,7 +791,7 @@ public class HostConfig
 
         Context context = null;
         try {
-            if (deployXML && xml.exists() && !copyXML) {
+            if (deployXML && xml.exists() && unpackWARs && !copyXML) {
                 synchronized (digesterLock) {
                     try {
                         context = (Context) digester.parse(xml);
