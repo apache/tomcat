@@ -601,7 +601,11 @@ public class HostConfig
             // Add the eventual unpacked WAR and all the resources which will be
             // watched inside it
             if (isExternalWar) {
-                if (unpackWARs) {
+                boolean unpackWAR = unpackWARs;
+                if (unpackWAR && context instanceof StandardContext) {
+                    unpackWAR = ((StandardContext) context).getUnpackWAR();
+                }
+                if (unpackWAR) {
                     deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
                             Long.valueOf(expandedDocBase.lastModified()));
                     addWatchedResources(deployedApp, expandedDocBase.getAbsolutePath(), context);
@@ -681,7 +685,11 @@ public class HostConfig
                 }
                 if (deploymentExists(cn.getName())) {
                     DeployedApplication app = deployed.get(cn.getName());
-                    if (!unpackWARs && app != null) {
+                    boolean unpackWAR = unpackWARs;
+                    if (unpackWAR && host.findChild(cn.getName()) instanceof StandardContext) {
+                        unpackWAR = ((StandardContext) host.findChild(cn.getName())).getUnpackWAR();
+                    }
+                    if (!unpackWAR && app != null) {
                         // Need to check for a directory that should not be
                         // there
                         File dir = new File(appBase, cn.getBaseName());
@@ -921,7 +929,11 @@ public class HostConfig
         } finally {
             // If we're unpacking WARs, the docBase will be mutated after
             // starting the context
-            if (unpackWARs && context != null && context.getDocBase() != null) {
+            boolean unpackWAR = unpackWARs;
+            if (unpackWAR && context instanceof StandardContext) {
+                unpackWAR = ((StandardContext) context).getUnpackWAR();
+            }
+            if (unpackWAR && context != null && context.getDocBase() != null) {
                 File docBase = new File(host.getAppBaseFile(), cn.getBaseName());
                 deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         Long.valueOf(docBase.lastModified()));
@@ -1237,7 +1249,11 @@ public class HostConfig
                         app.redeployResources.put(resources[i],
                                 Long.valueOf(resource.lastModified()));
                         app.timestamp = System.currentTimeMillis();
-                        if (unpackWARs) {
+                        boolean unpackWAR = unpackWARs;
+                        if (unpackWAR && context instanceof StandardContext) {
+                            unpackWAR = ((StandardContext) context).getUnpackWAR();
+                        }
+                        if (unpackWAR) {
                             addWatchedResources(app, context.getDocBase(), context);
                         } else {
                             addWatchedResources(app, null, context);
@@ -1584,7 +1600,11 @@ public class HostConfig
         host.addChild(context);
         // Add the eventual unpacked WAR and all the resources which will be
         // watched inside it
-        if (isWar && unpackWARs) {
+        boolean unpackWAR = unpackWARs;
+        if (unpackWAR && context instanceof StandardContext) {
+            unpackWAR = ((StandardContext) context).getUnpackWAR();
+        }
+        if (isWar && unpackWAR) {
             File docBase = new File(host.getAppBaseFile(), context.getBaseName());
             deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         Long.valueOf(docBase.lastModified()));
