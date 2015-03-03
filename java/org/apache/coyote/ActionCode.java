@@ -224,5 +224,11 @@ public enum ActionCode {
     /**
      * Callback to trigger the Servlet 3.1 based HTTP upgrade process.
      */
-    UPGRADE
+    UPGRADE,
+
+    /**
+     * Trigger end of request processing (remaining input swallowed, write any
+     * remaining parts of the response etc.).
+     */
+    END_REQUEST
 }

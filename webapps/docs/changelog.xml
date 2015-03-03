@@ -123,6 +123,10 @@
         (markt)
       </fix>
       <fix>
+        <bug>57621</bug>: When an async request completes, ensure that any
+        remaining request body data is swallowed. (markt)
+      </fix>
+      <fix>
         <bug>57637</bug>: Do not create unnecessary sessions when using
         PersistentValve. (jboynes/fschumacher)
       </fix>

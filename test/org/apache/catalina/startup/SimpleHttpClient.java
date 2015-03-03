@@ -384,6 +384,10 @@ public abstract class SimpleHttpClient {
 
         useContinue = false;
 
+        resetResponse();
+    }
+
+    public void resetResponse() {
         responseLine = null;
         responseHeaders = new ArrayList<String>();
         responseBody = null;
