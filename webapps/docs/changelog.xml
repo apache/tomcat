@@ -134,6 +134,12 @@
         Make sure that <code>unpackWAR</code> attribute of <code>Context</code>
         is handled correctly in <code>HostConfig</code>. (kfujino)
       </fix>
+      <fix>
+        When deploying a WAR file that contains a context.xml file and
+        <code>unpackWARs</code> is <code>false</code> ignore any context.xml
+        file that may exist in an expanded directory associated with the WAR.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
