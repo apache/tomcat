@@ -613,8 +613,8 @@ public class ContextConfig implements LifecycleListener {
         }
 
         if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory()) {
+            URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
             if (unpackWARs) {
-                URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
                 docBase = ExpandWar.expand(host, war, pathName);
                 file = new File(docBase);
                 docBase = file.getCanonicalPath();
@@ -622,8 +622,6 @@ public class ContextConfig implements LifecycleListener {
                     ((StandardContext) context).setOriginalDocBase(origDocBase);
                 }
             } else {
-                URL war =
-                        new URL("jar:" + (new File (docBase)).toURI().toURL() + "!/");
                 ExpandWar.validate(host, war, pathName);
             }
         } else {
