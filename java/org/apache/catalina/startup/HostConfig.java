@@ -789,9 +789,17 @@ public class HostConfig
             entry = null;
         }
 
+        // If there is an expanded directory then any xml in that directory
+        // should only be used if the directory is not out of date and
+        // unpackWARs is true. Note the code below may apply further limits
+        boolean useXml = false;
+        if (xml.exists() && unpackWARs && xml.lastModified() == war.lastModified()) {
+            useXml = true;
+        }
+
         Context context = null;
         try {
-            if (deployXML && xml.exists() && unpackWARs && !copyXML) {
+            if (deployXML && useXml && !copyXML) {
                 synchronized (digesterLock) {
                     try {
                         context = (Context) digester.parse(xml);

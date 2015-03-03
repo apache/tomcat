@@ -55,8 +55,7 @@ public class ExpandWar {
 
     /**
      * Expand the WAR file found at the specified URL into an unpacked
-     * directory structure, and return the absolute pathname to the expanded
-     * directory.
+     * directory structure.
      *
      * @param host Host war is being installed for
      * @param war URL of the web application archive to be expanded
@@ -67,31 +66,62 @@ public class ExpandWar {
      *            WAR file is invalid
      * @exception IOException if an input/output error was encountered
      *  during expansion
+     *
+     * @return The absolute path to the expanded directory foe the given WAR
      */
     public static String expand(Host host, URL war, String pathname)
         throws IOException {
 
-        // Make sure that there is no such directory already existing
-        File docBase = new File(host.getAppBaseFile(), pathname);
-        if (docBase.exists()) {
-            // War file is already installed
-            return (docBase.getAbsolutePath());
-        }
-
-        // Create the new document base directory
-        if(!docBase.mkdir() && !docBase.isDirectory())
-            throw new IOException(sm.getString("expandWar.createFailed", docBase));
-
-        // Expand the WAR into the new document base directory
-        String canonicalDocBasePrefix = docBase.getCanonicalPath();
-        if (!canonicalDocBasePrefix.endsWith(File.separator)) {
-            canonicalDocBasePrefix += File.separator;
-        }
+        // Open the connection to the WAR. There is no explicit close method.
+        // You have to get the JarFile and close that.
         JarURLConnection juc = (JarURLConnection) war.openConnection();
         juc.setUseCaches(false);
 
+        // Set up the variables used in the finally block of the following try
         boolean success = false;
+        File docBase = new File(host.getAppBaseFile(), pathname);
+
         try (JarFile jarFile = juc.getJarFile()) {
+
+            // Get the last modified time for the WAR
+            long warLastModified = juc.getContentLengthLong();
+
+            // Check to see of the WAR has been expanded previously
+            if (docBase.exists()) {
+                // A WAR was expanded. Tomcat will have set the last modified
+                // time of the expanded directory to the last modified time of
+                // the WAR so changes to the WAR while Tomcat is stopped can be
+                // detected
+                long dirLastModified = docBase.lastModified();
+
+                if (dirLastModified == warLastModified) {
+                    // No changes to the WAR
+                    return (docBase.getAbsolutePath());
+                }
+
+                log.info(sm.getString("expandWar.deleteOld", docBase));
+
+                // WAR must have been modified. Remove expanded directory.
+                if (!delete(docBase)) {
+                    throw new IOException(sm.getString("expandWar.deleteFailed", docBase));
+                }
+            }
+
+            // Create the new document base directory
+            if(!docBase.mkdir() && !docBase.isDirectory()) {
+                throw new IOException(sm.getString("expandWar.createFailed", docBase));
+            }
+
+            // Align the last modified time of the directory with the WAR so
+            // changes to the WAR while Tomcat is stopped can be detected
+            docBase.setLastModified(warLastModified);
+
+            // Expand the WAR into the new document base directory
+            String canonicalDocBasePrefix = docBase.getCanonicalPath();
+            if (!canonicalDocBasePrefix.endsWith(File.separator)) {
+                canonicalDocBasePrefix += File.separator;
+            }
+
             Enumeration<JarEntry> jarEntries = jarFile.entries();
             while (jarEntries.hasMoreElements()) {
                 JarEntry jarEntry = jarEntries.nextElement();
@@ -118,7 +148,6 @@ public class ExpandWar {
                 if (name.endsWith("/")) {
                     continue;
                 }
-
 
                 try (InputStream input = jarFile.getInputStream(jarEntry)) {
                     if (null == input)
