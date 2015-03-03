@@ -275,10 +275,15 @@
         placed in the <code>appBase</code> directory as web application
         archive (WAR) files to be unpacked into a corresponding disk directory
         structure, <code>false</code> to run such web applications directly
-        from a WAR file. WAR files located outside of the Host's
-        <strong>appBase</strong> will not be expanded. See
+        from a WAR file. See
         <a href="#Automatic_Application_Deployment">Automatic Application
         Deployment</a> for more information.</p>
+        <p>Note: If Tomcat expands the WAR file then it will add a file
+        (<code>/META-INF/war-tracking</code>) to the unpacked directory
+        structure which it uses to detect changes in the WAR file while Tomcat
+        is not running. Any such change will trigger the deletion of the
+        expanded directory and the deployment of the updated WAR file when
+        Tomcat next starts.</p>
       </attribute>
 
       <attribute name="workDir" required="false">
