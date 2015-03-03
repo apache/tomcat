@@ -974,6 +974,9 @@ public class Http11Processor extends AbstractProcessor {
             }
             break;
         }
+        case END_REQUEST: {
+            endRequest();
+        }
         }
     }
 
@@ -1128,22 +1131,12 @@ public class Http11Processor extends AbstractProcessor {
 
             // Finish the handling of the request
             rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
-
             if (!isAsync()) {
-                if (getErrorState().isError()) {
-                    // If we know we are closing the connection, don't drain
-                    // input. This way uploading a 100GB file doesn't tie up the
-                    // thread if the servlet has rejected it.
-                    inputBuffer.setSwallowInput(false);
-                } else {
-                    // Need to check this again here in case the response was
-                    // committed before the error that requires the connection
-                    // to be closed occurred.
-                    checkExpectationAndResponseStatus();
-                }
+                // If this is an async request then the request ends when it has
+                // been completed. The AsyncContext is responsible for calling
+                // endRequest() in that case.
                 endRequest();
             }
-
             rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
 
             // If there was an error, make sure the request is counted as
@@ -1807,7 +1800,23 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    /*
+     * No more input will be passed to the application. Remaining input will be
+     * swallowed or the connection dropped depending on the error and
+     * expectation status.
+     */
     private void endRequest() {
+        if (getErrorState().isError()) {
+            // If we know we are closing the connection, don't drain
+            // input. This way uploading a 100GB file doesn't tie up the
+            // thread if the servlet has rejected it.
+            inputBuffer.setSwallowInput(false);
+        } else {
+            // Need to check this again here in case the response was
+            // committed before the error that requires the connection
+            // to be closed occurred.
+            checkExpectationAndResponseStatus();
+        }
 
         // Finish the handling of the request
         if (getErrorState().isIoAllowed()) {

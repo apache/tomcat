@@ -45,6 +45,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -699,6 +700,105 @@ public class TestHttp11Processor extends TomcatBaseTest {
         @Override
         public boolean isResponseBodyOK() {
             return getResponseBody().contains("test - data");
+        }
+    }
+
+
+    /*
+     * Partially read chunked input is not swallowed when it is read during
+     * async processing.
+     */
+    @Test
+    public void testBug57621() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", null);
+        Wrapper w = Tomcat.addServlet(root, "Bug57621", new Bug57621Servlet());
+        w.setAsyncSupported(true);
+        root.addServletMapping("/test", "Bug57621");
+
+        tomcat.start();
+
+        Bug57621Client client = new Bug57621Client();
+        client.setPort(tomcat.getConnector().getLocalPort());
+
+        client.setUseContentLength(true);
+
+        client.connect();
+
+        client.doRequest();
+        assertTrue(client.getResponseLine(), client.isResponse200());
+        assertTrue(client.isResponseBodyOK());
+
+        // Do the request again to ensure that the remaining body was swallowed
+        client.resetResponse();
+        client.processRequest();
+        assertTrue(client.isResponse200());
+        assertTrue(client.isResponseBodyOK());
+
+        client.disconnect();
+    }
+
+
+    private static class Bug57621Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            AsyncContext ac = req.startAsync();
+            ac.start(new Runnable() {
+                @Override
+                public void run() {
+                    resp.setContentType("text/plain");
+                    resp.setCharacterEncoding("UTF-8");
+                    try {
+                        resp.getWriter().print("OK");
+                    } catch (IOException e) {
+                        // Should never happen. Test will fail if it does.
+                    }
+                    ac.complete();
+                }
+            });
+        }
+    }
+
+
+    private class Bug57621Client extends SimpleHttpClient {
+
+        private Exception doRequest() {
+            try {
+                String[] request = new String[2];
+                request[0] =
+                    "PUT http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    CRLF +
+                    "2" + CRLF +
+                    "OK";
+
+                request[1] =
+                    CRLF +
+                    "0" + CRLF +
+                    CRLF;
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            if (getResponseBody() == null) {
+                return false;
+            }
+            if (!getResponseBody().contains("OK")) {
+                return false;
+            }
+            return true;
         }
     }
 }
