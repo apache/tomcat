@@ -94,7 +94,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> resHeaders= new HashMap<>();
+        Map<String,List<String>> resHeaders= new HashMap<String,List<String>>();
         String path = "http://localhost:" + getPort() + "/outer";
         ByteChunk out = new ByteChunk();
 

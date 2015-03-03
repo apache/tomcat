@@ -303,7 +303,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         tomcat.start();
         
-        Map<String,List<String>> resHeaders= new HashMap<>();
+        Map<String,List<String>> resHeaders= new HashMap<String,List<String>>();
         String path = "http://localhost:" + getPort() + "/test/bug5nnnn/bug57601.jsp";
         ByteChunk out = new ByteChunk();
 
