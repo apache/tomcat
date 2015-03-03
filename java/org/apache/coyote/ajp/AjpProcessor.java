@@ -602,6 +602,7 @@ public class AjpProcessor extends AbstractProcessor {
         }
         case END_REQUEST: {
             // NO-OP for AJP
+            break;
         }
         }
     }
