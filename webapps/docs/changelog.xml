@@ -126,6 +126,10 @@
         <bug>57637</bug>: Do not create unnecessary sessions when using
         PersistentValve. (jboynes/fschumacher)
       </fix>
+      <fix>
+        Make sure that <code>unpackWAR</code> attribute of <code>Context</code>
+        is handled correctly in <code>HostConfig</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
