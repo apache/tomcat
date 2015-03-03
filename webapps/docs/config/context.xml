@@ -804,9 +804,7 @@
         file will not be unpacked. If <code>true</code>, the value of the owning
         <a href="host.html">Host</a>&apos;s <strong>unpackWARs</strong>
         attribute will determine if the WAR is unpacked. If not specified, the
-        default value is <code>true</code>. Note that WAR files located outside
-        of a <a href="host.html">Host</a>&apos;s <strong>appBase</strong> are
-        never unpacked.</p>
+        default value is <code>true</code>.</p>
       </attribute>
 
       <attribute name="useNaming" required="false">

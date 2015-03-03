@@ -217,6 +217,11 @@
         <bug>57503</bug>: Make clear that the JULI integration for log4j only
         works with log4j 1.2.x. (markt)
       </fix>
+      <fix>
+        Remove incorrect note from context configuration page in the
+        documentation web application that stated WAR files located outside the
+        appBase were never unpacked. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
