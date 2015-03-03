@@ -629,8 +629,7 @@ public class ContextConfig implements LifecycleListener {
             if (!docDir.exists()) {
                 File warFile = new File(docBase + ".war");
                 if (warFile.exists()) {
-                    URL war =
-                        new URL("jar:" + warFile.toURI().toURL() + "!/");
+                    URL war = new URL("jar:" + warFile.toURI().toURL() + "!/");
                     if (unpackWARs) {
                         docBase = ExpandWar.expand(host, war, pathName);
                         file = new File(docBase);
