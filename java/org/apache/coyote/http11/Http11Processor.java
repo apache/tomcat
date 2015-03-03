@@ -976,6 +976,7 @@ public class Http11Processor extends AbstractProcessor {
         }
         case END_REQUEST: {
             endRequest();
+            break;
         }
         }
     }
