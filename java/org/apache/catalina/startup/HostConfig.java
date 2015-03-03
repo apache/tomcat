@@ -774,7 +774,7 @@ public class HostConfig
     protected void deployWAR(ContextName cn, File war) {
 
         File xml = new File(host.getAppBaseFile(),
-                cn.getBaseName() + "/META-INF/context.xml");
+                cn.getBaseName() + "/" + Constants.ApplicationContextXml);
 
         boolean xmlInWar = false;
         JarEntry entry = null;
