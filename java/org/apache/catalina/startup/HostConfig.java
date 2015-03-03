@@ -776,6 +776,9 @@ public class HostConfig
         File xml = new File(host.getAppBaseFile(),
                 cn.getBaseName() + "/" + Constants.ApplicationContextXml);
 
+        File warTracker = new File(host.getAppBaseFile(),
+                cn.getBaseName() + "/" + Constants.WarTracker);
+
         boolean xmlInWar = false;
         JarEntry entry = null;
         try (JarFile jar = new JarFile(war)) {
@@ -793,10 +796,10 @@ public class HostConfig
         // should only be used if the directory is not out of date and
         // unpackWARs is true. Note the code below may apply further limits
         boolean useXml = false;
-        File expandedDir = new File(host.getAppBaseFile(), cn.getBaseName());
         // If the xml file exists then expandedDir must exists so no need to
         // test that here
-        if (xml.exists() && unpackWARs && expandedDir.lastModified() == war.lastModified()) {
+        if (xml.exists() && unpackWARs &&
+                (!warTracker.exists() || warTracker.lastModified() == war.lastModified())) {
             useXml = true;
         }
 
