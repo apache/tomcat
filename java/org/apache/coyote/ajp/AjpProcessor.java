@@ -600,6 +600,9 @@ public class AjpProcessor extends AbstractProcessor {
             setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
+        case END_REQUEST: {
+            // NO-OP for AJP
+        }
         }
     }
 

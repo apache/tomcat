@@ -107,11 +107,15 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
         }
 
-        // The application doesn't know it has to stop writing until it receives
-        // the complete event so the response has to be closed after firing the
-        // event.
+        // The application doesn't know it has to stop read and/or writing until
+        // it receives the complete event so the request and response have to be
+        // closed after firing the event.
         try {
+            // First of all ensure that any data written to the response is
+            // written to the I/O layer.
             request.getResponse().finishResponse();
+            // Close the request and the response.
+            request.getCoyoteRequest().action(ActionCode.END_REQUEST, null);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // Catch this here and allow async context complete to continue

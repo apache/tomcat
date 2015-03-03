@@ -228,5 +228,11 @@ public enum ActionCode {
      * when the non-blocking listeners are configured on a thread where the
      * processing wasn't triggered by a read or write event on the socket.
      */
-    DISPATCH_EXECUTE
+    DISPATCH_EXECUTE,
+
+    /**
+     * Trigger end of request processing (remaining input swallowed, write any
+     * remaining parts of the response etc.).
+     */
+    END_REQUEST
 }
