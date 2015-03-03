@@ -84,7 +84,7 @@ public class ExpandWar {
         try (JarFile jarFile = juc.getJarFile()) {
 
             // Get the last modified time for the WAR
-            long warLastModified = juc.getContentLengthLong();
+            long warLastModified = juc.getLastModified();
 
             // Check to see of the WAR has been expanded previously
             if (docBase.exists()) {
@@ -99,9 +99,8 @@ public class ExpandWar {
                     return (docBase.getAbsolutePath());
                 }
 
-                log.info(sm.getString("expandWar.deleteOld", docBase));
-
                 // WAR must have been modified. Remove expanded directory.
+                log.info(sm.getString("expandWar.deleteOld", docBase));
                 if (!delete(docBase)) {
                     throw new IOException(sm.getString("expandWar.deleteFailed", docBase));
                 }
@@ -111,10 +110,6 @@ public class ExpandWar {
             if(!docBase.mkdir() && !docBase.isDirectory()) {
                 throw new IOException(sm.getString("expandWar.createFailed", docBase));
             }
-
-            // Align the last modified time of the directory with the WAR so
-            // changes to the WAR while Tomcat is stopped can be detected
-            docBase.setLastModified(warLastModified);
 
             // Expand the WAR into the new document base directory
             String canonicalDocBasePrefix = docBase.getCanonicalPath();
@@ -161,6 +156,10 @@ public class ExpandWar {
                         expandedFile.setLastModified(lastModified);
                     }
                 }
+
+                // Align the last modified time of the directory with the WAR so
+                // changes to the WAR while Tomcat is stopped can be detected
+                docBase.setLastModified(warLastModified);
             }
             success = true;
         } catch (IOException e) {

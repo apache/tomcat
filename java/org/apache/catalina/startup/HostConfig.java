@@ -793,7 +793,10 @@ public class HostConfig
         // should only be used if the directory is not out of date and
         // unpackWARs is true. Note the code below may apply further limits
         boolean useXml = false;
-        if (xml.exists() && unpackWARs && xml.lastModified() == war.lastModified()) {
+        File expandedDir = new File(host.getAppBaseFile(), cn.getBaseName());
+        // If the xml file exists then expandedDir must exists so no need to
+        // test that here
+        if (xml.exists() && unpackWARs && expandedDir.lastModified() == war.lastModified()) {
             useXml = true;
         }
 
