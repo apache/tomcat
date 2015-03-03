@@ -243,29 +243,31 @@ public class ContextConfig implements LifecycleListener {
 
     private WebXmlParser webXmlParser;
 
+
     // ------------------------------------------------------------- Properties
+
     /**
-     * Return the location of the default deployment descriptor
+     * Obtain the location of the default deployment descriptor.
+     *
+     * @return The path to the default web.xml. If not absolute, it is relative
+     *         to CATALINA_BASE.
      */
     public String getDefaultWebXml() {
-        if( defaultWebXml == null ) {
-            defaultWebXml=Constants.DefaultWebXml;
+        if (defaultWebXml == null) {
+            defaultWebXml = Constants.DefaultWebXml;
         }
-
-        return (this.defaultWebXml);
-
+        return defaultWebXml;
     }
 
 
     /**
-     * Set the location of the default deployment descriptor
+     * Set the location of the default deployment descriptor.
      *
-     * @param path Absolute/relative path to the default web.xml
+     * @param path The path to the default web.xml. If not absolute, it is
+     *             relative to CATALINA_BASE.
      */
     public void setDefaultWebXml(String path) {
-
         this.defaultWebXml = path;
-
     }
 
 
