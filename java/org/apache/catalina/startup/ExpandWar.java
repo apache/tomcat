@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.FileChannel;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -72,57 +73,62 @@ public class ExpandWar {
     public static String expand(Host host, URL war, String pathname)
         throws IOException {
 
-        // Open the connection to the WAR. There is no explicit close method.
-        // You have to get the InputStream and close that.
+        /* Obtaining the last modified time opens an InputStream and there is no
+         * explicit close method. We have to obtain and then close the
+         * InputStream to avoid a file leak and the associated locked file.
+         */
         JarURLConnection juc = (JarURLConnection) war.openConnection();
         juc.setUseCaches(false);
+        URL jarFileUrl = juc.getJarFileURL();
+        URLConnection jfuc = jarFileUrl.openConnection();
 
-        // Set up the variables used in the finally block of the following try
         boolean success = false;
         File docBase = new File(host.getAppBaseFile(), pathname);
         File warTracker = new File(host.getAppBaseFile(), pathname + Constants.WarTracker);
+        long warLastModified = -1;
 
-        try (JarFile jarFile = juc.getJarFile();
-                InputStream is = juc.getInputStream()) {
-
+        try (InputStream is = jfuc.getInputStream()) {
             // Get the last modified time for the WAR
-            long warLastModified = juc.getLastModified();
+            warLastModified = jfuc.getLastModified();
+        }
 
-            // Check to see of the WAR has been expanded previously
-            if (docBase.exists()) {
-                // A WAR was expanded. Tomcat will have set the last modified
-                // time of the expanded directory to the last modified time of
-                // the WAR so changes to the WAR while Tomcat is stopped can be
-                // detected
-                if (!warTracker.exists() || warTracker.lastModified() == warLastModified) {
-                    // No (detectable) changes to the WAR
-                    success = true;
-                    return (docBase.getAbsolutePath());
-                }
-
-                // WAR must have been modified. Remove expanded directory.
-                log.info(sm.getString("expandWar.deleteOld", docBase));
-                if (!delete(docBase)) {
-                    throw new IOException(sm.getString("expandWar.deleteFailed", docBase));
-                }
+        // Check to see of the WAR has been expanded previously
+        if (docBase.exists()) {
+            // A WAR was expanded. Tomcat will have set the last modified
+            // time of the expanded directory to the last modified time of
+            // the WAR so changes to the WAR while Tomcat is stopped can be
+            // detected
+            if (!warTracker.exists() || warTracker.lastModified() == warLastModified) {
+                // No (detectable) changes to the WAR
+                success = true;
+                return (docBase.getAbsolutePath());
             }
 
-            // Create the new document base directory
-            if(!docBase.mkdir() && !docBase.isDirectory()) {
-                throw new IOException(sm.getString("expandWar.createFailed", docBase));
+            // WAR must have been modified. Remove expanded directory.
+            log.info(sm.getString("expandWar.deleteOld", docBase));
+            if (!delete(docBase)) {
+                throw new IOException(sm.getString("expandWar.deleteFailed", docBase));
             }
+        }
 
-            // Expand the WAR into the new document base directory
-            String canonicalDocBasePrefix = docBase.getCanonicalPath();
-            if (!canonicalDocBasePrefix.endsWith(File.separator)) {
-                canonicalDocBasePrefix += File.separator;
-            }
+        // Create the new document base directory
+        if(!docBase.mkdir() && !docBase.isDirectory()) {
+            throw new IOException(sm.getString("expandWar.createFailed", docBase));
+        }
 
-            // Creating war tracker parent (normally META-INF)
-            File warTrackerParent = warTracker.getParentFile();
-            if (!warTrackerParent.isDirectory() && !warTrackerParent.mkdirs()) {
-                throw new IOException(sm.getString("expandWar.createFailed", warTrackerParent.getAbsolutePath()));
-            }
+        // Expand the WAR into the new document base directory
+        String canonicalDocBasePrefix = docBase.getCanonicalPath();
+        if (!canonicalDocBasePrefix.endsWith(File.separator)) {
+            canonicalDocBasePrefix += File.separator;
+        }
+
+        // Creating war tracker parent (normally META-INF)
+        File warTrackerParent = warTracker.getParentFile();
+        if (!warTrackerParent.isDirectory() && !warTrackerParent.mkdirs()) {
+            throw new IOException(sm.getString("expandWar.createFailed", warTrackerParent.getAbsolutePath()));
+        }
+
+        try (JarFile jarFile = juc.getJarFile()) {
 
             Enumeration<JarEntry> jarEntries = jarFile.entries();
             while (jarEntries.hasMoreElements()) {
