@@ -206,6 +206,11 @@
         Simplify code in <code>ProtectedFunctionMapper</code> class of
         Jasper runtime. (kkolinko)
       </fix>
+      <update>
+        <bug>57123</bug>: Update all references to the ECJ compiler to version
+        4.4.1. With thanks to Ralph Schaer for uploading the 4.4.1 JAR to Maven
+        Central. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
