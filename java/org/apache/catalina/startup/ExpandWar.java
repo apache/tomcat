@@ -73,7 +73,7 @@ public class ExpandWar {
         throws IOException {
 
         // Open the connection to the WAR. There is no explicit close method.
-        // You have to get the JarFile and close that.
+        // You have to get the InputStream and close that.
         JarURLConnection juc = (JarURLConnection) war.openConnection();
         juc.setUseCaches(false);
 
@@ -82,7 +82,8 @@ public class ExpandWar {
         File docBase = new File(host.getAppBaseFile(), pathname);
         File warTracker = new File(host.getAppBaseFile(), pathname + Constants.WarTracker);
 
-        try (JarFile jarFile = juc.getJarFile()) {
+        try (JarFile jarFile = juc.getJarFile();
+                InputStream is = juc.getInputStream()) {
 
             // Get the last modified time for the WAR
             long warLastModified = juc.getLastModified();
