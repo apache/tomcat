@@ -117,6 +117,12 @@ public class ExpandWar {
                 canonicalDocBasePrefix += File.separator;
             }
 
+            // Creating war tracker parent (normally META-INF)
+            File warTrackerParent = warTracker.getParentFile();
+            if (!warTrackerParent.isDirectory() && !warTrackerParent.mkdirs()) {
+                throw new IOException(sm.getString("expandWar.createFailed", warTrackerParent.getAbsolutePath()));
+            }
+
             Enumeration<JarEntry> jarEntries = jarFile.entries();
             while (jarEntries.hasMoreElements()) {
                 JarEntry jarEntry = jarEntries.nextElement();
