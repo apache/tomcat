@@ -339,6 +339,15 @@
     appends the values of the <code>Referer</code> and <code>User-Agent</code>
     headers, each in double quotes, to the <code>common</code> pattern.</p>
 
+    <p>When Tomcat is operating behind a reverse proxy, the client information
+    logged by the Access Log Valve may represent the reverse proxy, the browser
+    or some combination of the two depending on the configuration of Tomcat and
+    the reverse proxy. For Tomcat configuration options see
+    <a href="#Proxies_Support">Proxies Support</a>. For reverse proxies that
+    use mod_jk, see the <a
+    href="http://tomcat.apache.org/connectors-doc/generic_howto/proxy.html">generic
+    proxy</a> docmentation. For other reverse proxies, consult their
+    documentation.</p>
   </subsection>
 
 </subsection>
