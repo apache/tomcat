@@ -229,6 +229,12 @@
         reported by Coverity Scan. (fschumacher)
       </fix>
       <fix>
+        <bug>56058</bug>: Add links to the AccessLogValve documentation for
+        configuring reverse proxies and/or Tomcat to ensure that the desired
+        information is used entered in the access log when Tomcat is running
+        behind a reverse proxy. (markt)
+      </fix>
+      <fix>
         <bug>57503</bug>: Make clear that the JULI integration for log4j only
         works with log4j 1.2.x. (markt)
       </fix>
