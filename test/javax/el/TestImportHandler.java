@@ -255,4 +255,19 @@ public class TestImportHandler {
             }
         }
     }
+
+
+    /**
+     * Package imports with conflicts due to non-public classes should not
+     * conflict.
+     */
+    @Test
+    public void testBug57135() {
+        ImportHandler importHandler = new ImportHandler();
+
+        importHandler.importPackage("util.a");
+        importHandler.importPackage("util.b");
+
+        importHandler.resolveClass("Foo");
+    }
 }

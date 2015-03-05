@@ -51,7 +51,7 @@ public class ImportHandler {
         String className = name.substring(0, lastPeriod);
         String fieldOrMethodName = name.substring(lastPeriod + 1);
 
-        Class<?> clazz = findClass(className);
+        Class<?> clazz = findClass(className, true);
 
         if (clazz == null) {
             throw new ELException(Util.message(
@@ -150,7 +150,7 @@ public class ImportHandler {
         // Search the class imports
         String className = classNames.get(name);
         if (className != null) {
-            Class<?> clazz = findClass(className);
+            Class<?> clazz = findClass(className, true);
             if (clazz != null) {
                 clazzes.put(className, clazz);
                 return clazz;
@@ -161,7 +161,7 @@ public class ImportHandler {
         // (which correctly triggers an error)
         for (String p : packageNames) {
             className = p + '.' + name;
-            Class<?> clazz = findClass(className);
+            Class<?> clazz = findClass(className, false);
             if (clazz != null) {
                 if (result != null) {
                     throw new ELException(Util.message(null,
@@ -188,7 +188,7 @@ public class ImportHandler {
     }
 
 
-    private Class<?> findClass(String name) {
+    private Class<?> findClass(String name, boolean throwException) {
         Class<?> clazz;
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
@@ -201,8 +201,12 @@ public class ImportHandler {
         int modifiers = clazz.getModifiers();
         if (!Modifier.isPublic(modifiers) || Modifier.isAbstract(modifiers) ||
                 Modifier.isInterface(modifiers)) {
-            throw new ELException(Util.message(
-                    null, "importHandler.invalidClass", name));
+            if (throwException) {
+                throw new ELException(Util.message(
+                        null, "importHandler.invalidClass", name));
+            } else {
+                return null;
+            }
         }
 
         return clazz;
