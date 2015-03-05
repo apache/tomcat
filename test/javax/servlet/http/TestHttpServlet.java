@@ -71,7 +71,7 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Verifies that the same Content-Length is returned for both GET and HEAD
      * operations when a Servlet includes content from another Servlet
      */

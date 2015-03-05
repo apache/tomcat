@@ -342,7 +342,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         assertTrue(client.isResponse404());
     }
 
-    /**
+    /*
      * Verifies that the same Content-Length is returned for both GET and HEAD
      * operations when a static resource served by the DefaultServlet is
      * included.
