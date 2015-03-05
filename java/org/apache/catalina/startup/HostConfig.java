@@ -696,13 +696,14 @@ public class HostConfig
                 }
             }
 
+            boolean unpackWAR = unpackWARs;
+            if (unpackWAR && context instanceof StandardContext) {
+                unpackWAR = ((StandardContext) context).getUnpackWAR();
+            }
+
             // Add the eventual unpacked WAR and all the resources which will be
             // watched inside it
             if (isExternalWar) {
-                boolean unpackWAR = unpackWARs;
-                if (unpackWAR && context instanceof StandardContext) {
-                    unpackWAR = ((StandardContext) context).getUnpackWAR();
-                }
                 if (unpackWAR) {
                     deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
                             Long.valueOf(expandedDocBase.lastModified()));
@@ -724,7 +725,7 @@ public class HostConfig
                                 Long.valueOf(0));
                     }
                 }
-                if (expandedDocBase.exists()) {
+                if (unpackWAR) {
                     deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
                             Long.valueOf(expandedDocBase.lastModified()));
                     addWatchedResources(deployedApp,
@@ -732,8 +733,9 @@ public class HostConfig
                 } else {
                     addWatchedResources(deployedApp, null, context);
                 }
-                // Add the context XML to the list of files which should trigger a redeployment
                 if (!isExternal) {
+                    // For external docBases, the context.xml will have been
+                    // added above.
                     deployedApp.redeployResources.put(
                             contextXml.getAbsolutePath(),
                             Long.valueOf(contextXml.lastModified()));
@@ -1464,23 +1466,25 @@ public class HostConfig
             }
         }
         resources = app.reloadResources.keySet().toArray(new String[0]);
+        boolean update = false;
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
-            if (log.isDebugEnabled())
-                log.debug("Checking context[" + app.name +
-                        "] reload resource " + resource);
-            long lastModified =
-                app.reloadResources.get(resources[i]).longValue();
-            if ((!resource.exists() && lastModified != 0L)
-                || (resource.lastModified() != lastModified)) {
-                // Reload application
-                reload(app);
-                // Update times
+            if (log.isDebugEnabled()) {
+                log.debug("Checking context[" + app.name + "] reload resource " + resource);
+            }
+            long lastModified = app.reloadResources.get(resources[i]).longValue();
+            if (resource.lastModified() != lastModified || update) {
+                if (!update) {
+                    // Reload application
+                    reload(app);
+                    update = true;
+                }
+                // Update times. More than one file may have been updated. We
+                // don't want to trigger a series of reloads.
                 app.reloadResources.put(resources[i],
                         Long.valueOf(resource.lastModified()));
-                app.timestamp = System.currentTimeMillis();
-                return;
             }
+            app.timestamp = System.currentTimeMillis();
         }
     }
 

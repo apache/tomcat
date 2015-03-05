@@ -106,6 +106,16 @@
         Directory. (kfujino)
       </fix>
       <fix>
+        <bug>56608</bug>: When deploying an external WAR, add watched resources
+        in the expanded directory based on whether the expanded directory is
+        expected to exist rather than if it does exist.
+      </fix>
+      <fix>
+         When triggering a reload due to a modified watched resource, ensure
+         that multiple changed watched resources only trigger one reload rather
+         than a series of reloads.
+      </fix>
+      <fix>
         Correct a regression in the fix for <bug>57190</bug> that incorrectly
         required the path passed to
         <code>ServletContext.getContext(String)</code> to be an exact match to a
