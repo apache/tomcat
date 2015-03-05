@@ -211,6 +211,10 @@
         4.4.1. With thanks to Ralph Schaer for uploading the 4.4.1 JAR to Maven
         Central. (markt)
       </update>
+      <update>
+        <bug>57662</bug>: Update all references to the ECJ compiler to version
+        4.4.2. (violetagg)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

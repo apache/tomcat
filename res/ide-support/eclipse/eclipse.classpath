@@ -25,6 +25,6 @@
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/tomcat7-deps/dbcp/tomcat-dbcp.jar" sourcepath="/TOMCAT_LIBS_BASE/tomcat7-deps/dbcp/src/java"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/jaxrpc-1.1-rc4/geronimo-spec-jaxrpc-1.1-rc4.jar"/>
     <classpathentry kind="var" path="TOMCAT_LIBS_BASE/wsdl4j-1.6.2/wsdl4j-1.6.2.jar"/>
-    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/ecj-4.4.1/ecj-4.4.1.jar"/>
+    <classpathentry kind="var" path="TOMCAT_LIBS_BASE/ecj-4.4.2/ecj-4.4.2.jar"/>
     <classpathentry kind="output" path=".settings/output"/>
 </classpath>
