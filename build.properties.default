@@ -136,8 +136,8 @@ wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
 
 # ----- Eclipse JDT, version 4.4 or later -----#
 # See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
-jdt.version=4.4.1
-jdt.release=R-4.4.1-201409250400
+jdt.version=4.4.2
+jdt.release=R-4.4.2-201502041700
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
