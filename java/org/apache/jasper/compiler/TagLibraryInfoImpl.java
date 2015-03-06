@@ -134,7 +134,10 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 String path = tldResourcePath.getWebappPath();
                 if (path != null) {
                     // Add TLD (jar==null) / JAR (jar!=null) file to dependency list
-                    pageInfo.addDependant(path, ctxt.getLastModified(path));
+                    // 2nd parameter is null since the path is always relative
+                    // to the root of the web application even if we are
+                    // processing a reference from a tag packaged in a JAR.
+                    pageInfo.addDependant(path, ctxt.getLastModified(path, null));
                 }
                 if (jar != null) {
                     if (path == null) {
