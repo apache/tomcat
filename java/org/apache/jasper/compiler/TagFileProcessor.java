@@ -652,16 +652,14 @@ class TagFileProcessor {
                                                   Long.valueOf(jar.getLastModified(tagFilePath.substring(1))));
                         } else {
                             pageInfo.addDependant(tagFilePath,
-                                                  compiler.getCompilationContext().getLastModified(
-                                                                                                   tagFilePath));
+                                                  compiler.getCompilationContext().getLastModified(tagFilePath));
                         }
                     } catch (IOException ioe) {
                         throw new JasperException(ioe);
                     }
                 } else {
                     pageInfo.addDependant(tagFilePath,
-                            compiler.getCompilationContext().getLastModified(
-                                    tagFilePath));
+                            compiler.getCompilationContext().getLastModified(tagFilePath));
                 }
                 Class<?> c = loadTagFile(compiler, tagFilePath, n.getTagInfo(),
                         pageInfo);
