@@ -611,7 +611,7 @@ public class AjpProcessor extends AbstractProcessor {
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
 
-        if (status == SocketStatus.OPEN_WRITE) {
+        if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
             try {
                 asyncStateMachine.asyncOperation();
                 try {
@@ -635,8 +635,7 @@ public class AjpProcessor extends AbstractProcessor {
             } catch (IllegalStateException x) {
                 socketWrapper.registerWriteInterest();
             }
-        } else if (status == SocketStatus.OPEN_READ &&
-                request.getReadListener() != null) {
+        } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
             try {
                 if (available()) {
                     asyncStateMachine.asyncOperation();
