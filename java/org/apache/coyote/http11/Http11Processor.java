@@ -1695,8 +1695,7 @@ public class Http11Processor extends AbstractProcessor {
     @Override
     public SocketState asyncDispatch(SocketStatus status) {
 
-        if (status == SocketStatus.OPEN_WRITE &&
-                response.getWriteListener() != null) {
+        if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
             try {
                 asyncStateMachine.asyncOperation();
 
@@ -1722,8 +1721,7 @@ public class Http11Processor extends AbstractProcessor {
                 status = SocketStatus.ASYNC_WRITE_ERROR;
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
             }
-        } else if (status == SocketStatus.OPEN_READ &&
-                request.getReadListener() != null) {
+        } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
             try {
                 if (inputBuffer.available() > 0) {
                     asyncStateMachine.asyncOperation();
