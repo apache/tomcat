@@ -351,7 +351,13 @@ public class JspCompilationContext {
         return jspUri;
     }
 
+
     public Long getLastModified(String resource) {
+        return getLastModified(resource, tagJar);
+    }
+
+
+    public Long getLastModified(String resource, Jar tagJar) {
         long result = -1;
         URLConnection uc = null;
         try {
