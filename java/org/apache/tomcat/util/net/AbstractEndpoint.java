@@ -52,7 +52,7 @@ public abstract class AbstractEndpoint<S> {
 
     // -------------------------------------------------------------- Constants
 
-    protected static final String DEFAULT_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5";
+    protected static final String DEFAULT_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
 
     protected static final StringManager sm = StringManager.getManager(
             AbstractEndpoint.class.getPackage().getName());
