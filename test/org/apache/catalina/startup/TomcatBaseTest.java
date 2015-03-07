@@ -60,6 +60,7 @@ import org.apache.catalina.valves.AccessLogValve;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.websocket.CaseInsensitiveKeyMap;
 
 /**
  * Base test case that provides a Tomcat instance for each test - mainly so we
@@ -242,7 +243,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         private final Map<String, String> requestInfo = new HashMap<>();
         private final Map<String, String> contextInitParameters = new HashMap<>();
         private final Map<String, String> contextAttributes = new HashMap<>();
-        private final Map<String, String> headers = new HashMap<>();
+        private final Map<String, String> headers = new CaseInsensitiveKeyMap<>();
         private final Map<String, String> attributes = new HashMap<>();
         private final Map<String, String> params = new HashMap<>();
         private final Map<String, String> sessionAttributes = new HashMap<>();
@@ -555,6 +556,20 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                                 (attribute != null ? attribute : "(null)"));
                 }
             }
+
+            int bodySize = 0;
+            if ("PUT".equalsIgnoreCase(request.getMethod())) {
+                InputStream is = request.getInputStream();
+                int read = 0;
+                byte[] buffer = new byte[8192];
+                while (read != -1) {
+                    read = is.read(buffer);
+                    if (read > -1) {
+                        bodySize += read;
+                    }
+                }
+            }
+            out.println("REQUEST-BODY-SIZE: " + bodySize);
         }
     }
 
