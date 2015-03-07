@@ -30,7 +30,7 @@ import javax.net.SocketFactory;
  */
 public class SimpleAjpClient {
 
-    private static final int AJP_PACKET_SIZE = 8192;
+    private static final int DEFAULT_AJP_PACKET_SIZE = 8192;
     private static final byte[] AJP_CPING;
 
     static {
@@ -43,6 +43,7 @@ public class SimpleAjpClient {
                 ajpCping.getLen());
     }
 
+    private final int packetSize;
     private String host = "localhost";
     private int port = -1;
     /* GET == 2 */
@@ -55,6 +56,14 @@ public class SimpleAjpClient {
     private int serverPort = 80;
     private boolean ssl = false;
     private Socket socket = null;
+
+    public SimpleAjpClient() {
+        this(DEFAULT_AJP_PACKET_SIZE);
+    }
+
+    public SimpleAjpClient(int packetSize) {
+        this.packetSize = packetSize;
+    }
 
     public void setPort(int port) {
         this.port = port;
@@ -284,7 +293,7 @@ public class SimpleAjpClient {
      */
     public TesterAjpMessage createForwardMessage() {
 
-        TesterAjpMessage message = new TesterAjpMessage(AJP_PACKET_SIZE);
+        TesterAjpMessage message = new TesterAjpMessage(packetSize);
         message.reset();
 
         // Set the header bytes
@@ -323,7 +332,7 @@ public class SimpleAjpClient {
 
     public TesterAjpMessage createBodyMessage(byte[] data) {
 
-        TesterAjpMessage message = new TesterAjpMessage(AJP_PACKET_SIZE);
+        TesterAjpMessage message = new TesterAjpMessage(packetSize);
         message.reset();
 
         // Set the header bytes
@@ -376,7 +385,7 @@ public class SimpleAjpClient {
 
         InputStream is = socket.getInputStream();
 
-        TesterAjpMessage message = new TesterAjpMessage(AJP_PACKET_SIZE);
+        TesterAjpMessage message = new TesterAjpMessage(packetSize);
 
         byte[] buf = message.getBuffer();
 
