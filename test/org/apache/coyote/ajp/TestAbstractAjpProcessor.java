@@ -62,6 +62,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
     private void doSnoopTest(RequestDescriptor desc) throws Exception {
 
+        final int ajpPacketSize = 16000;
+
         Map<String, String> requestInfo = desc.getRequestInfo();
         Map<String, String> contextInitParameters = desc.getContextInitParameters();
         Map<String, String> contextAttributes = desc.getContextAttributes();
@@ -70,6 +72,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Map<String, String> params = desc.getParams();
 
         Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize));
 
         // Must have a real docBase - just use temp
         Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
@@ -77,7 +80,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
         ctx.addServletMapping("/", "snoop");
 
-        SimpleAjpClient ajpClient = new SimpleAjpClient();
+        SimpleAjpClient ajpClient = new SimpleAjpClient(ajpPacketSize);
 
         if (requestInfo.get("REQUEST-QUERY-STRING") != null &&
             params.size() > 0) {
@@ -87,6 +90,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         }
 
         String value;
+        int bodySize = 0;
         Map<String, String> savedRequestInfo = new HashMap<String, String>();
         for (String name: requestInfo.keySet()) {
             value = requestInfo.get(name);
@@ -121,6 +125,9 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                 savedRequestInfo.put(name, value);
             } else if (name.equals("REQUEST-CONTENT-LENGTH")) {
                 headers.put("CONTENT-LENGTH", value);
+            } else if (name.equals("REQUEST-BODY-SIZE")) {
+                savedRequestInfo.put(name, value);
+                bodySize = Integer.parseInt(value);
             } else if (name.equals("REQUEST-CONTENT-TYPE")) {
                 headers.put("CONTENT-TYPE", value);
             /* Not yet implemented or not (easily) possible to implement
@@ -178,6 +185,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
                 forwardMessage.addAttribute(0x06, value);
             } else if (name.equals("REQUEST-SECRET")) {
                 forwardMessage.addAttribute(0x0C, value);
+            } else if (name.equals("REQUEST-BODY-SIZE")) {
+                // NO-OP
             } else {
                 throw(new IllegalArgumentException("Request setting '" + name + "' not supported"));
             }
@@ -245,8 +254,20 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         ajpClient.setPort(getPort());
         ajpClient.connect();
 
+        TesterAjpMessage responseHeaders = null;
+        if (bodySize == 0) {
+            responseHeaders = ajpClient.sendMessage(forwardMessage);
+        } else {
+            TesterAjpMessage bodyMessage = ajpClient.createBodyMessage(new byte[bodySize]);
+            responseHeaders = ajpClient.sendMessage(forwardMessage, bodyMessage);
+            // Expect back a request for more data (which will be emty and
+            // trigger end of stream in Servlet)
+            validateGetBody(responseHeaders);
+            bodyMessage = ajpClient.createBodyMessage(new byte[0]);
+            responseHeaders = ajpClient.sendMessage(bodyMessage);
+        }
+
         // Expect 3 packets: headers, body, end
-        TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage);
         validateResponseHeaders(responseHeaders, 200, "OK");
 
         String body = extractResponseBody(ajpClient.readMessage());
@@ -401,6 +422,26 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         desc.putHeader("MYHEADER2", "MYHEADER2-VALUE");
         desc.putAttribute("MYATTRIBUTE1", "MYATTRIBUTE-VALUE1");
         desc.putAttribute("MYATTRIBUTE2", "MYATTRIBUTE-VALUE2");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testSmallBody() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-METHOD", "PUT");
+        desc.putRequestInfo("REQUEST-CONTENT-LENGTH", "100");
+        desc.putRequestInfo("REQUEST-BODY-SIZE", "100");
+        desc.putRequestInfo("REQUEST-URI", "/testSmallBody");
+        doSnoopTest(desc);
+    }
+
+    @Test
+    public void testLargeBody() throws Exception {
+        RequestDescriptor desc = new RequestDescriptor();
+        desc.putRequestInfo("REQUEST-METHOD", "PUT");
+        desc.putRequestInfo("REQUEST-CONTENT-LENGTH", "10000");
+        desc.putRequestInfo("REQUEST-BODY-SIZE", "10000");
+        desc.putRequestInfo("REQUEST-URI", "/testLargeBody");
         doSnoopTest(desc);
     }
 
@@ -644,6 +685,14 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             // Read the header value
             message.readString();
         }
+    }
+
+    private void validateGetBody(TesterAjpMessage message) {
+        // First two bytes should always be AB
+        Assert.assertEquals((byte) 'A', message.buf[0]);
+        Assert.assertEquals((byte) 'B', message.buf[1]);
+        // Should be a body chunk message
+        Assert.assertEquals(0x06, message.readByte());
     }
 
     /**

@@ -353,7 +353,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         ByteBuffer readBuffer =
                 socketWrapper.getSocket().getBufHandler().getReadBuffer();
         readBuffer.clear();
-        readBuffer.limit(n);
+        if (n < readBuffer.capacity()) {
+            readBuffer.limit(n);
+        }
         if ( block ) {
             Selector selector = null;
             try {

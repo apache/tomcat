@@ -56,6 +56,7 @@ import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.websocket.CaseInsensitiveKeyMap;
 
 /**
  * Base test case that provides a Tomcat instance for each test - mainly so we
@@ -208,7 +209,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         private final Map<String, String> contextAttributes =
             new HashMap<String, String>();
         private final Map<String, String> headers =
-            new HashMap<String, String>();
+            new CaseInsensitiveKeyMap<String>();
         private final Map<String, String> attributes =
             new HashMap<String, String>();
         private final Map<String, String> params =
@@ -525,6 +526,20 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                                 (attribute != null ? attribute : "(null)"));
                 }
             }
+
+            int bodySize = 0;
+            if ("PUT".equalsIgnoreCase(request.getMethod())) {
+                InputStream is = request.getInputStream();
+                int read = 0;
+                byte[] buffer = new byte[8192];
+                while (read != -1) {
+                    read = is.read(buffer);
+                    if (read > -1) {
+                        bodySize += read;
+                    }
+                }
+            }
+            out.println("REQUEST-BODY-SIZE: " + bodySize);
         }
     }
 
