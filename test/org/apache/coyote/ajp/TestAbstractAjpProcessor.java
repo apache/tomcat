@@ -763,6 +763,48 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testLargeResponse() throws Exception {
+
+        int ajpPacketSize = 16000;
+
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize));
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        FixedResponseSizeServlet servlet = new FixedResponseSizeServlet(15000, 16000);
+        Tomcat.addServlet(ctx, "FixedResponseSizeServlet", servlet);
+        ctx.addServletMapping("/", "FixedResponseSizeServlet");
+
+        tomcat.start();
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient(ajpPacketSize);
+        ajpClient.setPort(getPort());
+        ajpClient.connect();
+
+        validateCpong(ajpClient.cping());
+
+        ajpClient.setUri("/");
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.end();
+
+        TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage);
+
+        // Expect 3 messages: headers, body, end for a valid request
+        validateResponseHeaders(responseHeaders, 200, "OK");
+        TesterAjpMessage responseBody = ajpClient.readMessage();
+        Assert.assertTrue(responseBody.len > 15000);
+        validateResponseEnd(ajpClient.readMessage(), true);
+
+        // Double check the connection is still open
+        validateCpong(ajpClient.cping());
+
+        ajpClient.disconnect();
+    }
+
+
     /**
      * Process response header packet and checks the status. Any other data is
      * ignored.
@@ -940,6 +982,35 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             try (PrintWriter w = response.getWriter()) {
                 w.println("Method: " + (isPost ? "POST" : "GET") + ". Reading request body...");
                 w.println("Request Body length in bytes: " + readCount);
+            }
+        }
+    }
+
+
+    private static class FixedResponseSizeServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final int responseSize;
+        private final int bufferSize;
+
+        public FixedResponseSizeServlet(int responseSize, int bufferSize) {
+            this.responseSize = responseSize;
+            this.bufferSize = bufferSize;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setBufferSize(bufferSize);
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentLength(responseSize);
+
+            PrintWriter pw = resp.getWriter();
+            for (int i = 0; i < responseSize; i++) {
+                pw.append('X');
             }
         }
     }
