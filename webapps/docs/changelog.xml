@@ -200,6 +200,11 @@
         body chunk larger than the socket read buffer is being read. This
         typically requires a larger than default AJP packetSize. (markt)
       </fix>
+      <fix>
+        <bug>57674</bug>: Avoid a BufferOverflowException when an AJP response
+        body chunk larger than the socket write buffer is being written. This
+        typically requires a larger than default AJP packetSize. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
