@@ -150,6 +150,10 @@
         file that may exist in an expanded directory associated with the WAR.
         (markt)
       </fix>
+      <fix>
+        <bug>57675</bug>: Correctly quote strings when using the extended
+        access log. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
