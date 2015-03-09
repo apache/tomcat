@@ -200,7 +200,9 @@ public class WsServerContainer extends WsWebSocketContainer
             if (!templateMatches.add(new TemplatePathMatch(sec, uriTemplate))) {
                 // Duplicate uriTemplate;
                 throw new DeploymentException(
-                        sm.getString("serverContainer.duplicatePaths", path));
+                        sm.getString("serverContainer.duplicatePaths", path,
+                                     sec.getEndpointClass(),
+                                     sec.getEndpointClass()));
             }
         } else {
             // Exact match
@@ -208,7 +210,9 @@ public class WsServerContainer extends WsWebSocketContainer
             if (old != null) {
                 // Duplicate path mappings
                 throw new DeploymentException(
-                        sm.getString("serverContainer.duplicatePaths", path));
+                        sm.getString("serverContainer.duplicatePaths", path,
+                                     old.getEndpointClass(),
+                                     sec.getEndpointClass()));
             }
         }
 
