@@ -239,6 +239,11 @@
         <bug>57662</bug>: Update all references to the ECJ compiler to version
         4.4.2. (violetagg)
       </update>
+      <fix>
+        <bug>57643</bug>: Fix JspC when the path to the web application to
+        compile contains a character that must be encoded when used in a URL
+        such as space. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
