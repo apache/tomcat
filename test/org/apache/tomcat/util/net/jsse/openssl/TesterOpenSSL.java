@@ -58,8 +58,9 @@ public class TesterOpenSSL {
                     Cipher.SSL2_RC4_128_EXPORT40_WITH_MD5)));
 
     static {
-        // Note: The tests are configured for OpenSSL 1.1.0. Running with a
-        //       different version is likely to trigger failures
+        // Note: The tests are configured for the OpenSSL 1.1.0 development
+        //       branch. Running with a different version is likely to trigger
+        //       failures.
         String expected_version = System.getProperty("tomcat.test.openssl.version", "");
         String versionString = null;
         try {
