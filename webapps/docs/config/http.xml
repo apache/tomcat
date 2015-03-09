@@ -1050,11 +1050,13 @@
       testing purposes only.</p>
       <p>The list can also use ':' as a separator, in that case
       it will use the OpenSSL syntax (see OpenSSL documentation for the list
-      of ciphers supported and the syntax).</p>
+      of ciphers supported and the syntax). The behaviour of this filtering is
+      kept aligned with the behaviour of the OpenSSL 1.1.0 development
+      branch.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
       <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code> will be used.</p>
-      <p>Note that Java does treat the order in which ciphers are defined as an
-      order of preference.</p>
+      <p>Note that Java does not treat the order in which ciphers are defined as
+      an order of preference. See <code>useServerCipherSuitesOrder</code>.</p>
     </attribute>
 
     <attribute name="clientAuth" required="false">
