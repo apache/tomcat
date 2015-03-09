@@ -31,6 +31,7 @@
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
   <property file="build.properties.default"/>
+  <property environment="env"/>
 
   <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
@@ -451,17 +452,31 @@
   </patternset>
 
   <!--
-    Verify availability of Java 7 JDK if one was configured.
-    Fail if java.7.home was set, but points to a non-existing path.
+    Guess path to Java 7 JDK from our JAVA_HOME if not already set
+    and the current JVM is at least version 7.
+    This will be wrong, if JAVA_HOME is set, but the current JVM
+    is not the one given in JAVA_HOME.
   -->
-  <fail message="Invalid java.7.home setting: [${java.7.home}]. The path $${java.7.home}/bin/ does not exist.">
-    <condition>
-      <and>
-        <isset property="java.7.home" />
-        <not><available file="${java.7.home}/bin/" type="dir" /></not>
-      </and>
+  <target name="guess-java7" unless="${java.7.home}">
+    <condition property="java.7.home" value="${env.JAVA_HOME}">
+      <matches string="${ant.java.version}" pattern="^1\.([789]|[0-9][0-9])" />
     </condition>
-  </fail>
+  </target>
+
+  <target name="check-java7" depends="guess-java7">
+    <!--
+      Verify availability of Java 7 JDK if one was configured.
+      Fail if java.7.home was set, but points to a non-existing path.
+    -->
+    <fail message="Invalid java.7.home setting: [${java.7.home}]. The path $${java.7.home}/bin/ does not exist.">
+      <condition>
+        <and>
+          <isset property="java.7.home" />
+          <not><available file="${java.7.home}/bin/" type="dir" /></not>
+        </and>
+      </condition>
+    </fail>
+  </target>
 
   <!-- =========================== Build targets =========================== -->
 
@@ -609,7 +624,7 @@
     </copy>
   </target>
 
-  <target name="compile" depends="compile-java6,compile-java7" />
+  <target name="compile" depends="compile-java6,check-java7,compile-java7" />
 
   <target name="compile-java6"
           depends="build-prepare,download-compile,compile-prepare,validate">
@@ -1378,7 +1393,7 @@
     <available file="${test.apr.loc}" property="apr.exists" />
   </target>
 
-  <target name="test-init">
+  <target name="test-init" depends="check-java7">
     <condition property="java.bin.path" value="${java.7.home}/bin/">
       <isset property="java.7.home" />
     </condition>
