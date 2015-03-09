@@ -17,6 +17,7 @@
 package org.apache.coyote.ajp;
 
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
@@ -1517,8 +1518,17 @@ public class AjpProcessor extends AbstractProcessor {
      */
     private boolean read(byte[] buf, int pos, int n, boolean block) throws IOException {
         int read = socketWrapper.read(block, buf, pos, n);
-        if (!block && read > 0 && read < n) {
-            socketWrapper.read(true, buf, pos + n, n - read);
+        if (read > 0 && read < n) {
+            int left = n - read;
+            int start = pos + read;
+            while (left > 0) {
+                read = socketWrapper.read(true, buf, start, left);
+                if (read == -1) {
+                    throw new EOFException();
+                }
+                left = left - read;
+                start = start + read;
+            }
         }
 
         return read > 0;
