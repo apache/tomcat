@@ -301,19 +301,17 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getRealPath(String path) {
-
         if (!myResourceBaseURL.getProtocol().equals("file"))
-            return (null);
+            return null;
         if (!path.startsWith("/"))
-            return (null);
+            return null;
         try {
-            return
-                (getResource(path).getFile().replace('/', File.separatorChar));
+            File f = new File(getResource(path).toURI());
+            return f.getAbsolutePath();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            return (null);
+            return null;
         }
-
     }
 
 
