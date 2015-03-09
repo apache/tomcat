@@ -661,7 +661,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
 
         FixedResponseSizeServlet servlet = new FixedResponseSizeServlet(15000, 16000);
         Tomcat.addServlet(ctx, "FixedResponseSizeServlet", servlet);
