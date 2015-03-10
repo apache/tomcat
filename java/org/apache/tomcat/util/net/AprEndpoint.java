@@ -947,9 +947,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         // countDownConnection() in that case
         Poller poller = this.poller;
         if (poller != null) {
-            if (!poller.close(socket)) {
-                destroySocket(socket);
-            }
+            poller.close(socket);
         }
     }
 
@@ -1420,9 +1418,24 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             } catch (InterruptedException e) {
                 // Ignore
             }
-            // Close all sockets in the add queue
-            SocketInfo info = addList.get();
+            // Close all sockets in the close queue
+            SocketInfo info = closeList.get();
             while (info != null) {
+                // Make sure we aren't trying add the socket as well as close it
+                addList.remove(info.socket);
+                // Make sure the  socket isn't in the poller before we close it
+                removeFromPoller(info.socket);
+                // Poller isn't running at this point so use destroySocket()
+                // directly
+                destroySocket(info.socket);
+                info = closeList.get();
+            }
+            closeList.clear();
+            // Close all sockets in the add queue
+            info = addList.get();
+            while (info != null) {
+                // Make sure the  socket isn't in the poller before we close it
+                removeFromPoller(info.socket);
                 // Poller isn't running at this point so use destroySocket()
                 // directly
                 destroySocket(info.socket);
@@ -1516,17 +1529,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
-        protected boolean close(long socket) {
-            if (!pollerRunning) {
-                return false;
-            }
+        protected void close(long socket) {
             synchronized (this) {
-                if (!pollerRunning) {
-                    return false;
-                }
                 closeList.add(socket, 0, 0);
                 this.notify();
-                return true;
             }
         }
 
