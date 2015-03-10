@@ -121,7 +121,7 @@
 
       <attribute name="pluggabilityScan" required="false">
        <p>The comma separated list of JAR file name patterns
-       to skip when scanning for pluggable features introduced by Servlet 3.0
+       to scan when scanning for pluggable features introduced by Servlet 3.0
        specification. If not specified, the default is obtained from the
        <code>tomcat.util.scan.StandardJarScanFilter.jarsToScan</code> system
        property.</p>
