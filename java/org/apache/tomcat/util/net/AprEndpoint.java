@@ -1489,20 +1489,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 // Always put a timeout in
                 timeout = Integer.MAX_VALUE;
             }
-            boolean ok = false;
             synchronized (this) {
                 // Add socket to the list. Newly added sockets will wait
-                // at most for pollTime before being polled. Don't add the
-                // socket once the poller has stopped but destroy it straight
-                // away
-                if (pollerRunning && addList.add(socket, timeout, flags)) {
-                    ok = true;
+                // at most for pollTime before being polled.
+                if (addList.add(socket, timeout, flags)) {
                     this.notify();
                 }
-            }
-            if (!ok) {
-                // Can't do anything: close the socket right away
-                closeSocket(socket);
             }
         }
 
