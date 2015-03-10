@@ -326,30 +326,6 @@ public abstract class SocketWrapperBase<E> {
         }
     }
 
-    public void reset(E socket, long soTimeout) {
-        async = false;
-        blockingStatus = true;
-        dispatches.clear();
-        error = null;
-        keepAliveLeft = 100;
-        lastRead = System.currentTimeMillis();
-        lastWrite = lastRead;
-        lastAsyncStart = 0;
-        asyncTimeout = -1;
-        localAddr = null;
-        localName = null;
-        localPort = -1;
-        remoteAddr = null;
-        remoteHost = null;
-        remotePort = -1;
-        this.socket = socket;
-        this.readTimeout = soTimeout;
-        this.writeTimeout = soTimeout;
-        upgraded = false;
-        resetSocketBufferHandler(socket);
-    }
-
-    protected abstract void resetSocketBufferHandler(E socket);
 
     /**
      * Overridden for debug purposes. No guarantees are made about the format of
