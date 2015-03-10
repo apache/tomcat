@@ -2332,7 +2332,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     closeSocket(socket.getSocket().longValue());
-                    socket.reset(null, 1);
                 } else if (state == Handler.SocketState.LONG) {
                     if (socket.isAsync()) {
                         waitingRequests.add(socket);
@@ -2372,12 +2371,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             }
 
             socketBufferHandler = new SocketBufferHandler(6 * 1500, 6 * 1500, true);
-        }
-
-
-        @Override
-        protected void resetSocketBufferHandler(Long socket) {
-            socketBufferHandler.reset();
         }
 
 
