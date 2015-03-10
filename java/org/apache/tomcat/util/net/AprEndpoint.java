@@ -1412,7 +1412,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             // still in the poller can cause problems
             try {
                 this.notify();
-                this.wait(pollTime / 1000);
+                this.wait(pollerCount * pollTime / 1000);
             } catch (InterruptedException e) {
                 // Ignore
             }
