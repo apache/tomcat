@@ -302,11 +302,11 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         ByteBuffer writeBuffer =
                 socketWrapper.getSocket().getBufHandler().getWriteBuffer();
 
-        int left = length;
+        int thisTime = 0;
         int written = 0;
-        while (left > 0) {
-            int toWrite = Math.min(left, writeBuffer.remaining());
-            writeBuffer.put(src, offset, toWrite);
+        while (written < length) {
+            int toWrite = Math.min(length - written, writeBuffer.remaining());
+            writeBuffer.put(src, offset + written, toWrite);
             
             writeBuffer.flip();
     
@@ -318,13 +318,13 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                 //ignore
             }
             try {
-                written = pool.write(writeBuffer, socketWrapper.getSocket(),
+                thisTime = pool.write(writeBuffer, socketWrapper.getSocket(),
                         selector, writeTimeout, true);
             } finally { 
                 writeBuffer.clear();
                 if ( selector != null ) pool.put(selector);
             }
-            left -= written;
+            written += thisTime;
         }
     }
 
