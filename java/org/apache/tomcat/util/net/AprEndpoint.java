@@ -696,7 +696,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             running = false;
             poller.stop();
             getAsyncTimeout().stop();
-            unlockAccept();
             for (AbstractEndpoint.Acceptor acceptor : acceptors) {
                 long waitLeft = 10000;
                 while (waitLeft > 0 &&
