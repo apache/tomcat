@@ -935,19 +935,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     }
 
     private void closeSocket(long socket) {
-        // If not running the socket will be destroyed by
-        // parent pool or acceptor socket.
-        // In any case disable double free which would cause JVM core.
-
-        connections.remove(Long.valueOf(socket));
-
-        // While the connector is running, destroySocket() will call
-        // countDownConnection(). Once the connector is stopped, the latch is
-        // removed so it does not matter that destroySocket() does not call
-        // countDownConnection() in that case
-        Poller poller = this.poller;
-        if (poller != null) {
-            poller.close(socket);
+        // Once this is called, the mapping from socket to wrapper will no
+        // longer be required.
+        SocketWrapperBase<Long> wrapper = connections.remove(Long.valueOf(socket));
+        if (wrapper != null) {
+            // Cast to avoid having to catch an IOE that is never thrown.
+            ((AprSocketWrapper) wrapper).close();
         }
     }
 
@@ -2357,7 +2350,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         private final ByteBuffer sslOutputBuffer;
 
-        private volatile boolean closed = false;
+        private final Object closedLock = new Object();
+        private boolean closed = false;
 
         // This field should only be used by Poller#run()
         private int pollerFlags = 0;
@@ -2537,9 +2531,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         @Override
         public void close() {
-            closed = true;
-            // AbstractProcessor needs to trigger the close as multiple closes for
-            // APR/native sockets will cause problems.
+            synchronized (closedLock) {
+                // APR typically crashes if the same socket is closed twice so
+                // make sure that doesn't happen.
+                if (closed) {
+                    return;
+                }
+                closed = true;
+                ((AprEndpoint) getEndpoint()).getPoller().close(getSocket().longValue());
+            }
         }
 
 
@@ -2652,15 +2652,27 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         @Override
         public void registerReadInterest() {
-            ((AprEndpoint) getEndpoint()).getPoller().add(
-                    getSocket().longValue(), -1, true, false);
+            // Make sure an already closed socket is not added to the poller
+            synchronized (closedLock) {
+                if (closed) {
+                    return;
+                }
+                ((AprEndpoint) getEndpoint()).getPoller().add(
+                        getSocket().longValue(), -1, true, false);
+            }
         }
 
 
         @Override
         public void registerWriteInterest() {
-            ((AprEndpoint) getEndpoint()).getPoller().add(
-                    getSocket().longValue(), -1, false, true);
+            // Make sure an already closed socket is not added to the poller
+            synchronized (closedLock) {
+                if (closed) {
+                    return;
+                }
+                ((AprEndpoint) getEndpoint()).getPoller().add(
+                        getSocket().longValue(), -1, false, true);
+            }
         }
 
 
