@@ -1759,6 +1759,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             nextPollerTime += pollerTime;
                         }
                         if (rv > 0) {
+                            rv = mergeDescriptors(desc, rv);
                             pollerSpace[i] += rv;
                             connectionCount.addAndGet(-rv);
                             for (int n = 0; n < rv; n++) {
@@ -1921,6 +1922,21 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
             synchronized (this) {
                 this.notifyAll();
+            }
+        }
+
+
+        private int mergeDescriptors(long[] desc, int startCount) {
+            if (OS.IS_BSD || OS.IS_MACOSX) {
+                // TODO Need to actually implement merging of the descriptors here.
+                //      I'm currently thinking quicksort followed by running
+                //      through the sorted list to merge the events.
+                return startCount;
+            } else {
+                // Other OS's do not (as far as it is known) return multiple
+                // entries for the same socket when the socket is registered for
+                // multiple events.
+                return startCount;
             }
         }
     }
