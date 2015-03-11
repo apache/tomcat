@@ -2351,7 +2351,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         private final ByteBuffer sslOutputBuffer;
 
         private final Object closedLock = new Object();
-        private boolean closed = false;
+        private volatile boolean closed = false;
 
         // This field should only be used by Poller#run()
         private int pollerFlags = 0;
