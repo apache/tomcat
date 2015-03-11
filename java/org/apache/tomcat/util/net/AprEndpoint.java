@@ -1928,10 +1928,22 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         private int mergeDescriptors(long[] desc, int startCount) {
             if (OS.IS_BSD || OS.IS_MACOSX) {
-                // TODO Need to actually implement merging of the descriptors here.
-                //      I'm currently thinking quicksort followed by running
-                //      through the sorted list to merge the events.
-                return startCount;
+                /*
+                 * Notes: Only the first startCount * 2 elements of the array
+                 *        are populated.
+                 *        The array is event, socket, event, socket etc.
+                 */
+                HashMap<Long,Long> merged = new HashMap<>(startCount);
+                for (int n = 0; n < startCount; n++) {
+                    merged.merge(Long.valueOf(desc[2*n+1]), Long.valueOf(desc[2*n]),
+                            (v1, v2) -> Long.valueOf(v1.longValue() | v2.longValue()));
+                }
+                int i = 0;
+                for (Map.Entry<Long,Long> entry : merged.entrySet()) {
+                    desc[i++] = entry.getValue().longValue();
+                    desc[i++] = entry.getKey().longValue();
+                }
+                return merged.size();
             } else {
                 // Other OS's do not (as far as it is known) return multiple
                 // entries for the same socket when the socket is registered for
