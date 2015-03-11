@@ -1739,9 +1739,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     // Poll for the specified interval
                     for (int i = 0; i < pollers.length; i++) {
 
-                        // Flags to ask to reallocate the pool
+                        // Flag to ask to reallocate the pool
                         boolean reset = false;
-                        //ArrayList<Long> skip = null;
 
                         int rv = 0;
                         // Iterate on each pollers, but no need to poll empty pollers
