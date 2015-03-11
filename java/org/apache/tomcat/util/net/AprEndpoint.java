@@ -1531,7 +1531,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
          * Remove specified socket from the pollers. Must only be called from
          * {@link Poller#run()}.
          */
-        private boolean removeFromPoller(long socket) {
+        private void removeFromPoller(long socket) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("endpoint.debug.pollerRemove",
                         Long.valueOf(socket)));
@@ -1552,7 +1552,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 }
             }
             timeouts.remove(socket);
-            return (rv == Status.APR_SUCCESS);
         }
 
         /**
