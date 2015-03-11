@@ -1708,6 +1708,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                                 wrapper.pollerFlags = wrapper.pollerFlags |
                                         (info.read() ? Poll.APR_POLLIN : 0) |
                                         (info.write() ? Poll.APR_POLLOUT : 0);
+                                // A socket can only be added to the poller
+                                // once. Adding it twice will return an error
+                                // which will close the socket. Therefore make
+                                // sure the socket we are about to add isn't in
+                                // the poller.
+                                removeFromPoller(info.socket);
                                 if (!addToPoller(info.socket, wrapper.pollerFlags)) {
                                     closeSocket(info.socket);
                                 } else {
