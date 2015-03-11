@@ -892,6 +892,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public void register(final NioChannel socket) {
             socket.setPoller(this);
             NioSocketWrapper ka = new NioSocketWrapper(socket, NioEndpoint.this);
+            ka.setPoller(this);
             ka.setReadTimeout(getSocketProperties().getSoTimeout());
             ka.setWriteTimeout(getSocketProperties().getSoTimeout());
             ka.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
