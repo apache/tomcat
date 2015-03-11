@@ -276,6 +276,11 @@
         documentation web application that stated WAR files located outside the
         appBase were never unpacked. (markt)
       </fix>
+      <fix>
+        <bug>57683</bug>: Ensure that if a client aborts their connection to the
+        stock ticker example (the only way a client can disconnect), the example
+        continues to work for existing and new clients. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

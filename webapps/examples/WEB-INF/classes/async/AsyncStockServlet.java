@@ -78,7 +78,11 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
         Iterator<AsyncContext> it = clients.iterator();
         while (it.hasNext()) {
             AsyncContext actx = it.next();
-            writeStock(actx, stock);
+            try {
+                writeStock(actx, stock);
+            } catch (Exception e) {
+                // Ignore. The async error handling will deal with this.
+            }
         }
     }
 
