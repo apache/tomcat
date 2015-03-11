@@ -1512,6 +1512,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
 
 
+        /*
+         * This is only called from the SocketWrapper to ensure that it is only
+         * called once per socket. Calling it more than once typically results
+         * in the JVM crash.
+         */
         protected void close(long socket) {
             synchronized (this) {
                 closeList.add(socket, 0, 0);
