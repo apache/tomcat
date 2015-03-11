@@ -360,7 +360,13 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
             tcn_socket_t *s = (tcn_socket_t *)fd->client_data;
             p->set[i*2+0] = (jlong)(fd->rtnevents);
             p->set[i*2+1] = P2J(s);
-            if (remove) {
+            /* If a socket is registered for multiple events and the poller has
+               multiple events to return it may do as a single pair in this
+               array or as multiple pairs depending on implementation. On OSX at
+               least, multiple pairs have been observed. In this case do not try
+               and remove socket from the pollset for a second time else a crash
+               will result. */ 
+            if (remove && s->pe) {
                 apr_pollset_remove(p->pollset, fd);
                 APR_RING_REMOVE(s->pe, link);
                 APR_RING_INSERT_TAIL(&p->dead_ring, s->pe, tcn_pfde_t, link);
