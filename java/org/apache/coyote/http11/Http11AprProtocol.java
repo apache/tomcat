@@ -221,9 +221,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller && getProtocol().getEndpoint().isRunning()) {
-                ((AprEndpoint)getProtocol().getEndpoint()).getPoller().add(
-                        socket.getSocket().longValue(),
-                        getProtocol().getEndpoint().getKeepAliveTimeout(), true, false);
+                socket.setReadTimeout(getProtocol().getEndpoint().getKeepAliveTimeout());
+                socket.registerReadInterest();
             }
         }
 
@@ -262,7 +261,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                     // Connector has been stopped
                     release(socket, processor, false);
                 } else {
-                    p.add(socket.getSocket().longValue(), -1, true, false);
+                    socket.registerReadInterest();
                 }
             }
         }
