@@ -1517,11 +1517,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
          * called once per socket. Calling it more than once typically results
          * in the JVM crash.
          */
-        protected void close(long socket) {
-            synchronized (this) {
-                closeList.add(socket, 0, 0);
-                this.notify();
-            }
+        private synchronized void close(long socket) {
+            closeList.add(socket, 0, 0);
+            this.notify();
         }
 
 
