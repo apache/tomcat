@@ -1295,6 +1295,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
             pool = endpoint.getSelectorPool();
+            socketBufferHandler = channel.getBufHandler();
         }
 
         public Poller getPoller() { return poller;}

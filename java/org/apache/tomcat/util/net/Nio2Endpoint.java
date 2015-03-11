@@ -757,6 +757,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         public Nio2SocketWrapper(Nio2Channel channel, Nio2Endpoint endpoint) {
             super(channel, endpoint);
+            socketBufferHandler = channel.getBufHandler();
 
             this.readCompletionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
                 @Override
