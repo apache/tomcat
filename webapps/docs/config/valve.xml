@@ -484,7 +484,7 @@
     expressions supported.</p>
 
     <p>Optionally one can append the server connector port separated with a
-    comma (";") to allow different expressions for each connector.</p>
+    semicolon (";") to allow different expressions for each connector.</p>
 
     <p>The behavior when a request is refused can be changed
     to not deny but instead set an invalid <code>authentication</code>
@@ -613,7 +613,7 @@
     expressions supported.</p>
 
     <p>Optionally one can append the server connector port separated with a
-    comma (";") to allow different expressions for each connector.</p>
+    semicolon (";") to allow different expressions for each connector.</p>
 
     <p>The behavior when a request is refused can be changed
     to not deny but instead set an invalid <code>authentication</code>
@@ -666,7 +666,7 @@
 
       <attribute name="addConnectorPort" required="false">
         <p>Append the server connector port to the client hostname separated
-        with a comma (";"). If this is set to <code>true</code>, the
+        with a semicolon (";"). If this is set to <code>true</code>, the
         expressions configured with <code>allow</code> and
         <code>deny</code> is compared against <code>HOSTNAME;PORT</code>
         where <code>HOSTNAME</code> is the client hostname and
