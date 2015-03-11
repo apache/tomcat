@@ -1461,7 +1461,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
          * @param read to do read polling
          * @param write to do write polling
          */
-        public void add(long socket, int timeout, boolean read, boolean write) {
+        private void add(long socket, int timeout, boolean read, boolean write) {
             add(socket, timeout,
                     (read ? Poll.APR_POLLIN : 0) |
                     (write ? Poll.APR_POLLOUT : 0));
