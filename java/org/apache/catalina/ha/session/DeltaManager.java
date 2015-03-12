@@ -1160,22 +1160,6 @@ public class DeltaManager extends ClusterManagerBase{
     //  -------------------------------------------------------- message receive
 
     /**
-     * Test that sender and local domain is the same
-     */
-    protected boolean checkSenderDomain(SessionMessage msg,Member sender) {
-        boolean sameDomain= true;
-        if (!sameDomain && log.isWarnEnabled()) {
-                log.warn(sm.getString("deltaManager.receiveMessage.fromWrongDomain",
-                         new Object[] {getName(), 
-                         msg.getEventTypeString(), 
-                         sender,
-                         "",
-                         "" }));
-        }
-        return sameDomain ;
-    }
-
-    /**
      * This method is called by the received thread when a SessionMessage has
      * been received from one of the other nodes in the cluster.
      * 
@@ -1187,9 +1171,6 @@ public class DeltaManager extends ClusterManagerBase{
      *            requesting node
      */
     protected void messageReceived(SessionMessage msg, Member sender) {
-        if(!checkSenderDomain(msg,sender)) {
-            return;
-        }
         ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
         try {
             

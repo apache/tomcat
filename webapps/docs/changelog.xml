@@ -246,6 +246,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Remove unnecessary method that always returns true. The domain filtering
+        works on <code>DomainFilterInterceptor</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
