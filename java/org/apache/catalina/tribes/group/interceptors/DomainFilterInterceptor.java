@@ -43,8 +43,12 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
 
     @Override
     public void messageReceived(ChannelMessage msg) {
-        //should we filter incoming based on domain?
-        super.messageReceived(msg);
+        if (Arrays.equals(domain, msg.getAddress().getDomain())) {
+            super.messageReceived(msg);
+        } else {
+            if (log.isWarnEnabled())
+                log.warn("Received message from cluster["+msg.getAddress()+"] was refused.");
+        }
     }//messageReceived
 
 

@@ -283,6 +283,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Make sure that refuse the messages from a different domain in
+        <code>DomainFilterInterceptor</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
