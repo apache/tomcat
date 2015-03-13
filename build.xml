@@ -273,6 +273,7 @@
     <include name="**/*.MF"/>
     <include name="**/*.notice"/>
     <include name="**/*.nsi"/>
+    <include name="**/*.pem"/>
     <include name="**/*.pl"/>
     <include name="**/*.policy"/>
     <include name="**/*.pom"/>
