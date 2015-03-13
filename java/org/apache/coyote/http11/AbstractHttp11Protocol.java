@@ -211,7 +211,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
         // Jump through some hoops so we don't end up with an empty set while
         // doing updates.
-        Set<String> toRemove = new HashSet<>();
+        Set<String> toRemove = new HashSet<String>();
         toRemove.addAll(allowedTrailerHeaders);
         if (commaSeparatedHeaders != null) {
             String[] headers = commaSeparatedHeaders.split(",");
@@ -229,7 +229,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public String getAllowedTrailerHeaders() {
         // Chances of a size change between these lines are small enough that a
         // sync is unnecessary.
-        List<String> copy = new ArrayList<>(allowedTrailerHeaders.size());
+        List<String> copy = new ArrayList<String>(allowedTrailerHeaders.size());
         copy.addAll(allowedTrailerHeaders);
         StringBuilder result = new StringBuilder();
         boolean first = true;
