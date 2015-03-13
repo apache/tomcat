@@ -1150,7 +1150,7 @@ public class JNDIRealm extends RealmBase {
      *            class name of the {@link HostnameVerifier} to be constructed
      */
     public void setHostnameVerifierClassName(String verifierClassName) {
-        if (hostNameVerifierClassName != null) {
+        if (verifierClassName != null) {
             this.hostNameVerifierClassName = verifierClassName.trim();
         } else {
             this.hostNameVerifierClassName = null;
