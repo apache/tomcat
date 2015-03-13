@@ -600,7 +600,7 @@ public class ChunkedInputFilter implements InputFilter {
         }
     
         String headerName = new String(trailingHeaders.getBytes(), startPos,
-                colonPos - startPos, StandardCharsets.ISO_8859_1);
+                colonPos - startPos, "ISO_8859_1");
     
         if (allowedTrailerHeaders.contains(headerName.trim().toLowerCase(Locale.ENGLISH))) {
             MessageBytes headerValue = headers.addValue(headerName);
