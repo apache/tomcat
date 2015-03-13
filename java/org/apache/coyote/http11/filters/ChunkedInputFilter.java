@@ -19,6 +19,8 @@ package org.apache.coyote.http11.filters;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Locale;
+import java.util.Set;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -147,10 +149,14 @@ public class ChunkedInputFilter implements InputFilter {
     private boolean error;
 
 
+    private final Set<String> allowedTrailerHeaders;
+
     // ----------------------------------------------------------- Constructors
 
-    public ChunkedInputFilter(int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
+    public ChunkedInputFilter(int maxTrailerSize, Set<String> allowedTrailerHeaders,
+            int maxExtensionSize, int maxSwallowSize) {
         this.trailingHeaders.setLimit(maxTrailerSize);
+        this.allowedTrailerHeaders = allowedTrailerHeaders;
         this.maxExtensionSize = maxExtensionSize;
         this.maxTrailerSize = maxTrailerSize;
         this.maxSwallowSize = maxSwallowSize;
@@ -474,7 +480,7 @@ public class ChunkedInputFilter implements InputFilter {
         }
     
         // Mark the current buffer position
-        int start = trailingHeaders.getEnd();
+        int startPos = trailingHeaders.getEnd();
     
         //
         // Reading the header name
@@ -505,12 +511,8 @@ public class ChunkedInputFilter implements InputFilter {
             pos++;
     
         }
-        MessageBytes headerValue = headers.addValue(trailingHeaders.getBytes(),
-                start, trailingHeaders.getEnd() - start);
+        int colonPos = trailingHeaders.getEnd();
     
-        // Mark the current buffer position
-        start = trailingHeaders.getEnd();
-
         //
         // Reading the header value (which can be spanned over multiple lines)
         //
@@ -597,10 +599,17 @@ public class ChunkedInputFilter implements InputFilter {
     
         }
     
-        // Set the header value
-        headerValue.setBytes(trailingHeaders.getBytes(), start,
-                lastSignificantChar - start);
+        String headerName = new String(trailingHeaders.getBytes(), startPos,
+                colonPos - startPos, StandardCharsets.ISO_8859_1);
     
+        if (allowedTrailerHeaders.contains(headerName.trim().toLowerCase(Locale.ENGLISH))) {
+            MessageBytes headerValue = headers.addValue(headerName);
+
+            // Set the header value
+            headerValue.setBytes(trailingHeaders.getBytes(), colonPos,
+                    lastSignificantChar - colonPos);
+        }
+
         return true;
     }
 

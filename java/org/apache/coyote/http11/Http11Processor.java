@@ -20,6 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Set;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
@@ -49,8 +50,8 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
    // ------------------------------------------------------------ Constructor
 
 
-    public Http11Processor(int headerBufferSize, JIoEndpoint endpoint,
-            int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
+    public Http11Processor(int headerBufferSize, JIoEndpoint endpoint, int maxTrailerSize,
+            Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize) {
 
         super(endpoint);
         
@@ -60,7 +61,7 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
         outputBuffer = new InternalOutputBuffer(response, headerBufferSize);
         response.setOutputBuffer(outputBuffer);
 
-        initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
+        initializeFilters(maxTrailerSize, allowedTrailerHeaders, maxExtensionSize, maxSwallowSize);
     }
 
 

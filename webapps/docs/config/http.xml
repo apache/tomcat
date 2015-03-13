@@ -301,6 +301,12 @@
       associated with the server.</p>
     </attribute>
 
+    <attribute name="allowedTrailerHeaders" required="false">
+      <p>By default Tomcat will ignore all trailer headers when processing
+      chunked input. For a header to be processed, it must be added to this
+      comma-separated list of header names.</p>
+    </attribute>
+
     <attribute name="bindOnInit" required="false">
       <p>Controls when the socket used by the connector is bound. By default it
       is bound when the connector is initiated and unbound when the connector is

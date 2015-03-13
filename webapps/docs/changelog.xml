@@ -182,6 +182,10 @@
         in memory. (markt)
       </fix>
       <fix>
+        <bug>57570</bug>: Make the processing of trailer headers with chunked
+        input optional and disabled by default. (markt)
+      </fix>
+      <fix>
         When applying the <code>maxSwallowSize</code> limit to a connection read
         that many bytes first before closing the connection to give the client a
         chance to read the reponse. (markt)

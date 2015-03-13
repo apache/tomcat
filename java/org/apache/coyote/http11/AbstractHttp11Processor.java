@@ -19,6 +19,7 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.Locale;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -683,18 +684,18 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Initialize standard input and output filters.
      */
-    protected void initializeFilters(int maxTrailerSize, int maxExtensionSize,
-            int maxSwallowSize) {
+    protected void initializeFilters(int maxTrailerSize, Set<String> allowedTrailerHeaders,
+            int maxExtensionSize, int maxSwallowSize) {
         // Create and add the identity filters.
         getInputBuffer().addFilter(new IdentityInputFilter(maxSwallowSize));
         getOutputBuffer().addFilter(new IdentityOutputFilter());
 
         // Create and add the chunked filters.
-        getInputBuffer().addFilter(
-                new ChunkedInputFilter(maxTrailerSize, maxExtensionSize, maxSwallowSize));
+        getInputBuffer().addFilter( new ChunkedInputFilter(maxTrailerSize,allowedTrailerHeaders,
+                maxExtensionSize, maxSwallowSize));
         getOutputBuffer().addFilter(new ChunkedOutputFilter());
 
-        // Create and add the void filters.
+        // Create and add the void filters
         getInputBuffer().addFilter(new VoidInputFilter());
         getOutputBuffer().addFilter(new VoidOutputFilter());
 

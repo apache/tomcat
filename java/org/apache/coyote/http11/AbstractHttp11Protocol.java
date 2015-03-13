@@ -16,6 +16,13 @@
  */
 package org.apache.coyote.http11;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.tomcat.util.res.StringManager;
@@ -192,6 +199,62 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public int getUpgradeAsyncWriteBufferSize() { return upgradeAsyncWriteBufferSize; }
     public void setUpgradeAsyncWriteBufferSize(int upgradeAsyncWriteBufferSize) {
         this.upgradeAsyncWriteBufferSize = upgradeAsyncWriteBufferSize;
+    }
+
+
+    /**
+     * The names of headers that are allowed to be sent via a trailer when using
+     * chunked encoding. They are stored in lower case.
+     */
+    private Set<String> allowedTrailerHeaders =
+            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
+        // Jump through some hoops so we don't end up with an empty set while
+        // doing updates.
+        Set<String> toRemove = new HashSet<>();
+        toRemove.addAll(allowedTrailerHeaders);
+        if (commaSeparatedHeaders != null) {
+            String[] headers = commaSeparatedHeaders.split(",");
+            for (String header : headers) {
+                String trimmedHeader = header.trim().toLowerCase(Locale.ENGLISH);
+                if (toRemove.contains(trimmedHeader)) {
+                    toRemove.remove(trimmedHeader);
+                } else {
+                    allowedTrailerHeaders.add(trimmedHeader);
+                }
+            }
+            allowedTrailerHeaders.removeAll(toRemove);
+        }
+    }
+    public String getAllowedTrailerHeaders() {
+        // Chances of a size change between these lines are small enough that a
+        // sync is unnecessary.
+        List<String> copy = new ArrayList<>(allowedTrailerHeaders.size());
+        copy.addAll(allowedTrailerHeaders);
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (String header : copy) {
+            if (first) {
+                first = false;
+            } else {
+                result.append(',');
+            }
+            result.append(header);
+        }
+        return result.toString();
+    }
+    public void addAllowedTrailerHeader(String header) {
+        if (header != null) {
+            allowedTrailerHeaders.add(header.trim().toLowerCase(Locale.ENGLISH));
+        }
+    }
+    public void removeAllowedTrailerHeader(String header) {
+        if (header != null) {
+            allowedTrailerHeaders.remove(header.trim().toLowerCase(Locale.ENGLISH));
+        }
+    }
+    protected Set<String> getAllowedTrailerHeadersAsSet() {
+        return allowedTrailerHeaders;
     }
 
 

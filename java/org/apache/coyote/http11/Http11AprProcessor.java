@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ErrorState;
@@ -58,8 +59,8 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11AprProcessor(int headerBufferSize, AprEndpoint endpoint,
-            int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
+    public Http11AprProcessor(int headerBufferSize, AprEndpoint endpoint, int maxTrailerSize,
+            Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize) {
 
         super(endpoint);
 
@@ -69,7 +70,7 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         outputBuffer = new InternalAprOutputBuffer(response, headerBufferSize);
         response.setOutputBuffer(outputBuffer);
 
-        initializeFilters(maxTrailerSize, maxExtensionSize, maxSwallowSize);
+        initializeFilters(maxTrailerSize, allowedTrailerHeaders, maxExtensionSize, maxSwallowSize);
     }
 
 
