@@ -230,7 +230,7 @@ com.sun.security.jgss.krb5.accept {
       SPNEGO project at SourceForge</a></li>
   <li><a href="http://docs.oracle.com/javase/1.5.0/docs/guide/security/jgss/tutorials/index.html">
       Oracle JGSS tutorial</a></li>
-  <li><a href="https://cwiki.apache.org/GMOxDOC21/using-spengo-in-geronimo.html#UsingSpengoingeronimo-SettinguptheActiveDirectoryDomainController">
+  <li><a href="https://cwiki.apache.org/confluence/display/GMOxDOC21/Using+SPNEGO+in+Geronimo#UsingSPNEGOinGeronimo-SettinguptheDomainControllerMachine">
       Geronimo configuration for Windows authentication</a></li>
   <li><a href="http://blogs.msdn.com/b/openspecification/archive/2010/11/17/encryption-type-selection-in-kerberos-exchanges.aspx">
       Encryption Selection in Kerberos Exchanges</a></li>
