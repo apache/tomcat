@@ -59,6 +59,8 @@ public class BufferedInputFilter implements InputFilter {
     /**
      * Set the buffering limit. This should be reset every time the buffer is
      * used.
+     *
+     * @param limit The maximum number of bytes that will be buffered
      */
     public void setLimit(int limit) {
         if (buffered == null) {

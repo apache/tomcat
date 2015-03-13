@@ -104,6 +104,9 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
+        // Configure allowed trailer headers
+        tomcat.getConnector().setProperty("allowedTrailerHeaders", "X-Trailer1,X-Trailer2");
+
         EchoHeaderServlet servlet = new EchoHeaderServlet(expectPass);
         Tomcat.addServlet(ctx, "servlet", servlet);
         ctx.addServletMapping("/", "servlet");

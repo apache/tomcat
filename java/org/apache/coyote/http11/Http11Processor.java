@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.Locale;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -238,8 +239,8 @@ public class Http11Processor extends AbstractProcessor {
     protected SSLSupport sslSupport;
 
 
-    public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<?> endpoint,
-            int maxTrailerSize, int maxExtensionSize, int maxSwallowSize) {
+    public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<?> endpoint,int maxTrailerSize,
+            Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize) {
 
         super(endpoint);
         userDataHelper = new UserDataHelper(log);
@@ -255,8 +256,8 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.addFilter(new IdentityOutputFilter());
 
         // Create and add the chunked filters.
-        inputBuffer.addFilter(
-                new ChunkedInputFilter(maxTrailerSize, maxExtensionSize, maxSwallowSize));
+        inputBuffer.addFilter(new ChunkedInputFilter(maxTrailerSize, allowedTrailerHeaders,
+                maxExtensionSize, maxSwallowSize));
         outputBuffer.addFilter(new ChunkedOutputFilter());
 
         // Create and add the void filters.
