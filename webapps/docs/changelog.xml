@@ -154,6 +154,11 @@
         <bug>57675</bug>: Correctly quote strings when using the extended
         access log. (markt)
       </fix>
+      <fix>
+        <bug>57704</bug>: Fix potential NPEs during web application start/stop
+        when <code>org.apache.tomcat.InstanceManager</code> is not initialized.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
