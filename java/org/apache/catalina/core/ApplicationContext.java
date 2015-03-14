@@ -1248,16 +1248,18 @@ public class ApplicationContext
     public void addListener(String className) {
 
         try {
-            Object obj = context.getInstanceManager().newInstance(className);
+            if (context.getInstanceManager() != null) {
+                Object obj = context.getInstanceManager().newInstance(className);
 
-            if (!(obj instanceof EventListener)) {
-                throw new IllegalArgumentException(sm.getString(
-                        "applicationContext.addListener.iae.wrongType",
-                        className));
+                if (!(obj instanceof EventListener)) {
+                    throw new IllegalArgumentException(sm.getString(
+                            "applicationContext.addListener.iae.wrongType",
+                            className));
+                }
+
+                EventListener listener = (EventListener) obj;
+                addListener(listener);
             }
-
-            EventListener listener = (EventListener) obj;
-            addListener(listener);
         } catch (IllegalAccessException e) {
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.cnfe", className),
