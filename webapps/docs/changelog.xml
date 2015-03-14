@@ -300,6 +300,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Extras">
+    <changelog>
+      <fix>
+        <bug>57377</bug>: Remove the restriction that prevented the use of SSL
+        when specifying a bind address with the JMXRemoteLifecycleListener. Also
+        enable SSL to be configured for the registry as well as the server.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>

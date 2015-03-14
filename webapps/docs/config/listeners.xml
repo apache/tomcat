@@ -478,10 +478,7 @@
       </attribute>
 
       <attribute name="rmiBindAddress" required="false">
-        <p>The address of the interface to be used by JMX/RMI server.
-        This option is incompatible with setting the system
-        property <code>com.sun.management.jmxremote.ssl</code> to
-        <code>true</code>.</p>
+        <p>The address of the interface to be used by JMX/RMI server.</p>
       </attribute>
 
       <attribute name="useLocalPorts" required="false">
