@@ -2104,7 +2104,7 @@ public class WebXml {
     }
 
 
-    private static <T> boolean mergeLifecycleCallback(
+    private static boolean mergeLifecycleCallback(
             Map<String, String> fragmentMap, Map<String, String> tempMap,
             WebXml fragment, String mapName) {
         for (Entry<String, String> entry : fragmentMap.entrySet()) {
