@@ -56,8 +56,7 @@ public class MBeanFactory {
 
     private static final Log log = LogFactory.getLog(MBeanFactory.class);
 
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(MBeanFactory.class);
 
     /**
      * The <code>MBeanServer</code> for this application.
