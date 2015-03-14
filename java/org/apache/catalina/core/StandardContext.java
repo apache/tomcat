@@ -4644,7 +4644,7 @@ public class StandardContext extends ContainerBase
                     listeners[i] + "'");
             try {
                 String listener = listeners[i];
-                results[i] = instanceManager.newInstance(listener);
+                results[i] = getInstanceManager().newInstance(listener);
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
@@ -4782,7 +4782,9 @@ public class StandardContext extends ContainerBase
                     }
                 }
                 try {
-                    getInstanceManager().destroyInstance(listeners[j]);
+                    if (getInstanceManager() != null) {
+                        getInstanceManager().destroyInstance(listeners[j]);
+                    }
                 } catch (Throwable t) {
                     t = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(t);
@@ -4802,7 +4804,9 @@ public class StandardContext extends ContainerBase
                 if (listeners[j] == null)
                     continue;
                 try {
-                    getInstanceManager().destroyInstance(listeners[j]);
+                    if (getInstanceManager() != null) {
+                        getInstanceManager().destroyInstance(listeners[j]);
+                    }
                 } catch (Throwable t) {
                     t = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(t);
@@ -5452,7 +5456,7 @@ public class StandardContext extends ContainerBase
         }
 
         //reset the instance manager
-        instanceManager = null;
+        setInstanceManager(null);
 
         if (log.isDebugEnabled())
             log.debug("Stopping complete");
