@@ -199,10 +199,11 @@ techniques are supported:</p>
 </ul>
 
 <p>If using digested passwords with DIGEST authentication, the cleartext used
-   to generate the digest is different and the digest must use the MD5
-   algorithm. In the examples above <code>{cleartext-password}</code> must be
-   replaced with <code>{username}:{realm}:{cleartext-password}</code>. For
-   example, in a development environment this might take the form
+   to generate the digest is different and the digest must use one iteration of
+   the MD5 algorithm with no salt. In the examples above
+   <code>{cleartext-password}</code> must be replaced with
+   <code>{username}:{realm}:{cleartext-password}</code>. For example, in a
+   development environment this might take the form
    <code>testUser:Authentication required:testPassword</code>. The value for
    <code>{realm}</code> is taken from the <code>&lt;realm-name&gt;</code>
    element of the web application's <code>&lt;login-config&gt;</code>. If
@@ -215,6 +216,10 @@ are supported using</p>
 <p>but care is required to ensure that the input is correctly passed to the
 digester. The digester returns <code>{input}:{digest}</code>. If the input
 appears corrupted in the return, the digest will be invalid.</p>
+
+<p>The output format of the digest is <code>{salt}${iterations}${digest}</code>.
+If the salt length is zero and the iteration count is one, the output is
+simplified to <code>{digest}</code>.</p>
 
 <p>The full syntax of <code>CATALINA_HOME/bin/digest.[bat|sh]</code> is:</p>
 <source>CATALINA_HOME/bin/digest.[bat|sh] [-a &lt;algorithm&gt;] [-e &lt;encoding&gt;]

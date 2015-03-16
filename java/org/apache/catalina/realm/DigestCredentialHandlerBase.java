@@ -120,15 +120,20 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
         String serverCredential = mutate(userCredential, salt, iterations);
 
-        StringBuilder result =
-                new StringBuilder((saltLength << 1) + 10 + serverCredential.length() + 2);
-        result.append(HexUtils.toHexString(salt));
-        result.append('$');
-        result.append(iterations);
-        result.append('$');
-        result.append(serverCredential);
+        if (saltLength == 0 && iterations == 1) {
+            // Output the simple/old format for backwards compatibility
+            return serverCredential;
+        } else {
+            StringBuilder result =
+                    new StringBuilder((saltLength << 1) + 10 + serverCredential.length() + 2);
+            result.append(HexUtils.toHexString(salt));
+            result.append('$');
+            result.append(iterations);
+            result.append('$');
+            result.append(serverCredential);
 
-        return result.toString();
+            return result.toString();
+        }
     }
 
 
