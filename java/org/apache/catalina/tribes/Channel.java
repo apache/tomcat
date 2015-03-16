@@ -246,7 +246,7 @@ public interface Channel {
 
     /**
      * Send a message to one or more members in the cluster
-     * @param destination Member[] - the destinations, can not be null or zero length, the reason for that
+     * @param destination Member[] - the destinations, cannot be null or zero length, the reason for that
      * is that a membership change can occur and at that time the application is uncertain what group the message
      * actually got sent to.
      * @param msg Serializable - the message to send, has to be serializable, or a <code>ByteMessage</code> to

@@ -317,7 +317,7 @@
     <li><b><code>msec</code></b> - number of milliseconds since the epoch</li>
     <li><b><code>msec_frac</code></b> - millisecond fraction</li>
     </ul>
-    <p>These formats can not be mixed with SimpleDateFormat formats in the same format
+    <p>These formats cannot be mixed with SimpleDateFormat formats in the same format
     token.</p>
 
     <p>Furthermore one can define whether to log the timestamp for the request start

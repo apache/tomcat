@@ -118,7 +118,7 @@ public class ReflectionUtil {
      * @param paramTypes the parameter types to use
      * @param paramValues the parameter values
      * @return the method specified
-     * @throws MethodNotFoundException If a method can not be found that matches
+     * @throws MethodNotFoundException If a method cannot be found that matches
      *         the given criteria
      */
     /*

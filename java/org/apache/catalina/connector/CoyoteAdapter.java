@@ -570,7 +570,7 @@ public class CoyoteAdapter implements Adapter {
      * @throws IOException If there is insufficient space in a buffer while
      *                     processing headers
      * @throws ServletException If the supported methods of the target servlet
-     *                          can not be determined
+     *                          cannot be determined
      */
     protected boolean postParseRequest(org.apache.coyote.Request req, Request request,
             org.apache.coyote.Response res, Response response) throws IOException, ServletException {

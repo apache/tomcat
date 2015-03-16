@@ -66,7 +66,7 @@ public class FileMessageFactory {
     protected final boolean openForWrite;
 
     /**
-     * Once the factory is used, it can not be reused.
+     * Once the factory is used, it cannot be reused.
      */
     protected boolean closed = false;
 

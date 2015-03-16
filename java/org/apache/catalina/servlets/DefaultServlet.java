@@ -333,7 +333,7 @@ public class DefaultServlet extends HttpServlet {
     protected String getRelativePath(HttpServletRequest request) {
         // IMPORTANT: DefaultServlet can be mapped to '/' or '/path/*' but always
         // serves resources from the web app root with context rooted paths.
-        // i.e. it can not be used to mount the web app root under a sub-path
+        // i.e. it cannot be used to mount the web app root under a sub-path
         // This method must construct a complete context rooted path, although
         // subclasses can change this behaviour.
 

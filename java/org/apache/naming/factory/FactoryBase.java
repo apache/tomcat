@@ -121,7 +121,7 @@ public abstract class FactoryBase implements ObjectFactory {
      * @return  The default factory for the given reference object or
      *          <code>null</code> if no default factory exists.
      *
-     * @throws NamingException  If the default factory can not be craeted
+     * @throws NamingException  If the default factory cannot be craeted
      */
     protected abstract ObjectFactory getDefaultFactory(Reference ref)
             throws NamingException;

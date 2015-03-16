@@ -535,7 +535,7 @@ to, and optionally the port number and distinguished name (DN) of the
 required root naming context.</p>
 
 <p>If you have more than one provider you can configure an
-<strong>alternateURL</strong>.  If a socket connection can not be
+<strong>alternateURL</strong>.  If a socket connection cannot be
 made to the provider at the <strong>connectionURL</strong> an
 attempt will be made to use the <strong>alternateURL</strong>.</p>
 

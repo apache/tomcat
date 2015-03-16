@@ -193,7 +193,7 @@ public class Benchmarks {
             try {
                 index = Integer.parseInt(month) - 1;
             } catch (Throwable t) {
-                index = 0; // Can not happen, in theory
+                index = 0; // cannot happen, in theory
             }
             return (months[index]);
         }

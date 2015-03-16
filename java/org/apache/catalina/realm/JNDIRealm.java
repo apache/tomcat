@@ -76,7 +76,7 @@ import org.ietf.jgss.GSSCredential;
  *     element in the top level <code>DirContext</code> that is accessed
  *     via the <code>connectionURL</code> property.</li>
  *
- * <li>If a socket connection can not be made to the <code>connectURL</code>
+ * <li>If a socket connection cannot be made to the <code>connectURL</code>
  *     an attempt will be made to use the <code>alternateURL</code> if it
  *     exists.</li>
  *

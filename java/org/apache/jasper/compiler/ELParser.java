@@ -96,7 +96,7 @@ public class ELParser {
      *
      * @return An ELNode.Nodes representing the EL expression
      *
-     * Note: This can not be refactored to use the standard EL implementation as
+     * Note: This cannot be refactored to use the standard EL implementation as
      *       the EL API does not provide the level of access required to the
      *       parsed expression.
      */
