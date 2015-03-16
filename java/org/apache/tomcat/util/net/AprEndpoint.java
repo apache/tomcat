@@ -1932,8 +1932,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
              */
             HashMap<Long,Long> merged = new HashMap<>(startCount);
             for (int n = 0; n < startCount; n++) {
-                merged.merge(Long.valueOf(desc[2*n+1]), Long.valueOf(desc[2*n]),
+                Long newValue = merged.merge(Long.valueOf(desc[2*n+1]), Long.valueOf(desc[2*n]),
                         (v1, v2) -> Long.valueOf(v1.longValue() | v2.longValue()));
+                if (log.isDebugEnabled()) {
+                    if (newValue.longValue() != desc[2*n]) {
+                        log.debug(sm.getString("endpoint.apr.pollMergeEvents",
+                                Long.valueOf(desc[2*n+1]), Long.valueOf(desc[2*n]), newValue));
+                    }
+                }
             }
             int i = 0;
             for (Map.Entry<Long,Long> entry : merged.entrySet()) {
