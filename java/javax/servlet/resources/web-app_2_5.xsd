@@ -475,7 +475,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd
             </xsd:documentation>
         </xsd:annotation>
         <xsd:restriction base="xsd:token">
-            <xsd:pattern value="[\p{L}-[\p{Cc}\p{Z}]]+" />
+            <xsd:pattern value="[!-~-[\(\)&#60;&#62;@,;:&#34;/\[\]?=\{\}\\\p{Z}]]+"/>
         </xsd:restriction>
 
     </xsd:simpleType>

@@ -341,6 +341,11 @@
         List names of Testsuites that have failed or skipped tests when
         running tests with Ant. (kkolinko)
       </add>
+      <fix>
+        <bug>57703</bug>: Update the <code>http-method</code> definition for
+        web applications using a Servlet 2.5 descriptor as per Servlet 2.5 MR 6.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
