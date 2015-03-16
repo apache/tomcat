@@ -42,6 +42,21 @@
       Fix compilation failures with master branch of OpenSSL. Replace access
       to OpenSSL internals by accessor functions. (rjung/kkolinko)
     </fix>
+    <fix>
+      Fix a zero-boundary-check compiler warning and simplify code in the
+      process. (rjung)
+    </fix>
+    <fix>
+      Remove superfluous semicolons after close-braces to eliminate compiler
+      warnings. (cshultz)
+    </fix>
+    <fix>
+      <bug>57653</bug>: Fix crash when multiple events for same socket are
+      returned via separate apr_pollfd_t structures. (markt)
+    </fix>
+    <fix>
+      Enable building with OpenSSL 1.0.2 onwards. (billbarker)
+    </fix>
   </changelog>
 </section>
 <section name="Changes between 1.1.31 and 1.1.32">
