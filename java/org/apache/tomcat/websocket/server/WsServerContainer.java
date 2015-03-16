@@ -166,7 +166,7 @@ public class WsServerContainer extends WsWebSocketContainer
      * must be called before calling this method.
      *
      * @param sec   The configuration to use when creating endpoint instances
-     * @throws DeploymentException if the endpoint can not be published as
+     * @throws DeploymentException if the endpoint cannot be published as
      *         requested
      */
     @Override

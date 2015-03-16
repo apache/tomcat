@@ -96,7 +96,7 @@ import org.apache.juli.logging.LogFactory;
  * Lets assume that C1 arrives, C1 has lower priority than C, but higher priority than D.<br>
  * Lets also assume that C1 sees the following view {B,D,E}<br>
  * C1 waits for a token to arrive. When the token arrives, the same scenario as above will happen.<br>
- * In the scenario where C1 sees {D,E} and A,B,C can not see C1, no token will ever arrive.<br>
+ * In the scenario where C1 sees {D,E} and A,B,C cannot see C1, no token will ever arrive.<br>
  * In this case, C1 sends a Z{C1-ldr, C1-src, mbrs-C1,D,E} to D<br>
  * D receives Z{C1-ldr, C1-src, mbrs-C1,D,E} and sends Z{A-ldr, C1-src, mbrs-A,B,C,C1,D,E} to E<br>
  * E receives Z{A-ldr, C1-src, mbrs-A,B,C,C1,D,E} and sends it to A<br>

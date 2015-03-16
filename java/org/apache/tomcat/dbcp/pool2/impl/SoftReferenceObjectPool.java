@@ -110,7 +110,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
      *             if an exception occurs creating a new instance
      * @return a valid, activated object instance
      */
-    @SuppressWarnings("null") // ref can not be null
+    @SuppressWarnings("null") // ref cannot be null
     @Override
     public synchronized T borrowObject() throws Exception {
         assertOpen();

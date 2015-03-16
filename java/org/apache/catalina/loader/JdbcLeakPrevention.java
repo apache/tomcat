@@ -34,7 +34,7 @@ import java.util.List;
  * version is do not just create a new instance of this class with the new
  * keyword.
  *
- * Since this class is loaded by {@link WebappClassLoaderBase}, it can not refer
+ * Since this class is loaded by {@link WebappClassLoaderBase}, it cannot refer
  * to any internal Tomcat classes as that will cause the security manager to
  * complain.
  */

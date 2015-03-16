@@ -502,7 +502,7 @@
         <p>
         Not reading the additional data will free the request processing thread
         more quickly. Unfortunately most HTTP clients will not read the response
-        if they can not write the full request.</p>
+        if they cannot write the full request.</p>
         <p>The default is <code>true</code>, so additional data will be
         read.</p>
         <p>Note if an error occurs during the request processing that triggers

@@ -123,7 +123,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                     return;
                 }
             } catch (MalformedURLException e) {
-                throw new ServletException("Can not locate jsp file", e);
+                throw new ServletException("cannot locate jsp file", e);
             }
             try {
                 if (SecurityUtil.isPackageProtectionEnabled()){

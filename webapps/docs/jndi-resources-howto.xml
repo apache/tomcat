@@ -328,7 +328,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     <code>foo</code> property (although we could have), the bean will
     contain whatever default value is set up by its constructor.</p>
 
-    <p>Some beans have properties with types that can not automatically be
+    <p>Some beans have properties with types that cannot automatically be
     converted from a string value. Setting such properties using the Tomcat
     BeanFactory will fail with a NamingException. In cases were those beans
     provide methods to set the properties from a string value, the Tomcat

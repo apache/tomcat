@@ -96,7 +96,7 @@ public class Rfc6265CookieProcessor implements CookieProcessor {
     public String generateHeader(javax.servlet.http.Cookie cookie) {
 
         StringBuilder header = new StringBuilder();
-        // TODO: Name validation takes place in Cookie and can not be configured
+        // TODO: Name validation takes place in Cookie and cannot be configured
         //       per Context. Moving it to here would allow per Context config
         //       but delay validation until the header is generated. However,
         //       the spec requires an IllegalArgumentException on Cookie

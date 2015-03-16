@@ -401,7 +401,7 @@
       </attribute>
 
       <attribute name="alternateURL" required="false">
-        <p>If a socket connection can not be made to the provider at
+        <p>If a socket connection cannot be made to the provider at
         the <code>connectionURL</code> an attempt will be made to use the
         <code>alternateURL</code>.</p>
       </attribute>

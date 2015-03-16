@@ -588,7 +588,7 @@
     </p>
   </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.JdbcInterceptor">
-    <p>Abstract base class for all interceptors, can not be instantiated.</p>
+    <p>Abstract base class for all interceptors, cannot be instantiated.</p>
     <attributes>
       <attribute name="useEquals" required="false">
         <p>(boolean) Set to true if you wish the <code>ProxyConnection</code> class to use <code>String.equals</code> and set to <code>false</code>

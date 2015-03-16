@@ -55,7 +55,7 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     public DataSourceProxy(PoolConfiguration poolProperties) {
-        if (poolProperties == null) throw new NullPointerException("PoolConfiguration can not be null.");
+        if (poolProperties == null) throw new NullPointerException("PoolConfiguration cannot be null.");
         this.poolProperties = poolProperties;
     }
 
