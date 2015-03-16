@@ -57,6 +57,9 @@
     <fix>
       Enable building with OpenSSL 1.0.2 onwards. (billbarker)
     </fix>
+    <update>
+      Use OpenSSL 1.0.1l with Windows binaries. (markt)
+    </update>
   </changelog>
 </section>
 <section name="Changes between 1.1.31 and 1.1.32">
