@@ -267,7 +267,7 @@ You can build them by using the following commands:
 
     A full release includes the Windows installer which requires a Windows
     environment to be available to create it. If not building in a Windows
-    environment, the build scripts assume that WINE is available. If this is not
+    environment, the build scripts assume that Wine is available. If this is not
     the case, the skip.installer property may be set to skip the creation of the
     Windows installer.
 
