@@ -159,6 +159,10 @@
         when <code>org.apache.tomcat.InstanceManager</code> is not initialized.
         (violetagg)
       </fix>
+      <fix>
+        Add support for <code>LAST_ACCESS_AT_START</code> system property to
+        <code>SingleSignOn</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

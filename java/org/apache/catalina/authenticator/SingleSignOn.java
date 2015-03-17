@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
@@ -58,6 +59,19 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SingleSignOn extends ValveBase implements SessionListener {
 
+    protected static final boolean LAST_ACCESS_AT_START;
+
+    static {
+        String lastAccessAtStart = System.getProperty(
+                "org.apache.catalina.session.StandardSession.LAST_ACCESS_AT_START");
+        if (lastAccessAtStart == null) {
+            LAST_ACCESS_AT_START = Globals.STRICT_SERVLET_COMPLIANCE;
+        } else {
+            LAST_ACCESS_AT_START =
+                Boolean.valueOf(lastAccessAtStart).booleanValue();
+        }
+    }
+    
     //------------------------------------------------------ Constructor
     public SingleSignOn() {
         super(true);
@@ -237,9 +251,14 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         // If so, we'll just remove the expired session from the
         // SSO.  If the session was logged out, we'll log out
         // of all session associated with the SSO.
+        long idle;
+        if (LAST_ACCESS_AT_START) {
+            idle = session.getLastAccessedTimeInternal();
+        } else {
+            idle = session.getThisAccessedTimeInternal();
+        }
         if (((session.getMaxInactiveInterval() > 0)
-            && (System.currentTimeMillis() - session.getThisAccessedTimeInternal() >=
-                session.getMaxInactiveInterval() * 1000)) 
+            && idle >= session.getMaxInactiveInterval() * 1000) 
             || (Session.SESSION_PASSIVATED_EVENT.equals(event.getType()))
             || (!session.getManager().getContainer().getState().isAvailable())) {
             removeSession(ssoId, session);
