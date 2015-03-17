@@ -314,8 +314,7 @@ public class SingleSignOn extends ValveBase {
         // session was logged out, we'll log out of all session associated with
         // the SSO.
         if (((session.getMaxInactiveInterval() > 0)
-            && (System.currentTimeMillis() - session.getThisAccessedTimeInternal() >=
-                session.getMaxInactiveInterval() * 1000))
+            && (session.getIdleTimeInternal() >= session.getMaxInactiveInterval() * 1000))
             || (!session.getManager().getContext().getState().isAvailable())) {
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug(sm.getString("singleSignOn.debug.sessionTimeout",
