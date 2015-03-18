@@ -149,40 +149,13 @@ public class FormAuthenticator
                                 LoginConfig config)
         throws IOException {
 
-        // References to objects we will need later
-        Session session = null;
-
-        // Have we already authenticated someone?
-        Principal principal = request.getUserPrincipal();
-        String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
-        if (principal != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Already authenticated '" +
-                    principal.getName() + "'");
-            }
-            // Associate the session with any existing SSO session
-            if (ssoId != null) {
-                associate(ssoId, request.getSessionInternal(true));
-            }
+        if (checkForCachedAuthentication(request, true)) {
             return (true);
         }
 
-        // Is there an SSO session against which we can try to reauthenticate?
-        if (ssoId != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("SSO Id " + ssoId + " set; attempting " +
-                          "reauthentication");
-            }
-            // Try to reauthenticate using data cached by SSO.  If this fails,
-            // either the original SSO logon was of DIGEST or SSL (which
-            // we can't reauthenticate ourselves because there is no
-            // cached username and password), or the realm denied
-            // the user's reauthentication for some reason.
-            // In either case we have to prompt the user for a logon */
-            if (reauthenticateFromSSO(ssoId, request)) {
-                return true;
-            }
-        }
+        // References to objects we will need later
+        Session session = null;
+        Principal principal = null;
 
         // Have we authenticated this user before but have caching disabled?
         if (!cache) {

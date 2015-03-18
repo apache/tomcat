@@ -167,6 +167,10 @@
         <bug>57724</bug>: Handle the case in the CORS filter where a user agent
         includes an origin header for a non-CORS request. (markt)
       </fix>
+      <scode>
+        Refactor Authenticator implementations to reduce code duplication.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
