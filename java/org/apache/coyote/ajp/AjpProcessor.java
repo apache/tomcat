@@ -303,6 +303,16 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     /**
+     * Use Tomcat authorization ?
+     */
+    private boolean tomcatAuthorization = false;
+    public boolean getTomcatAuthorization() { return tomcatAuthorization; }
+    public void setTomcatAuthorization(boolean tomcatAuthorization) {
+        this.tomcatAuthorization = tomcatAuthorization;
+    }
+
+
+    /**
      * Required secret.
      */
     private String requiredSecret = null;
@@ -1162,11 +1172,13 @@ public class AjpProcessor extends AbstractProcessor {
                 break;
 
             case Constants.SC_A_REMOTE_USER :
-                if (tomcatAuthentication) {
-                    // ignore server
-                    requestHeaderMessage.getBytes(tmpMB);
-                } else {
+                if (tomcatAuthorization || !tomcatAuthentication) {
+                    // Implies tomcatAuthentication == false
                     requestHeaderMessage.getBytes(request.getRemoteUser());
+                    request.setRemoteUserNeedsAuthorization(tomcatAuthorization);
+                } else {
+                    // Ignore user information from reverse proxy
+                    requestHeaderMessage.getBytes(tmpMB);
                 }
                 break;
 

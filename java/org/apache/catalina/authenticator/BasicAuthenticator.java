@@ -63,7 +63,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
     public boolean authenticate(Request request, HttpServletResponse response)
             throws IOException {
 
-        if (checkForCachedAuthentication(request, true)) {
+        if (checkForCachedAuthentication(request, response, true)) {
             return true;
         }
 

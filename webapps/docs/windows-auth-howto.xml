@@ -301,7 +301,9 @@ com.sun.security.jgss.krb5.accept {
   <li>Configure IIS to use Windows authentication</li>
   <li>Configure Tomcat to use the authentication user information from IIS by
   setting the tomcatAuthentication attribute on the <a href="config/ajp.html">
-  AJP connector</a> to <code>false</code>.</li>
+  AJP connector</a> to <code>false</code>. Alternatively, set the
+  tomcatAuthorization attribute to <code>true</code> to allow IIS to
+  authenticate, while Tomcat performs the authorization.</li>
   </ol>
   </subsection>
 
