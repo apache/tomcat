@@ -116,6 +116,11 @@ public final class NonLoginAuthenticator
         // Don't try and use SSO to authenticate since there is no auth
         // configured for this web application
         if (checkForCachedAuthentication(request, response, true)) {
+            // save the inherited Principal in this session so it can remain
+            // authenticated until it expires
+            if (cache) {
+                request.getSessionInternal(true).setPrincipal(request.getUserPrincipal());
+            }
             return true;
         }
 
