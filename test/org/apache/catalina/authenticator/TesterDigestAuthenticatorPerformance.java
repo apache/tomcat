@@ -266,5 +266,10 @@ public class TesterDigestAuthenticatorPerformance {
         public String getRequestURI() {
             return CONTEXT_PATH + URI;
         }
+
+        @Override
+        public org.apache.coyote.Request getCoyoteRequest() {
+            return new org.apache.coyote.Request();
+        }
     }
 }
