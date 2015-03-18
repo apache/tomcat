@@ -71,14 +71,14 @@ public class LoaderSF extends StoreFactoryBase {
     protected boolean isDefaultLoader(Loader loader) {
 
         if (!(loader instanceof WebappLoader)) {
-            return (false);
+            return false;
         }
         WebappLoader wloader = (WebappLoader) loader;
         if ((wloader.getDelegate() != false)
                 || !wloader.getLoaderClass().equals(
                         "org.apache.catalina.loader.WebappClassLoader")) {
-            return (false);
+            return false;
         }
-        return (true);
+        return true;
     }
 }

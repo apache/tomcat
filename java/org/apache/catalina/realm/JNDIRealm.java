@@ -1799,7 +1799,7 @@ public class JNDIRealm extends RealmBase {
             containerLog.trace("  validating credentials");
 
         if (info == null || credentials == null)
-            return (false);
+            return false;
 
         String password = info.getPassword();
 
@@ -1822,11 +1822,11 @@ public class JNDIRealm extends RealmBase {
          throws NamingException {
 
          if (credentials == null || user == null)
-             return (false);
+             return false;
 
          String dn = user.getDN();
          if (dn == null)
-             return (false);
+             return false;
 
          // Validate the credentials specified by the user
          if (containerLog.isTraceEnabled()) {

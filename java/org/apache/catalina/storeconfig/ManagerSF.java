@@ -72,9 +72,9 @@ public class ManagerSF extends StoreFactoryBase {
 
         if (!"SESSIONS.ser".equals(smanager.getPathname())
                 || (smanager.getMaxActiveSessions() != -1)) {
-            return (false);
+            return false;
         }
-        return (true);
+        return true;
 
     }
 

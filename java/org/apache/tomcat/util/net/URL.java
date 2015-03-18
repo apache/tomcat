@@ -247,10 +247,10 @@ public final class URL implements Serializable {
     public boolean equals(Object obj) {
 
         if (!(obj instanceof URL))
-            return (false);
+            return false;
         URL other = (URL) obj;
         if (!sameFile(other))
-            return (false);
+            return false;
         return (compare(ref, other.getRef()));
 
     }
@@ -470,14 +470,14 @@ public final class URL implements Serializable {
     public boolean sameFile(URL other) {
 
         if (!compare(protocol, other.getProtocol()))
-            return (false);
+            return false;
         if (!compare(host, other.getHost()))
-            return (false);
+            return false;
         if (port != other.getPort())
-            return (false);
+            return false;
         if (!compare(file, other.getFile()))
-            return (false);
-        return (true);
+            return false;
+        return true;
 
     }
 
@@ -527,12 +527,12 @@ public final class URL implements Serializable {
 
         if (first == null) {
             if (second == null)
-                return (true);
+                return true;
             else
-                return (false);
+                return false;
         } else {
             if (second == null)
-                return (false);
+                return false;
             else
                 return (first.equals(second));
         }

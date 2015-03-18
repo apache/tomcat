@@ -199,9 +199,9 @@ class ApplicationRequest extends ServletRequestWrapper {
 
         for (int i = 0; i < specials.length; i++) {
             if (specials[i].equals(name))
-                return (true);
+                return true;
         }
-        return (false);
+        return false;
 
     }
 

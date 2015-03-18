@@ -1660,7 +1660,7 @@ public class StandardWrapper extends ContainerBase
     protected boolean isContainerProvidedServlet(String classname) {
 
         if (classname.startsWith("org.apache.catalina.")) {
-            return (true);
+            return true;
         }
         try {
             Class<?> clazz =
@@ -1668,7 +1668,7 @@ public class StandardWrapper extends ContainerBase
             return (ContainerServlet.class.isAssignableFrom(clazz));
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            return (false);
+            return false;
         }
 
     }

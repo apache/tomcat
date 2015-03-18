@@ -85,7 +85,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 if (principal != null) {
                     register(request, response, principal,
                         HttpServletRequest.BASIC_AUTH, username, password);
-                    return (true);
+                    return true;
                 }
             }
             catch (IllegalArgumentException iae) {
@@ -102,7 +102,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         value.append('\"');
         response.setHeader(AUTH_HEADER_NAME, value.toString());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        return (false);
+        return false;
 
     }
 

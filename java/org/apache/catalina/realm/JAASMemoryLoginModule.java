@@ -139,7 +139,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
         // If our authentication was not successful, just return false
         if (principal == null)
-            return (false);
+            return false;
 
         // Clean up if overall authentication failed
         if (committed)
@@ -149,7 +149,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             principal = null;
         }
         log.debug("Abort");
-        return (true);
+        return true;
 
     }
 
@@ -171,7 +171,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
         // If authentication was not successful, just return false
         if (principal == null)
-            return (false);
+            return false;
 
         // Add our Principal to the Subject if needed
         if (!subject.getPrincipals().contains(principal)) {
@@ -189,7 +189,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         }
 
         committed = true;
-        return (true);
+        return true;
 
     }
 
@@ -299,7 +299,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
         // Report results based on success or failure
         if (principal != null) {
-            return (true);
+            return true;
         } else {
             throw new
                 FailedLoginException("Username or password is incorrect");
@@ -322,7 +322,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         subject.getPrincipals().remove(principal);
         committed = false;
         principal = null;
-        return (true);
+        return true;
 
     }
 
