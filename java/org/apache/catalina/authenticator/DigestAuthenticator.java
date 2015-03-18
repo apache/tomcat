@@ -221,7 +221,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 }
 
                 if (principal != null && !digestInfo.isNonceStale()) {
-                    register(request, response, principal, digestInfo.getUsername(), null);
+                    register(request, response, principal,
+                            HttpServletRequest.DIGEST_AUTH,
+                            digestInfo.getUsername(), null);
                     return true;
                 }
             }
