@@ -161,7 +161,9 @@ public class FormAuthenticator
                 if (principal != null) {
                     session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
                     if (!matchRequest(request)) {
-                        register(request, response, principal, username, password);
+                        register(request, response, principal,
+                                HttpServletRequest.FORM_AUTH,
+                                username, password);
                         return true;
                     }
                 }
@@ -182,7 +184,7 @@ public class FormAuthenticator
             }
             principal = (Principal)
                 session.getNote(Constants.FORM_PRINCIPAL_NOTE);
-            register(request, response, principal,
+            register(request, response, principal, HttpServletRequest.FORM_AUTH,
                      (String) session.getNote(Constants.SESS_USERNAME_NOTE),
                      (String) session.getNote(Constants.SESS_PASSWORD_NOTE));
             // If we're caching principals we no longer need the username

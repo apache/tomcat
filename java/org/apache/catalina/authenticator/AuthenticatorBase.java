@@ -783,20 +783,22 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @param request The servlet request we are processing
      * @param response The servlet response we are generating
      * @param principal The authenticated Principal to be registered
+     * @param authType The authentication type to be registered
      * @param username Username used to authenticate (if any)
      * @param password Password used to authenticate (if any)
      */
-    public void register(Request request, HttpServletResponse response, Principal principal,
+    public void register(Request request, HttpServletResponse response,
+                            Principal principal, String authType,
                             String username, String password) {
 
         if (log.isDebugEnabled()) {
             String name = (principal == null) ? "none" : principal.getName();
-            log.debug("Authenticated '" + name + "' with type '" + getAuthMethod() +
+            log.debug("Authenticated '" + name + "' with type '" + authType +
                     "'");
         }
 
         // Cache the authentication information in our request
-        request.setAuthType(getAuthMethod());
+        request.setAuthType(authType);
         request.setUserPrincipal(principal);
 
         Session session = request.getSessionInternal(false);
@@ -822,7 +824,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         // Cache the authentication information in our session, if any
         if (cache) {
             if (session != null) {
-                session.setAuthType(getAuthMethod());
+                session.setAuthType(authType);
                 session.setPrincipal(principal);
                 if (username != null) {
                     session.setNote(Constants.SESS_USERNAME_NOTE, username);
@@ -871,7 +873,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             response.addCookie(cookie);
 
             // Register this principal with our SSO valve
-            sso.register(ssoId, principal, getAuthMethod(), username, password);
+            sso.register(ssoId, principal, authType, username, password);
             request.setNote(Constants.REQ_SSOID_NOTE, ssoId);
 
         } else {
@@ -882,7 +884,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 return;
             } else {
                 // Update the SSO session with the latest authentication data
-                sso.update(ssoId, principal, getAuthMethod(), username, password);
+                sso.update(ssoId, principal, authType, username, password);
             }
         }
 
@@ -903,7 +905,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     public void login(String username, String password, Request request)
             throws ServletException {
         Principal principal = doLogin(request, username, password);
-        register(request, request.getResponse(), principal, username, password);
+        register(request, request.getResponse(), principal,
+                    getAuthMethod(), username, password);
     }
 
     protected abstract String getAuthMethod();
@@ -928,7 +931,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
     @Override
     public void logout(Request request) {
-        register(request, request.getResponse(), null, null, null);
+        register(request, request.getResponse(), null,
+                null, null, null);
+
     }
 
     /**

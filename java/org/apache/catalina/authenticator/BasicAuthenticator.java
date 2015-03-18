@@ -83,8 +83,9 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
                 Principal principal = context.getRealm().authenticate(username, password);
                 if (principal != null) {
-                    register(request, response, principal, username, password);
-                    return true;
+                    register(request, response, principal,
+                        HttpServletRequest.BASIC_AUTH, username, password);
+                    return (true);
                 }
             }
             catch (IllegalArgumentException iae) {
@@ -101,7 +102,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         value.append('\"');
         response.setHeader(AUTH_HEADER_NAME, value.toString());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        return false;
+        return (false);
 
     }
 

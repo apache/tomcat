@@ -271,7 +271,9 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 + Base64.encodeBase64String(outToken));
 
         if (principal != null) {
-            register(request, response, principal,  principal.getName(), null);
+            register(request, response, principal, Constants.SPNEGO_METHOD,
+                    principal.getName(), null);
+
             Pattern p = noKeepAliveUserAgents;
             if (p != null) {
                 MessageBytes ua =

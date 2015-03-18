@@ -85,12 +85,13 @@ public class SSLAuthenticator extends AuthenticatorBase {
             }
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                                sm.getString("authenticator.unauthorized"));
-            return false;
+            return (false);
         }
 
         // Cache the principal (if requested) and record this authentication
-        register(request, response, principal, null, null);
-        return true;
+        register(request, response, principal,
+                HttpServletRequest.CLIENT_CERT_AUTH, null, null);
+        return (true);
 
     }
 
