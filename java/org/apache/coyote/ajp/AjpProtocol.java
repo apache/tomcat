@@ -134,6 +134,7 @@ public class AjpProtocol extends AbstractAjpProtocol<Socket> {
             AjpProcessor processor = new AjpProcessor(proto.packetSize, (JIoEndpoint)proto.endpoint);
             processor.setAdapter(proto.adapter);
             processor.setTomcatAuthentication(proto.tomcatAuthentication);
+            processor.setTomcatAuthorization(proto.getTomcatAuthorization());
             processor.setRequiredSecret(proto.requiredSecret);
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
             processor.setClientCertProvider(proto.getClientCertProvider());

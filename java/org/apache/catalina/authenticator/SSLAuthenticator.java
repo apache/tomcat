@@ -92,7 +92,7 @@ public class SSLAuthenticator
         // Change to true below to allow previous FORM or BASIC authentications
         // to authenticate users for this webapp
         // TODO make this a configurable attribute (in SingleSignOn??)
-        if (checkForCachedAuthentication(request, false)) {
+        if (checkForCachedAuthentication(request, response, false)) {
             return true;
         }
 

@@ -115,7 +115,7 @@ public final class NonLoginAuthenticator
 
         // Don't try and use SSO to authenticate since there is no auth
         // configured for this web application
-        if (checkForCachedAuthentication(request, true)) {
+        if (checkForCachedAuthentication(request, response, true)) {
             return true;
         }
 

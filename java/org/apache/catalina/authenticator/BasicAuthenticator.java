@@ -93,7 +93,7 @@ public class BasicAuthenticator
                                 LoginConfig config)
         throws IOException {
 
-        if (checkForCachedAuthentication(request, true)) {
+        if (checkForCachedAuthentication(request, response, true)) {
             return true;
         }
 

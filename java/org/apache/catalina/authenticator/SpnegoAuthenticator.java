@@ -136,7 +136,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     public boolean authenticate(Request request, HttpServletResponse response,
             LoginConfig config) throws IOException {
 
-        if (checkForCachedAuthentication(request, true)) {
+        if (checkForCachedAuthentication(request, response, true)) {
             return true;
         }
 

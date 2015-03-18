@@ -234,6 +234,14 @@
         Refactor Connector authentication (only used by AJP) into a separate
         method. (markt) 
       </scode>
+      <add>
+        <bug>57708</bug>: Implement a new feature for AJP connectors - Tomcat
+        Authorization. If the new tomcatAuthorization attribute is set to
+        <code>true</code> (it is disabled by default) Tomcat will take an
+        authenticated user name from the AJP protocol and use the appropriate
+        Realm for the request to authorize (i.e. add roles) to that user.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

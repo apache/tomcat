@@ -127,6 +127,41 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
+     * Return the Principal associated with the specified user name otherwise
+     * return <code>null</code>.
+     *
+     * @param username User name of the Principal to look up
+     */
+    @Override
+    public Principal authenticate(String username) {
+        Principal authenticatedUser = null;
+
+        for (Realm realm : realms) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("combinedRealm.authStart", username,
+                        realm.getClass().getName()));
+            }
+
+            authenticatedUser = realm.authenticate(username);
+
+            if (authenticatedUser == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("combinedRealm.authFail", username,
+                            realm.getClass().getName()));
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("combinedRealm.authSuccess",
+                            username, realm.getClass().getName()));
+                }
+                break;
+            }
+        }
+        return authenticatedUser;
+    }
+
+
+    /**
      * Return the Principal associated with the specified username and
      * credentials, if there is one; otherwise return <code>null</code>.
      *

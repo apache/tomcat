@@ -45,6 +45,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.DateTool;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.util.StandardSessionIdGenerator;
@@ -710,20 +711,22 @@ public abstract class AuthenticatorBase extends ValveBase
      * authenticate the user without requiring further user interaction.
      *
      * @param request The current request
+     * @param response The current response
      * @param useSSO  Should information available from SSO be used to attempt
      *                to authenticate the current user?
      *
      * @return <code>true</code> if the user was authenticated via the cache,
      *         otherwise <code>false</code>
      */
-    protected boolean checkForCachedAuthentication(Request request, boolean useSSO) {
+    protected boolean checkForCachedAuthentication(Request request,
+            HttpServletResponse response, boolean useSSO) {
 
         // Has the user already been authenticated?
         Principal principal = request.getUserPrincipal();
         String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
         if (principal != null) {
             if (log.isDebugEnabled()) {
-                log.debug("Already authenticated '" + principal.getName() + "'");
+                log.debug(sm.getString("authenticator.check.found", principal.getName()));
             }
             // Associate the session with any existing SSO session. Even if
             // useSSO is false, this will ensure coordinated session
@@ -737,8 +740,7 @@ public abstract class AuthenticatorBase extends ValveBase
         // Is there an SSO session against which we can try to reauthenticate?
         if (useSSO && ssoId != null) {
             if (log.isDebugEnabled()) {
-                log.debug("SSO Id " + ssoId + " set; attempting " +
-                          "reauthentication");
+                log.debug(sm.getString("authenticator.check.sso", ssoId));
             }
             /* Try to reauthenticate using data cached by SSO.  If this fails,
                either the original SSO logon was of DIGEST or SSL (which
@@ -751,6 +753,31 @@ public abstract class AuthenticatorBase extends ValveBase
             }
         }
 
+        // Has the Connector provided a pre-authenticated Principal that now
+        // needs to be authorized?
+        if (request.getCoyoteRequest().getRemoteUserNeedsAuthorization()) {
+            String username = request.getCoyoteRequest().getRemoteUser().toString();
+            if (username != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("authenticator.check.authorize", username));
+                }
+                Principal authorized = context.getRealm().authenticate(username);
+                if (authorized == null) {
+                    // Realm doesn't recognise user. Create a user with no roles
+                    // from the authenticated user name
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("authenticator.check.authorizeFail", username));
+                    }
+                    authorized = new GenericPrincipal(username, null,  null);
+                }
+                String authType = request.getAuthType();
+                if (authType == null || authType.length() == 0) {
+                    authType = getAuthMethod();
+                }
+                register(request, response, authorized, authType, username, null);
+                return true;
+            }
+        }
         return false;
     }
 

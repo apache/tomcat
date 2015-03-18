@@ -76,6 +76,15 @@ public interface Realm {
 
 
     /**
+     * Return the Principal associated with the specified username, if there
+     * is one; otherwise return <code>null</code>.
+     *
+     * @param username Username of the Principal to look up
+     */
+    public Principal authenticate(String username);
+
+
+    /**
      * Return the Principal associated with the specified username and
      * credentials, if there is one; otherwise return <code>null</code>.
      *

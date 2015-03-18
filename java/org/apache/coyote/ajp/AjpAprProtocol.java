@@ -146,6 +146,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
             AjpAprProcessor processor = new AjpAprProcessor(proto.packetSize, (AprEndpoint)proto.endpoint);
             processor.setAdapter(proto.adapter);
             processor.setTomcatAuthentication(proto.tomcatAuthentication);
+            processor.setTomcatAuthorization(proto.getTomcatAuthorization());
             processor.setRequiredSecret(proto.requiredSecret);
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());
             processor.setClientCertProvider(proto.getClientCertProvider());
