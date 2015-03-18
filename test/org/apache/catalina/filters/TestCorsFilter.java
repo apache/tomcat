@@ -520,6 +520,85 @@ public class TestCorsFilter {
                 CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST)).booleanValue());
     }
 
+    /*
+     * Negative test, when a non-CORS request arrives, with an origin header.
+     */
+    @Test
+    public void testDoFilterSameHostWithOrigin01() throws IOException, ServletException {
+        doTestDoFilterSameHostWithOrigin01(
+                "http://localhost:8080", "http", "localhost", 8080, false);
+    }
+
+    @Test
+    public void testDoFilterSameHostWithOrigin02() throws IOException, ServletException {
+        doTestDoFilterSameHostWithOrigin01(
+                "http://localhost:8080", "https", "localhost", 8080, true);
+    }
+
+    @Test
+    public void testDoFilterSameHostWithOrigin03() throws IOException, ServletException {
+        doTestDoFilterSameHostWithOrigin01(
+                "http://localhost:8080", "http", "localhost", 8081, true);
+    }
+
+    @Test
+    public void testDoFilterSameHostWithOrigin04() throws IOException, ServletException {
+        doTestDoFilterSameHostWithOrigin01(
+                "http://localhost:8080", "http", "foo.dev.local", 8080, true);
+    }
+
+    @Test
+    public void testDoFilterSameHostWithOrigin05() throws IOException, ServletException {
+        doTestDoFilterSameHostWithOrigin01(
+                "https://localhost:8443", "https", "localhost", 8443, false);
+    }
+
+    @Test
+    public void testDoFilterSameHostWithOrigin06() throws IOException, ServletException {
+        doTestDoFilterSameHostWithOrigin01(
+                "https://localhost", "https", "localhost", 443, false);
+    }
+
+    @Test
+    public void testDoFilterSameHostWithOrigin07() throws IOException, ServletException {
+        doTestDoFilterSameHostWithOrigin01(
+                "http://localhost", "http", "localhost", 80, false);
+    }
+
+    private void doTestDoFilterSameHostWithOrigin01(String origin, String scheme, String host,
+            int port, boolean isCors) throws IOException, ServletException {
+
+        TesterHttpServletRequest request = new TesterHttpServletRequest();
+
+        request.setMethod("POST");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, origin);
+        request.setScheme(scheme);
+        request.setServerName(host);
+        request.setServerPort(port);
+        request.setContentType("text/plain");
+        TesterHttpServletResponse response = new TesterHttpServletResponse();
+
+        CorsFilter corsFilter = new CorsFilter();
+        corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
+        CorsFilter.CORSRequestType requestType =
+                corsFilter.checkRequestType(request);
+        if (isCors) {
+            Assert.assertNotEquals(CorsFilter.CORSRequestType.NOT_CORS, requestType);
+        } else {
+            Assert.assertEquals(CorsFilter.CORSRequestType.NOT_CORS, requestType);
+        }
+
+        corsFilter.doFilter(request, response, filterChain);
+
+        if (isCors) {
+            Assert.assertTrue(((Boolean) request.getAttribute(
+                    CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST)).booleanValue());
+        } else {
+            Assert.assertFalse(((Boolean) request.getAttribute(
+                    CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST)).booleanValue());
+        }
+    }
+
     @Test
     public void testDoFilterInvalidCORSOriginNotAllowed() throws IOException,
             ServletException {

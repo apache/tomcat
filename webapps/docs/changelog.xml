@@ -163,6 +163,10 @@
         Add support for <code>LAST_ACCESS_AT_START</code> system property to
         <code>SingleSignOn</code>. (kfujino)
       </fix>
+      <fix>
+        <bug>57724</bug>: Handle the case in the CORS filter where a user agent
+        includes an origin header for a non-CORS request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
