@@ -287,10 +287,12 @@
          rel="nofollow">Qualys SSL/TLS test</a> is a useful tool for
       configuring these settings.</p>
 
-      <p>The <strong>tomcatAuthentication</strong> attribute is used with the
-      AJP connectors to determine if Tomcat should authenticate the user or if
-      authentication can be delegated to the reverse proxy that will then pass
-      the authenticated username to Tomcat as part of the AJP protocol.</p>
+      <p>The <strong>tomcatAuthentication</strong> and
+      <strong>tomcatAuthorization</strong> attributes are used with the
+      AJP connectors to determine if Tomcat should handle all authenication and
+      authorisation or if authentication should be delegated to the reverse
+      proxy (the authenticated user name is passed to Tomcat as part of the AJP
+      protocol) with the option for Tomcat to still perform authorization.</p>
 
       <p>The <strong>allowUnsafeLegacyRenegotiation</strong> attribute provides
       a workaround for

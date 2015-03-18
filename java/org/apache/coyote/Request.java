@@ -127,9 +127,10 @@ public final class Request {
     private final ServerCookies serverCookies = new ServerCookies(INITIAL_COOKIE_SIZE);
     private final Parameters parameters = new Parameters();
 
-    private final MessageBytes remoteUser=MessageBytes.newInstance();
-    private final MessageBytes authType=MessageBytes.newInstance();
-    private final HashMap<String,Object> attributes=new HashMap<>();
+    private final MessageBytes remoteUser = MessageBytes.newInstance();
+    private boolean remoteUserNeedsAuthorization = false;
+    private final MessageBytes authType = MessageBytes.newInstance();
+    private final HashMap<String,Object> attributes = new HashMap<>();
 
     private Response response;
     private ActionHook hook;
@@ -415,6 +416,14 @@ public final class Request {
         return remoteUser;
     }
 
+    public boolean getRemoteUserNeedsAuthorization() {
+        return remoteUserNeedsAuthorization;
+    }
+
+    public void setRemoteUserNeedsAuthorization(boolean remoteUserNeedsAuthorization) {
+        this.remoteUserNeedsAuthorization = remoteUserNeedsAuthorization;
+    }
+
     public MessageBytes getAuthType() {
         return authType;
     }
@@ -542,6 +551,7 @@ public final class Request {
 
         instanceId.recycle();
         remoteUser.recycle();
+        remoteUserNeedsAuthorization = false;
         authType.recycle();
         attributes.clear();
 

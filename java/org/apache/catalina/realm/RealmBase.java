@@ -416,6 +416,27 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
+     * Return the Principal associated with the specified username, if there
+     * is one; otherwise return <code>null</code>.
+     *
+     * @param username Username of the Principal to look up
+     */
+    @Override
+    public Principal authenticate(String username) {
+
+        if (username == null) {
+            return null;
+        }
+
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("realmBase.authenticateSuccess", username));
+        }
+
+        return getPrincipal(username);
+    }
+
+
+    /**
      * Return the Principal associated with the specified username and
      * credentials, if there is one; otherwise return <code>null</code>.
      *
