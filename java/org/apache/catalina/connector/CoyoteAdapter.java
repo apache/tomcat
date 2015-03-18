@@ -687,18 +687,6 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
-        // Set the remote principal
-        String principal = req.getRemoteUser().toString();
-        if (principal != null) {
-            request.setUserPrincipal(new CoyotePrincipal(principal));
-        }
-
-        // Set the authorization type
-        String authtype = req.getAuthType().toString();
-        if (authtype != null) {
-            request.setAuthType(authtype);
-        }
-
         // Request mapping.
         MessageBytes serverName;
         if (connector.getUseIPVHosts()) {
@@ -863,7 +851,24 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
+        doConnectorAuthentication(req, request);
+
         return true;
+    }
+
+
+    private void doConnectorAuthentication(org.apache.coyote.Request req, Request request) {
+        // Set the remote principal
+        String principal = req.getRemoteUser().toString();
+        if (principal != null) {
+            request.setUserPrincipal(new CoyotePrincipal(principal));
+        }
+
+        // Set the authorization type
+        String authtype = req.getAuthType().toString();
+        if (authtype != null) {
+            request.setAuthType(authtype);
+        }
     }
 
 

@@ -230,6 +230,10 @@
         body chunk larger than the socket write buffer is being written. This
         typically requires a larger than default AJP packetSize. (markt)
       </fix>
+      <scode>
+        Refactor Connector authentication (only used by AJP) into a separate
+        method. (markt) 
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
