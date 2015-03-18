@@ -173,22 +173,22 @@ public final class ApplicationFilterFactory {
         // Check the specific "*" special URL pattern, which also matches
         // named dispatches
         if (filterMap.getMatchAllUrlPatterns())
-            return (true);
+            return true;
 
         if (requestPath == null)
-            return (false);
+            return false;
 
         // Match on context relative request path
         String[] testPaths = filterMap.getURLPatterns();
 
         for (int i = 0; i < testPaths.length; i++) {
             if (matchFiltersURL(testPaths[i], requestPath)) {
-                return (true);
+                return true;
             }
         }
 
         // No match
-        return (false);
+        return false;
 
     }
 
@@ -204,25 +204,25 @@ public final class ApplicationFilterFactory {
     private boolean matchFiltersURL(String testPath, String requestPath) {
 
         if (testPath == null)
-            return (false);
+            return false;
 
         // Case 1 - Exact Match
         if (testPath.equals(requestPath))
-            return (true);
+            return true;
 
         // Case 2 - Path Match ("/.../*")
         if (testPath.equals("/*"))
-            return (true);
+            return true;
         if (testPath.endsWith("/*")) {
             if (testPath.regionMatches(0, requestPath, 0,
                                        testPath.length() - 2)) {
                 if (requestPath.length() == (testPath.length() - 2)) {
-                    return (true);
+                    return true;
                 } else if ('/' == requestPath.charAt(testPath.length() - 2)) {
-                    return (true);
+                    return true;
                 }
             }
-            return (false);
+            return false;
         }
 
         // Case 3 - Extension Match
@@ -239,7 +239,7 @@ public final class ApplicationFilterFactory {
         }
 
         // Case 4 - "Default" Match
-        return (false); // NOTE - Not relevant for selecting filters
+        return false; // NOTE - Not relevant for selecting filters
 
     }
 
@@ -256,16 +256,16 @@ public final class ApplicationFilterFactory {
                                         String servletName) {
 
         if (servletName == null) {
-            return (false);
+            return false;
         }
         // Check the specific "*" special servlet name
         else if (filterMap.getMatchAllServletNames()) {
-            return (true);
+            return true;
         } else {
             String[] servletNames = filterMap.getServletNames();
             for (int i = 0; i < servletNames.length; i++) {
                 if (servletName.equals(servletNames[i])) {
-                    return (true);
+                    return true;
                 }
             }
             return false;

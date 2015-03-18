@@ -229,7 +229,7 @@ public class SecurityCollection implements Serializable {
     public boolean findMethod(String method) {
 
         if (methods.length == 0 && omittedMethods.length == 0)
-            return (true);
+            return true;
         if (methods.length > 0) {
             for (int i = 0; i < methods.length; i++) {
                 if (methods[i].equals(method))
@@ -280,9 +280,9 @@ public class SecurityCollection implements Serializable {
 
         for (int i = 0; i < patterns.length; i++) {
             if (patterns[i].equals(pattern))
-                return (true);
+                return true;
         }
-        return (false);
+        return false;
 
     }
 

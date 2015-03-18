@@ -396,13 +396,13 @@ final class StandardHostValve extends ValveBase {
             }
 
             // Indicate that we have successfully processed this custom page
-            return (true);
+            return true;
 
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // Report our failure to process this custom page
             container.getLogger().error("Exception Processing " + errorPage, t);
-            return (false);
+            return false;
 
         }
     }

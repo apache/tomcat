@@ -939,7 +939,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         throws IOException {
 
         if (constraints == null || constraints.length == 0)
-            return (true);
+            return true;
 
         // Which user principal have we already authenticated?
         Principal principal = request.getPrincipal();
@@ -1062,7 +1062,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if ((principal == null) || (role == null) ||
             !(principal instanceof GenericPrincipal))
-            return (false);
+            return false;
 
         GenericPrincipal gp = (GenericPrincipal) principal;
         boolean result = gp.hasRole(role);
@@ -1100,7 +1100,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if (constraints == null || constraints.length == 0) {
             if (log.isDebugEnabled())
                 log.debug("  No applicable security constraint defined");
-            return (true);
+            return true;
         }
         for(int i=0; i < constraints.length; i++) {
             SecurityConstraint constraint = constraints[i];
@@ -1108,12 +1108,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             if (userConstraint == null) {
                 if (log.isDebugEnabled())
                     log.debug("  No applicable user data constraint defined");
-                return (true);
+                return true;
             }
             if (userConstraint.equals(Constants.NONE_TRANSPORT)) {
                 if (log.isDebugEnabled())
                     log.debug("  User data constraint has no restrictions");
-                return (true);
+                return true;
             }
 
         }
@@ -1121,7 +1121,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if (request.getRequest().isSecure()) {
             if (log.isDebugEnabled())
                 log.debug("  User data constraint already satisfied");
-            return (true);
+            return true;
         }
         // Initialize variables we need to determine the appropriate action
         int redirectPort = request.getConnector().getRedirectPort();
@@ -1133,7 +1133,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             response.sendError
                 (HttpServletResponse.SC_FORBIDDEN,
                  request.getRequestURI());
-            return (false);
+            return false;
         }
 
         // Redirect to the corresponding SSL port
@@ -1165,7 +1165,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if (log.isDebugEnabled())
             log.debug("  Redirecting to " + file.toString());
         response.sendRedirect(file.toString());
-        return (false);
+        return false;
 
     }
 

@@ -383,10 +383,10 @@ public class StoreAppender {
 
         for (int i = 0; i < persistables.length; i++) {
             if (persistables[i] == clazz || persistables[i].isAssignableFrom(clazz)) {
-                return (true);
+                return true;
             }
         }
-        return (false);
+        return false;
 
     }
 }

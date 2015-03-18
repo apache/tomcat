@@ -235,22 +235,22 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
         String queryString = request.getQueryString();
         if (queryString == null) {
-            return (false);
+            return false;
         }
         int start = queryString.indexOf(Constants.PRECOMPILE);
         if (start < 0) {
-            return (false);
+            return false;
         }
         queryString =
             queryString.substring(start + Constants.PRECOMPILE.length());
         if (queryString.length() == 0) {
-            return (true);             // ?jsp_precompile
+            return true;             // ?jsp_precompile
         }
         if (queryString.startsWith("&")) {
-            return (true);             // ?jsp_precompile&foo=bar...
+            return true;             // ?jsp_precompile&foo=bar...
         }
         if (!queryString.startsWith("=")) {
-            return (false);            // part of some other name or value
+            return false;            // part of some other name or value
         }
         int limit = queryString.length();
         int ampersand = queryString.indexOf("&");
@@ -259,14 +259,14 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         }
         String value = queryString.substring(1, limit);
         if (value.equals("true")) {
-            return (true);             // ?jsp_precompile=true
+            return true;             // ?jsp_precompile=true
         } else if (value.equals("false")) {
             // Spec says if jsp_precompile=false, the request should not
             // be delivered to the JSP page; the easiest way to implement
             // this is to set the flag to true, and precompile the page anyway.
             // This still conforms to the spec, since it says the
             // precompilation request can be ignored.
-            return (true);             // ?jsp_precompile=false
+            return true;             // ?jsp_precompile=false
         } else {
             throw new ServletException("Cannot have request parameter " +
                                        Constants.PRECOMPILE + " set to " +

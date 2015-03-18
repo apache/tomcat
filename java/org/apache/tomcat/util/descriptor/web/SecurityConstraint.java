@@ -293,12 +293,12 @@ public class SecurityConstraint implements Serializable {
     public boolean findAuthRole(String role) {
 
         if (role == null)
-            return (false);
+            return false;
         for (int i = 0; i < authRoles.length; i++) {
             if (role.equals(authRoles[i]))
-                return (true);
+                return true;
         }
-        return (false);
+        return false;
 
     }
 
@@ -358,7 +358,7 @@ public class SecurityConstraint implements Serializable {
 
         // We cannot match without a valid request method
         if (method == null)
-            return (false);
+            return false;
 
         // Check all of the collections included in this constraint
         for (int i = 0; i < collections.length; i++) {
@@ -367,12 +367,12 @@ public class SecurityConstraint implements Serializable {
             String patterns[] = collections[i].findPatterns();
             for (int j = 0; j < patterns.length; j++) {
                 if (matchPattern(uri, patterns[j]))
-                    return (true);
+                    return true;
             }
         }
 
         // No collection included in this constraint matches this request
-        return (false);
+        return false;
 
     }
 
@@ -488,24 +488,24 @@ public class SecurityConstraint implements Serializable {
 
         // Check for exact match
         if (path.equals(pattern))
-            return (true);
+            return true;
 
         // Check for path prefix matching
         if (pattern.startsWith("/") && pattern.endsWith("/*")) {
             pattern = pattern.substring(0, pattern.length() - 2);
             if (pattern.length() == 0)
-                return (true);  // "/*" is the same as "/"
+                return true;  // "/*" is the same as "/"
             if (path.endsWith("/"))
                 path = path.substring(0, path.length() - 1);
             while (true) {
                 if (pattern.equals(path))
-                    return (true);
+                    return true;
                 int slash = path.lastIndexOf('/');
                 if (slash <= 0)
                     break;
                 path = path.substring(0, slash);
             }
-            return (false);
+            return false;
         }
 
         // Check for suffix matching
@@ -514,16 +514,16 @@ public class SecurityConstraint implements Serializable {
             int period = path.lastIndexOf('.');
             if ((slash >= 0) && (period > slash) &&
                 path.endsWith(pattern.substring(1))) {
-                return (true);
+                return true;
             }
-            return (false);
+            return false;
         }
 
         // Check for universal mapping
         if (pattern.equals("/"))
-            return (true);
+            return true;
 
-        return (false);
+        return false;
 
     }
 

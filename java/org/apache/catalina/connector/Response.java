@@ -1458,22 +1458,22 @@ public class Response
     protected boolean isEncodeable(final String location) {
 
         if (location == null) {
-            return (false);
+            return false;
         }
 
         // Is this an intra-document reference?
         if (location.startsWith("#")) {
-            return (false);
+            return false;
         }
 
         // Are we in a valid session that is not using cookies?
         final Request hreq = request;
         final Session session = hreq.getSessionInternal(false);
         if (session == null) {
-            return (false);
+            return false;
         }
         if (hreq.isRequestedSessionIdFromCookie()) {
-            return (false);
+            return false;
         }
 
         // Is URL encoding permitted
@@ -1503,15 +1503,15 @@ public class Response
         try {
             url = new URL(location);
         } catch (MalformedURLException e) {
-            return (false);
+            return false;
         }
 
         // Does this URL match down to (and including) the context path?
         if (!hreq.getScheme().equalsIgnoreCase(url.getProtocol())) {
-            return (false);
+            return false;
         }
         if (!hreq.getServerName().equalsIgnoreCase(url.getHost())) {
-            return (false);
+            return false;
         }
         int serverPort = hreq.getServerPort();
         if (serverPort == -1) {
@@ -1530,25 +1530,25 @@ public class Response
             }
         }
         if (serverPort != urlPort) {
-            return (false);
+            return false;
         }
 
         String contextPath = getContext().getPath();
         if (contextPath != null) {
             String file = url.getFile();
             if ((file == null) || !file.startsWith(contextPath)) {
-                return (false);
+                return false;
             }
             String tok = ";" +
                     SessionConfig.getSessionUriParamName(request.getContext()) +
                     "=" + session.getIdInternal();
             if( file.indexOf(tok, contextPath.length()) >= 0 ) {
-                return (false);
+                return false;
             }
         }
 
         // This URL belongs to our web application, so it is encodeable
-        return (true);
+        return true;
 
     }
 

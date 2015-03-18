@@ -585,12 +585,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
             String requestedSessionId = getRequestedSessionId();
             if (requestedSessionId == null)
-                return (false);
+                return false;
             if (context == null)
-                return (false);
+                return false;
             Manager manager = context.getManager();
             if (manager == null)
-                return (false);
+                return false;
             Session session = null;
             try {
                 session = manager.findSession(requestedSessionId);
@@ -598,9 +598,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                 // Ignore
             }
             if ((session != null) && session.isValid()) {
-                return (true);
+                return true;
             } else {
-                return (false);
+                return false;
             }
 
         } else {
@@ -768,9 +768,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         for (int i = 0; i < specials.length; i++) {
             if (specials[i].equals(name))
-                return (true);
+                return true;
         }
-        return (false);
+        return false;
 
     }
 
@@ -800,10 +800,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         for (int i = 0; i < specials.length; i++) {
             if (specials[i].equals(name)) {
                 specialAttributes[i] = value;
-                return (true);
+                return true;
             }
         }
-        return (false);
+        return false;
     }
 
 
@@ -816,10 +816,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         for (int i = 0; i < specials.length; i++) {
             if (specials[i].equals(name)) {
                 specialAttributes[i] = null;
-                return (true);
+                return true;
             }
         }
-        return (false);
+        return false;
     }
 
 
