@@ -49,6 +49,9 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     private Map<String, Object> attributes = new HashMap<>();
     private Map<String, List<String>> headers = new HashMap<>();
     private String method;
+    private String scheme;
+    private String serverName;
+    private int serverPort;
     private String contentType;
 
     @Override
@@ -126,20 +129,30 @@ public class TesterHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getScheme() {
+        return scheme;
+    }
 
-        throw new RuntimeException("Not implemented");
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
     }
 
     @Override
     public String getServerName() {
-
-        throw new RuntimeException("Not implemented");
+        return serverName;
     }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
 
     @Override
     public int getServerPort() {
+        return serverPort;
+    }
 
-        throw new RuntimeException("Not implemented");
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
     }
 
     @Override
@@ -208,7 +221,6 @@ public class TesterHttpServletRequest implements HttpServletRequest {
 
     @Override
     public String getLocalName() {
-
         throw new RuntimeException("Not implemented");
     }
 
