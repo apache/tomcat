@@ -18,13 +18,13 @@ package org.apache.catalina.loader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Filter;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
 import javax.servlet.http.HttpServletResponse;
-
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,6 +35,7 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
 
@@ -54,8 +55,10 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
                 "org.apache.tomcat.unittest.TesterLeakingServlet1");
         ctx.addServletMapping("/leak1", "leakServlet1");
 
-
         tomcat.start();
+
+        Executor executor = tomcat.getConnector().getProtocolHandler().getExecutor();
+        ((ThreadPoolExecutor) executor).setThreadRenewalDelay(-1);
 
         // Configure logging filter to check leak message appears
         LogValidationFilter f = new LogValidationFilter(
@@ -110,6 +113,9 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
         ctx.addServletMapping("/leak2", "leakServlet2");
 
         tomcat.start();
+
+        Executor executor = tomcat.getConnector().getProtocolHandler().getExecutor();
+        ((ThreadPoolExecutor) executor).setThreadRenewalDelay(-1);
 
         // Configure logging filter to check leak message appears
         LogValidationFilter f = new LogValidationFilter(
