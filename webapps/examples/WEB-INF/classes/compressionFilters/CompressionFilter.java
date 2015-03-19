@@ -257,12 +257,12 @@ public class CompressionFilter implements Filter {
     }
 
     /**
-     * Return filter config
      * Required by Weblogic 6.1
+     *
+     * @return the FilterConfig that was used to initialise this filter.
      */
     public FilterConfig getFilterConfig() {
         return config;
     }
-
 }
 
