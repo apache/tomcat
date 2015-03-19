@@ -499,9 +499,7 @@ public abstract class AbstractEndpoint<S> {
     /**
      * Attributes provide a way for configuration to be passed to sub-components
      * without the {@link org.apache.coyote.ProtocolHandler} being aware of the
-     * properties available on those sub-components. One example of such a
-     * sub-component is the
-     * {@link org.apache.tomcat.util.net.ServerSocketFactory}.
+     * properties available on those sub-components.
      */
     protected HashMap<String, Object> attributes = new HashMap<>();
 

@@ -33,8 +33,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * InputBuffer for HTTP that provides request header parsing as well as transfer
  * encoding.
- *
- * <S>  The type of socket used by the underlying I/O implementation
  */
 public class Http11InputBuffer implements InputBuffer {
 

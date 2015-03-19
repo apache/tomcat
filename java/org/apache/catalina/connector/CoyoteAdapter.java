@@ -1145,7 +1145,7 @@ public class CoyoteAdapter implements Adapter {
      *
      * @param uriMB URI to be normalized
      *
-     * @return <code>false</false> if normalizing this URI would require going
+     * @return <code>false</code> if normalizing this URI would require going
      *         above the root, or if the URI contains a null byte, otherwise
      *         <code>true</code>
      */
