@@ -202,10 +202,8 @@ public class Tomcat {
      *
      * @throws ServletException
      */
-    public Context addWebapp(String contextPath, 
-                                     String baseDir) throws ServletException {
-        
-        return addWebapp(getHost(), contextPath, baseDir);    
+    public Context addWebapp(String contextPath, String docBase) throws ServletException {
+        return addWebapp(getHost(), contextPath, docBase);
     }
     
     
@@ -233,12 +231,11 @@ public class Tomcat {
      * TODO: add the rest
      *
      *  @param contextPath "" for root context.
-     *  @param baseDir base dir for the context, for static files. Must exist, 
+     *  @param docBase base dir for the context, for static files. Must exist,
      *  relative to the server home
      */
-    public Context addContext(String contextPath, 
-                                      String baseDir) {
-        return addContext(getHost(), contextPath, baseDir);
+    public Context addContext(String contextPath, String docBase) {
+        return addContext(getHost(), contextPath, docBase);
     }
 
     /**
@@ -523,20 +520,27 @@ public class Tomcat {
         return ctx;
     }
     
-    public Context addWebapp(Host host, String url, String path) {
-        return addWebapp(host, url, url, path);
+    public Context addWebapp(Host host, String contextPath, String docBase) {
+        return addWebapp(host, contextPath, contextPath, docBase);
     }
 
-    public Context addWebapp(Host host, String url, String name, String path) {
-        silence(host, url);
+    /**
+     * @see #addWebapp(String, String)
+     *
+     * @param name Ignored. The contextPath will be used
+     *
+     * @deprecated Use {@link #addWebapp(Host, String, String)}
+     */
+    @Deprecated
+    public Context addWebapp(Host host, String contextPath, String name, String docBase) {
+        silence(host, contextPath);
 
-        Context ctx = createContext(host, url);
-        ctx.setName(name);
-        ctx.setPath(url);
-        ctx.setDocBase(path);
+        Context ctx = createContext(host, contextPath);
+        ctx.setPath(contextPath);
+        ctx.setDocBase(docBase);
 
         ctx.addLifecycleListener(new DefaultWebXmlListener());
-        ctx.setConfigFile(getWebappConfigFile(path, url));
+        ctx.setConfigFile(getWebappConfigFile(docBase, contextPath));
 
         ContextConfig ctxCfg = new ContextConfig();
         ctx.addLifecycleListener(ctxCfg);

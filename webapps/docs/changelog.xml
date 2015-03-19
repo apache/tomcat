@@ -164,6 +164,11 @@
         <code>SingleSignOn</code>. (kfujino)
       </fix>
       <fix>
+        <bug>57723</bug>: Ensure that the Context name and path remain
+        consistent when adding a web application to an embedded Tomcat instance
+        via <code>Tomcat.addWebapp(Host,String,String,String)</code>. (markt)
+      </fix>
+      <fix>
         <bug>57724</bug>: Handle the case in the CORS filter where a user agent
         includes an origin header for a non-CORS request. (markt)
       </fix>
