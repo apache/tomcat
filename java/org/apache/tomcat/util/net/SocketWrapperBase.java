@@ -368,7 +368,7 @@ public abstract class SocketWrapperBase<E> {
      * Writes the provided data to the socket, buffering any remaining data if
      * used in non-blocking mode.
      *
-     * @param block <code>true<code> if a blocking write should be used,
+     * @param block <code>true</code> if a blocking write should be used,
      *                  otherwise a non-blocking write will be used
      * @param buf   The byte array containing the data to be written
      * @param off   The offset within the byte array of the data to be written
@@ -469,7 +469,7 @@ public abstract class SocketWrapperBase<E> {
     /**
      * Writes as much data as possible from any that remains in the buffers.
      *
-     * @param block <code>true<code> if a blocking write should be used,
+     * @param block <code>true</code> if a blocking write should be used,
      *                  otherwise a non-blocking write will be used
      *
      * @return <code>true</code> if data remains to be flushed after this method
