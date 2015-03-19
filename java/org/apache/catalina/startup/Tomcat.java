@@ -520,18 +520,6 @@ public class Tomcat {
      * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String contextPath, String docBase) {
-        return addWebapp(host, contextPath, contextPath, docBase);
-    }
-
-    /**
-     * @see #addWebapp(String, String)
-     *
-     * @param name Ignored. The path will be used
-     *
-     * @deprecated Use {@link #addWebapp(Host, String, String)}
-     */
-    @Deprecated
-    public Context addWebapp(Host host, String contextPath, String name, String docBase) {
         silence(host, contextPath);
 
         Context ctx = createContext(host, contextPath);
