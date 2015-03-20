@@ -598,9 +598,18 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         // Do nothing here, just wait for it to get recycled
                         // Don't do this for Comet we need to generate an end
                         // event (see BZ 54022)
-                    } else if (processor.isAsync() ||
-                            state == SocketState.ASYNC_END) {
+                    } else if (processor.isAsync()) {
                         state = processor.asyncDispatch(status);
+                    } else if (state == SocketState.ASYNC_END) {
+                        state = processor.asyncDispatch(status);
+                        if (state == SocketState.OPEN) {
+                            // There may be pipe-lined data to read. If the data
+                            // isn't processed now, execution will exit this
+                            // loop and call release() which will recycle the
+                            // processor (and input buffer) deleting any
+                            // pipe-lined data. To avoid this, process it now.
+                            state = processor.process(wrapper);
+                        }
                     } else if (processor.isComet()) {
                         state = processor.event(status);
                     } else if (processor.getUpgradeInbound() != null) {

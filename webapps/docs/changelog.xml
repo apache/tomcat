@@ -247,6 +247,12 @@
         Realm for the request to authorize (i.e. add roles) to that user.
         (markt)
       </add>
+      <fix>
+        Fix an issue that meant that any pipe-lined data read by Tomcat before
+        an asynchronous request completed was lost during the completion of the
+        asynchronous request. This mean that the pipe-lined request(s) would be
+        lost and/or corrupted. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
