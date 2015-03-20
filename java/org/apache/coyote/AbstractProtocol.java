@@ -651,9 +651,18 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         }
                     } else if (status == SocketStatus.DISCONNECT) {
                         // Do nothing here, just wait for it to get recycled
-                    } else if (processor.isAsync() ||
-                            state == SocketState.ASYNC_END) {
+                    } else if (processor.isAsync()) {
                         state = processor.asyncDispatch(status);
+                    } else if (state == SocketState.ASYNC_END) {
+                        state = processor.asyncDispatch(status);
+                        if (state == SocketState.OPEN) {
+                            // There may be pipe-lined data to read. If the data
+                            // isn't processed now, execution will exit this
+                            // loop and call release() which will recycle the
+                            // processor (and input buffer) deleting any
+                            // pipe-lined data. To avoid this, process it now.
+                            state = processor.process(wrapper);
+                        }
                     } else if (processor.isUpgrade()) {
                         state = processor.upgradeDispatch(status);
                     } else if (status == SocketStatus.OPEN_WRITE) {
