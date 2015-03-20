@@ -32,7 +32,7 @@ public class TesterLeakingServlet1 extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private ThreadLocal<TesterCounter> myThreadLocal = new ThreadLocal<>();
+    private static ThreadLocal<TesterCounter> myThreadLocal = new ThreadLocal<>();
 
     @Override
     protected void doGet(HttpServletRequest request,
