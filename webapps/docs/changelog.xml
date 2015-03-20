@@ -73,6 +73,10 @@
         <bug>55988</bug>: Add support for Java 8 JSSE server-preferred TLS
         cipher suite ordering. Patch provided by Ognjen Blagojevic. (schultz)
       </fix>
+      <add>
+        Add support for HPACK header encoding and decoding, contributed
+        by Stuart Douglas. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
