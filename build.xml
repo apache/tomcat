@@ -1460,6 +1460,8 @@
             <!-- build without it.                                           -->
             <exclude unless="java.7.home" name="org/apache/catalina/websocket/**" />
             <exclude unless="java.7.home" name="org/apache/tomcat/websocket/**" />
+            <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
+            <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
           </fileset>
         </batchtest>
       </junit>
