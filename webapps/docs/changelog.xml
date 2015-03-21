@@ -333,6 +333,9 @@
         stock ticker example (the only way a client can disconnect), the example
         continues to work for existing and new clients. (markt)
       </fix>
+      <update>
+        Update examples to use Apache Standard Taglib 1.2.5. (jboynes)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Extras">
