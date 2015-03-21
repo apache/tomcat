@@ -28,11 +28,6 @@ import java.util.Map;
 
 import org.apache.tomcat.util.http.MimeHeaders;
 
-import static org.apache.coyote.http2.Hpack.HeaderField;
-import static org.apache.coyote.http2.Hpack.STATIC_TABLE;
-import static org.apache.coyote.http2.Hpack.STATIC_TABLE_LENGTH;
-import static org.apache.coyote.http2.Hpack.encodeInteger;
-
 /**
  * Encoder for HPACK frames.
  */
@@ -76,8 +71,8 @@ public class HpackEncoder {
 
     static {
         Map<String, TableEntry[]> map = new HashMap<>();
-        for (int i = 1; i < STATIC_TABLE.length; ++i) {
-            HeaderField m = STATIC_TABLE[i];
+        for (int i = 1; i < Hpack.STATIC_TABLE.length; ++i) {
+            Hpack.HeaderField m = Hpack.STATIC_TABLE[i];
             TableEntry[] existing = map.get(m.name);
             if (existing == null) {
                 map.put(m.name, new TableEntry[]{new TableEntry(m.name, m.value, i)});
@@ -173,18 +168,18 @@ public class HpackEncoder {
                         if (val.equals(tableEntry.value)) {
                             //the whole thing is in the table
                             target.put((byte) (1 << 7));
-                            encodeInteger(target, tableEntry.getPosition(), 7);
+                            Hpack.encodeInteger(target, tableEntry.getPosition(), 7);
                         } else {
                             if (canIndex) {
                                 //add the entry to the dynamic table
                                 target.put((byte) (1 << 6));
-                                encodeInteger(target, tableEntry.getPosition(), 6);
+                                Hpack.encodeInteger(target, tableEntry.getPosition(), 6);
                                 writeHuffmanEncodableValue(target, headerName, val);
                                 addToDynamicTable(headerName, val);
 
                             } else {
                                 target.put((byte) (1 << 4));
-                                encodeInteger(target, tableEntry.getPosition(), 4);
+                                Hpack.encodeInteger(target, tableEntry.getPosition(), 4);
                                 writeHuffmanEncodableValue(target, headerName, val);
                             }
                         }
@@ -208,7 +203,7 @@ public class HpackEncoder {
             }
         }
         target.put((byte) 0); //to use encodeInteger we need to place the first byte in the buffer.
-        encodeInteger(target, headerName.length(), 7);
+        Hpack.encodeInteger(target, headerName.length(), 7);
         for (int j = 0; j < headerName.length(); ++j) {
             target.put(Hpack.toLower((byte) headerName.charAt(j)));
         }
@@ -227,7 +222,7 @@ public class HpackEncoder {
 
     private void writeValueString(ByteBuffer target, String val) {
         target.put((byte) 0); //to use encodeInteger we need to place the first byte in the buffer.
-        encodeInteger(target, val.length(), 7);
+        Hpack.encodeInteger(target, val.length(), 7);
         for (int j = 0; j < val.length(); ++j) {
             target.put((byte) val.charAt(j));
         }
@@ -317,10 +312,10 @@ public class HpackEncoder {
         }
         if (minNewMaxHeaderSize != newMaxHeaderSize) {
             target.put((byte) (1 << 5));
-            encodeInteger(target, minNewMaxHeaderSize, 5);
+            Hpack.encodeInteger(target, minNewMaxHeaderSize, 5);
         }
         target.put((byte) (1 << 5));
-        encodeInteger(target, newMaxHeaderSize, 5);
+        Hpack.encodeInteger(target, newMaxHeaderSize, 5);
         maxTableSize = newMaxHeaderSize;
         runEvictionIfRequired();
         newMaxHeaderSize = -1;
@@ -363,7 +358,7 @@ public class HpackEncoder {
 
         @Override
         public int getPosition() {
-            return super.getPosition() + entryPositionCounter + STATIC_TABLE_LENGTH;
+            return super.getPosition() + entryPositionCounter + Hpack.STATIC_TABLE_LENGTH;
         }
     }
 

@@ -18,9 +18,10 @@ package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
 
-import org.apache.tomcat.util.http.MimeHeaders;
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tomcat.util.http.MimeHeaders;
 
 public class TestHpack {
 
