@@ -20,8 +20,6 @@ import java.nio.ByteBuffer;
 
 import org.apache.tomcat.util.res.StringManager;
 
-import static org.apache.coyote.http2.Hpack.HeaderField;
-
 /**
  * A decoder for HPACK.
  */
@@ -39,7 +37,7 @@ public class HpackDecoder {
     /**
      * The header table
      */
-    private HeaderField[] headerTable;
+    private Hpack.HeaderField[] headerTable;
 
     /**
      * The current HEAD position of the header table. We use a ring buffer type
@@ -67,7 +65,7 @@ public class HpackDecoder {
 
     public HpackDecoder(int maxMemorySize) {
         this.maxMemorySize = maxMemorySize;
-        headerTable = new HeaderField[DEFAULT_RING_BUFFER_SIZE];
+        headerTable = new Hpack.HeaderField[DEFAULT_RING_BUFFER_SIZE];
     }
 
     public HpackDecoder() {
@@ -109,7 +107,7 @@ public class HpackDecoder {
                     return;
                 }
                 headerEmitter.emitHeader(headerName, headerValue, false);
-                addEntryToHeaderTable(new HeaderField(headerName, headerValue));
+                addEntryToHeaderTable(new Hpack.HeaderField(headerName, headerValue));
             } else if ((b & 0b11110000) == 0) {
                 //Literal Header Field without Indexing
                 String headerName = readHeaderName(buffer, 4);
@@ -165,7 +163,7 @@ public class HpackDecoder {
                 if (firstSlotPosition == tableLength) {
                     firstSlotPosition = 0;
                 }
-                HeaderField oldData = headerTable[clearIndex];
+                Hpack.HeaderField oldData = headerTable[clearIndex];
                 headerTable[clearIndex] = null;
                 newSize -= oldData.size;
                 newTableSlots--;
@@ -225,7 +223,7 @@ public class HpackDecoder {
                 throw new HpackException();
             }
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
-            HeaderField res = headerTable[adjustedIndex];
+            Hpack.HeaderField res = headerTable[adjustedIndex];
             if (res == null) {
                 throw new HpackException();
             }
@@ -244,7 +242,7 @@ public class HpackDecoder {
             addStaticTableEntry(index);
         } else {
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
-            HeaderField headerField = headerTable[adjustedIndex];
+            Hpack.HeaderField headerField = headerTable[adjustedIndex];
             headerEmitter.emitHeader(headerField.name, headerField.value, false);
         }
     }
@@ -268,14 +266,14 @@ public class HpackDecoder {
     private void addStaticTableEntry(int index) throws HpackException {
         //adds an entry from the static table.
         //this must be an entry with a value as far as I can determine
-        HeaderField entry = Hpack.STATIC_TABLE[index];
+        Hpack.HeaderField entry = Hpack.STATIC_TABLE[index];
         if (entry.value == null) {
             throw new HpackException();
         }
         headerEmitter.emitHeader(entry.name, entry.value, false);
     }
 
-    private void addEntryToHeaderTable(HeaderField entry) {
+    private void addEntryToHeaderTable(Hpack.HeaderField entry) {
         if (entry.size > maxMemorySize) {
             //it is to big to fit, so we just completely clear the table.
             while (filledTableSlots > 0) {
@@ -301,7 +299,7 @@ public class HpackDecoder {
             if (firstSlotPosition == tableLength) {
                 firstSlotPosition = 0;
             }
-            HeaderField oldData = headerTable[clearIndex];
+            Hpack.HeaderField oldData = headerTable[clearIndex];
             headerTable[clearIndex] = null;
             newSize -= oldData.size;
             newTableSlots--;
@@ -312,7 +310,7 @@ public class HpackDecoder {
 
     private void resizeIfRequired() {
         if(filledTableSlots == headerTable.length) {
-            HeaderField[] newArray = new HeaderField[headerTable.length + 10]; //we only grow slowly
+            Hpack.HeaderField[] newArray = new Hpack.HeaderField[headerTable.length + 10]; //we only grow slowly
             for(int i = 0; i < headerTable.length; ++i) {
                 newArray[i] = headerTable[(firstSlotPosition + i) % headerTable.length];
             }
@@ -344,7 +342,7 @@ public class HpackDecoder {
         return firstSlotPosition;
     }
 
-    HeaderField[] getHeaderTable() {
+    Hpack.HeaderField[] getHeaderTable() {
         return headerTable;
     }
 
