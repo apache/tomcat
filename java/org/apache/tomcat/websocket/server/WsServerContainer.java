@@ -70,8 +70,7 @@ import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 public class WsServerContainer extends WsWebSocketContainer
         implements ServerContainer {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(WsServerContainer.class);
     private static final Log log = LogFactory.getLog(WsServerContainer.class);
 
     private static final CloseReason AUTHENTICATED_HTTP_SESSION_CLOSED =
@@ -267,7 +266,7 @@ public class WsServerContainer extends WsWebSocketContainer
                 configurator(configurator).
                 build();
         sec.getUserProperties().put(
-                PojoEndpointServer.POJO_METHOD_MAPPING_KEY,
+                org.apache.tomcat.websocket.pojo.Constants.POJO_METHOD_MAPPING_KEY,
                 methodMapping);
 
         addEndpoint(sec);
@@ -384,7 +383,7 @@ public class WsServerContainer extends WsWebSocketContainer
         if (!PojoEndpointServer.class.isAssignableFrom(sec.getEndpointClass())) {
             // Need to make path params available to POJO
             sec.getUserProperties().put(
-                    PojoEndpointServer.POJO_PATH_PARAM_KEY,
+                    org.apache.tomcat.websocket.pojo.Constants.POJO_PATH_PARAM_KEY,
                     pathParams);
         }
 

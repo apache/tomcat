@@ -34,8 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class UriTemplate {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(UriTemplate.class);
 
     private final String normalized;
     private final List<Segment> segments = new ArrayList<>();

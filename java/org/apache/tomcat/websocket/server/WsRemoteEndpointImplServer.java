@@ -39,7 +39,7 @@ import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
 public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+            StringManager.getManager(WsRemoteEndpointImplServer.class);
     private static final Log log =
             LogFactory.getLog(WsHttpUpgradeHandler.class);
 
