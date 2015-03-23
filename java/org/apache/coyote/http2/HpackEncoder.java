@@ -110,8 +110,10 @@ public class HpackEncoder {
     /**
      * Encodes the headers into a buffer.
      *
-     * @param headers
-     * @param target
+     * @param headers The headers to encode
+     * @param target  The buffer to which to write the encoded headers
+     *
+     * @return The state of the encoding process
      */
     public State encode(MimeHeaders headers, ByteBuffer target) {
         int it = headersIterator;
@@ -233,7 +235,7 @@ public class HpackEncoder {
         DynamicTableEntry d = new DynamicTableEntry(headerName, val, -pos);
         List<TableEntry> existing = dynamicTable.get(headerName);
         if (existing == null) {
-            dynamicTable.put(headerName, existing = new ArrayList<TableEntry>(1));
+            dynamicTable.put(headerName, existing = new ArrayList<>(1));
         }
         existing.add(d);
         evictionQueue.add(d);
