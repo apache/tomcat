@@ -1124,7 +1124,7 @@ public class ContextConfig implements LifecycleListener {
 
         // Step 3. Look for ServletContainerInitializer implementations
         if (ok) {
-            processServletContainerInitializers(sContext);
+            processServletContainerInitializers();
         }
 
         if  (!webXml.isMetadataComplete() || typeInitializerMap.size() > 0) {
@@ -1607,12 +1607,11 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Scan JARs for ServletContainerInitializer implementations.
      */
-    protected void processServletContainerInitializers(ServletContext servletContext) {
+    protected void processServletContainerInitializers() {
 
         List<ServletContainerInitializer> detectedScis;
         try {
-            WebappServiceLoader<ServletContainerInitializer> loader =
-                    new WebappServiceLoader<>(servletContext, context.getContainerSciFilter());
+            WebappServiceLoader<ServletContainerInitializer> loader = new WebappServiceLoader<>(context);
             detectedScis = loader.load(ServletContainerInitializer.class);
         } catch (IOException e) {
             log.error(sm.getString(
