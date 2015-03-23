@@ -32,13 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class PojoEndpointServer extends PojoEndpointBase {
 
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
-
-    public static final String POJO_PATH_PARAM_KEY =
-            "org.apache.tomcat.websocket.pojo.PojoEndpoint.pathParams";
-    public static final String POJO_METHOD_MAPPING_KEY =
-            "org.apache.tomcat.websocket.pojo.PojoEndpoint.methodMapping";
-
+            StringManager.getManager(PojoEndpointServer.class);
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
@@ -59,12 +53,12 @@ public class PojoEndpointServer extends PojoEndpointBase {
         @SuppressWarnings("unchecked")
         Map<String,String> pathParameters =
                 (Map<String, String>) sec.getUserProperties().get(
-                        POJO_PATH_PARAM_KEY);
+                        Constants.POJO_PATH_PARAM_KEY);
         setPathParameters(pathParameters);
 
         PojoMethodMapping methodMapping =
                 (PojoMethodMapping) sec.getUserProperties().get(
-                        POJO_METHOD_MAPPING_KEY);
+                        Constants.POJO_METHOD_MAPPING_KEY);
         setMethodMapping(methodMapping);
 
         doOnOpen(session, endpointConfig);

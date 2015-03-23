@@ -58,7 +58,7 @@ import org.apache.tomcat.websocket.Util.DecoderMatch;
 public class PojoMethodMapping {
 
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+            StringManager.getManager(PojoMethodMapping.class);
 
     private final Method onOpen;
     private final Method onClose;
