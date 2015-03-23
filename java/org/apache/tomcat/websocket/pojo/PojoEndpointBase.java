@@ -40,8 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class PojoEndpointBase extends Endpoint {
 
     private static final Log log = LogFactory.getLog(PojoEndpointBase.class);
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(PojoEndpointBase.class);
 
     private Object pojo;
     private Map<String,String> pathParameters;

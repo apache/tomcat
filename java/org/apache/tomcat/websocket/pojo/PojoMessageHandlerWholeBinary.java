@@ -39,7 +39,7 @@ public class PojoMessageHandlerWholeBinary
         extends PojoMessageHandlerWholeBase<ByteBuffer> {
 
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+            StringManager.getManager(PojoMessageHandlerWholeBinary.class);
 
     private final List<Decoder> decoders = new ArrayList<>();
 
