@@ -176,6 +176,13 @@
         Refactor Authenticator implementations to reduce code duplication.
         (markt)
       </scode>
+      <fix>
+        When searching for SCIs
+        <code>o.a.catalina.Context.getParentClassLoader</code> will be used
+        instead of <code>java.lang.ClassLoader.getParent</code>. Thus one can
+        provide the correct parent class loader when running embedded Tomcat in
+        other environments such as OSGi. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
