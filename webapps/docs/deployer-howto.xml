@@ -165,10 +165,12 @@
             <li>Any Context Descriptors will be deployed first.</li>
             <li>
                 Exploded web applications not referenced by any Context
-                Descriptor will then be deployed. If they have an associated
-                .WAR file in the appBase and it is newer than the exploded web application,
-                the exploded directory will be removed and the webapp will be
-                redeployed from the .WAR
+                Descriptor will then be deployed. Note that if an exploded web
+                application has an associated .WAR file in the appBase, Tomcat
+                will not detect if the associated .WAR has been updated while
+                Tomcat was stopped and will deploy the exploded web application
+                as is. The exploded web application will not be removed and
+                replaced with the contents of the updated .WAR file.
             </li>
             <li>.WAR files will be deployed</li>
         </ol>
