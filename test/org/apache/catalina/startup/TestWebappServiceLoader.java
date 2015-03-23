@@ -31,6 +31,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.core.TesterContext;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 
@@ -40,7 +42,8 @@ public class TestWebappServiceLoader {
     private IMocksControl control;
     private ClassLoader cl;
     private ClassLoader parent;
-    private ServletContext context;
+    private Context context;
+    private ServletContext servletContext;
     private WebappServiceLoader<ServletContainerInitializer> loader;
 
     @Before
@@ -51,14 +54,15 @@ public class TestWebappServiceLoader {
                 .withConstructor(parent)
                 .addMockedMethod("loadClass", String.class)
                 .createMock(control);
-        context = control.createMock(ServletContext.class);
-        EasyMock.expect(context.getClassLoader()).andStubReturn(cl);
+        servletContext = control.createMock(ServletContext.class);
+        EasyMock.expect(servletContext.getClassLoader()).andStubReturn(cl);
+        context = new ExtendedTesterContext(servletContext, parent);
     }
 
     @Test
     public void testNoInitializersFound() throws IOException {
-        loader = new WebappServiceLoader<>(context, null);
-        EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
+        loader = new WebappServiceLoader<>(context);
+        EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(null);
         EasyMock.expect(cl.getResources(CONFIG_FILE))
                 .andReturn(Collections.<URL>emptyEnumeration());
@@ -73,8 +77,8 @@ public class TestWebappServiceLoader {
         URL url = new URL("file://test");
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
-                .withConstructor(context, "").createMock(control);
-        EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
+                .withConstructor(context).createMock(control);
+        EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(null);
         EasyMock.expect(cl.getResources(CONFIG_FILE))
                 .andReturn(Collections.enumeration(Collections.singleton(url)));
@@ -93,14 +97,14 @@ public class TestWebappServiceLoader {
         URL sci2 = new URL("file://dir/" + CONFIG_FILE);
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
-                .withConstructor(context, "").createMock(control);
+                .withConstructor(context).createMock(control);
         List<String> jars = Arrays.asList("jar1.jar", "dir/");
-        EasyMock.expect(context.getAttribute(ServletContext.ORDERED_LIBS))
+        EasyMock.expect(servletContext.getAttribute(ServletContext.ORDERED_LIBS))
                 .andReturn(jars);
-        EasyMock.expect(context.getResource("/WEB-INF/lib/jar1.jar"))
+        EasyMock.expect(servletContext.getResource("/WEB-INF/lib/jar1.jar"))
                 .andReturn(url1);
         loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci1));
-        EasyMock.expect(context.getResource("/WEB-INF/lib/dir/"))
+        EasyMock.expect(servletContext.getResource("/WEB-INF/lib/dir/"))
                 .andReturn(url2);
         loader.parseConfigFile(EasyMock.isA(LinkedHashSet.class), EasyMock.eq(sci2));
         EasyMock.expect(parent.getResources(CONFIG_FILE))
@@ -114,7 +118,7 @@ public class TestWebappServiceLoader {
     @Test
     public void testParseConfigFile() throws IOException {
         LinkedHashSet<String> found = new LinkedHashSet<>();
-        loader = new WebappServiceLoader<>(context, null);
+        loader = new WebappServiceLoader<>(context);
         loader.parseConfigFile(found, getClass().getResource("service-config.txt"));
         Assert.assertEquals(Collections.singleton("provider1"), found);
     }
@@ -122,7 +126,7 @@ public class TestWebappServiceLoader {
     @Test
     public void testLoadServices() throws Exception {
         Class<?> sci = TesterServletContainerInitializer1.class;
-        loader = new WebappServiceLoader<>(context, null);
+        loader = new WebappServiceLoader<>(context);
         cl.loadClass(sci.getName());
         EasyMock.expectLastCall()
                 .andReturn(sci);
@@ -139,7 +143,7 @@ public class TestWebappServiceLoader {
     @Test
     public void testServiceIsNotExpectedType() throws Exception {
         Class<?> sci = Object.class;
-        loader = new WebappServiceLoader<>(context, null);
+        loader = new WebappServiceLoader<>(context);
         cl.loadClass(sci.getName());
         EasyMock.expectLastCall()
                 .andReturn(sci);
@@ -158,7 +162,7 @@ public class TestWebappServiceLoader {
     @Test
     public void testServiceCannotBeConstructed() throws Exception {
         Class<?> sci = Integer.class;
-        loader = new WebappServiceLoader<>(context, null);
+        loader = new WebappServiceLoader<>(context);
         cl.loadClass(sci.getName());
         EasyMock.expectLastCall()
                 .andReturn(sci);
@@ -172,5 +176,31 @@ public class TestWebappServiceLoader {
         } finally {
             control.verify();
         }
+    }
+
+    private static class ExtendedTesterContext extends TesterContext {
+        private final ServletContext servletContext;
+        private final ClassLoader parent;
+
+        public ExtendedTesterContext(ServletContext servletContext, ClassLoader parent) {
+            this.servletContext = servletContext;
+            this.parent = parent;
+        }
+
+        @Override
+        public ServletContext getServletContext() {
+            return servletContext;
+        }
+
+        @Override
+        public String getContainerSciFilter() {
+            return "";
+        }
+
+        @Override
+        public ClassLoader getParentClassLoader() {
+            return parent;
+        }
+
     }
 }

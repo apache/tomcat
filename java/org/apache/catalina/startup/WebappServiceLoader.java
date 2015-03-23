@@ -33,6 +33,8 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 
+import org.apache.catalina.Context;
+
 /**
  * A variation of Java's JAR ServiceLoader that respects exclusion rules for
  * web applications.
@@ -56,7 +58,8 @@ public class WebappServiceLoader<T> {
     private static final String LIB = "/WEB-INF/lib/";
     private static final String SERVICES = "META-INF/services/";
 
-    private final ServletContext context;
+    private final Context context;
+    private final ServletContext servletContext;
     private final Pattern containerSciFilterPattern;
 
     /**
@@ -64,8 +67,10 @@ public class WebappServiceLoader<T> {
      *
      * @param context the context to use
      */
-    public WebappServiceLoader(ServletContext context, String containerSciFilter) {
+    public WebappServiceLoader(Context context) {
         this.context = context;
+        this.servletContext = context.getServletContext();
+        String containerSciFilter = context.getContainerSciFilter();
         if (containerSciFilter != null && containerSciFilter.length() > 0) {
             containerSciFilterPattern = Pattern.compile(containerSciFilter);
         } else {
@@ -86,17 +91,17 @@ public class WebappServiceLoader<T> {
         LinkedHashSet<String> applicationServicesFound = new LinkedHashSet<>();
         LinkedHashSet<String> containerServicesFound = new LinkedHashSet<>();
 
-        ClassLoader loader = context.getClassLoader();
+        ClassLoader loader = servletContext.getClassLoader();
 
         // if the ServletContext has ORDERED_LIBS, then use that to specify the
         // set of JARs from WEB-INF/lib that should be used for loading services
         @SuppressWarnings("unchecked")
         List<String> orderedLibs =
-                (List<String>) context.getAttribute(ServletContext.ORDERED_LIBS);
+                (List<String>) servletContext.getAttribute(ServletContext.ORDERED_LIBS);
         if (orderedLibs != null) {
             // handle ordered libs directly, ...
             for (String lib : orderedLibs) {
-                URL jarUrl = context.getResource(LIB + lib);
+                URL jarUrl = servletContext.getResource(LIB + lib);
                 if (jarUrl == null) {
                     // should not happen, just ignore
                     continue;
@@ -117,7 +122,7 @@ public class WebappServiceLoader<T> {
             }
 
             // and the parent ClassLoader for all others
-            loader = loader.getParent();
+            loader = context.getParentClassLoader();
         }
 
         Enumeration<URL> resources;
@@ -174,7 +179,7 @@ public class WebappServiceLoader<T> {
 
     List<T> loadServices(Class<T> serviceType, LinkedHashSet<String> servicesFound)
             throws IOException {
-        ClassLoader loader = context.getClassLoader();
+        ClassLoader loader = servletContext.getClassLoader();
         List<T> services = new ArrayList<>(servicesFound.size());
         for (String serviceClass : servicesFound) {
             try {
