@@ -111,7 +111,7 @@ public class TesterFirehoseServer {
             System.out.println("Received " + msg + ", now sending data");
 
             session.getUserProperties().put(
-                    WsRemoteEndpointImplBase.BLOCKING_SEND_TIMEOUT_PROPERTY,
+                    org.apache.tomcat.websocket.Constants.BLOCKING_SEND_TIMEOUT_PROPERTY,
                     Long.valueOf(SEND_TIME_OUT_MILLIS));
 
             Basic remote = session.getBasicRemote();

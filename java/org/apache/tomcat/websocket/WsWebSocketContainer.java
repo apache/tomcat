@@ -68,41 +68,10 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
-public class WsWebSocketContainer
-        implements WebSocketContainer, BackgroundProcess {
-
-    /**
-     * Property name to set to configure the value that is passed to
-     * {@link SSLEngine#setEnabledProtocols(String[])}. The value should be a
-     * comma separated string.
-     */
-    public static final String SSL_PROTOCOLS_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_PROTOCOLS";
-    public static final String SSL_TRUSTSTORE_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_TRUSTSTORE";
-    public static final String SSL_TRUSTSTORE_PWD_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
-    public static final String SSL_TRUSTSTORE_PWD_DEFAULT = "changeit";
-    /**
-     * Property name to set to configure used SSLContext. The value should be an
-     * instance of SSLContext. If this property is present, the SSL_TRUSTSTORE*
-     * properties are ignored.
-     */
-    public static final String SSL_CONTEXT_PROPERTY =
-            "org.apache.tomcat.websocket.SSL_CONTEXT";
-
-    /**
-     * Property name to set to configure the timeout (in milliseconds) when
-     * establishing a WebSocket connection to server. The default is
-     * {@link #IO_TIMEOUT_MS_DEFAULT}.
-     */
-    public static final String IO_TIMEOUT_MS_PROPERTY =
-            "org.apache.tomcat.websocket.IO_TIMEOUT_MS";
-
-    public static final long IO_TIMEOUT_MS_DEFAULT = 5000;
+public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
 
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+            StringManager.getManager(WsWebSocketContainer.class);
     private static final Random random = new Random();
     private static final byte[] crlf = new byte[] {13, 10};
 
@@ -273,9 +242,9 @@ public class WsWebSocketContainer
         }
 
         // Get the connection timeout
-        long timeout = IO_TIMEOUT_MS_DEFAULT;
+        long timeout = Constants.IO_TIMEOUT_MS_DEFAULT;
         String timeoutValue = (String) clientEndpointConfiguration.getUserProperties().get(
-                IO_TIMEOUT_MS_PROPERTY);
+                Constants.IO_TIMEOUT_MS_PROPERTY);
         if (timeoutValue != null) {
             timeout = Long.valueOf(timeoutValue).intValue();
         }
@@ -685,7 +654,7 @@ public class WsWebSocketContainer
         try {
             // See if a custom SSLContext has been provided
             SSLContext sslContext =
-                    (SSLContext) userProperties.get(SSL_CONTEXT_PROPERTY);
+                    (SSLContext) userProperties.get(Constants.SSL_CONTEXT_PROPERTY);
 
             if (sslContext == null) {
                 // Create the SSL Context
@@ -693,12 +662,12 @@ public class WsWebSocketContainer
 
                 // Trust store
                 String sslTrustStoreValue =
-                        (String) userProperties.get(SSL_TRUSTSTORE_PROPERTY);
+                        (String) userProperties.get(Constants.SSL_TRUSTSTORE_PROPERTY);
                 if (sslTrustStoreValue != null) {
                     String sslTrustStorePwdValue = (String) userProperties.get(
-                            SSL_TRUSTSTORE_PWD_PROPERTY);
+                            Constants.SSL_TRUSTSTORE_PWD_PROPERTY);
                     if (sslTrustStorePwdValue == null) {
-                        sslTrustStorePwdValue = SSL_TRUSTSTORE_PWD_DEFAULT;
+                        sslTrustStorePwdValue = Constants.SSL_TRUSTSTORE_PWD_DEFAULT;
                     }
 
                     File keyStoreFile = new File(sslTrustStoreValue);
@@ -720,7 +689,7 @@ public class WsWebSocketContainer
             SSLEngine engine = sslContext.createSSLEngine();
 
             String sslProtocolsValue =
-                    (String) userProperties.get(SSL_PROTOCOLS_PROPERTY);
+                    (String) userProperties.get(Constants.SSL_PROTOCOLS_PROPERTY);
             if (sslProtocolsValue != null) {
                 engine.setEnabledProtocols(sslProtocolsValue.split(","));
             }

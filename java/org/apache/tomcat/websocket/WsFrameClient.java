@@ -31,7 +31,7 @@ public class WsFrameClient extends WsFrameBase {
 
     private final Log log = LogFactory.getLog(WsFrameClient.class);
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+            StringManager.getManager(WsFrameClient.class);
 
     private final AsyncChannelWrapper channel;
     private final CompletionHandler<Integer,Void> handler;
