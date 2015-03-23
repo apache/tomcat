@@ -95,9 +95,8 @@ public class ExpandWar {
         // Check to see of the WAR has been expanded previously
         if (docBase.exists()) {
             // A WAR was expanded. Tomcat will have set the last modified
-            // time of the expanded directory to the last modified time of
-            // the WAR so changes to the WAR while Tomcat is stopped can be
-            // detected
+            // time of warTracker file to the last modified time of the WAR so
+            // changes to the WAR while Tomcat is stopped can be detected
             if (!warTracker.exists() || warTracker.lastModified() == warLastModified) {
                 // No (detectable) changes to the WAR
                 success = true;
