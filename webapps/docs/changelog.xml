@@ -116,12 +116,6 @@
          than a series of reloads.
       </fix>
       <fix>
-        Correct a regression in the fix for <bug>57190</bug> that incorrectly
-        required the path passed to
-        <code>ServletContext.getContext(String)</code> to be an exact match to a
-        path to an existing context. (markt)
-      </fix>
-      <fix>
         <bug>57601</bug>: Ensure that HEAD requests return the correct content
         length (i.e. the same as for a GET) when the requested resource includes
         a resource served by the Default servlet. (jboynes/markt)
@@ -139,6 +133,12 @@
       <fix>
         <bug>57637</bug>: Do not create unnecessary sessions when using
         PersistentValve. (jboynes/fschumacher)
+      </fix>
+      <fix>
+        <bug>57645</bug>: Correct a regression in the fix for
+        <bug>57190</bug> that incorrectly required the path passed to
+        <code>ServletContext.getContext(String)</code> to be an exact match to a
+        path to an existing context. (markt)
       </fix>
       <fix>
         Make sure that <code>unpackWAR</code> attribute of <code>Context</code>
