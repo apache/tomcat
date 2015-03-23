@@ -92,7 +92,7 @@
        Content-Type request header. (markt)
       </fix>
       <fix>
-        Ensure that user name chekcing in the optional SecurityListener is
+        Ensure that user name checking in the optional SecurityListener is
         case-insensitive (as documented) and than the case-insensitive
         comparison is performed using the system default Locale. (markt)
       </fix>
@@ -217,7 +217,7 @@
       <fix>
         When applying the <code>maxSwallowSize</code> limit to a connection read
         that many bytes first before closing the connection to give the client a
-        chance to read the reponse. (markt)
+        chance to read the response. (markt)
       </fix>
       <fix>
         Prevent an async timeout being processed multiple times for the same
@@ -1139,7 +1139,7 @@
         if this technique is used in conjunction with an include. (markt)
       </fix>
       <fix>
-        Fix a potential resource leak in JDTCompiler when checking wether
+        Fix a potential resource leak in JDTCompiler when checking whether
         a resource is a package. Reported by Coverity Scan. (fschumacher)
       </fix>
     </changelog>
@@ -1488,7 +1488,7 @@
       </update>
       <fix>
         <bug>56685</bug>: Add quotes necessary for <code>daemon.sh</code> to
-        work correctly on Solaris. Based on a suggesiton by lfuka. (markt)
+        work correctly on Solaris. Based on a suggestion by lfuka. (markt)
       </fix>
       <update>
         <bug>56596</bug>: Update to Tomcat Native Library version 1.1.31 to pick
@@ -2956,7 +2956,7 @@
         (kfujino)
       </fix>
       <fix>
-        <bug>55331</bug>: Dispatching to an asychronous servlet from
+        <bug>55331</bug>: Dispatching to an asynchronous servlet from
         <code>AsyncListener.onTimeout()</code> should not trigger an
         <code>IllegalStateException</code>. (markt)
       </fix>
@@ -3450,7 +3450,7 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update Maven Cental location used to download dependencies at build time
+        Update Maven Central location used to download dependencies at build time
         to be <code>repo.maven.apache.org</code>. (kkolinko)
       </update>
       <update>
@@ -3688,7 +3688,7 @@
         are not permitted in scriptlets. (kkolinko/markt)
       </fix>
       <fix>
-        <bug>54821</bug>: Do not attept to parse text that looks like an EL
+        <bug>54821</bug>: Do not attempt to parse text that looks like an EL
         expressions in a JSP document if EL expressions have been disabled.
         (kkolinko/markt)  
       </fix>
@@ -5513,8 +5513,8 @@
       </fix>
       <fix>
         <bug>53403</bug>: Update a reference to the Servlet specification in the
-        first web applciation section of the documentation web application to
-        include newer versions of the specificarion. (markt)
+        first web application section of the documentation web application to
+        include newer versions of the specification. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -6243,7 +6243,7 @@
       </fix>
       <fix>
         <bug>52445</bug>: Don&apos;t assume that EL method expressions have
-        exactly three components (identifier, method name, paramaters). (markt)
+        exactly three components (identifier, method name, parameters). (markt)
       </fix>
     </changelog>
   </subsection>
@@ -6251,7 +6251,7 @@
     <changelog>
       <add>
         <bug>38216</bug>: Add the ability to invoke MBean operations to the JMX
-        proxy sevrlet in the Manager application. Based on a patch by
+        proxy servlet in the Manager application. Based on a patch by
         Christopher Hlubek. (markt)
       </add>
       <update>
@@ -6330,7 +6330,7 @@
         plain text. Patch provided by M Hasko. (markt/kkolinko)
       </add>
       <fix>
-        Fix build condition for tomcat-dbcp to always rebuild whan a new version
+        Fix build condition for tomcat-dbcp to always rebuild when a new version
         of commons-pool or commons-dbcp is downloaded. (kkolinko)
       </fix>
       <update>
@@ -7113,7 +7113,7 @@
       <fix>
         <bug>41709</bug>: Provide exception messages where no message is
         provided currently for IllegalStateExcpetions triggered by calling
-        HttpServletResponse methods when the reponse is committed. (markt)
+        HttpServletResponse methods when the response is committed. (markt)
       </fix>
       <fix>
         <bug>51509</bug>: Fix potential concurrency issue in CSRF prevention
@@ -8409,7 +8409,7 @@
         length string. (markt) 
       </fix>
       <fix>
-        Don&apos;t register non-singelton DataSource resources with JMX. (markt)
+        Don&apos;t register non-singleton DataSource resources with JMX. (markt)
       </fix>
       <add>
         CVE-2011-1184: Provide additional configuration options for the DIGEST
@@ -8924,7 +8924,7 @@
         while to complete. (markt)
       </fix>
       <fix>
-        Prvent multiple Comet END events if the CometServlet calls
+        Prevent multiple Comet END events if the CometServlet calls
         <code>event.close()</code> during an END event. (markt) 
       </fix>
       <fix>
@@ -8934,7 +8934,7 @@
         (markt)
       </fix>
       <fix>
-        <bug>50405</bug>: Fix occassional NPE when using NIO connector and
+        <bug>50405</bug>: Fix occasional NPE when using NIO connector and
         Comet. (markt)
       </fix>
       <fix>
@@ -9035,7 +9035,7 @@
         in a Context element. (markt)
       </fix>
       <fix>
-        <bug>50526</bug>: Provide additional documetation on configuring
+        <bug>50526</bug>: Provide additional documentation on configuring
         JavaMail resources. (markt)
       </fix>
       <fix>
@@ -9123,7 +9123,7 @@
       </add>
       <fix>
         <bug>49372</bug>: Re-fix after connector re-factoring. If connector
-        initialisation fails (e.g. if a port is alreasy in use) do not trigger
+        initialisation fails (e.g. if a port is already in use) do not trigger
         an <code>LifecycleException</code> for an invalid state transition.
         (markt)
       </fix>
@@ -9214,7 +9214,7 @@
       </fix>
       <add>
         <bug>50541</bug>: Add support for setting the size limit and time limit
-        for LDAP seaches when using the JNDI Realm with <code>userSearch</code>.
+        for LDAP searches when using the JNDI Realm with <code>userSearch</code>.
         (markt)
       </add>
       <update>
@@ -9325,7 +9325,7 @@
     <changelog>
       <fix>
         <bug>21157</bug>: Ensure cookies are written before the response is
-        commited in the Cookie example. Patch provided by Stefan Radzom. (markt)
+        committed in the Cookie example. Patch provided by Stefan Radzom. (markt)
       </fix>
       <add>
         <bug>50294</bug>: Add more information to documentation regarding format
@@ -10007,7 +10007,7 @@
         <code>UnsupportedOperationException</code>. (markt)
       </fix>
       <fix>
-        <bug>49884</bug>: Fix occassional NullPointerException on async
+        <bug>49884</bug>: Fix occasional NullPointerException on async
         complete(). This resulted in a major refactoring of the async
         implementation to address a number of threading issues. (markt)
       </fix>
@@ -10370,7 +10370,7 @@
         Manager selection. (markt)
       </add>
       <fix>
-        <bug>49550</bug>: Supress deprecation warning where deprecated code is
+        <bug>49550</bug>: Suppress deprecation warning where deprecated code is
         required to be used. No functional change. Patch provided by Sebb.
         (markt)
       </fix>
