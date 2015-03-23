@@ -364,14 +364,18 @@ public class HPackHuffman {
     }
 
     /**
-     * Decodes a huffman encoded string into the target StringBuilder. There must be enough space left in the buffer
-     * for this method to succeed.
+     * Decodes a huffman encoded string into the target StringBuilder. There
+     * must be enough space left in the buffer for this method to succeed.
      *
      * @param data   The byte buffer
-     * @param length The data length
+     * @param length The length of data from the buffer to decode
      * @param target The target for the decompressed data
+     *
+     * @throws HpackException If the Huffman encoded value in HPACK headers did
+     *                        not end with EOS padding
      */
-    public static void decode(ByteBuffer data, int length, StringBuilder target) throws HpackException {
+    public static void decode(ByteBuffer data, int length, StringBuilder target)
+            throws HpackException {
         assert data.remaining() >= length;
         int treePos = 0;
         boolean eosBits = true;
@@ -404,14 +408,16 @@ public class HPackHuffman {
             }
         }
         if (!eosBits) {
-            throw new HpackException(sm.getString("hpackhuffman.huffmanEncodedHpackValueDidNotEndWithEOS"));
+            throw new HpackException(sm.getString(
+                    "hpackhuffman.huffmanEncodedHpackValueDidNotEndWithEOS"));
         }
     }
 
 
     /**
-     * Encodes the given string into the buffer. If there is not enough space in the buffer, or the encoded
-     * version is bigger than the original it will return false and not modify the buffers position
+     * Encodes the given string into the buffer. If there is not enough space in
+     * the buffer, or the encoded version is bigger than the original it will
+     * return false and not modify the buffers position.
      *
      * @param buffer   The buffer to encode into
      * @param toEncode The string to encode

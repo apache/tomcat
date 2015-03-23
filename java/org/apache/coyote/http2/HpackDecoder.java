@@ -73,11 +73,13 @@ public class HpackDecoder {
     }
 
     /**
-     * Decodes the provided frame data. If this method leaves data in the buffer then
-     * this buffer should be compacted so this data is preserved, unless there is no
-     * more data in which case this should be considered a protocol error.
+     * Decodes the provided frame data. If this method leaves data in the buffer
+     * then this buffer should be compacted so this data is preserved, unless
+     * there is no more data in which case this should be considered a protocol error.
      *
      * @param buffer The buffer
+     *
+     * @throws HpackException If the packed data is not valid
      */
     public void decode(ByteBuffer buffer) throws HpackException {
         while (buffer.hasRemaining()) {
@@ -91,7 +93,8 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 } else if(index == 0) {
-                    throw new HpackException(sm.getString("hpackdecoder.zeroNotValidHeaderTableIndex"));
+                    throw new HpackException(
+                            sm.getString("hpackdecoder.zeroNotValidHeaderTableIndex"));
                 }
                 handleIndex(index);
             } else if ((b & 0b01000000) != 0) {
