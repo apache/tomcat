@@ -260,6 +260,10 @@
         asynchronous request. This mean that the pipe-lined request(s) would be
         lost and/or corrupted. (markt)
       </fix>
+      <update>
+        Update the minimum recommended version of the Tomcat Native library (if
+        used) to 1.1.33. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -398,6 +402,10 @@
         web applications using a Servlet 2.5 descriptor as per Servlet 2.5 MR 6.
         (markt)
       </fix>
+      <update>
+        Update to Tomcat Native Library version 1.1.33 to pick up the Windows
+        binaries that are based on OpenSSL 1.0.1m and APR 1.5.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
