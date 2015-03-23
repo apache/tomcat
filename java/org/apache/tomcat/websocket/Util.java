@@ -59,8 +59,7 @@ import org.apache.tomcat.websocket.pojo.PojoMessageHandlerWholeText;
  */
 public class Util {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(Util.class);
     private static final Queue<SecureRandom> randoms =
             new ConcurrentLinkedQueue<>();
 

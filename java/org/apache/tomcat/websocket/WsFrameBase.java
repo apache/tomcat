@@ -42,7 +42,7 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class WsFrameBase {
 
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+            StringManager.getManager(WsFrameBase.class);
 
     // Connection level attributes
     protected final WsSession wsSession;

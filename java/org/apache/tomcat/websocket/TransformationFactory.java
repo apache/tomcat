@@ -24,7 +24,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class TransformationFactory {
 
-    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(TransformationFactory.class);
 
     private static final TransformationFactory factory = new TransformationFactory();
 

@@ -32,7 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class PerMessageDeflate implements Transformation {
 
-    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(PerMessageDeflate.class);
 
     private static final String SERVER_NO_CONTEXT_TAKEOVER = "server_no_context_takeover";
     private static final String CLIENT_NO_CONTEXT_TAKEOVER = "client_no_context_takeover";

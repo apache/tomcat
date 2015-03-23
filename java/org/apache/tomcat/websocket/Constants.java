@@ -27,8 +27,6 @@ import javax.websocket.Extension;
  */
 public class Constants {
 
-    protected static final String PACKAGE_NAME =
-            Constants.class.getPackage().getName();
     // OP Codes
     public static final byte OPCODE_CONTINUATION = 0x00;
     public static final byte OPCODE_TEXT = 0x01;
@@ -48,6 +46,34 @@ public class Constants {
             .intValue();
 
     // Client connection
+    /**
+     * Property name to set to configure the value that is passed to
+     * {@link javax.net.ssl.SSLEngine#setEnabledProtocols(String[])}. The value
+     * should be a comma separated string.
+     */
+    public static final String SSL_PROTOCOLS_PROPERTY =
+            "org.apache.tomcat.websocket.SSL_PROTOCOLS";
+    public static final String SSL_TRUSTSTORE_PROPERTY =
+            "org.apache.tomcat.websocket.SSL_TRUSTSTORE";
+    public static final String SSL_TRUSTSTORE_PWD_PROPERTY =
+            "org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD";
+    public static final String SSL_TRUSTSTORE_PWD_DEFAULT = "changeit";
+    /**
+     * Property name to set to configure used SSLContext. The value should be an
+     * instance of SSLContext. If this property is present, the SSL_TRUSTSTORE*
+     * properties are ignored.
+     */
+    public static final String SSL_CONTEXT_PROPERTY =
+            "org.apache.tomcat.websocket.SSL_CONTEXT";
+    /**
+     * Property name to set to configure the timeout (in milliseconds) when
+     * establishing a WebSocket connection to server. The default is
+     * {@link #IO_TIMEOUT_MS_DEFAULT}.
+     */
+    public static final String IO_TIMEOUT_MS_PROPERTY =
+            "org.apache.tomcat.websocket.IO_TIMEOUT_MS";
+    public static final long IO_TIMEOUT_MS_DEFAULT = 5000;
+    // HTTP upgrade header names and values
     public static final String HOST_HEADER_NAME = "Host";
     public static final String UPGRADE_HEADER_NAME = "Upgrade";
     public static final String UPGRADE_HEADER_VALUE = "websocket";
@@ -57,14 +83,18 @@ public class Constants {
     public static final String WS_VERSION_HEADER_NAME = "Sec-WebSocket-Version";
     public static final String WS_VERSION_HEADER_VALUE = "13";
     public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";
-    public static final String WS_PROTOCOL_HEADER_NAME =
-            "Sec-WebSocket-Protocol";
-    public static final String WS_EXTENSIONS_HEADER_NAME =
-            "Sec-WebSocket-Extensions";
+    public static final String WS_PROTOCOL_HEADER_NAME = "Sec-WebSocket-Protocol";
+    public static final String WS_EXTENSIONS_HEADER_NAME = "Sec-WebSocket-Extensions";
 
     // Configuration for Origin header in client
     static final String DEFAULT_ORIGIN_HEADER_VALUE =
             System.getProperty("org.apache.tomcat.websocket.DEFAULT_ORIGIN_HEADER_VALUE");
+
+    // Configuration for blocking sends
+    public static final String BLOCKING_SEND_TIMEOUT_PROPERTY =
+            "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
+    // Milliseconds so this is 20 seconds
+    public static final long DEFAULT_BLOCKING_SEND_TIMEOUT = 20 * 1000;
 
     // Configuration for background processing checks intervals
     static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(

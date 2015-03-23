@@ -51,7 +51,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     private static final Log log =
             LogFactory.getLog(AsyncChannelWrapperSecure.class);
     private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+            StringManager.getManager(AsyncChannelWrapperSecure.class);
 
     private static final ByteBuffer DUMMY = ByteBuffer.allocate(8192);
     private final AsynchronousSocketChannel socketChannel;
