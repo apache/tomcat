@@ -125,6 +125,6 @@ public abstract class AbstractResourceSet extends LifecycleBase
 
     @Override
     protected final void destroyInternal() throws LifecycleException {
-        // NO-OP
+        gc();
     }
 }
