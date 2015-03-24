@@ -107,6 +107,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * more specific setter. That means the property belongs to the Endpoint,
      * the ServerSocketFactory or some other lower level component. This method
      * ensures that it is visible to both.
+     *
+     * @param name  The name of the property to set
+     * @param value The value, in string form, to set for the property
+     *
+     * @return <code>true</code> if the property was set successfully, otherwise
+     *         <code>false</code>
      */
     public boolean setProperty(String name, String value) {
         return endpoint.setProperty(name, value);
@@ -116,6 +122,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * Generic property getter used by the digester. Other code should not need
      * to use this.
+     *
+     * @param name The name of the property to get
+     *
+     * @return The value of the property converted to a string
      */
     public String getProperty(String name) {
         return endpoint.getProperty(name);
@@ -288,8 +298,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     /**
      * The name will be prefix-address-port if address is non-null and
-     * prefix-port if the address is null. The name will be appropriately quoted
-     * so it can be used directly in an ObjectName.
+     * prefix-port if the address is null.
+     *
+     * @return A name for this protocol instance that is appropriately quoted
+     *         for use in an ObjectName.
      */
     public String getName() {
         StringBuilder name = new StringBuilder(getNamePrefix());
