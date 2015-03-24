@@ -53,7 +53,7 @@ public class JarFactory {
             // Assume this is pointing to a JAR file within a WAR. Java doesn't
             // support jar:jar:file:... so switch to Tomcat's war:file:...
             baseExternal = baseExternal.replaceFirst("^jar:", "war:");
-            baseExternal = baseExternal.replaceFirst("!/", "^/");
+            baseExternal = baseExternal.replaceFirst("!/", "*/");
         }
 
         return new URL("jar:" + baseExternal + "!/" + entryName);
