@@ -36,11 +36,11 @@ public interface Processor {
 
     SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException;
 
-    SocketState asyncDispatch(SocketStatus status);
+    SocketState dispatch(SocketStatus status);
+
     SocketState asyncPostProcess();
 
     HttpUpgradeHandler getHttpUpgradeHandler();
-    SocketState upgradeDispatch(SocketStatus status);
 
     void errorDispatch();
 

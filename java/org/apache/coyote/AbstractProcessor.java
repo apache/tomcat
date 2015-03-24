@@ -201,18 +201,14 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     public abstract SocketState process(SocketWrapperBase<?> socket) throws IOException;
 
     /**
-     * Process in-progress Servlet 3.0 Async requests. These will start as HTTP
-     * requests.
+     * Process an in-progress request that is not longer in standard HTTP mode.
+     * Uses currently include Servlet 3.0 Async and HTTP upgrade connections.
+     * Further uses may be added in the future. These will typically start as
+     * HTTP requests.
      */
     @Override
-    public abstract SocketState asyncDispatch(SocketStatus status);
+    public abstract SocketState dispatch(SocketStatus status);
 
-    /**
-     * Processes data received on a connection that has been through an HTTP
-     * upgrade.
-     */
-    @Override
-    public abstract SocketState upgradeDispatch(SocketStatus status);
 
     @Override
     public abstract HttpUpgradeHandler getHttpUpgradeHandler();

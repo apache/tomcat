@@ -642,19 +642,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         // these calls may result in a nested call to process()
                         connections.put(socket, processor);
                         DispatchType nextDispatch = dispatches.next();
-                        if (processor.isUpgrade()) {
-                            state = processor.upgradeDispatch(
-                                    nextDispatch.getSocketStatus());
-                        } else {
-                            state = processor.asyncDispatch(
-                                    nextDispatch.getSocketStatus());
-                        }
+                        state = processor.dispatch(nextDispatch.getSocketStatus());
                     } else if (status == SocketStatus.DISCONNECT) {
                         // Do nothing here, just wait for it to get recycled
-                    } else if (processor.isAsync()) {
-                        state = processor.asyncDispatch(status);
+                    } else if (processor.isAsync() || processor.isUpgrade()) {
+                        state = processor.dispatch(status);
                     } else if (state == SocketState.ASYNC_END) {
-                        state = processor.asyncDispatch(status);
+                        state = processor.dispatch(status);
                         if (state == SocketState.OPEN) {
                             // There may be pipe-lined data to read. If the data
                             // isn't processed now, execution will exit this
@@ -663,8 +657,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             // pipe-lined data. To avoid this, process it now.
                             state = processor.process(wrapper);
                         }
-                    } else if (processor.isUpgrade()) {
-                        state = processor.upgradeDispatch(status);
                     } else if (status == SocketStatus.OPEN_WRITE) {
                         // Extra write event likely after async, ignore
                         state = SocketState.LONG;

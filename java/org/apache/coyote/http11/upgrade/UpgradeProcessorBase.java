@@ -27,7 +27,6 @@ import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public abstract class UpgradeProcessorBase implements Processor, WebConnection {
@@ -73,12 +72,6 @@ public abstract class UpgradeProcessorBase implements Processor, WebConnection {
 
     @Override
     public final SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException {
-        return null;
-    }
-
-
-    @Override
-    public final SocketState asyncDispatch(SocketStatus status) {
         return null;
     }
 
