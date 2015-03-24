@@ -18,33 +18,34 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 import java.net.URL;
-import java.net.URLConnection;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
-public class TestWarURLConnection {
+import org.apache.catalina.Context;
+import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 
-    @Before
-    public void register() {
-        TomcatURLStreamHandlerFactory.register();
-    }
-
+public class TestWarURLStreamHandlerIntegration extends TomcatBaseTest {
 
     @Test
-    public void testContentLength() throws Exception {
-        File f = new File("test/webresources/war-url-connection.war");
-        String fileUrl = f.toURI().toURL().toString();
+    public void testToURI() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
 
-        URL indexHtmlUrl = new URL("jar:war:" + fileUrl +
-                "*/WEB-INF/lib/test.jar!/META-INF/resources/index.html");
+        File docBase = new File("test/webresources/war-url-connection.war");
+        Context context = tomcat.addWebapp("/test", docBase.getAbsolutePath());
 
-        URLConnection urlConn = indexHtmlUrl.openConnection();
-        urlConn.connect();
+        ((StandardHost) tomcat.getHost()).setUnpackWARs(false);
 
-        int size = urlConn.getContentLength();
+        tomcat.start();
 
-        Assert.assertEquals(137, size);
+        URL url = context.getServletContext().getResource("/index.html");
+        try {
+            url.toURI();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
     }
 }

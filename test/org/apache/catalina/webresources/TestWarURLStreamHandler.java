@@ -16,32 +16,35 @@
  */
 package org.apache.catalina.webresources;
 
-import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLStreamHandler;
 
-public class WarURLStreamHandler extends URLStreamHandler {
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-    @Override
-    protected void parseURL(URL u, String spec, int start, int limit) {
-        // Need to make this look like a JAR URL for the WAR file
-        // Assumes that the spec is absolute and starts war:file:/...
+public class TestWarURLStreamHandler {
 
-        // Only the path needs to be changed
-        String path = "jar:" + spec.substring(4);
-        if (path.contains("*/")) {
-            path = path.replaceFirst("\\*/", "!/");
-        } else {
-            path = path.replaceFirst("\\^/", "!/");
-        }
-
-        setURL(u, u.getProtocol(), "", -1, null, null,
-                path, null, null);
+    @Before
+    public void register() {
+        TomcatURLStreamHandlerFactory.register();
     }
 
-    @Override
-    protected URLConnection openConnection(URL u) throws IOException {
-        return new WarURLConnection(u);
+
+    @Test
+    public void testOldFormat() throws Exception {
+        File f = new File("test/webresources/war-url-connection.war");
+        String fileUrl = f.toURI().toURL().toString();
+
+        URL indexHtmlUrl = new URL("jar:war:" + fileUrl +
+                "^/WEB-INF/lib/test.jar!/META-INF/resources/index.html");
+
+        URLConnection urlConn = indexHtmlUrl.openConnection();
+        urlConn.connect();
+
+        int size = urlConn.getContentLength();
+
+        Assert.assertEquals(137, size);
     }
 }

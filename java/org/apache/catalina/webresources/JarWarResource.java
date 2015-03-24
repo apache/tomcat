@@ -37,7 +37,7 @@ public class JarWarResource extends AbstractArchiveResource {
 
     public JarWarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
             String baseUrl, JarEntry jarEntry, String archivePath) {
-        super(archiveResourceSet, webAppPath, "jar:war:" + baseUrl + "^/" + archivePath,
+        super(archiveResourceSet, webAppPath, "jar:war:" + baseUrl + "*/" + archivePath,
                 jarEntry, "jar:" + baseUrl + "!/" + archivePath);
         this.archivePath = archivePath;
     }
