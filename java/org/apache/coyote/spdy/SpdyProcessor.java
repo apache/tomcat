@@ -511,12 +511,6 @@ public class SpdyProcessor extends AbstractProcessor implements Runnable {
     }
 
     @Override
-    public SocketState asyncDispatch(SocketStatus status) {
-        System.err.println("ASYNC DISPATCH: " + status);
-        return null;
-    }
-
-    @Override
     public boolean isUpgrade() {
         return false;
     }
@@ -527,7 +521,7 @@ public class SpdyProcessor extends AbstractProcessor implements Runnable {
     }
 
     @Override
-    public SocketState upgradeDispatch(SocketStatus status) {
+    public SocketState dispatch(SocketStatus status) {
         return null;
     }
 

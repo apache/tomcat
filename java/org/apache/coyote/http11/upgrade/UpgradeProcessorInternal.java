@@ -45,7 +45,7 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
 
 
     @Override
-    public SocketState upgradeDispatch(SocketStatus status) {
+    public SocketState dispatch(SocketStatus status) {
         return internalHttpUpgradeHandler.upgradeDispatch(status);
     }
 

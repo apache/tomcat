@@ -1694,7 +1694,7 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    public SocketState asyncDispatch(SocketStatus status) {
+    public SocketState dispatch(SocketStatus status) {
 
         if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
             try {
@@ -1778,14 +1778,6 @@ public class Http11Processor extends AbstractProcessor {
         return httpUpgradeHandler != null;
     }
 
-
-
-    @Override
-    public SocketState upgradeDispatch(SocketStatus status) {
-        // Should never reach this code but in case we do...
-        throw new IllegalStateException(
-                sm.getString("http11Processor.upgrade"));
-    }
 
 
     @Override

@@ -79,7 +79,7 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     // ------------------------------------------- Implemented Processor methods
 
     @Override
-    public final SocketState upgradeDispatch(SocketStatus status) {
+    public final SocketState dispatch(SocketStatus status) {
         if (status == SocketStatus.OPEN_READ) {
             upgradeServletInputStream.onDataAvailable();
         } else if (status == SocketStatus.OPEN_WRITE) {
