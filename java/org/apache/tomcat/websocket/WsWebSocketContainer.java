@@ -499,15 +499,16 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private ByteBuffer createRequest(URI uri,
-            Map<String,List<String>> reqHeaders) {
+    private ByteBuffer createRequest(URI uri, Map<String,List<String>> reqHeaders) {
         ByteBuffer result = ByteBuffer.allocate(4 * 1024);
 
         // Request line
         result.put(GET_BYTES);
-        byte[] path = (null == uri.getPath() || "".equals(uri.getPath()))
-                ? ROOT_URI_BYTES : uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1);
-        result.put(path);
+        if (null == uri.getPath() || "".equals(uri.getPath())) {
+            result.put(ROOT_URI_BYTES);
+        } else {
+            result.put(uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1));
+        }
         String query = uri.getRawQuery();
         if (query != null) {
             result.put((byte) '?');
@@ -516,8 +517,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         result.put(HTTP_VERSION_BYTES);
 
         // Headers
-        Iterator<Entry<String,List<String>>> iter =
-                reqHeaders.entrySet().iterator();
+        Iterator<Entry<String,List<String>>> iter = reqHeaders.entrySet().iterator();
         while (iter.hasNext()) {
             Entry<String,List<String>> entry = iter.next();
             addHeader(result, entry.getKey(), entry.getValue());
