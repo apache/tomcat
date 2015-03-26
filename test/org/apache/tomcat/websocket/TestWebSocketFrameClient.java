@@ -80,4 +80,55 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
         }
     }
 
+    @Test
+    public void testConnectToRootEndpoint() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
+        Context ctx2 = tomcat.addContext("/foo", null);
+        ctx2.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx2, "default", new DefaultServlet());
+        ctx2.addServletMapping("/", "default");
+
+        tomcat.start();
+
+        echoTester("");
+        echoTester("/");
+        // FIXME: The ws client doesn't handle any response other than the upgrade,
+        // which may or may not be allowed. In that case, the server will return
+        // a redirect to the root of the webapp to avoid possible broken relative
+        // paths.
+        // echoTester("/foo");
+        echoTester("/foo/");
+    }
+
+    public void echoTester(String path) throws Exception {
+        WebSocketContainer wsContainer =
+                ContainerProvider.getWebSocketContainer();
+        ClientEndpointConfig clientEndpointConfig =
+                ClientEndpointConfig.Builder.create().build();
+        Session wsSession = wsContainer.connectToServer(
+                TesterProgrammaticEndpoint.class,
+                clientEndpointConfig,
+                new URI("ws://localhost:" + getPort() + path));
+        CountDownLatch latch =
+                new CountDownLatch(1);
+        BasicText handler = new BasicText(latch);
+        wsSession.addMessageHandler(handler);
+        wsSession.getBasicRemote().sendText("Hello");
+
+        handler.getLatch().await(100, TimeUnit.MILLISECONDS);
+
+        Queue<String> messages = handler.getMessages();
+        Assert.assertEquals(1, messages.size());
+        for (String message : messages) {
+            Assert.assertEquals("Hello", message);
+        }
+        wsSession.close();
+    }
+
 }
