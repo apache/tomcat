@@ -70,10 +70,14 @@ import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
 
-    private static final StringManager sm =
-            StringManager.getManager(WsWebSocketContainer.class);
+    private static final StringManager sm = StringManager.getManager(WsWebSocketContainer.class);
     private static final Random random = new Random();
     private static final byte[] crlf = new byte[] {13, 10};
+
+    private static final byte[] GET_BYTES = "GET ".getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] ROOT_URI_BYTES = "/".getBytes(StandardCharsets.ISO_8859_1);
+    private static final byte[] HTTP_VERSION_BYTES =
+            " HTTP/1.1\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
     private volatile AsynchronousChannelGroup asynchronousChannelGroup = null;
     private final Object asynchronousChannelGroupLock = new Object();
@@ -500,17 +504,16 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         ByteBuffer result = ByteBuffer.allocate(4 * 1024);
 
         // Request line
-        result.put("GET ".getBytes(StandardCharsets.ISO_8859_1));
+        result.put(GET_BYTES);
         byte[] path = (null == uri.getPath() || "".equals(uri.getPath()))
-                ? "/".getBytes(StandardCharsets.ISO_8859_1)
-                : uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1);
+                ? ROOT_URI_BYTES : uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1);
         result.put(path);
         String query = uri.getRawQuery();
         if (query != null) {
             result.put((byte) '?');
             result.put(query.getBytes(StandardCharsets.ISO_8859_1));
         }
-        result.put(" HTTP/1.1\r\n".getBytes(StandardCharsets.ISO_8859_1));
+        result.put(HTTP_VERSION_BYTES);
 
         // Headers
         Iterator<Entry<String,List<String>>> iter =
