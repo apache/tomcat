@@ -56,6 +56,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.61 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct the check used for Java 8 JSSE server-preferred TLS cipher
+        suite ordering. Patch provided by Ognjen Blagojevic. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.60 (violetagg)">
   <subsection name="Catalina">

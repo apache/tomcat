@@ -654,7 +654,7 @@ public abstract class AbstractEndpoint<S> {
     private void testServerCipherSuitesOrderSupport() {
         // Only test this feature if the user explicitly requested its use.
         if(!"".equals(getUseServerCipherSuitesOrder().trim())) {
-            if (JreCompat.isJre8Available()) {
+            if (!JreCompat.isJre8Available()) {
                 throw new UnsupportedOperationException(
                         sm.getString("endpoint.jsse.cannotHonorServerCipherOrder"));
             }
