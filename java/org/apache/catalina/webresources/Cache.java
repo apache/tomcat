@@ -59,11 +59,11 @@ public class Cache {
 
     protected WebResource getResource(String path, boolean useClassLoaderResources) {
 
-        lookupCount.incrementAndGet();
-
         if (noCache(path)) {
             return root.getResourceInternal(path, useClassLoaderResources);
         }
+
+        lookupCount.incrementAndGet();
 
         CachedResource cacheEntry = resourceCache.get(path);
 
