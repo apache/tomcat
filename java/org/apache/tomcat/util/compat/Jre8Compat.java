@@ -27,16 +27,19 @@ class Jre8Compat extends Jre7Compat {
 
     private static final Method getSSLParametersMethod;
     private static final Method setUseCipherSuitesOrderMethod;
+    private static final Method setSSLParametersMethod;
 
 
     static {
         Method m1 = null;
         Method m2 = null;
+        Method m3 = null;
         try {
             // Get this class first since it is Java 8+ only
             Class<?> c2 = Class.forName("javax.net.ssl.SSLParameters");
             m1 = SSLServerSocket.class.getMethod("getSSLParameters");
             m2 = c2.getMethod("setUseCipherSuitesOrder", boolean.class);
+            m3 = SSLServerSocket.class.getMethod("setSSLParameters", c2);
         } catch (SecurityException e) {
             // Should never happen
         } catch (NoSuchMethodException e) {
@@ -46,6 +49,7 @@ class Jre8Compat extends Jre7Compat {
         }
         getSSLParametersMethod = m1;
         setUseCipherSuitesOrderMethod = m2;
+        setSSLParametersMethod = m3;
     }
 
 
@@ -61,6 +65,7 @@ class Jre8Compat extends Jre7Compat {
             Object sslParameters = getSSLParametersMethod.invoke(socket);
             setUseCipherSuitesOrderMethod.invoke(
                     sslParameters, Boolean.valueOf(useCipherSuitesOrder));
+            setSSLParametersMethod.invoke(socket, sslParameters);
             return;
         } catch (IllegalArgumentException e) {
             throw new UnsupportedOperationException(e);
@@ -78,6 +83,7 @@ class Jre8Compat extends Jre7Compat {
         SSLParameters sslParameters = engine.getSSLParameters();
         try {
             setUseCipherSuitesOrderMethod.invoke(sslParameters, Boolean.valueOf(useCipherSuitesOrder));
+            engine.setSSLParameters(sslParameters);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedOperationException(e);
         } catch (IllegalAccessException e) {
