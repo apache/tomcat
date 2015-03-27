@@ -522,7 +522,10 @@ public class WsWebSocketContainer
 
         // Request line
         result.put("GET ".getBytes(StandardCharsets.ISO_8859_1));
-        result.put(uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1));
+        byte[] path = (null == uri.getPath() || "".equals(uri.getPath()))
+                ? "/".getBytes(StandardCharsets.ISO_8859_1)
+                : uri.getRawPath().getBytes(StandardCharsets.ISO_8859_1);
+        result.put(path);
         String query = uri.getRawQuery();
         if (query != null) {
             result.put((byte) '?');

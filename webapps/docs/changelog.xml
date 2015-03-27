@@ -59,8 +59,18 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Correct the check used for Java 8 JSSE server-preferred TLS cipher
-        suite ordering. Patch provided by Ognjen Blagojevic. (violetagg)
+        <bug>55988</bug>: Correct the check used for Java 8 JSSE
+        server-preferred TLS cipher suite ordering. Ensure that SSL parameters
+        are provided to <code>SSLServerSocket</code> and <code>SSLEngine</code>.
+        Patch provided by Ognjen Blagojevic. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>57761</bug>: Ensure that the opening HTTP request is correctly
+        formatted when the WebSocket client connects to a server root. (remm)
       </fix>
     </changelog>
   </subsection>

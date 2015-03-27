@@ -49,6 +49,7 @@ public class TesterEchoServer {
                 sc.addEndpoint(Basic.class);
                 sc.addEndpoint(BasicLimitLow.class);
                 sc.addEndpoint(BasicLimitHigh.class);
+                sc.addEndpoint(RootEcho.class);
             } catch (DeploymentException e) {
                 throw new IllegalStateException(e);
             }
@@ -186,4 +187,21 @@ public class TesterEchoServer {
         }
     }
 
+
+    @ServerEndpoint("/")
+    public static class RootEcho {
+
+        @OnMessage
+        public void echoTextMessage(Session session, @SuppressWarnings("unused") String msg) {
+            try {
+                session.getBasicRemote().sendText(msg);
+            } catch (IOException e) {
+                try {
+                    session.close();
+                } catch (IOException e1) {
+                    // Ignore
+                }
+            }
+        }
+    }
 }
