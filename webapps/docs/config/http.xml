@@ -1017,8 +1017,13 @@
     </attribute>
 
     <attribute name="keyAlias" required="false">
-      <p>The alias used to for the server certificate in the keystore. If not
-      specified the first key read in the keystore will be used.</p>
+      <p>The alias used for the server key and certificate in the keystore. If
+      not specified, the first key read from the keystore will be used. The
+      order in which keys are read from the keystore is implementation
+      dependent. It may not be the case that keys are read from the keystore in
+      the same order as they were added. If more than one key is present in the
+      kesytore it is strongly recommended that a keyAlias is configured to
+      ensure that the correct key is used.</p>
     </attribute>
 
     <attribute name="keyPass" required="false">
