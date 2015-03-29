@@ -142,6 +142,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         CLF, SEC, MSEC, MSEC_FRAC, SDF
     }
 
+    /**
+     * The list of our port types.
+     */
+    private static enum PortType {
+        LOCAL, REMOTE
+    }
+
     //------------------------------------------------------ Constructor
     public AbstractAccessLogValve() {
         super(true);
@@ -1091,13 +1098,41 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write local port on which this request was received - %p
+     * write local or remote port for request connection - %p and %{xxx}p
      */
-    protected class LocalPortElement implements AccessLogElement {
+    protected class PortElement implements AccessLogElement {
+
+        /**
+         * Type of port to log
+         */
+        private static final String localPort = "local";
+        private static final String remotePort = "remote";
+
+        private final PortType portType;
+
+        public PortElement() {
+            portType = PortType.LOCAL;
+        }
+
+        public PortElement(String type) {
+            switch (type) {
+            case remotePort:
+                portType = PortType.REMOTE;
+                break;
+            case localPort:
+                portType = PortType.LOCAL;
+                break;
+            default:
+                log.error(sm.getString("accessLogValve.invalidPortType", type));
+                portType = PortType.LOCAL;
+                break;
+            }
+        }
+
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request,
                 Response response, long time) {
-            if (requestAttributesEnabled) {
+            if (requestAttributesEnabled && portType == PortType.LOCAL) {
                 Object port = request.getAttribute(SERVER_PORT_ATTRIBUTE);
                 if (port == null) {
                     buf.append(Integer.toString(request.getServerPort()));
@@ -1105,7 +1140,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     buf.append(port.toString());
                 }
             } else {
-                buf.append(Integer.toString(request.getServerPort()));
+                if (portType == PortType.LOCAL) {
+                    buf.append(Integer.toString(request.getServerPort()));
+                } else {
+                    buf.append(Integer.toString(request.getRemotePort()));
+                }
             }
         }
     }
@@ -1498,6 +1537,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return new CookieElement(name);
         case 'o':
             return new ResponseHeaderElement(name);
+        case 'p':
+            return new PortElement(name);
         case 'r':
             return new RequestAttributeElement(name);
         case 's':
@@ -1535,7 +1576,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         case 'm':
             return new MethodElement();
         case 'p':
-            return new LocalPortElement();
+            return new PortElement();
         case 'q':
             return new QueryElement();
         case 'r':
