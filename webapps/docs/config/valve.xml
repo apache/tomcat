@@ -278,7 +278,8 @@
     <li><b>%l</b> - Remote logical username from identd (always returns
         '-')</li>
     <li><b>%m</b> - Request method (GET, POST, etc.)</li>
-    <li><b>%p</b> - Local port on which this request was received</li>
+    <li><b>%p</b> - Local port on which this request was received.
+        See also <code>%{xxx}p</code> below.</li>
     <li><b>%q</b> - Query string (prepended with a '?' if it exists)</li>
     <li><b>%r</b> - First line of the request (method and request URI)</li>
     <li><b>%s</b> - HTTP status code of the response</li>
@@ -299,15 +300,18 @@
     timestamp formats.
     It is modeled after the
     <a href="http://httpd.apache.org/">Apache HTTP Server</a> log configuration
-    syntax:
+    syntax. Each of them can be used multiple times with different <code>xxx</code> keys:
     </p>
     <ul>
-    <li><b><code>%{xxx}i</code></b> for incoming headers</li>
-    <li><b><code>%{xxx}o</code></b> for outgoing response headers</li>
-    <li><b><code>%{xxx}c</code></b> for a specific cookie</li>
-    <li><b><code>%{xxx}r</code></b> xxx is an attribute in the ServletRequest</li>
-    <li><b><code>%{xxx}s</code></b> xxx is an attribute in the HttpSession</li>
-    <li><b><code>%{xxx}t</code></b> xxx is an enhanced SimpleDateFormat pattern</li>
+    <li><b><code>%{xxx}i</code></b> write value of incoming header with name <code>xxx</code></li>
+    <li><b><code>%{xxx}o</code></b> write value of outgoing header with name <code>xxx</code></li>
+    <li><b><code>%{xxx}c</code></b> write value of cookie with name <code>xxx</code></li>
+    <li><b><code>%{xxx}r</code></b> write value of ServletRequest attribute with name <code>xxx</code></li>
+    <li><b><code>%{xxx}s</code></b> write value of HttpSession attribute with name <code>xxx</code></li>
+    <li><b><code>%{xxx}p</code></b> write local (server) port (<code>xxx==local</code>) or
+        remote (client) port (<code>xxx=remote</code>)</li>
+    <li><b><code>%{xxx}t</code></b> write timestamp at the end of the request formatted using the
+        enhanced SimpleDateFormat pattern <code>xxx</code></li>
     </ul>
 
     <p>All formats supported by SimpleDateFormat are allowed in <code>%{xxx}t</code>.
