@@ -56,6 +56,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.62 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Allow logging of the remote port in the access log using the format
+        pattern <code>%{remote}p</code>. (rjung)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

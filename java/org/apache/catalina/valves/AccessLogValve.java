@@ -167,6 +167,13 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         CLF, SEC, MSEC, MSEC_FRAC, SDF
     }
 
+    /**
+     * The list of our port types.
+     */
+    private static enum PortType {
+        LOCAL, REMOTE
+    }
+
     //------------------------------------------------------ Constructor
     public AccessLogValve() {
         super(true);
@@ -1635,13 +1642,37 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     }
 
     /**
-     * write local port on which this request was received - %p
+     * write local or remote port for request connection - %p and %{xxx}p
      */
-    protected class LocalPortElement implements AccessLogElement {
+    protected class PortElement implements AccessLogElement {
+
+        /**
+         * Type of port to log
+         */
+        private static final String localPort = "local";
+        private static final String remotePort = "remote";
+
+        private final PortType portType;
+
+        public PortElement() {
+            portType = PortType.LOCAL;
+        }
+
+        public PortElement(String type) {
+            if (type.equals(localPort)) {
+                portType = PortType.LOCAL;
+            } else if (type.equals(remotePort)) {
+                portType = PortType.REMOTE;
+            } else {
+                portType = PortType.LOCAL;
+                log.error(sm.getString("accessLogValve.invalidPortType", type));
+            }
+        }
+
         @Override
         public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
-            if (requestAttributesEnabled) {
+            if (requestAttributesEnabled && portType == PortType.LOCAL) {
                 Object port = request.getAttribute(SERVER_PORT_ATTRIBUTE);
                 if (port == null) {
                     buf.append(request.getServerPort());
@@ -1649,7 +1680,11 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                     buf.append(port);
                 }
             } else {
-                buf.append(request.getServerPort());
+                if (portType == PortType.LOCAL) {
+                    buf.append(Integer.toString(request.getServerPort()));
+                } else {
+                    buf.append(Integer.toString(request.getRemotePort()));
+                }
             }
         }
     }
@@ -2044,6 +2079,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             return new CookieElement(name);
         case 'o':
             return new ResponseHeaderElement(name);
+        case 'p':
+            return new PortElement(name);
         case 'r':
             return new RequestAttributeElement(name);
         case 's':
@@ -2081,7 +2118,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
         case 'm':
             return new MethodElement();
         case 'p':
-            return new LocalPortElement();
+            return new PortElement();
         case 'q':
             return new QueryElement();
         case 'r':
