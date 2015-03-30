@@ -566,10 +566,10 @@ public class Tomcat {
         Context ctx = createContext(host, contextPath);
         ctx.setPath(contextPath);
         //TODO:
-        //  ctx.setDocBase(docBase);
+        //ctx.setDocBase(docBase);
         ctx.addLifecycleListener(new DefaultWebXmlListener());
         //TODO:
-        //  ctx.setConfigFile(getWebappConfigFile(docBase, contextPath));
+        //ctx.setConfigFile(getWebappConfigFile(docBase, contextPath));
 
         ContextConfig ctxCfg = new ContextConfig();
         ctx.addLifecycleListener(ctxCfg);
