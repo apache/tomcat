@@ -160,6 +160,13 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
     private static final Log log = LogFactory.getLog(AccessLogValve.class);
 
+    /**
+     * The list of our format types.
+     */
+    private static enum FormatType {
+        CLF, SEC, MSEC, MSEC_FRAC, SDF
+    }
+
     //------------------------------------------------------ Constructor
     public AccessLogValve() {
         super(true);
@@ -487,13 +494,6 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             return new Date();
         }
     };
-
-    /**
-     * The list of our format types.
-     */
-    private static enum FormatType {
-        CLF, SEC, MSEC, MSEC_FRAC, SDF
-    }
 
     /**
      * Resolve hosts.
@@ -2034,22 +2034,22 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     }
 
     /**
-     * create an AccessLogElement implementation which needs header string
+     * create an AccessLogElement implementation which needs an element name
      */
-    protected AccessLogElement createAccessLogElement(String header, char pattern) {
+    protected AccessLogElement createAccessLogElement(String name, char pattern) {
         switch (pattern) {
         case 'i':
-            return new HeaderElement(header);
+            return new HeaderElement(name);
         case 'c':
-            return new CookieElement(header);
+            return new CookieElement(name);
         case 'o':
-            return new ResponseHeaderElement(header);
+            return new ResponseHeaderElement(name);
         case 'r':
-            return new RequestAttributeElement(header);
+            return new RequestAttributeElement(name);
         case 's':
-            return new SessionAttributeElement(header);
+            return new SessionAttributeElement(name);
         case 't':
-            return new DateAndTimeElement(header);
+            return new DateAndTimeElement(name);
         default:
             return new StringElement("???");
         }
