@@ -305,6 +305,10 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             if (!bsh.getSendResult().isOK()) {
                 throw new IOException (bsh.getSendResult().getException());
             }
+            // The BlockingSendHandler doesn't call end message so update the
+            // flags.
+            fragmented = nextFragmented;
+            text = nextText;
         }
 
         if (payload != null) {
