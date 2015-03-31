@@ -35,10 +35,6 @@ import javax.servlet.jsp.PageContext;
 */
 public class ScopedAttributeELResolver extends ELResolver {
 
-    public ScopedAttributeELResolver() {
-        super();
-    }
-
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (context == null) {
