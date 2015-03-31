@@ -329,7 +329,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         // Some extensions/transformations may buffer messages so it is possible
         // that no message parts will be returned. If this is the case the
-        // trigger the suppler SendHandler
+        // trigger the supplied SendHandler
         if (messageParts.size() == 0) {
             handler.onResult(new SendResult());
             return;
