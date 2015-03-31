@@ -1388,6 +1388,8 @@ public class HostConfig
     protected synchronized void checkResources(DeployedApplication app) {
         String[] resources =
             app.redeployResources.keySet().toArray(new String[0]);
+        // Offset the current time by the resolution of File.lastModified()
+        long currentTimeWithResolutionOffset = System.currentTimeMillis() - 1000;
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
             if (log.isDebugEnabled())
@@ -1396,7 +1398,12 @@ public class HostConfig
             long lastModified =
                     app.redeployResources.get(resources[i]).longValue();
             if (resource.exists() || lastModified == 0) {
-                if (resource.lastModified() > lastModified) {
+                // File.lastModified() has a resolution of 1s (1000ms). The last
+                // modified time has to be more than 1000ms ago to ensure that
+                // modifications that take place in the same second are not
+                // missed. See Bug 57765.
+                if (resource.lastModified() > lastModified &&
+                        resource.lastModified() < currentTimeWithResolutionOffset) {
                     if (resource.isDirectory()) {
                         // No action required for modified directory
                         app.redeployResources.put(resources[i],
@@ -1473,7 +1480,12 @@ public class HostConfig
                 log.debug("Checking context[" + app.name + "] reload resource " + resource);
             }
             long lastModified = app.reloadResources.get(resources[i]).longValue();
-            if (resource.lastModified() != lastModified || update) {
+            // File.lastModified() has a resolution of 1s (1000ms). The last
+            // modified time has to be more than 1000ms ago to ensure that
+            // modifications that take place in the same second are not
+            // missed. See Bug 57765.
+            if ((resource.lastModified() != lastModified &&
+                    resource.lastModified() < currentTimeWithResolutionOffset) || update) {
                 if (!update) {
                     // Reload application
                     reload(app);
