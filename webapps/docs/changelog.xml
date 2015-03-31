@@ -70,6 +70,14 @@
         <bug>57762</bug>: Ensure that the WebSocket client correctly detects
         when the connection to the server is dropped. (markt)
       </fix>
+      <fix>
+        <bug>57776</bug>: Revert the 8.0.21 fix for the
+        <code>permessage-deflate</code> implementation and incorrect op-codes
+        since the fix was unnecessary (the bug only affected trunk) and the fix
+        broke rather than fixed <code>permessage-deflate</code> if an
+        uncompressed message was converted into more than one compressed
+        message. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
