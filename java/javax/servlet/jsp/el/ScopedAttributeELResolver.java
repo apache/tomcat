@@ -51,8 +51,7 @@ public class ScopedAttributeELResolver extends ELResolver {
             context.setPropertyResolved(base, property);
             if (property != null) {
                 String key = property.toString();
-                PageContext page = (PageContext) context
-                        .getContext(JspContext.class);
+                PageContext page = (PageContext) context.getContext(JspContext.class);
                 result = page.findAttribute(key);
 
                 if (result == null) {
@@ -86,8 +85,7 @@ public class ScopedAttributeELResolver extends ELResolver {
     }
 
     @Override
-    public Class<Object> getType(ELContext context, Object base,
-            Object property) {
+    public Class<Object> getType(ELContext context, Object base, Object property) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -101,8 +99,7 @@ public class ScopedAttributeELResolver extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         if (context == null) {
             throw new NullPointerException();
         }
@@ -111,8 +108,7 @@ public class ScopedAttributeELResolver extends ELResolver {
             context.setPropertyResolved(base, property);
             if (property != null) {
                 String key = property.toString();
-                PageContext page = (PageContext) context
-                        .getContext(JspContext.class);
+                PageContext page = (PageContext) context.getContext(JspContext.class);
                 int scope = page.getAttributesScope(key);
                 if (scope != 0) {
                     page.setAttribute(key, value, scope);
@@ -137,8 +133,7 @@ public class ScopedAttributeELResolver extends ELResolver {
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context,
-            Object base) {
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 
         PageContext ctxt = (PageContext) context.getContext(JspContext.class);
         List<FeatureDescriptor> list = new ArrayList<>();
