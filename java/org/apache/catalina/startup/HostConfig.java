@@ -64,7 +64,6 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
-
 /**
  * Startup event listener for a <b>Host</b> that configures the properties
  * of that Host, and the associated defined contexts.
@@ -72,13 +71,17 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class HostConfig
-    implements LifecycleListener {
+public class HostConfig implements LifecycleListener {
 
-    private static final Log log = LogFactory.getLog( HostConfig.class );
+    private static final Log log = LogFactory.getLog(HostConfig.class);
+
+    /**
+     * The string resources for this package.
+     */
+    protected static final StringManager sm = StringManager.getManager(HostConfig.class);
+
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The Java class name of the Context implementation we should use.
@@ -96,13 +99,6 @@ public class HostConfig
      * The JMX ObjectName of this component.
      */
     protected ObjectName oname = null;
-
-
-    /**
-     * The string resources for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     /**
