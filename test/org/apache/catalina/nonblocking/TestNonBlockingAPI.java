@@ -118,6 +118,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingWrite() throws Exception {
+        testNonBlockingWriteInternal(false);
+    }
+
+    @Test
+    public void testNonBlockingWriteWithKeepAlive() throws Exception {
+        testNonBlockingWriteInternal(true);
+    }
+
+    private void testNonBlockingWriteInternal(boolean keepAlive) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -132,16 +141,24 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         SocketFactory factory = SocketFactory.getDefault();
         Socket s = factory.createSocket("localhost", getPort());
 
+        InputStream is = s.getInputStream();
+        byte[] buffer = new byte[8192];
+
         ByteChunk result = new ByteChunk();
+
         OutputStream os = s.getOutputStream();
+        if (keepAlive) {
+            os.write(("OPTIONS * HTTP/1.1\r\n" +
+                    "Host: localhost:" + getPort() + "\r\n" +
+                    "\r\n").getBytes(StandardCharsets.ISO_8859_1));
+            os.flush();
+            is.read(buffer);
+        }
         os.write(("GET / HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
                 "Connection: close\r\n" +
                 "\r\n").getBytes(StandardCharsets.ISO_8859_1));
         os.flush();
-
-        InputStream is = s.getInputStream();
-        byte[] buffer = new byte[8192];
 
         int read = 0;
         int readSinceLastPause = 0;
