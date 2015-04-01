@@ -439,8 +439,8 @@
     <attribute name="tomcatAuthorization" required="false">
       <p>If set to <code>true</code>, the authenticated principal will be
       propagated from the native webserver and considered already authenticated
-      in Tomcat. If the web application has one or more security constriants,
-      authorization will then be performed by Tomcat and roles asisgned to the
+      in Tomcat. If the web application has one or more security constraints,
+      authorization will then be performed by Tomcat and roles assigned to the
       authenticated principal. If the appropriate Tomcat Realm for the request
       does not recognise the provided user name, a Principal will be still be
       created but it will have no roles. The default value is
