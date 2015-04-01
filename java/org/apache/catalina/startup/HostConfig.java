@@ -1408,8 +1408,8 @@ public class HostConfig
                 // modified time has to be more than 1000ms ago to ensure that
                 // modifications that take place in the same second are not
                 // missed. See Bug 57765.
-                if (resource.lastModified() != lastModified &&
-                        resource.lastModified() < currentTimeWithResolutionOffset) {
+                if (resource.lastModified() != lastModified && (!host.getAutoDeploy() ||
+                        resource.lastModified() < currentTimeWithResolutionOffset)) {
                     if (resource.isDirectory()) {
                         // No action required for modified directory
                         app.redeployResources.put(resources[i],
@@ -1491,7 +1491,9 @@ public class HostConfig
             // modifications that take place in the same second are not
             // missed. See Bug 57765.
             if ((resource.lastModified() != lastModified &&
-                    resource.lastModified() < currentTimeWithResolutionOffset) || update) {
+                    (!host.getAutoDeploy() ||
+                            resource.lastModified() < currentTimeWithResolutionOffset)) ||
+                    update) {
                 if (!update) {
                     // Reload application
                     reload(app);
