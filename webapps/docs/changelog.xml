@@ -84,6 +84,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>57779</bug>: When an I/O error occurs on a non-container thread
+        only dispatch to a container thread to handle the error if using Servlet
+        3+ asynchronous processing. This avoids potential deadlocks if an
+        application is performing I/O on a non-container thread without using
+        the Servlet 3+ asynchronous API/ (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
