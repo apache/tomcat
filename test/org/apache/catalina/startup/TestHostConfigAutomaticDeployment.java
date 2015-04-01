@@ -1702,7 +1702,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         Files.copy(src.toPath(), dest.toPath());
         // Make sure that HostConfig thinks the WAR has been modified.
         dest.setLastModified(
-                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return dest;
     }
 
