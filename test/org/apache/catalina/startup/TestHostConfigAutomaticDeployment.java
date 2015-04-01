@@ -1713,7 +1713,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         copy(src, dest);
         // Make sure that HostConfig thinks the WAR has been modified.
         dest.setLastModified(
-                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return dest;
     }
 
@@ -1726,7 +1726,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         copy(XML_SOURCE, xml);
         // Make sure that HostConfig thinks the xml has been modified.
         xml.setLastModified(
-                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return xml;
     }
 
@@ -1768,7 +1768,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
         // Make sure that HostConfig thinks the xml has been modified.
         xml.setLastModified(
-                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return xml;
     }
 
@@ -1987,7 +1987,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             }
         }
         dest.setLastModified(
-                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
     }
 
     
