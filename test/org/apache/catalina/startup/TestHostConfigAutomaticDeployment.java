@@ -1123,21 +1123,23 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         tomcat.start();
         host.backgroundProcess();
 
-        // Update the last modified time. Add a few seconds to make sure that
-        // the OS reports a change in modification time.
+        // Update the last modified time. Make sure that the OS reports a change
+        // in modification time that HostConfig can detect.
         switch (toModify) {
             case XML:
                 if (xml == null) {
                     Assert.fail();
                 } else {
-                    xml.setLastModified(System.currentTimeMillis() + 5000);
+                    xml.setLastModified(System.currentTimeMillis() -
+                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
                 }
                 break;
             case EXT:
                 if (ext == null) {
                     Assert.fail();
                 } else {
-                    if (!ext.setLastModified(System.currentTimeMillis() + 5000)){
+                    if (!ext.setLastModified(System.currentTimeMillis() -
+                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS)){
                         Assert.fail("Failed to set last modified time for " +
                                 "external WAR file. This is expected (due to " +
                                 "a JVM bug) with Java 6 on Windows.");
@@ -1148,7 +1150,8 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 if (war == null) {
                     Assert.fail();
                 } else {
-                    if (!war.setLastModified(System.currentTimeMillis() + 5000)) {
+                    if (!war.setLastModified(System.currentTimeMillis() -
+                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS)) {
                         Assert.fail("Failed to set last modified time for WAR " +
                                 "file. This is expected (due to a JVM bug) " +
                                 "with Java 6 on Windows.");
@@ -1159,7 +1162,8 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 if (dir == null) {
                     Assert.fail();
                 } else {
-                    dir.setLastModified(System.currentTimeMillis() + 5000);
+                    dir.setLastModified(System.currentTimeMillis() -
+                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
                 }
                 break;
             default:
@@ -1707,6 +1711,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             dest = new File(external, "external" + ".war");
         }
         copy(src, dest);
+        // Make sure that HostConfig thinks the WAR has been modified.
+        dest.setLastModified(
+                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return dest;
     }
 
@@ -1717,6 +1724,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Assert.assertTrue(parent.mkdirs());
         }
         copy(XML_SOURCE, xml);
+        // Make sure that HostConfig thinks the xml has been modified.
+        xml.setLastModified(
+                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return xml;
     }
 
@@ -1756,6 +1766,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 fos.close();
             }
         }
+        // Make sure that HostConfig thinks the xml has been modified.
+        xml.setLastModified(
+                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return xml;
     }
 
@@ -1973,6 +1986,8 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 }
             }
         }
+        dest.setLastModified(
+                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
     }
 
     
