@@ -1047,9 +1047,6 @@ public class Digester extends DefaultHandler2 {
 
         // Recover the body text from the surrounding element
         bodyText = bodyTexts.pop();
-        if (debug) {
-            log.debug("  Popping body text '" + bodyText.toString() + "'");
-        }
 
         // Fire "end" events for all relevant rules in reverse order
         if (rules != null) {
@@ -1252,9 +1249,6 @@ public class Digester extends DefaultHandler2 {
         
         // Save the body text accumulated for our surrounding element
         bodyTexts.push(bodyText);
-        if (debug) {
-            log.debug("  Pushing body text '" + bodyText.toString() + "'");
-        }
         bodyText = new StringBuilder();
 
         // the actual element name is either in localName or qName, depending 

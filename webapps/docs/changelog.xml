@@ -69,6 +69,11 @@
         ensure that if a file has been modified within the last second, the
         latest version of the file is always used. (markt)
       </fix>
+      <fix>
+        Cleanup <code>o.a.tomcat.util.digester.Digester</code> from debug
+        messages that do not give any valuable information. Patch provided
+        by Polina Genova. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
