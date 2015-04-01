@@ -82,6 +82,12 @@
         messages that do not give any valuable information. Patch provided
         by Polina Genova. (violetagg)
       </fix>
+      <fix>
+        <bug>57772</bug>: When reloading a web application and a directory
+        representing an expanded WAR needs to be deleted, delete the directory
+        after the web application has been stopped rather than before to avoid
+        potential ClassNotFoundExceptions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
