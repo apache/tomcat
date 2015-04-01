@@ -1120,35 +1120,39 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         tomcat.start();
         host.backgroundProcess();
 
-        // Update the last modified time. Add a few seconds to make sure that
-        // the OS reports a change in modification time.
+        // Update the last modified time. Make sure that the OS reports a change
+        // in modification time that HostConfig can detect.
         switch (toModify) {
             case XML:
                 if (xml == null) {
                     Assert.fail();
                 } else {
-                    xml.setLastModified(System.currentTimeMillis() + 5000);
+                    xml.setLastModified(System.currentTimeMillis() -
+                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
                 }
                 break;
             case EXT:
                 if (ext == null) {
                     Assert.fail();
                 } else {
-                    ext.setLastModified(System.currentTimeMillis() + 5000);
+                    ext.setLastModified(System.currentTimeMillis() -
+                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
                 }
                 break;
             case WAR:
                 if (war == null) {
                     Assert.fail();
                 } else {
-                    war.setLastModified(System.currentTimeMillis() + 5000);
+                    war.setLastModified(System.currentTimeMillis() -
+                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
                 }
                 break;
             case DIR:
                 if (dir == null) {
                     Assert.fail();
                 } else {
-                    dir.setLastModified(System.currentTimeMillis() + 5000);
+                    dir.setLastModified(System.currentTimeMillis() -
+                            10 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
                 }
                 break;
             default:
@@ -1696,6 +1700,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             dest = new File(external, "external" + ".war");
         }
         Files.copy(src.toPath(), dest.toPath());
+        // Make sure that HostConfig thinks the WAR has been modified.
+        dest.setLastModified(
+                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return dest;
     }
 
@@ -1706,6 +1713,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             Assert.assertTrue(parent.mkdirs());
         }
         Files.copy(XML_SOURCE.toPath(), xml.toPath());
+        // Make sure that HostConfig thinks the xml has been modified.
+        xml.setLastModified(
+                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return xml;
     }
 
@@ -1739,6 +1749,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             context.append("\" />");
             fos.write(context.toString().getBytes(StandardCharsets.ISO_8859_1));
         }
+        // Make sure that HostConfig thinks the xml has been modified.
+        xml.setLastModified(
+                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return xml;
     }
 
@@ -1756,7 +1769,12 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             @Override
             public FileVisitResult visitFile(Path file,
                     BasicFileAttributes attrs) throws IOException {
-                Files.copy(file, dest.resolve(src.relativize(file)));
+                Path destPath = dest.resolve(src.relativize(file));
+                Files.copy(file, destPath);
+                // Make sure that HostConfig thinks all newly copied files have
+                // been modified.
+                destPath.toFile().setLastModified(
+                        System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
                 return FileVisitResult.CONTINUE;
             }
 
