@@ -215,7 +215,7 @@ public class TesterEchoServer {
     public static class RootEcho {
 
         @OnMessage
-        public void echoTextMessage(Session session, @SuppressWarnings("unused") String msg) {
+        public void echoTextMessage(Session session, String msg) {
             try {
                 session.getBasicRemote().sendText(msg);
             } catch (IOException e) {
