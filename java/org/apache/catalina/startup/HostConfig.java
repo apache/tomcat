@@ -1264,12 +1264,10 @@ public class HostConfig implements LifecycleListener {
                                 docBaseFile = new File(host.getAppBaseFile(),
                                         docBase);
                             }
-                            ExpandWar.delete(docBaseFile);
-                            // Reset the docBase to trigger re-expansion of the
-                            // WAR
-                            context.setDocBase(resource.getAbsolutePath());
+                            reload(app, docBaseFile, resource.getAbsolutePath());
+                        } else {
+                            reload(app, null, null);
                         }
-                        reload(app);
                         // Update times
                         app.redeployResources.put(resources[i],
                                 Long.valueOf(resource.lastModified()));
@@ -1331,7 +1329,7 @@ public class HostConfig implements LifecycleListener {
                     update) {
                 if (!update) {
                     // Reload application
-                    reload(app);
+                    reload(app, null, null);
                     update = true;
                 }
                 // Update times. More than one file may have been updated. We
@@ -1344,16 +1342,28 @@ public class HostConfig implements LifecycleListener {
     }
 
 
-    private void reload(DeployedApplication app) {
+    /*
+     * Note: If either of fileToRemove and newDocBase are null, both will be
+     *       ignored.
+     */
+    private void reload(DeployedApplication app, File fileToRemove, String newDocBase) {
         if(log.isInfoEnabled())
             log.info(sm.getString("hostConfig.reload", app.name));
         Context context = (Context) host.findChild(app.name);
         if (context.getState().isAvailable()) {
+            if (fileToRemove != null && newDocBase != null) {
+                context.addLifecycleListener(
+                        new ExpandedDirectoryRemovalListener(fileToRemove, newDocBase));
+            }
             // Reload catches and logs exceptions
             context.reload();
         } else {
             // If the context was not started (for example an error
             // in web.xml) we'll still get to try to start
+            if (fileToRemove != null && newDocBase != null) {
+                ExpandWar.delete(fileToRemove);
+                context.setDocBase(newDocBase);
+            }
             try {
                 context.start();
             } catch (Exception e) {
@@ -1770,6 +1780,56 @@ public class HostConfig implements LifecycleListener {
         @Override
         public void run() {
             config.deployDirectory(cn, dir);
+        }
+    }
+
+
+    /*
+     * The purpose of this class is to provide a way for HostConfig to get
+     * a Context to delete an expanded WAR after the Context stops. This is to
+     * resolve this issue described in Bug 57772. The alternative solutions
+     * require either duplicating a lot of the Context.reload() code in
+     * HostConfig or adding a new reload(boolean) method to Context that allows
+     * the caller to optionally delete any expanded WAR.
+     *
+     * The LifecycleListener approach offers greater flexibility and enables the
+     * behaviour to be changed / extended / removed in future without changing
+     * the Context API.
+     */
+    private static class ExpandedDirectoryRemovalListener implements LifecycleListener {
+
+        private final File toDelete;
+        private final String newDocBase;
+
+        /**
+         * Create a listener that will ensure that any expanded WAR is removed
+         * and the docBase set to the specified WAR.
+         *
+         * @param toDelete The file (a directory representing an expanded WAR)
+         *                 to be deleted
+         * @param newDocBase The new docBase for the Context
+         */
+        public ExpandedDirectoryRemovalListener(File toDelete, String newDocBase) {
+            this.toDelete = toDelete;
+            this.newDocBase = newDocBase;
+        }
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (event.getType() == Lifecycle.AFTER_STOP_EVENT) {
+                // The context has stopped.
+                Context context = (Context) event.getLifecycle();
+
+                // Remove the old expanded WAR.
+                ExpandWar.delete(toDelete);
+
+                // Reset the docBase to trigger re-expansion of the WAR.
+                context.setDocBase(newDocBase);
+
+                // Remove this listener from the Context else it will run every
+                // time the Context is stopped.
+                context.removeLifecycleListener(this);
+            }
         }
     }
 }
