@@ -1408,7 +1408,7 @@ public class HostConfig
                 // modified time has to be more than 1000ms ago to ensure that
                 // modifications that take place in the same second are not
                 // missed. See Bug 57765.
-                if (resource.lastModified() > lastModified &&
+                if (resource.lastModified() != lastModified &&
                         resource.lastModified() < currentTimeWithResolutionOffset) {
                     if (resource.isDirectory()) {
                         // No action required for modified directory
