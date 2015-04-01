@@ -67,7 +67,15 @@
         automatic deployment process, account for the fact that
         <code>File.lastModified()</code> has a resolution of one second to
         ensure that if a file has been modified within the last second, the
-        latest version of the file is always used. (markt)
+        latest version of the file is always used. Note that a side-effect of
+        this change is that files with modification times in the future are
+        treated as if they are unmodified. (markt)
+      </fix>
+      <fix>
+        Align redeploy resource modification checking with reload modification
+        checking so that now, in both cases, a change in modification time
+        rather than an increase in modification time is used to determine if the
+        resource has changed. (markt)
       </fix>
       <fix>
         Cleanup <code>o.a.tomcat.util.digester.Digester</code> from debug
