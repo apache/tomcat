@@ -79,8 +79,13 @@ public class HostConfig
 
     private static final Log log = LogFactory.getLog( HostConfig.class );
 
-    // ----------------------------------------------------- Instance Variables
+    /**
+     * The resolution, in milliseconds, of file modification times.
+     */
+    protected static final long FILE_MODIFICATION_RESOLUTION_MS = 1000;
 
+
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * App base.
@@ -1389,7 +1394,8 @@ public class HostConfig
         String[] resources =
             app.redeployResources.keySet().toArray(new String[0]);
         // Offset the current time by the resolution of File.lastModified()
-        long currentTimeWithResolutionOffset = System.currentTimeMillis() - 1000;
+        long currentTimeWithResolutionOffset =
+                System.currentTimeMillis() - FILE_MODIFICATION_RESOLUTION_MS;
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
             if (log.isDebugEnabled())
