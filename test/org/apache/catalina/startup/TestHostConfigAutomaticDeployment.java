@@ -1715,7 +1715,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         Files.copy(XML_SOURCE.toPath(), xml.toPath());
         // Make sure that HostConfig thinks the xml has been modified.
         xml.setLastModified(
-                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return xml;
     }
 
@@ -1751,7 +1751,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
         // Make sure that HostConfig thinks the xml has been modified.
         xml.setLastModified(
-                System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return xml;
     }
 
@@ -1774,7 +1774,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 // Make sure that HostConfig thinks all newly copied files have
                 // been modified.
                 destPath.toFile().setLastModified(
-                        System.currentTimeMillis() - HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                        System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
                 return FileVisitResult.CONTINUE;
             }
 
