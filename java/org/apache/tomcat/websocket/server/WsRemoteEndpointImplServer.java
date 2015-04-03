@@ -43,8 +43,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
-    private static final Log log =
-            LogFactory.getLog(WsHttpUpgradeHandler.class);
+    private static final Log log = LogFactory.getLog(WsRemoteEndpointImplServer.class);
 
     private static final Queue<OnResultRunnable> onResultRunnables =
             new ConcurrentLinkedQueue<OnResultRunnable>();
