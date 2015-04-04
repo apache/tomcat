@@ -35,6 +35,8 @@
     <author email="schultz at apache.org">Christopher Schultz</author>
     <author email="slaurent at apache.org">Sylvain Laurent</author>
     <author email="violetagg at apache.org">Violeta Georgieva</author>
+    <author email="jboynes at apache.org">Jeremy Boynes</author>
+    <author email="fschumacher at apache.org">Felix Schumacher</author>
     <title>Changelog</title>
     <no-comments />
   </properties>
@@ -435,14 +437,15 @@
         documentation web application that stated WAR files located outside the
         appBase were never unpacked. (markt)
       </fix>
+      <update>
+        <bug>57644</bug>: Update examples to use Apache Standard Taglib 1.2.5.
+        (jboynes)
+      </update>
       <fix>
         <bug>57683</bug>: Ensure that if a client aborts their connection to the
         stock ticker example (the only way a client can disconnect), the example
         continues to work for existing and new clients. (markt)
       </fix>
-      <update>
-        Update examples to use Apache Standard Taglib 1.2.5. (jboynes)
-      </update>
       <fix>
         Correct the documentation for deployOnStartup to make clear that if a
         WAR file is updated while Tomcat is stopped and unpackWARs is true,
