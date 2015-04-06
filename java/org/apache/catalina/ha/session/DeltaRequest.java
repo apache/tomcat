@@ -204,9 +204,9 @@ public class DeltaRequest implements Externalizable {
                 case TYPE_LISTENER:
                     SessionListener listener = (SessionListener) info.getValue();
                     if (info.getAction() == ACTION_SET) {
-                        session.addSessionListener(listener);
+                        session.addSessionListener(listener,false);
                     } else {
-                        session.removeSessionListener(listener);
+                        session.removeSessionListener(listener,false);
                     }
                     break;
                 default :
