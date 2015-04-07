@@ -1171,8 +1171,14 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         public interface CompletionCheck {
             /**
              * Return true if enough data has been read or written and the
-             * handler should be notified.
-             * @param dsts ByteBuffer[] that has been passed to the
+             * handler should be notified. Return false if the IO is
+             * incomplete (data has not been fully written while it should,
+             * or more data read is needed for further processing) and should
+             * be continued before the completion handler is called.
+             *
+             * @param state of the operation (done or done inline since the
+             *        IO call is done)
+             * @param buffers ByteBuffer[] that has been passed to the
              *        original IO call
              * @param offset that has been passed to the original IO call
              * @param length that has been passed to the original IO call
@@ -1212,15 +1218,16 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * called if the callHandler method returned true. If no
          * CompletionCheck object has been provided, the completion handler
          * will be called.
-         * @param dsts
-         * @param offset
-         * @param length
+         *
+         * @param dsts buffers
+         * @param offset in the buffer array
+         * @param length in the buffer array
          * @param timeout
          * @param unit
          * @param attachment
-         * @param check
-         * @param handler
-         * @return
+         * @param check for the IO operation completion
+         * @param handler to call when the IO is complete
+         * @return the completion state (done, done inline, or still pending)
          */
         // FIXME: @Override
         public <A> CompletionState read(ByteBuffer[] dsts,
@@ -1253,15 +1260,16 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * called if the callHandler method returned true. If no
          * CompletionCheck object has been provided, the completion handler
          * will be called.
-         * @param srcs
-         * @param offset
-         * @param length
+         *
+         * @param srcs buffers
+         * @param offset in the buffer array
+         * @param length in the buffer array
          * @param timeout
          * @param unit
          * @param attachment
-         * @param check
-         * @param handler
-         * @return
+         * @param check for the IO operation completion
+         * @param handler to call when the IO is complete
+         * @return the completion state (done, done inline, or still pending)
          */
         // FIXME: @Override
         public <A> CompletionState write(ByteBuffer[] srcs,
