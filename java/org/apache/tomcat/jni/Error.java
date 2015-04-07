@@ -28,12 +28,12 @@ public class Error extends Exception {
     /**
      * APR error type.
      */
-    private int error;
+    private final int error;
 
     /**
      * A description of the problem.
      */
-    private String description;
+    private final String description;
 
     /**
      * Construct an APRException.

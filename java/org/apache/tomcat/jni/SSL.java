@@ -139,6 +139,10 @@ public final class SSL {
     public static final int SSL_OP_NO_SSLv2                         = 0x01000000;
     public static final int SSL_OP_NO_SSLv3                         = 0x02000000;
     public static final int SSL_OP_NO_TLSv1                         = 0x04000000;
+    public static final int SSL_OP_NO_TLSv1_2                       = 0x08000000;
+    public static final int SSL_OP_NO_TLSv1_1                       = 0x10000000;
+
+    public static final int SSL_OP_NO_TICKET                        = 0x00004000;
 
     // SSL_OP_PKCS1_CHECK_1 and SSL_OP_PKCS1_CHECK_2 flags are unsupported
     // in the current version of OpenSSL library. See ssl.h changes in commit
@@ -329,7 +333,7 @@ public final class SSL {
 
     /**
      * Generate temporary RSA key.
-     * <br />
+     * <br>
      * Index can be one of:
      * <PRE>
      * SSL_TMP_KEY_RSA_512
@@ -345,7 +349,7 @@ public final class SSL {
 
     /**
      * Load temporary DSA key from file
-     * <br />
+     * <br>
      * Index can be one of:
      * <PRE>
      * SSL_TMP_KEY_DH_512
