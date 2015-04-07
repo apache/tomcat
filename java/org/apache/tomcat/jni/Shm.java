@@ -27,15 +27,15 @@ public class Shm {
 
     /**
      * Create and make accessible a shared memory segment.
-     * <br />
-     * A note about Anonymous vs. Named shared memory segments:<br />
+     * <br>
+     * A note about Anonymous vs. Named shared memory segments:<br>
      *         Not all platforms support anonymous shared memory segments, but in
      *         some cases it is preferred over other types of shared memory
      *         implementations. Passing a NULL 'file' parameter to this function
      *         will cause the subsystem to use anonymous shared memory segments.
      *         If such a system is not available, APR_ENOTIMPL is returned.
-     * <br />
-     * A note about allocation sizes:<br />
+     * <br>
+     * A note about allocation sizes:<br>
      *         On some platforms it is necessary to store some metainformation
      *         about the segment within the actual segment. In order to supply
      *         the caller with the requested size it may be necessary for the
@@ -55,7 +55,7 @@ public class Shm {
 
     /**
      * Remove shared memory segment associated with a filename.
-     * <br />
+     * <br>
      * This function is only supported on platforms which support
      * name-based shared memory segments, and will return APR_ENOTIMPL on
      * platforms without such support.

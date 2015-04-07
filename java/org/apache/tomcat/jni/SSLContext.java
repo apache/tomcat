@@ -63,7 +63,7 @@ public final class SSLContext {
 
     /**
      * Associate BIOCallback for input or output data capture.
-     * <br />
+     * <br>
      * First word in the output string will contain error
      * level in the form:
      * <PRE>
@@ -90,14 +90,21 @@ public final class SSLContext {
     public static native void setOptions(long ctx, int options);
 
     /**
+     * Clears OpenSSL Options.
+     * @param ctx Server or Client context to use.
+     * @param options  See SSL.SSL_OP_* for option flags.
+     */
+    public static native void clearOptions(long ctx, int options);
+
+    /**
      * Sets the "quiet shutdown" flag for <b>ctx</b> to be
      * <b>mode</b>. SSL objects created from <b>ctx</b> inherit the
      * <b>mode</b> valid at the time and may be 0 or 1.
-     * <br />
+     * <br>
      * Normally when a SSL connection is finished, the parties must send out
-     * "close notify" alert messages using L<SSL_shutdown(3)|SSL_shutdown(3)>
+     * "close notify" alert messages using L&lt;SSL_shutdown(3)|SSL_shutdown(3)&gt;
      * for a clean shutdown.
-     * <br />
+     * <br>
      * When setting the "quiet shutdown" flag to 1, <b>SSL.shutdown</b>
      * will set the internal flags to SSL_SENT_SHUTDOWN|SSL_RECEIVED_SHUTDOWN.
      * (<b>SSL_shutdown</b> then behaves like called with
@@ -112,7 +119,7 @@ public final class SSLContext {
 
     /**
      * Cipher Suite available for negotiation in SSL handshake.
-     * <br />
+     * <br>
      * This complex directive uses a colon-separated cipher-spec string consisting
      * of OpenSSL cipher specifications to configure the Cipher Suite the client
      * is permitted to negotiate in the SSL handshake phase. Notice that this
@@ -130,13 +137,13 @@ public final class SSLContext {
     /**
      * Set File of concatenated PEM-encoded CA CRLs or
      * directory of PEM-encoded CA Certificates for Client Auth
-     * <br />
+     * <br>
      * This directive sets the all-in-one file where you can assemble the
      * Certificate Revocation Lists (CRL) of Certification Authorities (CA)
      * whose clients you deal with. These are used for Client Authentication.
      * Such a file is simply the concatenation of the various PEM-encoded CRL
      * files, in order of preference.
-     * <br />
+     * <br>
      * The files in this directory have to be PEM-encoded and are accessed through
      * hash filenames. So usually you can't just place the Certificate files there:
      * you also have to create symbolic links named hash-value.N. And you should
@@ -152,14 +159,14 @@ public final class SSLContext {
 
     /**
      * Set File of PEM-encoded Server CA Certificates
-     * <br />
+     * <br>
      * This directive sets the optional all-in-one file where you can assemble the
      * certificates of Certification Authorities (CA) which form the certificate
      * chain of the server certificate. This starts with the issuing CA certificate
      * of of the server certificate and can range up to the root CA certificate.
      * Such a file is simply the concatenation of the various PEM-encoded CA
      * Certificate files, usually in certificate chain order.
-     * <br />
+     * <br>
      * But be careful: Providing the certificate chain works only if you are using
      * a single (either RSA or DSA) based server certificate. If you are using a
      * coupled RSA+DSA certificate pair, this will work only if actually both
@@ -175,7 +182,7 @@ public final class SSLContext {
 
     /**
      * Set Certificate
-     * <br />
+     * <br>
      * Point setCertificateFile at a PEM encoded certificate.  If
      * the certificate is encrypted, then you will be prompted for a
      * pass phrase.  Note that a kill -HUP will prompt again. A test
@@ -183,7 +190,7 @@ public final class SSLContext {
      * built time. Keep in mind that if you've both a RSA and a DSA
      * certificate you can configure both in parallel (to also allow
      * the use of DSA ciphers, etc.)
-     * <br />
+     * <br>
      * If the key is not combined with the certificate, use key param
      * to point at the key file.  Keep in mind that if
      * you've both a RSA and a DSA private key you can configure
@@ -203,14 +210,14 @@ public final class SSLContext {
     /**
      * Set File and Directory of concatenated PEM-encoded CA Certificates
      * for Client Auth
-     * <br />
+     * <br>
      * This directive sets the all-in-one file where you can assemble the
      * Certificates of Certification Authorities (CA) whose clients you deal with.
      * These are used for Client Authentication. Such a file is simply the
      * concatenation of the various PEM-encoded Certificate files, in order of
      * preference. This can be used alternatively and/or additionally to
      * path.
-     * <br />
+     * <br>
      * The files in this directory have to be PEM-encoded and are accessed through
      * hash filenames. So usually you can't just place the Certificate files there:
      * you also have to create symbolic links named hash-value.N. And you should
@@ -234,7 +241,7 @@ public final class SSLContext {
 
     /**
      * Set SSL connection shutdown type
-     * <br />
+     * <br>
      * The following levels are available for level:
      * <PRE>
      * SSL_SHUTDOWN_TYPE_STANDARD
@@ -249,7 +256,7 @@ public final class SSLContext {
     /**
      * Set Type of Client Certificate verification and Maximum depth of CA Certificates
      * in Client Certificate verification.
-     * <br />
+     * <br>
      * This directive sets the Certificate verification level for the Client
      * Authentication. Notice that this directive can be used both in per-server
      * and per-directory context. In per-server context it applies to the client
@@ -257,7 +264,7 @@ public final class SSLContext {
      * is established. In per-directory context it forces a SSL renegotiation with
      * the reconfigured client verification level after the HTTP request was read
      * but before the HTTP response is sent.
-     * <br />
+     * <br>
      * The following levels are available for level:
      * <PRE>
      * SSL_CVERIFY_NONE           - No client Certificate is required at all
@@ -266,7 +273,7 @@ public final class SSLContext {
      * SSL_CVERIFY_OPTIONAL_NO_CA - The client may present a valid Certificate
      *                              but it need not to be (successfully) verifiable
      * </PRE>
-     * <br />
+     * <br>
      * The depth actually is the maximum number of intermediate certificate issuers,
      * i.e. the number of CA certificates which are max allowed to be followed while
      * verifying the client certificate. A depth of 0 means that self-signed client

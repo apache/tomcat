@@ -137,7 +137,7 @@ public class Pool {
      * @param data The user data associated with the pool.
      * @param key The key to use for association
      * @param pool The current pool
-     * <br /><b>Warning :</b>
+     * <br><b>Warning :</b>
      * The data to be attached to the pool should have a life span
      * at least as long as the pool it is being attached to.
      * Object attached to the pool will be globally referenced
