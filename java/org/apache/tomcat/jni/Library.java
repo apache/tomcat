@@ -47,7 +47,7 @@ public final class Library {
                 // Don't use a Java 7 multiple exception catch so we can keep
                 // the JNI code identical between Tomcat 6/7/8
                 throw t;
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 String name = System.mapLibraryName(NAMES[i]);
                 for (int j = 0; j < paths.length; j++) {
                     java.io.File fd = new java.io.File(paths[j] , name);
