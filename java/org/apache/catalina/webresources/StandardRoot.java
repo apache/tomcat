@@ -61,7 +61,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot {
 
-    private static final Log log = LogFactory.getLog(Cache.class);
+    private static final Log log = LogFactory.getLog(StandardRoot.class);
     protected static final StringManager sm =
             StringManager.getManager(Constants.Package);
 
