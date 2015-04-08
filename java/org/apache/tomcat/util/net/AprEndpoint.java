@@ -20,8 +20,10 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -67,13 +69,17 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
  */
 public class AprEndpoint extends AbstractEndpoint<Long> {
 
-
     // -------------------------------------------------------------- Constants
-
 
     private static final Log log = LogFactory.getLog(AprEndpoint.class);
 
+    // http/1.1 with preceding length
+    private static final byte[] ALPN_DEFAULT =
+            new byte[] { 0x08, 0x68, 0x74, 0x74, 0x70, 0x2f, 0x31, 0x2e, 0x31 };
+
+
     // ----------------------------------------------------------------- Fields
+
     /**
      * Root APR memory pool.
      */
@@ -628,8 +634,51 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     log.warn(sm.getString("endpoint.apr.noSendfileWithSSL"));
                 }
             }
+
+            if (negotiableProtocols.size() > 0) {
+                byte[] protocols = buildAlpnConfig(negotiableProtocols);
+                if (SSLContext.setALPN(sslContext, protocols, protocols.length) != 0) {
+                    log.warn(sm.getString("endpoint.alpn.fail", negotiableProtocols));
+                }
+            }
+        } else if (negotiableProtocols.size() > 0) {
+            log.info(sm.getString("endpoint.noNegotiation", getName(), negotiableProtocols.toString()));
         }
     }
+
+
+    private byte[] buildAlpnConfig(List<String> protocols) {
+        /*
+         * The expected format is zero or more of the following:
+         * - Single byte for size
+         * - Sequence of size bytes for the identifier
+         */
+        byte[][] protocolsBytes = new byte[protocols.size()][];
+        int i = 0;
+        int size = 0;
+        for (String protocol : protocols) {
+            protocolsBytes[i] = protocol.getBytes(StandardCharsets.UTF_8);
+            size += protocolsBytes[i].length;
+            // And one byte to store the size
+            size++;
+            i++;
+        }
+
+        size += ALPN_DEFAULT.length;
+
+        byte[] result = new byte[size];
+        int pos = 0;
+        for (byte[] protocolBytes : protocolsBytes) {
+            result[pos++] = (byte) (0xff & protocolBytes.length);
+            System.arraycopy(protocolBytes, 0, result, pos, protocolBytes.length);
+            pos += protocolBytes.length;
+        }
+
+        System.arraycopy(ALPN_DEFAULT, 0, result, pos, ALPN_DEFAULT.length);
+
+        return result;
+    }
+
 
     public long getJniSslContext() {
         return sslContext;
@@ -857,6 +906,18 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 wrapper.setSecure(isSSLEnabled());
                 wrapper.setReadTimeout(getSoTimeout());
                 wrapper.setWriteTimeout(getSoTimeout());
+                if (isSSLEnabled() && negotiableProtocols.size() > 0) {
+                    byte[] negotiated = new byte[256];
+                    int len = SSLSocket.getALPN(socket, negotiated);
+                    String negotiatedProtocol =
+                            new String(negotiated, 0, len, StandardCharsets.UTF_8);
+                    if (negotiatedProtocol.length() > 0) {
+                        wrapper.setNegotiatedProtocol(negotiatedProtocol);
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("endpoint.alpn.negotiated", negotiatedProtocol));
+                        }
+                    }
+                }
                 connections.put(Long.valueOf(socket), wrapper);
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }

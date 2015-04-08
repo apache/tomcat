@@ -365,6 +365,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     protected abstract String getProtocolName();
 
 
+    /**
+     * @param name The name of the requested negotiated protocol.
+     *
+     * @return The instance where {@link UpgradeProtocol#getAlpnName()} matches
+     *         the requested protocol
+     */
+    protected abstract UpgradeProtocol getNegotiatedProtocol(String name);
+
+
     // ----------------------------------------------------- JMX related methods
 
     protected String domain;
@@ -633,6 +642,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             ContainerThreadMarker.set();
 
             try {
+                if (processor == null) {
+                    String negotiatedProtocol = wrapper.getNegotiatedProtocol();
+                    if (negotiatedProtocol != null) {
+                        UpgradeProtocol upgradeProtocol =
+                                getProtocol().getNegotiatedProtocol(negotiatedProtocol);
+                        if (upgradeProtocol != null) {
+                            processor = upgradeProtocol.getProcessor(wrapper);
+                        }
+                    }
+                }
                 if (processor == null) {
                     processor = recycledProcessors.pop();
                 }

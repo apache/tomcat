@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.ajp.Constants;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -135,5 +136,11 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
         public void release(SocketChannel socket) {
             // TODO Auto-generated method stub
         }
+    }
+
+    @Override
+    protected UpgradeProtocol getNegotiatedProtocol(String name) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

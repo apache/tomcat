@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -495,6 +496,11 @@ public abstract class AbstractEndpoint<S> {
 
     protected abstract boolean getDeferAccept();
 
+
+    protected final List<String> negotiableProtocols = new ArrayList<>();
+    public void addNegotiatedProtocol(String negotiableProtocol) {
+        negotiableProtocols.add(negotiableProtocol);
+    }
 
     /**
      * Attributes provide a way for configuration to be passed to sub-components
