@@ -1044,17 +1044,14 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
         // TODO: NIO2 style scatter/gather methods.
-        // TODO: SecureNio2Channel scatter/gather would need to be improved
 
         public enum CompletionState {
             /**
-             * Operation is pending and the completion handler will
-             * be called later.
+             * Operation is still pending.
              */
             PENDING,
             /**
-             * The operation completed inline, and the completion handler
-             * will not be called unless an error occurred.
+             * The operation completed inline.
              */
             INLINE,
             /**
@@ -1071,12 +1068,12 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             CONTINUE,
             /**
              * The operation completed but the completion handler shouldn't be
-             * called. This is possibly useful if the operation completed
-             * inline.
+             * called.
              */
             NONE,
             /**
-             * The operation is complete, call the completion handler.
+             * The operation is complete, the completion handler should be
+             * called.
              */
             DONE
         }
@@ -1263,8 +1260,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * data has been read or an error occurred. If a CompletionCheck
          * object has been provided, the completion handler will only be
          * called if the callHandler method returned true. If no
-         * CompletionCheck object has been provided, the completion handler
-         * will be called.
+         * CompletionCheck object has been provided, the ddefault NIO2
+         * behavior is used: the completion handler will be called as soon
+         * as some data has been read, even if the read has completed inline.
          *
          * @param dsts buffers
          * @param offset in the buffer array
@@ -1277,11 +1275,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * @return the completion state (done, done inline, or still pending)
          */
         // FIXME: @Override
-        public <A> CompletionState read(ByteBuffer[] dsts,
-                int offset, int length,
+        public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
                 long timeout, TimeUnit unit, A attachment,
-                CompletionCheck check,
-                CompletionHandler<Long, ? super A> handler) {
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
             OperationState<A> state = new OperationState<>(dsts, offset, length, timeout, unit, attachment, check, handler);
             if (readPending.tryAcquire()) {
                 Nio2Endpoint.startInline();
@@ -1293,6 +1289,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             return state.state;
         }
 
+        // FIXME: @Override
         public boolean isWritePending() {
             synchronized (writeCompletionHandler) {
                 return writePending.availablePermits() == 0;
@@ -1304,8 +1301,10 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * data has been written or an error occurred. If a CompletionCheck
          * object has been provided, the completion handler will only be
          * called if the callHandler method returned true. If no
-         * CompletionCheck object has been provided, the completion handler
-         * will be called.
+         * CompletionCheck object has been provided, the ddefault NIO2
+         * behavior is used: the completion handler will be called, even
+         * if the write is incomplete and data remains in the buffers, or
+         * if the write completed inline.
          *
          * @param srcs buffers
          * @param offset in the buffer array
@@ -1318,11 +1317,9 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * @return the completion state (done, done inline, or still pending)
          */
         // FIXME: @Override
-        public <A> CompletionState write(ByteBuffer[] srcs,
-                int offset, int length,
+        public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
                 long timeout, TimeUnit unit, A attachment,
-                CompletionCheck check,
-                CompletionHandler<Long, ? super A> handler) {
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
             OperationState<A> state = new OperationState<>(srcs, offset, length, timeout, unit, attachment, check, handler);
             if (writePending.tryAcquire()) {
                 Nio2Endpoint.startInline();

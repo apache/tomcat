@@ -793,6 +793,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
     }
 
+    // TODO: Possible optimization for scatter
     @Override
     public <A> void read(ByteBuffer[] dsts, int offset, int length,
             long timeout, TimeUnit unit, A attachment,
@@ -957,6 +958,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
     }
 
+    // TODO: Possible optimization for gather
     @Override
     public <A> void write(ByteBuffer[] srcs, int offset, int length,
             long timeout, TimeUnit unit, A attachment,
