@@ -1264,9 +1264,46 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * behavior is used: the completion handler will be called as soon
          * as some data has been read, even if the read has completed inline.
          *
+         * @param block true to block until any pending read is done, if the
+         *        timeout occurs and a read is still pending, a
+         *        ReadPendingException will be thrown; false to
+         *        not block but any pending read operation will cause
+         *        a ReadPendingException
+         * @param timeout
+         * @param unit
+         * @param attachment
+         * @param check for the IO operation completion
+         * @param handler to call when the IO is complete
+         * @param dsts buffers
+         * @return the completion state (done, done inline, or still pending)
+         */
+        // FIXME: @Override
+        public <A> CompletionState read(boolean block, long timeout, TimeUnit unit, A attachment,
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler,
+                ByteBuffer... dsts) {
+            if (dsts == null) {
+                throw new IllegalArgumentException();
+            }
+            return read(dsts, 0, dsts.length, block, timeout, unit, attachment, check, handler);
+        }
+
+        /**
+         * Scatter read. The completion handler will be called once some
+         * data has been read or an error occurred. If a CompletionCheck
+         * object has been provided, the completion handler will only be
+         * called if the callHandler method returned true. If no
+         * CompletionCheck object has been provided, the ddefault NIO2
+         * behavior is used: the completion handler will be called as soon
+         * as some data has been read, even if the read has completed inline.
+         *
          * @param dsts buffers
          * @param offset in the buffer array
          * @param length in the buffer array
+         * @param block true to block until any pending read is done, if the
+         *        timeout occurs and a read is still pending, a
+         *        ReadPendingException will be thrown; false to
+         *        not block but any pending read operation will cause
+         *        a ReadPendingException
          * @param timeout
          * @param unit
          * @param attachment
@@ -1276,15 +1313,19 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          */
         // FIXME: @Override
         public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
-                long timeout, TimeUnit unit, A attachment,
+                boolean block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
             OperationState<A> state = new OperationState<>(dsts, offset, length, timeout, unit, attachment, check, handler);
-            if (readPending.tryAcquire()) {
-                Nio2Endpoint.startInline();
-                getSocket().read(dsts, offset, length, timeout, unit, state, new ScatterReadCompletionHandler<>());
-                Nio2Endpoint.endInline();
-            } else {
-                throw new ReadPendingException();
+            try {
+                if ((!block && readPending.tryAcquire()) || (block && readPending.tryAcquire(timeout, unit))) {
+                    Nio2Endpoint.startInline();
+                    getSocket().read(dsts, offset, length, timeout, unit, state, new ScatterReadCompletionHandler<>());
+                    Nio2Endpoint.endInline();
+                } else {
+                    throw new ReadPendingException();
+                }
+            } catch (InterruptedException e) {
+                handler.failed(e, attachment);
             }
             return state.state;
         }
@@ -1306,9 +1347,47 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * if the write is incomplete and data remains in the buffers, or
          * if the write completed inline.
          *
+         * @param block true to block until any pending write is done, if the
+         *        timeout occurs and a write is still pending, a
+         *        WritePendingException will be thrown; false to
+         *        not block but any pending write operation will cause
+         *        a WritePendingException
+         * @param timeout
+         * @param unit
+         * @param attachment
+         * @param check for the IO operation completion
+         * @param handler to call when the IO is complete
+         * @param srcs buffers
+         * @return the completion state (done, done inline, or still pending)
+         */
+        // FIXME: @Override
+        public <A> CompletionState write(boolean block, long timeout, TimeUnit unit, A attachment,
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler,
+                ByteBuffer... srcs) {
+            if (srcs == null) {
+                throw new IllegalArgumentException();
+            }
+            return write(srcs, 0, srcs.length, block, timeout, unit, attachment, check, handler);
+        }
+
+        /**
+         * Gather write. The completion handler will be called once some
+         * data has been written or an error occurred. If a CompletionCheck
+         * object has been provided, the completion handler will only be
+         * called if the callHandler method returned true. If no
+         * CompletionCheck object has been provided, the ddefault NIO2
+         * behavior is used: the completion handler will be called, even
+         * if the write is incomplete and data remains in the buffers, or
+         * if the write completed inline.
+         *
          * @param srcs buffers
          * @param offset in the buffer array
          * @param length in the buffer array
+         * @param block true to block until any pending write is done, if the
+         *        timeout occurs and a write is still pending, a
+         *        WritePendingException will be thrown; false to
+         *        not block but any pending write operation will cause
+         *        a WritePendingException
          * @param timeout
          * @param unit
          * @param attachment
@@ -1318,15 +1397,19 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          */
         // FIXME: @Override
         public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
-                long timeout, TimeUnit unit, A attachment,
+                boolean block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
             OperationState<A> state = new OperationState<>(srcs, offset, length, timeout, unit, attachment, check, handler);
-            if (writePending.tryAcquire()) {
-                Nio2Endpoint.startInline();
-                getSocket().write(srcs, offset, length, timeout, unit, state, new GatherWriteCompletionHandler<>());
-                Nio2Endpoint.endInline();
-            } else {
-                throw new WritePendingException();
+            try {
+                if ((!block && writePending.tryAcquire()) || (block && writePending.tryAcquire(timeout, unit))) {
+                    Nio2Endpoint.startInline();
+                    getSocket().write(srcs, offset, length, timeout, unit, state, new GatherWriteCompletionHandler<>());
+                    Nio2Endpoint.endInline();
+                } else {
+                    throw new WritePendingException();
+                }
+            } catch (InterruptedException e) {
+                handler.failed(e, attachment);
             }
             return state.state;
         }
