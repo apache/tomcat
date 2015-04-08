@@ -1044,94 +1044,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
         // TODO: NIO2 style scatter/gather methods.
-        // TODO: SecureNio2Channel gather would need to be improved
-
-        /**
-         * Internal state tracker for scatter/gather operations.
-         */
-        private class OperationState<A> {
-            private final ByteBuffer[] buffers;
-            private final int offset;
-            private final int length;
-            private final A attachment;
-            private final long timeout;
-            private final TimeUnit unit;
-            private final CompletionCheck check;
-            private final CompletionHandler<Long, ? super A> handler;
-            private OperationState(ByteBuffer[] buffers, int offset, int length,
-                    long timeout, TimeUnit unit, A attachment, CompletionCheck check,
-                    CompletionHandler<Long, ? super A> handler) {
-                this.buffers = buffers;
-                this.offset = offset;
-                this.length = length;
-                this.timeout = timeout;
-                this.unit = unit;
-                this.attachment = attachment;
-                this.check = check;
-                this.handler = handler;
-                this.pos = offset;
-            }
-            private long nBytes = 0;
-            private int pos;
-            private CompletionState state = CompletionState.PENDING;
-        }
-
-        private class GatherWriteCompletionHandler<A> implements CompletionHandler<Long, OperationState<A>> {
-            @Override
-            public void completed(Long nBytes, OperationState<A> state) {
-                if (nBytes.longValue() < 0) {
-                    failed(new EOFException(), state);
-                } else {
-                    state.nBytes += nBytes.longValue();
-                    if (state.pos == state.offset + state.length) {
-                        writePending.release();
-                        state.state = Nio2Endpoint.isInline() ? CompletionState.INLINE : CompletionState.DONE;
-                        if (state.check == null
-                                || state.check.callHandler(state.state, state.buffers, state.offset, state.length)
-                                    == CompletionHandlerCall.DONE) {
-                            state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
-                        }
-                    } else {
-                        if (state.check == null) {
-                            // Call completion handler
-                            writePending.release();
-                            state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
-                        } else {
-                            boolean inline = Nio2Endpoint.isInline();
-                            switch (state.check.callHandler(inline ? CompletionState.INLINE : CompletionState.DONE,
-                                        state.buffers, state.offset, state.length)) {
-                            case CONTINUE:
-                                getSocket().write(state.buffers, state.offset, state.length,
-                                        state.timeout, state.unit, state, this);
-                                break;
-                            case DONE:
-                                writePending.release();
-                                state.state = inline ? CompletionState.INLINE : CompletionState.DONE;
-                                state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
-                                break;
-                            case NONE:
-                                writePending.release();
-                                state.state = inline ? CompletionState.INLINE : CompletionState.DONE;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            @Override
-            public void failed(Throwable exc, OperationState<A> state) {
-                IOException ioe;
-                if (exc instanceof IOException) {
-                    ioe = (IOException) exc;
-                } else {
-                    ioe = new IOException(exc);
-                }
-                Nio2SocketWrapper.this.setError(ioe);
-                writePending.release();
-                state.state = Nio2Endpoint.isInline() ? CompletionState.INLINE : CompletionState.DONE;
-                state.handler.failed(ioe, state.attachment);
-            }
-        }
+        // TODO: SecureNio2Channel scatter/gather would need to be improved
 
         public enum CompletionState {
             /**
@@ -1187,8 +1100,139 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
         }
 
         /**
+         * Internal state tracker for scatter/gather operations.
+         */
+        private class OperationState<A> {
+            private final ByteBuffer[] buffers;
+            private final int offset;
+            private final int length;
+            private final A attachment;
+            private final long timeout;
+            private final TimeUnit unit;
+            private final CompletionCheck check;
+            private final CompletionHandler<Long, ? super A> handler;
+            private OperationState(ByteBuffer[] buffers, int offset, int length,
+                    long timeout, TimeUnit unit, A attachment, CompletionCheck check,
+                    CompletionHandler<Long, ? super A> handler) {
+                this.buffers = buffers;
+                this.offset = offset;
+                this.length = length;
+                this.timeout = timeout;
+                this.unit = unit;
+                this.attachment = attachment;
+                this.check = check;
+                this.handler = handler;
+            }
+            private long nBytes = 0;
+            private CompletionState state = CompletionState.PENDING;
+        }
+
+        private class ScatterReadCompletionHandler<A> implements CompletionHandler<Long, OperationState<A>> {
+            @Override
+            public void completed(Long nBytes, OperationState<A> state) {
+                if (nBytes.intValue() < 0) {
+                    failed(new EOFException(), state);
+                } else {
+                    state.nBytes += nBytes.longValue();
+                    CompletionState currentState = Nio2Endpoint.isInline() ? CompletionState.INLINE : CompletionState.DONE;
+                    boolean complete = true;
+                    boolean completion = true;
+                    if (state.check != null) {
+                        switch (state.check.callHandler(currentState, state.buffers, state.offset, state.length)) {
+                        case CONTINUE:
+                            complete = false;
+                            break;
+                        case DONE:
+                            break;
+                        case NONE:
+                            completion = false;
+                            break;
+                        }
+                    }
+                    if (complete) {
+                        readPending.release();
+                        state.state = currentState;
+                        if (completion) {
+                            state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
+                        }
+                    } else {
+                        getSocket().read(state.buffers, state.offset, state.length,
+                                state.timeout, state.unit, state, this);
+                    }
+                }
+            }
+            @Override
+            public void failed(Throwable exc, OperationState<A> state) {
+                IOException ioe;
+                if (exc instanceof IOException) {
+                    ioe = (IOException) exc;
+                } else {
+                    ioe = new IOException(exc);
+                }
+                Nio2SocketWrapper.this.setError(ioe);
+                readPending.release();
+                if (exc instanceof AsynchronousCloseException) {
+                    // If already closed, don't call onError and close again
+                    return;
+                }
+                state.state = Nio2Endpoint.isInline() ? CompletionState.INLINE : CompletionState.DONE;
+                state.handler.failed(ioe, state.attachment);
+            }
+        }
+
+        private class GatherWriteCompletionHandler<A> implements CompletionHandler<Long, OperationState<A>> {
+            @Override
+            public void completed(Long nBytes, OperationState<A> state) {
+                if (nBytes.longValue() < 0) {
+                    failed(new EOFException(), state);
+                } else {
+                    state.nBytes += nBytes.longValue();
+                    CompletionState currentState = Nio2Endpoint.isInline() ? CompletionState.INLINE : CompletionState.DONE;
+                    boolean complete = true;
+                    boolean completion = true;
+                    if (state.check != null) {
+                        switch (state.check.callHandler(currentState, state.buffers, state.offset, state.length)) {
+                        case CONTINUE:
+                            complete = false;
+                            break;
+                        case DONE:
+                            break;
+                        case NONE:
+                            completion = false;
+                            break;
+                        }
+                    }
+                    if (complete) {
+                        writePending.release();
+                        state.state = currentState;
+                        if (completion) {
+                            state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
+                        }
+                    } else {
+                        getSocket().write(state.buffers, state.offset, state.length,
+                                state.timeout, state.unit, state, this);
+                    }
+                }
+            }
+            @Override
+            public void failed(Throwable exc, OperationState<A> state) {
+                IOException ioe;
+                if (exc instanceof IOException) {
+                    ioe = (IOException) exc;
+                } else {
+                    ioe = new IOException(exc);
+                }
+                Nio2SocketWrapper.this.setError(ioe);
+                writePending.release();
+                state.state = Nio2Endpoint.isInline() ? CompletionState.INLINE : CompletionState.DONE;
+                state.handler.failed(ioe, state.attachment);
+            }
+        }
+
+        /**
          * This utility CompletionCheck will cause the write to fully write
-         * all remaining data.
+         * all remaining data. If the operation completes inline, the
+         * completion handler will not be called.
          */
         public static final CompletionCheck COMPLETE_WRITE = new CompletionCheck() {
             @Override
@@ -1204,7 +1248,8 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
 
         /**
          * This utility CompletionCheck will cause the completion handler
-         * to be called once some data has been read.
+         * to be called once some data has been read. If the operation
+         * completes inline, the completion handler will not be called.
          */
         public static final CompletionCheck READ_DATA = new CompletionCheck() {
             @Override
@@ -1240,8 +1285,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
             OperationState<A> state = new OperationState<>(dsts, offset, length, timeout, unit, attachment, check, handler);
             if (readPending.tryAcquire()) {
                 Nio2Endpoint.startInline();
-                // FIXME: Add scatter read to Nio2Channel and ScatterReadCompletionHandler class
-                //getSocket().read(dsts, offset, length, timeout, unit, state, new ScatterReadCompletionHandler<>());
+                getSocket().read(dsts, offset, length, timeout, unit, state, new ScatterReadCompletionHandler<>());
                 Nio2Endpoint.endInline();
             } else {
                 throw new ReadPendingException();
