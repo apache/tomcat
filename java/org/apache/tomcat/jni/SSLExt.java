@@ -21,7 +21,7 @@ package org.apache.tomcat.jni;
  *
  * The methods are separated to make it easier for java code to
  * support existing native library - it can check if this class can
- * be loaded in order to use the exensions.
+ * be loaded in order to use the extensions.
  *
  * @author Costin Manolache
  */
@@ -41,7 +41,7 @@ public final class SSLExt {
      *
      * Not supported in 1.0.0, seems to be in 1.0.1 and after
      */
-    public static native int setNPN(long tcctx, byte[] proto, int len);
+    public static native int setNPN(long ctx, byte[] proto, int len);
 
     /**
      * Get other side's advertised protocols.
@@ -121,9 +121,9 @@ public final class SSLExt {
      */
     public static native long sslSetMode(long tcsock, long mode);
 
-    public static int setNPN(long sslContext, byte[] spdyNPN) {
+    public static int setNPN(long ctx, byte[] spdyNPN) {
         try {
-            return SSLExt.setNPN(sslContext, spdyNPN, spdyNPN.length);
+            return SSLExt.setNPN(ctx, spdyNPN, spdyNPN.length);
         } catch (Throwable t) {
             t.printStackTrace();
             return -1;
@@ -153,7 +153,4 @@ public final class SSLExt {
         }
         return true;
     }
-
-
-
 }
