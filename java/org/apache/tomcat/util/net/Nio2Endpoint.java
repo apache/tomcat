@@ -1191,6 +1191,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * all remaining data.
          */
         public static final CompletionCheck COMPLETE_WRITE = new CompletionCheck() {
+            @Override
             public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length) {
                 for (int i = 0; i < offset; i++) {
                     if (buffers[i].remaining() > 0) {
@@ -1206,6 +1207,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
          * to be called once some data has been read.
          */
         public static final CompletionCheck READ_DATA = new CompletionCheck() {
+            @Override
             public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length) {
                 return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE : CompletionHandlerCall.NONE;
             }
@@ -1235,7 +1237,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check,
                 CompletionHandler<Long, ? super A> handler) {
-            OperationState<A> state = new OperationState<A>(dsts, offset, length, timeout, unit, attachment, check, handler);
+            OperationState<A> state = new OperationState<>(dsts, offset, length, timeout, unit, attachment, check, handler);
             if (readPending.tryAcquire()) {
                 Nio2Endpoint.startInline();
                 // FIXME: Add scatter read to Nio2Channel and ScatterReadCompletionHandler class
@@ -1277,7 +1279,7 @@ public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
                 long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check,
                 CompletionHandler<Long, ? super A> handler) {
-            OperationState<A> state = new OperationState<A>(srcs, offset, length, timeout, unit, attachment, check, handler);
+            OperationState<A> state = new OperationState<>(srcs, offset, length, timeout, unit, attachment, check, handler);
             if (writePending.tryAcquire()) {
                 Nio2Endpoint.startInline();
                 getSocket().write(srcs, offset, length, timeout, unit, state, new GatherWriteCompletionHandler<>());
