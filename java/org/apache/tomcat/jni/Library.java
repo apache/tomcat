@@ -32,7 +32,7 @@ public final class Library {
      */
     private static Library _instance = null;
 
-    private Library() throws Exception {
+    private Library() throws Throwable {
         boolean loaded = false;
         String path = System.getProperty("java.library.path");
         String [] paths = path.split(File.pathSeparator);
@@ -47,7 +47,7 @@ public final class Library {
                 // Don't use a Java 7 multiple exception catch so we can keep
                 // the JNI code identical between Tomcat 6/7/8
                 throw t;
-            } catch (Exception t) {
+            } catch (Throwable t) {
                 String name = System.mapLibraryName(NAMES[i]);
                 for (int j = 0; j < paths.length; j++) {
                     java.io.File fd = new java.io.File(paths[j] , name);
@@ -168,7 +168,7 @@ public final class Library {
      * @param libraryName the name of the library to load
      */
     public static boolean initialize(String libraryName)
-        throws Exception
+        throws Throwable
     {
         if (_instance == null) {
             if (libraryName == null)
