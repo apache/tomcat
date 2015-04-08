@@ -138,7 +138,7 @@ public class Nio2Channel implements AsynchronousByteChannel {
     public <A> void read(ByteBuffer[] dsts,
             int offset, int length, long timeout, TimeUnit unit,
             A attachment, CompletionHandler<Long,? super A> handler) {
-        sc.read(dsts, offset, length, timeout, unit, attachment, handler);;
+        sc.read(dsts, offset, length, timeout, unit, attachment, handler);
     }
 
     @Override
