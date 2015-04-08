@@ -22,6 +22,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
+import org.apache.coyote.UpgradeProtocol;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -64,6 +65,17 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     @Override
     protected AbstractEndpoint<S> getEndpoint() {
         return super.getEndpoint();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * AJP does not support protocol negotiation so this always returns null.
+     */
+    @Override
+    protected UpgradeProtocol getNegotiatedProtocol(String name) {
+        return null;
     }
 
 

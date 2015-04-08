@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,6 +32,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
+import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
@@ -41,6 +44,13 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public AbstractHttp11Protocol(AbstractEndpoint<S> endpoint) {
         super(endpoint);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
+
+        // TODO: Make this configurable via nested UpgradeProtocol elements in
+        //       the Connector.
+        //       This is disabled by default otherwise it will break the
+        //       APR/native connector with clients that support h2 with ALPN
+        //       (because the Http2Protocol is only stubbed out)
+        //addUpgradeProtocol(new Http2Protocol());
     }
 
 
@@ -253,6 +263,27 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         if (header != null) {
             allowedTrailerHeaders.remove(header.trim().toLowerCase(Locale.ENGLISH));
         }
+    }
+
+
+    /**
+     * The protocols that are available via internal Tomcat support for access
+     * via HTTP upgrade.
+     */
+    private final Map<String,UpgradeProtocol> httpUpgradeProtocols = new HashMap<>();
+    /**
+     * The protocols that are available via internal Tomcat support for access
+     * via ALPN negotiation.
+     */
+    private final Map<String,UpgradeProtocol> negotiatedProtocols = new HashMap<>();
+    public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
+        httpUpgradeProtocols.put(upgradeProtocol.getHttpUpgradeName(), upgradeProtocol);
+        negotiatedProtocols.put(upgradeProtocol.getAlpnName(), upgradeProtocol);
+        getEndpoint().addNegotiatedProtocol(upgradeProtocol.getAlpnName());
+    }
+    @Override
+    public UpgradeProtocol getNegotiatedProtocol(String negotiatedName) {
+        return negotiatedProtocols.get(negotiatedName);
     }
 
 

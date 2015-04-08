@@ -52,6 +52,7 @@ public abstract class SocketWrapperBase<E> {
     private boolean keptAlive = false;
     private volatile boolean upgraded = false;
     private boolean secure = false;
+    private String negotiatedProtocol = null;
     /*
      * Following cached for speed / reduced GC
      */
@@ -154,6 +155,10 @@ public abstract class SocketWrapperBase<E> {
     public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
     public boolean isSecure() { return secure; }
     public void setSecure(boolean secure) { this.secure = secure; }
+    public String getNegotiatedProtocol() { return negotiatedProtocol; }
+    public void setNegotiatedProtocol(String negotiatedProtocol) {
+        this.negotiatedProtocol = negotiatedProtocol;
+    }
 
     /**
      * Set the timeout for reading. Values of zero or less will be changed to]
