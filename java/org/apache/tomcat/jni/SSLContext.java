@@ -288,4 +288,5 @@ public final class SSLContext {
      */
     public static native void setVerify(long ctx, int level, int depth);
 
+    public static native int setALPN(long ctx, byte[] proto, int len);
 }
