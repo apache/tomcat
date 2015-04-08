@@ -832,7 +832,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     /**
      * Process the specified connection.
      */
-    protected boolean setSocketOptions(long socket) {
+    protected boolean setSocketOptions(SocketWrapperBase<Long> socketWrapper) {
+        long socket = socketWrapper.getSocket().longValue();
         // Process the connection
         int step = 1;
         try {
@@ -854,8 +855,20 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     }
                     return false;
                 }
-            }
 
+                if (negotiableProtocols.size() > 0) {
+                    byte[] negotiated = new byte[256];
+                    int len = SSLSocket.getALPN(socket, negotiated);
+                    String negotiatedProtocol =
+                            new String(negotiated, 0, len, StandardCharsets.UTF_8);
+                    if (negotiatedProtocol.length() > 0) {
+                        socketWrapper.setNegotiatedProtocol(negotiatedProtocol);
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("endpoint.alpn.negotiated", negotiatedProtocol));
+                        }
+                    }
+                }
+            }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             if (log.isDebugEnabled()) {
@@ -906,18 +919,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 wrapper.setSecure(isSSLEnabled());
                 wrapper.setReadTimeout(getSoTimeout());
                 wrapper.setWriteTimeout(getSoTimeout());
-                if (isSSLEnabled() && negotiableProtocols.size() > 0) {
-                    byte[] negotiated = new byte[256];
-                    int len = SSLSocket.getALPN(socket, negotiated);
-                    String negotiatedProtocol =
-                            new String(negotiated, 0, len, StandardCharsets.UTF_8);
-                    if (negotiatedProtocol.length() > 0) {
-                        wrapper.setNegotiatedProtocol(negotiatedProtocol);
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("endpoint.alpn.negotiated", negotiatedProtocol));
-                        }
-                    }
-                }
                 connections.put(Long.valueOf(socket), wrapper);
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
@@ -2359,7 +2360,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
             synchronized (socket) {
                 if (!deferAccept) {
-                    if (setSocketOptions(socket.getSocket().longValue())) {
+                    if (setSocketOptions(socket)) {
                         getPoller().add(socket.getSocket().longValue(),
                                 getSoTimeout(), Poll.APR_POLLIN);
                     } else {
@@ -2369,7 +2370,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     }
                 } else {
                     // Process the request from this socket
-                    if (!setSocketOptions(socket.getSocket().longValue())) {
+                    if (!setSocketOptions(socket)) {
                         // Close socket and pool
                         closeSocket(socket.getSocket().longValue());
                         socket = null;
