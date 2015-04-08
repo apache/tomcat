@@ -107,4 +107,16 @@ public class SSLSocket {
     public static native int getInfoI(long sock, int id)
         throws Exception;
 
+
+    /**
+     * Obtain the name of the protocol negotiated via ALPN. Only valid after the
+     * TLS handshake has completed.
+     *
+     * @param sock                  Socket
+     * @param negotiatedProtocol    Byte array in which to store agreed protocol
+     *
+     * @return Length of agreed protocol. Zero means no protocol agreed.
+     */
+    public static native int getALPN(long sock, byte[] negotiatedProtocol);
+
 }
