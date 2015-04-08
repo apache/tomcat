@@ -794,6 +794,37 @@ public class SecureNio2Channel extends Nio2Channel  {
     }
 
     @Override
+    public <A> void read(ByteBuffer[] dsts, int offset, int length,
+            long timeout, TimeUnit unit, A attachment,
+            final CompletionHandler<Long, ? super A> handler) {
+        if (offset < 0 || dsts == null || (offset + length) > dsts.length) {
+            throw new IllegalArgumentException();
+        }
+        ByteBuffer dst = null;
+        // Find the first buffer with space
+        for (int i = 0; i < length; i++) {
+            ByteBuffer current = dsts[offset + i];
+            if (current.position() < current.limit()) {
+                dst = current;
+            }
+        }
+        if (dst == null) {
+            throw new IllegalArgumentException();
+        }
+        CompletionHandler<Integer, ? super A> handlerWrapper = new CompletionHandler<Integer, A>() {
+            @Override
+            public void completed(Integer result, A attachment) {
+                handler.completed(Long.valueOf(result.longValue()), attachment);
+            }
+            @Override
+            public void failed(Throwable exc, A attachment) {
+                handler.failed(exc, attachment);
+            }
+        };
+        read(dst, timeout, unit, attachment, handlerWrapper);
+    }
+
+    @Override
     public <A> void write(final ByteBuffer src, final long timeout, final TimeUnit unit,
             final A attachment, final CompletionHandler<Integer, ? super A> handler) {
         // Check state
