@@ -28,6 +28,7 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
+import javax.net.ssl.SSLException;
 
 /**
  *
@@ -53,7 +54,7 @@ public class SecureNioChannel extends NioChannel  {
     protected NioSelectorPool pool;
 
     public SecureNioChannel(SocketChannel channel, SSLEngine engine, SocketBufferHandler bufHandler,
-            NioSelectorPool pool) throws IOException {
+            NioSelectorPool pool) {
         super(channel,bufHandler);
         this.sslEngine = engine;
         int netBufSize = sslEngine.getSession().getPacketBufferSize();
@@ -63,14 +64,13 @@ public class SecureNioChannel extends NioChannel  {
 
         //selector pool for blocking operations
         this.pool = pool;
-
-        reset();
     }
 
     public void reset(SSLEngine engine) throws IOException {
         this.sslEngine = engine;
         reset();
     }
+
     @Override
     public void reset() throws IOException {
         super.reset();
@@ -78,12 +78,10 @@ public class SecureNioChannel extends NioChannel  {
         netOutBuffer.limit(0);
         netInBuffer.position(0);
         netInBuffer.limit(0);
+        sniComplete = false;
         handshakeComplete = false;
         closed = false;
         closing = false;
-        //initiate handshake
-        sslEngine.beginHandshake();
-        handshakeStatus = sslEngine.getHandshakeStatus();
     }
 
 
@@ -224,7 +222,11 @@ public class SecureNioChannel extends NioChannel  {
      * present and, if it is, what host name has been requested. Based on the
      * provided host name, configure the SSLEngine for this connection.
      */
-    private int processSNI() {
+    private int processSNI() throws SSLException {
+        // Initiate handshake
+        sslEngine.beginHandshake();
+        handshakeStatus = sslEngine.getHandshakeStatus();
+
         return 0;
     }
 
