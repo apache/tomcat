@@ -465,7 +465,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                             Math.max(appbufsize,socketProperties.getAppReadBufSize()),
                             Math.max(appbufsize,socketProperties.getAppWriteBufSize()),
                             socketProperties.getDirectBuffer());
-                    channel = new SecureNioChannel(socket, engine, bufhandler, selectorPool);
+                    channel = new SecureNioChannel(socket, engine, bufhandler, selectorPool, this);
                 } else {
                     // normal tcp setup
                     SocketBufferHandler bufhandler = new SocketBufferHandler(
