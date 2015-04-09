@@ -92,9 +92,17 @@ public class NioChannel implements ByteChannel {
         getIOChannel().close();
     }
 
+    /**
+     * Close the connection.
+     *
+     * @param force Should the underlying socket be forcibly closed?
+     *
+     * @throws IOException If closing the secure channel fails.
+     */
     public void close(boolean force) throws IOException {
         if (isOpen() || force ) close();
     }
+
     /**
      * Tells whether or not this channel is open.
      *
