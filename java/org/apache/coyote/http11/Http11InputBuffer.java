@@ -292,9 +292,6 @@ public class Http11InputBuffer implements InputBuffer {
 
     // ---------------------------------------------------- InputBuffer Methods
 
-    /**
-     * Read some bytes.
-     */
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
 
@@ -1046,9 +1043,6 @@ public class Http11InputBuffer implements InputBuffer {
      */
     private class SocketInputBuffer implements InputBuffer {
 
-        /**
-         * Read bytes into the specified chunk.
-         */
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
 

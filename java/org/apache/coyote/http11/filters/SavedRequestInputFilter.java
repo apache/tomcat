@@ -43,9 +43,6 @@ public class SavedRequestInputFilter implements InputFilter {
         this.input = input;
     }
 
-    /**
-     * Read bytes.
-     */
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
         if(input.getOffset()>= input.getEnd())

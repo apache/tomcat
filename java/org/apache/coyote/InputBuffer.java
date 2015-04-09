@@ -27,11 +27,17 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public interface InputBuffer {
 
     /**
-     * Read from the input
-     * Return from the input stream.
-        IMPORTANT: the current model assumes that the protocol will 'own' the
-        buffer and return a pointer to it in ByteChunk ( i.e. the param will
-        have chunk.getBytes()==null before call, and the result after the call ).
-    */
+     * Read from the input stream into the given buffer.
+     * IMPORTANT: the current model assumes that the protocol will 'own' the
+     * buffer and return a pointer to it in ByteChunk (i.e. the param will
+     * have chunk.getBytes()==null before call, and the result after the call).
+     *
+     * @param chunk The buffer to read data into.
+     *
+     * @return The number of bytes that have been added to the buffer or -1 for
+     *         end of stream
+     *
+     * @throws IOException If an I/O error occurs reading from the input stream
+     */
     public int doRead(ByteChunk chunk) throws IOException;
 }
