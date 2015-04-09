@@ -54,24 +54,19 @@ public class SecureNioChannel extends NioChannel  {
     protected NioSelectorPool pool;
     private final NioEndpoint endpoint;
 
-    public SecureNioChannel(SocketChannel channel, SSLEngine engine, SocketBufferHandler bufHandler,
+    public SecureNioChannel(SocketChannel channel, SocketBufferHandler bufHandler,
             NioSelectorPool pool, NioEndpoint endpoint) {
-        super(channel,bufHandler);
-        this.sslEngine = engine;
+        super(channel, bufHandler);
 
         // selector pool for blocking operations
         this.pool = pool;
         this.endpoint = endpoint;
     }
 
-    public void reset(SSLEngine engine) throws IOException {
-        this.sslEngine = engine;
-        reset();
-    }
-
     @Override
     public void reset() throws IOException {
         super.reset();
+        sslEngine = null;
         sniComplete = false;
         handshakeComplete = false;
         closed = false;
@@ -221,6 +216,12 @@ public class SecureNioChannel extends NioChannel  {
         //      via SNI (if any) goes here.
 
         SocketProperties sp = endpoint.getSocketProperties();
+        sslEngine = endpoint.createSSLEngine();
+
+        // Ensure the application buffers (which have to be created earlier) are
+        // big enough.
+        bufHandler.expand(sslEngine.getSession().getApplicationBufferSize());
+
         // Create/expand network buffers.
         // In/Out are always created in a pair with identical settings so only
         // need to test one to determine what needs to be done for both.
