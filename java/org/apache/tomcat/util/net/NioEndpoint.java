@@ -40,12 +40,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSessionContext;
-import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -55,7 +51,6 @@ import org.apache.tomcat.util.collections.SynchronizedQueue;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.jsse.JSSESupport;
-import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -224,13 +219,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     }
 
 
-    private SSLImplementation sslImplementation = null;
-    private SSLContext sslContext = null;
-    public SSLContext getSSLContext() { return sslContext;}
-    public void setSSLContext(SSLContext c) { sslContext = c;}
-    private String[] enabledCiphers;
-    private String[] enabledProtocols;
-
     /**
      * Port in use.
      */
@@ -247,17 +235,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 return s.getLocalPort();
             }
         }
-    }
-
-
-    public SSLImplementation getSslImplementation() {
-        return sslImplementation;
-    }
-
-
-    @Override
-    public String[] getCiphersUsed() {
-        return enabledCiphers;
     }
 
 
@@ -338,41 +315,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         stopLatch = new CountDownLatch(pollerThreadCount);
 
         // Initialize SSL if needed
-        if (isSSLEnabled()) {
-            sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
-            SSLUtil sslUtil = sslImplementation.getSSLUtil(this);
-
-            sslContext = sslUtil.createSSLContext();
-            sslContext.init(wrap(sslUtil.getKeyManagers()),
-                    sslUtil.getTrustManagers(), null);
-
-            SSLSessionContext sessionContext =
-                sslContext.getServerSessionContext();
-            if (sessionContext != null) {
-                sslUtil.configureSessionContext(sessionContext);
-            }
-            // Determine which cipher suites and protocols to enable
-            enabledCiphers = sslUtil.getEnableableCiphers(sslContext);
-            enabledProtocols = sslUtil.getEnableableProtocols(sslContext);
-        }
+        initialiseSsl();
 
         if (oomParachute>0) reclaimParachute(true);
         selectorPool.open();
     }
-
-    public KeyManager[] wrap(KeyManager[] managers) {
-        if (managers==null) return null;
-        KeyManager[] result = new KeyManager[managers.length];
-        for (int i=0; i<result.length; i++) {
-            if (managers[i] instanceof X509KeyManager && getKeyAlias()!=null) {
-                result[i] = new NioX509KeyManager((X509KeyManager)managers[i],getKeyAlias());
-            } else {
-                result[i] = managers[i];
-            }
-        }
-        return result;
-    }
-
 
     /**
      * Start the NIO endpoint, creating acceptor, poller threads.
@@ -458,7 +405,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         serverSock.socket().close();
         serverSock.close();
         serverSock = null;
-        sslContext = null;
+        super.unbind();
         releaseCaches();
         selectorPool.close();
         if (log.isDebugEnabled()) {
@@ -511,7 +458,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             NioChannel channel = nioChannels.pop();
             if ( channel == null ) {
                 // SSL setup
-                if (sslContext != null) {
+                if (isSSLEnabled()) {
                     SSLEngine engine = createSSLEngine();
                     int appbufsize = engine.getSession().getApplicationBufferSize();
                     SocketBufferHandler bufhandler = new SocketBufferHandler(
@@ -548,25 +495,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             return false;
         }
         return true;
-    }
-
-    protected SSLEngine createSSLEngine() {
-        SSLEngine engine = sslContext.createSSLEngine();
-        if ("false".equals(getClientAuth())) {
-            engine.setNeedClientAuth(false);
-            engine.setWantClientAuth(false);
-        } else if ("true".equals(getClientAuth()) || "yes".equals(getClientAuth())){
-            engine.setNeedClientAuth(true);
-        } else if ("want".equals(getClientAuth())) {
-            engine.setWantClientAuth(true);
-        }
-        engine.setUseClientMode(false);
-        engine.setEnabledCipherSuites(enabledCiphers);
-        engine.setEnabledProtocols(enabledProtocols);
-
-        configureUseServerCipherSuitesOrder(engine);
-
-        return engine;
     }
 
 
