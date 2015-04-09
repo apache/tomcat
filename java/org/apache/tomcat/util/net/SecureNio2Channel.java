@@ -470,26 +470,29 @@ public class SecureNio2Channel extends Nio2Channel  {
     }
 
     private class FutureRead implements Future<Integer> {
-        private ByteBuffer dst;
+        private final ByteBuffer dst;
+        private final Future<Integer> integer;
         public FutureRead(ByteBuffer dst) {
             this.dst = dst;
+            this.integer = sc.read(netInBuffer);
         }
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            return false;
+            readPending = false;
+            return integer.cancel(mayInterruptIfRunning);
         }
         @Override
         public boolean isCancelled() {
-            return false;
+            return integer.isCancelled();
         }
         @Override
         public boolean isDone() {
-            return true;
+            return integer.isDone();
         }
         @Override
         public Integer get() throws InterruptedException, ExecutionException {
             try {
-                return unwrap(netInBuffer.position());
+                return unwrap(integer.get().intValue());
             } finally {
                 readPending = false;
             }
@@ -499,17 +502,17 @@ public class SecureNio2Channel extends Nio2Channel  {
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
             try {
-                return unwrap(netInBuffer.position());
+                return unwrap(integer.get(timeout, unit).intValue());
             } finally {
                 readPending = false;
             }
         }
-        protected Integer unwrap(int netread) throws ExecutionException {
+        private Integer unwrap(int nRead) throws ExecutionException {
             //are we in the middle of closing or closed?
             if (closing || closed)
                 return Integer.valueOf(-1);
             //did we reach EOF? if so send EOF up one layer.
-            if (netread == -1)
+            if (nRead < 0)
                 return Integer.valueOf(-1);
             //the data read
             int read = 0;
@@ -526,16 +529,18 @@ public class SecureNio2Channel extends Nio2Channel  {
                 }
                 //compact the buffer
                 netInBuffer.compact();
-                if (unwrap.getStatus()==Status.OK || unwrap.getStatus()==Status.BUFFER_UNDERFLOW) {
+                if (unwrap.getStatus() == Status.OK || unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
                     //we did receive some data, add it to our total
                     read += unwrap.bytesProduced();
                     //perform any tasks if needed
-                    if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK)
+                    if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
                         tasks();
+                    }
                     //if we need more network data, then bail out for now.
-                    if (unwrap.getStatus() == Status.BUFFER_UNDERFLOW)
+                    if (unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
                         break;
-                } else if (unwrap.getStatus()==Status.BUFFER_OVERFLOW && read > 0) {
+                    }
+                } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW && read > 0) {
                     //buffer overflow can happen, if we have read data, then
                     //empty out the dst buffer before we do another read
                     break;
@@ -550,46 +555,6 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
     }
 
-    private class FutureNetRead extends FutureRead {
-        private Future<Integer> integer;
-        protected FutureNetRead(ByteBuffer dst) {
-            super(dst);
-            this.integer = sc.read(netInBuffer);
-        }
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return integer.cancel(mayInterruptIfRunning);
-        }
-        @Override
-        public boolean isCancelled() {
-            return integer.isCancelled();
-        }
-        @Override
-        public boolean isDone() {
-            return integer.isDone();
-        }
-        @Override
-        public Integer get() throws InterruptedException, ExecutionException {
-            try {
-                int netread = integer.get().intValue();
-                return unwrap(netread);
-            } finally {
-                readPending = false;
-            }
-        }
-        @Override
-        public Integer get(long timeout, TimeUnit unit)
-                throws InterruptedException, ExecutionException,
-                TimeoutException {
-            try {
-                int netread = integer.get(timeout, unit).intValue();
-                return unwrap(netread);
-            } finally {
-                readPending = false;
-            }
-        }
-    }
-
     /**
      * Reads a sequence of bytes from this channel into the given buffer.
      *
@@ -599,19 +564,15 @@ public class SecureNio2Channel extends Nio2Channel  {
      */
     @Override
     public Future<Integer> read(ByteBuffer dst) {
+        if (!handshakeComplete) {
+            throw new IllegalStateException(sm.getString("channel.nio.ssl.incompleteHandshake"));
+        }
         if (readPending) {
             throw new ReadPendingException();
         } else {
             readPending = true;
         }
-        //did we finish our handshake?
-        if (!handshakeComplete)
-            throw new IllegalStateException(sm.getString("channel.nio.ssl.incompleteHandshake"));
-        if (netInBuffer.position() > 0) {
-            return new FutureRead(dst);
-        } else {
-            return new FutureNetRead(dst);
-        }
+        return new FutureRead(dst);
     }
 
     private class FutureWrite implements Future<Integer> {
@@ -630,6 +591,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
+            writePending = false;
             return integer.cancel(mayInterruptIfRunning);
         }
         @Override
@@ -649,6 +611,9 @@ public class SecureNio2Channel extends Nio2Channel  {
             if (integer.get().intValue() > 0 && written == 0) {
                 wrap();
                 return get();
+            } else if (netOutBuffer.hasRemaining()) {
+                integer = sc.write(netOutBuffer);
+                return get();
             } else {
                 writePending = false;
                 return Integer.valueOf(written);
@@ -664,6 +629,9 @@ public class SecureNio2Channel extends Nio2Channel  {
             }
             if (integer.get(timeout, unit).intValue() > 0 && written == 0) {
                 wrap();
+                return get(timeout, unit);
+            } else if (netOutBuffer.hasRemaining()) {
+                integer = sc.write(netOutBuffer);
                 return get(timeout, unit);
             } else {
                 writePending = false;
@@ -739,8 +707,9 @@ public class SecureNio2Channel extends Nio2Channel  {
                             if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK)
                                 tasks();
                             //if we need more network data, then bail out for now.
-                            if (unwrap.getStatus() == Status.BUFFER_UNDERFLOW)
+                            if (unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
                                 break;
+                            }
                         } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW && read > 0) {
                             //buffer overflow can happen, if we have read data, then
                             //empty out the dst buffer before we do another read
@@ -776,21 +745,15 @@ public class SecureNio2Channel extends Nio2Channel  {
             handler.completed(Integer.valueOf(-1), attachment);
             return;
         }
+        if (!handshakeComplete) {
+            throw new IllegalStateException(sm.getString("channel.nio.ssl.incompleteHandshake"));
+        }
         if (readPending) {
             throw new ReadPendingException();
         } else {
             readPending = true;
         }
-        if (!handshakeComplete) {
-            throw new IllegalStateException(sm.getString("channel.nio.ssl.incompleteHandshake"));
-        }
-
-        ReadCompletionHandler<A> readCompletionHandler = new ReadCompletionHandler<>(dst, handler);
-        if (netInBuffer.position() > 0 ) {
-            readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
-        } else {
-            sc.read(netInBuffer, timeout, unit, attachment, readCompletionHandler);
-        }
+        sc.read(netInBuffer, timeout, unit, attachment, new ReadCompletionHandler<>(dst, handler));
     }
 
     // TODO: Possible optimization for scatter
