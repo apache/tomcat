@@ -1584,9 +1584,6 @@ public class AjpProcessor extends AbstractProcessor {
      */
     protected class SocketInputBuffer implements InputBuffer {
 
-        /**
-         * Read bytes into the specified chunk.
-         */
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
 

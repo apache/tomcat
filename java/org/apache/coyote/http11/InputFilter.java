@@ -30,16 +30,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public interface InputFilter extends InputBuffer {
 
-
-    /**
-     * Read bytes.
-     *
-     * @return Number of bytes read.
-     */
-    @Override
-    public int doRead(ByteChunk chunk) throws IOException;
-
-
     /**
      * Some filters need additional parameters from the request. All the
      * necessary reading can occur in that method, as this method is called

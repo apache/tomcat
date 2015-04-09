@@ -49,11 +49,6 @@ public class VoidInputFilter implements InputFilter {
 
     // ---------------------------------------------------- InputBuffer Methods
 
-    /**
-     * Write some bytes.
-     *
-     * @return number of bytes written by the filter
-     */
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
         return -1;
