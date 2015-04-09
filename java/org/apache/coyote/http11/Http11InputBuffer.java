@@ -296,12 +296,12 @@ public class Http11InputBuffer implements InputBuffer {
      * Read some bytes.
      */
     @Override
-    public int doRead(ByteChunk chunk, Request req) throws IOException {
+    public int doRead(ByteChunk chunk) throws IOException {
 
         if (lastActiveFilter == -1)
-            return inputStreamInputBuffer.doRead(chunk, req);
+            return inputStreamInputBuffer.doRead(chunk);
         else
-            return activeFilters[lastActiveFilter].doRead(chunk,req);
+            return activeFilters[lastActiveFilter].doRead(chunk);
 
     }
 
@@ -1050,8 +1050,7 @@ public class Http11InputBuffer implements InputBuffer {
          * Read bytes into the specified chunk.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req )
-            throws IOException {
+        public int doRead(ByteChunk chunk) throws IOException {
 
             if (pos >= lastValid) {
                 // The application is reading the HTTP request body which is

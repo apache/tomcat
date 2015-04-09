@@ -47,8 +47,7 @@ public class SavedRequestInputFilter implements InputFilter {
      * Read bytes.
      */
     @Override
-    public int doRead(ByteChunk chunk, org.apache.coyote.Request request)
-            throws IOException {
+    public int doRead(ByteChunk chunk) throws IOException {
         if(input.getOffset()>= input.getEnd())
             return -1;
 

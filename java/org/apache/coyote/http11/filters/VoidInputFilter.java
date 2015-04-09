@@ -55,7 +55,7 @@ public class VoidInputFilter implements InputFilter {
      * @return number of bytes written by the filter
      */
     @Override
-    public int doRead(ByteChunk chunk, Request req) throws IOException {
+    public int doRead(ByteChunk chunk) throws IOException {
         return -1;
     }
 

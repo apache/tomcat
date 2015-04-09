@@ -174,7 +174,7 @@ public class ChunkedInputFilter implements InputFilter {
      * control, the returned value should be -1.
      */
     @Override
-    public int doRead(ByteChunk chunk, Request req) throws IOException {
+    public int doRead(ByteChunk chunk) throws IOException {
         if (endChunk) {
             return -1;
         }
@@ -247,7 +247,7 @@ public class ChunkedInputFilter implements InputFilter {
         long swallowed = 0;
         int read = 0;
         // Consume extra bytes : parse the stream until the end chunk is found
-        while ((read = doRead(readChunk, null)) >= 0) {
+        while ((read = doRead(readChunk)) >= 0) {
             swallowed += read;
             if (maxSwallowSize > -1 && swallowed > maxSwallowSize) {
                 throwIOException(sm.getString("inputFilter.maxSwallow"));
@@ -317,7 +317,7 @@ public class ChunkedInputFilter implements InputFilter {
      */
     protected int readBytes() throws IOException {
 
-        int nRead = buffer.doRead(readChunk, null);
+        int nRead = buffer.doRead(readChunk);
         pos = readChunk.getStart();
         lastValid = pos + nRead;
         buf = readChunk.getBytes();

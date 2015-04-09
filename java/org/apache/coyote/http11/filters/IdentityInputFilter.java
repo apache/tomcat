@@ -100,14 +100,13 @@ public class IdentityInputFilter implements InputFilter {
      * control, the returned value should be -1.
      */
     @Override
-    public int doRead(ByteChunk chunk, Request req)
-        throws IOException {
+    public int doRead(ByteChunk chunk) throws IOException {
 
         int result = -1;
 
         if (contentLength >= 0) {
             if (remaining > 0) {
-                int nRead = buffer.doRead(chunk, req);
+                int nRead = buffer.doRead(chunk);
                 if (nRead > remaining) {
                     // The chunk is longer than the number of bytes remaining
                     // in the body; changing the chunk length to the number
@@ -156,7 +155,7 @@ public class IdentityInputFilter implements InputFilter {
         // Consume extra bytes.
         while (remaining > 0) {
 
-            int nread = buffer.doRead(endChunk, null);
+            int nread = buffer.doRead(endChunk);
             if (nread > 0 ) {
                 swallowed += nread;
                 remaining = remaining - nread;

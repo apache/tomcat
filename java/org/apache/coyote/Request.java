@@ -464,9 +464,8 @@ public final class Request {
      * InputStream, this interface allows the app to process data in place, without copy.
      *
      */
-    public int doRead(ByteChunk chunk)
-        throws IOException {
-        int n = inputBuffer.doRead(chunk, this);
+    public int doRead(ByteChunk chunk) throws IOException {
+        int n = inputBuffer.doRead(chunk);
         if (n > 0) {
             bytesRead+=n;
         }
