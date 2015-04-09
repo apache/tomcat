@@ -20,27 +20,53 @@ import java.nio.ByteBuffer;
 
 public class SNIExtractor {
 
-    private final SNIResult result = SNIResult.NOT_PRESENT;
-    private final String sniValue = null;
+    private final SNIResult result;
+    private final String sniValue;
+
+    private static final int TLS_RECORD_HEADER_LEN = 5;
+
 
     public SNIExtractor(ByteBuffer netInBuffer) {
         // TODO: Detect use of http on a secure connection and provide a simple
         //       error page.
 
         int pos = netInBuffer.position();
+        SNIResult result = SNIResult.NOT_PRESENT;
+        String sniValue = null;
         try {
-            // TODO Parse the data
+            netInBuffer.flip();
+
+            if (!isRecordHeaderComplete(netInBuffer)) {
+                result = SNIResult.UNDERFLOW;
+                return;
+            }
+
+            if (!isTLSClientHello(netInBuffer)) {
+                return;
+            }
+
+            if (!isAllRecordPresent(netInBuffer)) {
+                result = SNIResult.UNDERFLOW;
+                return;
+            }
+
+            System.out.println("Looking good so far to find some SNI data");
+            // TODO Parse the remainder of the data
 
         } finally {
+            this.result = result;
+            this.sniValue = sniValue;
             // Whatever happens, return the buffer to its original state
             netInBuffer.limit(netInBuffer.capacity());
             netInBuffer.position(pos);
         }
     }
 
+
     public SNIResult getResult() {
         return result;
     }
+
 
     public String getSNIValue() {
         if (result == SNIResult.FOUND) {
@@ -48,6 +74,39 @@ public class SNIExtractor {
         } else {
             throw new IllegalStateException();
         }
+    }
+
+
+    private static boolean isRecordHeaderComplete(ByteBuffer bb) {
+        if (bb.remaining() < TLS_RECORD_HEADER_LEN) {
+            return false;
+        }
+        return true;
+    }
+
+
+    private static boolean isTLSClientHello(ByteBuffer bb) {
+        // For a TLS client hello the first byte must be 22 - handshake
+        if (bb.get() != 22) {
+            return false;
+        }
+        // Next two bytes are major/minor version. We need at least 3.1.
+        byte b2 = bb.get();
+        byte b3 = bb.get();
+        if (b2 < 3 || b2 == 3 && b3 == 0) {
+            return false;
+        }
+        return true;
+    }
+
+
+    private static boolean isAllRecordPresent(ByteBuffer bb) {
+        // Next two bytes (unsigned) are the size of the record. We need all of
+        // it.
+        if (bb.getChar() > bb.remaining()) {
+            return false;
+        }
+        return true;
     }
 
     public static enum SNIResult {
