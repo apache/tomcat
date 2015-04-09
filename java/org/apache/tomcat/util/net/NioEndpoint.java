@@ -456,32 +456,19 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             socketProperties.setProperties(sock);
 
             NioChannel channel = nioChannels.pop();
-            if ( channel == null ) {
-                // SSL setup
+            if (channel == null) {
+                SocketBufferHandler bufhandler = new SocketBufferHandler(
+                        socketProperties.getAppReadBufSize(),
+                        socketProperties.getAppWriteBufSize(),
+                        socketProperties.getDirectBuffer());
                 if (isSSLEnabled()) {
-                    SSLEngine engine = createSSLEngine();
-                    int appbufsize = engine.getSession().getApplicationBufferSize();
-                    SocketBufferHandler bufhandler = new SocketBufferHandler(
-                            Math.max(appbufsize,socketProperties.getAppReadBufSize()),
-                            Math.max(appbufsize,socketProperties.getAppWriteBufSize()),
-                            socketProperties.getDirectBuffer());
-                    channel = new SecureNioChannel(socket, engine, bufhandler, selectorPool, this);
+                    channel = new SecureNioChannel(socket, bufhandler, selectorPool, this);
                 } else {
-                    // normal tcp setup
-                    SocketBufferHandler bufhandler = new SocketBufferHandler(
-                            socketProperties.getAppReadBufSize(),
-                            socketProperties.getAppWriteBufSize(),
-                            socketProperties.getDirectBuffer());
                     channel = new NioChannel(socket, bufhandler);
                 }
             } else {
                 channel.setIOChannel(socket);
-                if ( channel instanceof SecureNioChannel ) {
-                    SSLEngine engine = createSSLEngine();
-                    ((SecureNioChannel)channel).reset(engine);
-                } else {
-                    channel.reset();
-                }
+                channel.reset();
             }
             getPoller0().register(channel);
         } catch (Throwable t) {

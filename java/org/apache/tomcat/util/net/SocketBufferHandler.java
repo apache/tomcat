@@ -21,10 +21,10 @@ import java.nio.ByteBuffer;
 public class SocketBufferHandler {
 
     private volatile boolean readBufferConfiguredForWrite = true;
-    private final ByteBuffer readBuffer;
+    private volatile ByteBuffer readBuffer;
 
     private volatile boolean writeBufferConfiguredForWrite = true;
-    private final ByteBuffer writeBuffer;
+    private volatile ByteBuffer writeBuffer;
 
 
     public SocketBufferHandler(int readBufferSize, int writeBufferSize,
@@ -145,5 +145,35 @@ public class SocketBufferHandler {
         readBufferConfiguredForWrite = true;
         writeBuffer.clear();
         writeBufferConfiguredForWrite = true;
+    }
+
+
+    public void expand(int newSize) {
+        if (readBuffer.capacity() < newSize) {
+            ByteBuffer newReadBuffer;
+            if (readBuffer.isDirect()) {
+                newReadBuffer = ByteBuffer.allocateDirect(newSize);
+            } else {
+                newReadBuffer = ByteBuffer.allocate(newSize);
+            }
+            configureReadBufferForRead();
+            newReadBuffer.put(readBuffer);
+            newReadBuffer.flip();
+            readBuffer = newReadBuffer;
+
+        }
+
+        if (writeBuffer.capacity() < newSize) {
+            ByteBuffer newWriteBuffer;
+            if (writeBuffer.isDirect()) {
+                newWriteBuffer = ByteBuffer.allocateDirect(newSize);
+            } else {
+                newWriteBuffer = ByteBuffer.allocate(newSize);
+            }
+            configureWriteBufferForRead();
+            newWriteBuffer.put(writeBuffer);
+            newWriteBuffer.flip();
+            writeBuffer = newWriteBuffer;
+        }
     }
 }
