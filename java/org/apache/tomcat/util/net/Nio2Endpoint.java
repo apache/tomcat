@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net;
 
 import java.io.EOFException;
@@ -63,7 +62,7 @@ import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 /**
  * NIO2 endpoint.
  */
-public class Nio2Endpoint extends AbstractEndpoint<Nio2Channel> {
+public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
 
     // -------------------------------------------------------------- Constants
