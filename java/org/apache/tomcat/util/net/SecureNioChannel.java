@@ -52,18 +52,16 @@ public class SecureNioChannel extends NioChannel  {
     protected boolean closing = false;
 
     protected NioSelectorPool pool;
+    private final NioEndpoint endpoint;
 
     public SecureNioChannel(SocketChannel channel, SSLEngine engine, SocketBufferHandler bufHandler,
-            NioSelectorPool pool) {
+            NioSelectorPool pool, NioEndpoint endpoint) {
         super(channel,bufHandler);
         this.sslEngine = engine;
-        int netBufSize = sslEngine.getSession().getPacketBufferSize();
-        //allocate network buffers - TODO, add in optional direct non-direct buffers
-        if ( netInBuffer == null ) netInBuffer = ByteBuffer.allocateDirect(netBufSize);
-        if ( netOutBuffer == null ) netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
 
-        //selector pool for blocking operations
+        // selector pool for blocking operations
         this.pool = pool;
+        this.endpoint = endpoint;
     }
 
     public void reset(SSLEngine engine) throws IOException {
@@ -74,10 +72,6 @@ public class SecureNioChannel extends NioChannel  {
     @Override
     public void reset() throws IOException {
         super.reset();
-        netOutBuffer.position(0);
-        netOutBuffer.limit(0);
-        netInBuffer.position(0);
-        netInBuffer.limit(0);
         sniComplete = false;
         handshakeComplete = false;
         closed = false;
@@ -223,6 +217,46 @@ public class SecureNioChannel extends NioChannel  {
      * provided host name, configure the SSLEngine for this connection.
      */
     private int processSNI() throws SSLException {
+        // TODO The peek at the available data to determine the host requested
+        //      via SNI (if any) goes here.
+
+        SocketProperties sp = endpoint.getSocketProperties();
+        // Create/expand network buffers.
+        // In/Out are always created in a pair with identical settings so only
+        // need to test one to determine what needs to be done for both.
+        int netBufSize = sslEngine.getSession().getPacketBufferSize();
+        if (netInBuffer == null) {
+            if (sp.getDirectSslBuffer()) {
+                netInBuffer = ByteBuffer.allocateDirect(netBufSize);
+                netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
+            } else {
+                netInBuffer = ByteBuffer.allocate(netBufSize);
+                netOutBuffer = ByteBuffer.allocate(netBufSize);
+            }
+        } else if (netInBuffer.capacity() < netBufSize) {
+            // Need to expand the buffers, making sure no data is lost.
+            ByteBuffer newInBuffer;
+            ByteBuffer newOutBuffer;
+            if (sp.getDirectSslBuffer()) {
+                newInBuffer = ByteBuffer.allocateDirect(netBufSize);
+                newOutBuffer = ByteBuffer.allocateDirect(netBufSize);
+            } else {
+                newInBuffer = ByteBuffer.allocate(netBufSize);
+                newOutBuffer = ByteBuffer.allocate(netBufSize);
+            }
+            newInBuffer.put(netInBuffer);
+            newOutBuffer.put(netOutBuffer);
+            netInBuffer = newInBuffer;
+            netOutBuffer = newOutBuffer;
+        } else {
+            // Existing buffers are big enough. Nothing to do here.
+        }
+        // Set limit and position to expected values
+        netInBuffer.position(0);
+        netInBuffer.limit(0);
+        netOutBuffer.position(0);
+        netOutBuffer.limit(0);
+
         // Initiate handshake
         sslEngine.beginHandshake();
         handshakeStatus = sslEngine.getHandshakeStatus();
@@ -246,7 +280,7 @@ public class SecureNioChannel extends NioChannel  {
         if (netOutBuffer.position() > 0 && netOutBuffer.position()<netOutBuffer.limit()) throw new IOException(sm.getString("channel.nio.ssl.netOutputNotEmpty"));
         if (!getBufHandler().isReadBufferEmpty()) throw new IOException(sm.getString("channel.nio.ssl.appInputNotEmpty"));
         if (!getBufHandler().isWriteBufferEmpty()) throw new IOException(sm.getString("channel.nio.ssl.appOutputNotEmpty"));
-        reset();
+        handshakeComplete = false;
         boolean isReadable = true;
         boolean isWriteable = true;
         boolean handshaking = true;
