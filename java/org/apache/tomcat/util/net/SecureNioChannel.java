@@ -28,15 +28,22 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
-import javax.net.ssl.SSLException;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
- *
  * Implementation of a secure socket channel
- * @version 1.0
  */
-
 public class SecureNioChannel extends NioChannel  {
+
+    private static final Log log = LogFactory.getLog(SecureNioChannel.class);
+    private static final StringManager sm = StringManager.getManager(SecureNioChannel.class);
+
+    // Value determined by observation of what the SSL Engine requested in
+    // various scenarios
+    private static final int DEFAULT_NET_BUFFER_SIZE = 16921;
 
     protected ByteBuffer netInBuffer;
     protected ByteBuffer netOutBuffer;
@@ -211,50 +218,50 @@ public class SecureNioChannel extends NioChannel  {
      * present and, if it is, what host name has been requested. Based on the
      * provided host name, configure the SSLEngine for this connection.
      */
-    private int processSNI() throws SSLException {
-        // TODO The peek at the available data to determine the host requested
-        //      via SNI (if any) goes here.
-
+    private int processSNI() throws IOException {
         SocketProperties sp = endpoint.getSocketProperties();
+
+        // Create the network input buffer as data needs to be read into this
+        // to be able to peek at it.
+        if (netInBuffer == null) {
+            if (sp.getDirectSslBuffer()) {
+                netInBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
+            } else {
+                netInBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
+            }
+        }
+
+        sc.read(netInBuffer);
+        SNIExtractor extractor = new SNIExtractor(netInBuffer);
+
+        String hostName = null;
+        switch (extractor.getResult()) {
+        case FOUND:
+            hostName = extractor.getSNIValue();
+            break;
+        case ERROR:
+            // NO-OP Let the handshake continue and deal with whatever was wrong
+            break;
+        case NOT_PRESENT:
+            // NO-OP
+            break;
+        case UNDERFLOW:
+            return SelectionKey.OP_READ;
+        }
+
+        System.out.println("SNI hostname was [" + hostName + "]");
+
+        // TODO: Extract the correct configuration for the requested host name
+        //       and set up the SSLEngine accordingly.
+
         sslEngine = endpoint.createSSLEngine();
 
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.
         bufHandler.expand(sslEngine.getSession().getApplicationBufferSize());
+        expandNetBuffers(sslEngine.getSession().getPacketBufferSize(), sp.getDirectSslBuffer());
 
-        // Create/expand network buffers.
-        // In/Out are always created in a pair with identical settings so only
-        // need to test one to determine what needs to be done for both.
-        int netBufSize = sslEngine.getSession().getPacketBufferSize();
-        if (netInBuffer == null) {
-            if (sp.getDirectSslBuffer()) {
-                netInBuffer = ByteBuffer.allocateDirect(netBufSize);
-                netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
-            } else {
-                netInBuffer = ByteBuffer.allocate(netBufSize);
-                netOutBuffer = ByteBuffer.allocate(netBufSize);
-            }
-        } else if (netInBuffer.capacity() < netBufSize) {
-            // Need to expand the buffers, making sure no data is lost.
-            ByteBuffer newInBuffer;
-            ByteBuffer newOutBuffer;
-            if (sp.getDirectSslBuffer()) {
-                newInBuffer = ByteBuffer.allocateDirect(netBufSize);
-                newOutBuffer = ByteBuffer.allocateDirect(netBufSize);
-            } else {
-                newInBuffer = ByteBuffer.allocate(netBufSize);
-                newOutBuffer = ByteBuffer.allocate(netBufSize);
-            }
-            newInBuffer.put(netInBuffer);
-            newOutBuffer.put(netOutBuffer);
-            netInBuffer = newInBuffer;
-            netOutBuffer = newOutBuffer;
-        } else {
-            // Existing buffers are big enough. Nothing to do here.
-        }
         // Set limit and position to expected values
-        netInBuffer.position(0);
-        netInBuffer.limit(0);
         netOutBuffer.position(0);
         netOutBuffer.limit(0);
 
@@ -263,6 +270,48 @@ public class SecureNioChannel extends NioChannel  {
         handshakeStatus = sslEngine.getHandshakeStatus();
 
         return 0;
+    }
+
+
+    private void expandNetBuffers(int newSize, boolean direct) {
+
+        // The input buffer will always have been created by the time this
+        // method is called.
+        if (netInBuffer.capacity() < newSize) {
+            // Info as we may need to increase DEFAULT_NET_BUFFER_SIZE
+            log.info(sm.getString("channel.nio.ssl.expandNetInBuffer", Integer.toString(newSize)));
+            ByteBuffer newInBuffer;
+            if (direct) {
+                newInBuffer = ByteBuffer.allocateDirect(newSize);
+            } else {
+                newInBuffer = ByteBuffer.allocate(newSize);
+            }
+            // Need to expand the buffers, making sure no data is lost.
+            netInBuffer.flip();
+            newInBuffer.put(netInBuffer);
+            netInBuffer = newInBuffer;
+        }
+
+        if (netOutBuffer == null) {
+            if (direct) {
+                netOutBuffer = ByteBuffer.allocateDirect(newSize);
+            } else {
+                netOutBuffer = ByteBuffer.allocate(newSize);
+            }
+        } else if (netOutBuffer.capacity() < newSize) {
+            // Info as we may need to increase DEFAULT_NET_BUFFER_SIZE
+            log.info(sm.getString("channel.nio.ssl.expandNetOutBuffer", Integer.toString(newSize)));
+            // Need to expand the buffers, making sure no data is lost.
+            ByteBuffer newOutBuffer;
+            if (direct) {
+                newOutBuffer = ByteBuffer.allocateDirect(newSize);
+            } else {
+                newOutBuffer = ByteBuffer.allocate(newSize);
+            }
+            netOutBuffer.flip();
+            newOutBuffer.put(netOutBuffer);
+            netOutBuffer = newOutBuffer;
+        }
     }
 
 
