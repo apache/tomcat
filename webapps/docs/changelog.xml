@@ -90,6 +90,10 @@
         after the web application has been stopped rather than before to avoid
         potential ClassNotFoundExceptions. (markt)
       </fix>
+      <fix>
+        <bug>57801</bug>: Improve the error message in the start script in case
+        the PID read from the PID file is already owned by a process. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

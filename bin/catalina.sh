@@ -335,6 +335,7 @@ elif [ "$1" = "start" ] ; then
           ps -p $PID >/dev/null 2>&1
           if [ $? -eq 0 ] ; then
             echo "Tomcat appears to still be running with PID $PID. Start aborted."
+            echo "If this process is not a Tomcat process, remove the PID file and try again."
             exit 1
           else
             echo "Removing/clearing stale PID file."
