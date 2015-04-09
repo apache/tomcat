@@ -50,6 +50,8 @@ public class SecureNio2Channel extends Nio2Channel  {
     protected SSLEngine sslEngine;
     protected final Nio2Endpoint endpoint;
 
+    protected boolean sniComplete = false;
+
     protected boolean handshakeComplete;
     protected HandshakeStatus handshakeStatus; //gets set by handshake
 
@@ -191,7 +193,8 @@ public class SecureNio2Channel extends Nio2Channel  {
      * In the event of a positive value coming back, reregister the selection key for the return values interestOps.
      *
      * @return int - 0 if hand shake is complete, otherwise it returns a SelectionKey interestOps value
-     * @throws IOException
+     * @throws IOException If an I/O error occurs during the handshake or if the
+     *                     handshake fails during wrapping or unwrapping
      */
     @Override
     public int handshake() throws IOException {
@@ -199,8 +202,18 @@ public class SecureNio2Channel extends Nio2Channel  {
     }
 
     protected int handshakeInternal(boolean async) throws IOException {
-        if (handshakeComplete)
+        if (handshakeComplete) {
             return 0; //we have done our initial handshake
+        }
+
+        if (!sniComplete) {
+            int sniResult = processSNI();
+            if (sniResult == 0) {
+                sniComplete = true;
+            } else {
+                return sniResult;
+            }
+        }
 
         SSLEngineResult handshake = null;
 
@@ -289,6 +302,17 @@ public class SecureNio2Channel extends Nio2Channel  {
         //return 0 if we are complete, otherwise recurse to process the task
         return handshakeComplete ? 0 : handshakeInternal(async);
     }
+
+
+    /*
+     * Peeks at the initial network bytes to determine if the SNI extension is
+     * present and, if it is, what host name has been requested. Based on the
+     * provided host name, configure the SSLEngine for this connection.
+     */
+    private int processSNI() {
+        return 0;
+    }
+
 
     /**
      * Force a blocking handshake to take place for this key.
@@ -452,11 +476,6 @@ public class SecureNio2Channel extends Nio2Channel  {
         closed = (!netOutBuffer.hasRemaining() && (handshake.getHandshakeStatus() != HandshakeStatus.NEED_WRAP));
     }
 
-    /**
-     * Force a close, can throw an IOException
-     * @param force boolean
-     * @throws IOException
-     */
     @Override
     public void close(boolean force) throws IOException {
         try {

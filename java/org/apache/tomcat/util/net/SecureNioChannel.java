@@ -42,6 +42,8 @@ public class SecureNioChannel extends NioChannel  {
 
     protected SSLEngine sslEngine;
 
+    protected boolean sniComplete = false;
+
     protected boolean handshakeComplete = false;
     protected HandshakeStatus handshakeStatus; //gets set by handshake
 
@@ -88,23 +90,25 @@ public class SecureNioChannel extends NioChannel  {
 //===========================================================================================
 //                  NIO SSL METHODS
 //===========================================================================================
+
     /**
      * Flush the channel.
      *
      * @param block     Should a blocking write be used?
-     * @param s
-     * @param timeout
+     * @param s         The selector to use for blocking, if null then a busy
+     *                  write will be initiated
+     * @param timeout   The timeout for this write operation in milliseconds,
+     *                  -1 means no timeout
      * @return <code>true</code> if the network buffer has been flushed out and
      *         is empty else <code>false</code>
-     * @throws IOException
+     * @throws IOException If an I/O error occurs during the operation
      */
     @Override
-    public boolean flush(boolean block, Selector s, long timeout)
-            throws IOException {
+    public boolean flush(boolean block, Selector s, long timeout) throws IOException {
         if (!block) {
             flush(netOutBuffer);
         } else {
-            pool.write(netOutBuffer, this, s, timeout,block);
+            pool.write(netOutBuffer, this, s, timeout, block);
         }
         return !netOutBuffer.hasRemaining();
     }
@@ -134,11 +138,23 @@ public class SecureNioChannel extends NioChannel  {
      * @param read boolean - true if the underlying channel is readable
      * @param write boolean - true if the underlying channel is writable
      * @return int - 0 if hand shake is complete, otherwise it returns a SelectionKey interestOps value
-     * @throws IOException
+     * @throws IOException If an I/O error occurs during the handshake or if the
+     *                     handshake fails during wrapping or unwrapping
      */
     @Override
     public int handshake(boolean read, boolean write) throws IOException {
-        if ( handshakeComplete ) return 0; //we have done our initial handshake
+        if (handshakeComplete) {
+            return 0; //we have done our initial handshake
+        }
+
+        if (!sniComplete) {
+            int sniResult = processSNI();
+            if (sniResult == 0) {
+                sniComplete = true;
+            } else {
+                return sniResult;
+            }
+        }
 
         if (!flush(netOutBuffer)) return SelectionKey.OP_WRITE; //we still have data to write
 
@@ -201,6 +217,17 @@ public class SecureNioChannel extends NioChannel  {
         //would cause this method to be called again.
         return handshakeComplete?0:(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
     }
+
+
+    /*
+     * Peeks at the initial network bytes to determine if the SNI extension is
+     * present and, if it is, what host name has been requested. Based on the
+     * provided host name, configure the SSLEngine for this connection.
+     */
+    private int processSNI() {
+        return 0;
+    }
+
 
     /**
      * Force a blocking handshake to take place for this key.
@@ -373,11 +400,7 @@ public class SecureNioChannel extends NioChannel  {
         closed = (!netOutBuffer.hasRemaining() && (handshake.getHandshakeStatus() != HandshakeStatus.NEED_WRAP));
     }
 
-    /**
-     * Force a close, can throw an IOException
-     * @param force boolean
-     * @throws IOException
-     */
+
     @Override
     public void close(boolean force) throws IOException {
         try {
