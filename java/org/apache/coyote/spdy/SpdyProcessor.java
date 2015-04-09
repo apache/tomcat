@@ -31,7 +31,6 @@ import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
-import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -93,7 +92,7 @@ public class SpdyProcessor extends AbstractProcessor implements Runnable {
 
     class LiteInputBuffer implements InputBuffer {
         @Override
-        public int doRead(ByteChunk bchunk, Request request) throws IOException {
+        public int doRead(ByteChunk bchunk) throws IOException {
             if (inFrame == null) {
                 // blocking
                 inFrame = spdyStream.getDataFrame(endpoint.getSoTimeout());

@@ -37,7 +37,6 @@ import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
-import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1589,7 +1588,7 @@ public class AjpProcessor extends AbstractProcessor {
          * Read bytes into the specified chunk.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req) throws IOException {
+        public int doRead(ByteChunk chunk) throws IOException {
 
             if (endOfStream) {
                 return -1;
