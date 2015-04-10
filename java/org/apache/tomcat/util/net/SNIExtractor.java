@@ -23,6 +23,9 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * This class extracts the SNI host name from a TLS client-hello message.
+ */
 public class SNIExtractor {
 
     private static final Log log = LogFactory.getLog(SNIExtractor.class);
@@ -34,18 +37,31 @@ public class SNIExtractor {
     private static final int TLS_RECORD_HEADER_LEN = 5;
 
 
+    /**
+     * Creates the instance of the parser and processes the provided buffer. The
+     * buffer position and limit will be modified during the execution of this
+     * method but they will be returned to the original values before the method
+     * exits.
+     *
+     * @param netInBuffer The buffer containing the TLS data to process
+     */
     public SNIExtractor(ByteBuffer netInBuffer) {
         // TODO: Detect use of http on a secure connection and provide a simple
         //       error page.
 
+        // Buffer is in write mode at this point. Record the current position so
+        // the buffer state can be restored at the end of this method.
         int pos = netInBuffer.position();
         SNIResult result = SNIResult.NOT_PRESENT;
         String sniValue = null;
         try {
+            // Switch to read mode.
             netInBuffer.flip();
 
-            if (!isRecordHeaderComplete(netInBuffer)) {
-                result = SNIResult.UNDERFLOW;
+            // A complete TLS record header is required before we can figure out
+            // how many bytes there are in the record.
+            if (!isAvailable(netInBuffer, TLS_RECORD_HEADER_LEN)) {
+                result = handleIncompleteRead(netInBuffer);
                 return;
             }
 
@@ -53,41 +69,32 @@ public class SNIExtractor {
                 return;
             }
 
-            int recordSizeToRead = recordSizeToRead(netInBuffer);
-            if (recordSizeToRead == -1) {
-                // Not enough data in the buffer for the full record
-                if (netInBuffer.limit() == netInBuffer.capacity()) {
-                    // Buffer too small
-                    result = SNIResult.UNDERFLOW;
-                    return;
-                } else {
-                    // Need to read more data
-                    result = SNIResult.NEED_READ;
-                    return;
-                }
-
+            if (!isAllRecordAvailable(netInBuffer)) {
+                result = handleIncompleteRead(netInBuffer);
+                return;
             }
 
             if (!isClientHello(netInBuffer)) {
                 return;
             }
 
-            int clientHelloSizeToRead = clientHelloSize(netInBuffer);
-            if (clientHelloSizeToRead == -1) {
-                // Client hello can't have fitted into single TLS record.
+            if (!isAllClientHelloAvailable(netInBuffer)) {
+                // Client hello didn't fit into single TLS record.
                 // Treat this as not present.
                 log.warn(sm.getString("sniExtractor.clientHelloTooBig"));
                 return;
             }
 
-            // Protocol Version (2 bytes)
-            netInBuffer.getChar();
-            swallowRandom(netInBuffer);
-            // Session ID
-            swallowUnit8Vector(netInBuffer);
-            swallowCipherSuites(netInBuffer);
-            // Compression methods
-            swallowUnit8Vector(netInBuffer);
+            // Protocol Version
+            skipBytes(netInBuffer, 2);
+            // Random
+            skipBytes(netInBuffer, 32);
+            // Session ID (single byte for length)
+            skipBytes(netInBuffer, (netInBuffer.get() & 0xFF));
+            // Cipher Suites (2 bytes for length)
+            skipBytes(netInBuffer, (netInBuffer.getChar()));
+            // Compression methods (single byte for length)
+            skipBytes(netInBuffer, (netInBuffer.get() & 0xFF));
 
             if (!netInBuffer.hasRemaining()) {
                 // No more data means no extensions present
@@ -95,8 +102,8 @@ public class SNIExtractor {
             }
 
             // Extension length
-            netInBuffer.getChar();
-            // Read th eextensions until we run out of data or find the SNI
+            skipBytes(netInBuffer, 2);
+            // Read the extensions until we run out of data or find the SNI
             while (netInBuffer.hasRemaining() && sniValue == null) {
                 sniValue = readSniExtension(netInBuffer);
             }
@@ -127,8 +134,20 @@ public class SNIExtractor {
     }
 
 
-    private static boolean isRecordHeaderComplete(ByteBuffer bb) {
-        if (bb.remaining() < TLS_RECORD_HEADER_LEN) {
+    private static SNIResult handleIncompleteRead(ByteBuffer bb) {
+        if (bb.limit() == bb.capacity()) {
+            // Buffer not big enough
+            return SNIResult.UNDERFLOW;
+        } else {
+            // Need to read more data into buffer
+            return SNIResult.NEED_READ;
+        }
+    }
+
+
+    private static boolean isAvailable(ByteBuffer bb, int size) {
+        if (bb.remaining() < size) {
+            bb.position(bb.limit());
             return false;
         }
         return true;
@@ -150,14 +169,11 @@ public class SNIExtractor {
     }
 
 
-    private static int recordSizeToRead(ByteBuffer bb) {
+    private static boolean isAllRecordAvailable(ByteBuffer bb) {
         // Next two bytes (unsigned) are the size of the record. We need all of
         // it.
         int size = bb.getChar();
-        if (bb.remaining() < size) {
-            return -1;
-        }
-        return size;
+        return isAvailable(bb, size);
     }
 
 
@@ -170,36 +186,16 @@ public class SNIExtractor {
     }
 
 
-    private static int clientHelloSize(ByteBuffer bb) {
+    private static boolean isAllClientHelloAvailable(ByteBuffer bb) {
         // Next three bytes (unsigned) are the size of the client hello. We need
         // all of it.
         int size = ((bb.get() & 0xFF) << 16) + ((bb.get() & 0xFF) << 8) + (bb.get() & 0xFF);
-        if (bb.remaining() < size) {
-            return -1;
-        }
-        return size;
-    }
-
-    private static void swallowRandom(ByteBuffer bb) {
-        // 32 bytes total
-        for (int i = 0; i < 4; i++) {
-            bb.getLong();
-        }
-    }
-
-    private static void swallowCipherSuites(ByteBuffer bb) {
-        char c = bb.getChar();
-        for (int i = 0; i < c; i++) {
-            bb.get();
-        }
+        return isAvailable(bb, size);
     }
 
 
-    private static void swallowUnit8Vector(ByteBuffer bb) {
-        int b = bb.get() & 0xFF;
-        for (int i = 0; i < b; i++) {
-            bb.get();
-        }
+    private static void skipBytes(ByteBuffer bb, int size) {
+        bb.position(bb.position() + size);
     }
 
 
@@ -210,21 +206,19 @@ public class SNIExtractor {
         char extensionDataSize = bb.getChar();
         if (extensionType == 0) {
             // First 2 bytes are size of server name list (only expecting one)
-            bb.getChar();
             // Next byte is type (0 for hostname)
-            bb.get();
+            skipBytes(bb, 3);
             // Next 2 bytes are length of host name
             char serverNameSize = bb.getChar();
             byte[] serverNameBytes = new byte[serverNameSize];
             bb.get(serverNameBytes);
             return new String(serverNameBytes, StandardCharsets.UTF_8);
         } else {
-            for (int i = 0; i < extensionDataSize; i++) {
-                bb.get();
-            }
+            skipBytes(bb, extensionDataSize);
         }
         return null;
     }
+
 
     public static enum SNIResult {
         FOUND,
