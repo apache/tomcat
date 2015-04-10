@@ -31,6 +31,7 @@ import javax.net.ssl.SSLEngineResult.Status;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.SNIExtractor.SNIResult;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -234,6 +235,22 @@ public class SecureNioChannel extends NioChannel  {
         sc.read(netInBuffer);
         SNIExtractor extractor = new SNIExtractor(netInBuffer);
 
+        while (extractor.getResult() == SNIResult.UNDERFLOW) {
+            // extractor needed more data to process but netInBuffer was full so
+            // double the size of the buffer and read some more data.
+            ByteBuffer newNetInBuffer;
+            if (sp.getDirectSslBuffer()) {
+                newNetInBuffer = ByteBuffer.allocateDirect(netInBuffer.capacity() * 2);
+            } else {
+                newNetInBuffer = ByteBuffer.allocate(netInBuffer.capacity() * 2);
+            }
+            netInBuffer.flip();
+            newNetInBuffer.put(netInBuffer);
+            netInBuffer = newNetInBuffer;
+            sc.read(netInBuffer);
+            extractor = new SNIExtractor(netInBuffer);
+        }
+
         String hostName = null;
         switch (extractor.getResult()) {
         case FOUND:
@@ -242,19 +259,17 @@ public class SecureNioChannel extends NioChannel  {
         case NOT_PRESENT:
             // NO-OP
             break;
-        case UNDERFLOW:
-            // Need to expand buffer
-            break;
         case NEED_READ:
             return SelectionKey.OP_READ;
-        default:
+        case UNDERFLOW:
+            // Can't happen. Buffer would have been expanded above.
             break;
         }
 
-        System.out.println("SNI hostname was [" + hostName + "]");
-
         // TODO: Extract the correct configuration for the requested host name
-        //       and set up the SSLEngine accordingly.
+        //       and set up the SSLEngine accordingly. At that point this can
+        //       become a debug level message.
+        log.info("SNI hostname was [" + hostName + "]");
 
         sslEngine = endpoint.createSSLEngine();
 
