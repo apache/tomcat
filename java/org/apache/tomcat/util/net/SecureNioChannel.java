@@ -31,6 +31,7 @@ import javax.net.ssl.SSLEngineResult.Status;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.SNIExtractor.SNIResult;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -227,8 +228,10 @@ public class SecureNioChannel extends NioChannel  {
         if (netInBuffer == null) {
             if (sp.getDirectSslBuffer()) {
                 netInBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
+                netOutBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
             } else {
                 netInBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
+                netOutBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
             }
         }
 
@@ -238,15 +241,10 @@ public class SecureNioChannel extends NioChannel  {
         while (extractor.getResult() == SNIResult.UNDERFLOW) {
             // extractor needed more data to process but netInBuffer was full so
             // double the size of the buffer and read some more data.
-            ByteBuffer newNetInBuffer;
-            if (sp.getDirectSslBuffer()) {
-                newNetInBuffer = ByteBuffer.allocateDirect(netInBuffer.capacity() * 2);
-            } else {
-                newNetInBuffer = ByteBuffer.allocate(netInBuffer.capacity() * 2);
-            }
-            netInBuffer.flip();
-            newNetInBuffer.put(netInBuffer);
-            netInBuffer = newNetInBuffer;
+            log.info(sm.getString("channel.nio.ssl.expandNetInBuffer",
+                    Integer.toString(netInBuffer.capacity() * 2)));
+
+            netInBuffer = ByteBufferUtils.expand(netInBuffer);
             sc.read(netInBuffer);
             extractor = new SNIExtractor(netInBuffer);
         }
@@ -276,7 +274,13 @@ public class SecureNioChannel extends NioChannel  {
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.
         bufHandler.expand(sslEngine.getSession().getApplicationBufferSize());
-        expandNetBuffers(sslEngine.getSession().getPacketBufferSize(), sp.getDirectSslBuffer());
+        if (netOutBuffer.capacity() < sslEngine.getSession().getApplicationBufferSize()) {
+            // Info for now as we may need to increase DEFAULT_NET_BUFFER_SIZE
+            log.info(sm.getString("channel.nio.ssl.expandNetOutBuffer",
+                    Integer.toString(sslEngine.getSession().getApplicationBufferSize())));
+        }
+        netInBuffer = ByteBufferUtils.expand(netInBuffer, sslEngine.getSession().getPacketBufferSize());
+        netOutBuffer = ByteBufferUtils.expand(netOutBuffer, sslEngine.getSession().getPacketBufferSize());
 
         // Set limit and position to expected values
         netOutBuffer.position(0);
@@ -287,48 +291,6 @@ public class SecureNioChannel extends NioChannel  {
         handshakeStatus = sslEngine.getHandshakeStatus();
 
         return 0;
-    }
-
-
-    private void expandNetBuffers(int newSize, boolean direct) {
-
-        // The input buffer will always have been created by the time this
-        // method is called.
-        if (netInBuffer.capacity() < newSize) {
-            // Info as we may need to increase DEFAULT_NET_BUFFER_SIZE
-            log.info(sm.getString("channel.nio.ssl.expandNetInBuffer", Integer.toString(newSize)));
-            ByteBuffer newInBuffer;
-            if (direct) {
-                newInBuffer = ByteBuffer.allocateDirect(newSize);
-            } else {
-                newInBuffer = ByteBuffer.allocate(newSize);
-            }
-            // Need to expand the buffers, making sure no data is lost.
-            netInBuffer.flip();
-            newInBuffer.put(netInBuffer);
-            netInBuffer = newInBuffer;
-        }
-
-        if (netOutBuffer == null) {
-            if (direct) {
-                netOutBuffer = ByteBuffer.allocateDirect(newSize);
-            } else {
-                netOutBuffer = ByteBuffer.allocate(newSize);
-            }
-        } else if (netOutBuffer.capacity() < newSize) {
-            // Info as we may need to increase DEFAULT_NET_BUFFER_SIZE
-            log.info(sm.getString("channel.nio.ssl.expandNetOutBuffer", Integer.toString(newSize)));
-            // Need to expand the buffers, making sure no data is lost.
-            ByteBuffer newOutBuffer;
-            if (direct) {
-                newOutBuffer = ByteBuffer.allocateDirect(newSize);
-            } else {
-                newOutBuffer = ByteBuffer.allocate(newSize);
-            }
-            netOutBuffer.flip();
-            newOutBuffer.put(netOutBuffer);
-            netOutBuffer = newOutBuffer;
-        }
     }
 
 
