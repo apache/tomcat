@@ -239,14 +239,16 @@ public class SecureNioChannel extends NioChannel  {
         case FOUND:
             hostName = extractor.getSNIValue();
             break;
-        case ERROR:
-            // NO-OP Let the handshake continue and deal with whatever was wrong
-            break;
         case NOT_PRESENT:
             // NO-OP
             break;
         case UNDERFLOW:
+            // Need to expand buffer
+            break;
+        case NEED_READ:
             return SelectionKey.OP_READ;
+        default:
+            break;
         }
 
         System.out.println("SNI hostname was [" + hostName + "]");

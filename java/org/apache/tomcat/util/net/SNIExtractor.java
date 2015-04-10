@@ -17,8 +17,16 @@
 package org.apache.tomcat.util.net;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 public class SNIExtractor {
+
+    private static final Log log = LogFactory.getLog(SNIExtractor.class);
+    private static final StringManager sm = StringManager.getManager(SNIExtractor.class);
 
     private final SNIResult result;
     private final String sniValue;
@@ -41,18 +49,60 @@ public class SNIExtractor {
                 return;
             }
 
-            if (!isTLSClientHello(netInBuffer)) {
+            if (!isTLSHandshake(netInBuffer)) {
                 return;
             }
 
-            if (!isAllRecordPresent(netInBuffer)) {
-                result = SNIResult.UNDERFLOW;
+            int recordSizeToRead = recordSizeToRead(netInBuffer);
+            if (recordSizeToRead == -1) {
+                // Not enough data in the buffer for the full record
+                if (netInBuffer.limit() == netInBuffer.capacity()) {
+                    // Buffer too small
+                    result = SNIResult.UNDERFLOW;
+                    return;
+                } else {
+                    // Need to read more data
+                    result = SNIResult.NEED_READ;
+                    return;
+                }
+
+            }
+
+            if (!isClientHello(netInBuffer)) {
                 return;
             }
 
-            System.out.println("Looking good so far to find some SNI data");
-            // TODO Parse the remainder of the data
+            int clientHelloSizeToRead = clientHelloSize(netInBuffer);
+            if (clientHelloSizeToRead == -1) {
+                // Client hello can't have fitted into single TLS record.
+                // Treat this as not present.
+                log.warn(sm.getString("sniExtractor.clientHelloTooBig"));
+                return;
+            }
 
+            // Protocol Version (2 bytes)
+            netInBuffer.getChar();
+            swallowRandom(netInBuffer);
+            // Session ID
+            swallowUnit8Vector(netInBuffer);
+            swallowCipherSuites(netInBuffer);
+            // Compression methods
+            swallowUnit8Vector(netInBuffer);
+
+            if (!netInBuffer.hasRemaining()) {
+                // No more data means no extensions present
+                return;
+            }
+
+            // Extension length
+            netInBuffer.getChar();
+            // Read th eextensions until we run out of data or find the SNI
+            while (netInBuffer.hasRemaining() && sniValue == null) {
+                sniValue = readSniExtension(netInBuffer);
+            }
+            if (sniValue != null) {
+                result = SNIResult.FOUND;
+            }
         } finally {
             this.result = result;
             this.sniValue = sniValue;
@@ -85,7 +135,7 @@ public class SNIExtractor {
     }
 
 
-    private static boolean isTLSClientHello(ByteBuffer bb) {
+    private static boolean isTLSHandshake(ByteBuffer bb) {
         // For a TLS client hello the first byte must be 22 - handshake
         if (bb.get() != 22) {
             return false;
@@ -100,19 +150,86 @@ public class SNIExtractor {
     }
 
 
-    private static boolean isAllRecordPresent(ByteBuffer bb) {
+    private static int recordSizeToRead(ByteBuffer bb) {
         // Next two bytes (unsigned) are the size of the record. We need all of
         // it.
-        if (bb.getChar() > bb.remaining()) {
-            return false;
+        int size = bb.getChar();
+        if (bb.remaining() < size) {
+            return -1;
         }
-        return true;
+        return size;
+    }
+
+
+    private static boolean isClientHello(ByteBuffer bb) {
+        // Client hello is handshake type 1
+        if (bb.get() == 1) {
+            return true;
+        }
+        return false;
+    }
+
+
+    private static int clientHelloSize(ByteBuffer bb) {
+        // Next three bytes (unsigned) are the size of the client hello. We need
+        // all of it.
+        int size = ((bb.get() & 0xFF) << 16) + ((bb.get() & 0xFF) << 8) + (bb.get() & 0xFF);
+        if (bb.remaining() < size) {
+            return -1;
+        }
+        return size;
+    }
+
+    private static void swallowRandom(ByteBuffer bb) {
+        // 32 bytes total
+        for (int i = 0; i < 4; i++) {
+            bb.getLong();
+        }
+    }
+
+    private static void swallowCipherSuites(ByteBuffer bb) {
+        char c = bb.getChar();
+        for (int i = 0; i < c; i++) {
+            bb.get();
+        }
+    }
+
+
+    private static void swallowUnit8Vector(ByteBuffer bb) {
+        int b = bb.get() & 0xFF;
+        for (int i = 0; i < b; i++) {
+            bb.get();
+        }
+    }
+
+
+    private static String readSniExtension(ByteBuffer bb) {
+        // SNI extension is type 0
+        char extensionType = bb.getChar();
+        // Next byte is data size
+        char extensionDataSize = bb.getChar();
+        if (extensionType == 0) {
+            // First 2 bytes are size of server name list (only expecting one)
+            bb.getChar();
+            // Next byte is type (0 for hostname)
+            bb.get();
+            // Next 2 bytes are length of host name
+            char serverNameSize = bb.getChar();
+            byte[] serverNameBytes = new byte[serverNameSize];
+            bb.get(serverNameBytes);
+            return new String(serverNameBytes, StandardCharsets.UTF_8);
+        } else {
+            for (int i = 0; i < extensionDataSize; i++) {
+                bb.get();
+            }
+        }
+        return null;
     }
 
     public static enum SNIResult {
         FOUND,
         NOT_PRESENT,
         UNDERFLOW,
-        ERROR
+        NEED_READ
     }
 }
