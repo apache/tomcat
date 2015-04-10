@@ -18,6 +18,8 @@ package org.apache.tomcat.util.net;
 
 import java.nio.ByteBuffer;
 
+import org.apache.tomcat.util.buf.ByteBufferUtils;
+
 public class SocketBufferHandler {
 
     private volatile boolean readBufferConfiguredForWrite = true;
@@ -149,31 +151,9 @@ public class SocketBufferHandler {
 
 
     public void expand(int newSize) {
-        if (readBuffer.capacity() < newSize) {
-            ByteBuffer newReadBuffer;
-            if (readBuffer.isDirect()) {
-                newReadBuffer = ByteBuffer.allocateDirect(newSize);
-            } else {
-                newReadBuffer = ByteBuffer.allocate(newSize);
-            }
-            configureReadBufferForRead();
-            newReadBuffer.put(readBuffer);
-            newReadBuffer.flip();
-            readBuffer = newReadBuffer;
-
-        }
-
-        if (writeBuffer.capacity() < newSize) {
-            ByteBuffer newWriteBuffer;
-            if (writeBuffer.isDirect()) {
-                newWriteBuffer = ByteBuffer.allocateDirect(newSize);
-            } else {
-                newWriteBuffer = ByteBuffer.allocate(newSize);
-            }
-            configureWriteBufferForRead();
-            newWriteBuffer.put(writeBuffer);
-            newWriteBuffer.flip();
-            writeBuffer = newWriteBuffer;
-        }
+        configureReadBufferForRead();
+        readBuffer = ByteBufferUtils.expand(readBuffer, newSize);
+        configureWriteBufferForRead();
+        writeBuffer = ByteBufferUtils.expand(writeBuffer, newSize);
     }
 }
