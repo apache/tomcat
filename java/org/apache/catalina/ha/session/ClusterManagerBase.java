@@ -67,6 +67,11 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
      */
     private volatile ReplicationValve replicationValve = null ;
 
+    /**
+     * send all actions of session attributes.
+     */
+    private boolean recordAllActions = false;
+
     /*
      * @see org.apache.catalina.ha.ClusterManager#getCluster()
      */
@@ -118,6 +123,14 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
             this.sessionAttributeFilter = sessionAttributeFilter;
             sessionAttributePattern = Pattern.compile(sessionAttributeFilter);
         }
+    }
+
+    public boolean isRecordAllActions() {
+        return recordAllActions;
+    }
+
+    public void setRecordAllActions(boolean recordAllActions) {
+        this.recordAllActions = recordAllActions;
     }
 
     /**
@@ -210,6 +223,7 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
              // Ignore
             }
         }
+        copy.setRecordAllActions(isRecordAllActions());
     }
 
     /**
