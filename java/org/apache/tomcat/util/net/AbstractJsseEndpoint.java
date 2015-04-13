@@ -66,7 +66,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     }
 
 
-    protected SSLEngine createSSLEngine() {
+    protected SSLEngine createSSLEngine(String sniHostName) {
         SSLEngine engine = sslContext.createSSLEngine();
         if ("false".equals(getClientAuth())) {
             engine.setNeedClientAuth(false);
