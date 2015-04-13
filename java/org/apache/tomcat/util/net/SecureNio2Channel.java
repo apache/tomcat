@@ -34,6 +34,10 @@ import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import javax.net.ssl.SSLException;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.ByteBufferUtils;
+import org.apache.tomcat.util.net.SNIExtractor.SNIResult;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -41,8 +45,12 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SecureNio2Channel extends Nio2Channel  {
 
-    protected static final StringManager sm = StringManager.getManager(
-            SecureNio2Channel.class.getPackage().getName());
+    private static final Log log = LogFactory.getLog(SecureNio2Channel.class);
+    private static final StringManager sm = StringManager.getManager(SecureNio2Channel.class);
+
+    // Value determined by observation of what the SSL Engine requested in
+    // various scenarios
+    private static final int DEFAULT_NET_BUFFER_SIZE = 16921;
 
     protected ByteBuffer netInBuffer;
     protected ByteBuffer netOutBuffer;
@@ -63,18 +71,15 @@ public class SecureNio2Channel extends Nio2Channel  {
     private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> handshakeReadCompletionHandler;
     private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> handshakeWriteCompletionHandler;
 
-    public SecureNio2Channel(SSLEngine engine, SocketBufferHandler bufHandler,
-            Nio2Endpoint endpoint0) {
+    public SecureNio2Channel(SocketBufferHandler bufHandler, Nio2Endpoint endpoint) {
         super(bufHandler);
-        sslEngine = engine;
-        endpoint = endpoint0;
-        int netBufSize = sslEngine.getSession().getPacketBufferSize();
+        this.endpoint = endpoint;
         if (endpoint.getSocketProperties().getDirectSslBuffer()) {
-            netInBuffer = ByteBuffer.allocateDirect(netBufSize);
-            netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
+            netInBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
+            netOutBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
         } else {
-            netInBuffer = ByteBuffer.allocate(netBufSize);
-            netOutBuffer = ByteBuffer.allocate(netBufSize);
+            netInBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
+            netOutBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
         }
         handshakeReadCompletionHandler = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
             @Override
@@ -114,18 +119,12 @@ public class SecureNio2Channel extends Nio2Channel  {
     public void reset(AsynchronousSocketChannel channel, SocketWrapperBase<Nio2Channel> socket)
             throws IOException {
         super.reset(channel, socket);
-        netOutBuffer.position(0);
-        netOutBuffer.limit(0);
-        netInBuffer.position(0);
-        netInBuffer.limit(0);
+        sniComplete = false;
         handshakeComplete = false;
         closed = false;
         closing = false;
         readPending = false;
         writePending = false;
-        //initiate handshake
-        sslEngine.beginHandshake();
-        handshakeStatus = sslEngine.getHandshakeStatus();
     }
 
 
@@ -309,7 +308,70 @@ public class SecureNio2Channel extends Nio2Channel  {
      * present and, if it is, what host name has been requested. Based on the
      * provided host name, configure the SSLEngine for this connection.
      */
-    private int processSNI() {
+    private int processSNI() throws IOException {
+        // If there is no data to process, trigger a read immediately. This is
+        // an optimisation for the typical case so we don't create an
+        // SNIExtractor only to discover there is no data to process
+        if (netInBuffer.position() == 0) {
+            sc.read(netInBuffer, socket, handshakeReadCompletionHandler);
+            return 1;
+        }
+
+        SNIExtractor extractor = new SNIExtractor(netInBuffer);
+
+        while (extractor.getResult() == SNIResult.UNDERFLOW) {
+            // extractor needed more data to process but netInBuffer was full so
+            // double the size of the buffer and read some more data.
+            log.info(sm.getString("channel.nio.ssl.expandNetInBuffer",
+                    Integer.toString(netInBuffer.capacity() * 2)));
+
+            netInBuffer = ByteBufferUtils.expand(netInBuffer);
+            sc.read(netInBuffer);
+            extractor = new SNIExtractor(netInBuffer);
+        }
+
+        String hostName = null;
+        switch (extractor.getResult()) {
+        case FOUND:
+            hostName = extractor.getSNIValue();
+            break;
+        case NOT_PRESENT:
+            // NO-OP
+            break;
+        case NEED_READ:
+            sc.read(netInBuffer, socket, handshakeReadCompletionHandler);
+            return 1;
+        case UNDERFLOW:
+            // Can't happen. Buffer would have been expanded above.
+            break;
+        }
+
+        // TODO: Extract the correct configuration for the requested host name
+        //       and set up the SSLEngine accordingly. At that point this can
+        //       become a debug level message.
+        log.info("SNI hostname was [" + hostName + "]");
+
+        sslEngine = endpoint.createSSLEngine();
+
+        // Ensure the application buffers (which have to be created earlier) are
+        // big enough.
+        bufHandler.expand(sslEngine.getSession().getApplicationBufferSize());
+        if (netOutBuffer.capacity() < sslEngine.getSession().getApplicationBufferSize()) {
+            // Info for now as we may need to increase DEFAULT_NET_BUFFER_SIZE
+            log.info(sm.getString("channel.nio.ssl.expandNetOutBuffer",
+                    Integer.toString(sslEngine.getSession().getApplicationBufferSize())));
+        }
+        netInBuffer = ByteBufferUtils.expand(netInBuffer, sslEngine.getSession().getPacketBufferSize());
+        netOutBuffer = ByteBufferUtils.expand(netOutBuffer, sslEngine.getSession().getPacketBufferSize());
+
+        // Set limit and position to expected values
+        netOutBuffer.position(0);
+        netOutBuffer.limit(0);
+
+        // Initiate handshake
+        sslEngine.beginHandshake();
+        handshakeStatus = sslEngine.getHandshakeStatus();
+
         return 0;
     }
 
