@@ -151,9 +151,9 @@ public class SocketBufferHandler {
 
 
     public void expand(int newSize) {
-        configureReadBufferForRead();
+        configureReadBufferForWrite();
         readBuffer = ByteBufferUtils.expand(readBuffer, newSize);
-        configureWriteBufferForRead();
+        configureWriteBufferForWrite();
         writeBuffer = ByteBufferUtils.expand(writeBuffer, newSize);
     }
 }
