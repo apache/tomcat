@@ -422,26 +422,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
             Nio2Channel channel = (useCaches) ? nioChannels.pop() : null;
             if (channel == null) {
-                // SSL setup
+                SocketBufferHandler bufhandler = new SocketBufferHandler(
+                        socketProperties.getAppReadBufSize(),
+                        socketProperties.getAppWriteBufSize(),
+                        socketProperties.getDirectBuffer());
                 if (isSSLEnabled()) {
-                    SSLEngine engine = createSSLEngine();
-                    int appBufferSize = engine.getSession().getApplicationBufferSize();
-                    SocketBufferHandler bufhandler = new SocketBufferHandler(
-                            Math.max(appBufferSize, socketProperties.getAppReadBufSize()),
-                            Math.max(appBufferSize, socketProperties.getAppWriteBufSize()),
-                            socketProperties.getDirectBuffer());
-                    channel = new SecureNio2Channel(engine, bufhandler, this);
+                    channel = new SecureNio2Channel(bufhandler, this);
                 } else {
-                    SocketBufferHandler bufhandler = new SocketBufferHandler(
-                            socketProperties.getAppReadBufSize(),
-                            socketProperties.getAppWriteBufSize(),
-                            socketProperties.getDirectBuffer());
                     channel = new Nio2Channel(bufhandler);
-                }
-            } else {
-                if (isSSLEnabled()) {
-                    SSLEngine engine = createSSLEngine();
-                    ((SecureNio2Channel) channel).setSSLEngine(engine);
                 }
             }
             Nio2SocketWrapper socketWrapper = new Nio2SocketWrapper(channel, this);
