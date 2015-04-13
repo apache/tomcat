@@ -140,6 +140,13 @@
         secureRandomProvider attribute and set this attribute to the empty
         string.</p>
       </attribute>
+      <attribute name="recordAllActions" required="false">
+        <p>Flag whether send all actions for session across Tomcat cluster
+        nodes. If set to false, if already done something to the same attribute, 
+        make sure don't send multiple actions across Tomcat cluster nodes.
+        In that case, sends only the actions that have been added at last.
+        Default is <code>false</code>.</p>
+      </attribute>
     </attributes>
   </subsection>
   <subsection name="org.apache.catalina.ha.session.DeltaManager Attributes">

@@ -107,6 +107,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        Add new attribute that send all actions for session across Tomcat
+        cluster nodes. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

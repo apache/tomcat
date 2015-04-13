@@ -571,7 +571,9 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         try {
             lock();
             if (deltaRequest == null) {
-                deltaRequest = new DeltaRequest(getIdInternal(), false);
+                boolean recordAllActions = manager instanceof ClusterManagerBase &&
+                        ((ClusterManagerBase)manager).isRecordAllActions();
+                deltaRequest = new DeltaRequest(getIdInternal(), recordAllActions);
             } else {
                 deltaRequest.reset();
                 deltaRequest.setSessionId(getIdInternal());
