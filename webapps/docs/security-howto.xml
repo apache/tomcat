@@ -294,15 +294,6 @@
       proxy (the authenticated user name is passed to Tomcat as part of the AJP
       protocol) with the option for Tomcat to still perform authorization.</p>
 
-      <p>The <strong>allowUnsafeLegacyRenegotiation</strong> attribute provides
-      a workaround for
-      <a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2009-3555">
-      CVE-2009-3555</a>, a TLS man in the middle attack. This workaround applies
-      to the BIO connector. It is only necessary if the underlying SSL
-      implementation is vulnerable to CVE-2009-3555. For more information on the
-      current state of this vulnerability and the work-arounds available see the
-      <security>Tomcat <version-major/> security page</security>.</p>
-
       <p>The <strong>requiredSecret</strong> attribute in AJP connectors
       configures shared secret between Tomcat and reverse proxy in front of
       Tomcat. It is used to prevent unauthorized connections over AJP protocol.</p>
