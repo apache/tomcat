@@ -1038,14 +1038,6 @@ public abstract class AbstractEndpoint<S> {
     public String getSessionTimeout() { return sessionTimeout;}
     public void setSessionTimeout(String s) { sessionTimeout = s;}
 
-    private String allowUnsafeLegacyRenegotiation = null;
-    public String getAllowUnsafeLegacyRenegotiation() {
-        return allowUnsafeLegacyRenegotiation;
-    }
-    public void setAllowUnsafeLegacyRenegotiation(String s) {
-        allowUnsafeLegacyRenegotiation = s;
-    }
-
 
     private String[] sslEnabledProtocolsarr = new String[0];
     public String[] getSslEnabledProtocolsArray() {

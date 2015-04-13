@@ -1025,19 +1025,6 @@
       documentation for the default value.</p>
     </attribute>
 
-    <attribute name="allowUnsafeLegacyRenegotiation" required="false">
-      <p>Is unsafe legacy TLS renegotiation allowed which is likely to expose
-      users to CVE-2009-3555, a man-in-the-middle vulnerability in the TLS
-      protocol that allows an attacker to inject arbitrary data into the user's
-      request. If not specified, a default of <code>false</code> is used. This
-      attribute only has an effect if the JVM does not support RFC 5746 as
-      indicated by the presence of the pseudo-ciphersuite
-      TLS_EMPTY_RENEGOTIATION_INFO_SCSV. This is available JRE/JDK 6 update 22
-      onwards. Where RFC 5746 is supported the renegotiation - including support
-      for unsafe legacy renegotiation - is controlled by the JVM configuration.
-      </p>
-    </attribute>
-
     <attribute name="useServerCipherSuitesOrder" required="false">
       <p>
         Set to <code>true</code> to enforce the server's cipher order

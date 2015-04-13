@@ -99,13 +99,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
     public void setSessionTimeout(String s){getEndpoint().setSessionTimeout(s);}
     public String getSessionTimeout(){ return getEndpoint().getSessionTimeout();}
 
-    public void setAllowUnsafeLegacyRenegotiation(String s) {
-        getEndpoint().setAllowUnsafeLegacyRenegotiation(s);
-    }
-    public String getAllowUnsafeLegacyRenegotiation() {
-        return getEndpoint().getAllowUnsafeLegacyRenegotiation();
-    }
-
     public String getSslImplementationName() { return getEndpoint().getSslImplementationName(); }
     public void setSslImplementationName(String s) { getEndpoint().setSslImplementationName(s); }
 }
