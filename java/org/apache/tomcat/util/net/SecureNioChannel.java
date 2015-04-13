@@ -67,6 +67,16 @@ public class SecureNioChannel extends NioChannel  {
             NioSelectorPool pool, NioEndpoint endpoint) {
         super(channel, bufHandler);
 
+        // Create the network buffers (these hold the encrypted data).
+        if (endpoint.getSocketProperties().getDirectSslBuffer()) {
+            netInBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
+            netOutBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
+        } else {
+            netInBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
+            netOutBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
+        }
+
+
         // selector pool for blocking operations
         this.pool = pool;
         this.endpoint = endpoint;
@@ -221,20 +231,7 @@ public class SecureNioChannel extends NioChannel  {
      * provided host name, configure the SSLEngine for this connection.
      */
     private int processSNI() throws IOException {
-        SocketProperties sp = endpoint.getSocketProperties();
-
-        // Create the network input buffer as data needs to be read into this
-        // to be able to peek at it.
-        if (netInBuffer == null) {
-            if (sp.getDirectSslBuffer()) {
-                netInBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
-                netOutBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
-            } else {
-                netInBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
-                netOutBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
-            }
-        }
-
+        // Read some data into the network input buffer so we can peek at it.
         sc.read(netInBuffer);
         SNIExtractor extractor = new SNIExtractor(netInBuffer);
 
