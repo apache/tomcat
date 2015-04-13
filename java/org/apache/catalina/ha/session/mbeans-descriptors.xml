@@ -309,6 +309,11 @@
       is="true"
       description="All session messages before state transfer message creation are dropped."
       type="boolean"/>
+    <attribute
+      name="recordAllActions"
+      is="true"
+      description="Flag whether send all actions for session across Tomcat cluster nodes."
+      type="boolean"/>
     <operation
       name="expireSession"
       description="Expired the given session"
@@ -530,6 +535,11 @@
       name="secureRandomProvider"
       description="The secure random number generator provider name"
       type="java.lang.String"/>
+    <attribute
+      name="recordAllActions"
+      is="true"
+      description="Flag whether send all actions for session across Tomcat cluster nodes."
+      type="boolean"/>
     <operation
       name="expireSession"
       description="Expired the given session"
