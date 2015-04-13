@@ -253,10 +253,6 @@
       description="Total number of sessions created by this manager"
       type="long"/>
     <attribute
-      name="sessionIdLength"
-      description="The session id length (in bytes) of Sessions created by this Manager"
-      type="int"/>
-    <attribute
       name="sessionMaxAliveTime"
       description="Longest time an expired session had been alive"
       type="int"/>
@@ -498,10 +494,6 @@
       name="sessionCounter"
       description="Total number of sessions created by this manager"
       type="long"/>
-    <attribute
-      name="sessionIdLength"
-      description="The session id length (in bytes) of Sessions created by this Manager"
-      type="int"/>
     <attribute
       name="sessionMaxAliveTime"
       description="Longest time an expired session had been alive"
