@@ -32,9 +32,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLParameters;
-
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
@@ -1074,23 +1071,6 @@ public abstract class AbstractEndpoint<S> {
 
     protected final Set<SocketWrapperBase<S>> waitingRequests = Collections
             .newSetFromMap(new ConcurrentHashMap<SocketWrapperBase<S>, Boolean>());
-
-    /**
-     * Configures SSLEngine to honor cipher suites ordering based upon
-     * endpoint configuration.
-     */
-    protected void configureUseServerCipherSuitesOrder(SSLEngine engine) {
-        String useServerCipherSuitesOrderStr = this
-                .getUseServerCipherSuitesOrder().trim();
-
-        SSLParameters sslParameters = engine.getSSLParameters();
-        boolean useServerCipherSuitesOrder =
-            ("true".equalsIgnoreCase(useServerCipherSuitesOrderStr)
-                || "yes".equalsIgnoreCase(useServerCipherSuitesOrderStr));
-
-        sslParameters.setUseCipherSuitesOrder(useServerCipherSuitesOrder);
-        engine.setSSLParameters(sslParameters);
-    }
 
     /**
      * The async timeout thread.
