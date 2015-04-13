@@ -19,6 +19,7 @@ package org.apache.tomcat.util.net;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.X509KeyManager;
 
@@ -89,6 +90,24 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     @Override
     public void unbind() throws Exception {
         sslContext = null;
+    }
+
+
+    /**
+     * Configures SSLEngine to honor cipher suites ordering based upon
+     * endpoint configuration.
+     */
+    private void configureUseServerCipherSuitesOrder(SSLEngine engine) {
+        String useServerCipherSuitesOrderStr = this
+                .getUseServerCipherSuitesOrder().trim();
+
+        SSLParameters sslParameters = engine.getSSLParameters();
+        boolean useServerCipherSuitesOrder =
+            ("true".equalsIgnoreCase(useServerCipherSuitesOrderStr)
+                || "yes".equalsIgnoreCase(useServerCipherSuitesOrderStr));
+
+        sslParameters.setUseCipherSuitesOrder(useServerCipherSuitesOrder);
+        engine.setSSLParameters(sslParameters);
     }
 
 
