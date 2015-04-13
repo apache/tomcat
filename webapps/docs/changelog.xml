@@ -133,6 +133,10 @@
         Fix log name typo in <code>WsRemoteEndpointImplServer</code> class,
         caused by a copy-paste. (markt/kkolinko)
       </fix>
+      <fix>
+        <bug>57788</bug>: Avoid NPE when looking up a class hierarchy without
+        finding anything. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

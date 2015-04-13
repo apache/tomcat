@@ -209,6 +209,10 @@ public class Util {
         @SuppressWarnings("unchecked")
         Class<? extends T> superClazz =
                 (Class<? extends T>) clazz.getSuperclass();
+        if (superClazz == null) {
+            // Finished looking up the class hierarchy without finding anything
+            return null;
+        }
 
         TypeResult superClassTypeResult = getGenericType(type, superClazz);
         int dimension = superClassTypeResult.getDimension();
