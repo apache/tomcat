@@ -261,12 +261,11 @@ public class SecureNioChannel extends NioChannel  {
             break;
         }
 
-        // TODO: Extract the correct configuration for the requested host name
-        //       and set up the SSLEngine accordingly. At that point this can
-        //       become a debug level message.
-        log.info("SNI hostname was [" + hostName + "]");
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("channel.nio.ssl.sniHostName", hostName));
+        }
 
-        sslEngine = endpoint.createSSLEngine();
+        sslEngine = endpoint.createSSLEngine(hostName);
 
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.
