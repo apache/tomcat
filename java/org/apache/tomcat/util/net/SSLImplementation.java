@@ -71,5 +71,5 @@ public abstract class SSLImplementation {
 
     public abstract SSLSupport getSSLSupport(SSLSession session);
 
-    public abstract SSLUtil getSSLUtil(AbstractEndpoint<?> ep);
+    public abstract SSLUtil getSSLUtil(AbstractEndpoint<?> ep, SSLHostConfig sslHostConfig);
 }

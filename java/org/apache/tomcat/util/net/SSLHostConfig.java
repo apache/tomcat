@@ -16,7 +16,46 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class SSLHostConfig {
 
-    static final String DEFAULT_SSL_HOST_NAME = "*DEFAULT*";
+    public static final String DEFAULT_SSL_HOST_NAME = "*DEFAULT*";
+
+    private String hostName;
+
+    private Set<String> sslProtocols = new HashSet<>();
+
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
+    }
+
+
+    public String getHostName() {
+        return hostName;
+    }
+
+
+    public void setProtocols(String protocols) {
+        // OpenSSL and JSSE use the same names.
+        if (protocols.trim().equalsIgnoreCase("all")) {
+            protocols = "TLSv1+TLSv1.1+TLSv1.2";
+        }
+
+        String[] values = protocols.split(",|\\+");
+
+        for (String value: values) {
+            String trimmed = value.trim();
+            if (trimmed.length() > 0) {
+                sslProtocols.add(trimmed);
+            }
+        }
+    }
+
+
+    public Set<String> getSslProtocols() {
+        return sslProtocols;
+    }
 }

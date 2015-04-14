@@ -37,6 +37,7 @@ import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
@@ -320,6 +321,29 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         } catch (Exception ex) {
             getLog().warn("Failed to init light protocol " + impl, ex);
         }
+    }
+
+
+    // ----------------------------------------------- HTTPS specific properties
+    // -------------------------------------------- Handled via an SSLHostConfig
+
+    private SSLHostConfig defaultSSLHostConfig = null;
+    private void registerDefaultSSLHostConfig() {
+        if (defaultSSLHostConfig == null) {
+            defaultSSLHostConfig = new SSLHostConfig();
+            defaultSSLHostConfig.setHostName(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
+            getEndpoint().addHostConfig(defaultSSLHostConfig);
+        }
+    }
+
+
+    public void setSslEnabledProtocols(String enabledProtocols) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setProtocols(enabledProtocols);
+    }
+    public void setSSLProtocol(String sslProtocol) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setProtocols(sslProtocol);
     }
 
 
