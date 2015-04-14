@@ -70,14 +70,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     public boolean getDeferAccept() { return ((AprEndpoint)getEndpoint()).getDeferAccept(); }
     public void setDeferAccept(boolean deferAccept) { ((AprEndpoint)getEndpoint()).setDeferAccept(deferAccept); }
 
+
     // --------------------  SSL related properties --------------------
-
-    /**
-     * SSL protocol.
-     */
-    public String getSSLProtocol() { return ((AprEndpoint)getEndpoint()).getSSLProtocol(); }
-    public void setSSLProtocol(String SSLProtocol) { ((AprEndpoint)getEndpoint()).setSSLProtocol(SSLProtocol); }
-
 
     /**
      * SSL password (if a cert is encrypted, and no password has been provided, a callback

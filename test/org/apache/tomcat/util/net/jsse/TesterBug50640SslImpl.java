@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net.jsse;
 
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLUtil;
 
 public class TesterBug50640SslImpl extends JSSEImplementation {
@@ -26,10 +27,10 @@ public class TesterBug50640SslImpl extends JSSEImplementation {
 
 
     @Override
-    public SSLUtil getSSLUtil(AbstractEndpoint<?> endpoint) {
+    public SSLUtil getSSLUtil(AbstractEndpoint<?> endpoint, SSLHostConfig sslHostConfig) {
         String flag = endpoint.getProperty(PROPERTY_NAME);
         if (PROPERTY_VALUE.equals(flag)) {
-            return super.getSSLUtil(endpoint);
+            return super.getSSLUtil(endpoint, sslHostConfig);
         } else {
             return null;
         }

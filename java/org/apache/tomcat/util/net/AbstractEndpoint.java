@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -214,6 +215,21 @@ public abstract class AbstractEndpoint<S> {
 
     // ----------------------------------------------------------------- Properties
 
+    protected Map<String,SSLHostConfig> sslHostConfigs = new ConcurrentHashMap<>();
+    public void addHostConfig(SSLHostConfig sslHostConfig) {
+        String key = sslHostConfig.getHostName();
+        if (key == null || key.length() == 0) {
+            // TODO i18n
+            throw new IllegalArgumentException();
+        }
+        SSLHostConfig duplicate = sslHostConfigs.put(key, sslHostConfig);
+        if (duplicate != null) {
+            // TODO i18n
+            throw new IllegalArgumentException();
+        }
+    }
+
+
     /**
      * Has the user requested that send file be used where possible?
      */
@@ -224,8 +240,6 @@ public abstract class AbstractEndpoint<S> {
     public void setUseSendfile(boolean useSendfile) {
         this.useSendfile = useSendfile;
     }
-
-
 
 
     /**

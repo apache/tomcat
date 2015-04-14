@@ -199,14 +199,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
 
     /**
-     * SSL protocols.
-     */
-    protected String SSLProtocol = "all";
-    public String getSSLProtocol() { return SSLProtocol; }
-    public void setSSLProtocol(String SSLProtocol) { this.SSLProtocol = SSLProtocol; }
-
-
-    /**
      * SSL password (if a cert is encrypted, and no password has been provided, a callback
      * will ask for a password).
      */
@@ -486,151 +478,159 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         // Initialize SSL if needed
         if (isSSLEnabled()) {
 
-            if (SSLCertificateFile == null) {
-                // This is required
-                throw new Exception(sm.getString("endpoint.apr.noSslCertFile"));
-            }
+            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
 
-            // SSL protocol
-            int value = SSL.SSL_PROTOCOL_NONE;
-            if (SSLProtocol == null || SSLProtocol.length() == 0) {
-                value = SSL.SSL_PROTOCOL_ALL;
-            } else {
-                for (String protocol : SSLProtocol.split("\\+")) {
-                    protocol = protocol.trim();
-                    if ("SSLv2".equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_SSLV2;
-                    } else if ("SSLv3".equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_SSLV3;
-                    } else if ("TLSv1".equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_TLSV1;
-                    } else if ("TLSv1.1".equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_TLSV1_1;
-                    } else if ("TLSv1.2".equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_TLSV1_2;
-                    } else if ("all".equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_ALL;
-                    } else {
-                        // Protocol not recognized, fail to start as it is safer than
-                        // continuing with the default which might enable more than the
-                        // is required
-                        throw new Exception(sm.getString(
-                                "endpoint.apr.invalidSslProtocol", SSLProtocol));
+                // TODO: No SNI support in APR/native so only process the
+                //       default host.
+                if (!SSLHostConfig.DEFAULT_SSL_HOST_NAME.equals(sslHostConfig.getHostName())) {
+                    continue;
+                }
+
+                if (SSLCertificateFile == null) {
+                    // This is required
+                    throw new Exception(sm.getString("endpoint.apr.noSslCertFile"));
+                }
+
+                // SSL protocol
+                int value = SSL.SSL_PROTOCOL_NONE;
+                if (sslHostConfig.getSslProtocols().size() == 0) {
+                    value = SSL.SSL_PROTOCOL_ALL;
+                } else {
+                    for (String protocol : sslHostConfig.getSslProtocols()) {
+                        if ("SSLv2".equalsIgnoreCase(protocol)) {
+                            value |= SSL.SSL_PROTOCOL_SSLV2;
+                        } else if ("SSLv3".equalsIgnoreCase(protocol)) {
+                            value |= SSL.SSL_PROTOCOL_SSLV3;
+                        } else if ("TLSv1".equalsIgnoreCase(protocol)) {
+                            value |= SSL.SSL_PROTOCOL_TLSV1;
+                        } else if ("TLSv1.1".equalsIgnoreCase(protocol)) {
+                            value |= SSL.SSL_PROTOCOL_TLSV1_1;
+                        } else if ("TLSv1.2".equalsIgnoreCase(protocol)) {
+                            value |= SSL.SSL_PROTOCOL_TLSV1_2;
+                        } else if ("all".equalsIgnoreCase(protocol)) {
+                            value |= SSL.SSL_PROTOCOL_ALL;
+                        } else {
+                            // Protocol not recognized, fail to start as it is safer than
+                            // continuing with the default which might enable more than the
+                            // is required
+                            throw new Exception(sm.getString(
+                                    "endpoint.apr.invalidSslProtocol", protocol));
+                        }
                     }
                 }
-            }
 
-            // Create SSL Context
-            try {
-                sslContext = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
-            } catch (Exception e) {
-                // If the sslEngine is disabled on the AprLifecycleListener
-                // there will be an Exception here but there is no way to check
-                // the AprLifecycleListener settings from here
-                throw new Exception(
-                        sm.getString("endpoint.apr.failSslContextMake"), e);
-            }
-
-            if (SSLInsecureRenegotiation) {
-                boolean legacyRenegSupported = false;
+                // Create SSL Context
                 try {
-                    legacyRenegSupported = SSL.hasOp(SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
-                    if (legacyRenegSupported)
-                        SSLContext.setOptions(sslContext, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
-                } catch (UnsatisfiedLinkError e) {
-                    // Ignore
-                }
-                if (!legacyRenegSupported) {
-                    // OpenSSL does not support unsafe legacy renegotiation.
-                    log.warn(sm.getString("endpoint.warn.noInsecureReneg",
-                                          SSL.versionString()));
-                }
-            }
-
-            // Set cipher order: client (default) or server
-            if (SSLHonorCipherOrder) {
-                boolean orderCiphersSupported = false;
-                try {
-                    orderCiphersSupported = SSL.hasOp(SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
-                    if (orderCiphersSupported)
-                        SSLContext.setOptions(sslContext, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
-                } catch (UnsatisfiedLinkError e) {
-                    // Ignore
-                }
-                if (!orderCiphersSupported) {
-                    // OpenSSL does not support ciphers ordering.
-                    log.warn(sm.getString("endpoint.warn.noHonorCipherOrder",
-                                          SSL.versionString()));
-                }
-            }
-
-            // Disable compression if requested
-            if (SSLDisableCompression) {
-                boolean disableCompressionSupported = false;
-                try {
-                    disableCompressionSupported = SSL.hasOp(SSL.SSL_OP_NO_COMPRESSION);
-                    if (disableCompressionSupported)
-                        SSLContext.setOptions(sslContext, SSL.SSL_OP_NO_COMPRESSION);
-                } catch (UnsatisfiedLinkError e) {
-                    // Ignore
-                }
-                if (!disableCompressionSupported) {
-                    // OpenSSL does not support ciphers ordering.
-                    log.warn(sm.getString("endpoint.warn.noDisableCompression",
-                                          SSL.versionString()));
-                }
-            }
-
-            // Disable TLS Session Tickets (RFC4507) to protect perfect forward secrecy
-            if (SSLDisableSessionTickets) {
-                boolean disableSessionTicketsSupported = false;
-                try {
-                    disableSessionTicketsSupported = SSL.hasOp(SSL.SSL_OP_NO_TICKET);
-                    if (disableSessionTicketsSupported)
-                        SSLContext.setOptions(sslContext, SSL.SSL_OP_NO_TICKET);
-                } catch (UnsatisfiedLinkError e) {
-                    // Ignore
+                    sslContext = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
+                } catch (Exception e) {
+                    // If the sslEngine is disabled on the AprLifecycleListener
+                    // there will be an Exception here but there is no way to check
+                    // the AprLifecycleListener settings from here
+                    throw new Exception(
+                            sm.getString("endpoint.apr.failSslContextMake"), e);
                 }
 
-                if (!disableSessionTicketsSupported) {
-                    // OpenSSL is too old to support TLS Session Tickets.
-                    log.warn(sm.getString("endpoint.warn.noDisableSessionTickets",
-                                          SSL.versionString()));
+                if (SSLInsecureRenegotiation) {
+                    boolean legacyRenegSupported = false;
+                    try {
+                        legacyRenegSupported = SSL.hasOp(SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
+                        if (legacyRenegSupported)
+                            SSLContext.setOptions(sslContext, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
+                    } catch (UnsatisfiedLinkError e) {
+                        // Ignore
+                    }
+                    if (!legacyRenegSupported) {
+                        // OpenSSL does not support unsafe legacy renegotiation.
+                        log.warn(sm.getString("endpoint.warn.noInsecureReneg",
+                                              SSL.versionString()));
+                    }
                 }
-            }
 
-            // List the ciphers that the client is permitted to negotiate
-            SSLContext.setCipherSuite(sslContext, SSLCipherSuite);
-            // Load Server key and certificate
-            SSLContext.setCertificate(sslContext, SSLCertificateFile, SSLCertificateKeyFile, SSLPassword, SSL.SSL_AIDX_RSA);
-            // Set certificate chain file
-            SSLContext.setCertificateChainFile(sslContext, SSLCertificateChainFile, false);
-            // Support Client Certificates
-            SSLContext.setCACertificate(sslContext, SSLCACertificateFile, SSLCACertificatePath);
-            // Set revocation
-            SSLContext.setCARevocation(sslContext, SSLCARevocationFile, SSLCARevocationPath);
-            // Client certificate verification
-            value = SSL.SSL_CVERIFY_NONE;
-            if ("optional".equalsIgnoreCase(SSLVerifyClient)) {
-                value = SSL.SSL_CVERIFY_OPTIONAL;
-            } else if ("require".equalsIgnoreCase(SSLVerifyClient)) {
-                value = SSL.SSL_CVERIFY_REQUIRE;
-            } else if ("optionalNoCA".equalsIgnoreCase(SSLVerifyClient)) {
-                value = SSL.SSL_CVERIFY_OPTIONAL_NO_CA;
-            }
-            SSLContext.setVerify(sslContext, value, SSLVerifyDepth);
-            // For now, sendfile is not supported with SSL
-            if (getUseSendfile()) {
-                setUseSendfileInternal(false);
-                if (useSendFileSet) {
-                    log.warn(sm.getString("endpoint.apr.noSendfileWithSSL"));
+                // Set cipher order: client (default) or server
+                if (SSLHonorCipherOrder) {
+                    boolean orderCiphersSupported = false;
+                    try {
+                        orderCiphersSupported = SSL.hasOp(SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                        if (orderCiphersSupported)
+                            SSLContext.setOptions(sslContext, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                    } catch (UnsatisfiedLinkError e) {
+                        // Ignore
+                    }
+                    if (!orderCiphersSupported) {
+                        // OpenSSL does not support ciphers ordering.
+                        log.warn(sm.getString("endpoint.warn.noHonorCipherOrder",
+                                              SSL.versionString()));
+                    }
                 }
-            }
 
-            if (negotiableProtocols.size() > 0) {
-                byte[] protocols = buildAlpnConfig(negotiableProtocols);
-                if (SSLContext.setALPN(sslContext, protocols, protocols.length) != 0) {
-                    log.warn(sm.getString("endpoint.alpn.fail", negotiableProtocols));
+                // Disable compression if requested
+                if (SSLDisableCompression) {
+                    boolean disableCompressionSupported = false;
+                    try {
+                        disableCompressionSupported = SSL.hasOp(SSL.SSL_OP_NO_COMPRESSION);
+                        if (disableCompressionSupported)
+                            SSLContext.setOptions(sslContext, SSL.SSL_OP_NO_COMPRESSION);
+                    } catch (UnsatisfiedLinkError e) {
+                        // Ignore
+                    }
+                    if (!disableCompressionSupported) {
+                        // OpenSSL does not support ciphers ordering.
+                        log.warn(sm.getString("endpoint.warn.noDisableCompression",
+                                              SSL.versionString()));
+                    }
+                }
+
+                // Disable TLS Session Tickets (RFC4507) to protect perfect forward secrecy
+                if (SSLDisableSessionTickets) {
+                    boolean disableSessionTicketsSupported = false;
+                    try {
+                        disableSessionTicketsSupported = SSL.hasOp(SSL.SSL_OP_NO_TICKET);
+                        if (disableSessionTicketsSupported)
+                            SSLContext.setOptions(sslContext, SSL.SSL_OP_NO_TICKET);
+                    } catch (UnsatisfiedLinkError e) {
+                        // Ignore
+                    }
+
+                    if (!disableSessionTicketsSupported) {
+                        // OpenSSL is too old to support TLS Session Tickets.
+                        log.warn(sm.getString("endpoint.warn.noDisableSessionTickets",
+                                              SSL.versionString()));
+                    }
+                }
+
+                // List the ciphers that the client is permitted to negotiate
+                SSLContext.setCipherSuite(sslContext, SSLCipherSuite);
+                // Load Server key and certificate
+                SSLContext.setCertificate(sslContext, SSLCertificateFile, SSLCertificateKeyFile, SSLPassword, SSL.SSL_AIDX_RSA);
+                // Set certificate chain file
+                SSLContext.setCertificateChainFile(sslContext, SSLCertificateChainFile, false);
+                // Support Client Certificates
+                SSLContext.setCACertificate(sslContext, SSLCACertificateFile, SSLCACertificatePath);
+                // Set revocation
+                SSLContext.setCARevocation(sslContext, SSLCARevocationFile, SSLCARevocationPath);
+                // Client certificate verification
+                value = SSL.SSL_CVERIFY_NONE;
+                if ("optional".equalsIgnoreCase(SSLVerifyClient)) {
+                    value = SSL.SSL_CVERIFY_OPTIONAL;
+                } else if ("require".equalsIgnoreCase(SSLVerifyClient)) {
+                    value = SSL.SSL_CVERIFY_REQUIRE;
+                } else if ("optionalNoCA".equalsIgnoreCase(SSLVerifyClient)) {
+                    value = SSL.SSL_CVERIFY_OPTIONAL_NO_CA;
+                }
+                SSLContext.setVerify(sslContext, value, SSLVerifyDepth);
+                // For now, sendfile is not supported with SSL
+                if (getUseSendfile()) {
+                    setUseSendfileInternal(false);
+                    if (useSendFileSet) {
+                        log.warn(sm.getString("endpoint.apr.noSendfileWithSSL"));
+                    }
+                }
+
+                if (negotiableProtocols.size() > 0) {
+                    byte[] protocols = buildAlpnConfig(negotiableProtocols);
+                    if (SSLContext.setALPN(sslContext, protocols, protocols.length) != 0) {
+                        log.warn(sm.getString("endpoint.alpn.fail", negotiableProtocols));
+                    }
                 }
             }
         } else if (negotiableProtocols.size() > 0) {

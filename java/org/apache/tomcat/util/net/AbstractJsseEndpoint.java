@@ -42,19 +42,20 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         if (isSSLEnabled()) {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
-            // TODO: Create multiple SSLContexts based on SSLHostConfig(s)
-            SSLUtil sslUtil = sslImplementation.getSSLUtil(this);
-            SSLContext sslContext = sslUtil.createSSLContext();
-            sslContext.init(wrap(sslUtil.getKeyManagers()),
-                    sslUtil.getTrustManagers(), null);
+            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                SSLUtil sslUtil = sslImplementation.getSSLUtil(this, sslHostConfig);
+                SSLContext sslContext = sslUtil.createSSLContext();
+                sslContext.init(wrap(sslUtil.getKeyManagers()),
+                        sslUtil.getTrustManagers(), null);
 
-            SSLSessionContext sessionContext =
-                sslContext.getServerSessionContext();
-            if (sessionContext != null) {
-                sslUtil.configureSessionContext(sessionContext);
+                SSLSessionContext sessionContext =
+                    sslContext.getServerSessionContext();
+                if (sessionContext != null) {
+                    sslUtil.configureSessionContext(sessionContext);
+                }
+                SSLContextWrapper sslContextWrapper = new SSLContextWrapper(sslContext, sslUtil);
+                sslContexts.put(sslHostConfig.getHostName(), sslContextWrapper);
             }
-            SSLContextWrapper sslContextWrapper = new SSLContextWrapper(sslContext, sslUtil);
-            sslContexts.put(SSLHostConfig.DEFAULT_SSL_HOST_NAME, sslContextWrapper);
         }
     }
 
