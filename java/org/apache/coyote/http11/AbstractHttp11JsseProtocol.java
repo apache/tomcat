@@ -52,7 +52,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
 
     public String getCiphers() { return getEndpoint().getCiphers();}
     public void setCiphers(String s) { getEndpoint().setCiphers(s);}
-    public String[] getCiphersUsed() { return getEndpoint().getCiphersUsed();}
 
     public String getKeyAlias() { return getEndpoint().getKeyAlias();}
     public void setKeyAlias(String s ) { getEndpoint().setKeyAlias(s);}

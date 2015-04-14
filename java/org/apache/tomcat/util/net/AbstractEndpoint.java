@@ -963,10 +963,6 @@ public abstract class AbstractEndpoint<S> {
     public void setCiphers(String s) {
         ciphers = s;
     }
-    /**
-     * @return  The ciphers in use by this Endpoint
-     */
-    public abstract String[] getCiphersUsed();
 
     private String useServerCipherSuitesOrder = "false";
     public String getUseServerCipherSuitesOrder() { return useServerCipherSuitesOrder;}
