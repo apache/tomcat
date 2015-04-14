@@ -42,6 +42,14 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         if (isSSLEnabled()) {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
+            // TODO: Temp code until config refactoring is complete. Remove once
+            //       refactoring is complete.
+            if (sslHostConfigs.size() == 0) {
+                SSLHostConfig defaultSslHostConfig = new SSLHostConfig();
+                defaultSslHostConfig.setHostName(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
+                sslHostConfigs.put(SSLHostConfig.DEFAULT_SSL_HOST_NAME, defaultSslHostConfig);
+            }
+
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
                 SSLUtil sslUtil = sslImplementation.getSSLUtil(this, sslHostConfig);
                 SSLContext sslContext = sslUtil.createSSLContext();
@@ -122,16 +130,21 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
 
     private SSLContextWrapper getSSLContextWrapper(String sniHostName) {
-        // First choice - direct match
-        SSLContextWrapper result = sslContexts.get(sniHostName);
-        if (result != null) {
-            return result;
+        SSLContextWrapper result = null;
+
+        if (sniHostName != null) {
+            // First choice - direct match
+            result = sslContexts.get(sniHostName);
+            if (result != null) {
+                return result;
+            }
+            // Second choice, wildcard match
+            int indexOfDot = sniHostName.indexOf('.');
+            if (indexOfDot > -1) {
+                result = sslContexts.get("*" + sniHostName.substring(indexOfDot));
+            }
         }
-        // Second choice, wildcard match
-        int indexOfDot = sniHostName.indexOf('.');
-        if (indexOfDot > -1) {
-            result = sslContexts.get("*" + sniHostName.substring(indexOfDot));
-        }
+
         // Fall-back. Use the default
         if (result == null) {
             result = sslContexts.get(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
