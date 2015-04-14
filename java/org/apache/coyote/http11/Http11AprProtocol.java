@@ -92,7 +92,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
      */
     public String getSSLCipherSuite() { return ((AprEndpoint)getEndpoint()).getSSLCipherSuite(); }
     public void setSSLCipherSuite(String SSLCipherSuite) { ((AprEndpoint)getEndpoint()).setSSLCipherSuite(SSLCipherSuite); }
-    public String[] getCiphersUsed() { return getEndpoint().getCiphersUsed();}
 
     /**
      * SSL honor cipher order.

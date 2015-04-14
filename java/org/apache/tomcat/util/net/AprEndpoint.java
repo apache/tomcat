@@ -353,14 +353,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     }
 
 
-    @Override
-    public String[] getCiphersUsed() {
-        // TODO : Investigate if it is possible to extract the current list of
-        //        available ciphers. Native code changes will be required.
-        return new String[] { getSSLCipherSuite() };
-    }
-
-
     /**
      * This endpoint does not support <code>-1</code> for unlimited connections,
      * nor does it support setting this attribute while the endpoint is running.
