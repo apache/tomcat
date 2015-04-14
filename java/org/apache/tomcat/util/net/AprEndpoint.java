@@ -493,10 +493,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
                 // SSL protocol
                 int value = SSL.SSL_PROTOCOL_NONE;
-                if (sslHostConfig.getSslProtocols().size() == 0) {
+                if (sslHostConfig.getProtocols().size() == 0) {
                     value = SSL.SSL_PROTOCOL_ALL;
                 } else {
-                    for (String protocol : sslHostConfig.getSslProtocols()) {
+                    for (String protocol : sslHostConfig.getProtocols()) {
                         if ("SSLv2".equalsIgnoreCase(protocol)) {
                             value |= SSL.SSL_PROTOCOL_SSLV2;
                         } else if ("SSLv3".equalsIgnoreCase(protocol)) {

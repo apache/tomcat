@@ -216,7 +216,7 @@ public abstract class AbstractEndpoint<S> {
     // ----------------------------------------------------------------- Properties
 
     protected Map<String,SSLHostConfig> sslHostConfigs = new ConcurrentHashMap<>();
-    public void addHostConfig(SSLHostConfig sslHostConfig) {
+    public void addSslHostConfig(SSLHostConfig sslHostConfig) {
         String key = sslHostConfig.getHostName();
         if (key == null || key.length() == 0) {
             // TODO i18n

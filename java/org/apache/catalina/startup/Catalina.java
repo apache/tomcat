@@ -336,6 +336,12 @@ public class Catalina {
                             "addConnector",
                             "org.apache.catalina.connector.Connector");
 
+        digester.addObjectCreate("Server/Service/Connector/SSLHostConfig",
+                                 "org.apache.tomcat.util.net.SSLHostConfig");
+        digester.addSetProperties("Server/Service/Connector/SSLHostConfig");
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig",
+                            "addSslHostConfig",
+                            "org.apache.tomcat.util.net.SSLHostConfig");
 
         digester.addObjectCreate("Server/Service/Connector/Listener",
                                  null, // MUST be specified in the element

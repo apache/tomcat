@@ -594,24 +594,24 @@ public class JSSESocketFactory implements SSLUtil {
 
     @Override
     public String[] getEnableableProtocols(SSLContext context) {
-        if (sslHostConfig.getSslProtocols().size() == 0) {
+        if (sslHostConfig.getProtocols().size() == 0) {
             return defaultServerProtocols;
         }
 
         List<String> protocols = new ArrayList<>();
-        protocols.addAll(sslHostConfig.getSslProtocols());
+        protocols.addAll(sslHostConfig.getProtocols());
         protocols.retainAll(Arrays.asList(context.getSupportedSSLParameters()
                 .getProtocols()));
 
         if (protocols.isEmpty()) {
             log.warn(sm.getString("jsse.requested_protocols_not_supported",
-                    sslHostConfig.getSslProtocols()));
+                    sslHostConfig.getProtocols()));
         }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("jsse.enableable_protocols", protocols));
-            if (protocols.size() != sslHostConfig.getSslProtocols().size()) {
+            if (protocols.size() != sslHostConfig.getProtocols().size()) {
                 List<String> skipped = new ArrayList<>();
-                skipped.addAll(sslHostConfig.getSslProtocols());
+                skipped.addAll(sslHostConfig.getProtocols());
                 skipped.removeAll(protocols);
                 log.debug(sm.getString("jsse.unsupported_protocols", skipped));
             }

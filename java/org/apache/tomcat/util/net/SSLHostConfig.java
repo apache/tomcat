@@ -25,7 +25,7 @@ public class SSLHostConfig {
 
     private String hostName;
 
-    private Set<String> sslProtocols = new HashSet<>();
+    private Set<String> protocols = new HashSet<>();
 
 
     public void setHostName(String hostName) {
@@ -38,24 +38,24 @@ public class SSLHostConfig {
     }
 
 
-    public void setProtocols(String protocols) {
+    public void setProtocols(String input) {
         // OpenSSL and JSSE use the same names.
-        if (protocols.trim().equalsIgnoreCase("all")) {
-            protocols = "TLSv1+TLSv1.1+TLSv1.2";
+        if (input.trim().equalsIgnoreCase("all")) {
+            input = "TLSv1+TLSv1.1+TLSv1.2";
         }
 
-        String[] values = protocols.split(",|\\+");
+        String[] values = input.split(",|\\+");
 
         for (String value: values) {
             String trimmed = value.trim();
             if (trimmed.length() > 0) {
-                sslProtocols.add(trimmed);
+                protocols.add(trimmed);
             }
         }
     }
 
 
-    public Set<String> getSslProtocols() {
-        return sslProtocols;
+    public Set<String> getProtocols() {
+        return protocols;
     }
 }

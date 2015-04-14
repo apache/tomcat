@@ -327,12 +327,18 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ----------------------------------------------- HTTPS specific properties
     // -------------------------------------------- Handled via an SSLHostConfig
 
+    @Override
+    public void addSslHostConfig(SSLHostConfig sslHostConfig) {
+        getEndpoint().addSslHostConfig(sslHostConfig);
+    }
+
+
     private SSLHostConfig defaultSSLHostConfig = null;
     private void registerDefaultSSLHostConfig() {
         if (defaultSSLHostConfig == null) {
             defaultSSLHostConfig = new SSLHostConfig();
             defaultSSLHostConfig.setHostName(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
-            getEndpoint().addHostConfig(defaultSSLHostConfig);
+            getEndpoint().addSslHostConfig(defaultSSLHostConfig);
         }
     }
 
