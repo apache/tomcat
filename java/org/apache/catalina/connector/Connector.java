@@ -35,6 +35,7 @@ import org.apache.coyote.ProtocolHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -851,6 +852,10 @@ public class Connector extends LifecycleMBeanBase  {
         return "Internal";
     }
 
+
+    public void addSslHostConfig(SSLHostConfig sslHostConfig) {
+        protocolHandler.addSslHostConfig(sslHostConfig);
+    }
     // --------------------------------------------------------- Public Methods
 
 

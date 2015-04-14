@@ -24,6 +24,7 @@ import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -125,6 +126,15 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
             this.packetSize = packetSize;
         }
     }
+
+
+    // --------------------------------------------- SSL is not supported in AJP
+
+    @Override
+    public void addSslHostConfig(SSLHostConfig sslHostConfig) {
+        getLog().warn(sm.getString("ajpprotocol.noSSL", sslHostConfig.getHostName()));
+    }
+
 
     protected void configureProcessor(AjpProcessor processor) {
         processor.setAdapter(getAdapter());

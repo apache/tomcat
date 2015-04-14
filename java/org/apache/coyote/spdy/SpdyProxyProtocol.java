@@ -31,6 +31,7 @@ import org.apache.tomcat.spdy.SpdyContext.SpdyHandler;
 import org.apache.tomcat.spdy.SpdyStream;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
+import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -142,5 +143,10 @@ public class SpdyProxyProtocol extends AbstractProtocol<NioChannel> {
     protected UpgradeProtocol getNegotiatedProtocol(String name) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void addSslHostConfig(SSLHostConfig sslHostConfig) {
+        // TODO Auto-generated method stub
     }
 }
