@@ -142,14 +142,14 @@ public class Introspection {
         try {
             clazz = cl.loadClass(className);
         } catch (ClassNotFoundException e) {
-            log.debug(sm.getString("introspection.classLoadFailed"), e);
+            log.debug(sm.getString("introspection.classLoadFailed", className), e);
         } catch (NoClassDefFoundError e) {
-            log.debug(sm.getString("introspection.classLoadFailed"), e);
+            log.debug(sm.getString("introspection.classLoadFailed", className), e);
         } catch (ClassFormatError e) {
-            log.debug(sm.getString("introspection.classLoadFailed"), e);
+            log.debug(sm.getString("introspection.classLoadFailed", className), e);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.debug(sm.getString("introspection.classLoadFailed"), t);
+            log.debug(sm.getString("introspection.classLoadFailed", className), t);
         }
         return clazz;
     }
