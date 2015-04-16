@@ -94,6 +94,11 @@
         <bug>57801</bug>: Improve the error message in the start script in case
         the PID read from the PID file is already owned by a process. (rjung)
       </fix>
+      <fix>
+        <bug>57824</bug>: Correct a regression in the fix for <bug>57252</bug>
+        that broke request listeners for non-async requests that triggered an
+        error that was handled by the ErrorReportingValve. (markt/violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
