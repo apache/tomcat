@@ -957,59 +957,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             }
         }
 
-        // TODO: NIO2 style scatter/gather methods.
-
-        public enum CompletionState {
-            /**
-             * Operation is still pending.
-             */
-            PENDING,
-            /**
-             * The operation completed inline.
-             */
-            INLINE,
-            /**
-             * The operation completed, but not inline.
-             */
-            DONE
-        }
-
-        public enum CompletionHandlerCall {
-            /**
-             * Operation should continue, the completion handler shouldn't be
-             * called.
-             */
-            CONTINUE,
-            /**
-             * The operation completed but the completion handler shouldn't be
-             * called.
-             */
-            NONE,
-            /**
-             * The operation is complete, the completion handler should be
-             * called.
-             */
-            DONE
-        }
-
-        public interface CompletionCheck {
-            /**
-             * Return true if enough data has been read or written and the
-             * handler should be notified. Return false if the IO is
-             * incomplete (data has not been fully written while it should,
-             * or more data read is needed for further processing) and should
-             * be continued before the completion handler is called.
-             *
-             * @param state of the operation (done or done inline since the
-             *        IO call is done)
-             * @param buffers ByteBuffer[] that has been passed to the
-             *        original IO call
-             * @param offset that has been passed to the original IO call
-             * @param length that has been passed to the original IO call
-             */
-            public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length);
-        }
-
         /**
          * Internal state tracker for scatter/gather operations.
          */
@@ -1140,92 +1087,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             }
         }
 
-        /**
-         * This utility CompletionCheck will cause the write to fully write
-         * all remaining data. If the operation completes inline, the
-         * completion handler will not be called.
-         */
-        public static final CompletionCheck COMPLETE_WRITE = new CompletionCheck() {
-            @Override
-            public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length) {
-                for (int i = 0; i < offset; i++) {
-                    if (buffers[i].remaining() > 0) {
-                        return CompletionHandlerCall.CONTINUE;
-                    }
-                }
-                return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE : CompletionHandlerCall.NONE;
-            }
-        };
-
-        /**
-         * This utility CompletionCheck will cause the completion handler
-         * to be called once some data has been read. If the operation
-         * completes inline, the completion handler will not be called.
-         */
-        public static final CompletionCheck READ_DATA = new CompletionCheck() {
-            @Override
-            public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length) {
-                return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE : CompletionHandlerCall.NONE;
-            }
-        };
-
-        /**
-         * Scatter read. The completion handler will be called once some
-         * data has been read or an error occurred. If a CompletionCheck
-         * object has been provided, the completion handler will only be
-         * called if the callHandler method returned true. If no
-         * CompletionCheck object has been provided, the ddefault NIO2
-         * behavior is used: the completion handler will be called as soon
-         * as some data has been read, even if the read has completed inline.
-         *
-         * @param block true to block until any pending read is done, if the
-         *        timeout occurs and a read is still pending, a
-         *        ReadPendingException will be thrown; false to
-         *        not block but any pending read operation will cause
-         *        a ReadPendingException
-         * @param timeout
-         * @param unit
-         * @param attachment
-         * @param check for the IO operation completion
-         * @param handler to call when the IO is complete
-         * @param dsts buffers
-         * @return the completion state (done, done inline, or still pending)
-         */
-        // FIXME: @Override
-        public <A> CompletionState read(boolean block, long timeout, TimeUnit unit, A attachment,
-                CompletionCheck check, CompletionHandler<Long, ? super A> handler,
-                ByteBuffer... dsts) {
-            if (dsts == null) {
-                throw new IllegalArgumentException();
-            }
-            return read(dsts, 0, dsts.length, block, timeout, unit, attachment, check, handler);
-        }
-
-        /**
-         * Scatter read. The completion handler will be called once some
-         * data has been read or an error occurred. If a CompletionCheck
-         * object has been provided, the completion handler will only be
-         * called if the callHandler method returned true. If no
-         * CompletionCheck object has been provided, the ddefault NIO2
-         * behavior is used: the completion handler will be called as soon
-         * as some data has been read, even if the read has completed inline.
-         *
-         * @param dsts buffers
-         * @param offset in the buffer array
-         * @param length in the buffer array
-         * @param block true to block until any pending read is done, if the
-         *        timeout occurs and a read is still pending, a
-         *        ReadPendingException will be thrown; false to
-         *        not block but any pending read operation will cause
-         *        a ReadPendingException
-         * @param timeout
-         * @param unit
-         * @param attachment
-         * @param check for the IO operation completion
-         * @param handler to call when the IO is complete
-         * @return the completion state (done, done inline, or still pending)
-         */
-        // FIXME: @Override
+        @Override
         public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
                 boolean block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
@@ -1244,72 +1106,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             return state.state;
         }
 
-        // FIXME: @Override
+        @Override
         public boolean isWritePending() {
             synchronized (writeCompletionHandler) {
                 return writePending.availablePermits() == 0;
             }
         }
 
-        /**
-         * Gather write. The completion handler will be called once some
-         * data has been written or an error occurred. If a CompletionCheck
-         * object has been provided, the completion handler will only be
-         * called if the callHandler method returned true. If no
-         * CompletionCheck object has been provided, the ddefault NIO2
-         * behavior is used: the completion handler will be called, even
-         * if the write is incomplete and data remains in the buffers, or
-         * if the write completed inline.
-         *
-         * @param block true to block until any pending write is done, if the
-         *        timeout occurs and a write is still pending, a
-         *        WritePendingException will be thrown; false to
-         *        not block but any pending write operation will cause
-         *        a WritePendingException
-         * @param timeout
-         * @param unit
-         * @param attachment
-         * @param check for the IO operation completion
-         * @param handler to call when the IO is complete
-         * @param srcs buffers
-         * @return the completion state (done, done inline, or still pending)
-         */
-        // FIXME: @Override
-        public <A> CompletionState write(boolean block, long timeout, TimeUnit unit, A attachment,
-                CompletionCheck check, CompletionHandler<Long, ? super A> handler,
-                ByteBuffer... srcs) {
-            if (srcs == null) {
-                throw new IllegalArgumentException();
-            }
-            return write(srcs, 0, srcs.length, block, timeout, unit, attachment, check, handler);
-        }
-
-        /**
-         * Gather write. The completion handler will be called once some
-         * data has been written or an error occurred. If a CompletionCheck
-         * object has been provided, the completion handler will only be
-         * called if the callHandler method returned true. If no
-         * CompletionCheck object has been provided, the ddefault NIO2
-         * behavior is used: the completion handler will be called, even
-         * if the write is incomplete and data remains in the buffers, or
-         * if the write completed inline.
-         *
-         * @param srcs buffers
-         * @param offset in the buffer array
-         * @param length in the buffer array
-         * @param block true to block until any pending write is done, if the
-         *        timeout occurs and a write is still pending, a
-         *        WritePendingException will be thrown; false to
-         *        not block but any pending write operation will cause
-         *        a WritePendingException
-         * @param timeout
-         * @param unit
-         * @param attachment
-         * @param check for the IO operation completion
-         * @param handler to call when the IO is complete
-         * @return the completion state (done, done inline, or still pending)
-         */
-        // FIXME: @Override
+        @Override
         public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
                 boolean block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
@@ -1327,8 +1131,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             }
             return state.state;
         }
-
-        // TODO: End NIO2 style scatter/gather methods.
 
         /* Callers of this method must:
          * - have acquired the readPending semaphore

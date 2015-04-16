@@ -20,6 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
+import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -2892,5 +2894,31 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     ((AprEndpoint)getEndpoint()).getSSLVerifyDepth());
             SSLSocket.renegotiate(socket);
         }
+
+
+        @Override
+        public boolean isWritePending() {
+            return false;
+        }
+
+
+        @Override
+        public <A> CompletionState read(ByteBuffer[] dsts, int offset,
+                int length, boolean block, long timeout, TimeUnit unit,
+                A attachment, CompletionCheck check,
+                CompletionHandler<Long, ? super A> handler) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <A> CompletionState write(ByteBuffer[] srcs, int offset,
+                int length, boolean block, long timeout, TimeUnit unit,
+                A attachment, CompletionCheck check,
+                CompletionHandler<Long, ? super A> handler) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
     }
 }
