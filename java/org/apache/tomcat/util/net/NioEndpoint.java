@@ -26,6 +26,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
+import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -1498,6 +1499,29 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     log.warn(sm.getString("http11processor.socket.sslreneg",ioe));
                 }
             }
+        }
+
+        @Override
+        public boolean isWritePending() {
+            return false;
+        }
+
+        @Override
+        public <A> CompletionState read(ByteBuffer[] dsts, int offset,
+                int length, boolean block, long timeout, TimeUnit unit,
+                A attachment, CompletionCheck check,
+                CompletionHandler<Long, ? super A> handler) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public <A> CompletionState write(ByteBuffer[] srcs, int offset,
+                int length, boolean block, long timeout, TimeUnit unit,
+                A attachment, CompletionCheck check,
+                CompletionHandler<Long, ? super A> handler) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
         }
     }
 
