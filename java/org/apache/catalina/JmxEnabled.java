@@ -28,7 +28,7 @@ import javax.management.ObjectName;
 public interface JmxEnabled extends MBeanRegistration {
 
     /**
-     * Obtain the domain under which this component will be / has been
+     * @return the domain under which this component will be / has been
      * registered.
      */
     String getDomain();
@@ -38,12 +38,15 @@ public interface JmxEnabled extends MBeanRegistration {
      * Specify the domain under which this component should be registered. Used
      * with components that cannot (easily) navigate the component hierarchy to
      * determine the correct domain to use.
+     *
+     * @param domain The name of the domain under which this component should be
+     *               registered
      */
     void setDomain(String domain);
 
 
     /**
-     * Obtain the name under which this component has been registered with JMX.
+     * @return the name under which this component has been registered with JMX.
      */
     ObjectName getObjectName();
 }

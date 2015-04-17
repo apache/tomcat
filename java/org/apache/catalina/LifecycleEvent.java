@@ -14,19 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
-
 
 import java.util.EventObject;
 
-
 /**
  * General event for notifying listeners of significant changes on a component
- * that implements the Lifecycle interface.  In particular, this will be useful
- * on Containers, where these events replace the ContextInterceptor concept in
- * Tomcat 3.x.
+ * that implements the Lifecycle interface.
  *
  * @author Craig R. McClanahan
  */
@@ -34,8 +28,6 @@ public final class LifecycleEvent extends EventObject {
 
     private static final long serialVersionUID = 1L;
 
-
-    // ----------------------------------------------------------- Constructors
 
     /**
      * Construct a new LifecycleEvent with the specified parameters.
@@ -45,14 +37,10 @@ public final class LifecycleEvent extends EventObject {
      * @param data Event data (if any)
      */
     public LifecycleEvent(Lifecycle lifecycle, String type, Object data) {
-
         super(lifecycle);
         this.type = type;
         this.data = data;
     }
-
-
-    // ----------------------------------------------------- Instance Variables
 
 
     /**
@@ -67,37 +55,26 @@ public final class LifecycleEvent extends EventObject {
     private final String type;
 
 
-    // ------------------------------------------------------------- Properties
-
-
     /**
-     * Return the event data of this event.
+     * @return the event data of this event.
      */
     public Object getData() {
-
-        return (this.data);
-
+        return data;
     }
 
 
     /**
-     * Return the Lifecycle on which this event occurred.
+     * @return the Lifecycle on which this event occurred.
      */
     public Lifecycle getLifecycle() {
-
         return (Lifecycle) getSource();
-
     }
 
 
     /**
-     * Return the event type of this event.
+     * @return the event type of this event.
      */
     public String getType() {
-
-        return (this.type);
-
+        return this.type;
     }
-
-
 }
