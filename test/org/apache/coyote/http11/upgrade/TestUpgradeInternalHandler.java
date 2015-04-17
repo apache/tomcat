@@ -184,7 +184,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
     }
 
 
-    public static class EchoAsync implements HttpUpgradeHandler, InternalHttpUpgradeHandler {
+    public static class EchoAsync implements InternalHttpUpgradeHandler {
         private SocketWrapperBase<?> wrapper;
         @Override
         public void init(WebConnection connection) {
