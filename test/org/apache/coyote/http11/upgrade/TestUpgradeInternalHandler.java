@@ -16,8 +16,6 @@
  */
 package org.apache.coyote.http11.upgrade;
 
-import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +37,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
+import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Test;
+
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -46,9 +50,6 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Test;
 
 public class TestUpgradeInternalHandler extends TomcatBaseTest {
 
