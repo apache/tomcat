@@ -129,15 +129,15 @@
      <p>When deploying a web application that provides management functions for
      the Tomcat instance, the following guidelines should be followed:</p>
      <ul>
-       <ol>Ensure that any users permitted to access the management application
-           have strong passwords.</ol>
-       <ol>Do not remove the use of the <a
+       <li>Ensure that any users permitted to access the management application
+           have strong passwords.</li>
+       <li>Do not remove the use of the <a
            href="config/realm.html#LockOut_Realm_-_org.apache.catalina.realm.LockOutRealm">LockOutRealm</a>
-           which prevents brute force attacks against user passwords.</ol>
-       <ol>Uncomment the <a href="config/valve.html#Remote_Address_Filter">RemoteAddrValve</a>
+           which prevents brute force attacks against user passwords.</li>
+       <li>Uncomment the <a href="config/valve.html#Remote_Address_Filter">RemoteAddrValve</a>
            in <code>/META-INF/context.xml</code> which limits access to
            localhost. If remote access is required, limit it to specific IP
-           addresses using this valve.</ol>
+           addresses using this valve.</li>
      </ul>
    </subsection>
   </section>
