@@ -21,9 +21,9 @@ import java.util.Set;
 
 public class SSLHostConfig {
 
-    public static final String DEFAULT_SSL_HOST_NAME = "*DEFAULT*";
+    public static final String DEFAULT_SSL_HOST_NAME = "_default_";
 
-    private String hostName;
+    private String hostName = DEFAULT_SSL_HOST_NAME;
 
     private Set<String> protocols = new HashSet<>();
 

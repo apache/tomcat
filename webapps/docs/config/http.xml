@@ -85,6 +85,15 @@
       30000 (30 seconds).</p>
     </attribute>
 
+    <attribute name="defaultSSLHostConfigName" required="false">
+      <p>The name of the default <strong>SSLHostConfig</strong> that will be
+      used for secure connections (if this connector is configured for secure
+      connections) if the client connection does not provide SNI or if the SNI
+      is provided but does not match any configured
+      <strong>SSLHostConfig</strong>. If not specified the default value of
+      <code>_default_</code> will be used.</p>
+    </attribute>
+
     <attribute name="enableLookups" required="false">
       <p>Set to <code>true</code> if you want calls to
       <code>request.getRemoteHost()</code> to perform DNS lookups in
@@ -946,7 +955,14 @@
 
 <section name="Nested Components">
 
-  <p>None at this time.</p>
+  <p>Starting with Tomcat 9, Tomcat supports Server Name Indication (SNI). This
+  allows multiple SSL configurations to be associated with a single secure
+  connector with the configuration used for any given connection determined by
+  the host name requested by the client. To facilitate this, Tomcat 9 added the
+  <strong>SSLHostConfig</strong> element which can be used to define one of
+  these configurations. Any number of <strong>SSLHostConfig</strong> may be
+  nested in a <strong>Connector</strong>. For further information, see the
+  SSL Support section below.</p>
 
 </section>
 
@@ -991,7 +1007,6 @@
   </subsection>
 
 
-
   <subsection name="SSL Support">
 
   <p>You can enable SSL support for a particular instance of this
@@ -1002,15 +1017,55 @@
   attributes to the values <code>https</code> and <code>true</code>
   respectively, to pass correct information to the servlets.</p>
 
-  <p>The NIO and NIO2 connectors use the JSSE SSL whereas the APR/native
-  connector uses OpenSSL. Therefore, in addition to using different attributes
-  to configure SSL, the APR/native connector also requires keys and certificates
-  to be provided in a different format.</p>
+  <p>The NIO and NIO2 connectors use the JSSE SSL implementation whereas the
+  APR/native connector uses OpenSSL. Prior to Tomcat 9, different configuration
+  attributes were used for JSSE and OpenSSL. From Tomcat 9 onwards, and as far
+  as possible, common configuration attributes are used for both JSSE and
+  OpenSSL. This is to aid simpler switching between connector implementations
+  for SSL connectors.</p>
+
+  <p>Each secure connector must define at least one
+  <strong>SSLHostConfig</strong>. The names of the
+  <strong>SSLHostConfig</strong> elements must be unique and one of the must
+  match the <code>sslDefaultHost</code> attribute of the
+  <strong>Connector</strong>.</p>
+
+  <p>As of Tomcat 9, the SSL configuration attributes in the
+  <strong>Connector</strong> are deprecated. If specified, thwy will be used to
+  configure a <strong>SSLHostConfig</strong> for the
+  <code>sslDefaultHost</code>. Note that if an explicit
+  <strong>SSLHostConfig</strong> element also exists for the
+  <code>sslDefaultHost</code> then that will be treated as a configuration
+  error. It is expected that Tomcat 10 will drop support for the SSL
+  configuration attributes in the <strong>Connector</strong></p>.
 
   <p>For more information, see the
   <a href="../ssl-howto.html">SSL Configuration HOW-TO</a>.</p>
 
-  <subsection name="SSL Support - NIO and NIO2">
+  </subsection>
+
+  <subsection name="SSL Support - SSLHostConfig">
+
+  <p></p>
+
+  <attributes>
+
+    <attribute name="hostName" required="true">
+      <p>The name of the SSL Host. This should either be the fully qualified
+      domain name (e.g. <code>tomcat.apache.org</code>) or a wild card domain
+      name (e.g. <code>*.apache.org</code>). If not specified, the default value
+      of <code>_default_</code> will be used.</p>
+    </attribute>
+
+    <attribute name="protocols" required="false">
+      <p></p>
+    </attribute>
+
+  </attributes>
+
+  </subsection>
+
+  <subsection name="SSL Support - NIO and NIO2 (deprecated)">
 
   <p>The NIO and NIO2 connectors use the following attributes to configure SSL:
   </p>
@@ -1226,7 +1281,7 @@
 
   </subsection>
 
-  <subsection name="SSL Support - APR/Native">
+  <subsection name="SSL Support - APR/Native (deprecated)">
 
   <p>When APR/native is enabled, the HTTPS connector will use a socket poller
   for keep-alive, increasing scalability of the server. It also uses OpenSSL,
@@ -1360,7 +1415,6 @@
 
   </subsection>
 
-  </subsection>
   <subsection name="Connector Comparison">
 
     <p>Below is a small chart that shows how the connectors differentiate.</p>
