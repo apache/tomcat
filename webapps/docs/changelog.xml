@@ -153,6 +153,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Fix a concurrency issue when a backup message that has all session data
+        and a backup message that has diff data are processing at the same time.
+        This fix ensures that <code>MapOwner</code> is set to
+        <code>ReplicatedMapEntry</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.61 (violetagg)" rtext="released 2015-04-07">
   <subsection name="Catalina">

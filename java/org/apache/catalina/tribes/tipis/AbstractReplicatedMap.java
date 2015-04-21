@@ -675,8 +675,17 @@ public abstract class AbstractReplicatedMap<K,V>
                             diff.unlock();
                         }
                     } else {
-                        if ( mapmsg.getValue()!=null ) entry.setValue((V) mapmsg.getValue());
-                        ((ReplicatedMapEntry)entry.getValue()).setOwner(getMapOwner());
+                        if ( mapmsg.getValue()!=null ) {
+                            if (mapmsg.getValue() instanceof ReplicatedMapEntry) {
+                                ReplicatedMapEntry re = (ReplicatedMapEntry)mapmsg.getValue();
+                                re.setOwner(getMapOwner());
+                                entry.setValue((V) re);
+                            } else {
+                                entry.setValue((V) mapmsg.getValue());
+                            }
+                        } else {
+                            ((ReplicatedMapEntry)entry.getValue()).setOwner(getMapOwner());
+                        }
                     } //end if
                 } else if  (mapmsg.getValue() instanceof ReplicatedMapEntry) {
                     ReplicatedMapEntry re = (ReplicatedMapEntry)mapmsg.getValue();
