@@ -1050,7 +1050,7 @@
 
   <attributes>
 
-    <attribute name="hostName" required="true">
+    <attribute name="hostName" required="false">
       <p>The name of the SSL Host. This should either be the fully qualified
       domain name (e.g. <code>tomcat.apache.org</code>) or a wild card domain
       name (e.g. <code>*.apache.org</code>). If not specified, the default value
@@ -1058,7 +1058,20 @@
     </attribute>
 
     <attribute name="protocols" required="false">
-      <p></p>
+      <p>The names of the protocols to support when communicating with clients.
+      This should be a comma separated list of any combination of the following:
+      </p>
+      <ul><li>SSLv2Hello</li><li>SSLv2</li><li>SSLv3</li><li>TLSv1</li>
+          <li>TLSv1.1</li><li>TLSv1.2</li><li>all</li></ul>
+      <p>Note that OpenSSL based secure connectors will always support
+      <code>SSLv2Hello</code> regardless of whether or not it is included in the
+      value for this attribute.</p>
+      <p>Note that <code>all</code> is an alias for
+      <code>TLSv1,TLSv1.1,TLSv1.2</code>.</p>
+      <p>Note that <code>SSLv2</code> and <code>SSLv3</code> are inherently
+      unsafe.</p>
+      <p>If not specified, the default value of <code>all</code> will be
+      used.</p>
     </attribute>
 
   </attributes>
@@ -1191,16 +1204,9 @@
     </attribute>
 
     <attribute name="sslEnabledProtocols" required="false">
-      <p>The comma separated list of SSL protocols to support for HTTPS
-      connections. If specified, only the protocols that are listed and
-      supported by the SSL implementation will be enabled. If not specified,
-      the JVM default (excluding SSLv2 and SSLv3 if the JVM enables either or
-      both of them by default) is used. The permitted values may be obtained
-      from the JVM documentation for the allowed values for
-      <code>SSLSocket.setEnabledProtocols()</code> e.g.
-      <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#jssenames">
-      Oracle Java 7</a>. Note: There is overlap between this attribute and
-      <code>sslProtocol</code>.</p>
+      <p>This is an alias for the <code>protocols</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="sslImplementationName" required="false">
@@ -1386,13 +1392,9 @@
     </attribute>
 
     <attribute name="SSLProtocol" required="false">
-      <p>Protocol which may be used for communicating with clients. The default
-      value is <code>all</code>, which is equivalent to <code>TLSv1+TLSv1.1+TLSv1.2</code>
-      with other acceptable values being <code>SSLv2</code>,
-      <code>SSLv3</code>, <code>TLSv1</code>, <code>TLSv1.1</code>, <code>TLSv1.2</code>
-      and any combination of these protocols concatenated with a plus sign.
-      Note that both protocols <code>SSLv2</code> and <code>SSLv3</code> are
-      inherently unsafe.</p>
+      <p>This is an alias for the <code>protocols</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="SSLVerifyClient" required="false">
