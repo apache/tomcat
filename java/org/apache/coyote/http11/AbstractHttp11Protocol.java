@@ -302,8 +302,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     /**
-     * Maximum number of requests which can be performed over a keepalive
-     * connection. The default is the same as for Apache HTTP Server.
+     * @return The maximum number of requests which can be performed over a
+     *         keep-alive connection. The default is the same as for Apache HTTP
+     *         Server (100).
      */
     public int getMaxKeepAliveRequests() {
         return getEndpoint().getMaxKeepAliveRequests();
@@ -327,6 +328,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ----------------------------------------------- HTTPS specific properties
     // -------------------------------------------- Handled via an SSLHostConfig
 
+    private String defaultSSLHostConfigName = SSLHostConfig.DEFAULT_SSL_HOST_NAME;
+    public String getDefaultSSLHostConfigName() {
+        return defaultSSLHostConfigName;
+    }
+    public void setDefaultSSLHostConfigName(String defaultSSLHostConfigName) {
+        this.defaultSSLHostConfigName = defaultSSLHostConfigName;
+    }
+
+
     @Override
     public void addSslHostConfig(SSLHostConfig sslHostConfig) {
         getEndpoint().addSslHostConfig(sslHostConfig);
@@ -337,7 +347,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     private void registerDefaultSSLHostConfig() {
         if (defaultSSLHostConfig == null) {
             defaultSSLHostConfig = new SSLHostConfig();
-            defaultSSLHostConfig.setHostName(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
+            defaultSSLHostConfig.setHostName(getDefaultSSLHostConfigName());
             getEndpoint().addSslHostConfig(defaultSSLHostConfig);
         }
     }
