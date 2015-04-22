@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.net.ssl.KeyManager;
@@ -119,8 +120,13 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         if (managers==null) return null;
         KeyManager[] result = new KeyManager[managers.length];
         for (int i=0; i<result.length; i++) {
-            if (managers[i] instanceof X509KeyManager && getKeyAlias()!=null) {
-                result[i] = new NioX509KeyManager((X509KeyManager)managers[i],getKeyAlias());
+            if (managers[i] instanceof X509KeyManager && getKeyAlias() != null) {
+                String keyAlias = getKeyAlias();
+                // JKS keystores always convert the alias name to lower case
+                if ("jks".equalsIgnoreCase(getKeystoreType())) {
+                    keyAlias = keyAlias.toLowerCase(Locale.ENGLISH);
+                }
+                result[i] = new NioX509KeyManager((X509KeyManager) managers[i], keyAlias);
             } else {
                 result[i] = managers[i];
             }
