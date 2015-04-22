@@ -21,6 +21,7 @@ import java.security.Principal;
 import org.apache.catalina.Container;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.authenticator.SingleSignOnEntry;
 import org.apache.catalina.authenticator.SingleSignOnSessionKey;
@@ -99,6 +100,15 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
 
 
     // ---------------------------------------------------- SingleSignOn Methods
+
+    @Override
+    protected boolean associate(String ssoId, Session session) {
+        boolean result = super.associate(ssoId, session);
+        if (result) {
+            ((ReplicatedMap<String,SingleSignOnEntry>) cache).replicate(ssoId, true);
+        }
+        return result;
+    }
 
     @Override
     protected boolean update(String ssoId, Principal principal, String authType,
