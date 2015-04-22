@@ -162,7 +162,6 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
                     rpcTimeout, cluster.getClusterName() + "-SSO-cache", cls);
             reverse = new ReplicatedMap<SingleSignOnSessionKey, String>(this, cluster.getChannel(),
                     rpcTimeout, cluster.getClusterName() + "-SSO-reverse", cls);
-
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             throw new LifecycleException(
@@ -187,7 +186,6 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
 
         if (getCluster() != null) {
             ((ReplicatedMap<?,?>) cache).breakdown();
-            ((ReplicatedMap<?,?>) reverse).breakdown();
         }
     }
 }

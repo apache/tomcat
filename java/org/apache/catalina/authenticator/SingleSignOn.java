@@ -32,7 +32,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
-import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -60,7 +59,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-public class SingleSignOn extends ValveBase implements SessionListener {
+public class SingleSignOn extends ValveBase {
 
     protected static final boolean LAST_ACCESS_AT_START;
 
@@ -114,6 +113,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
     private boolean requireReauthentication = false;
 
     /**
+<<<<<<< .working
      * The cache of single sign on identifiers, keyed by the Session that is
      * associated with them.
      */
@@ -122,6 +122,8 @@ public class SingleSignOn extends ValveBase implements SessionListener {
 
 
     /**
+=======
+>>>>>>> .merge-right.r1646757
      * Optional SSO cookie domain.
      */
     private String cookieDomain;
@@ -221,69 +223,14 @@ public class SingleSignOn extends ValveBase implements SessionListener {
     }
 
 
-    // ------------------------------------------------ SessionListener Methods
-
-    /**
-     * Acknowledge the occurrence of the specified event.
-     *
-     * @param event SessionEvent that has occurred
-     */
-    @Override
-    public void sessionEvent(SessionEvent event) {
-
-        if (!getState().isAvailable()) {
-            return;
-        }
-
-        // We only care about session destroyed events
-        if (!Session.SESSION_DESTROYED_EVENT.equals(event.getType())) {
-            return;
-        }
-
-        // Look up the single session id associated with this session (if any)
-        Session session = event.getSession();
-        if (containerLog.isDebugEnabled())
-            containerLog.debug("Process session destroyed on " + session);
-
-        String ssoId = null;
-        ssoId = reverse.get(new SingleSignOnSessionKey(session));
-        if (ssoId == null)
-            return;
-
-        // Was the session destroyed as the result of a timeout or context stop?
-        // If so, we'll just remove the expired session from the SSO. If the
-        // session was logged out, we'll log out of all session associated with
-        // the SSO.
-        long idle;
-        if (LAST_ACCESS_AT_START) {
-            idle = session.getLastAccessedTimeInternal();
-        } else {
-            idle = session.getThisAccessedTimeInternal();
-        }
-        if (((session.getMaxInactiveInterval() > 0)
-            && idle >= session.getMaxInactiveInterval() * 1000) 
-            || (!session.getManager().getContainer().getState().isAvailable())) {
-            removeSession(ssoId, session);
-        } else {
-            // The session was logged out.
-            // Deregister this single session id, invalidating 
-            // associated sessions
-            deregister(ssoId);
-        }
-    }
-
-
     // ---------------------------------------------------------- Valve Methods
-
 
     /**
      * Return descriptive information about this Valve implementation.
      */
     @Override
     public String getInfo() {
-
-        return (info);
-
+        return info;
     }
 
 
@@ -382,6 +329,43 @@ public class SingleSignOn extends ValveBase implements SessionListener {
     // ------------------------------------------------------ Protected Methods
 
     /**
+     * Process a session destroyed event by removing references to that session
+     * from the caches and - if the session destruction is the result of a
+     * logout - destroy the associated SSO session.
+     *
+     * @param ssoId   The ID of the SSO session which which the destroyed
+     *                session was associated
+     * @param session The session that has been destroyed
+     */
+    public void sessionDestroyed(String ssoId, Session session) {
+
+        if (!getState().isAvailable()) {
+            return;
+        }
+
+        if (containerLog.isDebugEnabled()) {
+            containerLog.debug("Process session destroyed on " + session);
+        }
+
+        // Was the session destroyed as the result of a timeout or context stop?
+        // If so, we'll just remove the expired session from the SSO. If the
+        // session was logged out, we'll log out of all session associated with
+        // the SSO.
+        if (((session.getMaxInactiveInterval() > 0)
+            && (System.currentTimeMillis() - session.getThisAccessedTimeInternal() >=
+                session.getMaxInactiveInterval() * 1000))
+            || (!((Context)session.getManager().getContainer()).getState().isAvailable())) {
+            removeSession(ssoId, session);
+        } else {
+            // The session was logged out.
+            // Deregister this single session id, invalidating
+            // associated sessions
+            deregister(ssoId);
+        }
+    }
+
+
+    /**
      * Associate the specified single sign on identifier with the
      * specified Session.
      *
@@ -400,7 +384,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         if (sso == null) {
             return false;
         } else {
-            reverse.put(new SingleSignOnSessionKey(session), ssoId);
+            sso.addSession(this, ssoId, session);
             return true;
         }
     }
@@ -427,8 +411,6 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         for (SingleSignOnSessionKey ssoKey : sso.findSessions()) {
             if (containerLog.isTraceEnabled())
                 containerLog.trace(" Invalidating session " + ssoKey);
-            // Remove from reverse cache first to avoid recursion
-            reverse.remove(ssoKey);
             // Invalidate this session
             expire(ssoKey);
         }
@@ -609,14 +591,16 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         // Remove the inactive session from SingleSignOnEntry
         entry.removeSession(session);
 
-        // Remove the inactive session from the 'reverse' Map.
-        reverse.remove(new SingleSignOnSessionKey(session));
-
         // If there are not sessions left in the SingleSignOnEntry,
         // deregister the entry.
         if (entry.findSessions().size() == 0) {
             deregister(ssoId);
         }
+    }
+
+
+    protected SessionListener getSessionListener(String ssoId) {
+        return new SingleSignOnListener(ssoId);
     }
 
 
