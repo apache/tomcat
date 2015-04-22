@@ -118,6 +118,10 @@
         Add new attribute that send all actions for session across Tomcat
         cluster nodes. (kfujino)
       </add>
+      <fix>
+        Remove unused <code>pathname</code> attribute in mbean definition of
+        <code>BackupManager</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

@@ -511,10 +511,6 @@
       description="Send session attribute change events on backup nodes"
       type="boolean"/>
     <attribute
-      name="pathname"
-      description="Path name of the disk file in which active sessions"
-      type="java.lang.String"/>
-    <attribute
       name="processExpiresFrequency"
       description="The frequency of the manager checks (expiration and passivation)"
       type="int"/>
