@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.ha.authenticator;
 
+import java.security.Principal;
+
 import org.apache.catalina.Container;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
@@ -93,6 +95,19 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
     }
     public void setRpcTimeout(long rpcTimeout) {
         this.rpcTimeout = rpcTimeout;
+    }
+
+
+    // ---------------------------------------------------- SingleSignOn Methods
+
+    @Override
+    protected boolean update(String ssoId, Principal principal, String authType,
+            String username, String password) {
+        boolean result = super.update(ssoId, principal, authType, username, password);
+        if (result) {
+            ((ReplicatedMap<String,SingleSignOnEntry>) cache).replicate(ssoId, true);
+        }
+        return result;
     }
 
 

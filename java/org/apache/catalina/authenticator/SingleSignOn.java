@@ -568,8 +568,11 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      *                  DIGEST or FORM)
      * @param username  the username (if any) used for the authentication
      * @param password  the password (if any) used for the authentication
+     *
+     * @return <code>true</code> if the crednetials were updated, otherwise
+     *         <code>false</code>
      */
-    protected void update(String ssoId, Principal principal, String authType,
+    protected boolean update(String ssoId, Principal principal, String authType,
                           String username, String password) {
 
         SingleSignOnEntry sso = cache.get(ssoId);
@@ -578,7 +581,9 @@ public class SingleSignOn extends ValveBase implements SessionListener {
                 containerLog.debug("Update sso id " + ssoId + " to auth type " + authType);
 
             sso.updateCredentials(principal, authType, username, password);
+            return true;
         }
+        return false;
     }
 
 
