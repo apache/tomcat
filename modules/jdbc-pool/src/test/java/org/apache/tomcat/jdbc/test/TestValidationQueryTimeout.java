@@ -238,7 +238,10 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
             return false;
         }
 
-        @Override
+        /**
+         * @return <code>null</code>
+         * @throws SQLFeatureNotSupportedException
+         */
         public Logger getParentLogger() throws SQLFeatureNotSupportedException {
             return null;
         }
