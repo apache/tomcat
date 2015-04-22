@@ -122,6 +122,16 @@
         <p>Java class name of the implementation to use.  This MUST be set to
         <strong>org.apache.catalina.ha.authenticator.ClusterSingleSignOn</strong>.</p>
       </attribute>
+      <attribute name="cookieDomain" required="false">
+        <p>Sets the host domain to be used for sso cookies.</p>
+      </attribute>
+      <attribute name="mapSendOptions" required="false">
+        <p>The Valve uses a replicated map. You can setup the flag for how this
+        map sends messages. The default value is <code>6</code> (synchronous).
+        Note that if you use asynchronous messaging it is possible for update
+        messages to be processed by the receiving node in a different order to
+        the order in which they were sent.</p>
+      </attribute>
       <attribute name="requireReauthentication" required="false">
         <p>Default false. Flag to determine whether each request needs to be
         reauthenticated to the security <strong>Realm</strong>. If "true", this
@@ -131,8 +141,20 @@
         requests based on the presence of a valid SSO cookie, without
         rechecking with the <strong>Realm</strong>.</p>
       </attribute>
-      <attribute name="cookieDomain" required="false">
-        <p>Sets the host domain to be used for sso cookies.</p>
+      <attribute name="rpcTimeout" required="false">
+        <p>The Valve uses a replicated map. This is the timeout for messages
+        that transfer state to/from the other nodes in the cluster. If not
+        specified, a default value of <code>15000</code> milliseconds is used.
+        </p>
+      </attribute>
+      <attribute name="terminateOnStartFailure" required="false">
+        <p>Set to <code>true</code> if you wish this Valve to fail if the
+        underlying replication fails to start. If the Valve fails, then the
+        associated container will fail to start. If you set this attribute to
+        false, and the underlying replications fails to start, the Valve will
+        start and it will attempt to join the cluster and start replication as
+        part of the heartbeat process. If not specified, the default value of
+        <code>false</code> is used.</p>
       </attribute>
     </attributes>
   </subsection>

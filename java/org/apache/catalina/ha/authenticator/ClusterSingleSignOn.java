@@ -26,6 +26,7 @@ import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.authenticator.SingleSignOnEntry;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterValve;
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 import org.apache.catalina.tribes.tipis.ReplicatedMap;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -98,6 +99,26 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
     }
 
 
+    private int mapSendOptions =
+            Channel.SEND_OPTIONS_SYNCHRONIZED_ACK | Channel.SEND_OPTIONS_USE_ACK;
+    public int getMapSendOptions() {
+        return mapSendOptions;
+    }
+    public void setMapSendOptions(int mapSendOptions) {
+        this.mapSendOptions = mapSendOptions;
+    }
+
+
+    private boolean terminateOnStartFailure = false;
+    public boolean getTerminateOnStartFailure() {
+        return terminateOnStartFailure;
+    }
+
+    public void setTerminateOnStartFailure(boolean terminateOnStartFailure) {
+        this.terminateOnStartFailure = terminateOnStartFailure;
+    }
+
+
     // ---------------------------------------------------- SingleSignOn Methods
 
     @Override
@@ -157,8 +178,12 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
 
             ClassLoader[] cls = new ClassLoader[] { this.getClass().getClassLoader() };
 
-            cache = new ReplicatedMap<String, SingleSignOnEntry>(this, cluster.getChannel(),
-                    rpcTimeout, cluster.getClusterName() + "-SSO-cache", cls);
+            ReplicatedMap<String,SingleSignOnEntry> cache =
+                    new ReplicatedMap<String,SingleSignOnEntry>(
+                    this, cluster.getChannel(), rpcTimeout, cluster.getClusterName() + "-SSO-cache",
+                    cls, terminateOnStartFailure);
+            cache.setChannelSendOptions(mapSendOptions);
+            this.cache = cache;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             throw new LifecycleException(
