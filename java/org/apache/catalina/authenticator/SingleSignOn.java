@@ -568,7 +568,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * @param username  the username (if any) used for the authentication
      * @param password  the password (if any) used for the authentication
      *
-     * @return <code>true</code> if the crednetials were updated, otherwise
+     * @return <code>true</code> if the credentials were updated, otherwise
      *         <code>false</code>
      */
     protected boolean update(String ssoId, Principal principal, String authType,
