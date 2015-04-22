@@ -99,6 +99,10 @@
         that broke request listeners for non-async requests that triggered an
         error that was handled by the ErrorReportingValve. (markt/violetagg)
       </fix>
+      <fix>
+        <bug>57841</bug>: Improve error logging during web application start.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

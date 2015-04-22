@@ -5322,7 +5322,7 @@ public class StandardContext extends ContainerBase
                 else
                     setResources(new FileDirContext());
             } catch (IllegalArgumentException e) {
-                log.error("Error initializing resources: " + e.getMessage());
+                log.error(sm.getString("standardContext.resourcesInit"), e);
                 ok = false;
             }
         }
@@ -5350,7 +5350,7 @@ public class StandardContext extends ContainerBase
             dependencyCheck = ExtensionValidator.validateApplication
                 (getResources(), this);
         } catch (IOException ioe) {
-            log.error("Error in dependencyCheck", ioe);
+            log.error(sm.getString("standardContext.extensionValidationError"), ioe);
             dependencyCheck = false;
         }
 
@@ -5470,7 +5470,7 @@ public class StandardContext extends ContainerBase
         }
 
         if (!getConfigured()) {
-            log.error( "Error getConfigured");
+            log.error(sm.getString("standardContext.configurationFail"));
             ok = false;
         }
 
@@ -5526,7 +5526,7 @@ public class StandardContext extends ContainerBase
             // Configure and call application event listeners
             if (ok) {
                 if (!listenerStart()) {
-                    log.error( "Error listenerStart");
+                    log.error(sm.getString("standardContext.listenerFail"));
                     ok = false;
                 }
             }
@@ -5537,14 +5537,14 @@ public class StandardContext extends ContainerBase
                     ((Lifecycle) getManager()).start();
                 }
             } catch(Exception e) {
-                log.error("Error manager.start()", e);
+                log.error(sm.getString("standardContext.managerFail"), e);
                 ok = false;
             }
 
             // Configure and call application filters
             if (ok) {
                 if (!filterStart()) {
-                    log.error("Error filterStart");
+                    log.error(sm.getString("standardContext.filterFail"));
                     ok = false;
                 }
             }
@@ -5552,7 +5552,7 @@ public class StandardContext extends ContainerBase
             // Load and initialize all "load on startup" servlets
             if (ok) {
                 if (!loadOnStartup(findChildren())){
-                    log.error("Error loadOnStartup");
+                    log.error(sm.getString("standardContext.servletFail"));
                     ok = false;
                 }
             }
