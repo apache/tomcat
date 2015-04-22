@@ -24,7 +24,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.authenticator.SingleSignOnEntry;
-import org.apache.catalina.authenticator.SingleSignOnSessionKey;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
@@ -160,8 +159,6 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
 
             cache = new ReplicatedMap<String, SingleSignOnEntry>(this, cluster.getChannel(),
                     rpcTimeout, cluster.getClusterName() + "-SSO-cache", cls);
-            reverse = new ReplicatedMap<SingleSignOnSessionKey, String>(this, cluster.getChannel(),
-                    rpcTimeout, cluster.getClusterName() + "-SSO-reverse", cls);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             throw new LifecycleException(

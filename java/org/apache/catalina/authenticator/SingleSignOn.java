@@ -114,17 +114,6 @@ public class SingleSignOn extends ValveBase {
     private boolean requireReauthentication = false;
 
     /**
-<<<<<<< .working
-     * The cache of single sign on identifiers, keyed by the Session that is
-     * associated with them.
-     */
-    protected Map<SingleSignOnSessionKey,String> reverse =
-            new ConcurrentHashMap<SingleSignOnSessionKey,String>();
-
-
-    /**
-=======
->>>>>>> .merge-right.r1646757
      * Optional SSO cookie domain.
      */
     private String cookieDomain;
