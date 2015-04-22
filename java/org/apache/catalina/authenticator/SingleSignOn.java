@@ -19,6 +19,7 @@ package org.apache.catalina.authenticator;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
@@ -251,18 +252,18 @@ public class SingleSignOn extends ValveBase {
 
         // Has a valid user already been authenticated?
         if (containerLog.isDebugEnabled())
-            containerLog.debug("Process request for '" + request.getRequestURI() + "'");
+            containerLog.debug(sm.getString("singleSignOn.debug.invoke", request.getRequestURI()));
         if (request.getUserPrincipal() != null) {
             if (containerLog.isDebugEnabled())
-                containerLog.debug(" Principal '" + request.getUserPrincipal().getName() +
-                    "' has already been authenticated");
+                containerLog.debug(sm.getString("singleSignOn.debug.hasPrincipal",
+                        request.getUserPrincipal().getName()));
             getNext().invoke(request, response);
             return;
         }
 
         // Check for the single sign on cookie
         if (containerLog.isDebugEnabled())
-            containerLog.debug(" Checking for SSO cookie");
+            containerLog.debug(sm.getString("singleSignOn.debug.cookieCheck"));
         Cookie cookie = null;
         Cookie cookies[] = request.getCookies();
         if (cookies != null) {
@@ -275,20 +276,21 @@ public class SingleSignOn extends ValveBase {
         }
         if (cookie == null) {
             if (containerLog.isDebugEnabled())
-                containerLog.debug(" SSO cookie is not present");
+                containerLog.debug(sm.getString("singleSignOn.debug.cookieNotFound"));
             getNext().invoke(request, response);
             return;
         }
 
         // Look up the cached Principal associated with this cookie value
         if (containerLog.isDebugEnabled())
-            containerLog.debug(" Checking for cached principal for " + cookie.getValue());
+            containerLog.debug(sm.getString("singleSignOn.debug.principalCheck",
+                    cookie.getValue()));
         SingleSignOnEntry entry = cache.get(cookie.getValue());
         if (entry != null) {
             if (containerLog.isDebugEnabled())
-                containerLog.debug(" Found cached principal '" +
-                    (entry.getPrincipal() != null ? entry.getPrincipal().getName() : "") + "' with auth type '" +
-                    entry.getAuthType() + "'");
+                containerLog.debug(sm.getString("singleSignOn.debug.principalFound",
+                        entry.getPrincipal() != null ? entry.getPrincipal().getName() : "",
+                        entry.getAuthType()));
             request.setNote(Constants.REQ_SSOID_NOTE, cookie.getValue());
             // Only set security elements if reauthentication is not required
             if (!getRequireReauthentication()) {
@@ -297,7 +299,8 @@ public class SingleSignOn extends ValveBase {
             }
         } else {
             if (containerLog.isDebugEnabled())
-                containerLog.debug(" No cached principal found, erasing SSO cookie");
+                containerLog.debug(sm.getString("singleSignOn.debug.principalNotFound",
+                        cookie.getValue()));
             // No need to return a valid SSO session ID
             cookie.setValue("REMOVE");
             // Age of zero will trigger removal
@@ -343,10 +346,6 @@ public class SingleSignOn extends ValveBase {
             return;
         }
 
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug("Process session destroyed on " + session);
-        }
-
         // Was the session destroyed as the result of a timeout or context stop?
         // If so, we'll just remove the expired session from the SSO. If the
         // session was logged out, we'll log out of all session associated with
@@ -355,11 +354,19 @@ public class SingleSignOn extends ValveBase {
             && (System.currentTimeMillis() - session.getThisAccessedTimeInternal() >=
                 session.getMaxInactiveInterval() * 1000))
             || (!((Context)session.getManager().getContainer()).getState().isAvailable())) {
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("singleSignOn.debug.sessionTimeout",
+                        ssoId, session));
+            }
             removeSession(ssoId, session);
         } else {
             // The session was logged out.
             // Deregister this single session id, invalidating
             // associated sessions
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("singleSignOn.debug.sessionLogout",
+                        ssoId, session));
+            }
             deregister(ssoId);
         }
     }
@@ -376,14 +383,18 @@ public class SingleSignOn extends ValveBase {
      *         session, otherwise <code>false</code>
      */
     protected boolean associate(String ssoId, Session session) {
-
-        if (containerLog.isDebugEnabled())
-            containerLog.debug("Associate sso id " + ssoId + " with session " + session);
-
         SingleSignOnEntry sso = cache.get(ssoId);
         if (sso == null) {
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("singleSignOn.debug.associateFail",
+                        ssoId, session));
+            }
             return false;
         } else {
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("singleSignOn.debug.associate",
+                        ssoId, session));
+            }
             sso.addSession(this, ssoId, session);
             return true;
         }
@@ -398,19 +409,27 @@ public class SingleSignOn extends ValveBase {
      */
     protected void deregister(String ssoId) {
 
-        if (containerLog.isDebugEnabled())
-            containerLog.debug("Deregistering sso id '" + ssoId + "'");
-
         // Look up and remove the corresponding SingleSignOnEntry
         SingleSignOnEntry sso = cache.remove(ssoId);
 
-        if (sso == null)
+        if (sso == null) {
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("singleSignOn.debug.deregisterFail", ssoId));
+            }
             return;
+        }
 
         // Expire any associated sessions
-        for (SingleSignOnSessionKey ssoKey : sso.findSessions()) {
-            if (containerLog.isTraceEnabled())
-                containerLog.trace(" Invalidating session " + ssoKey);
+        Set<SingleSignOnSessionKey> ssoKeys = sso.findSessions();
+        if (ssoKeys.size() == 0) {
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("singleSignOn.debug.deregisterNone", ssoId));
+            }
+        }
+        for (SingleSignOnSessionKey ssoKey : ssoKeys) {
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("singleSignOn.debug.deregister", ssoKey, ssoId));
+            }
             // Invalidate this session
             expire(ssoKey);
         }
@@ -520,8 +539,8 @@ public class SingleSignOn extends ValveBase {
                   String username, String password) {
 
         if (containerLog.isDebugEnabled())
-            containerLog.debug("Registering sso id '" + ssoId + "' for user '" +
-                (principal != null ? principal.getName() : "") + "' with auth type '" + authType + "'");
+            containerLog.debug(sm.getString("singleSignOn.debug.register", ssoId,
+                    principal != null ? principal.getName() : "", authType));
 
         cache.put(ssoId, new SingleSignOnEntry(principal, authType, username, password));
     }
@@ -561,7 +580,7 @@ public class SingleSignOn extends ValveBase {
         SingleSignOnEntry sso = cache.get(ssoId);
         if (sso != null && !sso.getCanReauthenticate()) {
             if (containerLog.isDebugEnabled())
-                containerLog.debug("Update sso id " + ssoId + " to auth type " + authType);
+                containerLog.debug(sm.getString("singleSignOn.debug.update", ssoId, authType));
 
             sso.updateCredentials(principal, authType, username, password);
             return true;
@@ -579,9 +598,9 @@ public class SingleSignOn extends ValveBase {
      */
     protected void removeSession(String ssoId, Session session) {
 
-        if (containerLog.isDebugEnabled())
-            containerLog.debug("Removing session " + session.toString() + " from sso id " + 
-                ssoId );
+        if (containerLog.isDebugEnabled()) {
+            containerLog.debug(sm.getString("singleSignOn.debug.removeSession", session, ssoId));
+        }
 
         // Get a reference to the SingleSignOn
         SingleSignOnEntry entry = cache.get(ssoId);
