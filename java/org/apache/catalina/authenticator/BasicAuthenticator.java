@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.authenticator;
-
 
 import java.io.IOException;
 import java.security.Principal;
@@ -27,14 +24,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.LoginConfig;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.codec.binary.Base64;
-
-
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC
@@ -43,9 +36,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
  *
  * @author Craig R. McClanahan
  */
-public class BasicAuthenticator
-    extends AuthenticatorBase {
-    private static final Log log = LogFactory.getLog(BasicAuthenticator.class);
+public class BasicAuthenticator extends AuthenticatorBase {
 
    // ----------------------------------------------------- Instance Variables
 
