@@ -122,6 +122,11 @@
         Remove unused <code>pathname</code> attribute in mbean definition of
         <code>BackupManager</code>. (kfujino)
       </fix>
+      <fix>
+        <bug>57338</bug>:  Improve the ability of the ClusterSingleSignOn valve
+        to handle nodes being added and removed from the Cluster at run time.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
