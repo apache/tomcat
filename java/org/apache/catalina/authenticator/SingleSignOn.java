@@ -18,8 +18,8 @@ package org.apache.catalina.authenticator;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -81,9 +81,8 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * The cache of SingleSignOnEntry instances for authenticated Principals,
      * keyed by the cookie value that is used to select them.
      */
-    protected Map<String,SingleSignOnEntry> cache =
-        new HashMap<String,SingleSignOnEntry>();
-
+    protected final Map<String,SingleSignOnEntry> cache =
+            new ConcurrentHashMap<String,SingleSignOnEntry>();
 
     /**
      * Descriptive information about this Valve implementation.
@@ -103,7 +102,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * The cache of single sign on identifiers, keyed by the Session that is
      * associated with them.
      */
-    protected Map<Session,String> reverse = new HashMap<Session,String>();
+    protected final Map<Session,String> reverse = new ConcurrentHashMap<Session,String>();
 
 
     /**
@@ -239,9 +238,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             containerLog.debug("Process session destroyed on " + session);
 
         String ssoId = null;
-        synchronized (reverse) {
-            ssoId = reverse.get(session);
-        }
+        ssoId = reverse.get(session);
         if (ssoId == null)
             return;
 
@@ -394,10 +391,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         SingleSignOnEntry sso = lookup(ssoId);
         if (sso != null)
             sso.addSession(this, session);
-        synchronized (reverse) {
-            reverse.put(session, ssoId);
-        }
-
+        reverse.put(session, ssoId);
     }
 
 
@@ -410,9 +404,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      */
     protected void deregister(String ssoId, Session session) {
 
-        synchronized (reverse) {
-            reverse.remove(session);
-        }
+        reverse.remove(session);
 
         SingleSignOnEntry sso = lookup(ssoId);
         if (sso == null)
@@ -423,11 +415,8 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         // see if we are the last session, if so blow away ssoId
         Session sessions[] = sso.findSessions();
         if (sessions == null || sessions.length == 0) {
-            synchronized (cache) {
-                cache.remove(ssoId);
-            }
+            cache.remove(ssoId);
         }
-
     }
 
 
@@ -443,10 +432,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             containerLog.debug("Deregistering sso id '" + ssoId + "'");
 
         // Look up and remove the corresponding SingleSignOnEntry
-        SingleSignOnEntry sso = null;
-        synchronized (cache) {
-            sso = cache.remove(ssoId);
-        }
+        SingleSignOnEntry sso = cache.remove(ssoId);
 
         if (sso == null)
             return;
@@ -457,9 +443,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             if (containerLog.isTraceEnabled())
                 containerLog.trace(" Invalidating session " + sessions[i]);
             // Remove from reverse cache first to avoid recursion
-            synchronized (reverse) {
-                reverse.remove(sessions[i]);
-            }
+            reverse.remove(sessions[i]);
             // Invalidate this session
             sessions[i].expire();
         }
@@ -538,11 +522,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             containerLog.debug("Registering sso id '" + ssoId + "' for user '" +
                 (principal != null ? principal.getName() : "") + "' with auth type '" + authType + "'");
 
-        synchronized (cache) {
-            cache.put(ssoId, new SingleSignOnEntry(principal, authType,
-                                                   username, password));
-        }
-
+        cache.put(ssoId, new SingleSignOnEntry(principal, authType, username, password));
     }
 
 
@@ -594,11 +574,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * @param ssoId Single sign on identifier to look up
      */
     protected SingleSignOnEntry lookup(String ssoId) {
-
-        synchronized (cache) {
-            return cache.get(ssoId);
-        }
-
+        return cache.get(ssoId);
     }
 
     
@@ -624,9 +600,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         entry.removeSession(session);
 
         // Remove the inactive session from the 'reverse' Map.
-        synchronized(reverse) {
-            reverse.remove(session);
-        }
+        reverse.remove(session);
 
         // If there are not sessions left in the SingleSignOnEntry,
         // deregister the entry.
