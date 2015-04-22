@@ -81,7 +81,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * The cache of SingleSignOnEntry instances for authenticated Principals,
      * keyed by the cookie value that is used to select them.
      */
-    protected final Map<String,SingleSignOnEntry> cache =
+    protected Map<String,SingleSignOnEntry> cache =
             new ConcurrentHashMap<String,SingleSignOnEntry>();
 
     /**
@@ -102,7 +102,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * The cache of single sign on identifiers, keyed by the Session that is
      * associated with them.
      */
-    protected final Map<Session,String> reverse = new ConcurrentHashMap<Session,String>();
+    protected Map<Session,String> reverse = new ConcurrentHashMap<Session,String>();
 
 
     /**
