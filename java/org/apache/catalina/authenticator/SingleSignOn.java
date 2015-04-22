@@ -19,7 +19,6 @@ package org.apache.catalina.authenticator;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
@@ -403,31 +402,6 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         if (sso != null)
             sso.addSession(this, session);
         reverse.put(new SingleSignOnSessionKey(session), ssoId);
-    }
-
-
-    /**
-     * Deregister the specified session.  If it is the last session,
-     * then also get rid of the single sign on identifier
-     *
-     * @param ssoId Single sign on identifier
-     * @param session Session to be deregistered
-     */
-    protected void deregister(String ssoId, Session session) {
-
-        reverse.remove(new SingleSignOnSessionKey(session));
-
-        SingleSignOnEntry sso = cache.get(ssoId);
-        if (sso == null)
-            return;
-
-        sso.removeSession(session);
-
-        // see if we are the last session, if so blow away ssoId
-        Set<SingleSignOnSessionKey> sessions = sso.findSessions();
-        if (sessions == null || sessions.size() == 0) {
-            cache.remove(ssoId);
-        }
     }
 
 
