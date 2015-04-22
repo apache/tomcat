@@ -37,9 +37,7 @@ import org.apache.catalina.SessionListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
-
 import org.apache.tomcat.util.res.StringManager;
-
 
 /**
  * A <strong>Valve</strong> that supports a "single sign on" user experience,
@@ -151,7 +149,7 @@ public class SingleSignOn extends ValveBase {
      * Authenticator downstream in the pipeline) to the security
      * <code>Realm</code>, or if this Valve can itself bind security info
      * to the request based on the presence of a valid SSO entry without
-     * rechecking with the <code>Realm</code..
+     * rechecking with the <code>Realm</code>.
      *
      * @return  <code>true</code> if it is required that a downstream
      *          Authenticator reauthenticate each request before calls to
@@ -173,7 +171,7 @@ public class SingleSignOn extends ValveBase {
      * Authenticator downstream in the pipeline) to the security
      * <code>Realm</code>, or if this Valve can itself bind security info
      * to the request, based on the presence of a valid SSO entry, without
-     * rechecking with the <code>Realm</code.
+     * rechecking with the <code>Realm</code>.
      * <p>
      * If this property is <code>false</code> (the default), this
      * <code>Valve</code> will bind a UserPrincipal and AuthType to the request
@@ -240,19 +238,22 @@ public class SingleSignOn extends ValveBase {
         request.removeNote(Constants.REQ_SSOID_NOTE);
 
         // Has a valid user already been authenticated?
-        if (containerLog.isDebugEnabled())
+        if (containerLog.isDebugEnabled()) {
             containerLog.debug(sm.getString("singleSignOn.debug.invoke", request.getRequestURI()));
+        }
         if (request.getUserPrincipal() != null) {
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug(sm.getString("singleSignOn.debug.hasPrincipal",
                         request.getUserPrincipal().getName()));
+            }
             getNext().invoke(request, response);
             return;
         }
 
         // Check for the single sign on cookie
-        if (containerLog.isDebugEnabled())
+        if (containerLog.isDebugEnabled()) {
             containerLog.debug(sm.getString("singleSignOn.debug.cookieCheck"));
+        }
         Cookie cookie = null;
         Cookie cookies[] = request.getCookies();
         if (cookies != null) {
@@ -264,22 +265,25 @@ public class SingleSignOn extends ValveBase {
             }
         }
         if (cookie == null) {
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug(sm.getString("singleSignOn.debug.cookieNotFound"));
+            }
             getNext().invoke(request, response);
             return;
         }
 
         // Look up the cached Principal associated with this cookie value
-        if (containerLog.isDebugEnabled())
+        if (containerLog.isDebugEnabled()) {
             containerLog.debug(sm.getString("singleSignOn.debug.principalCheck",
                     cookie.getValue()));
+        }
         SingleSignOnEntry entry = cache.get(cookie.getValue());
         if (entry != null) {
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug(sm.getString("singleSignOn.debug.principalFound",
                         entry.getPrincipal() != null ? entry.getPrincipal().getName() : "",
                         entry.getAuthType()));
+            }
             request.setNote(Constants.REQ_SSOID_NOTE, cookie.getValue());
             // Only set security elements if reauthentication is not required
             if (!getRequireReauthentication()) {
@@ -287,9 +291,10 @@ public class SingleSignOn extends ValveBase {
                 request.setUserPrincipal(entry.getPrincipal());
             }
         } else {
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug(sm.getString("singleSignOn.debug.principalNotFound",
                         cookie.getValue()));
+            }
             // No need to return a valid SSO session ID
             cookie.setValue("REMOVE");
             // Age of zero will trigger removal
@@ -488,8 +493,9 @@ public class SingleSignOn extends ValveBase {
     protected boolean reauthenticate(String ssoId, Realm realm,
                                      Request request) {
 
-        if (ssoId == null || realm == null)
+        if (ssoId == null || realm == null) {
             return false;
+        }
 
         boolean reauthenticated = false;
 
@@ -527,9 +533,10 @@ public class SingleSignOn extends ValveBase {
     protected void register(String ssoId, Principal principal, String authType,
                   String username, String password) {
 
-        if (containerLog.isDebugEnabled())
+        if (containerLog.isDebugEnabled()) {
             containerLog.debug(sm.getString("singleSignOn.debug.register", ssoId,
                     principal != null ? principal.getName() : "", authType));
+        }
 
         cache.put(ssoId, new SingleSignOnEntry(principal, authType, username, password));
     }
@@ -568,8 +575,9 @@ public class SingleSignOn extends ValveBase {
 
         SingleSignOnEntry sso = cache.get(ssoId);
         if (sso != null && !sso.getCanReauthenticate()) {
-            if (containerLog.isDebugEnabled())
+            if (containerLog.isDebugEnabled()) {
                 containerLog.debug(sm.getString("singleSignOn.debug.update", ssoId, authType));
+            }
 
             sso.updateCredentials(principal, authType, username, password);
             return true;
@@ -593,8 +601,9 @@ public class SingleSignOn extends ValveBase {
 
         // Get a reference to the SingleSignOn
         SingleSignOnEntry entry = cache.get(ssoId);
-        if (entry == null)
+        if (entry == null) {
             return;
+        }
 
         // Remove the inactive session from SingleSignOnEntry
         entry.removeSession(session);

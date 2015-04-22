@@ -22,6 +22,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
+import org.apache.catalina.SessionListener;
 import org.apache.catalina.authenticator.SingleSignOn;
 import org.apache.catalina.authenticator.SingleSignOnEntry;
 import org.apache.catalina.ha.CatalinaCluster;
@@ -59,7 +60,7 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
         "org.apache.catalina.ha.authenticator.ClusterSingleSignOn";
 
 
-    // ------------------------------------------------------------- Properties
+    // -------------------------------------------------------------- Properties
 
     private CatalinaCluster cluster = null;
 
@@ -76,17 +77,10 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
     }
 
     @Override
-    public CatalinaCluster getCluster() {
-
-        return cluster;
-
-    }
-
+    public CatalinaCluster getCluster() { return cluster; }
     @Override
     public void setCluster(CatalinaCluster cluster) {
-
         this.cluster = cluster;
-
     }
 
 
@@ -138,6 +132,11 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
             ((ReplicatedMap<String,SingleSignOnEntry>) cache).replicate(ssoId, true);
         }
         return result;
+    }
+
+    @Override
+    protected SessionListener getSessionListener(String ssoId) {
+        return new ClusterSingleSignOnListener(ssoId);
     }
 
 

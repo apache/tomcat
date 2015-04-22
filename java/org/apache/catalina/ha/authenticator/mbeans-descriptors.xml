@@ -40,5 +40,18 @@
       name="cookieDomain"
       description="(Optiona) Domain to be used by sso cookies"
       type="java.lang.String"/>
+    <attribute
+      name="mapSendOptions"
+      description="mapSendOptions"
+      type="int"
+      writeable="false"/>
+    <attribute
+      name="rpcTimeout"
+      description="Timeout for RPC messages, how long we will wait for a reply"
+      type="long"/>
+    <attribute
+      name="terminateOnStartFailure"
+      description="Flag for whether to terminate this map that failed to start."
+      type="boolean"/>
   </mbean>
 </mbeans-descriptors>
