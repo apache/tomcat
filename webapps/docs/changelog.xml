@@ -110,6 +110,11 @@
         application is performing I/O on a non-container thread without using
         the Servlet 3+ asynchronous API. (markt)
       </fix>
+      <fix>
+        <bug>57833</bug>: When using JKS based keystores for NIO, ensure that
+        the key alias is always converted to lower caes since that is what JKS
+        key stores expect. Based on a patch by  Santosh Giri Govind M. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
