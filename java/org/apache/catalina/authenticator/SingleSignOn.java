@@ -557,9 +557,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             if (containerLog.isDebugEnabled())
                 containerLog.debug("Update sso id " + ssoId + " to auth type " + authType);
 
-            synchronized(sso) {
-                sso.updateCredentials(principal, authType, username, password);
-            }
+            sso.updateCredentials(principal, authType, username, password);
         }
     }
 
