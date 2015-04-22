@@ -16,7 +16,11 @@
  */
 package org.apache.catalina.authenticator;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.security.Principal;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,17 +37,21 @@ import org.apache.catalina.Session;
  * @see SingleSignOn
  * @see AuthenticatorBase#reauthenticateFromSSO
  */
-public class SingleSignOnEntry
-{
+public class SingleSignOnEntry implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     // ------------------------------------------------------  Instance Fields
 
     protected String authType = null;
 
     protected String password = null;
 
-    protected Principal principal = null;
+    // Marked as transient so special handling can be applied to serialization
+    protected transient Principal principal = null;
 
-    protected Session sessions[] = new Session[0];
+    protected ConcurrentHashMap<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys =
+            new ConcurrentHashMap<SingleSignOnSessionKey, SingleSignOnSessionKey>();
 
     protected String username = null;
 
@@ -77,16 +85,13 @@ public class SingleSignOnEntry
      *                  the SSO session.
      * @param session   The <code>Session</code> being associated with the SSO.
      */
-    public synchronized void addSession(SingleSignOn sso, Session session) {
-        for (int i = 0; i < sessions.length; i++) {
-            if (session == sessions[i])
-                return;
+    public void addSession(SingleSignOn sso, Session session) {
+        SingleSignOnSessionKey key = new SingleSignOnSessionKey(session);
+        SingleSignOnSessionKey currentKey = sessionKeys.putIfAbsent(key, key);
+        if (currentKey == null) {
+            // Session not previously added
+            session.addSessionListener(sso);
         }
-        Session results[] = new Session[sessions.length + 1];
-        System.arraycopy(sessions, 0, results, 0, sessions.length);
-        results[sessions.length] = session;
-        sessions = results;
-        session.addSessionListener(sso);
     }
 
     /**
@@ -95,21 +100,16 @@ public class SingleSignOnEntry
      *
      * @param session  the <code>Session</code> to remove.
      */
-    public synchronized void removeSession(Session session) {
-        Session[] nsessions = new Session[sessions.length - 1];
-        for (int i = 0, j = 0; i < sessions.length; i++) {
-            if (session == sessions[i])
-                continue;
-            nsessions[j++] = sessions[i];
-        }
-        sessions = nsessions;
+    public void removeSession(Session session) {
+        SingleSignOnSessionKey key = new SingleSignOnSessionKey(session);
+        sessionKeys.remove(key);
     }
 
     /**
      * Returns the <code>Session</code>s associated with this SSO.
      */
-    public synchronized Session[] findSessions() {
-        return (this.sessions);
+    public Set<SingleSignOnSessionKey> findSessions() {
+        return sessionKeys.keySet();
     }
 
     /**
@@ -181,5 +181,25 @@ public class SingleSignOnEntry
         this.password = password;
         this.canReauthenticate = (HttpServletRequest.BASIC_AUTH.equals(authType) ||
                 HttpServletRequest.FORM_AUTH.equals(authType));
+    }
+
+
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+        if (principal instanceof Serializable) {
+            out.writeBoolean(true);
+            out.writeObject(principal);
+        } else {
+            out.writeBoolean(false);
+        }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+            ClassNotFoundException {
+        in.defaultReadObject();
+        boolean hasPrincipal = in.readBoolean();
+        if (hasPrincipal) {
+            principal = (Principal) in.readObject();
+        }
     }
 }

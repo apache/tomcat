@@ -19,12 +19,18 @@ package org.apache.catalina.authenticator;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 
+import org.apache.catalina.Container;
+import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
@@ -32,7 +38,12 @@ import org.apache.catalina.SessionListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 import org.apache.tomcat.util.res.StringManager;
+
 
 /**
  * A <strong>Valve</strong> that supports a "single sign on" user experience,
@@ -68,6 +79,15 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         }
     }
     
+    private static final Log log = LogFactory.getLog(SingleSignOn.class);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
+
+    /* The engine at the top of the container hierarchy in which this SSO Valve
+     * has been placed. It is used to get back to a session object from a
+     * SingleSignOnSessionKey and is updated when the Valve starts and stops.
+     */
+    private Engine engine;
+
     //------------------------------------------------------ Constructor
 
     public SingleSignOn() {
@@ -102,15 +122,8 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      * The cache of single sign on identifiers, keyed by the Session that is
      * associated with them.
      */
-    protected Map<Session,String> reverse = new ConcurrentHashMap<Session,String>();
-
-
-    /**
-     * The string manager for this package.
-     */
-    @Deprecated
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected Map<SingleSignOnSessionKey,String> reverse =
+            new ConcurrentHashMap<SingleSignOnSessionKey,String>();
 
 
     /**
@@ -238,7 +251,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             containerLog.debug("Process session destroyed on " + session);
 
         String ssoId = null;
-        ssoId = reverse.get(session);
+        ssoId = reverse.get(new SingleSignOnSessionKey(session));
         if (ssoId == null)
             return;
 
@@ -389,7 +402,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         SingleSignOnEntry sso = cache.get(ssoId);
         if (sso != null)
             sso.addSession(this, session);
-        reverse.put(session, ssoId);
+        reverse.put(new SingleSignOnSessionKey(session), ssoId);
     }
 
 
@@ -402,7 +415,7 @@ public class SingleSignOn extends ValveBase implements SessionListener {
      */
     protected void deregister(String ssoId, Session session) {
 
-        reverse.remove(session);
+        reverse.remove(new SingleSignOnSessionKey(session));
 
         SingleSignOnEntry sso = cache.get(ssoId);
         if (sso == null)
@@ -411,8 +424,8 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         sso.removeSession(session);
 
         // see if we are the last session, if so blow away ssoId
-        Session sessions[] = sso.findSessions();
-        if (sessions == null || sessions.length == 0) {
+        Set<SingleSignOnSessionKey> sessions = sso.findSessions();
+        if (sessions == null || sessions.size() == 0) {
             cache.remove(ssoId);
         }
     }
@@ -436,20 +449,53 @@ public class SingleSignOn extends ValveBase implements SessionListener {
             return;
 
         // Expire any associated sessions
-        Session sessions[] = sso.findSessions();
-        for (int i = 0; i < sessions.length; i++) {
+        for (SingleSignOnSessionKey ssoKey : sso.findSessions()) {
             if (containerLog.isTraceEnabled())
-                containerLog.trace(" Invalidating session " + sessions[i]);
+                containerLog.trace(" Invalidating session " + ssoKey);
             // Remove from reverse cache first to avoid recursion
-            reverse.remove(sessions[i]);
+            reverse.remove(ssoKey);
             // Invalidate this session
-            sessions[i].expire();
+            expire(ssoKey);
         }
 
         // NOTE:  Clients may still possess the old single sign on cookie,
         // but it will be removed on the next request since it is no longer
         // in the cache
+    }
 
+
+    private void expire(SingleSignOnSessionKey key) {
+        if (engine == null) {
+            log.warn(sm.getString("singleSignOn.sessionExpire.engineNull", key));
+            return;
+        }
+        Container host = engine.findChild(key.getHostName());
+        if (host == null) {
+            log.warn(sm.getString("singleSignOn.sessionExpire.hostNotFound", key));
+            return;
+        }
+        Context context = (Context) host.findChild(key.getContextName());
+        if (context == null) {
+            log.warn(sm.getString("singleSignOn.sessionExpire.contextNotFound", key));
+            return;
+        }
+        Manager manager = context.getManager();
+        if (manager == null) {
+            log.warn(sm.getString("singleSignOn.sessionExpire.managerNotFound", key));
+            return;
+        }
+        Session session = null;
+        try {
+            session = manager.findSession(key.getSessionId());
+        } catch (IOException e) {
+            log.warn(sm.getString("singleSignOn.sessionExpire.managerError", key), e);
+            return;
+        }
+        if (session == null) {
+            log.warn(sm.getString("singleSignOn.sessionExpire.sessionNotFound", key));
+            return;
+        }
+        session.expire();
     }
 
 
@@ -584,12 +630,32 @@ public class SingleSignOn extends ValveBase implements SessionListener {
         entry.removeSession(session);
 
         // Remove the inactive session from the 'reverse' Map.
-        reverse.remove(session);
+        reverse.remove(new SingleSignOnSessionKey(session));
 
         // If there are not sessions left in the SingleSignOnEntry,
         // deregister the entry.
-        if (entry.findSessions().length == 0) {
+        if (entry.findSessions().size() == 0) {
             deregister(ssoId);
         }
+    }
+
+
+    @Override
+    protected synchronized void startInternal() throws LifecycleException {
+        Container c = getContainer();
+        while (c != null && !(c instanceof Engine)) {
+            c = c.getParent();
+        }
+        if (c instanceof Engine) {
+            engine = (Engine) c;
+        }
+        super.startInternal();
+    }
+
+
+    @Override
+    protected synchronized void stopInternal() throws LifecycleException {
+        super.stopInternal();
+        engine = null;
     }
 }
