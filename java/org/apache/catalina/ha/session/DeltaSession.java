@@ -515,10 +515,14 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     @Override
     public void addSessionListener(SessionListener listener) {
+        addSessionListener(listener, true);
+    }
+
+    public void addSessionListener(SessionListener listener, boolean addDeltaRequest) {
         lock();
         try {
             super.addSessionListener(listener);
-            if (deltaRequest != null && listener instanceof ReplicatedSessionListener) {
+            if (addDeltaRequest && deltaRequest != null && listener instanceof ReplicatedSessionListener) {
                 deltaRequest.addSessionListener(listener);
             }
         } finally {
@@ -528,10 +532,14 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     @Override
     public void removeSessionListener(SessionListener listener) {
+        removeSessionListener(listener, true);
+    }
+
+    public void removeSessionListener(SessionListener listener, boolean addDeltaRequest) {
         lock();
         try {
             super.removeSessionListener(listener);
-            if (deltaRequest != null && listener instanceof ReplicatedSessionListener) {
+            if (addDeltaRequest && deltaRequest != null && listener instanceof ReplicatedSessionListener) {
                 deltaRequest.removeSessionListener(listener);
             }
         } finally {

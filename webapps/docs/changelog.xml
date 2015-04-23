@@ -136,6 +136,10 @@
         to handle nodes being added and removed from the Cluster at run time.
         (markt) 
       </fix>
+      <fix>
+        Avoid unnecessary call of <code>DeltaRequest.addSessionListener()</code>
+        in non-primary nodes. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -178,6 +182,26 @@
         and a backup message that has diff data are processing at the same time.
         This fix ensures that <code>MapOwner</code> is set to
         <code>ReplicatedMapEntry</code>. (kfujino)
+      </fix>
+      <fix>
+        Clarify the handling of Copy message and Copy nodes. (kfujino)
+      </fix>
+      <fix>
+        Copy node does not need to send the entry data. It is enough to send
+        only the node information of the entry. (kfujino)
+      </fix>
+      <fix>
+        <code>ReplicatedMap</code> should send the Copy message when
+        replicating. (kfujino)
+      </fix>
+      <fix>
+        Fix behavior of <code>ReplicatedMap</code> when member has disappeared.
+        If map entry is primary, rebuild the backup members. If primary node of
+        map entry has disappeared, backup node is promoted to primary. (kfujino)
+      </fix>
+      <fix>
+        When a map member has been added to <code>ReplicatedMap</code>, make
+        sure to add it to backup nodes list of all other members. (kfujino)
       </fix>
     </changelog>
   </subsection>
