@@ -65,19 +65,6 @@ public class Constants {
         System.getProperty("org.apache.jasper.Constants.SERVLET_CLASSPATH", "org.apache.catalina.jsp_classpath");
 
     /**
-     * Request attribute for <code>&lt;jsp-file&gt;</code> element of a
-     * servlet definition.  If present on a request, this overrides the
-     * value returned by <code>request.getServletPath()</code> to select
-     * the JSP page to be executed.
-     * @deprecated  This will be removed in Tomcat 9.0.x onwards. It is replaced
-     *              by the use of the jspFile servlet initialisation parameter
-     */
-    @Deprecated
-    public static final String JSP_FILE =
-        System.getProperty("org.apache.jasper.Constants.JSP_FILE", "org.apache.catalina.jsp_file");
-
-
-    /**
      * Default size of the JSP buffer.
      */
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
