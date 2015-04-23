@@ -121,6 +121,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>57845</bug>: Ensure that, if the same JSP is accessed directly and
+        via a <code>&lt;jsp-file&gt;</code> declaration in web.xml, updates to
+        the JSP are visible (subject to the normal rules on re-compilation)
+        regardless of how the JSP is accessed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>

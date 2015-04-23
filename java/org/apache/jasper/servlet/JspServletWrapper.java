@@ -220,6 +220,13 @@ public class JspServletWrapper {
                 if (this.servletClassLastModifiedTime < lastModified) {
                     this.servletClassLastModifiedTime = lastModified;
                     reload = true;
+                    // Really need to unload the old class but can't do that. Do
+                    // the next best thing which is throw away the JspLoader so
+                    // a new loader will be created which will load the new
+                    // class.
+                    // TODO Are there inefficiencies between reload and the
+                    //      isOutDated() check?
+                    ctxt.clearJspLoader();
                 }
             }
         }

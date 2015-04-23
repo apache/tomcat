@@ -186,6 +186,11 @@ public class JspCompilationContext {
         return jspLoader;
     }
 
+    public void clearJspLoader() {
+        jspLoader = null;
+    }
+
+
     /** ---------- Input/Output  ---------- */
 
     /**
