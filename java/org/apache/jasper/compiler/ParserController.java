@@ -159,11 +159,6 @@ class ParserController implements TagConstants {
      * @param inFileName The name of the JSP page or tag file to be parsed.
      * @param parent The parent node (non-null when processing an include
      * directive)
-     * @param isTagFile true if file to be parsed is tag file, and false if it
-     * is a regular JSP page
-     * @param directivesOnly true if the file to be parsed is a tag file and
-     * we are only interested in the directives needed for constructing a
-     * TagFileInfo.
      * @param jar  The JAR file from which to read the JSP page or tag file,
      * or null if the JSP page or tag file is to be read from the filesystem
      */
