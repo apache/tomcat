@@ -227,8 +227,9 @@ public abstract class AbstractEndpoint<S> {
             // TODO i18n
             throw new IllegalArgumentException();
         }
+        sslHostConfig.setConfigType(getSslConfigType());
     }
-
+    protected abstract SSLHostConfig.Type getSslConfigType();
 
     /**
      * Has the user requested that send file be used where possible?
@@ -948,13 +949,6 @@ public abstract class AbstractEndpoint<S> {
     private String clientAuth = "false";
     public String getClientAuth() { return clientAuth;}
     public void setClientAuth(String s ) { this.clientAuth = s;}
-
-    private String keystoreFile = System.getProperty("user.home")+"/.keystore";
-    public String getKeystoreFile() { return keystoreFile;}
-    public void setKeystoreFile(String s ) {
-        keystoreFile = adjustRelativePath(s,
-                System.getProperty(Constants.CATALINA_BASE_PROP));
-    }
 
     private String keystorePass = null;
     public String getKeystorePass() { return keystorePass;}

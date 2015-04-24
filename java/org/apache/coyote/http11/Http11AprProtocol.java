@@ -99,20 +99,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
 
     /**
-     * SSL certificate file.
-     */
-    public String getSSLCertificateFile() { return ((AprEndpoint)getEndpoint()).getSSLCertificateFile(); }
-    public void setSSLCertificateFile(String SSLCertificateFile) { ((AprEndpoint)getEndpoint()).setSSLCertificateFile(SSLCertificateFile); }
-
-
-    /**
-     * SSL certificate key file.
-     */
-    public String getSSLCertificateKeyFile() { return ((AprEndpoint)getEndpoint()).getSSLCertificateKeyFile(); }
-    public void setSSLCertificateKeyFile(String SSLCertificateKeyFile) { ((AprEndpoint)getEndpoint()).setSSLCertificateKeyFile(SSLCertificateKeyFile); }
-
-
-    /**
      * SSL certificate chain file.
      */
     public String getSSLCertificateChainFile() { return ((AprEndpoint)getEndpoint()).getSSLCertificateChainFile(); }

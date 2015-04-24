@@ -235,7 +235,7 @@ public class JSSESocketFactory implements SSLUtil {
     protected KeyStore getKeystore(String type, String provider, String pass)
             throws IOException {
 
-        String keystoreFile = endpoint.getKeystoreFile();
+        String keystoreFile = sslHostConfig.getKeystoreFile();
         if (keystoreFile == null)
             keystoreFile = defaultKeystoreFile;
 

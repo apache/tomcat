@@ -27,6 +27,7 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.X509KeyManager;
 
+import org.apache.tomcat.util.net.SSLHostConfig.Type;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 
 public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
@@ -36,6 +37,12 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     public SSLImplementation getSslImplementation() {
         return sslImplementation;
+    }
+
+
+    @Override
+    protected Type getSslConfigType() {
+        return SSLHostConfig.Type.JSSE;
     }
 
 
