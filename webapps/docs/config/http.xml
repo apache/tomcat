@@ -1050,11 +1050,34 @@
 
   <attributes>
 
+    <attribute name="certificateFile" required="false">
+      <p>OpenSSL only (required).</p>
+      <p>Name of the file that contains the server certificate. The format is
+      PEM-encoded.</p>
+    </attribute>
+
+    <attribute name="certificateKeyFile" required="false">
+      <p>OpenSSL only.</p>
+      <p>Name of the file that contains the server private key. The format is
+      PEM-encoded. The default value is the value of "SSLCertificateFile" and in
+      this case both certificate and private key have to be in this file (NOT
+      RECOMMENDED).</p>
+    </attribute>
+
     <attribute name="hostName" required="false">
       <p>The name of the SSL Host. This should either be the fully qualified
       domain name (e.g. <code>tomcat.apache.org</code>) or a wild card domain
       name (e.g. <code>*.apache.org</code>). If not specified, the default value
       of <code>_default_</code> will be used.</p>
+    </attribute>
+
+    <attribute name="keystoreFile" required="false">
+      <p>JSSE only.</p>
+      <p>The pathname of the keystore file where you have stored the server
+      certificate and key to be loaded. By default, the pathname is the file
+      <code>.keystore</code> in the operating system home directory of the user
+      that is running Tomcat. If your <code>keystoreType</code> doesn't need a
+      file use <code>""</code> (empty string) for this parameter.</p>
     </attribute>
 
     <attribute name="protocols" required="false">
@@ -1164,12 +1187,9 @@
     </attribute>
 
     <attribute name="keystoreFile" required="false">
-      <p>The pathname of the keystore file where you have stored the
-      server certificate to be loaded.  By default, the pathname is
-      the file "<code>.keystore</code>" in the operating system home
-      directory of the user that is running Tomcat. If your
-      <code>keystoreType</code> doesn't need a file use <code>""</code>
-      (empty string) for this parameter.</p>
+      <p>This is an alias for the <code>keystoreFile</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="keystorePass" required="false">
@@ -1357,15 +1377,15 @@
     </attribute>
 
     <attribute name="SSLCertificateFile" required="true">
-      <p>Name of the file that contains the server certificate. The format is
-      PEM-encoded.</p>
+      <p>This is an alias for the <code>certificateFile</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="SSLCertificateKeyFile" required="false">
-      <p>Name of the file that contains the server private key. The format is
-      PEM-encoded. The default value is the value of "SSLCertificateFile" and in
-      this case both certificate and private key have to be in this file (NOT
-      RECOMMENDED).</p>
+      <p>This is an alias for the <code>certificateKeyFile</code> attribute of
+      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="SSLCipherSuite" required="false">
