@@ -63,6 +63,12 @@ public final class CookieSupport {
     public static final boolean ALLOW_NAME_ONLY;
 
     /**
+     * If set to true, the cookie header will be preserved. In most cases 
+     * except debugging, this is not useful.
+     */
+    public static final boolean PRESERVE_COOKIE_HEADER;
+
+    /**
      * The list of separators that apply to version 0 cookies. To quote the
      * spec, these are comma, semi-colon and white-space. The HTTP spec
      * definition of linear white space is [CRLF] 1*( SP | HT )
@@ -98,6 +104,15 @@ public final class CookieSupport {
         } else {
             ALWAYS_ADD_EXPIRES =
                 Boolean.valueOf(alwaysAddExpires).booleanValue();
+        }
+
+        String preserveCookieHeader = System.getProperty(
+                "org.apache.tomcat.util.http.ServerCookie.PRESERVE_COOKIE_HEADER");
+        if (preserveCookieHeader == null) {
+            PRESERVE_COOKIE_HEADER = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            PRESERVE_COOKIE_HEADER =
+                Boolean.valueOf(preserveCookieHeader).booleanValue();
         }
 
         String  fwdSlashIsSeparator = System.getProperty(
