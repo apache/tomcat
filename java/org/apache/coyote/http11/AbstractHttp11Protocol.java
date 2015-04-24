@@ -363,6 +363,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    public void setKeystoreFile(String keystoreFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setKeystoreFile(keystoreFile);
+    }
+    public void setCertificateFile(String certificateFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateFile(certificateFile);
+    }
+    public void setCertificateKeyFile(String certificateKeyFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateKeyFile(certificateKeyFile);
+    }
+
+
     // ------------------------------------------------------------- Common code
 
     // Common configuration required for all new HTTP11 processors

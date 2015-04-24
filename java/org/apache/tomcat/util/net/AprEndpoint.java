@@ -52,6 +52,7 @@ import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SSLHostConfig.Type;
 
 
 /**
@@ -200,6 +201,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     }
 
 
+    @Override
+    protected Type getSslConfigType() {
+        return SSLHostConfig.Type.OPENSSL;
+    }
+
+
     /**
      * SSL password (if a cert is encrypted, and no password has been provided, a callback
      * will ask for a password).
@@ -215,22 +222,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     protected String SSLCipherSuite = DEFAULT_CIPHERS;
     public String getSSLCipherSuite() { return SSLCipherSuite; }
     public void setSSLCipherSuite(String SSLCipherSuite) { this.SSLCipherSuite = SSLCipherSuite; }
-
-
-    /**
-     * SSL certificate file.
-     */
-    protected String SSLCertificateFile = null;
-    public String getSSLCertificateFile() { return SSLCertificateFile; }
-    public void setSSLCertificateFile(String SSLCertificateFile) { this.SSLCertificateFile = SSLCertificateFile; }
-
-
-    /**
-     * SSL certificate key file.
-     */
-    protected String SSLCertificateKeyFile = null;
-    public String getSSLCertificateKeyFile() { return SSLCertificateKeyFile; }
-    public void setSSLCertificateKeyFile(String SSLCertificateKeyFile) { this.SSLCertificateKeyFile = SSLCertificateKeyFile; }
 
 
     /**
@@ -496,7 +487,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     continue;
                 }
 
-                if (SSLCertificateFile == null) {
+                if (sslHostConfig.getCertificateFile() == null) {
                     // This is required
                     throw new Exception(sm.getString("endpoint.apr.noSslCertFile"));
                 }
@@ -613,7 +604,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 // List the ciphers that the client is permitted to negotiate
                 SSLContext.setCipherSuite(sslContext, SSLCipherSuite);
                 // Load Server key and certificate
-                SSLContext.setCertificate(sslContext, SSLCertificateFile, SSLCertificateKeyFile, SSLPassword, SSL.SSL_AIDX_RSA);
+                SSLContext.setCertificate(sslContext, sslHostConfig.getCertificateFile(),
+                        sslHostConfig.getCertificateKeyFile(), SSLPassword, SSL.SSL_AIDX_RSA);
                 // Set certificate chain file
                 SSLContext.setCertificateChainFile(sslContext, SSLCertificateChainFile, false);
                 // Support Client Certificates

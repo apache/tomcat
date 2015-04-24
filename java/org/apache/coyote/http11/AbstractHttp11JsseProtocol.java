@@ -31,9 +31,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
     public String getClientAuth() { return getEndpoint().getClientAuth();}
     public void setClientAuth(String s ) { getEndpoint().setClientAuth(s);}
 
-    public String getKeystoreFile() { return getEndpoint().getKeystoreFile();}
-    public void setKeystoreFile(String s ) { getEndpoint().setKeystoreFile(s);}
-
     public String getKeystorePass() { return getEndpoint().getKeystorePass();}
     public void setKeystorePass(String s ) { getEndpoint().setKeystorePass(s);}
 
