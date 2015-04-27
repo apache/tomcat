@@ -17,6 +17,8 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -40,11 +42,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
@@ -617,6 +621,49 @@ public class RemoteIpFilter implements Filter {
         }
     }
 
+    public static class XForwardedResponse extends HttpServletResponseWrapper {
+
+        private final String scheme;
+        private final int port;
+
+        public XForwardedResponse(HttpServletResponse response, String scheme, int port) {
+            super(response);
+            this.scheme = scheme;
+            if ("http".equals(scheme) && port == 80 || "https".equals(scheme) && port == 443) {
+                this.port = -1;
+            } else {
+                this.port = port;
+            }
+        }
+
+        @Override
+        public void sendRedirect(String location) throws IOException {
+            /*
+             * This isn't particularly pretty but, given that:
+             * a) there is no setRequest() method on ServletResponse (even if
+             *    there were the response could still access this information
+             *    via some internal structure for speed); and
+             * b) that this is meant to work on any Servlet container;
+             * this was the cleanest way I could come up with for doing this.
+             */
+            super.sendRedirect(location);
+            String redirect = getHeader("location");
+            URI newRedirectURI;
+            try {
+                URI redirectURI = new URI(redirect);
+                newRedirectURI = new URI(scheme, redirectURI.getUserInfo(),
+                        redirectURI.getHost(), port, redirectURI.getPath(),
+                        redirectURI.getQuery(), redirectURI.getFragment());
+            } catch (URISyntaxException e) {
+                log.warn(sm.getString("remoteIpFilter.invalidLocation",
+                        location, scheme, Integer.toString(port)));
+                return;
+            }
+            reset();
+            super.sendRedirect(newRedirectURI.toString());
+        }
+    }
+
     /**
      * {@link Pattern} for a comma delimited string that support whitespace characters
      */
@@ -632,6 +679,7 @@ public class RemoteIpFilter implements Filter {
      * Logger
      */
     private static final Log log = LogFactory.getLog(RemoteIpFilter.class);
+    private static final StringManager sm = StringManager.getManager(RemoteIpFilter.class);
 
     protected static final String PROTOCOL_HEADER_PARAMETER = "protocolHeader";
 
@@ -810,6 +858,14 @@ public class RemoteIpFilter implements Filter {
                 }
             }
 
+            HttpServletResponse xResponse;
+            if (xRequest.getScheme() != request.getScheme() ||
+                    xRequest.getServerPort() != request.getServerPort()) {
+                xResponse = new XForwardedResponse(response, xRequest.getScheme(), xRequest.getServerPort());
+            } else {
+                xResponse = response;
+            }
+
             if (log.isDebugEnabled()) {
                 log.debug("Incoming request " + request.getRequestURI() + " with originalRemoteAddr '" + request.getRemoteAddr()
                         + "', originalRemoteHost='" + request.getRemoteHost() + "', originalSecure='" + request.isSecure()
@@ -832,7 +888,7 @@ public class RemoteIpFilter implements Filter {
                 request.setAttribute(AccessLog.SERVER_PORT_ATTRIBUTE,
                         Integer.valueOf(xRequest.getServerPort()));
             }
-            chain.doFilter(xRequest, response);
+            chain.doFilter(xRequest, xResponse);
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("Skip RemoteIpFilter for request " + request.getRequestURI() + " with originalRemoteAddr '"
