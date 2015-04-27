@@ -37,4 +37,27 @@ public class TesterResponse extends Response {
                 message + "\")");
          */
     }
+
+    @Override
+    public void resetBuffer(boolean resetWriterStreamFlags) {
+        // NO-OP by default.
+        // There is no buffer created for this test object since no test depends
+        // on one being present or on this method resetting it.
+    }
+
+    @Override
+    public org.apache.coyote.Response getCoyoteResponse() {
+        // Lazy init
+        if (super.getCoyoteResponse() == null) {
+            this.coyoteResponse = new org.apache.coyote.Response();
+        }
+        return super.getCoyoteResponse();
+    }
+
+    @Override
+    public void setSuspended(boolean suspended) {
+        // NO-OP by default.
+        // There is no buffer created for this test object since no test depends
+        // on one being present or on this method suspending it.
+    }
 }
