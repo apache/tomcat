@@ -41,8 +41,9 @@ import org.apache.el.util.ReflectionUtil;
  */
 public final class AstValue extends SimpleNode {
 
-    private static final boolean IS_SECURITY_ENABLED =
-        (System.getSecurityManager() != null);
+    private static final Object[] EMPTY_ARRAY = new Object[0];
+    private static final Object[] ARRAY_OF_SINGLE_NULL = new Object[1];
+    private static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
 
     protected static final boolean COERCE_TO_ZERO;
     
@@ -296,7 +297,8 @@ public final class AstValue extends SimpleNode {
     private Object[] convertArgs(Object[] src, Method m) {
         Class<?>[] types = m.getParameterTypes();
         if (types.length == 0) {
-            return new Object[0];
+            // Treated as if parameters have been provided so src is ignored
+            return EMPTY_ARRAY;
         }
         
         int paramCount = types.length;
@@ -304,23 +306,24 @@ public final class AstValue extends SimpleNode {
         if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount > src.length) ||
                 !m.isVarArgs() && (paramCount > 0 && src == null ||
                         src != null && src.length != paramCount)) {
-            String inputParamCount = null;
+            String srcCount = null;
             if (src != null) {
-                inputParamCount = Integer.toString(src.length);
+                srcCount = Integer.toString(src.length);
             }
             String msg;
             if (m.isVarArgs()) {
                 msg = MessageFactory.get("error.invoke.tooFewParams",
-                        m.getName(), inputParamCount, Integer.toString(paramCount));
+                        m.getName(), srcCount, Integer.toString(paramCount));
             } else {
                 msg = MessageFactory.get("error.invoke.wrongParams",
-                        m.getName(), inputParamCount, Integer.toString(paramCount));
+                        m.getName(), srcCount, Integer.toString(paramCount));
             }
             throw new IllegalArgumentException(msg);
         }
 
         if (src == null) {
-            return new Object[1];
+            // Must be a varargs method with a single parameter.
+            return ARRAY_OF_SINGLE_NULL;
         }
 
         Object[] dest = new Object[paramCount];

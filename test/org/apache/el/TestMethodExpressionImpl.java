@@ -479,6 +479,15 @@ public class TestMethodExpressionImpl {
 
 
     @Test
+    public void testBug53792d() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "#{beanB.sayHello().length()}", null, new Class<?>[] {});
+        Integer result = (Integer) me.invoke(context, new Object[] { "foo" });
+        assertEquals(beanB.sayHello().length(), result.intValue());
+    }
+
+
+    @Test
     public void testBug56797a() {
         MethodExpression me = factory.createMethodExpression(context,
                 "${beanAA.echo1('Hello World!')}", null , null);
