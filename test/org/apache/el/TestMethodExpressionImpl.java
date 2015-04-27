@@ -510,4 +510,28 @@ public class TestMethodExpressionImpl {
                 "${beanAA.echo2}", null , new Class[]{String.class});
         me.invoke(context, null);
     }
+
+    @Test
+    public void testBug57855c() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanB.echo}", null , new Class[]{String.class});
+        me.invoke(context, null);
+    }
+
+
+    @Test
+    public void testBug57855d() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanB.echo}", null , new Class[]{String.class});
+        Object r = me.invoke(context, new String[] { "aaa" });
+        assertEquals("aaa", r.toString());
+    }
+    @Test
+    public void testBug57855e() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanB.echo}", null , new Class[]{String.class});
+        Object r = me.invoke(context, new String[] { "aaa", "bbb" });
+        assertEquals("aaa, bbb", r.toString());
+    }
+
 }

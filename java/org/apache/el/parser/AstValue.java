@@ -301,9 +301,9 @@ public final class AstValue extends SimpleNode {
         
         int paramCount = types.length;
 
-        if (paramCount > 0 && src == null ||
-                m.isVarArgs() && src.length < paramCount ||
-                !m.isVarArgs() && src.length != paramCount) {
+        if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount > src.length) ||
+                !m.isVarArgs() && (paramCount > 0 && src == null ||
+                        src != null && src.length != paramCount)) {
             String inputParamCount = null;
             if (src != null) {
                 inputParamCount = Integer.toString(src.length);
@@ -317,6 +317,10 @@ public final class AstValue extends SimpleNode {
                         m.getName(), inputParamCount, Integer.toString(paramCount));
             }
             throw new IllegalArgumentException(msg);
+        }
+
+        if (src == null) {
+            return new Object[1];
         }
 
         Object[] dest = new Object[paramCount];
