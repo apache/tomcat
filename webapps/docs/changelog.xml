@@ -129,6 +129,15 @@
         the JSP are visible (subject to the normal rules on re-compilation)
         regardless of how the JSP is accessed. (markt)
       </fix>
+      <fix>
+        <bug>57855</bug>: Explicitly handle the case where a
+        <code>MethodExpression</code> is invoked with null or the wrong number
+        of parameters. Rather than failing with an
+        <code>ArrayIndexOutOfBoundsException</code> or a
+        <code>NullPointerException</code> throw an
+        <code>IllegalArgumentException</code> with a useful error message.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

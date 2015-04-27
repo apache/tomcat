@@ -270,7 +270,7 @@ public final class AstValue extends SimpleNode {
         }
         m = ReflectionUtil.getMethod(t.base, t.property, types, values);
 
-        // Handle varArgs and any co-ercion required
+        // Handle varArgs and any coercion required
         values = convertArgs(values, m);
 
         Object result = null;
@@ -300,6 +300,24 @@ public final class AstValue extends SimpleNode {
         }
         
         int paramCount = types.length;
+
+        if (paramCount > 0 && src == null ||
+                m.isVarArgs() && src.length < paramCount ||
+                !m.isVarArgs() && src.length != paramCount) {
+            String inputParamCount = null;
+            if (src != null) {
+                inputParamCount = Integer.toString(src.length);
+            }
+            String msg;
+            if (m.isVarArgs()) {
+                msg = MessageFactory.get("error.invoke.tooFewParams",
+                        m.getName(), inputParamCount, Integer.toString(paramCount));
+            } else {
+                msg = MessageFactory.get("error.invoke.wrongParams",
+                        m.getName(), inputParamCount, Integer.toString(paramCount));
+            }
+            throw new IllegalArgumentException(msg);
+        }
 
         Object[] dest = new Object[paramCount];
 
