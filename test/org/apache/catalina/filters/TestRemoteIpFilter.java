@@ -151,7 +151,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         public Context getContext() {
             // Lazt init
             if (super.getContext() == null) {
-                getMappingData().context = new TesterContext();
+                super.setContext(new TesterContext());
             }
             return super.getContext();
         }
