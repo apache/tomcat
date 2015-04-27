@@ -60,4 +60,12 @@ public class TesterResponse extends Response {
         // There is no buffer created for this test object since no test depends
         // on one being present or on this method suspending it.
     }
+
+    @Override
+    public void reset() {
+        // Minimal implementation for tests that avoids using OutputBuffer
+        if (super.getCoyoteResponse() != null) {
+            super.getCoyoteResponse().reset();
+        }
+    }
 }
