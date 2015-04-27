@@ -482,4 +482,20 @@ public class TestMethodExpressionImpl {
         Object r = me.invoke(context, null);
         assertEquals("AA2Hello World!", r.toString());
     }
+
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testBug57855a() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanAA.echo2}", null , new Class[]{String.class});
+        me.invoke(context, new Object[0]);
+    }
+
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testBug57855b() {
+        MethodExpression me = factory.createMethodExpression(context,
+                "${beanAA.echo2}", null , new Class[]{String.class});
+        me.invoke(context, null);
+    }
 }
