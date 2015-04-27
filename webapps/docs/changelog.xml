@@ -103,6 +103,11 @@
         <bug>57841</bug>: Improve error logging during web application start.
         (markt)
       </fix>
+      <fix>
+        <bug>57856</bug>: Ensure that any scheme/port changes implemented by the
+        <code>RemoteIpFilter</code> also affect
+        <code>HttpServletResponse.sendRedirect()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
