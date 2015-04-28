@@ -132,7 +132,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private String compressableMimeType = "text/html,text/xml,text/plain";
+    private String compressableMimeType = "text/html,text/xml,text/plain,text/css";
     private String[] compressableMimeTypes = null;
     public String getCompressableMimeType() { return compressableMimeType; }
     public void setCompressableMimeType(String valueS) {
