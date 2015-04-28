@@ -46,6 +46,19 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite("RewriteRule ^/b/(.*) /b/../a/$1", "/b/%255A", "/b/../a/%255A");
     }
 
+    // BZ 57863
+    @Test
+    public void testRewriteMap01() throws Exception {
+        doTestRewrite("RewriteMap mapa org.apache.catalina.valves.rewrite.TesterRewriteMapA\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapa:$1}", "/b/a.html", "/c/aa");
+    }
+
+    @Test
+    public void testRewriteMap02() throws Exception {
+        doTestRewrite("RewriteMap mapa org.apache.catalina.valves.rewrite.TesterRewriteMapA\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapa:$1|dd}", "/b/x.html", "/c/dd");
+    }
+
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
@@ -61,6 +74,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         //       (http://svn.apache.org/r285186)
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
         ctx.addServletMapping("/a/%255A", "snoop");
+        ctx.addServletMapping("/c/*", "snoop");
 
         tomcat.start();
 

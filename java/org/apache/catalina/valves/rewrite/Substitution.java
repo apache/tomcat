@@ -30,8 +30,7 @@ public class Substitution {
         public String value;
 
         @Override
-        public String evaluate
-            (Matcher rule, Matcher cond, Resolver resolver) {
+        public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
             return value;
         }
 
@@ -89,9 +88,10 @@ public class Substitution {
         public RewriteMap map = null;
         public String key;
         public String defaultValue = null;
+        public int n;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
-            String result = map.lookup(key);
+            String result = map.lookup(rule.group(n));
             if (result == null) {
                 result = defaultValue;
             }
@@ -161,6 +161,9 @@ public class Substitution {
                         newElement.defaultValue = sub.substring(def + 1, close);
                     } else {
                         newElement.key = sub.substring(colon + 1, close);
+                    }
+                    if (newElement.key.startsWith("$")) {
+                        newElement.n = Integer.parseInt(newElement.key.substring(1));
                     }
                     pos = close + 1;
                     elements.add(newElement);
