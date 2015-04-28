@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpUpgradeHandler;
@@ -131,16 +132,29 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private String compressableMimeTypes = "text/html,text/xml,text/plain";
-    public String getCompressableMimeType() { return compressableMimeTypes; }
+    private String compressableMimeType = "text/html,text/xml,text/plain";
+    private String[] compressableMimeTypes = null;
+    public String getCompressableMimeType() { return compressableMimeType; }
     public void setCompressableMimeType(String valueS) {
-        compressableMimeTypes = valueS;
+        compressableMimeType = valueS;
+        compressableMimeTypes = null;
     }
-    public String getCompressableMimeTypes() {
-        return getCompressableMimeType();
-    }
-    public void setCompressableMimeTypes(String valueS) {
-        setCompressableMimeType(valueS);
+    public String[] getCompressableMimeTypes() {
+        String[] result = compressableMimeTypes;
+        if (result != null) {
+            return result;
+        }
+        List<String> values = new ArrayList<>();
+        StringTokenizer tokens = new StringTokenizer(compressableMimeType, ",");
+        while (tokens.hasMoreTokens()) {
+            String token = tokens.nextToken().trim();
+            if (token.length() > 0) {
+                values.add(token);
+            }
+        }
+        result = values.toArray(new String[values.size()]);
+        compressableMimeTypes = result;
+        return result;
     }
 
 
