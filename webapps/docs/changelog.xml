@@ -124,6 +124,10 @@
         the key alias is always converted to lower caes since that is what JKS
         key stores expect. Based on a patch by  Santosh Giri Govind M. (markt)
       </fix>
+      <fix>
+        <bug>57837</bug>: Add <code>text/css</code> to the default list of
+        compressable MIME types. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
