@@ -42,7 +42,6 @@ import org.apache.el.util.ReflectionUtil;
 public final class AstValue extends SimpleNode {
 
     private static final Object[] EMPTY_ARRAY = new Object[0];
-    private static final Object[] ARRAY_OF_SINGLE_NULL = new Object[1];
 
     protected static class Target {
         protected Object base;
@@ -292,7 +291,9 @@ public final class AstValue extends SimpleNode {
 
         if (src == null) {
             // Must be a varargs method with a single parameter.
-            return ARRAY_OF_SINGLE_NULL;
+            // Use a new array every time since the called code could modify the
+            // contents of the array
+            return new Object[1];
         }
 
         Object[] dest = new Object[paramCount];
