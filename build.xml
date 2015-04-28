@@ -2119,9 +2119,27 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
   </target>
 
+  <target name="-installer-pre-init">
+    <property environment="env" />
+    <condition property="wine.ok">
+      <or>
+        <os family="windows" />
+        <available file="wine" filepath="${env.PATH}" />
+        <isset property="skip.installer"/>
+      </or>
+    </condition>
+  </target>
+
+  <target name="-installer-init" depends="-installer-pre-init" unless="${wine.ok}">
+    <fail message="The executable wine was not found on the current path.
+Wine is required to build the Windows installer when running a release build on
+a non-Windows platform. To skip building the Windows installer, set the
+skip.installer property in build.properties" />
+  </target>
+
   <target name="-installer-prep"
       description="Prepares file structure required to build installer"
-      unless="skip.installer" depends="dist-static">
+      unless="skip.installer" depends="dist-static,-installer-init">
     <copy todir="${tomcat.dist}">
       <fileset dir="res">
         <include name="INSTALLLICENSE" />
