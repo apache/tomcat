@@ -275,6 +275,11 @@
         cipher suite ordering. This feature requires Java 8.
         Based upon patches provided by Ognjen Blagojevic. (schultz)
       </fix>
+      <add>
+        <bug>56438</bug>: Add logging that reports when a JAR is scanned for
+        TLDs but nothing is found so that Tomcat may be configured to skip this
+        JAR in future. Based on a patch by VIN. (markt)
+      </add>
       <fix>
         <bug>56848</bug>: Use <code>Locale.forLanguageTag</code> to process
         Locale headers when running on a Java 7 or later JRE. (markt)

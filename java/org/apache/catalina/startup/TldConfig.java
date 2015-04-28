@@ -266,10 +266,13 @@ public final class TldConfig  implements LifecycleListener {
 
         // Stages 3b & 4
         JarScanner jarScanner = context.getJarScanner();
-        jarScanner.scan(context.getServletContext(),
-                context.getLoader().getClassLoader(),
-                new TldJarScannerCallback(), noTldJars);
         
+        TldJarScannerCallback tldCallBack = new TldJarScannerCallback();
+        jarScanner.scan(context.getServletContext(), context.getLoader().getClassLoader(),
+                tldCallBack, noTldJars);
+        if(tldCallBack.scanFoundNoTLDs()){
+            log.info(sm.getString("tldConfig.noTldSummary"));
+        }
         // Now add all the listeners we found to the listeners for this context
         String list[] = getTldListeners();
 
@@ -290,18 +293,23 @@ public final class TldConfig  implements LifecycleListener {
     }
 
     private class TldJarScannerCallback implements JarScannerCallback {
-
+        boolean tldFound = true;
+        
         @Override
         public void scan(JarURLConnection urlConn) throws IOException {
-            tldScanJar(urlConn);
+            tldFound = tldScanJar(urlConn);
         }
 
         @Override
         public void scan(File file) {
             File metaInf = new File(file, "META-INF");
             if (metaInf.isDirectory()) {
-                tldScanDir(metaInf);
+                tldFound = tldScanDir(metaInf);
             }
+        }
+        
+        private boolean scanFoundNoTLDs() {
+            return !tldFound;
         }
     }
 
@@ -432,8 +440,9 @@ public final class TldConfig  implements LifecycleListener {
      *
      * Keep in sync with o.a.j.comiler.TldLocationsCache
      */
-    private void tldScanDir(File start) {
-
+    private boolean tldScanDir(File start) {
+        boolean isFound = false;
+        
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("tldConfig.dirScan", start.getAbsolutePath()));
         }
@@ -446,6 +455,7 @@ public final class TldConfig  implements LifecycleListener {
                     tldScanDir(fileList[i]);
                 } else if (fileList[i].getAbsolutePath().endsWith(TLD_EXT)) {
                     InputStream stream = null;
+                    isFound = true;
                     try {
                         stream = new FileInputStream(fileList[i]);
                         XmlErrorHandler handler = tldScanStream(stream);
@@ -466,6 +476,12 @@ public final class TldConfig  implements LifecycleListener {
                 }
             }
         }
+        if(!isFound){
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("tldConfig.noTldInDir", start.getAbsolutePath()));
+            }
+        }
+        return isFound;
     }
 
     /*
@@ -476,10 +492,11 @@ public final class TldConfig  implements LifecycleListener {
      * 
      * Keep in sync with o.a.j.comiler.TldLocationsCache
      */
-    private void tldScanJar(JarURLConnection jarConn) {
+    private boolean tldScanJar(JarURLConnection jarConn) {
 
         Jar jar = null;
         InputStream is;
+        boolean isFound = false;
         
         try {
             jar = JarFactory.newInstance(jarConn.getURL());
@@ -489,6 +506,7 @@ public final class TldConfig  implements LifecycleListener {
             while (entryName != null) {
                 if (entryName.startsWith("META-INF/") &&
                         entryName.endsWith(".tld")) {
+                    isFound = true;
                     is = null;
                     try {
                         is = jar.getEntryInputStream();
@@ -507,6 +525,12 @@ public final class TldConfig  implements LifecycleListener {
                 jar.nextEntry();
                 entryName = jar.getEntryName();
             }
+            if(!isFound){
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("tldConfig.noTldInJar",
+                            jarConn.getURL().getFile()));
+                }
+            }
         } catch (IOException ioe) {
             log.warn(sm.getString("tldConfig.jarFail", jarConn.getURL()), ioe);
         } finally {
@@ -514,6 +538,7 @@ public final class TldConfig  implements LifecycleListener {
                 jar.close();
             }
         }
+        return isFound;
     }
 
 
