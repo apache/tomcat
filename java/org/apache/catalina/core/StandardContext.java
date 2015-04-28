@@ -4411,7 +4411,8 @@ public class StandardContext extends ContainerBase
                 String canonicalPath = resource.getCanonicalPath();
                 if (canonicalPath == null) {
                     return null;
-                } else if (resource.isDirectory() && !canonicalPath.endsWith(File.separator)) {
+                } else if ((resource.isDirectory() && !canonicalPath.endsWith(File.separator) ||
+                        !resource.exists()) && path.endsWith("/")) {
                     return canonicalPath + File.separatorChar;
                 } else {
                     return canonicalPath;
