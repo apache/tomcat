@@ -21,7 +21,6 @@ import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
@@ -201,11 +200,11 @@ public class Http11Processor extends AbstractProcessor {
      */
     protected Pattern noCompressionUserAgents = null;
 
+
     /**
-     * List of MIMES which could be gzipped
+     * List of MIMES for which compression may be enabled.
      */
-    protected String[] compressableMimeTypes =
-    { "text/html", "text/xml", "text/plain" };
+    protected String[] compressableMimeTypes;
 
 
     /**
@@ -320,18 +319,6 @@ public class Http11Processor extends AbstractProcessor {
         }
     }
 
-    /**
-     * Add a mime-type which will be compressible
-     * The mime-type String will be exactly matched
-     * in the response mime-type header .
-     *
-     * @param mimeType mime-type string
-     */
-    public void addCompressableMimeType(String mimeType) {
-        compressableMimeTypes =
-            addStringArray(compressableMimeTypes, mimeType);
-    }
-
 
     /**
      * Set compressible mime-type list (this method is best when used with
@@ -340,24 +327,6 @@ public class Http11Processor extends AbstractProcessor {
      */
     public void setCompressableMimeTypes(String[] compressableMimeTypes) {
         this.compressableMimeTypes = compressableMimeTypes;
-    }
-
-
-    /**
-     * Set compressable mime-type list
-     * List contains users agents separated by ',' :
-     *
-     * ie: "text/html,text/xml,text/plain"
-     */
-    public void setCompressableMimeTypes(String compressableMimeTypes) {
-        if (compressableMimeTypes != null) {
-            this.compressableMimeTypes = null;
-            StringTokenizer st = new StringTokenizer(compressableMimeTypes, ",");
-
-            while (st.hasMoreTokens()) {
-                addCompressableMimeType(st.nextToken().trim());
-            }
-        }
     }
 
 
@@ -374,29 +343,6 @@ public class Http11Processor extends AbstractProcessor {
             return "force";
         }
         return "off";
-    }
-
-
-    /**
-     * General use method
-     *
-     * @param sArray the StringArray
-     * @param value string
-     */
-    private String[] addStringArray(String sArray[], String value) {
-        String[] result = null;
-        if (sArray == null) {
-            result = new String[1];
-            result[0] = value;
-        }
-        else {
-            result = new String[sArray.length + 1];
-            for (int i = 0; i < sArray.length; i++) {
-                result[i] = sArray[i];
-            }
-            result[sArray.length] = value;
-        }
-        return result;
     }
 
 
