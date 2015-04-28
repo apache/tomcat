@@ -201,6 +201,11 @@
         it clear that the order keys are read from the keystore is
         implementation dependent. (markt)
       </add>
+      <fix>
+        <bug>57864</bug>: Update the documentation web application to make it
+        clearer that hex values are not valid for cluster send options. Based on
+        a patch by Kyohei Nakamura. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
