@@ -123,11 +123,11 @@
       <code>Channel.SEND_OPTIONS_SYNCHRONIZED_ACK = 0x0004</code><br/>
       <code>Channel.SEND_OPTIONS_ASYNCHRONOUS = 0x0008</code><br/>
       <code>Channel.SEND_OPTIONS_USE_ACK = 0x0002</code><br/>
-      So to use ACK and ASYNC messaging, the flag would be <code>10 (8+2) or 0x000B</code><br/>
+      So to use ACK and ASYNC messaging, the flag would be <code>10</code> (8+2)
+      <br/>
       Note that if you use ASYNC messaging it is possible for update messages
       for a session to be processed by the receiving nodes in a different order
-      to the order in which they were sent.
-      </p>
+      to the order in which they were sent.</p>
     </attribute>
     <attribute name="channelStartOptions" required="false">
       <p>Sets the start and stop flags for the &lt;Channel&gt; object used by the cluster.
