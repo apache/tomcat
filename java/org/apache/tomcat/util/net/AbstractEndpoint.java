@@ -43,8 +43,8 @@ import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
+
 /**
- *
  * @author Mladen Turk
  * @author Remy Maucherat
  */
@@ -230,6 +230,34 @@ public abstract class AbstractEndpoint<S> {
         sslHostConfig.setConfigType(getSslConfigType());
     }
     protected abstract SSLHostConfig.Type getSslConfigType();
+
+    protected SSLHostConfig getSSLHostConfig(String sniHostName) {
+        SSLHostConfig result = null;
+
+        if (sniHostName != null) {
+            // First choice - direct match
+            result = sslHostConfigs.get(sniHostName);
+            if (result != null) {
+                return result;
+            }
+            // Second choice, wildcard match
+            int indexOfDot = sniHostName.indexOf('.');
+            if (indexOfDot > -1) {
+                result = sslHostConfigs.get("*" + sniHostName.substring(indexOfDot));
+            }
+        }
+
+        // Fall-back. Use the default
+        if (result == null) {
+            result = sslHostConfigs.get(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
+        }
+        if (result == null) {
+            // Should never happen.
+            throw new IllegalStateException();
+        }
+        return result;
+    }
+
 
     /**
      * Has the user requested that send file be used where possible?
