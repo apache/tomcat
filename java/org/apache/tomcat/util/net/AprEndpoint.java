@@ -45,6 +45,7 @@ import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLContext;
+import org.apache.tomcat.jni.SSLContext.SNICallBack;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
@@ -70,7 +71,7 @@ import org.apache.tomcat.util.net.SSLHostConfig.Type;
  * @author Mladen Turk
  * @author Remy Maucherat
  */
-public class AprEndpoint extends AbstractEndpoint<Long> {
+public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     // -------------------------------------------------------------- Constants
 
@@ -472,12 +473,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         if (isSSLEnabled()) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
 
-                // TODO: No SNI support in APR/native so only process the
-                //       default host.
-                if (!SSLHostConfig.DEFAULT_SSL_HOST_NAME.equals(sslHostConfig.getHostName())) {
-                    continue;
-                }
-
                 if (sslHostConfig.getCertificateFile() == null) {
                     // This is required
                     throw new Exception(sm.getString("endpoint.apr.noSslCertFile"));
@@ -514,8 +509,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 }
 
                 // Create SSL Context
+                long ctx = 0;
                 try {
-                    sslContext = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
+                    ctx = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
                 } catch (Exception e) {
                     // If the sslEngine is disabled on the AprLifecycleListener
                     // there will be an Exception here but there is no way to check
@@ -529,7 +525,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     try {
                         legacyRenegSupported = SSL.hasOp(SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
                         if (legacyRenegSupported)
-                            SSLContext.setOptions(sslContext, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
+                            SSLContext.setOptions(ctx, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
                     } catch (UnsatisfiedLinkError e) {
                         // Ignore
                     }
@@ -546,7 +542,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     try {
                         orderCiphersSupported = SSL.hasOp(SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
                         if (orderCiphersSupported)
-                            SSLContext.setOptions(sslContext, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                            SSLContext.setOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
                     } catch (UnsatisfiedLinkError e) {
                         // Ignore
                     }
@@ -563,7 +559,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     try {
                         disableCompressionSupported = SSL.hasOp(SSL.SSL_OP_NO_COMPRESSION);
                         if (disableCompressionSupported)
-                            SSLContext.setOptions(sslContext, SSL.SSL_OP_NO_COMPRESSION);
+                            SSLContext.setOptions(ctx, SSL.SSL_OP_NO_COMPRESSION);
                     } catch (UnsatisfiedLinkError e) {
                         // Ignore
                     }
@@ -580,7 +576,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     try {
                         disableSessionTicketsSupported = SSL.hasOp(SSL.SSL_OP_NO_TICKET);
                         if (disableSessionTicketsSupported)
-                            SSLContext.setOptions(sslContext, SSL.SSL_OP_NO_TICKET);
+                            SSLContext.setOptions(ctx, SSL.SSL_OP_NO_TICKET);
                     } catch (UnsatisfiedLinkError e) {
                         // Ignore
                     }
@@ -593,16 +589,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 }
 
                 // List the ciphers that the client is permitted to negotiate
-                SSLContext.setCipherSuite(sslContext, SSLCipherSuite);
+                SSLContext.setCipherSuite(ctx, SSLCipherSuite);
                 // Load Server key and certificate
-                SSLContext.setCertificate(sslContext, sslHostConfig.getCertificateFile(),
+                SSLContext.setCertificate(ctx, sslHostConfig.getCertificateFile(),
                         sslHostConfig.getCertificateKeyFile(), SSLPassword, SSL.SSL_AIDX_RSA);
                 // Set certificate chain file
-                SSLContext.setCertificateChainFile(sslContext, SSLCertificateChainFile, false);
+                SSLContext.setCertificateChainFile(ctx, SSLCertificateChainFile, false);
                 // Support Client Certificates
-                SSLContext.setCACertificate(sslContext, SSLCACertificateFile, SSLCACertificatePath);
+                SSLContext.setCACertificate(ctx, SSLCACertificateFile, SSLCACertificatePath);
                 // Set revocation
-                SSLContext.setCARevocation(sslContext, SSLCARevocationFile, SSLCARevocationPath);
+                SSLContext.setCARevocation(ctx, SSLCARevocationFile, SSLCARevocationPath);
                 // Client certificate verification
                 value = SSL.SSL_CVERIFY_NONE;
                 if ("optional".equalsIgnoreCase(SSLVerifyClient)) {
@@ -612,7 +608,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 } else if ("optionalNoCA".equalsIgnoreCase(SSLVerifyClient)) {
                     value = SSL.SSL_CVERIFY_OPTIONAL_NO_CA;
                 }
-                SSLContext.setVerify(sslContext, value, SSLVerifyDepth);
+                SSLContext.setVerify(ctx, value, SSLVerifyDepth);
                 // For now, sendfile is not supported with SSL
                 if (getUseSendfile()) {
                     setUseSendfileInternal(false);
@@ -623,14 +619,32 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
                 if (negotiableProtocols.size() > 0) {
                     byte[] protocols = buildAlpnConfig(negotiableProtocols);
-                    if (SSLContext.setALPN(sslContext, protocols, protocols.length) != 0) {
+                    if (SSLContext.setALPN(ctx, protocols, protocols.length) != 0) {
                         log.warn(sm.getString("endpoint.alpn.fail", negotiableProtocols));
                     }
                 }
+                sslHostConfig.setSslContext(Long.valueOf(ctx));
             }
+            SSLHostConfig defaultSSLHostConfig = sslHostConfigs.get(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
+            Long defaultSSLContext = (Long) defaultSSLHostConfig.getSslContext();
+            sslContext = defaultSSLContext.longValue();
+            SSLContext.registerDefault(defaultSSLContext, this);
+
         } else if (negotiableProtocols.size() > 0) {
             log.info(sm.getString("endpoint.noNegotiation", getName(), negotiableProtocols.toString()));
         }
+    }
+
+
+    @Override
+    public long getSslContext(String sniHostName) {
+        SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
+        Long ctx = (Long) sslHostConfig.getSslContext();
+        if (ctx != null) {
+            return ctx.longValue();
+        }
+        // Default
+        return 0;
     }
 
 
@@ -792,7 +806,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             serverSock = 0;
         }
 
-        sslContext = 0;
+        if (sslContext != 0) {
+            Long ctx = Long.valueOf(sslContext);
+            SSLContext.unregisterDefault(ctx);
+            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                sslHostConfig.setSslContext(null);
+            }
+            sslContext = 0;
+        }
 
         // Close all APR memory pools and resources if initialised
         if (rootPool != 0) {
