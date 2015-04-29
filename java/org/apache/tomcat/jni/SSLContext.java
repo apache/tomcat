@@ -17,6 +17,9 @@
 
 package org.apache.tomcat.jni;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /** SSL Context
  *
  * @author Mladen Turk
@@ -289,4 +292,25 @@ public final class SSLContext {
     public static native void setVerify(long ctx, int level, int depth);
 
     public static native int setALPN(long ctx, byte[] proto, int len);
+
+    public static long sniCallback(long defaultCtx, String sniHostName) {
+        SNICallBack sniCallBack = sniCallBacks.get(Long.valueOf(defaultCtx));
+        if (sniCallBack == null) {
+            return 0;
+        }
+        return sniCallBack.getSslContext(sniHostName);
+    }
+
+    private static Map<Long,SNICallBack> sniCallBacks = new ConcurrentHashMap<>();
+    public static void registerDefault(Long defaultSSLContext,
+            SNICallBack sniCallBack) {
+        sniCallBacks.put(defaultSSLContext, sniCallBack);
+    }
+    public static void unregisterDefault(Long ctx) {
+        sniCallBacks.remove(ctx);
+    }
+
+    public static interface SNICallBack {
+        public long getSslContext(String sniHostName);
+    }
 }
