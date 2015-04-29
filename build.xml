@@ -3112,6 +3112,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <fail unless="file" />
     <exec executable="${gpg.exec}" failonerror="true"
           inputstring="${gpg.passphrase}">
+      <arg value="--batch"/>
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
       <arg value="-a"/>
