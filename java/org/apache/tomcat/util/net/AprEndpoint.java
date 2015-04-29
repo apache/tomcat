@@ -676,10 +676,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
     }
 
 
-    public long getJniSslContext() {
-        return sslContext;
-    }
-
     /**
      * Start the APR endpoint, creating acceptor, poller and sendfile threads.
      */
