@@ -27,7 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -1070,28 +1069,6 @@ public abstract class AbstractEndpoint<S> {
     private String sessionTimeout = "86400";
     public String getSessionTimeout() { return sessionTimeout;}
     public void setSessionTimeout(String s) { sessionTimeout = s;}
-
-
-    private String[] sslEnabledProtocolsarr = new String[0];
-    public String[] getSslEnabledProtocolsArray() {
-        return this.sslEnabledProtocolsarr;
-    }
-    public void setSslEnabledProtocols(String s) {
-        if (s == null) {
-            this.sslEnabledProtocolsarr = new String[0];
-        } else {
-            ArrayList<String> sslEnabledProtocols = new ArrayList<>();
-            StringTokenizer t = new StringTokenizer(s,",");
-            while (t.hasMoreTokens()) {
-                String p = t.nextToken().trim();
-                if (p.length() > 0) {
-                    sslEnabledProtocols.add(p);
-                }
-            }
-            sslEnabledProtocolsarr = sslEnabledProtocols.toArray(
-                    new String[sslEnabledProtocols.size()]);
-        }
-    }
 
 
     protected final Set<SocketWrapperBase<S>> waitingRequests = Collections
