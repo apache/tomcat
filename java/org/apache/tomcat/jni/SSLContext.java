@@ -293,7 +293,7 @@ public final class SSLContext {
 
     public static native int setALPN(long ctx, byte[] proto, int len);
 
-    public static long sniCallback(long defaultCtx, String sniHostName) {
+    public static long sniCallBack(long defaultCtx, String sniHostName) {
         SNICallBack sniCallBack = sniCallBacks.get(Long.valueOf(defaultCtx));
         if (sniCallBack == null) {
             return 0;
