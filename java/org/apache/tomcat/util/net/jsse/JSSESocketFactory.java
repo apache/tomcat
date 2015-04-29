@@ -46,7 +46,6 @@ import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSessionContext;
@@ -58,6 +57,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
+import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
@@ -107,9 +107,9 @@ public class JSSESocketFactory implements SSLUtil {
             sslProtocol = defaultProtocol;
         }
 
-        SSLContext context;
+        javax.net.ssl.SSLContext context;
         try {
-             context = SSLContext.getInstance(sslProtocol);
+             context = javax.net.ssl.SSLContext.getInstance(sslProtocol);
              context.init(null,  null,  null);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             // This is fatal for the connector so throw an exception to prevent
@@ -376,9 +376,7 @@ public class JSSESocketFactory implements SSLUtil {
             protocol = defaultProtocol;
         }
 
-        SSLContext context = SSLContext.getInstance(protocol);
-
-        return context;
+        return new JSSESSLContext(protocol);
     }
 
     @Override

@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.net;
 
 import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 
