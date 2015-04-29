@@ -21,7 +21,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Poller;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
@@ -171,15 +170,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     }
 
 
-    @Override
-    public void start() throws Exception {
-        super.start();
-        if (npnHandler != null) {
-            long sslCtx = ((AprEndpoint) getEndpoint()).getJniSslContext();
-            npnHandler.init(getEndpoint(), sslCtx, getAdapter());
-        }
-    }
-
     // --------------------  Connection handler --------------------
 
     protected static class Http11ConnectionHandler
@@ -203,28 +193,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 socket.setReadTimeout(getProtocol().getEndpoint().getKeepAliveTimeout());
                 socket.registerReadInterest();
             }
-        }
-
-        @Override
-        public SocketState process(SocketWrapperBase<Long> socket,
-                SocketStatus status) {
-            if (getProtocol().npnHandler != null) {
-                Processor processor = null;
-                if (status == SocketStatus.OPEN_READ) {
-                    processor = connections.get(socket.getSocket());
-
-                }
-                if (processor == null) {
-                    // if not null - handled by http11
-                    SocketState socketState = getProtocol().npnHandler.process(socket, status);
-                    // handled by npn protocol.
-                    if (socketState == SocketState.CLOSED ||
-                            socketState == SocketState.LONG) {
-                        return socketState;
-                    }
-                }
-            }
-            return super.process(socket, status);
         }
 
         @Override

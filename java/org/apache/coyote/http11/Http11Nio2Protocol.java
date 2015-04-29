@@ -23,7 +23,6 @@ import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.Nio2Endpoint.Handler;
 import org.apache.tomcat.util.net.Nio2Endpoint.Nio2SocketWrapper;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
@@ -45,16 +44,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
 
     @Override
     protected Log getLog() { return log; }
-
-
-    @Override
-    public void start() throws Exception {
-        super.start();
-        if (npnHandler != null) {
-            npnHandler.init(getEndpoint(), 0, getAdapter());
-        }
-    }
-
 
 
     // -------------------- Pool setup --------------------
@@ -116,18 +105,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                     recycledProcessors.push(processor);
                 }
             }
-        }
-
-        @Override
-        public SocketState process(SocketWrapperBase<Nio2Channel> socket,
-                SocketStatus status) {
-            if (getProtocol().npnHandler != null) {
-                SocketState ss = getProtocol().npnHandler.process(socket, status);
-                if (ss != SocketState.OPEN) {
-                    return ss;
-                }
-            }
-            return super.process(socket, status);
         }
 
 
