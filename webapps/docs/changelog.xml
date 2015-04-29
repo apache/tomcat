@@ -77,6 +77,11 @@
         Add support for HPACK header encoding and decoding, contributed
         by Stuart Douglas. (remm)
       </add>
+      <add>
+        <bug>57108</bug>: Add support for Server Name Indication (SNI). There
+        has been significant changes to the SSL configuration in server.xml to
+        support this. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
