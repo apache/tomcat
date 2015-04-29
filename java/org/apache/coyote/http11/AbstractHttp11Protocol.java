@@ -370,11 +370,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setKeystoreFile(keystoreFile);
     }
-    public void setCertificateFile(String certificateFile) {
+    public void setSSLCertificateFile(String certificateFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateFile(certificateFile);
     }
-    public void setCertificateKeyFile(String certificateKeyFile) {
+    public void setSSLCertificateKeyFile(String certificateKeyFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeyFile(certificateKeyFile);
     }
