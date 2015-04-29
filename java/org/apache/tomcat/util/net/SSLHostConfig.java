@@ -37,6 +37,10 @@ public class SSLHostConfig {
 
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
+    private Object sslContext;
+
+    // Configuration properties
+
     // Common
     private Set<String> protocols = new HashSet<>();
     // JSSE
@@ -48,6 +52,16 @@ public class SSLHostConfig {
     public SSLHostConfig() {
         // Set defaults that can't be (easily) set when defining the fields.
         setProtocols("all");
+    }
+
+
+    public Object getSslContext() {
+        return sslContext;
+    }
+
+
+    public void setSslContext(Object sslContext) {
+        this.sslContext = sslContext;
     }
 
 

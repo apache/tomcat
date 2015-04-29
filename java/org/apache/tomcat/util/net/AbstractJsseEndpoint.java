@@ -16,9 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
@@ -32,7 +30,6 @@ import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     private SSLImplementation sslImplementation = null;
-    private Map<String,SSLContextWrapper> sslContexts = new HashMap<>();
 
     public SSLImplementation getSslImplementation() {
         return sslImplementation;
@@ -69,14 +66,19 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
                     sslUtil.configureSessionContext(sessionContext);
                 }
                 SSLContextWrapper sslContextWrapper = new SSLContextWrapper(sslContext, sslUtil);
-                sslContexts.put(sslHostConfig.getHostName(), sslContextWrapper);
+                sslHostConfig.setSslContext(sslContextWrapper);
             }
         }
     }
 
 
     protected SSLEngine createSSLEngine(String sniHostName) {
-        SSLContextWrapper sslContextWrapper = getSSLContextWrapper(sniHostName);
+        SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
+        SSLContextWrapper sslContextWrapper = (SSLContextWrapper) sslHostConfig.getSslContext();
+        if (sslContextWrapper == null) {
+            // TODO i18n
+            throw new IllegalStateException();
+        }
 
         SSLEngine engine = sslContextWrapper.getSSLContext().createSSLEngine();
         if ("false".equals(getClientAuth())) {
@@ -97,10 +99,11 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     }
 
 
-
     @Override
     public void unbind() throws Exception {
-        sslContexts.clear();
+        for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+            sslHostConfig.setSslContext(null);
+        }
     }
 
 
@@ -136,34 +139,6 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             } else {
                 result[i] = managers[i];
             }
-        }
-        return result;
-    }
-
-
-    private SSLContextWrapper getSSLContextWrapper(String sniHostName) {
-        SSLContextWrapper result = null;
-
-        if (sniHostName != null) {
-            // First choice - direct match
-            result = sslContexts.get(sniHostName);
-            if (result != null) {
-                return result;
-            }
-            // Second choice, wildcard match
-            int indexOfDot = sniHostName.indexOf('.');
-            if (indexOfDot > -1) {
-                result = sslContexts.get("*" + sniHostName.substring(indexOfDot));
-            }
-        }
-
-        // Fall-back. Use the default
-        if (result == null) {
-            result = sslContexts.get(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
-        }
-        if (result == null) {
-            // Should never happen.
-            throw new IllegalStateException();
         }
         return result;
     }
