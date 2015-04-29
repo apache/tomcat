@@ -25,7 +25,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
@@ -52,15 +51,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
     @Override
     protected Log getLog() { return log; }
-
-
-    @Override
-    public void start() throws Exception {
-        super.start();
-        if (npnHandler != null) {
-            npnHandler.init(getEndpoint(), 0, getAdapter());
-        }
-    }
 
 
     // -------------------- Pool setup --------------------
@@ -167,18 +157,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                 processor.recycle();
                 recycledProcessors.push(processor);
             }
-        }
-
-        @Override
-        public SocketState process(SocketWrapperBase<NioChannel> socket,
-                SocketStatus status) {
-            if (getProtocol().npnHandler != null) {
-                SocketState ss = getProtocol().npnHandler.process(socket, status);
-                if (ss != SocketState.OPEN) {
-                    return ss;
-                }
-            }
-            return super.process(socket, status);
         }
 
 

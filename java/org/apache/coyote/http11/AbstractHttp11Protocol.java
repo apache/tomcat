@@ -327,17 +327,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         getEndpoint().setMaxKeepAliveRequests(mkar);
     }
 
-    protected NpnHandler<S> npnHandler;
-    @SuppressWarnings("unchecked")
-    public void setNpnHandler(String impl) {
-        try {
-            Class<?> c = Class.forName(impl);
-            npnHandler = (NpnHandler<S>) c.newInstance();
-        } catch (Exception ex) {
-            getLog().warn("Failed to init light protocol " + impl, ex);
-        }
-    }
-
 
     // ----------------------------------------------- HTTPS specific properties
     // -------------------------------------------- Handled via an SSLHostConfig
