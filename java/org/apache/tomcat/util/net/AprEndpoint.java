@@ -470,15 +470,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
         // Initialize SSL if needed
         if (isSSLEnabled()) {
-
-            // TODO: Temp code until config refactoring is complete. Remove once
-            //       refactoring is complete.
-            if (sslHostConfigs.size() == 0) {
-                SSLHostConfig defaultSslHostConfig = new SSLHostConfig();
-                defaultSslHostConfig.setHostName(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
-                sslHostConfigs.put(SSLHostConfig.DEFAULT_SSL_HOST_NAME, defaultSslHostConfig);
-            }
-
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
 
                 // TODO: No SNI support in APR/native so only process the
