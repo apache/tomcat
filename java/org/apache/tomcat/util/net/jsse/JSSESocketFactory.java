@@ -386,13 +386,8 @@ public class JSSESocketFactory implements SSLUtil {
             keystoreType = defaultKeystoreType;
         }
 
-        String algorithm = endpoint.getAlgorithm();
-        if (algorithm == null) {
-            algorithm = KeyManagerFactory.getDefaultAlgorithm();
-        }
-
         return getKeyManagers(keystoreType, endpoint.getKeystoreProvider(),
-                algorithm, endpoint.getKeyAlias());
+                sslHostConfig.getCertificateAlgorithm(), endpoint.getKeyAlias());
     }
 
     @Override

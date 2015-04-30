@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.net.ssl.KeyManagerFactory;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -45,6 +47,7 @@ public class SSLHostConfig {
     private Set<String> protocols = new HashSet<>();
     // JSSE
     private String keystoreFile = System.getProperty("user.home")+"/.keystore";
+    private String certificateAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     // OpenSSL
     private String certificateFile;
     private String certificateKeyFile;
@@ -142,6 +145,17 @@ public class SSLHostConfig {
 
     public String getKeystoreFile() {
         return keystoreFile;
+    }
+
+
+    public void setCertificateAlgorithm(String certificateAlgorithm) {
+        setProperty("certificateAlgorithm", Type.JSSE);
+        this.certificateAlgorithm = certificateAlgorithm;
+    }
+
+
+    public String getCertificateAlgorithm() {
+        return certificateAlgorithm;
     }
 
 
