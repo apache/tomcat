@@ -1065,6 +1065,20 @@
       RECOMMENDED).</p>
     </attribute>
 
+    <attribute name="certificateVerification" required="false">
+      <p>Set to <code>required</code> if you want the SSL stack to require a
+      valid certificate chain from the client before accepting a connection.
+      Set to <code>optional</code> if you want the SSL stack to request a client
+      Certificate, but not fail if one isn't presented. Set to
+      <code>optionalNoCA</code> if you want client certificates to be optional
+      and you don't want Tomcat to check them against the list of trusted CAs.
+      If the TLS provider doesn't support this option (OpenSSL does, JSSE does
+      not) it is treated as if <code>optional</code> was specified. A
+      <code>none</code> value (which is the default) will not require a
+      certificate chain unless the client requests a resource protected by a
+      security constraint that uses <code>CLIENT-CERT</code> authentication.</p>
+    </attribute>
+
     <attribute name="hostName" required="false">
       <p>The name of the SSL Host. This should either be the fully qualified
       domain name (e.g. <code>tomcat.apache.org</code>) or a wild card domain
@@ -1142,13 +1156,9 @@
     </attribute>
 
     <attribute name="clientAuth" required="false">
-      <p>Set to <code>true</code> if you want the SSL stack to require a
-      valid certificate chain from the client before accepting a connection.
-      Set to <code>want</code> if you want the SSL stack to request a client
-      Certificate, but not fail if one isn't presented. A <code>false</code>
-      value (which is the default) will not require a certificate chain
-      unless the client requests a resource protected by a security
-      constraint that uses <code>CLIENT-CERT</code> authentication.</p>
+      <p>This is an alias for the <code>certificateValidation</code> attribute
+      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="clientCertProvider" required="false">
@@ -1425,9 +1435,9 @@
     </attribute>
 
     <attribute name="SSLVerifyClient" required="false">
-      <p>Ask client for certificate. The default is "none", meaning the client
-      will not have the opportunity to submit a certificate. Other acceptable
-      values include "optional", "require" and "optionalNoCA".</p>
+      <p>This is an alias for the <code>certificateValidation</code> attribute
+      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="SSLVerifyDepth" required="false">

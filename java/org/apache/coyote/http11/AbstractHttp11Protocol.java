@@ -356,6 +356,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    // TODO: All of these SSL setters can be removed once it is no longer
+    // necessary to support the old configuration attributes (Tomcat 10?).
+
     public void setSslEnabledProtocols(String enabledProtocols) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setProtocols(enabledProtocols);
@@ -382,6 +385,16 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setAlgorithm(String keyManagerAlgorithm) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setKeyManagerAlgorithm(keyManagerAlgorithm);
+    }
+
+    public void setClientAuth(String certificateVerification) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateVerification(certificateVerification);
+    }
+
+    public void setSSLVerifyClient(String certificateVerification) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateVerification(certificateVerification);
     }
 
 
