@@ -1051,8 +1051,8 @@
 
   <attributes>
 
-    <attribute name="certificateFile" required="false">
-      <p>OpenSSL only (required).</p>
+    <attribute name="certificateFile" required="true">
+      <p>OpenSSL only.</p>
       <p>Name of the file that contains the server certificate. The format is
       PEM-encoded.</p>
     </attribute>
@@ -1087,6 +1087,7 @@
     </attribute>
 
     <attribute name="keyManagerAlgorithm" required="false">
+      <p>JSSE only.</p>
       <p>The <code>KeyManager</code> algorithm to be used. This defaults to
       <code>KeyManagerFactory.getDefaultAlgorithm()</code> which returns
       <code>SunX509</code> for Sun JVMs. IBM JVMs return
