@@ -387,7 +387,7 @@ public class JSSESocketFactory implements SSLUtil {
         }
 
         return getKeyManagers(keystoreType, endpoint.getKeystoreProvider(),
-                sslHostConfig.getCertificateAlgorithm(), endpoint.getKeyAlias());
+                sslHostConfig.getKeyManagerAlgorithm(), endpoint.getKeyAlias());
     }
 
     @Override

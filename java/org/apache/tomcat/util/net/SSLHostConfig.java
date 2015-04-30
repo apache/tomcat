@@ -46,8 +46,8 @@ public class SSLHostConfig {
     // Common
     private Set<String> protocols = new HashSet<>();
     // JSSE
+    private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     private String keystoreFile = System.getProperty("user.home")+"/.keystore";
-    private String certificateAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     // OpenSSL
     private String certificateFile;
     private String certificateKeyFile;
@@ -137,6 +137,17 @@ public class SSLHostConfig {
 
     // ---------------------------------- JSSE specific configuration properties
 
+    public void setKeyManagerAlgorithm(String keyManagerAlgorithm) {
+        setProperty("keyManagerAlgorithm", Type.JSSE);
+        this.keyManagerAlgorithm = keyManagerAlgorithm;
+    }
+
+
+    public String getKeyManagerAlgorithm() {
+        return keyManagerAlgorithm;
+    }
+
+
     public void setKeystoreFile(String keystoreFile) {
         setProperty("keystoreFile", Type.JSSE);
         this.keystoreFile = keystoreFile;
@@ -145,17 +156,6 @@ public class SSLHostConfig {
 
     public String getKeystoreFile() {
         return keystoreFile;
-    }
-
-
-    public void setCertificateAlgorithm(String certificateAlgorithm) {
-        setProperty("certificateAlgorithm", Type.JSSE);
-        this.certificateAlgorithm = certificateAlgorithm;
-    }
-
-
-    public String getCertificateAlgorithm() {
-        return certificateAlgorithm;
     }
 
 
