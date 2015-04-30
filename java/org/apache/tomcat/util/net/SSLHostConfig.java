@@ -45,6 +45,7 @@ public class SSLHostConfig {
 
     // Common
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
+    private int certificateVerificationDepth = 10;
 
     private Set<String> protocols = new HashSet<>();
     // JSSE
@@ -108,6 +109,16 @@ public class SSLHostConfig {
 
     public CertificateVerification getCertificateVerification() {
         return certificateVerification;
+    }
+
+
+    public void setCertificateVerificationDepth(int certificateVerificationDepth) {
+        this.certificateVerificationDepth = certificateVerificationDepth;
+    }
+
+
+    public int getCertificateVerificationDepth() {
+        return certificateVerificationDepth;
     }
 
 

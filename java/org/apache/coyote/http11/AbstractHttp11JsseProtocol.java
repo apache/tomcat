@@ -73,13 +73,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
         return getEndpoint().getTruststoreAlgorithm();
     }
 
-    public void setTrustMaxCertLength(String s){
-        getEndpoint().setTrustMaxCertLength(s);
-    }
-    public String getTrustMaxCertLength(){
-        return getEndpoint().getTrustMaxCertLength();
-    }
-
     public void setCrlFile(String s){getEndpoint().setCrlFile(s);}
     public String getCrlFile(){ return getEndpoint().getCrlFile();}
 
