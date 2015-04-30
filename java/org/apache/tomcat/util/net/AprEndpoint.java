@@ -297,9 +297,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     protected boolean SSLHonorCipherOrder = false;
     /**
-     * Set to <code>true</code> to enforce the <i>server's</i> cipher order
-     * instead of the default which is to allow the client to choose a
-     * preferred cipher.
+     * Configures whether or not this endpoint enforces the server's preference
+     * order ciphers.
+     *
+     * @param SSLHonorCipherOrder   Set to <code>true</code> to enforce the
+     *                              server's cipher order instead of the default
+     *                              which is to allow the client to choose a
+     *                              preferred cipher.
      */
     public void setSSLHonorCipherOrder(boolean SSLHonorCipherOrder) { this.SSLHonorCipherOrder = SSLHonorCipherOrder; }
     public boolean getSSLHonorCipherOrder() { return SSLHonorCipherOrder; }
@@ -312,8 +316,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     protected boolean SSLDisableCompression = false;
 
     /**
-     * Set to <code>true</code> to disable SSL compression. This thwarts CRIME
-     * attack.
+     * Configures whether or not to use SSL compression. The default is
+     * <code>false</code>.
+     *
+     * @param SSLDisableCompression Set to <code>true</code> to disable SSL
+     *                              compression. This thwarts the CRIMEattack.
      */
     public void setSSLDisableCompression(boolean SSLDisableCompression) { this.SSLDisableCompression = SSLDisableCompression; }
     public boolean getSSLDisableCompression() { return SSLDisableCompression; }
@@ -364,7 +371,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Number of keepalive sockets.
+     * Obtain the number of kept alive sockets.
+     *
+     * @return The number of open sockets currently managed by the Poller
      */
     public int getKeepAliveCount() {
         if (poller == null) {
@@ -376,7 +385,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     /**
-     * Number of sendfile sockets.
+     * Obtain the number of sendfile sockets.
+     *
+     * @return The number of sockets currently managed by the Sendfile poller.
      */
     public int getSendfileCount() {
         if (sendfile == null) {
@@ -941,7 +952,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     /**
-     * Process given socket. Typically keep alive or upgraded protocol.
+     * Process the given socket. Typically keep alive or upgraded protocol.
+     *
+     * @param socket    The socket to process
+     * @param status    The current status of the socket
+     *
+     * @return <code>true</code> if the processing completed normally otherwise
+     *         <code>false</code> which indicates an error occurred and that the
+     *         socket should be closed
      */
     public boolean processSocket(long socket, SocketStatus status) {
         try {
@@ -1190,6 +1208,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         /**
          * Removes the specified socket from the poller.
+         *
+         * @param socket The socket to remove
          *
          * @return The configured timeout for the socket or zero if the socket
          *         was not in the list of socket timeouts
@@ -2929,6 +2949,5 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException();
         }
-
     }
 }
