@@ -527,33 +527,22 @@ public class JSSESocketFactory implements SSLUtil {
      * @param trustStore The configured TrustStore.
      * @return The parameters including the CRLs and TrustStore.
      */
-    protected CertPathParameters getParameters(String algorithm,
-                                                String crlf,
-                                                KeyStore trustStore)
-        throws Exception {
-        CertPathParameters params = null;
+    protected CertPathParameters getParameters(String algorithm, String crlf,
+            KeyStore trustStore) throws Exception {
+
         if("PKIX".equalsIgnoreCase(algorithm)) {
             PKIXBuilderParameters xparams =
-                new PKIXBuilderParameters(trustStore, new X509CertSelector());
+                    new PKIXBuilderParameters(trustStore, new X509CertSelector());
             Collection<? extends CRL> crls = getCRLs(crlf);
             CertStoreParameters csp = new CollectionCertStoreParameters(crls);
             CertStore store = CertStore.getInstance("Collection", csp);
             xparams.addCertStore(store);
             xparams.setRevocationEnabled(true);
-            String trustLength = endpoint.getTrustMaxCertLength();
-            if(trustLength != null) {
-                try {
-                    xparams.setMaxPathLength(Integer.parseInt(trustLength));
-                } catch(Exception ex) {
-                    log.warn("Bad maxCertLength: "+trustLength);
-                }
-            }
-
-            params = xparams;
+            xparams.setMaxPathLength(sslHostConfig.getCertificateVerificationDepth());
+            return xparams;
         } else {
             throw new CRLException("CRLs not supported for type: "+algorithm);
         }
-        return params;
     }
 
 

@@ -1063,12 +1063,6 @@ public abstract class AbstractEndpoint<S> {
         this.crlFile = crlFile;
     }
 
-    private String trustMaxCertLength = null;
-    public String getTrustMaxCertLength() {return trustMaxCertLength;}
-    public void setTrustMaxCertLength(String trustMaxCertLength) {
-        this.trustMaxCertLength = trustMaxCertLength;
-    }
-
     private String sessionCacheSize = null;
     public String getSessionCacheSize() { return sessionCacheSize;}
     public void setSessionCacheSize(String s) { sessionCacheSize = s;}

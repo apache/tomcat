@@ -397,6 +397,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         defaultSSLHostConfig.setCertificateVerification(certificateVerification);
     }
 
+    public void setTrustMaxCertLength(int certificateVerificationDepth){
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateVerificationDepth(certificateVerificationDepth);
+    }
+    public void setSSLVerifyDepth(int certificateVerificationDepth) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateVerificationDepth(certificateVerificationDepth);
+    }
+
 
     // ------------------------------------------------------------- Common code
 

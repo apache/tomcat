@@ -272,14 +272,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     public void setSSLDisableSessionTickets(boolean SSLDisableSessionTickets) { this.SSLDisableSessionTickets = SSLDisableSessionTickets; }
 
     /**
-     * SSL verify depth.
-     */
-    protected int SSLVerifyDepth = 10;
-    public int getSSLVerifyDepth() { return SSLVerifyDepth; }
-    public void setSSLVerifyDepth(int SSLVerifyDepth) { this.SSLVerifyDepth = SSLVerifyDepth; }
-
-
-    /**
      * SSL allow insecure renegotiation for the the client that does not
      * support the secure renegotiation.
      */
@@ -617,7 +609,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     value = SSL.SSL_CVERIFY_REQUIRE;
                     break;
                 }
-                SSLContext.setVerify(ctx, value, SSLVerifyDepth);
+                SSLContext.setVerify(ctx, value, sslHostConfig.getCertificateVerificationDepth());
                 // For now, sendfile is not supported with SSL
                 if (getUseSendfile()) {
                     setUseSendfileInternal(false);
@@ -2918,8 +2910,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         public void doClientAuth(SSLSupport sslSupport) {
             long socket = getSocket().longValue();
             // Configure connection to require a certificate
-            SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE,
-                    ((AprEndpoint)getEndpoint()).getSSLVerifyDepth());
+            SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE, -1);
             SSLSocket.renegotiate(socket);
         }
 
