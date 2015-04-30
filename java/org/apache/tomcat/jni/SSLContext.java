@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.jni;
 
 import java.util.Map;
@@ -26,9 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class SSLContext {
 
-
     /**
-     * Initialize new SSL context
+     * Create a new SSL context.
+     *
      * @param pool The pool to use.
      * @param protocol The SSL protocol to use. It can be any combination of
      * the following:
@@ -46,9 +45,13 @@ public final class SSLContext {
      * SSL_MODE_SERVER
      * SSL_MODE_COMBINED
      * </PRE>
+     *
+     * @return The Java representation of a pointer to the newly created SSL
+     *         Context
+     *
+     * @throws Exception If the SSL Context could not be created
      */
-    public static native long make(long pool, int protocol, int mode)
-        throws Exception;
+    public static native long make(long pool, int protocol, int mode) throws Exception;
 
     /**
      * Free the resources used by the Context
@@ -293,24 +296,85 @@ public final class SSLContext {
 
     public static native int setALPN(long ctx, byte[] proto, int len);
 
-    public static long sniCallBack(long defaultCtx, String sniHostName) {
-        SNICallBack sniCallBack = sniCallBacks.get(Long.valueOf(defaultCtx));
+    /**
+     * When tc-native encounters a SNI extension in the TLS handshake it will
+     * call this method to determine which OpenSSL SSLContext to use for the
+     * connection.
+     *
+     * @param currentCtx   The OpenSSL SSLContext that the handshake started to
+     *                     use. This will be the default OpenSSL SSLContext for
+     *                     the endpoint associated with the socket.
+     * @param sniHostName  The host name requested by the client
+     *
+     * @return The Java representation of the pointer to the OpenSSL SSLContext
+     *         to use for the given host or zero if no SSLContext could be
+     *         identified
+     */
+    public static long sniCallBack(long currentCtx, String sniHostName) {
+        SNICallBack sniCallBack = sniCallBacks.get(Long.valueOf(currentCtx));
         if (sniCallBack == null) {
             return 0;
         }
         return sniCallBack.getSslContext(sniHostName);
     }
 
+    /*
+     * A map of default SSL Contexts to SNICallBack instances (in Tomcat these
+     * are instances of AprEndpoint) that will be used to determine the SSL
+     * Context to use bases on the SNI host name. It is structured this way
+     * since a Tomcat instance may have several TLS enabled endpoints that each
+     * have different SSL Context mappings for the same host name.
+     */
     private static Map<Long,SNICallBack> sniCallBacks = new ConcurrentHashMap<>();
+
+    /**
+     * Register an OpenSSL SSLContext that will be used to initiate TLS
+     * connections that may use the SNI extension with the component that will
+     * be used to map the requested hostname to the correct OpenSSL SSLContext
+     * for the remainder of the connection.
+     *
+     * @param defaultSSLContext The Java representation of a pointer to the
+     *                          OpenSSL SSLContext that will be used to
+     *                          initiate TLS connections
+     * @param sniCallBack The component that will map SNI hosts names received
+     *                    via connections initiated using
+     *                    <code>defaultSSLContext</code> to the correct  OpenSSL
+     *                    SSLContext
+     */
     public static void registerDefault(Long defaultSSLContext,
             SNICallBack sniCallBack) {
         sniCallBacks.put(defaultSSLContext, sniCallBack);
     }
-    public static void unregisterDefault(Long ctx) {
-        sniCallBacks.remove(ctx);
+
+    /**
+     * Unregister an OpenSSL SSLContext that will no longer be used to initiate
+     * TLS connections that may use the SNI extension.
+     *
+     * @param defaultSSLContext The Java representation of a pointer to the
+     *                          OpenSSL SSLContext that will no longer be used
+     */
+    public static void unregisterDefault(Long defaultSSLContext) {
+        sniCallBacks.remove(defaultSSLContext);
     }
 
+
+    /**
+     * Interface implemented by components that will receive the call back to
+     * select an OpenSSL SSLContext based on the host name requested by the
+     * client.
+     */
     public static interface SNICallBack {
+
+        /**
+         * This callback is made during the TLS handshake when the client uses
+         * the SNI extension to request a specific TLS host.
+         *
+         * @param sniHostName The host name requested by the client
+         *
+         * @return The Java representation of the pointer to the OpenSSL
+         *         SSLContext to use for the given host or zero if no SSLContext
+         *         could be identified
+         */
         public long getSslContext(String sniHostName);
     }
 }
