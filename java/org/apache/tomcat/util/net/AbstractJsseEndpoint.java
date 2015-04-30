@@ -98,7 +98,12 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         engine.setEnabledCipherSuites(sslContextWrapper.getEnabledCiphers());
         engine.setEnabledProtocols(sslContextWrapper.getEnabledProtocols());
 
-        configureUseServerCipherSuitesOrder(engine);
+        // Force server cipher suite order to be honored
+        SSLParameters sslParameters = engine.getSSLParameters();
+        sslParameters.setUseCipherSuitesOrder(true);
+        // Following line may not be required. Depends if JRE takes a defensive
+        // copy. Keep the line to avoid any possible issues.
+        engine.setSSLParameters(sslParameters);
 
         return engine;
     }
@@ -109,24 +114,6 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
             sslHostConfig.setSslContext(null);
         }
-    }
-
-
-    /**
-     * Configures SSLEngine to honor cipher suites ordering based upon
-     * endpoint configuration.
-     */
-    private void configureUseServerCipherSuitesOrder(SSLEngine engine) {
-        String useServerCipherSuitesOrderStr = this
-                .getUseServerCipherSuitesOrder().trim();
-
-        SSLParameters sslParameters = engine.getSSLParameters();
-        boolean useServerCipherSuitesOrder =
-            ("true".equalsIgnoreCase(useServerCipherSuitesOrderStr)
-                || "yes".equalsIgnoreCase(useServerCipherSuitesOrderStr));
-
-        sslParameters.setUseCipherSuitesOrder(useServerCipherSuitesOrder);
-        engine.setSSLParameters(sslParameters);
     }
 
 

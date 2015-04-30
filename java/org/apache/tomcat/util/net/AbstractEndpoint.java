@@ -1006,10 +1006,6 @@ public abstract class AbstractEndpoint<S> {
         ciphers = s;
     }
 
-    private String useServerCipherSuitesOrder = "false";
-    public String getUseServerCipherSuitesOrder() { return useServerCipherSuitesOrder;}
-    public void setUseServerCipherSuitesOrder(String s) { this.useServerCipherSuitesOrder = s;}
-
     private String keyAlias = null;
     public String getKeyAlias() { return keyAlias;}
     public void setKeyAlias(String s ) { keyAlias = s;}
