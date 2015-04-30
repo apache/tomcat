@@ -379,9 +379,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         defaultSSLHostConfig.setCertificateKeyFile(certificateKeyFile);
     }
 
-    public void setAlgorithm(String certificateAlgorithm) {
+    public void setAlgorithm(String keyManagerAlgorithm) {
         registerDefaultSSLHostConfig();
-        defaultSSLHostConfig.setCertificateAlgorithm(certificateAlgorithm);
+        defaultSSLHostConfig.setKeyManagerAlgorithm(keyManagerAlgorithm);
     }
 
 
