@@ -44,6 +44,8 @@ import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
+ * @param <S> The type for the sockets managed by this endpoint.
+ *
  * @author Mladen Turk
  * @author Remy Maucherat
  */
@@ -82,6 +84,8 @@ public abstract class AbstractEndpoint<S> {
 
         /**
          * Obtain the GlobalRequestProcessor associated with the handler.
+         *
+         * @return the GlobalRequestProcessor
          */
         public Object getGlobal();
 
@@ -218,13 +222,11 @@ public abstract class AbstractEndpoint<S> {
     public void addSslHostConfig(SSLHostConfig sslHostConfig) {
         String key = sslHostConfig.getHostName();
         if (key == null || key.length() == 0) {
-            // TODO i18n
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(sm.getString("endpoint.noSslHostName"));
         }
         SSLHostConfig duplicate = sslHostConfigs.put(key, sslHostConfig);
         if (duplicate != null) {
-            // TODO i18n
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(sm.getString("endpoint.duplicateSslHostName", key));
         }
         sslHostConfig.setConfigType(getSslConfigType());
     }
@@ -412,6 +414,9 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Socket TCP no delay.
+     *
+     * @return The current TCP no delay setting for sockets created by this
+     *         endpoint
      */
     public boolean getTcpNoDelay() { return socketProperties.getTcpNoDelay();}
     public void setTcpNoDelay(boolean tcpNoDelay) { socketProperties.setTcpNoDelay(tcpNoDelay); }
@@ -419,6 +424,9 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Socket linger.
+     *
+     * @return The current socket linger time for sockets created by this
+     *         endpoint
      */
     public int getSoLinger() { return socketProperties.getSoLingerTime(); }
     public void setSoLinger(int soLinger) {
@@ -429,6 +437,8 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Socket timeout.
+     *
+     * @return The current socket timeout for sockets created by this endpoint
      */
     public int getSoTimeout() { return socketProperties.getSoTimeout(); }
     public void setSoTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
@@ -555,6 +565,9 @@ public abstract class AbstractEndpoint<S> {
      * {@link org.apache.coyote.ProtocolHandler} needs to be made available to
      * sub-components. The specific setter will call this method to populate the
      * attributes.
+     *
+     * @param name  Name of property to set
+     * @param value The value to set the property to
      */
     public void setAttribute(String name, Object value) {
         if (getLog().isTraceEnabled()) {
@@ -564,6 +577,11 @@ public abstract class AbstractEndpoint<S> {
     }
     /**
      * Used by sub-components to retrieve configuration information.
+     *
+     * @param key The name of the property for which the value should be
+     *            retrieved
+     *
+     * @return The value of the specified property
      */
     public Object getAttribute(String key) {
         Object value = attributes.get(key);
