@@ -722,7 +722,6 @@ public abstract class AbstractEndpoint<S> {
                 if (getSocketProperties().getUnlockTimeout() > utmo)
                     utmo = getSocketProperties().getUnlockTimeout();
                 s.setSoTimeout(stmo);
-                // TODO Consider hard-coding to s.setSoLinger(true,0)
                 s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
                 if (getLog().isDebugEnabled()) {
                     getLog().debug("About to unlock socket for:"+saddr);
