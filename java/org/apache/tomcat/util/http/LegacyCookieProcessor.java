@@ -184,7 +184,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             if (allowHttpSepsInV0) {
                 allowedWithoutQuotes.set(sep);
             } else {
-                allowedWithoutQuotes.clear();
+                allowedWithoutQuotes.clear(sep);
             }
         }
         if (getForwardSlashIsSeparator() && !allowHttpSepsInV0) {
