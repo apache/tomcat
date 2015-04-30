@@ -133,13 +133,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
 
     /**
-     * SSL verify client.
-     */
-    public String getSSLVerifyClient() { return ((AprEndpoint)getEndpoint()).getSSLVerifyClient(); }
-    public void setSSLVerifyClient(String SSLVerifyClient) { ((AprEndpoint)getEndpoint()).setSSLVerifyClient(SSLVerifyClient); }
-
-
-    /**
      * SSL verify depth.
      */
     public int getSSLVerifyDepth() { return ((AprEndpoint)getEndpoint()).getSSLVerifyDepth(); }

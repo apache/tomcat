@@ -272,14 +272,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     public void setSSLDisableSessionTickets(boolean SSLDisableSessionTickets) { this.SSLDisableSessionTickets = SSLDisableSessionTickets; }
 
     /**
-     * SSL verify client.
-     */
-    protected String SSLVerifyClient = "none";
-    public String getSSLVerifyClient() { return SSLVerifyClient; }
-    public void setSSLVerifyClient(String SSLVerifyClient) { this.SSLVerifyClient = SSLVerifyClient; }
-
-
-    /**
      * SSL verify depth.
      */
     protected int SSLVerifyDepth = 10;
@@ -611,13 +603,19 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 // Set revocation
                 SSLContext.setCARevocation(ctx, SSLCARevocationFile, SSLCARevocationPath);
                 // Client certificate verification
-                value = SSL.SSL_CVERIFY_NONE;
-                if ("optional".equalsIgnoreCase(SSLVerifyClient)) {
+                switch (sslHostConfig.getCertificateVerification()) {
+                case NONE:
+                    value = SSL.SSL_CVERIFY_NONE;
+                    break;
+                case OPTIONAL:
                     value = SSL.SSL_CVERIFY_OPTIONAL;
-                } else if ("require".equalsIgnoreCase(SSLVerifyClient)) {
-                    value = SSL.SSL_CVERIFY_REQUIRE;
-                } else if ("optionalNoCA".equalsIgnoreCase(SSLVerifyClient)) {
+                    break;
+                case OPTIONAL_NO_CA:
                     value = SSL.SSL_CVERIFY_OPTIONAL_NO_CA;
+                    break;
+                case REQUIRED:
+                    value = SSL.SSL_CVERIFY_REQUIRE;
+                    break;
                 }
                 SSLContext.setVerify(ctx, value, SSLVerifyDepth);
                 // For now, sendfile is not supported with SSL

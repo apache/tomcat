@@ -81,13 +81,18 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         }
 
         SSLEngine engine = sslContextWrapper.getSSLContext().createSSLEngine();
-        if ("false".equals(getClientAuth())) {
+        switch (sslHostConfig.getCertificateVerification()) {
+        case NONE:
             engine.setNeedClientAuth(false);
             engine.setWantClientAuth(false);
-        } else if ("true".equals(getClientAuth()) || "yes".equals(getClientAuth())){
-            engine.setNeedClientAuth(true);
-        } else if ("want".equals(getClientAuth())) {
+            break;
+        case OPTIONAL:
+        case OPTIONAL_NO_CA:
             engine.setWantClientAuth(true);
+            break;
+        case REQUIRED:
+            engine.setNeedClientAuth(true);
+            break;
         }
         engine.setUseClientMode(false);
         engine.setEnabledCipherSuites(sslContextWrapper.getEnabledCiphers());

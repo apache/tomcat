@@ -44,6 +44,8 @@ public class SSLHostConfig {
     // Configuration properties
 
     // Common
+    private CertificateVerification certificateVerification = CertificateVerification.NONE;
+
     private Set<String> protocols = new HashSet<>();
     // JSSE
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
@@ -98,6 +100,16 @@ public class SSLHostConfig {
 
 
     // ----------------------------------------- Common configuration properties
+
+    public void setCertificateVerification(String certificateVerification) {
+        this.certificateVerification = CertificateVerification.fromString(certificateVerification);
+    }
+
+
+    public CertificateVerification getCertificateVerification() {
+        return certificateVerification;
+    }
+
 
     public void setHostName(String hostName) {
         this.hostName = hostName;
@@ -188,5 +200,38 @@ public class SSLHostConfig {
     public static enum Type {
         JSSE,
         OPENSSL
+    }
+
+
+    public static enum CertificateVerification {
+        NONE,
+        OPTIONAL_NO_CA,
+        OPTIONAL,
+        REQUIRED;
+
+        public static CertificateVerification fromString(String value) {
+            if ("true".equalsIgnoreCase(value) ||
+                    "yes".equalsIgnoreCase(value) ||
+                    "require".equalsIgnoreCase(value) ||
+                    "required".equalsIgnoreCase(value)) {
+                return REQUIRED;
+            } else if ("optional".equalsIgnoreCase(value) ||
+                    "want".equalsIgnoreCase(value)) {
+                return OPTIONAL;
+            } else if ("optionalNoCA".equalsIgnoreCase(value) ||
+                    "optional_no_ca".equalsIgnoreCase(value)) {
+                return OPTIONAL_NO_CA;
+            } else if ("false".equalsIgnoreCase(value) ||
+                    "no".equalsIgnoreCase(value) ||
+                    "none".equalsIgnoreCase(value)) {
+                return NONE;
+            } else {
+                // Could be a typo. Don't default to NONE since that is not
+                // secure. Force user to fix config. Could default to REQUIRED
+                // instead.
+                throw new IllegalArgumentException(
+                        sm.getString("sslHostConfig.certificateVerificationInvalid", value));
+            }
+        }
     }
 }

@@ -984,10 +984,6 @@ public abstract class AbstractEndpoint<S> {
         this.sslImplementationName = s;
     }
 
-    private String clientAuth = "false";
-    public String getClientAuth() { return clientAuth;}
-    public void setClientAuth(String s ) { this.clientAuth = s;}
-
     private String keystorePass = null;
     public String getKeystorePass() { return keystorePass;}
     public void setKeystorePass(String s ) { this.keystorePass = s;}
