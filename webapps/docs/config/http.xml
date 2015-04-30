@@ -1051,6 +1051,14 @@
 
   <attributes>
 
+    <attribute name="certificateAlgorithm" required="false">
+      <p>The certificate encoding algorithm to be used. This defaults to
+      <code>KeyManagerFactory.getDefaultAlgorithm()</code> which returns
+      <code>SunX509</code> for Sun JVMs. IBM JVMs return
+      <code>IbmX509</code>. For other vendors, consult the JVM
+      documentation for the default value.</p>
+    </attribute>
+
     <attribute name="certificateFile" required="false">
       <p>OpenSSL only (required).</p>
       <p>Name of the file that contains the server certificate. The format is
@@ -1110,11 +1118,9 @@
   <attributes>
 
     <attribute name="algorithm" required="false">
-      <p>The certificate encoding algorithm to be used. This defaults to
-      <code>KeyManagerFactory.getDefaultAlgorithm()</code> which returns
-      <code>SunX509</code> for Sun JVMs. IBM JVMs return
-      <code>IbmX509</code>. For other vendors, consult the JVM
-      documentation for the default value.</p>
+      <p>This is an alias for the <code>certificateAlgorithm</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="useServerCipherSuitesOrder" required="false">

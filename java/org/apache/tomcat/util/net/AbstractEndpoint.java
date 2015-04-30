@@ -31,8 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.KeyManagerFactory;
-
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
@@ -985,10 +983,6 @@ public abstract class AbstractEndpoint<S> {
     public void setSslImplementationName(String s) {
         this.sslImplementationName = s;
     }
-
-    private String algorithm = KeyManagerFactory.getDefaultAlgorithm();
-    public String getAlgorithm() { return algorithm;}
-    public void setAlgorithm(String s ) { this.algorithm = s;}
 
     private String clientAuth = "false";
     public String getClientAuth() { return clientAuth;}

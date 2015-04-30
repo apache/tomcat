@@ -25,9 +25,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
         super(endpoint);
     }
 
-    public String getAlgorithm() { return getEndpoint().getAlgorithm();}
-    public void setAlgorithm(String s ) { getEndpoint().setAlgorithm(s);}
-
     public String getClientAuth() { return getEndpoint().getClientAuth();}
     public void setClientAuth(String s ) { getEndpoint().setClientAuth(s);}
 
