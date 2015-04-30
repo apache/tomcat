@@ -2793,6 +2793,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             // Must never load javax.el.* classes
             return false;
         }
+        if (name.startsWith("javax.websocket")) {
+            // Must never load javax.websocket.* classes
+            return false;
+        }
 
         // Assume everything else is OK
         return true;
