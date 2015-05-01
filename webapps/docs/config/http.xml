@@ -1085,6 +1085,12 @@
       of 10 will be used.</p>
     </attribute>
 
+    <attribute name="honorCipherOrder" required="false">
+      <p>Set to <code>true</code> to enforce the server's cipher order
+      (from the <code>ciphers</code> setting) instead of allowing
+      the client to choose the cipher (which is the default).</p>
+    </attribute>
+
     <attribute name="hostName" required="false">
       <p>The name of the SSL Host. This should either be the fully qualified
       domain name (e.g. <code>tomcat.apache.org</code>) or a wild card domain
@@ -1158,8 +1164,8 @@
       branch.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
       <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code> will be used.</p>
-      <p>Note that JSSE based connectors will always be configured to treat the
-      order in which ciphers are defined as an order of preference.</p>
+      <p>Note that Java does not treat the order in which ciphers are defined as
+      an order of preference. See <code>useServerCipherSuitesOrder</code>.</p>
     </attribute>
 
     <attribute name="clientAuth" required="false">
@@ -1318,6 +1324,12 @@
       the default.</p>
      </attribute>
 
+    <attribute name="useServerCipherSuitesOrder" required="false">
+      <p>This is an alias for the <code>honorCipherOrder</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
+    </attribute>
+
   </attributes>
 
   </subsection>
@@ -1416,9 +1428,9 @@
     </attribute>
 
     <attribute name="SSLHonorCipherOrder" required="false">
-      <p>Set to <code>true</code> to enforce the server's cipher order
-      (from the <code>SSLCipherSuite</code> setting) instead of allowing
-      the client to choose the cipher (which is the default).</p>
+      <p>This is an alias for the <code>honorCipherOrder</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="SSLPassword" required="false">

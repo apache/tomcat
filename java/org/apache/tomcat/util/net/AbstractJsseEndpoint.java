@@ -98,11 +98,9 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         engine.setEnabledCipherSuites(sslContextWrapper.getEnabledCiphers());
         engine.setEnabledProtocols(sslContextWrapper.getEnabledProtocols());
 
-        // Force server cipher suite order to be honored
         SSLParameters sslParameters = engine.getSSLParameters();
-        sslParameters.setUseCipherSuitesOrder(true);
-        // Following line may not be required. Depends if JRE takes a defensive
-        // copy. Keep the line to avoid any possible issues.
+        sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
+        // In case the getter returns a defensive copy
         engine.setSSLParameters(sslParameters);
 
         return engine;

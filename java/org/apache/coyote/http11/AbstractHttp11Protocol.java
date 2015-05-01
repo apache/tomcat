@@ -382,20 +382,24 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         defaultSSLHostConfig.setCertificateKeyFile(certificateKeyFile);
     }
 
+
     public void setAlgorithm(String keyManagerAlgorithm) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setKeyManagerAlgorithm(keyManagerAlgorithm);
     }
+
 
     public void setClientAuth(String certificateVerification) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateVerification(certificateVerification);
     }
 
+
     public void setSSLVerifyClient(String certificateVerification) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateVerification(certificateVerification);
     }
+
 
     public void setTrustMaxCertLength(int certificateVerificationDepth){
         registerDefaultSSLHostConfig();
@@ -404,6 +408,16 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setSSLVerifyDepth(int certificateVerificationDepth) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateVerificationDepth(certificateVerificationDepth);
+    }
+
+
+    public void setUseServerCipherSuitesOrder(boolean honorCipherOrder) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setHonorCipherOrder(honorCipherOrder);
+    }
+    public void setSSLHonorCipherOrder(boolean honorCipherOrder) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setHonorCipherOrder(honorCipherOrder);
     }
 
 
