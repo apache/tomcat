@@ -1076,6 +1076,15 @@
       RECOMMENDED).</p>
     </attribute>
 
+    <attribute name="certificateKeystoreFile" required="false">
+      <p>JSSE only.</p>
+      <p>The pathname of the keystore file where you have stored the server
+      certificate and key to be loaded. By default, the pathname is the file
+      <code>.keystore</code> in the operating system home directory of the user
+      that is running Tomcat. If your <code>keystoreType</code> doesn't need a
+      file use <code>""</code> (empty string) for this parameter.</p>
+    </attribute>
+
     <attribute name="certificateVerification" required="false">
       <p>Set to <code>required</code> if you want the SSL stack to require a
       valid certificate chain from the client before accepting a connection.
@@ -1132,15 +1141,6 @@
       <code>SunX509</code> for Sun JVMs. IBM JVMs return
       <code>IbmX509</code>. For other vendors, consult the JVM
       documentation for the default value.</p>
-    </attribute>
-
-    <attribute name="keystoreFile" required="false">
-      <p>JSSE only.</p>
-      <p>The pathname of the keystore file where you have stored the server
-      certificate and key to be loaded. By default, the pathname is the file
-      <code>.keystore</code> in the operating system home directory of the user
-      that is running Tomcat. If your <code>keystoreType</code> doesn't need a
-      file use <code>""</code> (empty string) for this parameter.</p>
     </attribute>
 
     <attribute name="protocols" required="false">
@@ -1211,8 +1211,8 @@
     </attribute>
 
     <attribute name="keystoreFile" required="false">
-      <p>This is an alias for the <code>keystoreFile</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      <p>This is an alias for the <code>certificateKeystoreFile</code> attribute
+      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
       element.</p>
     </attribute>
 
