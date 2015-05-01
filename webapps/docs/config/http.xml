@@ -1043,7 +1043,7 @@
   <strong>Connector</strong>.</p>
 
   <p>As of Tomcat 9, the SSL configuration attributes in the
-  <strong>Connector</strong> are deprecated. If specified, thwy will be used to
+  <strong>Connector</strong> are deprecated. If specified, they will be used to
   configure a <strong>SSLHostConfig</strong> for the
   <code>sslDefaultHost</code>. Note that if an explicit
   <strong>SSLHostConfig</strong> element also exists for the
