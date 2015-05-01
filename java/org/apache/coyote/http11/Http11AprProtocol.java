@@ -81,13 +81,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
 
     /**
-     * SSL cipher suite.
-     */
-    public String getSSLCipherSuite() { return ((AprEndpoint)getEndpoint()).getSSLCipherSuite(); }
-    public void setSSLCipherSuite(String SSLCipherSuite) { ((AprEndpoint)getEndpoint()).setSSLCipherSuite(SSLCipherSuite); }
-
-
-    /**
      * SSL certificate chain file.
      */
     public String getSSLCertificateChainFile() { return ((AprEndpoint)getEndpoint()).getSSLCertificateChainFile(); }

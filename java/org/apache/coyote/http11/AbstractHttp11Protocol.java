@@ -421,6 +421,16 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    public void setCiphers(String ciphers) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCiphers(ciphers);
+    }
+    public void setSSLCipherSuite(String ciphers) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCiphers(ciphers);
+    }
+
+
     // ------------------------------------------------------------- Common code
 
     // Common configuration required for all new HTTP11 processors
