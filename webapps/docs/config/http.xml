@@ -1509,13 +1509,13 @@
       <tr>
         <th style="text-align: left;">Read HTTP Body</th>
         <td>Sim Blocking</td>
-        <td>Blocking</td>
+        <td>Sim Blocking</td>
         <td>Blocking</td>
       </tr>
       <tr>
         <th style="text-align: left;">Write HTTP Response</th>
         <td>Sim Blocking</td>
-        <td>Blocking</td>
+        <td>Sim Blocking</td>
         <td>Blocking</td>
       </tr>
       <tr>
