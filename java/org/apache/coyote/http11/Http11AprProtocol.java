@@ -86,16 +86,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     public String getSSLCipherSuite() { return ((AprEndpoint)getEndpoint()).getSSLCipherSuite(); }
     public void setSSLCipherSuite(String SSLCipherSuite) { ((AprEndpoint)getEndpoint()).setSSLCipherSuite(SSLCipherSuite); }
 
-    /**
-     * SSL honor cipher order.
-     *
-     * Set to <code>true</code> to enforce the <i>server's</i> cipher order
-     * instead of the default which is to allow the client to choose a
-     * preferred cipher.
-     */
-    public boolean getSSLHonorCipherOrder() { return ((AprEndpoint)getEndpoint()).getSSLHonorCipherOrder(); }
-    public void setSSLHonorCipherOrder(boolean SSLHonorCipherOrder) { ((AprEndpoint)getEndpoint()).setSSLHonorCipherOrder(SSLHonorCipherOrder); }
-
 
     /**
      * SSL certificate chain file.

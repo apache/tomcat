@@ -46,6 +46,7 @@ public class SSLHostConfig {
     // Common
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
+    private boolean honorCipherOrder = false;
 
     private Set<String> protocols = new HashSet<>();
     // JSSE
@@ -119,6 +120,16 @@ public class SSLHostConfig {
 
     public int getCertificateVerificationDepth() {
         return certificateVerificationDepth;
+    }
+
+
+    public void setHonorCipherOrder(boolean honorCipherOrder) {
+        this.honorCipherOrder = honorCipherOrder;
+    }
+
+
+    public boolean getHonorCipherOrder() {
+        return honorCipherOrder;
     }
 
 

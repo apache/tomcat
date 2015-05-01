@@ -279,19 +279,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     public void setSSLInsecureRenegotiation(boolean SSLInsecureRenegotiation) { this.SSLInsecureRenegotiation = SSLInsecureRenegotiation; }
     public boolean getSSLInsecureRenegotiation() { return SSLInsecureRenegotiation; }
 
-    protected boolean SSLHonorCipherOrder = false;
-    /**
-     * Configures whether or not this endpoint enforces the server's preference
-     * order ciphers.
-     *
-     * @param SSLHonorCipherOrder   Set to <code>true</code> to enforce the
-     *                              server's cipher order instead of the default
-     *                              which is to allow the client to choose a
-     *                              preferred cipher.
-     */
-    public void setSSLHonorCipherOrder(boolean SSLHonorCipherOrder) { this.SSLHonorCipherOrder = SSLHonorCipherOrder; }
-    public boolean getSSLHonorCipherOrder() { return SSLHonorCipherOrder; }
-
     /**
      * Disables compression of the SSL stream. This thwarts CRIME attack
      * and possibly improves performance by not compressing uncompressible
@@ -532,7 +519,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
 
                 // Set cipher order: client (default) or server
-                if (SSLHonorCipherOrder) {
+                if (sslHostConfig.getHonorCipherOrder()) {
                     boolean orderCiphersSupported = false;
                     try {
                         orderCiphersSupported = SSL.hasOp(SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
