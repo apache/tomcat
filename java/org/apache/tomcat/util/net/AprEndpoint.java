@@ -218,14 +218,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     /**
-     * SSL cipher suite.
-     */
-    protected String SSLCipherSuite = DEFAULT_CIPHERS;
-    public String getSSLCipherSuite() { return SSLCipherSuite; }
-    public void setSSLCipherSuite(String SSLCipherSuite) { this.SSLCipherSuite = SSLCipherSuite; }
-
-
-    /**
      * SSL certificate chain file.
      */
     protected String SSLCertificateChainFile = null;
@@ -571,7 +563,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
 
                 // List the ciphers that the client is permitted to negotiate
-                SSLContext.setCipherSuite(ctx, SSLCipherSuite);
+                SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
                 // Load Server key and certificate
                 SSLContext.setCertificate(ctx, sslHostConfig.getCertificateFile(),
                         sslHostConfig.getCertificateKeyFile(), SSLPassword, SSL.SSL_AIDX_RSA);

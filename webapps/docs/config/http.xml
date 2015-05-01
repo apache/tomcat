@@ -1085,6 +1085,22 @@
       of 10 will be used.</p>
     </attribute>
 
+    <attribute name="ciphers" required="false">
+      <p>The ciphers to enable using the OpenSSL syntax. (See the OpenSSL
+      documentation for the list of ciphers supported and the syntax).
+      Alternatively, a comma separated list of ciphers using with the standard
+      OpenSSL cipher names or the standard JSSE cipher names may be used.</p>
+      <p>When converting from OpenSSL syntax to JSSE ciphers for JSSE based
+      connectors, the behaviour of the OpenSSL syntax parsing is kept aligned
+      with the behaviour of the OpenSSL 1.1.0 development branch.</p>
+      <p>Only the ciphers that are supported by the SSL implementation will be
+      used.</p>
+      <p>If not specified, a default (using the OpenSSL notation) of
+      <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code> will be used.</p>
+      <p>Note that, by default, the order in which ciphers are defined is not
+      trreated as an order of preference. See <code>honorCipherOrder</code>.</p>
+    </attribute>
+
     <attribute name="honorCipherOrder" required="false">
       <p>Set to <code>true</code> to enforce the server's cipher order
       (from the <code>ciphers</code> setting) instead of allowing
@@ -1145,27 +1161,14 @@
   <attributes>
 
     <attribute name="algorithm" required="false">
-      <p>This is an alias for the <code>keyManagerAlgorithm</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      <p>This is an alias for the <code>keyManagerAlgorithm</code> attribute of
+      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
       element.</p>
     </attribute>
 
     <attribute name="ciphers" required="false">
-      <p>If specified and using ',' as a separator, only the ciphers that are
-      listed and supported by the SSL implementation will be used.
-      The ciphers are specified using the JSSE cipher naming convention. The
-      special value of <code>ALL</code> will enable all supported ciphers. This
-      will include many that are not secure. <code>ALL</code> is intended for
-      testing purposes only.</p>
-      <p>The list can also use ':' as a separator, in that case
-      it will use the OpenSSL syntax (see OpenSSL documentation for the list
-      of ciphers supported and the syntax). The behaviour of this filtering is
-      kept aligned with the behaviour of the OpenSSL 1.1.0 development
-      branch.</p>
-      <p>If not specified, a default (using the OpenSSL notation) of
-      <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code> will be used.</p>
-      <p>Note that Java does not treat the order in which ciphers are defined as
-      an order of preference. See <code>useServerCipherSuitesOrder</code>.</p>
+      <p>This is an alias for the <code>ciphers</code> attribute of the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="clientAuth" required="false">
@@ -1416,9 +1419,8 @@
     </attribute>
 
     <attribute name="SSLCipherSuite" required="false">
-      <p>Ciphers which may be used for communicating with clients. The default
-      is <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code>. See the OpenSSL
-      documentation for details of the syntax for this attribute.</p>
+      <p>This is an alias for the <code>ciphers</code> attribute of the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="SSLDisableCompression" required="false">

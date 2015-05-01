@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -373,6 +374,8 @@ public class OpenSSLCipherConfigurationParser {
     private static final String ALL = "ALL";
     private static final String COMPLEMENTOFALL = "COMPLEMENTOFALL";
 
+    private static final Map<String,String> jsseToOpenSSL = new HashMap<>();
+
     private static final void init() {
 
         for (Cipher cipher : Cipher.values()) {
@@ -385,6 +388,12 @@ public class OpenSSLCipherConfigurationParser {
                 aliases.put(alias, list);
             }
             aliases.put(cipher.name(), Collections.singletonList(cipher));
+
+            jsseToOpenSSL.put(cipher.name(), cipher.getOpenSSLAlias());
+            Set<String> jsseNames = cipher.getJsseNames();
+            for (String jsseName : jsseNames) {
+                jsseToOpenSSL.put(jsseName, cipher.getOpenSSLAlias());
+            }
         }
         List<Cipher> allCiphersList = Arrays.asList(Cipher.values());
         Collections.reverse(allCiphersList);
@@ -701,6 +710,13 @@ public class OpenSSLCipherConfigurationParser {
      */
     public static List<String> parseExpression(String expression) {
         return convertForJSSE(parse(expression));
+    }
+
+    public static String jsseToOpenSSL(String cipher) {
+        if (!initialized) {
+            init();
+        }
+        return jsseToOpenSSL.get(cipher);
     }
 
     static String displayResult(Collection<Cipher> ciphers, boolean useJSSEFormat, String separator) {

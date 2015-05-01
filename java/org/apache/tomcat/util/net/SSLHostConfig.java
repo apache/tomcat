@@ -25,6 +25,7 @@ import javax.net.ssl.KeyManagerFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
 public class SSLHostConfig {
@@ -46,6 +47,7 @@ public class SSLHostConfig {
     // Common
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
+    private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
     private boolean honorCipherOrder = false;
 
     private Set<String> protocols = new HashSet<>();
@@ -120,6 +122,40 @@ public class SSLHostConfig {
 
     public int getCertificateVerificationDepth() {
         return certificateVerificationDepth;
+    }
+
+
+    public void setCiphers(String ciphersList) {
+        // Ciphers is stored in OpenSSL format. Convert the provided value if
+        // necessary.
+        if (ciphersList != null && !ciphersList.contains(":")) {
+            StringBuilder sb = new StringBuilder();
+            // Not obviously in OpenSSL format. May be a single OpenSSL or JSSE
+            // cipher name. May be a comma separated list of cipher names
+            String ciphers[] = ciphersList.split(",");
+            for (String cipher : ciphers) {
+                String trimmed = cipher.trim();
+                if (trimmed.length() > 0) {
+                    String openSSLName = OpenSSLCipherConfigurationParser.jsseToOpenSSL(trimmed);
+                    if (openSSLName == null) {
+                        // Not a JSSE name. Maybe an OpenSSL name or alias
+                        openSSLName = trimmed;
+                    }
+                    if (sb.length() > 0) {
+                        sb.append(':');
+                    }
+                    sb.append(openSSLName);
+                }
+            }
+            this.ciphers = sb.toString();
+        } else {
+            this.ciphers = ciphersList;
+        }
+    }
+
+
+    public String getCiphers() {
+        return ciphers;
     }
 
 

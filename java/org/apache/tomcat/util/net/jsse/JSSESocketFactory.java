@@ -88,14 +88,12 @@ public class JSSESocketFactory implements SSLUtil {
         = System.getProperty("user.home") + "/.keystore";
     private static final int defaultSessionCacheSize = 0;
     private static final int defaultSessionTimeout = 86400;
-    private static final String ALLOW_ALL_SUPPORTED_CIPHERS = "ALL";
     public static final String DEFAULT_KEY_PASS = "changeit";
 
     private final AbstractEndpoint<?> endpoint;
     private final SSLHostConfig sslHostConfig;
 
     private final String[] defaultServerProtocols;
-    private final String[] defaultServerCipherSuites;
 
 
     public JSSESocketFactory (AbstractEndpoint<?> endpoint, SSLHostConfig sslHostConfig) {
@@ -127,20 +125,12 @@ public class JSSESocketFactory implements SSLUtil {
             // This is very likely to be fatal but there is a slim chance that
             // the JSSE implementation just doesn't like creating unbound
             // sockets so allow the code to proceed.
-            defaultServerCipherSuites = new String[0];
             defaultServerProtocols = new String[0];
-            log.warn(sm.getString("jsse.noDefaultCiphers", endpoint.getName()));
             log.warn(sm.getString("jsse.noDefaultProtocols", endpoint.getName()));
             return;
         }
 
         try {
-            defaultServerCipherSuites = socket.getEnabledCipherSuites();
-            if (defaultServerCipherSuites.length == 0) {
-                log.warn(sm.getString("jsse.noDefaultCiphers",
-                        endpoint.getName()));
-            }
-
             // Filter out all the SSL protocols (SSLv2 and SSLv3) from the
             // defaults
             // since they are no longer considered secure
@@ -171,33 +161,13 @@ public class JSSESocketFactory implements SSLUtil {
 
     @Override
     public String[] getEnableableCiphers(SSLContext context) {
-        String requestedCiphersStr = endpoint.getCiphers();
+        String requestedCiphersStr = sslHostConfig.getCiphers();
 
-        if (ALLOW_ALL_SUPPORTED_CIPHERS.equals(requestedCiphersStr)) {
-            return context.getSupportedSSLParameters().getCipherSuites();
-        }
-        if ((requestedCiphersStr == null)
-                || (requestedCiphersStr.trim().length() == 0)) {
-            return defaultServerCipherSuites;
-        }
+        List<String> requestedCiphers =
+                OpenSSLCipherConfigurationParser.parseExpression(requestedCiphersStr);
 
-        List<String> requestedCiphers = new ArrayList<>();
-        if (requestedCiphersStr.indexOf(':') != -1) {
-            requestedCiphers = OpenSSLCipherConfigurationParser.parseExpression(requestedCiphersStr);
-        } else {
-            for (String rc : requestedCiphersStr.split(",")) {
-                final String cipher = rc.trim();
-                if (cipher.length() > 0) {
-                    requestedCiphers.add(cipher);
-                }
-            }
-        }
-        if (requestedCiphers.isEmpty()) {
-            return defaultServerCipherSuites;
-        }
         List<String> ciphers = new ArrayList<>(requestedCiphers);
-        ciphers.retainAll(Arrays.asList(context.getSupportedSSLParameters()
-                .getCipherSuites()));
+        ciphers.retainAll(Arrays.asList(context.getSupportedSSLParameters().getCipherSuites()));
 
         if (ciphers.isEmpty()) {
             log.warn(sm.getString("jsse.requested_ciphers_not_supported",

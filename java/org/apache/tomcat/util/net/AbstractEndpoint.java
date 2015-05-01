@@ -51,8 +51,6 @@ public abstract class AbstractEndpoint<S> {
 
     // -------------------------------------------------------------- Constants
 
-    protected static final String DEFAULT_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
-
     protected static final StringManager sm = StringManager.getManager(
             AbstractEndpoint.class.getPackage().getName());
 
@@ -999,12 +997,6 @@ public abstract class AbstractEndpoint<S> {
     private String sslProtocol = "TLS";
     public String getSslProtocol() { return sslProtocol;}
     public void setSslProtocol(String s) { sslProtocol = s;}
-
-    private String ciphers = DEFAULT_CIPHERS;
-    public String getCiphers() { return ciphers;}
-    public void setCiphers(String s) {
-        ciphers = s;
-    }
 
     private String keyAlias = null;
     public String getKeyAlias() { return keyAlias;}
