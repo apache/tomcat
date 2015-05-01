@@ -1085,6 +1085,21 @@
       file use <code>""</code> (empty string) for this parameter.</p>
     </attribute>
 
+    <attribute name="certificateKeystorePassword" required="false">
+      <p>JSSE only.</p>
+      <p>The password to use to access the keystore containing the server&apos;s
+      private key and certificate. If not specified, a default of
+      <code>changeit</code> will be used.</p>
+    </attribute>
+
+    <attribute name="certificateKeyPassword" required="false">
+      <p>The password used to access the private key associated with the server
+      certificate from the specified file.</p>
+      <p>If not specified, the default behaviour for JSSE is to use the
+      <strong>certificateKeystorePassword</strong> for OpenSSL the default
+      behaviour is not to use a password.</p>
+    </attribute>
+
     <attribute name="certificateVerification" required="false">
       <p>Set to <code>required</code> if you want the SSL stack to require a
       valid certificate chain from the client before accepting a connection.
@@ -1205,9 +1220,9 @@
     </attribute>
 
     <attribute name="keyPass" required="false">
-      <p>The password used to access the server certificate from the
-      specified keystore file.  The default value is "<code>changeit</code>".
-      </p>
+      <p>This is an alias for the <code>certificateKeyPassword</code> attribute
+      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="keystoreFile" required="false">
@@ -1217,9 +1232,9 @@
     </attribute>
 
     <attribute name="keystorePass" required="false">
-      <p>The password used to access the specified keystore file. The default
-      value is the value of the <code>keyPass</code> attribute.
-      </p>
+      <p>This is an alias for the <code>certificateKeystorePassword</code>
+      attribute of the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="keystoreProvider" required="false">
@@ -1411,8 +1426,9 @@
     </attribute>
 
     <attribute name="SSLPassword" required="false">
-      <p>Pass phrase for the encrypted private key. If "SSLPassword" is not
-      provided, the callback function should prompt for the pass phrase.</p>
+      <p>This is an alias for the <code>certificateKeyPassword</code> attribute
+      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="SSLProtocol" required="false">

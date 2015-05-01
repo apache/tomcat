@@ -209,15 +209,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     /**
-     * SSL password (if a cert is encrypted, and no password has been provided, a callback
-     * will ask for a password).
-     */
-    protected String SSLPassword = null;
-    public String getSSLPassword() { return SSLPassword; }
-    public void setSSLPassword(String SSLPassword) { this.SSLPassword = SSLPassword; }
-
-
-    /**
      * SSL certificate chain file.
      */
     protected String SSLCertificateChainFile = null;
@@ -566,7 +557,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
                 // Load Server key and certificate
                 SSLContext.setCertificate(ctx, sslHostConfig.getCertificateFile(),
-                        sslHostConfig.getCertificateKeyFile(), SSLPassword, SSL.SSL_AIDX_RSA);
+                        sslHostConfig.getCertificateKeyFile(),
+                        sslHostConfig.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
                 // Set certificate chain file
                 SSLContext.setCertificateChainFile(ctx, SSLCertificateChainFile, false);
                 // Support Client Certificates

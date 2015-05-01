@@ -430,6 +430,21 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         defaultSSLHostConfig.setCiphers(ciphers);
     }
 
+    public void setKeystorePass(String certificateKeystorePassword) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateKeystorePassword(certificateKeystorePassword);
+    }
+
+    public void setKeyPass(String certificateKeyPassword) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateKeyPassword(certificateKeyPassword);
+    }
+    public void setSSLPassword(String certificateKeyPassword) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateKeyPassword(certificateKeyPassword);
+    }
+
+
 
     // ------------------------------------------------------------- Common code
 

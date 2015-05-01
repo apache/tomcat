@@ -73,14 +73,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     // --------------------  SSL related properties --------------------
 
     /**
-     * SSL password (if a cert is encrypted, and no password has been provided, a callback
-     * will ask for a password).
-     */
-    public String getSSLPassword() { return ((AprEndpoint)getEndpoint()).getSSLPassword(); }
-    public void setSSLPassword(String SSLPassword) { ((AprEndpoint)getEndpoint()).setSSLPassword(SSLPassword); }
-
-
-    /**
      * SSL certificate chain file.
      */
     public String getSSLCertificateChainFile() { return ((AprEndpoint)getEndpoint()).getSSLCertificateChainFile(); }
