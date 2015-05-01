@@ -186,20 +186,6 @@ public class JSSESocketFactory implements SSLUtil {
     }
 
     /*
-     * Gets the SSL server's keystore password.
-     */
-    protected String getKeystorePassword() {
-        String keystorePass = endpoint.getKeystorePass();
-        if (keystorePass == null) {
-            keystorePass = endpoint.getKeyPass();
-        }
-        if (keystorePass == null) {
-            keystorePass = DEFAULT_KEY_PASS;
-        }
-        return keystorePass;
-    }
-
-    /*
      * Gets the SSL server's keystore.
      */
     protected KeyStore getKeystore(String type, String provider, String pass)
@@ -414,7 +400,7 @@ public class JSSESocketFactory implements SSLUtil {
 
         KeyManager[] kms = null;
 
-        String keystorePass = getKeystorePassword();
+        String keystorePass = sslHostConfig.getCertificateKeystorePassword();
 
         KeyStore ks = getKeystore(keystoreType, keystoreProvider, keystorePass);
         if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
@@ -423,7 +409,7 @@ public class JSSESocketFactory implements SSLUtil {
         }
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-        String keyPass = endpoint.getKeyPass();
+        String keyPass = sslHostConfig.getCertificateKeyPassword();
         if (keyPass == null) {
             keyPass = keystorePass;
         }

@@ -45,6 +45,7 @@ public class SSLHostConfig {
     // Configuration properties
 
     // Common
+    private String certificateKeyPassword = null;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
     private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
@@ -52,6 +53,7 @@ public class SSLHostConfig {
 
     private Set<String> protocols = new HashSet<>();
     // JSSE
+    private String certificateKeystorePassword = "changeit";
     private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     // OpenSSL
@@ -104,6 +106,16 @@ public class SSLHostConfig {
 
 
     // ----------------------------------------- Common configuration properties
+
+    public void setCertificateKeyPassword(String certificateKeyPassword) {
+        this.certificateKeyPassword = certificateKeyPassword;
+    }
+
+
+    public String getCertificateKeyPassword() {
+        return certificateKeyPassword;
+    }
+
 
     public void setCertificateVerification(String certificateVerification) {
         this.certificateVerification = CertificateVerification.fromString(certificateVerification);
@@ -207,14 +219,13 @@ public class SSLHostConfig {
 
     // ---------------------------------- JSSE specific configuration properties
 
-    public void setKeyManagerAlgorithm(String keyManagerAlgorithm) {
-        setProperty("keyManagerAlgorithm", Type.JSSE);
-        this.keyManagerAlgorithm = keyManagerAlgorithm;
+    public void setCertificateKeystorePassword(String certificateKeystorePassword) {
+        this.certificateKeystorePassword = certificateKeystorePassword;
     }
 
 
-    public String getKeyManagerAlgorithm() {
-        return keyManagerAlgorithm;
+    public String getCertificateKeystorePassword() {
+        return certificateKeystorePassword;
     }
 
 
@@ -226,6 +237,17 @@ public class SSLHostConfig {
 
     public String getCertificateKeystoreFile() {
         return certificateKeystoreFile;
+    }
+
+
+    public void setKeyManagerAlgorithm(String keyManagerAlgorithm) {
+        setProperty("keyManagerAlgorithm", Type.JSSE);
+        this.keyManagerAlgorithm = keyManagerAlgorithm;
+    }
+
+
+    public String getKeyManagerAlgorithm() {
+        return keyManagerAlgorithm;
     }
 
 

@@ -982,10 +982,6 @@ public abstract class AbstractEndpoint<S> {
         this.sslImplementationName = s;
     }
 
-    private String keystorePass = null;
-    public String getKeystorePass() { return keystorePass;}
-    public void setKeystorePass(String s ) { this.keystorePass = s;}
-
     private String keystoreType = "JKS";
     public String getKeystoreType() { return keystoreType;}
     public void setKeystoreType(String s ) { this.keystoreType = s;}
@@ -1001,10 +997,6 @@ public abstract class AbstractEndpoint<S> {
     private String keyAlias = null;
     public String getKeyAlias() { return keyAlias;}
     public void setKeyAlias(String s ) { keyAlias = s;}
-
-    private String keyPass = null;
-    public String getKeyPass() { return keyPass;}
-    public void setKeyPass(String s ) { this.keyPass = s;}
 
     private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
     public String getTruststoreFile() {return truststoreFile;}

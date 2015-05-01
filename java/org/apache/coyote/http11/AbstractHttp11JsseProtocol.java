@@ -25,9 +25,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
         super(endpoint);
     }
 
-    public String getKeystorePass() { return getEndpoint().getKeystorePass();}
-    public void setKeystorePass(String s ) { getEndpoint().setKeystorePass(s);}
-
     public String getKeystoreType() { return getEndpoint().getKeystoreType();}
     public void setKeystoreType(String s ) { getEndpoint().setKeystoreType(s);}
 
@@ -43,9 +40,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
 
     public String getKeyAlias() { return getEndpoint().getKeyAlias();}
     public void setKeyAlias(String s ) { getEndpoint().setKeyAlias(s);}
-
-    public String getKeyPass() { return getEndpoint().getKeyPass();}
-    public void setKeyPass(String s ) { getEndpoint().setKeyPass(s);}
 
     public void setTruststoreFile(String f){ getEndpoint().setTruststoreFile(f);}
     public String getTruststoreFile(){ return getEndpoint().getTruststoreFile();}
