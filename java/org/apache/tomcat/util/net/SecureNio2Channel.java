@@ -534,31 +534,35 @@ public class SecureNio2Channel extends Nio2Channel  {
         private final Future<Integer> integer;
         private FutureRead(ByteBuffer dst) {
             this.dst = dst;
-            this.integer = sc.read(netInBuffer);
+            if (netInBuffer.position() > 0) {
+                this.integer = null;
+            } else {
+                this.integer = sc.read(netInBuffer);
+            }
         }
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            return integer.cancel(mayInterruptIfRunning);
+            return (integer == null) ? false : integer.cancel(mayInterruptIfRunning);
         }
         @Override
         public boolean isCancelled() {
-            return integer.isCancelled();
+            return (integer == null) ? false : integer.isCancelled();
         }
         @Override
         public boolean isDone() {
-            return integer.isDone();
+            return (integer == null) ? true : integer.isDone();
         }
         @Override
         public Integer get() throws InterruptedException, ExecutionException {
-            return unwrap(integer.get().intValue());
+            return (integer == null) ? unwrap(netInBuffer.position(), -1, TimeUnit.MILLISECONDS) : unwrap(integer.get().intValue(), -1, TimeUnit.MILLISECONDS);
         }
         @Override
         public Integer get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
-            return unwrap(integer.get(timeout, unit).intValue());
+            return (integer == null) ? unwrap(netInBuffer.position(), timeout, unit) : unwrap(integer.get(timeout, unit).intValue(), timeout, unit);
         }
-        private Integer unwrap(int nRead) throws ExecutionException {
+        private Integer unwrap(int nRead, long timeout, TimeUnit unit) throws ExecutionException {
             //are we in the middle of closing or closed?
             if (closing || closed)
                 return Integer.valueOf(-1);
@@ -589,7 +593,19 @@ public class SecureNio2Channel extends Nio2Channel  {
                     }
                     //if we need more network data, then bail out for now.
                     if (unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
-                        break;
+                        if (read == 0) {
+                            try {
+                                if (timeout > 0) {
+                                    return unwrap(sc.read(netInBuffer).get(timeout, unit).intValue(), timeout, unit);
+                                } else {
+                                    return unwrap(sc.read(netInBuffer).get().intValue(), -1, TimeUnit.MILLISECONDS);
+                                }
+                            } catch (InterruptedException | TimeoutException e) {
+                                throw new ExecutionException(e);
+                            }
+                        } else {
+                            break;
+                        }
                     }
                 } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW && read > 0) {
                     //buffer overflow can happen, if we have read data, then
@@ -723,7 +739,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         if (!handshakeComplete) {
             throw new IllegalStateException(sm.getString("channel.nio.ssl.incompleteHandshake"));
         }
-        sc.read(netInBuffer, timeout, unit, attachment, new CompletionHandler<Integer, A>() {
+        CompletionHandler<Integer, A> readCompletionHandler = new CompletionHandler<Integer, A>() {
             @Override
             public void completed(Integer nBytes, A attach) {
                 if (nBytes.intValue() < 0) {
@@ -749,7 +765,12 @@ public class SecureNio2Channel extends Nio2Channel  {
                                     tasks();
                                 //if we need more network data, then bail out for now.
                                 if (unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
-                                    break;
+                                    if (read == 0) {
+                                        sc.read(netInBuffer, timeout, unit, attachment, this);
+                                        return;
+                                    } else {
+                                        break;
+                                    }
                                 }
                             } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW && read > 0) {
                                 //buffer overflow can happen, if we have read data, then
@@ -773,7 +794,12 @@ public class SecureNio2Channel extends Nio2Channel  {
             public void failed(Throwable exc, A attach) {
                 handler.failed(exc, attach);
             }
-        });
+        };
+        if (netInBuffer.position() > 0) {
+            readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
+        } else {
+            sc.read(netInBuffer, timeout, unit, attachment, readCompletionHandler);
+        }
     }
 
     @Override
@@ -790,7 +816,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         if (!handshakeComplete) {
             throw new IllegalStateException(sm.getString("channel.nio.ssl.incompleteHandshake"));
         }
-        sc.read(netInBuffer, timeout, unit, attachment, new CompletionHandler<Integer, A>() {
+        CompletionHandler<Integer, A> readCompletionHandler = new CompletionHandler<Integer, A>() {
             @Override
             public void completed(Integer nBytes, A attach) {
                 if (nBytes.intValue() < 0) {
@@ -816,7 +842,12 @@ public class SecureNio2Channel extends Nio2Channel  {
                                     tasks();
                                 //if we need more network data, then bail out for now.
                                 if (unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
-                                    break;
+                                    if (read == 0) {
+                                        sc.read(netInBuffer, timeout, unit, attachment, this);
+                                        return;
+                                    } else {
+                                        break;
+                                    }
                                 }
                             } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW && read > 0) {
                                 //buffer overflow can happen, if we have read data, then
@@ -840,8 +871,12 @@ public class SecureNio2Channel extends Nio2Channel  {
             public void failed(Throwable exc, A attach) {
                 handler.failed(exc, attach);
             }
-        });
-
+        };
+        if (netInBuffer.position() > 0) {
+            readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
+        } else {
+            sc.read(netInBuffer, timeout, unit, attachment, readCompletionHandler);
+        }
     }
 
     @Override
