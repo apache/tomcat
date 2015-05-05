@@ -445,6 +445,19 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    public void setCrlFile(String certificateRevocationListFile){
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateRevocationListFile(certificateRevocationListFile);
+    }
+    public void setSSLCARevocationFile(String certificateRevocationListFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateRevocationListFile(certificateRevocationListFile);
+    }
+    public void setSSLCARevocationPath(String certificateRevocationListPath) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateRevocationListPath(certificateRevocationListPath);
+    }
+
 
     // ------------------------------------------------------------- Common code
 

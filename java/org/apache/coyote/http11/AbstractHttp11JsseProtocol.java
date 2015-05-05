@@ -64,9 +64,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
         return getEndpoint().getTruststoreAlgorithm();
     }
 
-    public void setCrlFile(String s){getEndpoint().setCrlFile(s);}
-    public String getCrlFile(){ return getEndpoint().getCrlFile();}
-
     public void setSessionCacheSize(String s){getEndpoint().setSessionCacheSize(s);}
     public String getSessionCacheSize(){ return getEndpoint().getSessionCacheSize();}
 

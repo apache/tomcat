@@ -1037,12 +1037,6 @@ public abstract class AbstractEndpoint<S> {
         this.trustManagerClassName = trustManagerClassName;
     }
 
-    private String crlFile = null;
-    public String getCrlFile() {return crlFile;}
-    public void setCrlFile(String crlFile) {
-        this.crlFile = crlFile;
-    }
-
     private String sessionCacheSize = null;
     public String getSessionCacheSize() { return sessionCacheSize;}
     public void setSessionCacheSize(String s) { sessionCacheSize = s;}

@@ -1069,6 +1069,20 @@
       behaviour is not to use a password.</p>
     </attribute>
 
+    <attribute name="certificateRevocationFile" required="false">
+      <p>Name of the file that contains the concatenated certificate revocation
+      lists for the certificate authorities. The format is PEM-encoded. If not
+      defined, client certificates will not be checked against a certificate
+      revocation list (unless an OpenSSl based connector is used and
+      <strong>certificateRevocationPath</strong> is defined).</p>
+    </attribute>
+
+    <attribute name="certificateRevocationPath" required="false">
+      <p>OpenSSL only.</p>
+      <p>Name of the directory that contains the certificate revocation lists
+      for the certificate authorities. The format is PEM-encoded.</p>
+    </attribute>
+
     <attribute name="certificateVerification" required="false">
       <p>Set to <code>required</code> if you want the SSL stack to require a
       valid certificate chain from the client before accepting a connection.
@@ -1173,9 +1187,9 @@
     </attribute>
 
     <attribute name="crlFile" required="false">
-      <p>The certificate revocation list to be used to verify client
-      certificates. If not defined, client certificates will not be checked
-      against a certificate revocation list.</p>
+      <p>This is an alias for the <code>certificateRevocationFile</code>
+      attribute of the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="keyAlias" required="false">
@@ -1350,13 +1364,15 @@
     </attribute>
 
     <attribute name="SSLCARevocationFile" required="false">
-      <p>Name of the file that contains the concatenated certificate revocation
-      lists for the certificate authorities. The format is PEM-encoded.</p>
+      <p>This is an alias for the <code>certificateRevocationFile</code>
+      attribute of the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="SSLCARevocationPath" required="false">
-      <p>Name of the directory that contains the certificate revocation lists
-      for the certificate authorities. The format is PEM-encoded.</p>
+      <p>This is an alias for the <code>certificateRevocationPath</code>
+      attribute of the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="SSLCertificateChainFile" required="false">
