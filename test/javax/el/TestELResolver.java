@@ -127,4 +127,17 @@ public class TestELResolver {
 
         Assert.assertEquals("3", result);
     }
+
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=57802
+    @Test
+    public void testDefaultConvertToType() {
+        ELContext context = new TesterELContext(new StaticFieldELResolver());
+
+        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(
+                        context, "${!Boolean.FALSE}", Boolean.class);
+
+        Boolean result = (Boolean) ve.getValue(context);
+
+        Assert.assertEquals(Boolean.TRUE, result);
+    }
 }
