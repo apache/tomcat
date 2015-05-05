@@ -857,13 +857,6 @@
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
-      <attribute name="socket.socketWrapperCache" required="false">
-        <p>(int)Tomcat will cache SocketWrapper objects to reduce garbage
-        collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
-      </attribute>
-
     </attributes>
   </subsection>
 
