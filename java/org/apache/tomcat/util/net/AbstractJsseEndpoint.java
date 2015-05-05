@@ -57,7 +57,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
                 SSLUtil sslUtil = sslImplementation.getSSLUtil(this, sslHostConfig);
                 SSLContext sslContext = sslUtil.createSSLContext();
-                sslContext.init(wrap(sslUtil.getKeyManagers()),
+                sslContext.init(wrap(sslUtil.getKeyManagers(), sslHostConfig),
                         sslUtil.getTrustManagers(), null);
 
                 SSLSessionContext sessionContext =
@@ -115,14 +115,15 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     }
 
 
-    private KeyManager[] wrap(KeyManager[] managers) {
+    private KeyManager[] wrap(KeyManager[] managers, SSLHostConfig sslHostConfig) {
         if (managers==null) return null;
         KeyManager[] result = new KeyManager[managers.length];
         for (int i=0; i<result.length; i++) {
-            if (managers[i] instanceof X509KeyManager && getKeyAlias() != null) {
-                String keyAlias = getKeyAlias();
+            if (managers[i] instanceof X509KeyManager &&
+                    sslHostConfig.getCertificateKeyAlias() != null) {
+                String keyAlias = sslHostConfig.getCertificateKeyAlias();
                 // JKS keystores always convert the alias name to lower case
-                if ("jks".equalsIgnoreCase(getKeystoreType())) {
+                if ("jks".equalsIgnoreCase(sslHostConfig.getCertificateKeystoreType())) {
                     keyAlias = keyAlias.toLowerCase(Locale.ENGLISH);
                 }
                 result[i] = new NioX509KeyManager((X509KeyManager) managers[i], keyAlias);

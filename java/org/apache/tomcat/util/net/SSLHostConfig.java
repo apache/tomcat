@@ -53,8 +53,11 @@ public class SSLHostConfig {
     private Set<String> protocols = new HashSet<>();
     private String certificateRevocationListFile;
     // JSSE
+    private String certificateKeyAlias;
     private String certificateKeystorePassword = "changeit";
     private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
+    private String certificateKeystoreProvider;
+    private String certificateKeystoreType = "JKS";
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     // OpenSSL
     private String certificateFile;
@@ -230,13 +233,14 @@ public class SSLHostConfig {
 
     // ---------------------------------- JSSE specific configuration properties
 
-    public void setCertificateKeystorePassword(String certificateKeystorePassword) {
-        this.certificateKeystorePassword = certificateKeystorePassword;
+    public void setCertificateKeyAlias(String certificateKeyAlias) {
+        setProperty("certificateKeyAlias", Type.JSSE);
+        this.certificateKeyAlias = certificateKeyAlias;
     }
 
 
-    public String getCertificateKeystorePassword() {
-        return certificateKeystorePassword;
+    public String getCertificateKeyAlias() {
+        return certificateKeyAlias;
     }
 
 
@@ -248,6 +252,39 @@ public class SSLHostConfig {
 
     public String getCertificateKeystoreFile() {
         return certificateKeystoreFile;
+    }
+
+
+    public void setCertificateKeystorePassword(String certificateKeystorePassword) {
+        setProperty("certificateKeystorePassword", Type.JSSE);
+        this.certificateKeystorePassword = certificateKeystorePassword;
+    }
+
+
+    public String getCertificateKeystorePassword() {
+        return certificateKeystorePassword;
+    }
+
+
+    public void setCertificateKeystoreProvider(String certificateKeystoreProvider) {
+        setProperty("certificateKeystoreProvider", Type.JSSE);
+        this.certificateKeystoreProvider = certificateKeystoreProvider;
+    }
+
+
+    public String getCertificateKeystoreProvider() {
+        return certificateKeystoreProvider;
+    }
+
+
+    public void setCertificateKeystoreType(String certificateKeystoreType) {
+        setProperty("certificateKeystoreType", Type.JSSE);
+        this.certificateKeystoreType = certificateKeystoreType;
+    }
+
+
+    public String getCertificateKeystoreType() {
+        return certificateKeystoreType;
     }
 
 
