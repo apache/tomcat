@@ -74,11 +74,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     private AsynchronousServerSocketChannel serverSock = null;
 
     /**
-     * The size of the OOM parachute.
-     */
-    private int oomParachute = 1024*1024;
-
-    /**
      * Allows detecting if a completion handler completes inline.
      */
     private static ThreadLocal<Boolean> inlineCompletion = new ThreadLocal<>();
@@ -89,24 +84,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     private AsynchronousChannelGroup threadGroup = null;
 
     private volatile boolean allClosed;
-
-    /**
-     * The oom parachute, when an OOM error happens,
-     * will release the data, giving the JVM instantly
-     * a chunk of data to be able to recover with.
-     */
-    private byte[] oomParachuteData = null;
-
-    /**
-     * Make sure this string has already been allocated
-     */
-    private static final String oomParachuteMsg =
-        "SEVERE:Memory usage is low, parachute is non existent, your system may start failing.";
-
-    /**
-     * Keep track of OOM warning messages.
-     */
-    private long lastParachuteCheck = System.currentTimeMillis();
 
     /**
      * Cache for SocketProcessor objects
@@ -151,14 +128,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         return false;
     }
 
-    public void setOomParachute(int oomParachute) {
-        this.oomParachute = oomParachute;
-    }
-
-    public void setOomParachuteData(byte[] oomParachuteData) {
-        this.oomParachuteData = oomParachuteData;
-    }
-
 
     /**
      * Port in use.
@@ -183,35 +152,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     }
 
 
-    // --------------------------------------------------------- OOM Parachute Methods
-
-    protected void checkParachute() {
-        boolean para = reclaimParachute(false);
-        if (!para && (System.currentTimeMillis()-lastParachuteCheck)>10000) {
-            try {
-                log.fatal(oomParachuteMsg);
-            }catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                System.err.println(oomParachuteMsg);
-            }
-            lastParachuteCheck = System.currentTimeMillis();
-        }
-    }
-
-    protected boolean reclaimParachute(boolean force) {
-        if ( oomParachuteData != null ) return true;
-        if ( oomParachute > 0 && ( force || (Runtime.getRuntime().freeMemory() > (oomParachute*2))) )
-            oomParachuteData = new byte[oomParachute];
-        return oomParachuteData != null;
-    }
-
     protected void releaseCaches() {
         if (useCaches) {
             this.nioChannels.clear();
             this.processorCache.clear();
         }
         if ( handler != null ) handler.recycle();
-
     }
 
     // --------------------------------------------------------- Public Methods
@@ -261,8 +207,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         // Initialize SSL if needed
         initialiseSsl();
-
-        if (oomParachute>0) reclaimParachute(true);
     }
 
 
@@ -397,15 +341,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     public int getReadBufSize() {
         return socketProperties.getRxBufSize();
     }
-
-    public int getOomParachute() {
-        return oomParachute;
-    }
-
-    public byte[] getOomParachuteData() {
-        return oomParachuteData;
-    }
-
 
     @Override
     protected AbstractEndpoint.Acceptor createAcceptor() {
@@ -1740,20 +1675,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         closeSocket(socket);
                         if (useCaches && running && !paused) {
                             nioChannels.push(socket.getSocket());
-                        }
-                    }
-                } catch (OutOfMemoryError oom) {
-                    try {
-                        oomParachuteData = null;
-                        log.error("", oom);
-                        closeSocket(socket);
-                        releaseCaches();
-                    } catch (Throwable oomt) {
-                        try {
-                            System.err.println(oomParachuteMsg);
-                            oomt.printStackTrace();
-                        } catch (Throwable letsHopeWeDontGetHere){
-                            ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
                         }
                     }
                 } catch (VirtualMachineError vme) {
