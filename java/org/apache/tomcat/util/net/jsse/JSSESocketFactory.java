@@ -337,13 +337,14 @@ public class JSSESocketFactory implements SSLUtil {
 
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
-        String keystoreType = endpoint.getKeystoreType();
+        String keystoreType = sslHostConfig.getCertificateKeystoreType();
         if (keystoreType == null) {
             keystoreType = defaultKeystoreType;
         }
 
-        return getKeyManagers(keystoreType, endpoint.getKeystoreProvider(),
-                sslHostConfig.getKeyManagerAlgorithm(), endpoint.getKeyAlias());
+        return getKeyManagers(keystoreType, sslHostConfig.getCertificateKeystoreProvider(),
+                sslHostConfig.getKeyManagerAlgorithm(),
+                sslHostConfig.getCertificateKeyAlias());
     }
 
     @Override
@@ -353,7 +354,7 @@ public class JSSESocketFactory implements SSLUtil {
             truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
         }
         if (truststoreType == null) {
-            truststoreType = endpoint.getKeystoreType();
+            truststoreType = sslHostConfig.getCertificateKeystoreType();
         }
         if (truststoreType == null) {
             truststoreType = defaultKeystoreType;
@@ -364,7 +365,7 @@ public class JSSESocketFactory implements SSLUtil {
             algorithm = TrustManagerFactory.getDefaultAlgorithm();
         }
 
-        return getTrustManagers(truststoreType, endpoint.getKeystoreProvider(),
+        return getTrustManagers(truststoreType, sslHostConfig.getCertificateKeystoreProvider(),
                 algorithm);
     }
 
