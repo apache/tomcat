@@ -88,11 +88,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
     }
 
 
-    // -------------------- Tcp setup --------------------
-    public void setOomParachute(int oomParachute) {
-        ((NioEndpoint)getEndpoint()).setOomParachute(oomParachute);
-    }
-
     // ----------------------------------------------------- JMX related methods
 
     @Override

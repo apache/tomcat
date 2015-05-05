@@ -88,28 +88,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     private ServerSocketChannel serverSock = null;
 
     /**
-     * The size of the OOM parachute.
-     */
-    private int oomParachute = 1024*1024;
-    /**
-     * The oom parachute, when an OOM error happens,
-     * will release the data, giving the JVM instantly
-     * a chunk of data to be able to recover with.
-     */
-    private byte[] oomParachuteData = null;
-
-    /**
-     * Make sure this string has already been allocated
-     */
-    private static final String oomParachuteMsg =
-        "SEVERE:Memory usage is low, parachute is non existent, your system may start failing.";
-
-    /**
-     * Keep track of OOM warning messages.
-     */
-    private long lastParachuteCheck = System.currentTimeMillis();
-
-    /**
      *
      */
     private volatile CountDownLatch stopLatch = null;
@@ -211,14 +189,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         return false;
     }
 
-    public void setOomParachute(int oomParachute) {
-        this.oomParachute = oomParachute;
-    }
-
-    public void setOomParachuteData(byte[] oomParachuteData) {
-        this.oomParachuteData = oomParachuteData;
-    }
-
 
     /**
      * Port in use.
@@ -239,34 +209,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     }
 
 
-    // --------------------------------------------------------- OOM Parachute Methods
-
-    protected void checkParachute() {
-        boolean para = reclaimParachute(false);
-        if (!para && (System.currentTimeMillis()-lastParachuteCheck)>10000) {
-            try {
-                log.fatal(oomParachuteMsg);
-            }catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                System.err.println(oomParachuteMsg);
-            }
-            lastParachuteCheck = System.currentTimeMillis();
-        }
-    }
-
-    protected boolean reclaimParachute(boolean force) {
-        if ( oomParachuteData != null ) return true;
-        if ( oomParachute > 0 && ( force || (Runtime.getRuntime().freeMemory() > (oomParachute*2))) )
-            oomParachuteData = new byte[oomParachute];
-        return oomParachuteData != null;
-    }
-
     protected void releaseCaches() {
         this.nioChannels.clear();
         this.processorCache.clear();
         if ( handler != null ) handler.recycle();
 
     }
+
 
     // --------------------------------------------------------- Public Methods
     /**
@@ -289,7 +238,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
 
     // ----------------------------------------------- Public Lifecycle Methods
-
 
     /**
      * Initialize the endpoint.
@@ -318,7 +266,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         // Initialize SSL if needed
         initialiseSsl();
 
-        if (oomParachute>0) reclaimParachute(true);
         selectorPool.open();
     }
 
@@ -428,14 +375,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
     public NioSelectorPool getSelectorPool() {
         return selectorPool;
-    }
-
-    public int getOomParachute() {
-        return oomParachute;
-    }
-
-    public byte[] getOomParachuteData() {
-        return oomParachuteData;
     }
 
 
@@ -600,23 +539,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 } catch (IOException x) {
                     if (running) {
                         log.error(sm.getString("endpoint.accept.fail"), x);
-                    }
-                } catch (OutOfMemoryError oom) {
-                    try {
-                        oomParachuteData = null;
-                        releaseCaches();
-                        log.error("", oom);
-                    }catch ( Throwable oomt ) {
-                        try {
-                            try {
-                                System.err.println(oomParachuteMsg);
-                                oomt.printStackTrace();
-                            }catch (Throwable letsHopeWeDontGetHere){
-                                ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
-                            }
-                        }catch (Throwable letsHopeWeDontGetHere){
-                            ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
-                        }
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -874,19 +796,42 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public void run() {
             // Loop until destroy() is called
             while (true) {
-                try {
-                    // Loop if endpoint is paused
-                    while (paused && (!close) ) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            // Ignore
-                        }
+                // Loop if endpoint is paused
+                while (paused && (!close) ) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        // Ignore
                     }
+                }
 
-                    boolean hasEvents = false;
+                boolean hasEvents = false;
 
-                    // Time to terminate?
+                // Time to terminate?
+                if (close) {
+                    events();
+                    timeout(0, false);
+                    try {
+                        selector.close();
+                    } catch (IOException ioe) {
+                        log.error(sm.getString(
+                                "endpoint.nio.selectorCloseFail"), ioe);
+                    }
+                    break;
+                } else {
+                    hasEvents = events();
+                }
+                try {
+                    if ( !close ) {
+                        if (wakeupCounter.getAndSet(-1) > 0) {
+                            //if we are here, means we have other stuff to do
+                            //do a non blocking select
+                            keyCount = selector.selectNow();
+                        } else {
+                            keyCount = selector.select(selectorTimeout);
+                        }
+                        wakeupCounter.set(0);
+                    }
                     if (close) {
                         events();
                         timeout(0, false);
@@ -897,73 +842,34 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                                     "endpoint.nio.selectorCloseFail"), ioe);
                         }
                         break;
-                    } else {
-                        hasEvents = events();
                     }
-                    try {
-                        if ( !close ) {
-                            if (wakeupCounter.getAndSet(-1) > 0) {
-                                //if we are here, means we have other stuff to do
-                                //do a non blocking select
-                                keyCount = selector.selectNow();
-                            } else {
-                                keyCount = selector.select(selectorTimeout);
-                            }
-                            wakeupCounter.set(0);
-                        }
-                        if (close) {
-                            events();
-                            timeout(0, false);
-                            try {
-                                selector.close();
-                            } catch (IOException ioe) {
-                                log.error(sm.getString(
-                                        "endpoint.nio.selectorCloseFail"), ioe);
-                            }
-                            break;
-                        }
-                    } catch (Throwable x) {
-                        ExceptionUtils.handleThrowable(x);
-                        log.error("",x);
-                        continue;
-                    }
-                    //either we timed out or we woke up, process events first
-                    if ( keyCount == 0 ) hasEvents = (hasEvents | events());
-
-                    Iterator<SelectionKey> iterator =
-                        keyCount > 0 ? selector.selectedKeys().iterator() : null;
-                    // Walk through the collection of ready keys and dispatch
-                    // any active event.
-                    while (iterator != null && iterator.hasNext()) {
-                        SelectionKey sk = iterator.next();
-                        NioSocketWrapper attachment = (NioSocketWrapper)sk.attachment();
-                        // Attachment may be null if another thread has called
-                        // cancelledKey()
-                        if (attachment == null) {
-                            iterator.remove();
-                        } else {
-                            iterator.remove();
-                            processKey(sk, attachment);
-                        }
-                    }//while
-
-                    //process timeouts
-                    timeout(keyCount,hasEvents);
-                    if ( oomParachute > 0 && oomParachuteData == null ) checkParachute();
-                } catch (OutOfMemoryError oom) {
-                    try {
-                        oomParachuteData = null;
-                        releaseCaches();
-                        log.error("", oom);
-                    }catch ( Throwable oomt ) {
-                        try {
-                            System.err.println(oomParachuteMsg);
-                            oomt.printStackTrace();
-                        }catch (Throwable letsHopeWeDontGetHere){
-                            ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
-                        }
-                    }
+                } catch (Throwable x) {
+                    ExceptionUtils.handleThrowable(x);
+                    log.error("",x);
+                    continue;
                 }
+                //either we timed out or we woke up, process events first
+                if ( keyCount == 0 ) hasEvents = (hasEvents | events());
+
+                Iterator<SelectionKey> iterator =
+                    keyCount > 0 ? selector.selectedKeys().iterator() : null;
+                // Walk through the collection of ready keys and dispatch
+                // any active event.
+                while (iterator != null && iterator.hasNext()) {
+                    SelectionKey sk = iterator.next();
+                    NioSocketWrapper attachment = (NioSocketWrapper)sk.attachment();
+                    // Attachment may be null if another thread has called
+                    // cancelledKey()
+                    if (attachment == null) {
+                        iterator.remove();
+                    } else {
+                        iterator.remove();
+                        processKey(sk, attachment);
+                    }
+                }//while
+
+                //process timeouts
+                timeout(keyCount,hasEvents);
             }//while
 
             stopLatch.countDown();
@@ -1640,22 +1546,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 } catch (CancelledKeyException cx) {
                     if (socket != null) {
                         socket.getPoller().cancelledKey(key);
-                    }
-                } catch (OutOfMemoryError oom) {
-                    try {
-                        oomParachuteData = null;
-                        log.error("", oom);
-                        if (socket != null) {
-                            socket.getPoller().cancelledKey(key);
-                        }
-                        releaseCaches();
-                    } catch (Throwable oomt) {
-                        try {
-                            System.err.println(oomParachuteMsg);
-                            oomt.printStackTrace();
-                        } catch (Throwable letsHopeWeDontGetHere){
-                            ExceptionUtils.handleThrowable(letsHopeWeDontGetHere);
-                        }
                     }
                 } catch (VirtualMachineError vme) {
                     ExceptionUtils.handleThrowable(vme);

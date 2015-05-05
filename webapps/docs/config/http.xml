@@ -777,18 +777,6 @@
         <strong>selectorPool.maxSelectors</strong> attribute.</p>
       </attribute>
 
-      <attribute name="oomParachute" required="false">
-        <p>(int)The NIO connector implements an OutOfMemoryError strategy called
-        parachute. It holds a chunk of data as a byte array. In case of an OOM,
-        this chunk of data is released and the error is reported. This will give
-        the VM enough room to clean up. The <code>oomParachute</code> represents
-        the size in bytes of the parachute(the byte array). The default value is
-        <code>1024*1024</code>(1MB). Please note, this only works for OOM errors
-        regarding the Java Heap space, and there is absolutely no  guarantee
-        that you will be able to recover at all. If you have an OOM outside of
-        the Java Heap, then this parachute trick will not help.
-        </p>
-      </attribute>
     </attributes>
   </subsection>
 
@@ -876,18 +864,6 @@
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
-      <attribute name="oomParachute" required="false">
-        <p>(int)The NIO2 connector implements an OutOfMemoryError strategy called
-        parachute. It holds a chunk of data as a byte array. In case of an OOM,
-        this chunk of data is released and the error is reported. This will give
-        the VM enough room to clean up. The <code>oomParachute</code> represents
-        the size in bytes of the parachute(the byte array). The default value is
-        <code>1024*1024</code>(1MB). Please note, this only works for OOM errors
-        regarding the Java Heap space, and there is absolutely no  guarantee
-        that you will be able to recover at all. If you have an OOM outside of
-        the Java Heap, then this parachute trick will not help.
-        </p>
-      </attribute>
     </attributes>
   </subsection>
 
