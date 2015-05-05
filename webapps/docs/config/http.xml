@@ -1096,7 +1096,7 @@
       <p>The password used to access the private key associated with the server
       certificate from the specified file.</p>
       <p>If not specified, the default behaviour for JSSE is to use the
-      <strong>certificateKeystorePassword</strong> for OpenSSL the default
+      <strong>certificateKeystorePassword</strong>. For OpenSSL the default
       behaviour is not to use a password.</p>
     </attribute>
 
@@ -1114,7 +1114,7 @@
       security constraint that uses <code>CLIENT-CERT</code> authentication.</p>
     </attribute>
 
-    <attribute name="certificateVerificationDepth">
+    <attribute name="certificateVerificationDepth" required="false">
       <p>The maximum number of intermediate certificates that will be allowed
       when validating client certificates. If not specified, the default value
       of 10 will be used.</p>
@@ -1133,7 +1133,7 @@
       <p>If not specified, a default (using the OpenSSL notation) of
       <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code> will be used.</p>
       <p>Note that, by default, the order in which ciphers are defined is not
-      trreated as an order of preference. See <code>honorCipherOrder</code>.</p>
+      treated as an order of preference. See <code>honorCipherOrder</code>.</p>
     </attribute>
 
     <attribute name="honorCipherOrder" required="false">
