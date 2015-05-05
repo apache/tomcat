@@ -435,7 +435,7 @@ public class JSSESocketFactory implements SSLUtil {
     protected TrustManager[] getTrustManagers(String keystoreType,
             String keystoreProvider, String algorithm)
         throws Exception {
-        String crlf = endpoint.getCrlFile();
+        String crlf = sslHostConfig.getCertificateRevocationListFile();
 
         String className = endpoint.getTrustManagerClassName();
         if(className != null && className.length() > 0) {

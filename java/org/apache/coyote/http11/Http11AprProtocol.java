@@ -94,20 +94,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
 
     /**
-     * SSL CA revocation path.
-     */
-    public String getSSLCARevocationPath() { return ((AprEndpoint)getEndpoint()).getSSLCARevocationPath(); }
-    public void setSSLCARevocationPath(String SSLCARevocationPath) { ((AprEndpoint)getEndpoint()).setSSLCARevocationPath(SSLCARevocationPath); }
-
-
-    /**
-     * SSL CA revocation file.
-     */
-    public String getSSLCARevocationFile() { return ((AprEndpoint)getEndpoint()).getSSLCARevocationFile(); }
-    public void setSSLCARevocationFile(String SSLCARevocationFile) { ((AprEndpoint)getEndpoint()).setSSLCARevocationFile(SSLCARevocationFile); }
-
-
-    /**
      * Disable SSL compression.
      */
     public boolean getSSLDisableCompression() { return ((AprEndpoint)getEndpoint()).getSSLDisableCompression(); }

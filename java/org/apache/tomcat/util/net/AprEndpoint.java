@@ -233,21 +233,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     /**
-     * SSL CA revocation path.
-     */
-    protected String SSLCARevocationPath = null;
-    public String getSSLCARevocationPath() { return SSLCARevocationPath; }
-    public void setSSLCARevocationPath(String SSLCARevocationPath) { this.SSLCARevocationPath = SSLCARevocationPath; }
-
-
-    /**
-     * SSL CA revocation file.
-     */
-    protected String SSLCARevocationFile = null;
-    public String getSSLCARevocationFile() { return SSLCARevocationFile; }
-    public void setSSLCARevocationFile(String SSLCARevocationFile) { this.SSLCARevocationFile = SSLCARevocationFile; }
-
-    /**
      * SSL disable TLS Session Tickets (RFC 4507).
      */
     protected boolean SSLDisableSessionTickets = false;
@@ -564,7 +549,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 // Support Client Certificates
                 SSLContext.setCACertificate(ctx, SSLCACertificateFile, SSLCACertificatePath);
                 // Set revocation
-                SSLContext.setCARevocation(ctx, SSLCARevocationFile, SSLCARevocationPath);
+                SSLContext.setCARevocation(ctx, sslHostConfig.getCertificateRevocationListFile(),
+                        sslHostConfig.getCertificateRevocationListPath());
                 // Client certificate verification
                 switch (sslHostConfig.getCertificateVerification()) {
                 case NONE:

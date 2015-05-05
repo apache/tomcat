@@ -50,8 +50,8 @@ public class SSLHostConfig {
     private int certificateVerificationDepth = 10;
     private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
     private boolean honorCipherOrder = false;
-
     private Set<String> protocols = new HashSet<>();
+    private String certificateRevocationListFile;
     // JSSE
     private String certificateKeystorePassword = "changeit";
     private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
@@ -59,6 +59,7 @@ public class SSLHostConfig {
     // OpenSSL
     private String certificateFile;
     private String certificateKeyFile;
+    private String certificateRevocationListPath;
 
     public SSLHostConfig() {
         // Set defaults that can't be (easily) set when defining the fields.
@@ -114,6 +115,16 @@ public class SSLHostConfig {
 
     public String getCertificateKeyPassword() {
         return certificateKeyPassword;
+    }
+
+
+    public void setCertificateRevocationListFile(String certificateRevocationListFile) {
+        this.certificateRevocationListFile = certificateRevocationListFile;
+    }
+
+
+    public String getCertificateRevocationListFile() {
+        return certificateRevocationListFile;
     }
 
 
@@ -272,6 +283,17 @@ public class SSLHostConfig {
 
     public String getCertificateKeyFile() {
         return certificateKeyFile;
+    }
+
+
+    public void setCertificateRevocationListPath(String certificateRevocationListPath) {
+        setProperty("certificateRevocationListPath", Type.OPENSSL);
+        this.certificateRevocationListPath = certificateRevocationListPath;
+    }
+
+
+    public String getCertificateRevocationListPath() {
+        return certificateRevocationListPath;
     }
 
 
