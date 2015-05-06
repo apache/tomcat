@@ -1173,9 +1173,11 @@
       </p>
       <ul><li>SSLv2Hello</li><li>SSLv2</li><li>SSLv3</li><li>TLSv1</li>
           <li>TLSv1.1</li><li>TLSv1.2</li><li>all</li></ul>
-      <p>Note that OpenSSL based secure connectors will always support
-      <code>SSLv2Hello</code> regardless of whether or not it is included in the
-      value for this attribute.</p>
+      <p>Note that <code>SSLv2Hello</code> will be ignored for OpenSSL based
+      secure connectors. If more than one protocol is specified for an OpenSSL
+      based secure connector it will support <code>SSLv2Hello</code>. If a
+      single protocol is specified it will not support
+      <code>SSLv2Hello</code>.</p>
       <p>Note that <code>all</code> is an alias for
       <code>TLSv1,TLSv1.1,TLSv1.2</code>.</p>
       <p>Note that <code>SSLv2</code> and <code>SSLv3</code> are inherently
