@@ -1188,7 +1188,7 @@
 
   </subsection>
 
-  <subsection name="SSL Support - NIO and NIO2 (deprecated)">
+  <subsection name="SSL Support - Connector - NIO and NIO2 (deprecated)">
 
   <p>The NIO and NIO2 connectors use the following attributes to configure SSL:
   </p>
@@ -1356,7 +1356,7 @@
 
   </subsection>
 
-  <subsection name="SSL Support - APR/Native (deprecated)">
+  <subsection name="SSL Support - Connector - APR/Native (deprecated)">
 
   <p>When APR/native is enabled, the HTTPS connector will use a socket poller
   for keep-alive, increasing scalability of the server. It also uses OpenSSL,
