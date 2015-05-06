@@ -1007,7 +1007,7 @@
 
   <p>Each secure connector must define at least one
   <strong>SSLHostConfig</strong>. The names of the
-  <strong>SSLHostConfig</strong> elements must be unique and one of the must
+  <strong>SSLHostConfig</strong> elements must be unique and one of them must
   match the <code>sslDefaultHost</code> attribute of the
   <strong>Connector</strong>.</p>
 
@@ -1018,7 +1018,7 @@
   <strong>SSLHostConfig</strong> element also exists for the
   <code>sslDefaultHost</code> then that will be treated as a configuration
   error. It is expected that Tomcat 10 will drop support for the SSL
-  configuration attributes in the <strong>Connector</strong></p>.
+  configuration attributes in the <strong>Connector</strong>.</p>
 
   <p>For more information, see the
   <a href="../ssl-howto.html">SSL Configuration HOW-TO</a>.</p>
