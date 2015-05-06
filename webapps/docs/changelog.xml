@@ -128,6 +128,12 @@
         <bug>57837</bug>: Add <code>text/css</code> to the default list of
         compressable MIME types. (markt) 
       </fix>
+      <fix>
+        For the JSSE based TLS connectors, use the
+        <code>truststoreProvider</code> rather than the
+        <code>keystoreProvider</code> when creating the
+        <code>TrustManager</code>s. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
