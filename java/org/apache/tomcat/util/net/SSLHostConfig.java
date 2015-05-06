@@ -16,18 +16,23 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Represents the TLS configuration for a virtual host.
+ */
 public class SSLHostConfig {
 
     private static final Log log = LogFactory.getLog(SSLHostConfig.class);
@@ -46,19 +51,26 @@ public class SSLHostConfig {
 
     // Common
     private String certificateKeyPassword = null;
+    private String certificateRevocationListFile;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
     private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
     private boolean honorCipherOrder = false;
     private Set<String> protocols = new HashSet<>();
-    private String certificateRevocationListFile;
     // JSSE
     private String certificateKeyAlias;
     private String certificateKeystorePassword = "changeit";
     private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
-    private String certificateKeystoreProvider;
-    private String certificateKeystoreType = "JKS";
+    private String certificateKeystoreProvider = System.getProperty("javax.net.ssl.keyStoreProvider");
+    private String certificateKeystoreType = System.getProperty("javax.net.ssl.keyStoreType");
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+    private String trustManagerClassName;
+    private String truststoreAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+    private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
+    private String truststorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
+    private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
+    private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
+
     // OpenSSL
     private String certificateFile;
     private String certificateKeyFile;
@@ -67,6 +79,10 @@ public class SSLHostConfig {
     public SSLHostConfig() {
         // Set defaults that can't be (easily) set when defining the fields.
         setProtocols("all");
+        // Configure fall-back defaults if system property is not set.
+        if (certificateKeystoreType == null) {
+            certificateKeystoreType = "JKS";
+        }
     }
 
 
@@ -122,7 +138,7 @@ public class SSLHostConfig {
 
 
     public void setCertificateRevocationListFile(String certificateRevocationListFile) {
-        this.certificateRevocationListFile = certificateRevocationListFile;
+        this.certificateRevocationListFile = adjustRelativePath(certificateRevocationListFile);
     }
 
 
@@ -246,7 +262,7 @@ public class SSLHostConfig {
 
     public void setCertificateKeystoreFile(String certificateKeystoreFile) {
         setProperty("certificateKeystoreFile", Type.JSSE);
-        this.certificateKeystoreFile = certificateKeystoreFile;
+        this.certificateKeystoreFile = adjustRelativePath(certificateKeystoreFile);
     }
 
 
@@ -299,11 +315,85 @@ public class SSLHostConfig {
     }
 
 
+    public void setTrustManagerClassName(String trustManagerClassName) {
+        setProperty("trustManagerClassName", Type.JSSE);
+        this.trustManagerClassName = trustManagerClassName;
+    }
+
+
+    public String getTrustManagerClassName() {
+        return trustManagerClassName;
+    }
+
+
+    public void setTruststoreAlgorithm(String truststoreAlgorithm) {
+        setProperty("truststoreAlgorithm", Type.JSSE);
+        this.truststoreAlgorithm = truststoreAlgorithm;
+    }
+
+
+    public String getTruststoreAlgorithm() {
+        return truststoreAlgorithm;
+    }
+
+
+    public void setTruststoreFile(String truststoreFile) {
+        setProperty("truststoreFile", Type.JSSE);
+        this.truststoreFile = adjustRelativePath(truststoreFile);
+    }
+
+
+    public String getTruststoreFile() {
+        return truststoreFile;
+    }
+
+
+    public void setTruststorePassword(String truststorePassword) {
+        setProperty("truststorePassword", Type.JSSE);
+        this.truststorePassword = truststorePassword;
+    }
+
+
+    public String getTruststorePassword() {
+        return truststorePassword;
+    }
+
+
+    public void setTruststoreProvider(String truststoreProvider) {
+        setProperty("truststoreProvider", Type.JSSE);
+        this.truststoreProvider = truststoreProvider;
+    }
+
+
+    public String getTruststoreProvider() {
+        if (truststoreProvider == null) {
+            return getCertificateKeystoreProvider();
+        } else {
+            return truststoreProvider;
+        }
+    }
+
+
+    public void setTruststoreType(String truststoreType) {
+        setProperty("truststoreType", Type.JSSE);
+        this.truststoreType = truststoreType;
+    }
+
+
+    public String getTruststoreType() {
+        if (truststoreType == null) {
+            return getCertificateKeystoreType();
+        } else {
+            return truststoreType;
+        }
+    }
+
+
     // ------------------------------- OpenSSL specific configuration properties
 
     public void setCertificateFile(String certificateFile) {
         setProperty("certificateFile", Type.OPENSSL);
-        this.certificateFile = certificateFile;
+        this.certificateFile = adjustRelativePath(certificateFile);
     }
 
 
@@ -314,7 +404,7 @@ public class SSLHostConfig {
 
     public void setCertificateKeyFile(String certificateKeyFile) {
         setProperty("certificateKeyFile", Type.OPENSSL);
-        this.certificateKeyFile = certificateKeyFile;
+        this.certificateKeyFile = adjustRelativePath(certificateKeyFile);
     }
 
 
@@ -325,12 +415,34 @@ public class SSLHostConfig {
 
     public void setCertificateRevocationListPath(String certificateRevocationListPath) {
         setProperty("certificateRevocationListPath", Type.OPENSSL);
-        this.certificateRevocationListPath = certificateRevocationListPath;
+        this.certificateRevocationListPath = adjustRelativePath(certificateRevocationListPath);
     }
 
 
     public String getCertificateRevocationListPath() {
         return certificateRevocationListPath;
+    }
+
+
+    // --------------------------------------------------------- Support methods
+
+    private String adjustRelativePath(String path) {
+        // Empty or null path can't point to anything useful. The assumption is
+        // that the value is deliberately empty / null so leave it that way.
+        if (path == null || path.length() == 0) {
+            return path;
+        }
+        String newPath = path;
+        File f = new File(newPath);
+        if ( !f.isAbsolute()) {
+            newPath = System.getProperty(Constants.CATALINA_BASE_PROP) + File.separator + newPath;
+            f = new File(newPath);
+        }
+        if (!f.exists()) {
+            // TODO i18n, sm
+            log.warn("configured file:["+newPath+"] does not exist.");
+        }
+        return newPath;
     }
 
 

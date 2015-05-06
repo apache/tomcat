@@ -476,6 +476,35 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         defaultSSLHostConfig.setCertificateKeyAlias(certificateKeyAlias);
     }
 
+    public void setTruststoreAlgorithm(String truststoreAlgorithm){
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setTruststoreAlgorithm(truststoreAlgorithm);
+    }
+
+
+    public void setTruststoreFile(String truststoreFile){
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setTruststoreFile(truststoreFile);
+    }
+
+
+    public void setTruststorePass(String truststorePassword){
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setTruststorePassword(truststorePassword);
+    }
+
+
+    public void setTruststoreType(String truststoreType){
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setTruststoreType(truststoreType);
+    }
+
+
+    public void setTruststoreProvider(String truststoreProvider){
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setTruststoreProvider(truststoreProvider);
+    }
+
 
     // ------------------------------------------------------------- Common code
 

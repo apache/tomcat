@@ -1034,7 +1034,8 @@
     <attribute name="certificateFile" required="true">
       <p>OpenSSL only.</p>
       <p>Name of the file that contains the server certificate. The format is
-      PEM-encoded.</p>
+      PEM-encoded. Relative paths will be resolved against
+      <code>$CATALINA_BASE</code>.</p>
     </attribute>
 
     <attribute name="certificateKeyAlias" required="true">
@@ -1051,9 +1052,10 @@
     <attribute name="certificateKeyFile" required="false">
       <p>OpenSSL only.</p>
       <p>Name of the file that contains the server private key. The format is
-      PEM-encoded. The default value is the value of "SSLCertificateFile" and in
-      this case both certificate and private key have to be in this file (NOT
-      RECOMMENDED).</p>
+      PEM-encoded. The default value is the value of
+      <strong>certificateFile</strong> and in this case both certificate and
+      private key have to be in this file (NOT RECOMMENDED). Relative paths will
+      be resolved against <code>$CATALINA_BASE</code>.</p>
     </attribute>
 
     <attribute name="certificateKeyPassword" required="false">
@@ -1070,7 +1072,9 @@
       certificate and key to be loaded. By default, the pathname is the file
       <code>.keystore</code> in the operating system home directory of the user
       that is running Tomcat. If your <code>keystoreType</code> doesn't need a
-      file use <code>""</code> (empty string) for this parameter.</p>
+      file use <code>""</code> (empty string) or <code>NONE</code> for this
+      parameter.  Relative paths will be resolved against
+      <code>$CATALINA_BASE</code>.</p>
     </attribute>
 
     <attribute name="certificateKeystorePassword" required="false">
@@ -1083,16 +1087,21 @@
     <attribute name="certificateKeystoreProvider" required="true">
       <p>JSSE only.</p>
       <p>The name of the keystore provider to be used for the server
-      certificate. If not specified, the list of registered providers is
-      traversed in preference order and the first provider that supports the
-      <code>keystoreType</code> is used.
+      certificate. If not specified, the value of the system property
+      <code>javax.net.ssl.keyStoreProvider</code> is used. If neither this
+      attribute nor the system property are set, the list of registered
+      providers is traversed in preference order and the first provider that
+      supports the <code>keystoreType</code> is used.
       </p>
     </attribute>
 
     <attribute name="certificateKeystoreType" required="true">
       <p>JSSE only.</p>
       <p>The type of keystore file to be used for the server certificate.
-      If not specified, the default value is "<code>JKS</code>".</p>
+      If not specified, the value of the system property
+      <code>javax.net.ssl.keyStoreType</code> is used. If neither this attribute
+      nor the system property are set, a default value of "<code>JKS</code>". is
+      used.</p>
     </attribute>
 
     <attribute name="certificateRevocationFile" required="false">
@@ -1100,13 +1109,15 @@
       lists for the certificate authorities. The format is PEM-encoded. If not
       defined, client certificates will not be checked against a certificate
       revocation list (unless an OpenSSl based connector is used and
-      <strong>certificateRevocationPath</strong> is defined).</p>
+      <strong>certificateRevocationPath</strong> is defined). Relative paths
+      will be resolved against <code>$CATALINA_BASE</code>.</p>
     </attribute>
 
     <attribute name="certificateRevocationPath" required="false">
       <p>OpenSSL only.</p>
       <p>Name of the directory that contains the certificate revocation lists
-      for the certificate authorities. The format is PEM-encoded.</p>
+      for the certificate authorities. The format is PEM-encoded. Relative paths
+      will be resolved against <code>$CATALINA_BASE</code>.</p>
     </attribute>
 
     <attribute name="certificateVerification" required="false">
@@ -1185,6 +1196,62 @@
       <p>If not specified, the default value of <code>all</code> will be
       used.</p>
     </attribute>
+
+    <attribute name="trustManagerClassName" required="false">
+      <p>JSSE only.</p>
+      <p>The name of a custom trust manager class to use to validate client
+      certificates. The class must have a zero argument constructor and must
+      also implement <code>javax.net.ssl.X509TrustManager</code>. If this
+      attribute is set, the trust store attributes may be ignored.</p>
+    </attribute>
+
+    <attribute name="truststoreAlgorithm" required="false">
+      <p>JSSE only.</p>
+      <p>The algorithm to use for truststore. If not specified, the default
+      value returned by
+      <code>javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm()</code> is
+      used.</p>
+    </attribute>
+
+    <attribute name="truststoreFile" required="false">
+      <p>JSSE only.</p>
+      <p>The trust store file to use to validate client certificates. The
+      default is the value of the <code>javax.net.ssl.trustStore</code> system
+      property. If neither this attribute nor the default system property is
+      set, no trust store will be configured. Relative paths
+      will be resolved against <code>$CATALINA_BASE</code>.</p>
+    </attribute>
+
+    <attribute name="truststorePass" required="false">
+      <p>JSSE only.</p>
+      <p>The password to access the trust store. The default is the value of the
+      <code>javax.net.ssl.trustStorePassword</code> system property. If that
+      property is null, no trust store password will be configured. If an
+      invalid trust store password is specified, a warning will be logged and an
+      attempt will be made to access the trust store without a password which
+      will skip validation of the trust store contents.</p>
+    </attribute>
+
+    <attribute name="truststoreProvider" required="false">
+      <p>JSSE only.</p>
+      <p>The name of the truststore provider to be used for the server
+      certificate. The default is the value of the
+      <code>javax.net.ssl.trustStoreProvider</code> system property. If
+      that property is null, the value of <code>keystoreProvider</code> is used
+      as the default. If neither this attribute, the default system property nor
+      <code>keystoreProvider</code>is set, the list of registered providers is
+      traversed in preference order and the first provider that supports the
+      <code>truststoreType</code> is used.
+      </p>
+    </attribute>
+
+    <attribute name="truststoreType" required="false">
+      <p>JSSE only.</p>
+      <p>The type of key store used for the trust store. The default is the
+      value of the <code>javax.net.ssl.trustStoreType</code> system property. If
+      that property is null, the value of <code>keystoreType</code> is used as
+      the default.</p>
+     </attribute>
 
   </attributes>
 
@@ -1293,11 +1360,9 @@
     </attribute>
 
     <attribute name="trustManagerClassName" required="false">
-      <p>The name of a custom trust manager class to use to validate client
-      certificates. The class must have a zero argument constructor and must
-      also implement <code>javax.net.ssl.X509TrustManager</code>. If this
-      attribute is set, the trust store attributes may be ignored.
-      </p>
+      <p>This is an alias for the <code>trustManagerClassName</code> attribute
+      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="trustMaxCertLength" required="false">
@@ -1307,45 +1372,33 @@
     </attribute>
 
     <attribute name="truststoreAlgorithm" required="false">
-      <p>The algorithm to use for truststore. If not specified, the default
-      value returned by
-      <code>javax.net.ssl.TrustManagerFactory.getDefaultAlgorithm()</code> is
-      used.</p>
+      <p>This is an alias for the <code>truststoreAlgorithm</code> attribute of
+      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="truststoreFile" required="false">
-      <p>The trust store file to use to validate client certificates. The
-      default is the value of the <code>javax.net.ssl.trustStore</code> system
-      property. If neither this attribute nor the default system property is
-      set, no trust store will be configured.</p>
+      <p>This is an alias for the <code>truststoreFile</code> attribute of
+      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="truststorePass" required="false">
-      <p>The password to access the trust store. The default is the value of the
-      <code>javax.net.ssl.trustStorePassword</code> system property. If that
-      property is null, no trust store password will be configured. If an
-      invalid trust store password is specified, a warning will be logged and an
-      attempt will be made to access the trust store without a password which
-      will skip validation of the trust store contents.</p>
+      <p>This is an alias for the <code>truststorePass</code> attribute of
+      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="truststoreProvider" required="false">
-      <p>The name of the truststore provider to be used for the server
-      certificate. The default is the value of the
-      <code>javax.net.ssl.trustStoreProvider</code> system property. If
-      that property is null, the value of <code>keystoreProvider</code> is used
-      as the default. If neither this attribute, the default system property nor
-      <code>keystoreProvider</code>is set, the list of registered providers is
-      traversed in preference order and the first provider that supports the
-      <code>truststoreType</code> is used.
-      </p>
+      <p>This is an alias for the <code>truststoreProvider</code> attribute of
+      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="truststoreType" required="false">
-      <p>The type of key store used for the trust store. The default is the
-      value of the <code>javax.net.ssl.trustStoreType</code> system property. If
-      that property is null, the value of <code>keystoreType</code> is used as
-      the default.</p>
+      <p>This is an alias for the <code>truststoreType</code> attribute of
+      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
      </attribute>
 
     <attribute name="useServerCipherSuitesOrder" required="false">

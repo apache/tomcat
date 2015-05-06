@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.net;
 
-import java.io.File;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -890,24 +889,6 @@ public abstract class AbstractEndpoint<S> {
     }
 
 
-    private String adjustRelativePath(String path, String relativeTo) {
-        // Empty or null path can't point to anything useful. The assumption is
-        // that the value is deliberately empty / null so leave it that way.
-        if (path == null || path.length() == 0) {
-            return path;
-        }
-        String newPath = path;
-        File f = new File(newPath);
-        if ( !f.isAbsolute()) {
-            newPath = relativeTo + File.separator + newPath;
-            f = new File(newPath);
-        }
-        if (!f.exists()) {
-            getLog().warn("configured file:["+newPath+"] does not exist.");
-        }
-        return newPath;
-    }
-
     protected abstract Log getLog();
 
     protected LimitLatch initializeConnectionLatch() {
@@ -985,45 +966,6 @@ public abstract class AbstractEndpoint<S> {
     private String sslProtocol = "TLS";
     public String getSslProtocol() { return sslProtocol;}
     public void setSslProtocol(String s) { sslProtocol = s;}
-
-    private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
-    public String getTruststoreFile() {return truststoreFile;}
-    public void setTruststoreFile(String s) {
-        truststoreFile = adjustRelativePath(s,
-                System.getProperty(Constants.CATALINA_BASE_PROP));
-    }
-
-    private String truststorePass =
-        System.getProperty("javax.net.ssl.trustStorePassword");
-    public String getTruststorePass() {return truststorePass;}
-    public void setTruststorePass(String truststorePass) {
-        this.truststorePass = truststorePass;
-    }
-
-    private String truststoreType =
-        System.getProperty("javax.net.ssl.trustStoreType");
-    public String getTruststoreType() {return truststoreType;}
-    public void setTruststoreType(String truststoreType) {
-        this.truststoreType = truststoreType;
-    }
-
-    private String truststoreProvider = null;
-    public String getTruststoreProvider() {return truststoreProvider;}
-    public void setTruststoreProvider(String truststoreProvider) {
-        this.truststoreProvider = truststoreProvider;
-    }
-
-    private String truststoreAlgorithm = null;
-    public String getTruststoreAlgorithm() {return truststoreAlgorithm;}
-    public void setTruststoreAlgorithm(String truststoreAlgorithm) {
-        this.truststoreAlgorithm = truststoreAlgorithm;
-    }
-
-    private String trustManagerClassName = null;
-    public String getTrustManagerClassName() {return trustManagerClassName;}
-    public void setTrustManagerClassName(String trustManagerClassName) {
-        this.trustManagerClassName = trustManagerClassName;
-    }
 
     private String sessionCacheSize = null;
     public String getSessionCacheSize() { return sessionCacheSize;}

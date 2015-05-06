@@ -28,29 +28,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
     public String getSslProtocol() { return getEndpoint().getSslProtocol();}
     public void setSslProtocol(String s) { getEndpoint().setSslProtocol(s);}
 
-    public void setTruststoreFile(String f){ getEndpoint().setTruststoreFile(f);}
-    public String getTruststoreFile(){ return getEndpoint().getTruststoreFile();}
-
-    public void setTruststorePass(String p){ getEndpoint().setTruststorePass(p);}
-    public String getTruststorePass(){return getEndpoint().getTruststorePass();}
-
-    public void setTruststoreType(String t){ getEndpoint().setTruststoreType(t);}
-    public String getTruststoreType(){ return getEndpoint().getTruststoreType();}
-
-    public void setTruststoreProvider(String t){
-        getEndpoint().setTruststoreProvider(t);
-    }
-    public String getTruststoreProvider(){
-        return getEndpoint().getTruststoreProvider();
-    }
-
-    public void setTruststoreAlgorithm(String a){
-        getEndpoint().setTruststoreAlgorithm(a);
-    }
-    public String getTruststoreAlgorithm(){
-        return getEndpoint().getTruststoreAlgorithm();
-    }
-
     public void setSessionCacheSize(String s){getEndpoint().setSessionCacheSize(s);}
     public String getSessionCacheSize(){ return getEndpoint().getSessionCacheSize();}
 

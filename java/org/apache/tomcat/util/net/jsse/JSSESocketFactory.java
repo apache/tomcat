@@ -83,12 +83,8 @@ public class JSSESocketFactory implements SSLUtil {
 
     // Defaults - made public where re-used
     private static final String defaultProtocol = "TLS";
-    private static final String defaultKeystoreType = "JKS";
-    private static final String defaultKeystoreFile
-        = System.getProperty("user.home") + "/.keystore";
     private static final int defaultSessionCacheSize = 0;
     private static final int defaultSessionTimeout = 86400;
-    public static final String DEFAULT_KEY_PASS = "changeit";
 
     private final AbstractEndpoint<?> endpoint;
     private final SSLHostConfig sslHostConfig;
@@ -185,70 +181,21 @@ public class JSSESocketFactory implements SSLUtil {
         return ciphers.toArray(new String[ciphers.size()]);
     }
 
-    /*
-     * Gets the SSL server's keystore.
-     */
-    protected KeyStore getKeystore(String type, String provider, String pass)
-            throws IOException {
-
-        String keystoreFile = sslHostConfig.getCertificateKeystoreFile();
-        if (keystoreFile == null)
-            keystoreFile = defaultKeystoreFile;
-
-        return getStore(type, provider, keystoreFile, pass);
-    }
 
     /*
      * Gets the SSL server's truststore.
      */
-    protected KeyStore getTrustStore(String keystoreType,
-            String keystoreProvider) throws IOException {
+    protected KeyStore getTrustStore() throws IOException {
         KeyStore trustStore = null;
 
-        String truststoreFile = endpoint.getTruststoreFile();
-        if(truststoreFile == null) {
-            truststoreFile = System.getProperty("javax.net.ssl.trustStore");
-        }
-        if(log.isDebugEnabled()) {
-            log.debug("Truststore = " + truststoreFile);
-        }
-
-        String truststorePassword = endpoint.getTruststorePass();
-        if( truststorePassword == null) {
-            truststorePassword =
-                System.getProperty("javax.net.ssl.trustStorePassword");
-        }
-        if(log.isDebugEnabled()) {
-            log.debug("TrustPass = " + truststorePassword);
-        }
-
-        String truststoreType = endpoint.getTruststoreType();
-        if( truststoreType == null) {
-            truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
-        }
-        if(truststoreType == null) {
-            truststoreType = keystoreType;
-        }
-        if(log.isDebugEnabled()) {
-            log.debug("trustType = " + truststoreType);
-        }
-
-        String truststoreProvider = endpoint.getTruststoreProvider();
-        if( truststoreProvider == null) {
-            truststoreProvider =
-                System.getProperty("javax.net.ssl.trustStoreProvider");
-        }
-        if (truststoreProvider == null) {
-            truststoreProvider = keystoreProvider;
-        }
-        if(log.isDebugEnabled()) {
-            log.debug("trustProvider = " + truststoreProvider);
-        }
+        String truststoreFile = sslHostConfig.getTruststoreFile();
+        String truststoreType = sslHostConfig.getTruststoreType();
+        String truststoreProvider = sslHostConfig.getTruststoreProvider();
 
         if (truststoreFile != null){
             try {
                 trustStore = getStore(truststoreType, truststoreProvider,
-                        truststoreFile, truststorePassword);
+                        truststoreFile, sslHostConfig.getTruststorePassword());
             } catch (IOException ioe) {
                 Throwable cause = ioe.getCause();
                 if (cause instanceof UnrecoverableKeyException) {
@@ -268,6 +215,7 @@ public class JSSESocketFactory implements SSLUtil {
         return trustStore;
     }
 
+
     /*
      * Gets the key- or truststore with the specified type, path, and password.
      */
@@ -283,12 +231,9 @@ public class JSSESocketFactory implements SSLUtil {
                 ks = KeyStore.getInstance(type, provider);
             }
             if(!("PKCS11".equalsIgnoreCase(type) ||
-                    "".equalsIgnoreCase(path))) {
+                    "".equalsIgnoreCase(path)) ||
+                    "NONE".equalsIgnoreCase(path)) {
                 File keyStoreFile = new File(path);
-                if (!keyStoreFile.isAbsolute()) {
-                    keyStoreFile = new File(System.getProperty(
-                            Constants.CATALINA_BASE_PROP), path);
-                }
                 istream = new FileInputStream(keyStoreFile);
             }
 
@@ -335,37 +280,85 @@ public class JSSESocketFactory implements SSLUtil {
         return new JSSESSLContext(protocol);
     }
 
+
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
         String keystoreType = sslHostConfig.getCertificateKeystoreType();
-        if (keystoreType == null) {
-            keystoreType = defaultKeystoreType;
+        String keystoreProvider = sslHostConfig.getCertificateKeystoreProvider();
+        String keystoreFile = sslHostConfig.getCertificateKeystoreFile();
+        String keystorePass = sslHostConfig.getCertificateKeystorePassword();
+        String keyAlias = sslHostConfig.getCertificateKeyAlias();
+        String algorithm = sslHostConfig.getKeyManagerAlgorithm();
+        String keyPass = sslHostConfig.getCertificateKeyPassword();
+        // This has to be here as it can't be moved to SSLHostConfig since the
+        // defaults vary between JSSE and OpenSSL.
+        if (keyPass == null) {
+            keyPass = sslHostConfig.getCertificateKeystorePassword();
         }
 
-        return getKeyManagers(keystoreType, sslHostConfig.getCertificateKeystoreProvider(),
-                sslHostConfig.getKeyManagerAlgorithm(),
-                sslHostConfig.getCertificateKeyAlias());
+        KeyManager[] kms = null;
+
+        KeyStore ks = getStore(keystoreType, keystoreProvider, keystoreFile, keystorePass);
+        if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
+            throw new IOException(
+                    sm.getString("jsse.alias_no_key_entry", keyAlias));
+        }
+
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
+        kmf.init(ks, keyPass.toCharArray());
+
+        kms = kmf.getKeyManagers();
+        if (keyAlias != null) {
+            String alias = keyAlias;
+            if ("JKS".equals(keystoreType)) {
+                alias = alias.toLowerCase(Locale.ENGLISH);
+            }
+            for(int i=0; i<kms.length; i++) {
+                kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], alias);
+            }
+        }
+
+        return kms;
     }
+
 
     @Override
     public TrustManager[] getTrustManagers() throws Exception {
-        String truststoreType = endpoint.getTruststoreType();
-        if (truststoreType == null) {
-            truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
-        }
-        if (truststoreType == null) {
-            truststoreType = sslHostConfig.getCertificateKeystoreType();
-        }
-        if (truststoreType == null) {
-            truststoreType = defaultKeystoreType;
+        String algorithm = sslHostConfig.getTruststoreAlgorithm();
+
+        String crlf = sslHostConfig.getCertificateRevocationListFile();
+
+        String className = sslHostConfig.getTrustManagerClassName();
+        if(className != null && className.length() > 0) {
+             ClassLoader classLoader = getClass().getClassLoader();
+             Class<?> clazz = classLoader.loadClass(className);
+             if(!(TrustManager.class.isAssignableFrom(clazz))){
+                throw new InstantiationException(sm.getString(
+                        "jsse.invalidTrustManagerClassName", className));
+             }
+             Object trustManagerObject = clazz.newInstance();
+             TrustManager trustManager = (TrustManager) trustManagerObject;
+             return new TrustManager[]{ trustManager };
         }
 
-        String algorithm = endpoint.getTruststoreAlgorithm();
-        if (algorithm == null) {
-            algorithm = TrustManagerFactory.getDefaultAlgorithm();
+        TrustManager[] tms = null;
+
+        KeyStore trustStore = getTrustStore();
+        if (trustStore != null || className != null) {
+            if (crlf == null) {
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
+                tmf.init(trustStore);
+                tms = tmf.getTrustManagers();
+            } else {
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
+                CertPathParameters params = getParameters(algorithm, crlf, trustStore);
+                ManagerFactoryParameters mfp = new CertPathTrustManagerParameters(params);
+                tmf.init(mfp);
+                tms = tmf.getTrustManagers();
+            }
         }
 
-        return getTrustManagers(truststoreType, endpoint.getTruststoreProvider(), algorithm);
+        return tms;
     }
 
     @Override
@@ -389,90 +382,6 @@ public class JSSESocketFactory implements SSLUtil {
         sslSessionContext.setSessionTimeout(sessionTimeout);
     }
 
-    /**
-     * Gets the initialized key managers.
-     */
-    protected KeyManager[] getKeyManagers(String keystoreType,
-                                          String keystoreProvider,
-                                          String algorithm,
-                                          String keyAlias)
-                throws Exception {
-
-        KeyManager[] kms = null;
-
-        String keystorePass = sslHostConfig.getCertificateKeystorePassword();
-
-        KeyStore ks = getKeystore(keystoreType, keystoreProvider, keystorePass);
-        if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
-            throw new IOException(
-                    sm.getString("jsse.alias_no_key_entry", keyAlias));
-        }
-
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-        String keyPass = sslHostConfig.getCertificateKeyPassword();
-        if (keyPass == null) {
-            keyPass = keystorePass;
-        }
-        kmf.init(ks, keyPass.toCharArray());
-
-        kms = kmf.getKeyManagers();
-        if (keyAlias != null) {
-            String alias = keyAlias;
-            if ("JKS".equals(keystoreType)) {
-                alias = alias.toLowerCase(Locale.ENGLISH);
-            }
-            for(int i=0; i<kms.length; i++) {
-                kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], alias);
-            }
-        }
-
-        return kms;
-    }
-
-    /**
-     * Gets the initialized trust managers.
-     */
-    protected TrustManager[] getTrustManagers(String keystoreType,
-            String keystoreProvider, String algorithm)
-        throws Exception {
-        String crlf = sslHostConfig.getCertificateRevocationListFile();
-
-        String className = endpoint.getTrustManagerClassName();
-        if(className != null && className.length() > 0) {
-             ClassLoader classLoader = getClass().getClassLoader();
-             Class<?> clazz = classLoader.loadClass(className);
-             if(!(TrustManager.class.isAssignableFrom(clazz))){
-                throw new InstantiationException(sm.getString(
-                        "jsse.invalidTrustManagerClassName", className));
-             }
-             Object trustManagerObject = clazz.newInstance();
-             TrustManager trustManager = (TrustManager) trustManagerObject;
-             return new TrustManager[]{ trustManager };
-        }
-
-        TrustManager[] tms = null;
-
-        KeyStore trustStore = getTrustStore(keystoreType, keystoreProvider);
-        if (trustStore != null || endpoint.getTrustManagerClassName() != null) {
-            if (crlf == null) {
-                TrustManagerFactory tmf =
-                    TrustManagerFactory.getInstance(algorithm);
-                tmf.init(trustStore);
-                tms = tmf.getTrustManagers();
-            } else {
-                TrustManagerFactory tmf =
-                    TrustManagerFactory.getInstance(algorithm);
-                CertPathParameters params =
-                    getParameters(algorithm, crlf, trustStore);
-                ManagerFactoryParameters mfp =
-                    new CertPathTrustManagerParameters(params);
-                tmf.init(mfp);
-                tms = tmf.getTrustManagers();
-            }
-        }
-
-        return tms;
-    }
 
     /**
      * Return the initialization parameters for the TrustManager.
