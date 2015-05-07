@@ -213,6 +213,15 @@ public abstract class AbstractEndpoint<S> {
 
     // ----------------------------------------------------------------- Properties
 
+    private String defaultSSLHostConfigName = SSLHostConfig.DEFAULT_SSL_HOST_NAME;
+    public String getDefaultSSLHostConfigName() {
+        return defaultSSLHostConfigName;
+    }
+    public void setDefaultSSLHostConfigName(String defaultSSLHostConfigName) {
+        this.defaultSSLHostConfigName = defaultSSLHostConfigName;
+    }
+
+
     protected Map<String,SSLHostConfig> sslHostConfigs = new ConcurrentHashMap<>();
     public void addSslHostConfig(SSLHostConfig sslHostConfig) {
         String key = sslHostConfig.getHostName();
@@ -245,7 +254,7 @@ public abstract class AbstractEndpoint<S> {
 
         // Fall-back. Use the default
         if (result == null) {
-            result = sslHostConfigs.get(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
+            result = sslHostConfigs.get(getDefaultSSLHostConfigName());
         }
         if (result == null) {
             // Should never happen.

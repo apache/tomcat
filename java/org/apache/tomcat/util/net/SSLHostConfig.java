@@ -38,7 +38,7 @@ public class SSLHostConfig {
     private static final Log log = LogFactory.getLog(SSLHostConfig.class);
     private static final StringManager sm = StringManager.getManager(SSLHostConfig.class);
 
-    public static final String DEFAULT_SSL_HOST_NAME = "_default_";
+    protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
 
     private Type configType = null;
     private Map<Type,Set<String>> configuredProperties = new HashMap<>();
