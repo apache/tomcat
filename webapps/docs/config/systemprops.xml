@@ -286,6 +286,7 @@
       <li><code>org.apache.catalina.session.<br/>StandardSession.LAST_ACCESS_AT_START</code></li>
       <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.ALWAYS_ADD_EXPIRES</code></li>
       <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.FWD_SLASH_IS_SEPARATOR</code></li>
+      <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.PRESERVE_COOKIE_HEADER</code></li>
       <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.STRICT_NAMING</code></li>
       <li>The <code>resourceOnlyServlets</code> attribute of any
           <a href="context.html">Context</a> element.</li>
@@ -384,6 +385,15 @@
       the path attribute is quoted as is required by a strict adherence to the
       specifications. This is highly likely to break session tracking using
       cookies.</p>
+      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      <code>true</code>, the default of this setting will be <code>true</code>,
+      else the default value will be <code>false</code>.</p>
+    </property>
+
+    <property name="org.apache.tomcat.util.http. ServerCookie.PRESERVE_COOKIE_HEADER">
+      <p>If this is <code>true</code> Tomcat will ensure that cookie
+      processing does not modify cookie header returned by
+      <code>HttpServletRequest.getHeader()</code>.</p>
       <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
