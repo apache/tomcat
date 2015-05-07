@@ -18,7 +18,6 @@ package org.apache.tomcat.util.net.jsse;
 
 import javax.net.ssl.SSLSession;
 
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -51,7 +50,7 @@ public class JSSEImplementation extends SSLImplementation {
     }
 
     @Override
-    public SSLUtil getSSLUtil(AbstractEndpoint<?> endpoint, SSLHostConfig sslHostConfig) {
-        return new JSSESocketFactory(endpoint, sslHostConfig);
+    public SSLUtil getSSLUtil(SSLHostConfig sslHostConfig) {
+        return new JSSESocketFactory(sslHostConfig);
     }
 }

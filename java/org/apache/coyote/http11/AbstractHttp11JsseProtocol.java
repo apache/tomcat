@@ -25,12 +25,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
         super(endpoint);
     }
 
-    public void setSessionCacheSize(String s){getEndpoint().setSessionCacheSize(s);}
-    public String getSessionCacheSize(){ return getEndpoint().getSessionCacheSize();}
-
-    public void setSessionTimeout(String s){getEndpoint().setSessionTimeout(s);}
-    public String getSessionTimeout(){ return getEndpoint().getSessionTimeout();}
-
     public String getSslImplementationName() { return getEndpoint().getSslImplementationName(); }
     public void setSslImplementationName(String s) { getEndpoint().setSslImplementationName(s); }
 }

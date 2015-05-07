@@ -963,14 +963,6 @@ public abstract class AbstractEndpoint<S> {
         this.sslImplementationName = s;
     }
 
-    private String sessionCacheSize = null;
-    public String getSessionCacheSize() { return sessionCacheSize;}
-    public void setSessionCacheSize(String s) { sessionCacheSize = s;}
-
-    private String sessionTimeout = "86400";
-    public String getSessionTimeout() { return sessionTimeout;}
-    public void setSessionTimeout(String s) { sessionTimeout = s;}
-
 
     protected final Set<SocketWrapperBase<S>> waitingRequests = Collections
             .newSetFromMap(new ConcurrentHashMap<SocketWrapperBase<S>, Boolean>());

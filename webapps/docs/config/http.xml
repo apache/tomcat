@@ -1197,6 +1197,20 @@
       used.</p>
     </attribute>
 
+    <attribute name="sessionCacheSize" required="false">
+      <p>JSSE only.</p>
+      <p>The number of SSL sessions to maintain in the session cache. Use 0 to
+      specify an unlimited cache size. If not specified, a default of 0 is
+      used.</p>
+    </attribute>
+
+    <attribute name="sessionTimeout" required="false">
+      <p>JSSE only.</p>
+      <p>The time, in seconds, after the creation of an SSL session that it will
+      timeout. Use 0 to specify an unlimited timeout. If not specified, a
+      default of 86400 (24 hours) is used.</p>
+    </attribute>
+
     <attribute name="sslProtocol" required="false">
       <p>JSSE only.</p>
       <p>The the SSL protocol(s) to use (a single value may enable multiple
@@ -1336,15 +1350,15 @@
     </attribute>
 
     <attribute name="sessionCacheSize" required="false">
-      <p>The number of SSL sessions to maintain in the session cache. Use 0 to
-      specify an unlimited cache size. If not specified, a default of 0 is
-      used.</p>
+      <p>This is an alias for the <code>sessionCacheSize</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="sessionTimeout" required="false">
-      <p>The time, in seconds, after the creation of an SSL session that it will
-      timeout. Use 0 to specify an unlimited timeout. If not specified, a
-      default of 86400 (24 hours) is used.</p>
+      <p>This is an alias for the <code>sessionTimeout</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="sslEnabledProtocols" required="false">
