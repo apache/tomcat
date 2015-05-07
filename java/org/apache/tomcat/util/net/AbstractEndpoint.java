@@ -964,14 +964,6 @@ public abstract class AbstractEndpoint<S> {
 
     }
 
-    // --------------------  SSL related properties --------------------
-
-    private String sslImplementationName = null;
-    public String getSslImplementationName() { return sslImplementationName; }
-    public void setSslImplementationName(String s) {
-        this.sslImplementationName = s;
-    }
-
 
     protected final Set<SocketWrapperBase<S>> waitingRequests = Collections
             .newSetFromMap(new ConcurrentHashMap<SocketWrapperBase<S>, Boolean>());

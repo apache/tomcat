@@ -29,7 +29,20 @@ import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 
 public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
+    private String sslImplementationName = null;
+
     private SSLImplementation sslImplementation = null;
+
+
+    public String getSslImplementationName() {
+        return sslImplementationName;
+    }
+
+
+    public void setSslImplementationName(String s) {
+        this.sslImplementationName = s;
+    }
+
 
     public SSLImplementation getSslImplementation() {
         return sslImplementation;
