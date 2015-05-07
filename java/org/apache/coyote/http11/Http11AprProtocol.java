@@ -70,42 +70,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     public void setDeferAccept(boolean deferAccept) { ((AprEndpoint)getEndpoint()).setDeferAccept(deferAccept); }
 
 
-    // --------------------  SSL related properties --------------------
-
-    /**
-     * SSL certificate chain file.
-     */
-    public String getSSLCertificateChainFile() { return ((AprEndpoint)getEndpoint()).getSSLCertificateChainFile(); }
-    public void setSSLCertificateChainFile(String SSLCertificateChainFile) { ((AprEndpoint)getEndpoint()).setSSLCertificateChainFile(SSLCertificateChainFile); }
-
-
-    /**
-     * SSL CA certificate path.
-     */
-    public String getSSLCACertificatePath() { return ((AprEndpoint)getEndpoint()).getSSLCACertificatePath(); }
-    public void setSSLCACertificatePath(String SSLCACertificatePath) { ((AprEndpoint)getEndpoint()).setSSLCACertificatePath(SSLCACertificatePath); }
-
-
-    /**
-     * SSL CA certificate file.
-     */
-    public String getSSLCACertificateFile() { return ((AprEndpoint)getEndpoint()).getSSLCACertificateFile(); }
-    public void setSSLCACertificateFile(String SSLCACertificateFile) { ((AprEndpoint)getEndpoint()).setSSLCACertificateFile(SSLCACertificateFile); }
-
-
-    /**
-     * Disable SSL compression.
-     */
-    public boolean getSSLDisableCompression() { return ((AprEndpoint)getEndpoint()).getSSLDisableCompression(); }
-    public void setSSLDisableCompression(boolean disable) { ((AprEndpoint)getEndpoint()).setSSLDisableCompression(disable); }
-
-    /**
-     * Disable TLS Session Tickets (RFC 4507).
-     */
-    public boolean getSSLDisableSessionTickets() { return ((AprEndpoint)getEndpoint()).getSSLDisableSessionTickets(); }
-    public void setSSLDisableSessionTickets(boolean enable) { ((AprEndpoint)getEndpoint()).setSSLDisableSessionTickets(enable); }
-
-
     // ----------------------------------------------------- JMX related methods
 
     @Override

@@ -73,11 +73,16 @@ public class SSLHostConfig {
     private String truststorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
-
     // OpenSSL
+    private String certificateChainFile;
     private String certificateFile;
     private String certificateKeyFile;
     private String certificateRevocationListPath;
+    private String caCertificateFile;
+    private String caCertificatePath;
+    private boolean disableCompression = true;
+    private boolean disableSessionTickets = false;
+    private boolean insecureRenegotiation = false;
 
     public SSLHostConfig() {
         // Set defaults that can't be (easily) set when defining the fields.
@@ -427,6 +432,16 @@ public class SSLHostConfig {
 
     // ------------------------------- OpenSSL specific configuration properties
 
+    public void setCertificateChainFile(String certificateChainFile) {
+        setProperty("certificateChainFile", Type.OPENSSL);
+        this.certificateChainFile = adjustRelativePath(certificateChainFile);
+    }
+
+    public String getCertificateChainFile() {
+        return certificateChainFile;
+    }
+
+
     public void setCertificateFile(String certificateFile) {
         setProperty("certificateFile", Type.OPENSSL);
         this.certificateFile = adjustRelativePath(certificateFile);
@@ -457,6 +472,61 @@ public class SSLHostConfig {
 
     public String getCertificateRevocationListPath() {
         return certificateRevocationListPath;
+    }
+
+
+    public void setCaCertificateFile(String caCertificateFile) {
+        setProperty("caCertificateFile", Type.OPENSSL);
+        this.caCertificateFile = adjustRelativePath(caCertificateFile);
+    }
+
+
+    public String getCaCertificateFile() {
+        return caCertificateFile;
+    }
+
+
+    public void setCaCertificatePath(String caCertificatePath) {
+        setProperty("caCertificatePath", Type.OPENSSL);
+        this.caCertificatePath = adjustRelativePath(caCertificatePath);
+    }
+
+
+    public String getCaCertificatePath() {
+        return caCertificatePath;
+    }
+
+
+    public void setDisableCompression(boolean disableCompression) {
+        setProperty("disableCompression", Type.OPENSSL);
+        this.disableCompression = disableCompression;
+    }
+
+
+    public boolean getDisableCompression() {
+        return disableCompression;
+    }
+
+
+    public void setDisableSessionTickets(boolean disableSessionTickets) {
+        setProperty("disableSessionTickets", Type.OPENSSL);
+        this.disableSessionTickets = disableSessionTickets;
+    }
+
+
+    public boolean getDisableSessionTickets() {
+        return disableSessionTickets;
+    }
+
+
+    public void setInsecureRenegotiation(boolean insecureRenegotiation) {
+        setProperty("insecureRenegotiation", Type.OPENSSL);
+        this.insecureRenegotiation = insecureRenegotiation;
+    }
+
+
+    public boolean getInsecureRenegotiation() {
+        return insecureRenegotiation;
     }
 
 

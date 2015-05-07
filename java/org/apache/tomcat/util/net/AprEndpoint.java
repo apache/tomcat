@@ -209,62 +209,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     /**
-     * SSL certificate chain file.
-     */
-    protected String SSLCertificateChainFile = null;
-    public String getSSLCertificateChainFile() { return SSLCertificateChainFile; }
-    public void setSSLCertificateChainFile(String SSLCertificateChainFile) { this.SSLCertificateChainFile = SSLCertificateChainFile; }
-
-
-    /**
-     * SSL CA certificate path.
-     */
-    protected String SSLCACertificatePath = null;
-    public String getSSLCACertificatePath() { return SSLCACertificatePath; }
-    public void setSSLCACertificatePath(String SSLCACertificatePath) { this.SSLCACertificatePath = SSLCACertificatePath; }
-
-
-    /**
-     * SSL CA certificate file.
-     */
-    protected String SSLCACertificateFile = null;
-    public String getSSLCACertificateFile() { return SSLCACertificateFile; }
-    public void setSSLCACertificateFile(String SSLCACertificateFile) { this.SSLCACertificateFile = SSLCACertificateFile; }
-
-
-    /**
-     * SSL disable TLS Session Tickets (RFC 4507).
-     */
-    protected boolean SSLDisableSessionTickets = false;
-    public boolean getSSLDisableSessionTickets() { return SSLDisableSessionTickets; }
-    public void setSSLDisableSessionTickets(boolean SSLDisableSessionTickets) { this.SSLDisableSessionTickets = SSLDisableSessionTickets; }
-
-    /**
-     * SSL allow insecure renegotiation for the the client that does not
-     * support the secure renegotiation.
-     */
-    protected boolean SSLInsecureRenegotiation = false;
-    public void setSSLInsecureRenegotiation(boolean SSLInsecureRenegotiation) { this.SSLInsecureRenegotiation = SSLInsecureRenegotiation; }
-    public boolean getSSLInsecureRenegotiation() { return SSLInsecureRenegotiation; }
-
-    /**
-     * Disables compression of the SSL stream. This thwarts CRIME attack
-     * and possibly improves performance by not compressing uncompressible
-     * content such as JPEG, etc.
-     */
-    protected boolean SSLDisableCompression = false;
-
-    /**
-     * Configures whether or not to use SSL compression. The default is
-     * <code>false</code>.
-     *
-     * @param SSLDisableCompression Set to <code>true</code> to disable SSL
-     *                              compression. This thwarts the CRIMEattack.
-     */
-    public void setSSLDisableCompression(boolean SSLDisableCompression) { this.SSLDisableCompression = SSLDisableCompression; }
-    public boolean getSSLDisableCompression() { return SSLDisableCompression; }
-
-    /**
      * Port in use.
      */
     @Override
@@ -470,7 +414,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                             sm.getString("endpoint.apr.failSslContextMake"), e);
                 }
 
-                if (SSLInsecureRenegotiation) {
+                if (sslHostConfig.getInsecureRenegotiation()) {
                     boolean legacyRenegSupported = false;
                     try {
                         legacyRenegSupported = SSL.hasOp(SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
@@ -504,7 +448,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
 
                 // Disable compression if requested
-                if (SSLDisableCompression) {
+                if (sslHostConfig.getDisableCompression()) {
                     boolean disableCompressionSupported = false;
                     try {
                         disableCompressionSupported = SSL.hasOp(SSL.SSL_OP_NO_COMPRESSION);
@@ -521,7 +465,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
 
                 // Disable TLS Session Tickets (RFC4507) to protect perfect forward secrecy
-                if (SSLDisableSessionTickets) {
+                if (sslHostConfig.getDisableSessionTickets()) {
                     boolean disableSessionTicketsSupported = false;
                     try {
                         disableSessionTicketsSupported = SSL.hasOp(SSL.SSL_OP_NO_TICKET);
@@ -545,9 +489,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         sslHostConfig.getCertificateKeyFile(),
                         sslHostConfig.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
                 // Set certificate chain file
-                SSLContext.setCertificateChainFile(ctx, SSLCertificateChainFile, false);
+                SSLContext.setCertificateChainFile(
+                        ctx, sslHostConfig.getCertificateChainFile(), false);
                 // Support Client Certificates
-                SSLContext.setCACertificate(ctx, SSLCACertificateFile, SSLCACertificatePath);
+                SSLContext.setCACertificate(ctx, sslHostConfig.getCaCertificateFile(),
+                        sslHostConfig.getCaCertificatePath());
                 // Set revocation
                 SSLContext.setCARevocation(ctx, sslHostConfig.getCertificateRevocationListFile(),
                         sslHostConfig.getCertificateRevocationListPath());
