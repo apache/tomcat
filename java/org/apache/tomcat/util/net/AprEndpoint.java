@@ -367,7 +367,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         if (isSSLEnabled()) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
 
-                if (sslHostConfig.getCertificateFileAbsolute() == null) {
+                if (SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateFile()) == null) {
                     // This is required
                     throw new Exception(sm.getString("endpoint.apr.noSslCertFile"));
                 }
@@ -485,19 +485,24 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 // List the ciphers that the client is permitted to negotiate
                 SSLContext.setCipherSuite(ctx, sslHostConfig.getCiphers());
                 // Load Server key and certificate
-                SSLContext.setCertificate(ctx, sslHostConfig.getCertificateFileAbsolute(),
-                        sslHostConfig.getCertificateKeyFileAbsolute(),
+                SSLContext.setCertificate(ctx,
+                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateFile()),
+                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateKeyFile()),
                         sslHostConfig.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
                 // Set certificate chain file
-                SSLContext.setCertificateChainFile(
-                        ctx, sslHostConfig.getCertificateChainFileAbsolute(), false);
+                SSLContext.setCertificateChainFile(ctx,
+                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateChainFile()),
+                        false);
                 // Support Client Certificates
-                SSLContext.setCACertificate(ctx, sslHostConfig.getCaCertificateFileAbsolute(),
-                        sslHostConfig.getCaCertificatePathAbsolute());
+                SSLContext.setCACertificate(ctx,
+                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
+                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
                 // Set revocation
                 SSLContext.setCARevocation(ctx,
-                        sslHostConfig.getCertificateRevocationListFileAbsolute(),
-                        sslHostConfig.getCertificateRevocationListPathAbsolute());
+                        SSLHostConfig.adjustRelativePath(
+                                sslHostConfig.getCertificateRevocationListFile()),
+                        SSLHostConfig.adjustRelativePath(
+                                sslHostConfig.getCertificateRevocationListPath()));
                 // Client certificate verification
                 switch (sslHostConfig.getCertificateVerification()) {
                 case NONE:

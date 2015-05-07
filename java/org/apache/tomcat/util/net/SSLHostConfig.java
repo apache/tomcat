@@ -52,7 +52,6 @@ public class SSLHostConfig {
     // Common
     private String certificateKeyPassword = null;
     private String certificateRevocationListFile;
-    private String certificateRevocationListFileAbsolute;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
     private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
@@ -62,7 +61,6 @@ public class SSLHostConfig {
     private String certificateKeyAlias;
     private String certificateKeystorePassword = "changeit";
     private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
-    private String certificateKeystoreFileAbsolute = adjustRelativePath(certificateKeystoreFile);
     private String certificateKeystoreProvider = System.getProperty("javax.net.ssl.keyStoreProvider");
     private String certificateKeystoreType = System.getProperty("javax.net.ssl.keyStoreType");
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
@@ -72,23 +70,16 @@ public class SSLHostConfig {
     private String trustManagerClassName;
     private String truststoreAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
     private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
-    private String truststoreFileAbsolute = adjustRelativePath(truststoreFile);
     private String truststorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
     // OpenSSL
     private String certificateChainFile;
-    private String certificateChainFileAbsolute;
     private String certificateFile;
-    private String certificateFileAbsolute;
     private String certificateKeyFile;
-    private String certificateKeyFileAbsolute;
     private String certificateRevocationListPath;
-    private String certificateRevocationListPathAbsolute;
     private String caCertificateFile;
-    private String caCertificateFileAbsolute;
     private String caCertificatePath;
-    private String caCertificatePathAbsolute;
     private boolean disableCompression = true;
     private boolean disableSessionTickets = false;
     private boolean insecureRenegotiation = false;
@@ -156,19 +147,12 @@ public class SSLHostConfig {
 
     public void setCertificateRevocationListFile(String certificateRevocationListFile) {
         this.certificateRevocationListFile = certificateRevocationListFile;
-        this.certificateRevocationListFileAbsolute =
-                adjustRelativePath(certificateRevocationListFile);
     }
 
 
     public String getCertificateRevocationListFile() {
         return certificateRevocationListFile;
     }
-    public String getCertificateRevocationListFileAbsolute() {
-        return certificateRevocationListFileAbsolute;
-    }
-
-
 
 
     public void setCertificateVerification(String certificateVerification) {
@@ -287,15 +271,11 @@ public class SSLHostConfig {
     public void setCertificateKeystoreFile(String certificateKeystoreFile) {
         setProperty("certificateKeystoreFile", Type.JSSE);
         this.certificateKeystoreFile = certificateKeystoreFile;
-        this.certificateKeystoreFileAbsolute = adjustRelativePath(certificateKeystoreFile);
     }
 
 
     public String getCertificateKeystoreFile() {
         return certificateKeystoreFile;
-    }
-    public String getCertificateKeystoreFileAbsolute() {
-        return certificateKeystoreFileAbsolute;
     }
 
 
@@ -401,15 +381,11 @@ public class SSLHostConfig {
     public void setTruststoreFile(String truststoreFile) {
         setProperty("truststoreFile", Type.JSSE);
         this.truststoreFile = truststoreFile;
-        this.truststoreFileAbsolute = adjustRelativePath(truststoreFile);
     }
 
 
     public String getTruststoreFile() {
         return truststoreFile;
-    }
-    public String getTruststoreFileAbsolute() {
-        return truststoreFileAbsolute;
     }
 
 
@@ -459,91 +435,66 @@ public class SSLHostConfig {
     public void setCertificateChainFile(String certificateChainFile) {
         setProperty("certificateChainFile", Type.OPENSSL);
         this.certificateChainFile = certificateChainFile;
-        this.certificateChainFileAbsolute = adjustRelativePath(certificateChainFile);
     }
 
 
     public String getCertificateChainFile() {
         return certificateChainFile;
     }
-    public String getCertificateChainFileAbsolute() {
-        return certificateChainFileAbsolute;
-    }
 
 
     public void setCertificateFile(String certificateFile) {
         setProperty("certificateFile", Type.OPENSSL);
         this.certificateFile = certificateFile;
-        this.certificateFileAbsolute = adjustRelativePath(certificateFile);
     }
 
 
     public String getCertificateFile() {
         return certificateFile;
     }
-    public String getCertificateFileAbsolute() {
-        return certificateFileAbsolute;
-    }
 
 
     public void setCertificateKeyFile(String certificateKeyFile) {
         setProperty("certificateKeyFile", Type.OPENSSL);
         this.certificateKeyFile = certificateKeyFile;
-        this.certificateKeyFileAbsolute = adjustRelativePath(certificateKeyFile);
     }
 
 
     public String getCertificateKeyFile() {
         return certificateKeyFile;
     }
-    public String getCertificateKeyFileAbsolute() {
-        return certificateKeyFileAbsolute;
-    }
 
 
     public void setCertificateRevocationListPath(String certificateRevocationListPath) {
         setProperty("certificateRevocationListPath", Type.OPENSSL);
         this.certificateRevocationListPath = certificateRevocationListPath;
-        this.certificateRevocationListPathAbsolute =
-                adjustRelativePath(certificateRevocationListPath);
     }
 
 
     public String getCertificateRevocationListPath() {
         return certificateRevocationListPath;
     }
-    public String getCertificateRevocationListPathAbsolute() {
-        return certificateRevocationListPathAbsolute;
-    }
 
 
     public void setCaCertificateFile(String caCertificateFile) {
         setProperty("caCertificateFile", Type.OPENSSL);
         this.caCertificateFile = caCertificateFile;
-        this.caCertificateFileAbsolute = adjustRelativePath(caCertificateFile);
     }
 
 
     public String getCaCertificateFile() {
         return caCertificateFile;
     }
-    public String getCaCertificateFileAbsolute() {
-        return caCertificateFileAbsolute;
-    }
 
 
     public void setCaCertificatePath(String caCertificatePath) {
         setProperty("caCertificatePath", Type.OPENSSL);
         this.caCertificatePath = caCertificatePath;
-        this.caCertificatePathAbsolute = adjustRelativePath(caCertificatePath);
     }
 
 
     public String getCaCertificatePath() {
         return caCertificatePath;
-    }
-    public String getCaCertificatePathAbsolute() {
-        return caCertificatePathAbsolute;
     }
 
 
@@ -582,7 +533,7 @@ public class SSLHostConfig {
 
     // --------------------------------------------------------- Support methods
 
-    private String adjustRelativePath(String path) {
+    public static String adjustRelativePath(String path) {
         // Empty or null path can't point to anything useful. The assumption is
         // that the value is deliberately empty / null so leave it that way.
         if (path == null || path.length() == 0) {
