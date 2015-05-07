@@ -1031,6 +1031,13 @@
 
   <attributes>
 
+    <attribute name="certificateChainFile" required="false">
+      <p>OpenSSL only.</p>
+      <p>Name of the file that contains concatenated certifcates for the
+      certificate authorities which form the certifcate chain for the server
+      certificate. The format is PEM-encoded.</p>
+    </attribute>
+
     <attribute name="certificateFile" required="true">
       <p>OpenSSL only.</p>
       <p>Name of the file that contains the server certificate. The format is
@@ -1140,6 +1147,18 @@
       of 10 will be used.</p>
     </attribute>
 
+    <attribute name="caCertificateFile" required="false">
+      <p>OpenSSL only.</p>
+      <p>Name of the file that contains the concatenated certificates for the
+      trusted certificate authorities. The format is PEM-encoded.</p>
+    </attribute>
+
+    <attribute name="caCertificatePath" required="false">
+      <p>OpenSSL only.</p>
+      <p>Name of the directory that contains the certificates for the trusted
+      certificate authorities. The format is PEM-encoded.</p>
+    </attribute>
+
     <attribute name="ciphers" required="false">
       <p>The ciphers to enable using the OpenSSL syntax. (See the OpenSSL
       documentation for the list of ciphers supported and the syntax).
@@ -1156,6 +1175,19 @@
       treated as an order of preference. See <code>honorCipherOrder</code>.</p>
     </attribute>
 
+    <attribute name="disableCompression" required="false">
+      <p>OpenSSL only.</p>
+      <p>Disables compression if set to <code>true</code> and OpenSSL supports
+      disabling compression. Default is <code>true</code>. If <code>false</code>
+      the default compression setting in OpenSSL will be used.</p>
+    </attribute>
+
+    <attribute name="disableSessionTickets" required="false">
+      <p>OpenSSL only.</p>
+      <p>Disables use of TLS Session Tickets (RFC 4507) if set to
+      <code>true</code>. Default is <code>false</code>.</p>
+    </attribute>
+
     <attribute name="honorCipherOrder" required="false">
       <p>Set to <code>true</code> to enforce the server's cipher order
       (from the <code>ciphers</code> setting) instead of allowing
@@ -1167,6 +1199,14 @@
       domain name (e.g. <code>tomcat.apache.org</code>) or a wild card domain
       name (e.g. <code>*.apache.org</code>). If not specified, the default value
       of <code>_default_</code> will be used.</p>
+    </attribute>
+
+    <attribute name="insecureRenegotiation" required="false">
+      <p>OpenSSL only.</p>
+      <p>Enables insecure renegotiation if set to <code>true</code> and OpenSSL
+      supports enabling insecure renegotiation. Default is <code>false</code>.
+      If <code>false</code> the default insecure renegotiation setting in
+      OpenSSL will be used.</p>
     </attribute>
 
     <attribute name="keyManagerAlgorithm" required="false">
@@ -1451,13 +1491,15 @@
   <attributes>
 
     <attribute name="SSLCACertificateFile" required="false">
-      <p>Name of the file that contains the concatenated certificates for the
-      trusted certificate authorities. The format is PEM-encoded.</p>
+      <p>This is an alias for the <code>caCertificateFile</code>
+      attribute of the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="SSLCACertificatePath" required="false">
-      <p>Name of the directory that contains the certificates for the trusted
-      certificate authorities. The format is PEM-encoded.</p>
+      <p>This is an alias for the <code>caCertificatePath</code>
+      attribute of the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="SSLCARevocationFile" required="false">
@@ -1473,9 +1515,9 @@
     </attribute>
 
     <attribute name="SSLCertificateChainFile" required="false">
-      <p>Name of the file that contains concatenated certifcates for the
-      certificate authorities which form the certifcate chain for the server
-      certificate. The format is PEM-encoded.</p>
+      <p>This is an alias for the <code>certificateChainFile</code>
+      attribute of the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="SSLCertificateFile" required="true">
@@ -1496,9 +1538,9 @@
     </attribute>
 
     <attribute name="SSLDisableCompression" required="false">
-      <p>Disables compression if set to <code>true</code> and OpenSSL supports
-      disabling compression. Default is <code>false</code> which inherits the
-      default compression setting in OpenSSL.</p>
+      <p>This is an alias for the <code>disableCompression</code> attribute of
+      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="SSLHonorCipherOrder" required="false">
@@ -1532,8 +1574,9 @@
     </attribute>
 
     <attribute name="SSLDisableSessionTickets" required="false">
-      <p>Disables use of TLS Session Tickets (RFC 4507) if set to
-      <code>true</code>. Default is <code>false</code>.</p>
+      <p>This is an alias for the <code>disableSessionTickets</code> attribute
+      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
   </attributes>

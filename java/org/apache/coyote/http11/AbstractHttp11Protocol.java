@@ -524,6 +524,36 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    public void setSSLCertificateChainFile(String certificateChainFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateChainFile(certificateChainFile);
+    }
+
+
+    public void setSSLCACertificatePath(String caCertificatePath) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCaCertificatePath(caCertificatePath);
+    }
+
+
+    public void setSSLCACertificateFile(String caCertificateFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCaCertificateFile(caCertificateFile);
+    }
+
+
+    public void setSSLDisableCompression(boolean disableCompression) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setDisableCompression(disableCompression);
+    }
+
+
+    public void setSSLDisableSessionTickets(boolean disableSessionTickets) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setDisableSessionTickets(disableSessionTickets);
+    }
+
+
     // ------------------------------------------------------------- Common code
 
     // Common configuration required for all new HTTP11 processors
