@@ -512,6 +512,18 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    public void setSessionCacheSize(int sessionCacheSize){
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setSessionCacheSize(sessionCacheSize);
+    }
+
+
+    public void setSessionTimeout(int sessionTimeout){
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setSessionTimeout(sessionTimeout);
+    }
+
+
     // ------------------------------------------------------------- Common code
 
     // Common configuration required for all new HTTP11 processors

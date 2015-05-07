@@ -64,6 +64,8 @@ public class SSLHostConfig {
     private String certificateKeystoreProvider = System.getProperty("javax.net.ssl.keyStoreProvider");
     private String certificateKeystoreType = System.getProperty("javax.net.ssl.keyStoreType");
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+    private int sessionCacheSize = 0;
+    private int sessionTimeout = 86400;
     private String sslProtocol = "TLS";
     private String trustManagerClassName;
     private String truststoreAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
@@ -313,6 +315,28 @@ public class SSLHostConfig {
 
     public String getKeyManagerAlgorithm() {
         return keyManagerAlgorithm;
+    }
+
+
+    public void setSessionCacheSize(int sessionCacheSize) {
+        setProperty("sessionCacheSize", Type.JSSE);
+        this.sessionCacheSize = sessionCacheSize;
+    }
+
+
+    public int getSessionCacheSize() {
+        return sessionCacheSize;
+    }
+
+
+    public void setSessionTimeout(int sessionTimeout) {
+        setProperty("sessionTimeout", Type.JSSE);
+        this.sessionTimeout = sessionTimeout;
+    }
+
+
+    public int getSessionTimeout() {
+        return sessionTimeout;
     }
 
 

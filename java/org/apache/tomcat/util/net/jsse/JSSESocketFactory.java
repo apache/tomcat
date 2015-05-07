@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net.jsse;
 
 import java.io.File;
@@ -55,8 +54,6 @@ import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.AbstractEndpoint;
-import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLUtil;
@@ -81,17 +78,12 @@ public class JSSESocketFactory implements SSLUtil {
     private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
-    private static final int defaultSessionCacheSize = 0;
-    private static final int defaultSessionTimeout = 86400;
-
-    private final AbstractEndpoint<?> endpoint;
     private final SSLHostConfig sslHostConfig;
 
     private final String[] defaultServerProtocols;
 
 
-    public JSSESocketFactory (AbstractEndpoint<?> endpoint, SSLHostConfig sslHostConfig) {
-        this.endpoint = endpoint;
+    public JSSESocketFactory (SSLHostConfig sslHostConfig) {
         this.sslHostConfig = sslHostConfig;
 
         SSLContext context;
@@ -115,7 +107,7 @@ public class JSSESocketFactory implements SSLUtil {
             // the JSSE implementation just doesn't like creating unbound
             // sockets so allow the code to proceed.
             defaultServerProtocols = new String[0];
-            log.warn(sm.getString("jsse.noDefaultProtocols", endpoint.getName()));
+            log.warn(sm.getString("jsse.noDefaultProtocols", sslHostConfig.getHostName()));
             return;
         }
 
@@ -126,17 +118,15 @@ public class JSSESocketFactory implements SSLUtil {
             List<String> filteredProtocols = new ArrayList<>();
             for (String protocol : socket.getEnabledProtocols()) {
                 if (protocol.toUpperCase(Locale.ENGLISH).contains("SSL")) {
-                    log.debug(sm.getString("jsse.excludeDefaultProtocol",
-                            protocol));
+                    log.debug(sm.getString("jsse.excludeDefaultProtocol", protocol));
                     continue;
                 }
                 filteredProtocols.add(protocol);
             }
-            defaultServerProtocols = filteredProtocols
-                    .toArray(new String[filteredProtocols.size()]);
+            defaultServerProtocols =
+                    filteredProtocols.toArray(new String[filteredProtocols.size()]);
             if (defaultServerProtocols.length == 0) {
-                log.warn(sm.getString("jsse.noDefaultProtocols",
-                        endpoint.getName()));
+                log.warn(sm.getString("jsse.noDefaultProtocols", sslHostConfig.getHostName()));
             }
         } finally {
             try {
@@ -287,8 +277,7 @@ public class JSSESocketFactory implements SSLUtil {
 
         KeyStore ks = getStore(keystoreType, keystoreProvider, keystoreFile, keystorePass);
         if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
-            throw new IOException(
-                    sm.getString("jsse.alias_no_key_entry", keyAlias));
+            throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));
         }
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
@@ -350,23 +339,8 @@ public class JSSESocketFactory implements SSLUtil {
 
     @Override
     public void configureSessionContext(SSLSessionContext sslSessionContext) {
-        int sessionCacheSize;
-        if (endpoint.getSessionCacheSize() != null) {
-            sessionCacheSize = Integer.parseInt(
-                    endpoint.getSessionCacheSize());
-        } else {
-            sessionCacheSize = defaultSessionCacheSize;
-        }
-
-        int sessionTimeout;
-        if (endpoint.getSessionTimeout() != null) {
-            sessionTimeout = Integer.parseInt(endpoint.getSessionTimeout());
-        } else {
-            sessionTimeout = defaultSessionTimeout;
-        }
-
-        sslSessionContext.setSessionCacheSize(sessionCacheSize);
-        sslSessionContext.setSessionTimeout(sessionTimeout);
+        sslSessionContext.setSessionCacheSize(sslHostConfig.getSessionCacheSize());
+        sslSessionContext.setSessionTimeout(sslHostConfig.getSessionTimeout());
     }
 
 
@@ -406,10 +380,6 @@ public class JSSESocketFactory implements SSLUtil {
         throws IOException, CRLException, CertificateException {
 
         File crlFile = new File(crlf);
-        if( !crlFile.isAbsolute() ) {
-            crlFile = new File(
-                    System.getProperty(Constants.CATALINA_BASE_PROP), crlf);
-        }
         Collection<? extends CRL> crls = null;
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");

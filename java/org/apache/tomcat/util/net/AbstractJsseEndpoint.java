@@ -46,22 +46,13 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         if (isSSLEnabled()) {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
-            // TODO: Temp code until config refactoring is complete. Remove once
-            //       refactoring is complete.
-            if (sslHostConfigs.size() == 0) {
-                SSLHostConfig defaultSslHostConfig = new SSLHostConfig();
-                defaultSslHostConfig.setHostName(SSLHostConfig.DEFAULT_SSL_HOST_NAME);
-                sslHostConfigs.put(SSLHostConfig.DEFAULT_SSL_HOST_NAME, defaultSslHostConfig);
-            }
-
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                SSLUtil sslUtil = sslImplementation.getSSLUtil(this, sslHostConfig);
+                SSLUtil sslUtil = sslImplementation.getSSLUtil(sslHostConfig);
                 SSLContext sslContext = sslUtil.createSSLContext();
                 sslContext.init(wrap(sslUtil.getKeyManagers(), sslHostConfig),
                         sslUtil.getTrustManagers(), null);
 
-                SSLSessionContext sessionContext =
-                    sslContext.getServerSessionContext();
+                SSLSessionContext sessionContext = sslContext.getServerSessionContext();
                 if (sessionContext != null) {
                     sslUtil.configureSessionContext(sessionContext);
                 }
