@@ -235,13 +235,15 @@ public class SecureNioChannel extends NioChannel  {
         sc.read(netInBuffer);
         SNIExtractor extractor = new SNIExtractor(netInBuffer);
 
-        while (extractor.getResult() == SNIResult.UNDERFLOW) {
+        while (extractor.getResult() == SNIResult.UNDERFLOW &&
+                netInBuffer.capacity() < endpoint.getSniParseLimit()) {
             // extractor needed more data to process but netInBuffer was full so
-            // double the size of the buffer and read some more data.
+            // expand the buffer and read some more data.
+            int newLimit = Math.min(netInBuffer.capacity() * 2, endpoint.getSniParseLimit());
             log.info(sm.getString("channel.nio.ssl.expandNetInBuffer",
-                    Integer.toString(netInBuffer.capacity() * 2)));
+                    Integer.toString(newLimit)));
 
-            netInBuffer = ByteBufferUtils.expand(netInBuffer);
+            netInBuffer = ByteBufferUtils.expand(netInBuffer, newLimit);
             sc.read(netInBuffer);
             extractor = new SNIExtractor(netInBuffer);
         }
@@ -257,7 +259,11 @@ public class SecureNioChannel extends NioChannel  {
         case NEED_READ:
             return SelectionKey.OP_READ;
         case UNDERFLOW:
-            // Can't happen. Buffer would have been expanded above.
+            // Unable to buffer enough data to read SNI extension data
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("channel.nio.ssl.sniDefault"));
+            }
+            hostName = endpoint.getDefaultSSLHostConfigName();
             break;
         }
 

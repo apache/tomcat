@@ -1330,6 +1330,19 @@
 
   <attributes>
 
+    <attribute name="sniParseLimit" required="false">
+      <p>In order to implement SNI support, Tomcat has to parse the first TLS
+      message received on a new TLS connection (the client hello) to extract the
+      requested server name. The message needs to be buffered so it can then be
+      passed to the JSSE implementation for normal TLS processing. In theory,
+      this first message could be very large although in practise it is
+      typically a few hundered bytes. This attribute sets the maximum message
+      size that Tomcat will buffer. If a message exceeds this size, the
+      connection will be configured as if no server name was indicated by the
+      client. If not specified a default of <code>65536</code> (64k) will be
+      used.</p>
+    </attribute>
+
     <attribute name="sslImplementationName" required="false">
       <p>The class name of the SSL implementation to use. If not specified, the
       default of <code>org.apache.tomcat.util.net.jsse.JSSEImplementation</code>

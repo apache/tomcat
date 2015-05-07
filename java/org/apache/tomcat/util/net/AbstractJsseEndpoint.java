@@ -30,6 +30,7 @@ import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     private String sslImplementationName = null;
+    private int sniParseLimit = 64 * 1024;
 
     private SSLImplementation sslImplementation = null;
 
@@ -46,6 +47,16 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     public SSLImplementation getSslImplementation() {
         return sslImplementation;
+    }
+
+
+    public int getSniParseLimit() {
+        return sniParseLimit;
+    }
+
+
+    public void setSniParseLimit(int sniParseLimit) {
+        this.sniParseLimit = sniParseLimit;
     }
 
 
