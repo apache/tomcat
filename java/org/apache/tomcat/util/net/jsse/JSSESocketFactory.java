@@ -170,7 +170,7 @@ public class JSSESocketFactory implements SSLUtil {
     protected KeyStore getTrustStore() throws IOException {
         KeyStore trustStore = null;
 
-        String truststoreFile = sslHostConfig.getTruststoreFileAbsolute();
+        String truststoreFile = SSLHostConfig.adjustRelativePath(sslHostConfig.getTruststoreFile());
         String truststoreType = sslHostConfig.getTruststoreType();
         String truststoreProvider = sslHostConfig.getTruststoreProvider();
 
@@ -261,7 +261,8 @@ public class JSSESocketFactory implements SSLUtil {
     public KeyManager[] getKeyManagers() throws Exception {
         String keystoreType = sslHostConfig.getCertificateKeystoreType();
         String keystoreProvider = sslHostConfig.getCertificateKeystoreProvider();
-        String keystoreFile = sslHostConfig.getCertificateKeystoreFileAbsolute();
+        String keystoreFile = SSLHostConfig.adjustRelativePath(
+                sslHostConfig.getCertificateKeystoreFile());
         String keystorePass = sslHostConfig.getCertificateKeystorePassword();
         String keyAlias = sslHostConfig.getCertificateKeyAlias();
         String algorithm = sslHostConfig.getKeyManagerAlgorithm();
@@ -301,7 +302,8 @@ public class JSSESocketFactory implements SSLUtil {
     public TrustManager[] getTrustManagers() throws Exception {
         String algorithm = sslHostConfig.getTruststoreAlgorithm();
 
-        String crlf = sslHostConfig.getCertificateRevocationListFileAbsolute();
+        String crlf = SSLHostConfig.adjustRelativePath(
+                sslHostConfig.getCertificateRevocationListFile());
 
         String className = sslHostConfig.getTrustManagerClassName();
         if(className != null && className.length() > 0) {
