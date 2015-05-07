@@ -34,15 +34,15 @@ import javax.net.ssl.TrustManager;
  */
 public interface SSLContext {
 
-    public abstract void init(KeyManager[] kms, TrustManager[] tms,
+    public void init(KeyManager[] kms, TrustManager[] tms,
             SecureRandom sr) throws KeyManagementException;
 
-    public abstract SSLSessionContext getServerSessionContext();
+    public SSLSessionContext getServerSessionContext();
 
-    public abstract SSLEngine createSSLEngine();
+    public SSLEngine createSSLEngine();
 
-    public abstract SSLServerSocketFactory getServerSocketFactory();
+    public SSLServerSocketFactory getServerSocketFactory();
 
-    public abstract SSLParameters getSupportedSSLParameters();
+    public SSLParameters getSupportedSSLParameters();
 
 }
