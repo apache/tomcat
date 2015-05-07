@@ -963,10 +963,6 @@ public abstract class AbstractEndpoint<S> {
         this.sslImplementationName = s;
     }
 
-    private String sslProtocol = "TLS";
-    public String getSslProtocol() { return sslProtocol;}
-    public void setSslProtocol(String s) { sslProtocol = s;}
-
     private String sessionCacheSize = null;
     public String getSessionCacheSize() { return sessionCacheSize;}
     public void setSessionCacheSize(String s) { sessionCacheSize = s;}
