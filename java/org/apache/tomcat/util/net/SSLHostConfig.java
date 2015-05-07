@@ -64,6 +64,7 @@ public class SSLHostConfig {
     private String certificateKeystoreProvider = System.getProperty("javax.net.ssl.keyStoreProvider");
     private String certificateKeystoreType = System.getProperty("javax.net.ssl.keyStoreType");
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+    private String sslProtocol = "TLS";
     private String trustManagerClassName;
     private String truststoreAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
     private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
@@ -312,6 +313,17 @@ public class SSLHostConfig {
 
     public String getKeyManagerAlgorithm() {
         return keyManagerAlgorithm;
+    }
+
+
+    public void setSslProtocol(String sslProtocol) {
+        setProperty("sslProtocol", Type.JSSE);
+        this.sslProtocol = sslProtocol;
+    }
+
+
+    public String getSslProtocol() {
+        return sslProtocol;
     }
 
 

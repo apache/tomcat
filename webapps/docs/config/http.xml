@@ -1197,6 +1197,18 @@
       used.</p>
     </attribute>
 
+    <attribute name="sslProtocol" required="false">
+      <p>JSSE only.</p>
+      <p>The the SSL protocol(s) to use (a single value may enable multiple
+      protocols - see the JVM documentation for details). If not specified, the
+      default is <code>TLS</code>. The permitted values may be obtained from the
+      JVM documentation for the allowed values for algorithm when creating an
+      <code>SSLContext</code> instance e.g.
+      <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#SSLContext">
+      Oracle Java 7</a>. Note: There is overlap between this attribute and
+      <code>protocols</code>.</p>
+    </attribute>
+
     <attribute name="trustManagerClassName" required="false">
       <p>JSSE only.</p>
       <p>The name of a custom trust manager class to use to validate client
@@ -1349,14 +1361,9 @@
     </attribute>
 
     <attribute name="sslProtocol" required="false">
-      <p>The the SSL protocol(s) to use (a single value may enable multiple
-      protocols - see the JVM documentation for details). If not specified, the
-      default is <code>TLS</code>. The permitted values may be obtained from the
-      JVM documentation for the allowed values for algorithm when creating an
-      <code>SSLContext</code> instance e.g.
-      <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#SSLContext">
-      Oracle Java 7</a>. Note: There is overlap between this attribute and
-      <code>sslEnabledProtocols</code>.</p>
+      <p>This is an alias for the <code>sslProtocol</code> attribute of the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="trustManagerClassName" required="false">

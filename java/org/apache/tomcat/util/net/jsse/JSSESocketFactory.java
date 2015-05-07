@@ -81,8 +81,6 @@ public class JSSESocketFactory implements SSLUtil {
     private static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
-    // Defaults - made public where re-used
-    private static final String defaultProtocol = "TLS";
     private static final int defaultSessionCacheSize = 0;
     private static final int defaultSessionTimeout = 86400;
 
@@ -96,15 +94,10 @@ public class JSSESocketFactory implements SSLUtil {
         this.endpoint = endpoint;
         this.sslHostConfig = sslHostConfig;
 
-        String sslProtocol = endpoint.getSslProtocol();
-        if (sslProtocol == null) {
-            sslProtocol = defaultProtocol;
-        }
-
-        javax.net.ssl.SSLContext context;
+        SSLContext context;
         try {
-             context = javax.net.ssl.SSLContext.getInstance(sslProtocol);
-             context.init(null,  null,  null);
+            context = createSSLContext();
+            context.init(null,  null,  null);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             // This is fatal for the connector so throw an exception to prevent
             // it from starting
@@ -268,16 +261,10 @@ public class JSSESocketFactory implements SSLUtil {
         return ks;
     }
 
+
     @Override
-    public SSLContext createSSLContext() throws Exception {
-
-        // SSL protocol variant (e.g., TLS, SSL v3, etc.)
-        String protocol = endpoint.getSslProtocol();
-        if (protocol == null) {
-            protocol = defaultProtocol;
-        }
-
-        return new JSSESSLContext(protocol);
+    public SSLContext createSSLContext() throws NoSuchAlgorithmException {
+        return new JSSESSLContext(sslHostConfig.getSslProtocol());
     }
 
 
