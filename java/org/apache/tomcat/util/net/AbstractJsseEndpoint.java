@@ -67,8 +67,8 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
         SSLContextWrapper sslContextWrapper = (SSLContextWrapper) sslHostConfig.getSslContext();
         if (sslContextWrapper == null) {
-            // TODO i18n
-            throw new IllegalStateException();
+            throw new IllegalStateException(
+                    sm.getString("endpoint.jsse.noSslContext", sniHostName));
         }
 
         SSLEngine engine = sslContextWrapper.getSSLContext().createSSLEngine();
