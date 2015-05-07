@@ -75,8 +75,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class JSSESocketFactory implements SSLUtil {
 
     private static final Log log = LogFactory.getLog(JSSESocketFactory.class);
-    private static final StringManager sm =
-        StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
+    private static final StringManager sm = StringManager.getManager(JSSESocketFactory.class);
 
     private final SSLHostConfig sslHostConfig;
 
