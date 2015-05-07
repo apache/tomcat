@@ -476,6 +476,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         defaultSSLHostConfig.setCertificateKeyAlias(certificateKeyAlias);
     }
 
+
     public void setTruststoreAlgorithm(String truststoreAlgorithm){
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setTruststoreAlgorithm(truststoreAlgorithm);
@@ -551,6 +552,12 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setSSLDisableSessionTickets(boolean disableSessionTickets) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setDisableSessionTickets(disableSessionTickets);
+    }
+
+
+    public void setTrustManagerClassName(String trustManagerClassName) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setTrustManagerClassName(trustManagerClassName);
     }
 
 
