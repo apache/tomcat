@@ -1011,7 +1011,7 @@
   match the <code>sslDefaultHost</code> attribute of the
   <strong>Connector</strong>.</p>
 
-  <p>As of Tomcat 9, the SSL configuration attributes in the
+  <p>As of Tomcat 9, the majority of the SSL configuration attributes in the
   <strong>Connector</strong> are deprecated. If specified, they will be used to
   configure a <strong>SSLHostConfig</strong> for the
   <code>sslDefaultHost</code>. Note that if an explicit
@@ -1323,9 +1323,29 @@
 
   </subsection>
 
+  <subsection name="SSL Support - Connector - NIO and NIO2">
+
+  <p>The following NIO and NIO2 SSL configuration attributes are not specific to
+  a virtual host and, therefore, must be configured on the connector.</p>
+
+  <attributes>
+
+    <attribute name="sslImplementationName" required="false">
+      <p>The class name of the SSL implementation to use. If not specified, the
+      default of <code>org.apache.tomcat.util.net.jsse.JSSEImplementation</code>
+      will be used which wraps JVM&apos;s default JSSE provider. Note that the
+      JVM can be configured to use a different JSSE provider as the default.</p>
+    </attribute>
+
+  </attributes>
+
+  </subsection>
+
   <subsection name="SSL Support - Connector - NIO and NIO2 (deprecated)">
 
-  <p>The NIO and NIO2 connectors use the following attributes to configure SSL:
+  <p>The following NIO and NIO2 SSL configuration attributes have been
+  depreacted in favour of the default
+  <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.
   </p>
 
   <attributes>
@@ -1405,13 +1425,6 @@
       <p>This is an alias for the <code>protocols</code> attribute of the
       default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
       element.</p>
-    </attribute>
-
-    <attribute name="sslImplementationName" required="false">
-      <p>The class name of the SSL implementation to use. If not specified, the
-      default of <code>org.apache.tomcat.util.net.jsse.JSSEImplementation</code>
-      will be used which wraps JVM&apos;s default JSSE provider. Note that the
-      JVM can be configured to use a different JSSE provider as the default.</p>
     </attribute>
 
     <attribute name="sslProtocol" required="false">
