@@ -17,6 +17,8 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -43,6 +45,12 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     private boolean hstsIncludeSubDomains = false;
     private String hstsHeaderValue;
 
+    // Click-jacking protection
+    private static final String ANTI_CLICK_JACKING_HEADER_NAME = "X-Frame-Options";
+    private boolean antiClickJackingEnabled = true;
+    private XFrameOption antiClickJackingOption = XFrameOption.DENY;
+    private URI antiClickJackingUri;
+    private String antiClickJackingHeaderValue;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -55,6 +63,14 @@ public class HttpHeaderSecurityFilter extends FilterBase {
             hstsValue.append(";includeSubDomains");
         }
         hstsHeaderValue = hstsValue.toString();
+
+        // Anti click-jacking
+        StringBuilder cjValue = new StringBuilder(antiClickJackingOption.headerValue);
+        if (antiClickJackingOption == XFrameOption.ALLOW_FROM) {
+            cjValue.append(':');
+            cjValue.append(antiClickJackingUri);
+        }
+        antiClickJackingHeaderValue = cjValue.toString();
     }
 
 
@@ -69,6 +85,12 @@ public class HttpHeaderSecurityFilter extends FilterBase {
         // HSTS
         if (hstsEnabled && request.isSecure() && response instanceof HttpServletResponse) {
             ((HttpServletResponse) response).addHeader(HSTS_HEADER_NAME, hstsHeaderValue);
+        }
+
+        // anti click-jacking
+        if (antiClickJackingEnabled && response instanceof HttpServletResponse) {
+            ((HttpServletResponse) response).addHeader(
+                    ANTI_CLICK_JACKING_HEADER_NAME, antiClickJackingHeaderValue);
         }
 
         chain.doFilter(request, response);
@@ -120,5 +142,72 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
     public void setHstsIncludeSubDomains(boolean hstsIncludeSubDomains) {
         this.hstsIncludeSubDomains = hstsIncludeSubDomains;
+    }
+
+
+
+    public boolean isAntiClickJackingEnabled() {
+        return antiClickJackingEnabled;
+    }
+
+
+
+    public void setAntiClickJackingEnabled(boolean antiClickJackingEnabled) {
+        this.antiClickJackingEnabled = antiClickJackingEnabled;
+    }
+
+
+
+    public String getAntiClickJackingOption() {
+        return antiClickJackingOption.toString();
+    }
+
+
+
+    public void setAntiClickJackingOption(String antiClickJackingOption) {
+        for (XFrameOption option : XFrameOption.values()) {
+            if (option.getHeaderValue().equalsIgnoreCase(antiClickJackingOption)) {
+                this.antiClickJackingOption = option;
+                return;
+            }
+        }
+        // TODO i18n
+        throw new IllegalArgumentException();
+    }
+
+
+
+    public String getAntiClickJackingUri() {
+        return antiClickJackingUri.toString();
+    }
+
+
+
+    public void setAntiClickJackingUri(String antiClickJackingUri) {
+        URI uri;
+        try {
+            uri = new URI(antiClickJackingUri);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+        this.antiClickJackingUri = uri;
+    }
+
+
+    private static enum XFrameOption {
+        DENY("DENY"),
+        SAME_ORIGIN("SAMEORIGIN"),
+        ALLOW_FROM("ALLOW-FROM");
+
+
+        private final String headerValue;
+
+        private XFrameOption(String headerValue) {
+            this.headerValue = headerValue;
+        }
+
+        public String getHeaderValue() {
+            return headerValue;
+        }
     }
 }
