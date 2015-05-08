@@ -697,6 +697,56 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
 </section>
 
+<section name="HTTP Header Security Filter">
+
+  <subsection name="Introduction">
+
+    <p>There are a number of HTTP headers that can be added to the response to
+    improve the security of the connection. This filter provides a mechanism for
+    adding those headers. Note that security related headers with more complex
+    requirements, like CORS, are implemted as separate Filters.</p>
+
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the HTTP Header Security Filter is
+    <strong><code>org.apache.catalina.filters.HttpHeaderSecurityFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The HTTP Header Security Filter supports the following initialization
+    parameters:</p>
+
+    <attributes>
+
+      <attribute name="hstsEnabled" required="false">
+        <p>Will an HTTP Strict Transport Security (HSTS) header be added to the
+        response. See <a href="http://tools.ietf.org/html/rfc6797">RFC 6797</a>
+        for further details of HSTS. If not specified, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="hstsMaxAgeSeconds" required="false">
+        <p>The max age value that should be used in the HSTS header. Negative
+        values will be treated as zero. If not specified, the default value of
+        <code>0</code> will be used.</p>
+      </attribute>
+
+      <attribute name="hstsIncludeSubDomains" required="false">
+        <p>Should the includeSubDomains parameter be included in the HSTS
+        header.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
 <section name="Remote Address Filter">
 
   <subsection name="Introduction">
