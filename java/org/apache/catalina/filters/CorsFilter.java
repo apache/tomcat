@@ -79,9 +79,7 @@ import org.apache.tomcat.util.res.StringManager;
 public final class CorsFilter implements Filter {
 
     private static final Log log = LogFactory.getLog(CorsFilter.class);
-
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(CorsFilter.class);
 
 
     /**

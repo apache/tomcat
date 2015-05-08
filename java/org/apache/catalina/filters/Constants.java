@@ -25,8 +25,6 @@ package org.apache.catalina.filters;
  */
 public final class Constants {
 
-    public static final String Package = "org.apache.catalina.filters";
-
     public static final String CSRF_NONCE_SESSION_ATTR_NAME =
         "org.apache.catalina.filters.CSRF_NONCE";
 
