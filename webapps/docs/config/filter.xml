@@ -738,7 +738,27 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
       <attribute name="hstsIncludeSubDomains" required="false">
         <p>Should the includeSubDomains parameter be included in the HSTS
-        header.</p>
+        header. If not specified, the default value of <code>false</code> will
+        be used.</p>
+      </attribute>
+
+      <attribute name="antiClickJackingEnabled" required="false">
+        <p>Should the anti click-jacking <code>X-Frame-Options</code> be added
+        to the response. If not specified, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="antiClickJackingOption" required="false">
+        <p>What value should be used for the ant click-jacking header? Must be
+        one of <code>DENY</code>, <code>SAMEORIGIN</code>,
+        <code>ALLOW-FROM </code> (case-insensitive). If not specified, the
+        default value of <code>DENY</code> will be used.</p>
+      </attribute>
+
+      <attribute name="antiClickJackingUri" required="false">
+        <p>IF ALLOW-FROM is used for <strong>antiClickJackingOption</strong>,
+        what URI should be allowed? If not specified, the default value of an
+        empty string will be used.</p>
       </attribute>
 
     </attributes>
