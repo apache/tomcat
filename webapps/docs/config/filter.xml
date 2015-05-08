@@ -761,6 +761,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         empty string will be used.</p>
       </attribute>
 
+      <attribute name="blockContentTypeSniffingEnabled" required="false">
+        <p>Should the header that blocks content type sniffing be added to every
+        response. If not specified, the default value of <code>true</code> will
+        be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>

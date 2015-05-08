@@ -52,6 +52,11 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     private URI antiClickJackingUri;
     private String antiClickJackingHeaderValue;
 
+    // Block content sniffing
+    private static final String BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME = "X-Content-Type-Options";
+    private static final String BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE = "nosniff";
+    private boolean blockContentTypeSniffingEnabled = true;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
@@ -93,6 +98,11 @@ public class HttpHeaderSecurityFilter extends FilterBase {
                     ANTI_CLICK_JACKING_HEADER_NAME, antiClickJackingHeaderValue);
         }
 
+        // Block content type sniffing
+        if (blockContentTypeSniffingEnabled && response instanceof HttpServletResponse) {
+            ((HttpServletResponse) response).addHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
+                    BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
+        }
         chain.doFilter(request, response);
     }
 
@@ -163,7 +173,6 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     }
 
 
-
     public void setAntiClickJackingOption(String antiClickJackingOption) {
         for (XFrameOption option : XFrameOption.values()) {
             if (option.getHeaderValue().equalsIgnoreCase(antiClickJackingOption)) {
@@ -171,8 +180,8 @@ public class HttpHeaderSecurityFilter extends FilterBase {
                 return;
             }
         }
-        // TODO i18n
-        throw new IllegalArgumentException();
+        throw new IllegalArgumentException(
+                sm.getString("httpHeaderSecurityFilter.clickjack.invalid", antiClickJackingOption));
     }
 
 
@@ -181,6 +190,16 @@ public class HttpHeaderSecurityFilter extends FilterBase {
         return antiClickJackingUri.toString();
     }
 
+
+    public boolean isBlockContentTypeSniffingEnabled() {
+        return blockContentTypeSniffingEnabled;
+    }
+
+
+    public void setBlockContentTypeSniffingEnabled(
+            boolean blockContentTypeSniffingEnabled) {
+        this.blockContentTypeSniffingEnabled = blockContentTypeSniffingEnabled;
+    }
 
 
     public void setAntiClickJackingUri(String antiClickJackingUri) {
