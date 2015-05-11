@@ -52,6 +52,7 @@ public class SNIExtractor {
         // Buffer is in write mode at this point. Record the current position so
         // the buffer state can be restored at the end of this method.
         int pos = netInBuffer.position();
+        int limit = netInBuffer.limit();
         SNIResult result = SNIResult.NOT_PRESENT;
         String sniValue = null;
         try {
@@ -114,7 +115,7 @@ public class SNIExtractor {
             this.result = result;
             this.sniValue = sniValue;
             // Whatever happens, return the buffer to its original state
-            netInBuffer.limit(netInBuffer.capacity());
+            netInBuffer.limit(limit);
             netInBuffer.position(pos);
         }
     }
