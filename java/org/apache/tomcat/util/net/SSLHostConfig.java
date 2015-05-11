@@ -55,7 +55,7 @@ public class SSLHostConfig {
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
     private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
-    private boolean honorCipherOrder = false;
+    private boolean honorCipherOrder = true;
     private Set<String> protocols = new HashSet<>();
     // JSSE
     private String certificateKeyAlias;

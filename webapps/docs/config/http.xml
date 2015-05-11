@@ -1177,9 +1177,9 @@
 
     <attribute name="disableCompression" required="false">
       <p>OpenSSL only.</p>
-      <p>Disables compression if set to <code>true</code> and OpenSSL supports
-      disabling compression. Default is <code>true</code>. If <code>false</code>
-      the default compression setting in OpenSSL will be used.</p>
+      <p>Configures if compression is disabled. The default is
+      <code>true</code>. If the OpenSSL version used does not support disabling
+      compression then the default for that OpenSSL version will be used.</p>
     </attribute>
 
     <attribute name="disableSessionTickets" required="false">
@@ -1191,7 +1191,7 @@
     <attribute name="honorCipherOrder" required="false">
       <p>Set to <code>true</code> to enforce the server's cipher order
       (from the <code>ciphers</code> setting) instead of allowing
-      the client to choose the cipher (which is the default).</p>
+      the client to choose the cipher. The default is <code>true</code>.</p>
     </attribute>
 
     <attribute name="hostName" required="false">
@@ -1203,10 +1203,10 @@
 
     <attribute name="insecureRenegotiation" required="false">
       <p>OpenSSL only.</p>
-      <p>Enables insecure renegotiation if set to <code>true</code> and OpenSSL
-      supports enabling insecure renegotiation. Default is <code>false</code>.
-      If <code>false</code> the default insecure renegotiation setting in
-      OpenSSL will be used.</p>
+      <p>Configures if insecure renegotiation is allowed. The default is
+      <code>false</code>. If the OpenSSL version used does not support
+      configuring if insecure renegotiation is allowed then the default for that
+      OpenSSL version will be used.</p>
     </attribute>
 
     <attribute name="keyManagerAlgorithm" required="false">
