@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.63 (violetagg)">
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Make sure that stream is closed after using it in
+        <code>DeltaSession.applyDiff()</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.62 (violetagg)">
   <subsection name="Catalina">
