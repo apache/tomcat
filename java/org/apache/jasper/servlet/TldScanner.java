@@ -220,6 +220,7 @@ public class TldScanner {
     protected void scanResourcePaths(String startPath)
             throws IOException, SAXException {
 
+        boolean found = false;
         Set<String> dirList = context.getResourcePaths(startPath);
         if (dirList != null) {
             for (String path : dirList) {
@@ -232,11 +233,22 @@ public class TldScanner {
                 } else if (path.startsWith("/WEB-INF/tags/")) {
                     // JSP 7.3.1: in /WEB-INF/tags only consider implicit.tld
                     if (path.endsWith("/implicit.tld")) {
+                        found = true;
                         parseTld(path);
                     }
                 } else if (path.endsWith(TLD_EXT)) {
+                    found = true;
                     parseTld(path);
                 }
+            }
+        }
+        if (found) {
+            if (log.isDebugEnabled()) {
+                log.debug(Localizer.getMessage("jsp.tldCache.tldInResourcePath", startPath));
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug(Localizer.getMessage("jsp.tldCache.noTldInResourcePath", startPath));
             }
         }
     }
@@ -279,6 +291,7 @@ public class TldScanner {
 
     class TldScannerCallback implements JarScannerCallback {
         private boolean foundJarWithoutTld = false;
+        private boolean foundFileWithoutTld = false;
 
         @Override
         public void scan(JarURLConnection urlConn, String webappPath,
@@ -305,11 +318,14 @@ public class TldScanner {
                     }
                 }
             }
-            if (!found) {
+            if (found) {
+                if (log.isDebugEnabled()) {
+                    log.debug(Localizer.getMessage("jsp.tldCache.tldInJar", jarURL.toString()));
+                }
+            } else {
                 foundJarWithoutTld = true;
                 if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage("jsp.tldCache.noTldInJar",
-                            jarURL.toString()));
+                    log.debug(Localizer.getMessage("jsp.tldCache.noTldInJar", jarURL.toString()));
                 }
             }
         }
@@ -321,6 +337,7 @@ public class TldScanner {
             if (!metaInf.isDirectory()) {
                 return;
             }
+            foundFileWithoutTld = false;
             final Path filePath = file.toPath();
             Files.walkFileTree(metaInf.toPath(), new SimpleFileVisitor<Path>() {
                 @Override
@@ -332,6 +349,7 @@ public class TldScanner {
                         return FileVisitResult.CONTINUE;
                     }
 
+                    foundFileWithoutTld = true;
                     String resourcePath;
                     if (webappPath == null) {
                         resourcePath = null;
@@ -354,6 +372,17 @@ public class TldScanner {
                     return FileVisitResult.CONTINUE;
                 }
             });
+            if (foundFileWithoutTld) {
+                if (log.isDebugEnabled()) {
+                    log.debug(Localizer.getMessage("jsp.tldCache.tldInDir",
+                            file.getAbsolutePath()));
+                }
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(Localizer.getMessage("jsp.tldCache.noTldInDir",
+                            file.getAbsolutePath()));
+                }
+            }
         }
 
         @Override
