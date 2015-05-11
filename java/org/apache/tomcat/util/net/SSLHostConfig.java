@@ -239,6 +239,7 @@ public class SSLHostConfig {
             String trimmed = value.trim();
             if (trimmed.length() > 0) {
                 if (input.trim().equalsIgnoreCase("all")) {
+                    protocols.add("SSLv2Hello");
                     protocols.add("TLSv1");
                     protocols.add("TLSv1.1");
                     protocols.add("TLSv1.2");
