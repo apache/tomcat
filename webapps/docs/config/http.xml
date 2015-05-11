@@ -1230,7 +1230,7 @@
       single protocol is specified it will not support
       <code>SSLv2Hello</code>.</p>
       <p>Note that <code>all</code> is an alias for
-      <code>TLSv1,TLSv1.1,TLSv1.2</code>.</p>
+      <code>SSLv2Hello,TLSv1,TLSv1.1,TLSv1.2</code>.</p>
       <p>Note that <code>SSLv2</code> and <code>SSLv3</code> are inherently
       unsafe.</p>
       <p>If not specified, the default value of <code>all</code> will be
