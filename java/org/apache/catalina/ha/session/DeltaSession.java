@@ -161,8 +161,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     @Override
     public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException {
         lock();
-        try {
-            ReplicationStream stream = ( (ClusterManager) getManager()).getReplicationStream(diff, offset, length);
+        try (ObjectInputStream stream = ((ClusterManager) getManager()).getReplicationStream(diff, offset, length)) {
             ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
             try {
                 ClassLoader[] loaders = getClassLoaders();
@@ -170,7 +169,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                     Thread.currentThread().setContextClassLoader(loaders[0]);
                 getDeltaRequest().readExternal(stream);
                 getDeltaRequest().execute(this, ((ClusterManager)getManager()).isNotifyListenersOnReplication());
-                stream.close();
             } finally {
                 Thread.currentThread().setContextClassLoader(contextLoader);
             }
