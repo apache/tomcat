@@ -33,6 +33,9 @@ import org.apache.tomcat.util.res.StringManager;
  * on the basis that there will never be more than one thread performing I/O at
  * a time.
  * <br>
+ * For reading, this implementation is blocking within frames and non-blocking
+ * between frames.
+ * <br>
  * Note that unless Tomcat is configured with an ECC certificate, FireFox
  * (tested with v37.0.2) needs to be configured with
  * network.http.spdy.enforce-tls-profile=false in order for FireFox to be able
@@ -86,11 +89,16 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
             }
             connectionPrefaceParser = null;
 
-            // TODO process frames
-            break;
+            while (processFrame()) {
+            }
+
+            // TODO: CLOSED (GO_AWAY + no open streams apart from 0?) vs LONG
+            return SocketState.CLOSED;
+
         case OPEN_WRITE:
             // TODO
             break;
+
         case ASYNC_READ_ERROR:
         case ASYNC_WRITE_ERROR:
         case CLOSE_NOW:
@@ -113,6 +121,11 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         log.fatal("TODO: Handle SocketStatus: " + status);
         close();
         return SocketState.CLOSED;
+    }
+
+
+    private boolean processFrame() {
+        return false;
     }
 
 
