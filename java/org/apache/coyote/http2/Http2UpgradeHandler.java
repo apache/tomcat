@@ -34,12 +34,9 @@ import org.apache.tomcat.util.res.StringManager;
  * on the basis that there will never be more than one thread performing I/O at
  * a time.
  * <br>
- * Currently, it appears that Firefox needs to be configured with
- * network.http.spdy.enforce-tls-profile=false in order for FireFox to be able
- * to connect. I'm not sure what is going wrong here since as far as I have
- * found that only requires TLSv1.2. openssl s_client and Wireshark confirm that
- * TLSv1.2 is used and it still doesn't work if I limit the HTTPS connector to
- * TLSv1.2. There looks to be some other restriction being applied.
+ * Note that unless Tomcat is configured with an ECC certificate, Firefox needs
+ * o be configured with network.http.spdy.enforce-tls-profile=false in order for
+ * FireFox to be able to connect.
  *
  */
 public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
