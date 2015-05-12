@@ -77,21 +77,44 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
             init(null);
         }
 
-        if (clientPrefaceStartBytesRead < CLIENT_PREFACE_START_EXPECTED.length) {
-            readClientPrefaceStart();
-            if (clientPrefaceStartBytesRead == -1) {
-                // A fatal (for this connection) error occurred
-                close();
-                return SocketState.CLOSED;
+        switch(status) {
+        case OPEN_READ:
+            if (clientPrefaceStartBytesRead < CLIENT_PREFACE_START_EXPECTED.length) {
+                readClientPrefaceStart();
+                if (clientPrefaceStartBytesRead == -1) {
+                    // A fatal (for this connection) error occurred
+                    close();
+                    return SocketState.CLOSED;
+                }
+                // Preface start has been read and validated. No need to keep this
+                // buffer hanging around in memory.
+                clientPrefaceStartData = null;
             }
-            // Preface start has been read and validated. No need to keep this
-            // buffer hanging around in memory.
-            clientPrefaceStartData = null;
+            // TODO process frames
+            break;
+        case OPEN_WRITE:
+            // TODO
+            break;
+        case ASYNC_READ_ERROR:
+        case ASYNC_WRITE_ERROR:
+        case CLOSE_NOW:
+            // This should never happen and will be fatal for this connection.
+            // Add the exception to trace how this point was reached.
+            log.error(sm.getString("upgradeHandler.unexpectedStatus", status),
+                    new IllegalStateException());
+            //$FALL-THROUGH$
+        case DISCONNECT:
+        case ERROR:
+        case TIMEOUT:
+        case STOP:
+            // For all of the above, including the unexpected values, close the
+            // connection.
+            close();
+            return SocketState.CLOSED;
         }
 
         // TODO This is for debug purposes to make sure ALPN is working.
         log.fatal("TODO: Handle SocketStatus: " + status);
-
         close();
         return SocketState.CLOSED;
     }
