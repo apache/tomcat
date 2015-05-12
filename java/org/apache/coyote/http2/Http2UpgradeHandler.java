@@ -17,7 +17,6 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.WebConnection;
 
@@ -43,19 +42,12 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
 
     private static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
     private static final StringManager sm = StringManager.getManager(Http2UpgradeHandler.class);
-    private static final byte[] CLIENT_PREFACE_START_EXPECTED;
 
     private volatile SocketWrapperBase<?> socketWrapper;
     private volatile boolean initialized = false;
-    private volatile byte[] clientPrefaceStartData = new byte[CLIENT_PREFACE_START_EXPECTED.length];
-    private volatile int clientPrefaceStartBytesRead = 0;
+    private volatile ConnectionPrefaceParser connectionPrefaceParser =
+            new ConnectionPrefaceParser();
     private volatile boolean readFirstFrame = false;
-
-
-    static {
-        CLIENT_PREFACE_START_EXPECTED =
-                "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
-    }
 
 
     @Override
@@ -79,17 +71,21 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
 
         switch(status) {
         case OPEN_READ:
-            if (clientPrefaceStartBytesRead < CLIENT_PREFACE_START_EXPECTED.length) {
-                readClientPrefaceStart();
-                if (clientPrefaceStartBytesRead == -1) {
-                    // A fatal (for this connection) error occurred
-                    close();
-                    return SocketState.CLOSED;
+            // Gets set to null once the connection preface has been
+            // successfully parsed.
+            if (connectionPrefaceParser != null) {
+                if (!connectionPrefaceParser.parse(socketWrapper)) {
+                    if (connectionPrefaceParser.isError()) {
+                        close();
+                        return SocketState.CLOSED;
+                    } else {
+                        // Incomplete
+                        return SocketState.LONG;
+                    }
                 }
-                // Preface start has been read and validated. No need to keep this
-                // buffer hanging around in memory.
-                clientPrefaceStartData = null;
             }
+            connectionPrefaceParser = null;
+
             // TODO process frames
             break;
         case OPEN_WRITE:
@@ -132,35 +128,5 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         } catch (IOException ioe) {
             log.debug(sm.getString("upgradeHandler.socketCloseFailed"), ioe);
         }
-    }
-
-
-    private void readClientPrefaceStart() {
-        int read = 0;
-        try {
-            read = socketWrapper.read(false, clientPrefaceStartData, clientPrefaceStartBytesRead,
-                    clientPrefaceStartData.length - clientPrefaceStartBytesRead);
-        } catch (IOException ioe) {
-            log.error(sm.getString("upgradeHandler.prefaceErrorIo"), ioe);
-            clientPrefaceStartBytesRead = -1;
-            return;
-        }
-
-        if (read == -1) {
-            log.error(sm.getString("upgradeHandler.prefaceErrorEos",
-                    Integer.toString(clientPrefaceStartBytesRead)));
-            clientPrefaceStartBytesRead = -1;
-            return;
-        }
-
-        for (int i = clientPrefaceStartBytesRead; i < (clientPrefaceStartBytesRead + read); i++) {
-            if (clientPrefaceStartData[i] != CLIENT_PREFACE_START_EXPECTED[i]) {
-                log.error(sm.getString("upgradeHandler.prefaceErrorMismatch",
-                        new String(clientPrefaceStartData, StandardCharsets.ISO_8859_1)));
-                clientPrefaceStartBytesRead = -1;
-                return;
-            }
-        }
-        clientPrefaceStartBytesRead += read;
     }
 }

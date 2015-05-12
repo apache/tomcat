@@ -37,6 +37,7 @@ import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
+import org.apache.coyote.http2.Http2Protocol;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -52,7 +53,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         //       This is disabled by default otherwise it will break the
         //       APR/native connector with clients that support h2 with ALPN
         //       (because the Http2Protocol is only stubbed out)
-        //addUpgradeProtocol(new Http2Protocol());
+        addUpgradeProtocol(new Http2Protocol());
     }
 
 
