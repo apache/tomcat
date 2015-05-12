@@ -93,7 +93,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
             }
 
             // TODO: CLOSED (GO_AWAY + no open streams apart from 0?) vs LONG
-            return SocketState.CLOSED;
+            break;
 
         case OPEN_WRITE:
             // TODO
