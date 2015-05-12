@@ -34,10 +34,10 @@ import org.apache.tomcat.util.res.StringManager;
  * on the basis that there will never be more than one thread performing I/O at
  * a time.
  * <br>
- * Note that unless Tomcat is configured with an ECC certificate, Firefox needs
- * o be configured with network.http.spdy.enforce-tls-profile=false in order for
- * FireFox to be able to connect.
- *
+ * Note that unless Tomcat is configured with an ECC certificate, FireFox
+ * (tested with v37.0.2) needs to be configured with
+ * network.http.spdy.enforce-tls-profile=false in order for FireFox to be able
+ * to connect.
  */
 public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
 
