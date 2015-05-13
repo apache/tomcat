@@ -52,6 +52,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private static final Integer STREAM_ID_ZERO = Integer.valueOf(0);
 
+    private static final int FRAME_TYPE_PRIORITY = 2;
     private static final int FRAME_TYPE_SETTINGS = 4;
     private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
 
@@ -67,6 +68,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private final ConnectionSettings remoteSettings = new ConnectionSettings();
     private volatile long flowControlWindowSize = ConnectionSettings.DEFAULT_WINDOW_SIZE;
+    private volatile int maxRemoteStreamId = 0;
 
     private final Map<Integer,Stream> streams = new HashMap<>();
 
@@ -186,6 +188,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         int payloadSize = getPayloadSize(streamId, frameHeader);
 
         switch (frameType) {
+        case FRAME_TYPE_PRIORITY:
+            processFramePriority(flags, streamId, payloadSize);
+            break;
         case FRAME_TYPE_SETTINGS:
             processFrameSettings(flags, streamId, payloadSize);
             break;
@@ -197,6 +202,51 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             processFrameUnknown(streamId, frameType, payloadSize);
         }
         return true;
+    }
+
+
+    private void processFramePriority(int flags, int streamId, int payloadSize) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.processFrame",
+                    Integer.toString(FRAME_TYPE_PRIORITY), Integer.toString(flags),
+                    Integer.toString(streamId), Integer.toString(payloadSize)));
+        }
+        // Validate the frame
+        if (streamId == 0) {
+            throw new Http2Exception(sm.getString("upgradeHandler.processFramePriority.invalidStream"),
+                    0, Http2Exception.PROTOCOL_ERROR);
+        }
+        if (payloadSize != 5) {
+            throw new Http2Exception(sm.getString("upgradeHandler.processFramePriority.invalidPayloadSize",
+                    Integer.toString(payloadSize)), streamId, Http2Exception.FRAME_SIZE_ERROR);
+        }
+
+        byte[] payload = new byte[5];
+        readFully(payload);
+
+        boolean exclusive = (payload[0] & 0x80) > 0;
+        int parentStreamId = ((payload[0] & 0x7F) << 24) + ((payload[1] & 0xFF) << 16) +
+                ((payload[2] & 0xFF) << 8) + (payload[3] & 0xFF);
+        int weight = (payload[4] & 0xFF) + 1;
+
+        Stream stream = getStream(streamId);
+        AbstractStream parentStream;
+        if (parentStreamId == 0) {
+            parentStream = this;
+        } else {
+            parentStream = getStream(parentStreamId);
+            if (parentStream == null) {
+                parentStream = this;
+                weight = Constants.DEFAULT_WEIGHT;
+                exclusive = false;
+            }
+        }
+
+        if (stream == null) {
+            // Old stream. Already closed and dropped from the stream map.
+        } else {
+            stream.rePrioritise(parentStream, exclusive, weight);
+        }
     }
 
 
@@ -276,19 +326,20 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         if (streamId == 0) {
             flowControlWindowSize += windowSizeIncrement;
         } else {
-            Integer key = Integer.valueOf(streamId);
-            Stream stream = streams.get(key);
+            Stream stream = getStream(streamId);
             if (stream == null) {
-                stream = new Stream(key, this);
+                // Old stream already closed.
+                // Ignore
+            } else {
+                stream.incrementWindowSize(windowSizeIncrement);
             }
-            stream.incrementWindowSize(windowSizeIncrement);
         }
     }
 
 
     private void processFrameUnknown(int streamId, int type, int payloadSize) throws IOException {
         // Swallow the payload
-        log.info("Swallowing [" + payloadSize + "] bytes of unknown frame type + [" + type +
+        log.info("Swallowing [" + payloadSize + "] bytes of unknown frame type [" + type +
                 "] from stream [" + streamId + "]");
         swallowPayload(payloadSize);
     }
@@ -420,6 +471,21 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 throw new EOFException(sm.getString("upgradeHandler.unexpectedEos"));
             }
             read += thisTime;
+        }
+    }
+
+
+    private Stream getStream(int streamId) {
+        Integer key = Integer.valueOf(streamId);
+
+        if (streamId > maxRemoteStreamId) {
+            // Must be a new stream
+            maxRemoteStreamId = streamId;
+            Stream stream = new Stream(key, this);
+            streams.put(key, stream);
+            return stream;
+        } else {
+            return streams.get(key);
         }
     }
 
