@@ -45,10 +45,12 @@ import org.apache.tomcat.util.res.StringManager;
  * network.http.spdy.enforce-tls-profile=false in order for FireFox to be able
  * to connect.
  */
-public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
+public class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler {
 
     private static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
     private static final StringManager sm = StringManager.getManager(Http2UpgradeHandler.class);
+
+    private static final Integer STREAM_ID_ZERO = Integer.valueOf(0);
 
     private static final int FRAME_TYPE_SETTINGS = 4;
     private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
@@ -67,6 +69,12 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
     private volatile long flowControlWindowSize = ConnectionSettings.DEFAULT_WINDOW_SIZE;
 
     private final Map<Integer,Stream> streams = new HashMap<>();
+
+
+    public Http2UpgradeHandler() {
+        super (STREAM_ID_ZERO);
+    }
+
 
     @Override
     public void init(WebConnection unused) {
@@ -271,7 +279,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
             Integer key = Integer.valueOf(streamId);
             Stream stream = streams.get(key);
             if (stream == null) {
-                stream = new Stream(key, remoteSettings.getInitialWindowSize());
+                stream = new Stream(key, this);
             }
             stream.incrementWindowSize(windowSizeIncrement);
         }
@@ -359,6 +367,11 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         }
 
         return payloadSize;
+    }
+
+
+    ConnectionSettings getRemoteSettings() {
+        return remoteSettings;
     }
 
 

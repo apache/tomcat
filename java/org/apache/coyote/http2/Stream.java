@@ -16,20 +16,15 @@
  */
 package org.apache.coyote.http2;
 
-public class Stream {
-
-    private final Integer identifier;
+public class Stream extends AbstractStream {
 
     private volatile long flowControlWindowSize;
 
-    public Stream(Integer identifier, long intitalWindowSize) {
-        this.identifier = identifier;
-        flowControlWindowSize = intitalWindowSize;
-    }
 
-
-    public Integer getIdentifier() {
-        return identifier;
+    public Stream(Integer identifier, Http2UpgradeHandler handler) {
+        super(identifier);
+        setParentStream(handler);
+        flowControlWindowSize = handler.getRemoteSettings().getInitialWindowSize();
     }
 
 
