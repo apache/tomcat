@@ -16,7 +16,15 @@
  */
 package org.apache.coyote.http2;
 
-public class Stream extends AbstractStream {
+import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
+public class Stream extends AbstractStream implements HeaderEmitter {
+
+    private static final Log log = LogFactory.getLog(Stream.class);
+    private static final StringManager sm = StringManager.getManager(Stream.class);
 
     private volatile long flowControlWindowSize;
 
@@ -30,5 +38,21 @@ public class Stream extends AbstractStream {
 
     public void incrementWindowSize(int windowSizeIncrement) {
         flowControlWindowSize += windowSizeIncrement;
+    }
+
+
+    @Override
+    public void emitHeader(String name, String value, boolean neverIndex) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("stream.header.debug", getIdentifier(), name, value));
+        }
+
+        // TODO: Do something with these headers
+    }
+
+
+    @Override
+    protected final Log getLog() {
+        return log;
     }
 }

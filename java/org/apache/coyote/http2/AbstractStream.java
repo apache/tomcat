@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -29,7 +28,6 @@ import org.apache.tomcat.util.res.StringManager;
  */
 abstract class AbstractStream {
 
-    private static final Log log = LogFactory.getLog(AbstractStream.class);
     private static final StringManager sm = StringManager.getManager(AbstractStream.class);
 
     private final Integer identifier;
@@ -49,8 +47,8 @@ abstract class AbstractStream {
 
 
     public void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("abstractStream.reprioritisation.debug", identifier,
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("abstractStream.reprioritisation.debug", identifier,
                     Boolean.toString(exclusive), parent.getIdentifier(), Integer.toString(weight)));
         }
 
@@ -120,4 +118,6 @@ abstract class AbstractStream {
     Set<AbstractStream> getChildStreams() {
         return childStreams;
     }
+
+    protected abstract Log getLog();
 }
