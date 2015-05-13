@@ -495,6 +495,7 @@ public abstract class AbstractReplicatedMap<K,V>
                             messageReceived( (Serializable) list.get(i), resp[0].getSource());
                         } //for
                     }
+                    stateTransferred = true;
                 } else {
                     log.warn("Transfer state, 0 replies, probably a timeout.");
                 }
@@ -506,7 +507,6 @@ public abstract class AbstractReplicatedMap<K,V>
         } catch (ClassNotFoundException x) {
             log.error("Unable to transfer LazyReplicatedMap state.", x);
         }
-        stateTransferred = true;
     }
 
     /**
