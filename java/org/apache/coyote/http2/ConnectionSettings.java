@@ -27,6 +27,7 @@ public class ConnectionSettings {
     private final Log log = LogFactory.getLog(ConnectionSettings.class);
     private final StringManager sm = StringManager.getManager(ConnectionSettings.class);
 
+    public static final long DEFAULT_WINDOW_SIZE = (1 << 16) - 1;
     private static final long UNLIMITED = 1 << 32; // Use the maximum possible
     private static final long MAX_WINDOW_SIZE = (1 << 31) - 1;
     private static final long MIN_MAX_FRAME_SIZE = 1 << 14;
@@ -35,7 +36,7 @@ public class ConnectionSettings {
     private volatile long headerTableSize = 4096;
     private volatile long enablePush = 1;
     private volatile long maxConcurrentStreams = UNLIMITED;
-    private volatile long initialWindowSize = (1 << 16) - 1;
+    private volatile long initialWindowSize = DEFAULT_WINDOW_SIZE;
     private volatile long maxFrameSize = MIN_MAX_FRAME_SIZE;
     private volatile long maxHeaderListSize = UNLIMITED;
 
