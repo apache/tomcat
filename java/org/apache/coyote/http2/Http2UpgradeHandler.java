@@ -19,6 +19,8 @@ package org.apache.coyote.http2;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.WebConnection;
 
@@ -48,11 +50,12 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
     private static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
     private static final StringManager sm = StringManager.getManager(Http2UpgradeHandler.class);
 
-    private static final int FRAME_SETTINGS = 4;
+    private static final int FRAME_TYPE_SETTINGS = 4;
+    private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
 
     private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
     private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
-    private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00 };
+    private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
 
     private volatile SocketWrapperBase<?> socketWrapper;
     private volatile boolean initialized = false;
@@ -61,6 +64,9 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
     private volatile boolean firstFrame = true;
 
     private final ConnectionSettings remoteSettings = new ConnectionSettings();
+    private volatile long flowControlWindowSize = ConnectionSettings.DEFAULT_WINDOW_SIZE;
+
+    private final Map<Integer,Stream> streams = new HashMap<>();
 
     @Override
     public void init(WebConnection unused) {
@@ -172,8 +178,11 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         int payloadSize = getPayloadSize(streamId, frameHeader);
 
         switch (frameType) {
-        case FRAME_SETTINGS:
+        case FRAME_TYPE_SETTINGS:
             processFrameSettings(flags, streamId, payloadSize);
+            break;
+        case FRAME_TYPE_WINDOW_UPDATE:
+            processFrameWindowUpdate(flags, streamId, payloadSize);
             break;
         default:
             // Unknown frame type.
@@ -185,7 +194,8 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
 
     private void processFrameSettings(int flags, int streamId, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrameSettings", Integer.toString(flags),
+            log.debug(sm.getString("upgradeHandler.processFrame",
+                    Integer.toString(FRAME_TYPE_SETTINGS), Integer.toString(flags),
                     Integer.toString(streamId), Integer.toString(payloadSize)));
         }
         // Validate the frame
@@ -211,14 +221,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
             // Process the settings
             byte[] setting = new byte[6];
             for (int i = 0; i < payloadSize / 6; i++) {
-                int read = 0;
-                while (read < 6) {
-                    int thisTime = socketWrapper.read(true, setting, read, setting.length - read);
-                    if (thisTime == -1) {
-                        throw new EOFException(sm.getString("upgradeHandler.unexpectedEos"));
-                    }
-                    read += thisTime;
-                }
+                readFully(setting);
                 int id = ((setting[0] & 0xFF) << 8) + (setting[1] & 0xFF);
                 long value = ((setting[2] & 0xFF) << 24) + ((setting[3] & 0xFF) << 16) +
                         ((setting[4] & 0xFF) << 8) + (setting[5] & 0xFF);
@@ -230,6 +233,43 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         // TODO Need to coordinate writes with other threads
         socketWrapper.write(true, SETTINGS_ACK, 0, SETTINGS_ACK.length);
         socketWrapper.flush(true);
+    }
+
+
+    private void processFrameWindowUpdate(int flags, int streamId, int payloadSize)
+            throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.processFrame",
+                    Integer.toString(FRAME_TYPE_WINDOW_UPDATE), Integer.toString(flags),
+                    Integer.toString(streamId), Integer.toString(payloadSize)));
+        }
+        // Validate the frame
+        if (payloadSize != 4) {
+            // TODO i18n
+            // Use stream 0 since this is always a connection error
+            throw new Http2Exception("", 0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+
+        byte[] payload = new byte[4];
+        readFully(payload);
+        int windowSizeIncrement = ((payload[0] & 0x7F) << 24) + ((payload[1] & 0xFF) << 16) +
+                ((payload[2] & 0xFF) << 8) + (payload[3] & 0xFF);
+
+        // Validate the data
+        if (windowSizeIncrement == 0) {
+            // TODO i18n
+            throw new Http2Exception("", streamId, Http2Exception.PROTOCOL_ERROR);
+        }
+        if (streamId == 0) {
+            flowControlWindowSize += windowSizeIncrement;
+        } else {
+            Integer key = Integer.valueOf(streamId);
+            Stream stream = streams.get(key);
+            if (stream == null) {
+                stream = new Stream(key, remoteSettings.getInitialWindowSize());
+            }
+            stream.incrementWindowSize(windowSizeIncrement);
+        }
     }
 
 
@@ -282,7 +322,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         int frameType = frameHeader[3] & 0xFF;
         // Make sure the first frame is a settings frame
         if (firstFrame) {
-            if (frameType != FRAME_SETTINGS) {
+            if (frameType != FRAME_TYPE_SETTINGS) {
                 throw new Http2Exception(sm.getString("upgradeHandler.receivePrefaceNotSettings"),
                         0, Http2Exception.PROTOCOL_ERROR);
             } else {
@@ -296,7 +336,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
     private int getStreamIdentifier(byte[] frameHeader) {
         // MSB of [5] is reserved and must be ignored.
         return ((frameHeader[5] & 0x7F) << 24) + ((frameHeader[6] & 0xFF) << 16) +
-                ((frameHeader[7] & 0xFF) << 6) + (frameHeader[8] & 0xFF);
+                ((frameHeader[7] & 0xFF) << 8) + (frameHeader[8] & 0xFF);
     }
 
 
@@ -352,6 +392,19 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
 
         return result;
     }
+
+
+    private void readFully(byte[] dest) throws IOException {
+        int read = 0;
+        while (read < dest.length) {
+            int thisTime = socketWrapper.read(true, dest, read, dest.length - read);
+            if (thisTime == -1) {
+                throw new EOFException(sm.getString("upgradeHandler.unexpectedEos"));
+            }
+            read += thisTime;
+        }
+    }
+
 
     private void close() {
         try {
