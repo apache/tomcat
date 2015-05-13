@@ -41,6 +41,11 @@ public class ConnectionSettings {
     private volatile long maxHeaderListSize = UNLIMITED;
 
     public void set(int parameterId, long value) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("connectionSettings.debug",
+                    Integer.toString(parameterId), Long.toString(value)));
+        }
+
         switch(parameterId) {
         case 1:
             setHeaderTableSize(value);

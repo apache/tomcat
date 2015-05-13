@@ -245,9 +245,9 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         }
         // Validate the frame
         if (payloadSize != 4) {
-            // TODO i18n
             // Use stream 0 since this is always a connection error
-            throw new Http2Exception("", 0, Http2Exception.FRAME_SIZE_ERROR);
+            throw new Http2Exception(sm.getString("upgradeHandler.processFrameWindowUpdate.invalidPayloadSize",
+                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
         }
 
         byte[] payload = new byte[4];
@@ -255,10 +255,15 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         int windowSizeIncrement = ((payload[0] & 0x7F) << 24) + ((payload[1] & 0xFF) << 16) +
                 ((payload[2] & 0xFF) << 8) + (payload[3] & 0xFF);
 
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.processFrameWindowUpdate.debug",
+                    Integer.toString(streamId), Integer.toString(windowSizeIncrement)));
+        }
+
         // Validate the data
         if (windowSizeIncrement == 0) {
-            // TODO i18n
-            throw new Http2Exception("", streamId, Http2Exception.PROTOCOL_ERROR);
+            throw new Http2Exception("upgradeHandler.processFrameWindowUpdate.invalidIncrement",
+                    streamId, Http2Exception.PROTOCOL_ERROR);
         }
         if (streamId == 0) {
             flowControlWindowSize += windowSizeIncrement;
