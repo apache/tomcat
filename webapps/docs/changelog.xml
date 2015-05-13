@@ -66,6 +66,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Ensure that the state transfer flag is updated to true only when the map
+        states have been transferred correctly from existing map members.
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.62 (violetagg)">
   <subsection name="Catalina">
