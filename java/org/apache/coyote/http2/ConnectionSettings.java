@@ -82,8 +82,8 @@ public class ConnectionSettings {
         // Can't be less than zero since the result of the byte->long conversion
         // will never be negative
         if (enablePush > 1) {
-            // TODO i18n
-            throw new Http2Exception("", 0, Http2Exception.PROTOCOL_ERROR);
+            throw new Http2Exception(sm.getString("connectionSettings.enablePushInvalid",
+                    Long.toString(enablePush)), 0, Http2Exception.PROTOCOL_ERROR);
         }
         this.enablePush = enablePush;
     }
@@ -102,8 +102,9 @@ public class ConnectionSettings {
     }
     public void setInitialWindowSize(long initialWindowSize) throws IOException {
         if (initialWindowSize > MAX_WINDOW_SIZE) {
-            // TODO i18n
-            throw new Http2Exception("", 0, Http2Exception.PROTOCOL_ERROR);
+            throw new Http2Exception(sm.getString("connectionSettings.windowSizeTooBig",
+                    Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE)),
+                    0, Http2Exception.PROTOCOL_ERROR);
         }
         this.initialWindowSize = initialWindowSize;
     }
@@ -114,8 +115,9 @@ public class ConnectionSettings {
     }
     public void setMaxFrameSize(long maxFrameSize) throws IOException {
         if (maxFrameSize < MIN_MAX_FRAME_SIZE || maxFrameSize > MAX_MAX_FRAME_SIZE) {
-            // TODO i18n
-            throw new Http2Exception("", 0, Http2Exception.PROTOCOL_ERROR);
+            throw new Http2Exception(sm.getString("connectionSettings.maxFrameSizeInvalid",
+                    Long.toString(maxFrameSize), Long.toString(MIN_MAX_FRAME_SIZE),
+                    Long.toString(MAX_MAX_FRAME_SIZE)), 0, Http2Exception.PROTOCOL_ERROR);
         }
         this.maxFrameSize = maxFrameSize;
     }

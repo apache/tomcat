@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.WebConnection;
 
@@ -51,13 +52,13 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
 
     private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
     private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
+    private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00 };
 
     private volatile SocketWrapperBase<?> socketWrapper;
     private volatile boolean initialized = false;
     private volatile ConnectionPrefaceParser connectionPrefaceParser =
             new ConnectionPrefaceParser();
     private volatile boolean firstFrame = true;
-    private volatile boolean open = true;
 
     private final ConnectionSettings remoteSettings = new ConnectionSettings();
 
@@ -70,8 +71,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
             socketWrapper.write(true, SETTINGS_EMPTY, 0, SETTINGS_EMPTY.length);
             socketWrapper.flush(true);
         } catch (IOException ioe) {
-            // TODO i18n
-            throw new IllegalStateException("Failed to send preface to client", ioe);
+            throw new IllegalStateException(sm.getString("upgradeHandler.sendPrefaceFail"), ioe);
         }
     }
 
@@ -96,6 +96,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
             if (connectionPrefaceParser != null) {
                 if (!connectionPrefaceParser.parse(socketWrapper)) {
                     if (connectionPrefaceParser.isError()) {
+                        // Any errors will have already been logged.
                         close();
                         return SocketState.CLOSED;
                     } else {
@@ -109,17 +110,25 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
             try {
                 while (processFrame()) {
                 }
-                // TODO Catch the Http2Exception and reset the stream / close
-                // the connection as appropriate
+            } catch (Http2Exception h2e) {
+                if (h2e.getStreamId() == 0) {
+                    // Connection error
+                    log.warn(sm.getString("upgradeHandler.connectionError"), h2e);
+                    close(h2e);
+                    return SocketState.CLOSED;
+                } else {
+                    // Stream error
+                    // TODO Reset stream
+                }
             } catch (IOException ioe) {
-                log.error("TODO: i18n - Frame processing error", ioe);
-                open = false;
+                if (log.isDebugEnabled()) {
+                    log.debug("TODO: i18n - I/O error during frame processing", ioe);
+                }
+                close();
+                return SocketState.CLOSED;
             }
 
-            if (open) {
-                return SocketState.LONG;
-            }
-            break;
+            return SocketState.LONG;
 
         case OPEN_WRITE:
             // TODO
@@ -181,16 +190,16 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         }
         // Validate the frame
         if (streamId != 0) {
-            // TODO i18n
-            throw new Http2Exception("", 0, Http2Exception.FRAME_SIZE_ERROR);
+            throw new Http2Exception(sm.getString("upgradeHandler.processFrameSettings.invalidStream",
+                    Integer.toString(streamId)), 0, Http2Exception.FRAME_SIZE_ERROR);
         }
         if (payloadSize % 6 != 0) {
-            // TODO i18n
-            throw new Http2Exception("", 0, Http2Exception.FRAME_SIZE_ERROR);
+            throw new Http2Exception(sm.getString("upgradeHandler.processFrameSettings.invalidPayloadSize",
+                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
         }
         if (payloadSize > 0 && (flags & 0x1) != 0) {
-            // TODO i18n
-            throw new Http2Exception("", 0, Http2Exception.FRAME_SIZE_ERROR);
+            throw new Http2Exception(sm.getString("upgradeHandler.processFrameSettings.ackWithNonZeroPayload"),
+                    0, Http2Exception.FRAME_SIZE_ERROR);
         }
 
         if (payloadSize == 0) {
@@ -206,8 +215,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
                 while (read < 6) {
                     int thisTime = socketWrapper.read(true, setting, read, setting.length - read);
                     if (thisTime == -1) {
-                        // TODO i18n
-                        throw new EOFException();
+                        throw new EOFException(sm.getString("upgradeHandler.unexpectedEos"));
                     }
                     read += thisTime;
                 }
@@ -262,8 +270,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
             int read = socketWrapper.read(true, frameHeader, headerBytesRead,
                     frameHeader.length - headerBytesRead);
             if (read == -1) {
-                // TODO i18n
-                throw new EOFException();
+                throw new EOFException(sm.getString("upgradeHandler.unexpectedEos"));
             }
         }
 
@@ -276,8 +283,8 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         // Make sure the first frame is a settings frame
         if (firstFrame) {
             if (frameType != FRAME_SETTINGS) {
-                // TODO i18n
-                throw new Http2Exception("", 0, Http2Exception.PROTOCOL_ERROR);
+                throw new Http2Exception(sm.getString("upgradeHandler.receivePrefaceNotSettings"),
+                        0, Http2Exception.PROTOCOL_ERROR);
             } else {
                 firstFrame = false;
             }
@@ -301,8 +308,9 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
 
         if (payloadSize > remoteSettings.getMaxFrameSize()) {
             swallowPayload(payloadSize);
-            // TODO i18n
-            throw new Http2Exception("", streamId, Http2Exception.FRAME_SIZE_ERROR);
+            throw new Http2Exception(sm.getString("upgradeHandler.payloadTooBig",
+                    Integer.toString(payloadSize), Long.toString(remoteSettings.getMaxFrameSize())),
+                    streamId, Http2Exception.FRAME_SIZE_ERROR);
         }
 
         return payloadSize;
@@ -314,6 +322,36 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         // NO-OP
     }
 
+
+    private void close(Http2Exception h2e) {
+        // Write a GOAWAY frame.
+        byte[] payload = h2e.getMessage().getBytes(StandardCharsets.UTF_8);
+        byte[] payloadLength = getPayloadLength(payload);
+
+        try {
+            socketWrapper.write(true, payloadLength, 0, payloadLength.length);
+            socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
+            socketWrapper.write(true, payload, 0,  payload.length);
+            socketWrapper.flush(true);
+        } catch (IOException ioe) {
+            // Ignore. GOAWAY is sent on a best efforts basis and the original
+            // error has already been logged.
+        }
+        close();
+    }
+
+
+    private byte[] getPayloadLength(byte[] payload) {
+        byte[] result = new byte[3];
+        int len = payload.length;
+        result[2] = (byte) (len & 0xFF);
+        len = len >>> 8;
+        result[1] = (byte) (len & 0xFF);
+        len = len >>> 8;
+        result[0] = (byte) (len & 0xFF);
+
+        return result;
+    }
 
     private void close() {
         try {
