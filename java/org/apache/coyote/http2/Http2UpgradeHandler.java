@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private static final Integer STREAM_ID_ZERO = Integer.valueOf(0);
 
+    private static final int FRAME_TYPE_HEADERS = 1;
     private static final int FRAME_TYPE_PRIORITY = 2;
     private static final int FRAME_TYPE_SETTINGS = 4;
     private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
@@ -67,11 +69,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private volatile boolean firstFrame = true;
 
     private final ConnectionSettings remoteSettings = new ConnectionSettings();
+    private final ConnectionSettings localSettings = new ConnectionSettings();
     private volatile long flowControlWindowSize = ConnectionSettings.DEFAULT_WINDOW_SIZE;
     private volatile int maxRemoteStreamId = 0;
 
-    private final Map<Integer,Stream> streams = new HashMap<>();
+    private HpackDecoder hpackDecoder;
+    private ByteBuffer headerReadBuffer = ByteBuffer.allocate(1024);
+    private HpackEncoder hpackEncoder;
 
+    private final Map<Integer,Stream> streams = new HashMap<>();
 
     public Http2UpgradeHandler() {
         super (STREAM_ID_ZERO);
@@ -188,6 +194,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         int payloadSize = getPayloadSize(streamId, frameHeader);
 
         switch (frameType) {
+        case FRAME_TYPE_HEADERS:
+            processFrameHeaders(flags, streamId, payloadSize);
+            break;
         case FRAME_TYPE_PRIORITY:
             processFramePriority(flags, streamId, payloadSize);
             break;
@@ -202,6 +211,85 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             processFrameUnknown(streamId, frameType, payloadSize);
         }
         return true;
+    }
+
+
+    private void processFrameHeaders(int flags, int streamId, int payloadSize) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.processFrame",
+                    Integer.toString(FRAME_TYPE_HEADERS), Integer.toString(flags),
+                    Integer.toString(streamId), Integer.toString(payloadSize)));
+        }
+
+        // Validate the stream
+        if (streamId == 0) {
+            throw new Http2Exception(sm.getString("upgradeHandler.processFrameHeaders.invalidStream"),
+                    0, Http2Exception.PROTOCOL_ERROR);
+        }
+
+        // Process the stream
+        // TODO Handle end of headers flag
+        // TODO Handle end of stream flag
+        // TODO Handle continutation frames
+        Stream stream = getStream(streamId);
+        int padLength = 0;
+
+        boolean padding = (flags & 0x08) > 0;
+        boolean priority = (flags & 0x20) > 0;
+        int optionalLen = 0;
+        if (padding) {
+            optionalLen = 1;
+        }
+        if (priority) {
+            optionalLen += 5;
+        }
+        if (optionalLen > 0) {
+            byte[] optional = new byte[optionalLen];
+            readFully(optional);
+            int optionalPos = 0;
+            if (padding) {
+                padLength = ByteUtil.getOneByte(optional, optionalPos++);
+            }
+            if (priority) {
+                boolean exclusive = ByteUtil.isBit7Set(optional[optionalPos]);
+                int parentStreamId = ByteUtil.get31Bits(optional, optionalPos);
+                int weight = ByteUtil.getOneByte(optional, optionalPos + 4) + 1;
+                AbstractStream parentStream = getStream(parentStreamId);
+                if (parentStream == null) {
+                    parentStream = this;
+                }
+                stream.rePrioritise(parentStream, exclusive, weight);
+            }
+
+            payloadSize -= optionalLen;
+        }
+
+        hpackDecoder.setHeaderEmitter(stream);
+        while (payloadSize > 0) {
+            int toRead = Math.min(headerReadBuffer.remaining(), payloadSize);
+            // headerReadBuffer in write mode
+            readFully(headerReadBuffer, toRead);
+            // switch to read mode
+            headerReadBuffer.flip();
+            try {
+                hpackDecoder.decode(headerReadBuffer);
+            } catch (HpackException hpe) {
+                // TODO i18n
+                throw new Http2Exception("", 0, Http2Exception.PROTOCOL_ERROR);
+            }
+            // switches to write mode
+            headerReadBuffer.compact();
+            payloadSize -= toRead;
+        }
+        // Should be empty at this point
+        if (headerReadBuffer.position() > 0) {
+            // TODO i18n
+            throw new Http2Exception("", 0, Http2Exception.PROTOCOL_ERROR);
+        }
+
+        if (padLength > 0) {
+            swallowPayload(padLength);
+        }
     }
 
 
@@ -280,9 +368,14 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             for (int i = 0; i < payloadSize / 6; i++) {
                 readFully(setting);
                 int id = ByteUtil.getTwoBytes(setting, 0);
-                long value = ByteUtil.getFourBytes(setting, 2);
+                int value = ByteUtil.getFourBytes(setting, 2);
                 remoteSettings.set(id, value);
             }
+        }
+        if (firstFrame) {
+            firstFrame = false;
+            hpackDecoder = new HpackDecoder(remoteSettings.getHeaderTableSize());
+            hpackEncoder = new HpackEncoder(localSettings.getHeaderTableSize());
         }
 
         // Acknowledge the settings
@@ -344,7 +437,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private void swallowPayload(int payloadSize) throws IOException {
         int read = 0;
-        byte[] buffer = new byte[8 * 1024];
+        byte[] buffer = new byte[1024];
         while (read < payloadSize) {
             int toRead = Math.min(buffer.length, payloadSize - read);
             int thisTime = socketWrapper.read(true, buffer, 0, toRead);
@@ -386,8 +479,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             if (frameType != FRAME_TYPE_SETTINGS) {
                 throw new Http2Exception(sm.getString("upgradeHandler.receivePrefaceNotSettings"),
                         0, Http2Exception.PROTOCOL_ERROR);
-            } else {
-                firstFrame = false;
             }
         }
         return frameType;
@@ -463,6 +554,19 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
+    private void readFully(ByteBuffer dest, int len) throws IOException {
+        int read = 0;
+        while (read < len) {
+            int thisTime = socketWrapper.read(true, dest.array(), dest.arrayOffset(), len -read);
+            if (thisTime == -1) {
+                throw new EOFException(sm.getString("upgradeHandler.unexpectedEos"));
+            }
+            read += thisTime;
+        }
+        dest.position(dest.position() + read);
+    }
+
+
     private Stream getStream(int streamId) {
         Integer key = Integer.valueOf(streamId);
 
@@ -484,5 +588,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         } catch (IOException ioe) {
             log.debug(sm.getString("upgradeHandler.socketCloseFailed"), ioe);
         }
+    }
+
+
+    @Override
+    protected final Log getLog() {
+        return log;
     }
 }
