@@ -49,6 +49,9 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
 
     private static final int FRAME_SETTINGS = 4;
 
+    private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
+
     private volatile SocketWrapperBase<?> socketWrapper;
     private volatile boolean initialized = false;
     private volatile ConnectionPrefaceParser connectionPrefaceParser =
@@ -56,12 +59,20 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
     private volatile boolean firstFrame = true;
     private volatile boolean open = true;
 
-    private volatile int settingsMaxFrameSize = 16 * 1024;
-
+    private final ConnectionSettings remoteSettings = new ConnectionSettings();
 
     @Override
     public void init(WebConnection unused) {
         initialized = true;
+
+        // Send the initial settings frame
+        try {
+            socketWrapper.write(true, SETTINGS_EMPTY, 0, SETTINGS_EMPTY.length);
+            socketWrapper.flush(true);
+        } catch (IOException ioe) {
+            // TODO i18n
+            throw new IllegalStateException("Failed to send preface to client", ioe);
+        }
     }
 
 
@@ -147,31 +158,70 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
         }
 
         int frameType = getFrameType(frameHeader);
+        int flags = frameHeader[4] & 0xFF;
         int streamId = getStreamIdentifier(frameHeader);
         int payloadSize = getPayloadSize(streamId, frameHeader);
 
         switch (frameType) {
         case FRAME_SETTINGS:
-            processFrameSettings(streamId, payloadSize);
+            processFrameSettings(flags, streamId, payloadSize);
             break;
         default:
             // Unknown frame type.
             processFrameUnknown(streamId, frameType, payloadSize);
         }
-        return false;
+        return true;
     }
 
 
-    private void processFrameSettings(int streamId, int payloadSize) throws IOException {
+    private void processFrameSettings(int flags, int streamId, int payloadSize) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.processFrameSettings", Integer.toString(flags),
+                    Integer.toString(streamId), Integer.toString(payloadSize)));
+        }
+        // Validate the frame
         if (streamId != 0) {
             // TODO i18n
             throw new Http2Exception("", 0, Http2Exception.FRAME_SIZE_ERROR);
         }
-
         if (payloadSize % 6 != 0) {
             // TODO i18n
             throw new Http2Exception("", 0, Http2Exception.FRAME_SIZE_ERROR);
         }
+        if (payloadSize > 0 && (flags & 0x1) != 0) {
+            // TODO i18n
+            throw new Http2Exception("", 0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+
+        if (payloadSize == 0) {
+            // Either an ACK or an empty settings frame
+            if ((flags & 0x1) != 0) {
+                // TODO process ACK
+            }
+        } else {
+            // Process the settings
+            byte[] setting = new byte[6];
+            for (int i = 0; i < payloadSize / 6; i++) {
+                int read = 0;
+                while (read < 6) {
+                    int thisTime = socketWrapper.read(true, setting, read, setting.length - read);
+                    if (thisTime == -1) {
+                        // TODO i18n
+                        throw new EOFException();
+                    }
+                    read += thisTime;
+                }
+                int id = ((setting[0] & 0xFF) << 8) + (setting[1] & 0xFF);
+                long value = ((setting[2] & 0xFF) << 24) + ((setting[3] & 0xFF) << 16) +
+                        ((setting[4] & 0xFF) << 8) + (setting[5] & 0xFF);
+                remoteSettings.set(id, value);
+            }
+        }
+
+        // Acknowledge the settings
+        // TODO Need to coordinate writes with other threads
+        socketWrapper.write(true, SETTINGS_ACK, 0, SETTINGS_ACK.length);
+        socketWrapper.flush(true);
     }
 
 
@@ -208,7 +258,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
 
         // Partial header read. Blocking within a frame to block while the
         // remainder is read.
-        if (headerBytesRead < frameHeader.length) {
+        while (headerBytesRead < frameHeader.length) {
             int read = socketWrapper.read(true, frameHeader, headerBytesRead,
                     frameHeader.length - headerBytesRead);
             if (read == -1) {
@@ -249,7 +299,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
                 ((frameHeader[1] & 0xFF) << 8) +
                 (frameHeader[2] & 0xFF);
 
-        if (payloadSize > settingsMaxFrameSize) {
+        if (payloadSize > remoteSettings.getMaxFrameSize()) {
             swallowPayload(payloadSize);
             // TODO i18n
             throw new Http2Exception("", streamId, Http2Exception.FRAME_SIZE_ERROR);
