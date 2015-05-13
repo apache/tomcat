@@ -20,18 +20,23 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Used to managed prioritisation.
  */
 abstract class AbstractStream {
 
-    private static final int DEFAULT_WEIGHT = 16;
+    private static final Log log = LogFactory.getLog(AbstractStream.class);
+    private static final StringManager sm = StringManager.getManager(AbstractStream.class);
 
     private final Integer identifier;
 
     private volatile AbstractStream parentStream = null;
     private final Set<AbstractStream> childStreams = new HashSet<>();
-    private volatile int weight = DEFAULT_WEIGHT;
+    private volatile int weight = Constants.DEFAULT_WEIGHT;
 
     public Integer getIdentifier() {
         return identifier;
@@ -43,7 +48,12 @@ abstract class AbstractStream {
     }
 
 
-    public void rePrioritise(Stream parent, boolean exclusive, int weight) {
+    public void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("abstractStream.reprioritisation.debug", identifier,
+                    Boolean.toString(exclusive), parent.getIdentifier(), Integer.toString(weight)));
+        }
+
         // Check if new parent is a descendant of this stream
         if (isDescendant(parent)) {
             parent.detachFromParent();
