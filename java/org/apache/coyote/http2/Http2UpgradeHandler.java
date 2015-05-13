@@ -183,8 +183,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         int frameType = getFrameType(frameHeader);
-        int flags = frameHeader[4] & 0xFF;
-        int streamId = getStreamIdentifier(frameHeader);
+        int flags = ByteUtil.getOneByte(frameHeader, 4);
+        int streamId = ByteUtil.get31Bits(frameHeader, 5);
         int payloadSize = getPayloadSize(streamId, frameHeader);
 
         switch (frameType) {
@@ -224,10 +224,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         byte[] payload = new byte[5];
         readFully(payload);
 
-        boolean exclusive = (payload[0] & 0x80) > 0;
-        int parentStreamId = ((payload[0] & 0x7F) << 24) + ((payload[1] & 0xFF) << 16) +
-                ((payload[2] & 0xFF) << 8) + (payload[3] & 0xFF);
-        int weight = (payload[4] & 0xFF) + 1;
+        boolean exclusive = ByteUtil.isBit7Set(payload[0]);
+        int parentStreamId = ByteUtil.get31Bits(payload, 0);
+        int weight = ByteUtil.getOneByte(payload, 4) + 1;
 
         Stream stream = getStream(streamId);
         AbstractStream parentStream;
@@ -280,9 +279,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             byte[] setting = new byte[6];
             for (int i = 0; i < payloadSize / 6; i++) {
                 readFully(setting);
-                int id = ((setting[0] & 0xFF) << 8) + (setting[1] & 0xFF);
-                long value = ((setting[2] & 0xFF) << 24) + ((setting[3] & 0xFF) << 16) +
-                        ((setting[4] & 0xFF) << 8) + (setting[5] & 0xFF);
+                int id = ByteUtil.getTwoBytes(setting, 0);
+                long value = ByteUtil.getFourBytes(setting, 2);
                 remoteSettings.set(id, value);
             }
         }
@@ -310,8 +308,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         byte[] payload = new byte[4];
         readFully(payload);
-        int windowSizeIncrement = ((payload[0] & 0x7F) << 24) + ((payload[1] & 0xFF) << 16) +
-                ((payload[2] & 0xFF) << 8) + (payload[3] & 0xFF);
+        int windowSizeIncrement = ByteUtil.get31Bits(payload, 0);
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.processFrameWindowUpdate.debug",
@@ -383,7 +380,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     private int getFrameType(byte[] frameHeader) throws IOException {
-        int frameType = frameHeader[3] & 0xFF;
+        int frameType = ByteUtil.getOneByte(frameHeader, 3);
         // Make sure the first frame is a settings frame
         if (firstFrame) {
             if (frameType != FRAME_TYPE_SETTINGS) {
@@ -397,18 +394,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private int getStreamIdentifier(byte[] frameHeader) {
-        // MSB of [5] is reserved and must be ignored.
-        return ((frameHeader[5] & 0x7F) << 24) + ((frameHeader[6] & 0xFF) << 16) +
-                ((frameHeader[7] & 0xFF) << 8) + (frameHeader[8] & 0xFF);
-    }
-
-
     private int getPayloadSize(int streamId, byte[] frameHeader) throws IOException {
         // Make sure the payload size is valid
-        int payloadSize = ((frameHeader[0] & 0xFF) << 16) +
-                ((frameHeader[1] & 0xFF) << 8) +
-                (frameHeader[2] & 0xFF);
+        int payloadSize = ByteUtil.getThreeBytes(frameHeader, 0);
 
         if (payloadSize > remoteSettings.getMaxFrameSize()) {
             swallowPayload(payloadSize);
