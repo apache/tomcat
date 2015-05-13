@@ -274,8 +274,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             try {
                 hpackDecoder.decode(headerReadBuffer);
             } catch (HpackException hpe) {
-                // TODO i18n
-                throw new Http2Exception("", 0, Http2Exception.PROTOCOL_ERROR);
+                throw new Http2Exception(
+                        sm.getString("upgradeHandler.processFrameHeaders.decodingFailed"),
+                        0, Http2Exception.PROTOCOL_ERROR);
             }
             // switches to write mode
             headerReadBuffer.compact();
@@ -283,8 +284,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
         // Should be empty at this point
         if (headerReadBuffer.position() > 0) {
-            // TODO i18n
-            throw new Http2Exception("", 0, Http2Exception.PROTOCOL_ERROR);
+            throw new Http2Exception(
+                    sm.getString("upgradeHandler.processFrameHeaders.decodingDataLeft"),
+                    0, Http2Exception.PROTOCOL_ERROR);
         }
 
         if (padLength > 0) {
