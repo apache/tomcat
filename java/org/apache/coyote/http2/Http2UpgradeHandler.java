@@ -122,7 +122,7 @@ public class Http2UpgradeHandler implements InternalHttpUpgradeHandler {
                 }
             } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug("TODO: i18n - I/O error during frame processing", ioe);
+                    log.debug(sm.getString("upgradeHandler.processFrame.ioerror"), ioe);
                 }
                 close();
                 return SocketState.CLOSED;
