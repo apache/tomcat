@@ -58,6 +58,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.63 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Add a workaround for issues with SPNEGO authentication when running on
+        Java 8 update 40 and later. The workaround should be safe for earlier
+        Java versions but it can be disabled with the
+        <code>applyJava8u40Fix</code> attribute of the SPNEGO authenticator if
+        necessary. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
