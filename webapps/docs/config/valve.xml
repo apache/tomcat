@@ -1438,6 +1438,17 @@
 
     <attributes>
 
+      <attribute name="applyJava8u40Fix" required="false">
+        <p>A fix introduced in Java 8 update 40 (
+        <a href="https://bugs.openjdk.java.net/browse/JDK-8048194">JDK-8048194</a>)
+        onwards broke SPNEGO authentication for IE with Tomcat running on
+        Windows 2008 R2 servers. This option enables a work-around that allows
+        SPNEGO authentication to continue working. The work-around should not
+        impact other configurations so it is enabled by default. If necessary,
+        the workaround can be disabled by setting this attribute to
+        <code>false</code>.</p>
+      </attribute>
+
       <attribute name="alwaysUseSession" required="false">
         <p>Should a session always be used once a user is authenticated? This
         may offer some performance benefits since the session can then be used
