@@ -158,7 +158,7 @@
       </fix>
       <fix>
         <bug>57833</bug>: When using JKS based keystores for NIO, ensure that
-        the key alias is always converted to lower caes since that is what JKS
+        the key alias is always converted to lower case since that is what JKS
         key stores expect. Based on a patch by  Santosh Giri Govind M. (markt)
       </fix>
       <fix>
