@@ -523,8 +523,8 @@
 
   <!-- ==================== Built In Filter Mappings ====================== -->
 
-<!--
   <!-- The mapping for the HTTP header security Filter -->
+<!--
     <filter-mapping>
         <filter-name>httpHeaderSecurity</filter-name>
         <url-pattern>/*</url-pattern>
