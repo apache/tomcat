@@ -724,9 +724,11 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     <attributes>
 
       <attribute name="hstsEnabled" required="false">
-        <p>Will an HTTP Strict Transport Security (HSTS) header be added to the
-        response. See <a href="http://tools.ietf.org/html/rfc6797">RFC 6797</a>
-        for further details of HSTS. If not specified, the default value of
+        <p>Will an HTTP Strict Transport Security (HSTS) header
+        (<code>Strict-Transport-Security</code>) be set on the response for
+        secure requests. Any HSTS header already present will be replaced. See
+        <a href="http://tools.ietf.org/html/rfc6797">RFC 6797</a> for further
+        details of HSTS. If not specified, the default value of
         <code>true</code> will be used.</p>
       </attribute>
 
@@ -743,8 +745,9 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="antiClickJackingEnabled" required="false">
-        <p>Should the anti click-jacking <code>X-Frame-Options</code> be added
-        to the response. If not specified, the default value of
+        <p>Should the anti click-jacking header (<code>X-Frame-Options</code>)
+        be set on the response. Any anti click-jacking header already present
+        will be replaced. If not specified, the default value of
         <code>true</code> will be used.</p>
       </attribute>
 
@@ -762,9 +765,10 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="blockContentTypeSniffingEnabled" required="false">
-        <p>Should the header that blocks content type sniffing be added to every
-        response. If not specified, the default value of <code>true</code> will
-        be used.</p>
+        <p>Should the header that blocks content type sniffing
+        (<code>X-Content-Type-Options</code>) be set on every response. If
+        already present, the header will be replaced. If not specified, the
+        default value of <code>true</code> will be used.</p>
       </attribute>
 
     </attributes>
