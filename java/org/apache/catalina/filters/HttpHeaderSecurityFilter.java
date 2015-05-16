@@ -89,18 +89,18 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
         // HSTS
         if (hstsEnabled && request.isSecure() && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).addHeader(HSTS_HEADER_NAME, hstsHeaderValue);
+            ((HttpServletResponse) response).setHeader(HSTS_HEADER_NAME, hstsHeaderValue);
         }
 
         // anti click-jacking
         if (antiClickJackingEnabled && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).addHeader(
+            ((HttpServletResponse) response).setHeader(
                     ANTI_CLICK_JACKING_HEADER_NAME, antiClickJackingHeaderValue);
         }
 
         // Block content type sniffing
         if (blockContentTypeSniffingEnabled && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).addHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
+            ((HttpServletResponse) response).setHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
                     BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
         }
         chain.doFilter(request, response);
