@@ -406,7 +406,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             manager = managerTemplate.cloneFromTemplate();
             manager.setName(name);
         } catch (Exception x) {
-            log.error("Unable to clone cluster manager, defaulting to org.apache.catalina.ha.session.DeltaManager", x);
+            log.error(sm.getString("simpleTcpCluster.clustermanager.cloneFailed"), x);
             manager = new org.apache.catalina.ha.session.DeltaManager();
         } finally {
             if ( manager != null) manager.setCluster(this);
@@ -418,7 +418,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     public void registerManager(Manager manager) {
 
         if (! (manager instanceof ClusterManager)) {
-            log.warn("Manager [ " + manager + "] does not implement ClusterManager, addition to cluster has been aborted.");
+            log.warn(sm.getString("simpleTcpCluster.clustermanager.notImplement", manager));
             return;
         }
         ClusterManager cmanager = (ClusterManager) manager ;
@@ -534,7 +534,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     @Override
     protected void startInternal() throws LifecycleException {
 
-        if (log.isInfoEnabled()) log.info("Cluster is about to start");
+        if (log.isInfoEnabled()) log.info(sm.getString("simpleTcpCluster.start"));
 
         try {
             checkDefaults();
@@ -545,7 +545,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             if (clusterDeployer != null) clusterDeployer.start();
             registerMember(channel.getLocalMember(false));
         } catch (Exception x) {
-            log.error("Unable to start cluster.", x);
+            log.error(sm.getString("simpleTcpCluster.startUnable"), x);
             throw new LifecycleException(x);
         }
 
@@ -625,7 +625,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             channel.removeMembershipListener(this);
             this.unregisterClusterValve();
         } catch (Exception x) {
-            log.error("Unable to stop cluster.", x);
+            log.error(sm.getString("simpleTcpCluster.stopUnable"), x);
         }
     }
 
@@ -689,7 +689,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                 if (!getLocalMember().equals(dest)) {
                     channel.send(new Member[] {dest}, msg, sendOptions);
                 } else
-                    log.error("Unable to send message to local member " + msg);
+                    log.error(sm.getString("simpleTcpCluster.unableSend.localMember", msg));
             } else {
                 Member[] destmembers = channel.getMembers();
                 if (destmembers.length>0)
@@ -698,7 +698,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
                     log.debug("No members in cluster, ignoring message:"+msg);
             }
         } catch (Exception x) {
-            log.error("Unable to send message through cluster sender.", x);
+            log.error(sm.getString("simpleTcpCluster.sendFailed"), x);
         }
     }
 
@@ -711,7 +711,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     public void memberAdded(Member member) {
         try {
             hasMembers = channel.hasMembers();
-            if (log.isInfoEnabled()) log.info("Replication member added:" + member);
+            if (log.isInfoEnabled()) log.info(sm.getString("simpleTcpCluster.member.added", member));
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(BEFORE_MEMBERREGISTER_EVENT, member);
 
@@ -720,7 +720,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(AFTER_MEMBERREGISTER_EVENT, member);
         } catch (Exception x) {
-            log.error("Unable to connect to replication system.", x);
+            log.error(sm.getString("simpleTcpCluster.member.addFailed"), x);
         }
 
     }
@@ -734,7 +734,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     public void memberDisappeared(Member member) {
         try {
             hasMembers = channel.hasMembers();
-            if (log.isInfoEnabled()) log.info("Received member disappeared:" + member);
+            if (log.isInfoEnabled()) log.info(sm.getString("simpleTcpCluster.member.disappeared", member));
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(BEFORE_MEMBERUNREGISTER_EVENT, member);
 
@@ -743,7 +743,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(AFTER_MEMBERUNREGISTER_EVENT, member);
         } catch (Exception x) {
-            log.error("Unable remove cluster node from replication system.", x);
+            log.error(sm.getString("simpleTcpCluster.member.removeFailed"), x);
         }
     }
 
