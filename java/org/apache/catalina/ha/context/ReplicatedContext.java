@@ -70,8 +70,8 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             }
             super.startInternal();
         }  catch ( Exception x ) {
-            log.error(sm.getString("replicatedContext.startUnable"),x);
-            throw new LifecycleException(sm.getString("replicatedContext.startFailed"),x);
+            log.error(sm.getString("replicatedContext.startUnable", getName()),x);
+            throw new LifecycleException(sm.getString("replicatedContext.startFailed", getName()),x);
         }
     }
 
