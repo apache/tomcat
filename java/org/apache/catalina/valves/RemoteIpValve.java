@@ -31,6 +31,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
  * <p>
@@ -566,6 +567,8 @@ public class RemoteIpValve extends ValveBase {
         final String originalScheme = request.getScheme();
         final boolean originalSecure = request.isSecure();
         final int originalServerPort = request.getServerPort();
+        final String originalProxiesHeader = request.getHeader(proxiesHeader);
+        final String originalRemoteIpHeader = request.getHeader(remoteIpHeader);
 
         if (internalProxies !=null &&
                 internalProxies.matcher(originalRemoteAddr).matches()) {
@@ -677,10 +680,23 @@ public class RemoteIpValve extends ValveBase {
 
             request.setSecure(originalSecure);
 
+            MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
             // use request.coyoteRequest.scheme instead of request.setScheme() because request.setScheme() is no-op in Tomcat 6.0
             request.getCoyoteRequest().scheme().setString(originalScheme);
 
             request.setServerPort(originalServerPort);
+
+            if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
+                headers.removeHeader(proxiesHeader);
+            } else {
+                headers.setValue(proxiesHeader).setString(originalProxiesHeader);
+            }
+
+            if (originalRemoteIpHeader == null || originalRemoteIpHeader.length() == 0) {
+                headers.removeHeader(remoteIpHeader);
+            } else {
+                headers.setValue(remoteIpHeader).setString(originalRemoteIpHeader);
+            }
         }
     }
 
