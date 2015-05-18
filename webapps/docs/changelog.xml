@@ -60,6 +60,12 @@
 <section name="Tomcat 7.0.63 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>54618</bug>: Add a new <code>HttpHeaderSecurityFilter</code> that
+        adds the <code>Strict-Transport-Security</code>,
+        <code>X-Frame-Options</code> and <code>X-Content-Type-Options</code>
+        HTTP headers to the response. (markt)
+      </add>
       <fix>
         Add a workaround for issues with SPNEGO authentication when running on
         Java 8 update 40 and later. The workaround should be safe for earlier

@@ -395,6 +395,46 @@
 
   <!-- ================== Built In Filter Definitions ===================== -->
 
+  <!-- A filter that sets various security related HTTP Response headers.   -->
+  <!-- This filter supports the following initialization parameters         -->
+  <!-- (default values are in square brackets):                             -->
+  <!--                                                                      -->
+  <!--   hstsEnabled         Should the HTTP Strict Transport Security      -->
+  <!--                       (HSTS) header be added to the response? See    -->
+  <!--                       RFC 6797 for more information on HSTS. [true]  -->
+  <!--                                                                      -->
+  <!--   hstsMaxAgeSeconds   The max age value that should be used in the   -->
+  <!--                       HSTS header. Negative values will be treated   -->
+  <!--                       as zero. [0]                                   -->
+  <!--                                                                      -->
+  <!--   hstsIncludeSubDomains                                              -->
+  <!--                       Should the includeSubDomains parameter be      -->
+  <!--                       included in the HSTS header.                   -->
+  <!--                                                                      -->
+  <!--   antiClickJackingEnabled                                            -->
+  <!--                       Should the anti click-jacking header           -->
+  <!--                       X-Frame-Options be added to every response?    -->
+  <!--                       [true]                                         -->
+  <!--                                                                      -->
+  <!--   antiClickJackingOption                                             -->
+  <!--                       What value should be used for the header. Must -->
+  <!--                       be one of DENY, SAMEORIGIN, ALLOW-FROM         -->
+  <!--                       (case-insensitive). [DENY]                     -->
+  <!--                                                                      -->
+  <!--   antiClickJackingUri IF ALLOW-FROM is used, what URI should be      -->
+  <!--                       allowed? []                                    -->
+  <!--                                                                      -->
+  <!--   blockContentTypeSniffingEnabled                                    -->
+  <!--                       Should the header that blocks content type     -->
+  <!--                       sniffing be added to every response? [true]    -->
+<!--
+    <filter>
+        <filter-name>httpHeaderSecurity</filter-name>
+        <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
+        <async-supported>true</async-supported>
+    </filter>
+-->
+
   <!-- A filter that sets character encoding that is used to decode -->
   <!-- parameters in a POST request -->
 <!--
@@ -482,6 +522,15 @@
 
 
   <!-- ==================== Built In Filter Mappings ====================== -->
+
+  <!-- The mapping for the HTTP header security Filter -->
+<!--
+    <filter-mapping>
+        <filter-name>httpHeaderSecurity</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+-->
 
   <!-- The mapping for the Set Character Encoding Filter -->
 <!--

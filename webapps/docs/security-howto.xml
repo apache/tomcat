@@ -469,6 +469,13 @@ server.info=Apache Tomcat/7.0.x
     can be configured and used to reject requests that had errors during
     request parameter parsing. Without the filter the default behaviour is
     to ignore invalid or excessive parameters.</p>
+
+    <p><a href="config/filter.html">HttpHeaderSecurityFilter</a> can be
+    used to add headers to responses to improve security. If clients access
+    Tomcat directly, then you probably want to enable this filter and all the
+    headers it sets unless your application is already setting them. If Tomcat
+    is accessed via a reverse proxy, then the configuration of this filter needs
+    to be co-ordinated with any headers that the reverse proxy sets.</p>
   </section>
 
   <section name="General">
