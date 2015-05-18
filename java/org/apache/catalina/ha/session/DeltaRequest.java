@@ -142,7 +142,7 @@ public class DeltaRequest implements Externalizable {
             try {
                 info = actionPool.removeFirst();
             }catch ( Exception x ) {
-                log.error("Unable to remove element:",x);
+                log.error(sm.getString("deltaRequest.removeUnable"),x);
                 info = new AttributeInfo(type, action, name, value);
             }
             info.init(type,action,name,value);
@@ -164,7 +164,7 @@ public class DeltaRequest implements Externalizable {
 
     public void execute(DeltaSession session, boolean notifyListeners) {
         if ( !this.sessionId.equals( session.getId() ) )
-            throw new java.lang.IllegalArgumentException("Session id mismatch, not executing the delta request");
+            throw new java.lang.IllegalArgumentException(sm.getString("deltaRequest.ssid.mismatch"));
         session.access();
         for ( int i=0; i<actions.size(); i++ ) {
             AttributeInfo info = actions.get(i);
@@ -210,7 +210,7 @@ public class DeltaRequest implements Externalizable {
                     }
                     break;
                 default :
-                    throw new java.lang.IllegalArgumentException("Invalid attribute info type="+info);
+                    throw new java.lang.IllegalArgumentException(sm.getString("deltaRequest.invalidAttributeInfoType", info));
             }//switch
         }//for
         session.endAccess();
@@ -224,7 +224,7 @@ public class DeltaRequest implements Externalizable {
                 info.recycle();
                 actionPool.addLast(info);
             }catch  ( Exception x ) {
-                log.error("Unable to remove element",x);
+                log.error(sm.getString("deltaRequest.removeUnable"),x);
             }
         }
         actions.clear();
@@ -236,7 +236,7 @@ public class DeltaRequest implements Externalizable {
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
         if ( sessionId == null ) {
-            new Exception("Session Id is null for setSessionId").fillInStackTrace().printStackTrace();
+            new Exception(sm.getString("deltaRequest.ssid.null")).fillInStackTrace().printStackTrace();
         }
     }
     public int getSize() {
@@ -268,7 +268,7 @@ public class DeltaRequest implements Externalizable {
                 try {
                     info = actionPool.removeFirst();
                 } catch ( Exception x )  {
-                    log.error("Unable to remove element",x);
+                    log.error(sm.getString("deltaRequest.removeUnable"),x);
                     info = new AttributeInfo();
                 }
             }
