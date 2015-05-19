@@ -28,6 +28,10 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
+import javax.net.ssl.SSLException;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  *
@@ -37,6 +41,8 @@ import javax.net.ssl.SSLEngineResult.Status;
  */
 
 public class SecureNioChannel extends NioChannel  {
+
+    protected static final Log log = LogFactory.getLog(SecureNioChannel.class);
 
     protected ByteBuffer netInBuffer;
     protected ByteBuffer netOutBuffer;
@@ -172,10 +178,20 @@ public class SecureNioChannel extends NioChannel  {
                 }
                 case NEED_WRAP: {
                     //perform the wrap function
-                    handshake = handshakeWrap(write);
-                    if ( handshake.getStatus() == Status.OK ){
+                    try {
+                        handshake = handshakeWrap(write);
+                    } catch (SSLException e) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("channel.nio.ssl.wrapException"), e);
+                        }
+                        handshake = handshakeWrap(write);
+                    }
+                    if (handshake.getStatus() == Status.OK) {
                         if (handshakeStatus == HandshakeStatus.NEED_TASK)
                             handshakeStatus = tasks();
+                    } else if (handshake.getStatus() == Status.CLOSED) {
+                        flush(netOutBuffer);
+                        return -1;
                     } else {
                         //wrap should always work with our buffers
                         throw new IOException("Unexpected status:" + handshake.getStatus() + " during handshake WRAP.");
@@ -568,5 +584,4 @@ public class SecureNioChannel extends NioChannel  {
     public SocketChannel getIOChannel() {
         return sc;
     }
-
 }
