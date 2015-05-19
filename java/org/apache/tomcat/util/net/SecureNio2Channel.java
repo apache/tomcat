@@ -223,10 +223,19 @@ public class SecureNio2Channel extends Nio2Channel  {
                 }
                 case NEED_WRAP: {
                     //perform the wrap function
-                    handshake = handshakeWrap();
-                    if (handshake.getStatus() == Status.OK){
+                    try {
+                        handshake = handshakeWrap();
+                    } catch (SSLException e) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("channel.nio.ssl.wrapException", e);
+                        }
+                        handshake = handshakeWrap();
+                    }
+                    if (handshake.getStatus() == Status.OK) {
                         if (handshakeStatus == HandshakeStatus.NEED_TASK)
                             handshakeStatus = tasks();
+                    } else if (handshake.getStatus() == Status.CLOSED) {
+                        return -1;
                     } else {
                         //wrap should always work with our buffers
                         throw new IOException(sm.getString("channel.nio.ssl.unexpectedStatusDuringWrap", handshake.getStatus()));
