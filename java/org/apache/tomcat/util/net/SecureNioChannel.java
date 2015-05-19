@@ -90,6 +90,7 @@ public class SecureNioChannel extends NioChannel  {
         handshakeComplete = false;
         closed = false;
         closing = false;
+        netInBuffer.clear();
     }
 
 
