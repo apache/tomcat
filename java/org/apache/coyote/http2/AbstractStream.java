@@ -48,8 +48,9 @@ abstract class AbstractStream {
 
     public void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
         if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("abstractStream.reprioritisation.debug", identifier,
-                    Boolean.toString(exclusive), parent.getIdentifier(), Integer.toString(weight)));
+            getLog().debug(sm.getString("abstractStream.reprioritisation.debug",
+                    Long.toString(getConnectionId()), identifier, Boolean.toString(exclusive),
+                    parent.getIdentifier(), Integer.toString(weight)));
         }
 
         // Check if new parent is a descendant of this stream
@@ -120,4 +121,6 @@ abstract class AbstractStream {
     }
 
     protected abstract Log getLog();
+
+    protected abstract int getConnectionId();
 }

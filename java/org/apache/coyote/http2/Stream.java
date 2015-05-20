@@ -56,7 +56,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     @Override
     public void emitHeader(String name, String value, boolean neverIndex) {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.header.debug", getIdentifier(), name, value));
+            log.debug(sm.getString("stream.header.debug",
+                    Long.toString(getConnectionId()), getIdentifier(), name, value));
         }
 
         switch(name) {
@@ -95,19 +96,35 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void writeHeaders() {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("stream.write",
+                    Long.toString(getConnectionId()), getIdentifier()));
+        }
         // Format the frames.
         // TODO
+        handler.addWrite("HEADERS");
     }
 
 
     void flushData() {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("stream.write",
+                    Long.toString(getConnectionId()), getIdentifier()));
+        }
         // TODO
+        handler.addWrite("DATA");
     }
 
 
     @Override
     protected final Log getLog() {
         return log;
+    }
+
+
+    @Override
+    protected final int getConnectionId() {
+        return getParentStream().getConnectionId();
     }
 
 
