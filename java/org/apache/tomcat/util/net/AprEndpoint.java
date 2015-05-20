@@ -2510,7 +2510,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             if (result > 0) {
                 socketReadBuffer.position(socketReadBuffer.position() + result);
                 return result;
-            } else if (-result == Status.EAGAIN) {
+            } else if (result == 0 || -result == Status.EAGAIN) {
                 return 0;
             } else if (-result == Status.APR_EGENERAL && isSecure()) {
                 // Not entirely sure why this is necessary. Testing to date has not

@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.nio.charset.StandardCharsets;
 
+import org.apache.coyote.Adapter;
 import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
@@ -45,9 +46,9 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
     @Override
-    public Processor getProcessor(SocketWrapperBase<?> socketWrapper) {
+    public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter) {
         UpgradeProcessorInternal processor =
-                new UpgradeProcessorInternal(socketWrapper, null, new Http2UpgradeHandler());
+                new UpgradeProcessorInternal(socketWrapper, null, new Http2UpgradeHandler(adapter));
         return processor;
     }
 }

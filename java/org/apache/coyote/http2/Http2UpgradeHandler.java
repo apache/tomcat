@@ -25,6 +25,7 @@ import java.util.Map;
 
 import javax.servlet.http.WebConnection;
 
+import org.apache.coyote.Adapter;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -62,6 +63,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
 
+    private final Adapter adapter;
     private volatile SocketWrapperBase<?> socketWrapper;
     private volatile boolean initialized = false;
     private volatile ConnectionPrefaceParser connectionPrefaceParser =
@@ -79,8 +81,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private final Map<Integer,Stream> streams = new HashMap<>();
 
-    public Http2UpgradeHandler() {
+
+    public Http2UpgradeHandler(Adapter adapter) {
         super (STREAM_ID_ZERO);
+        this.adapter = adapter;
     }
 
 
@@ -129,6 +133,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             }
             connectionPrefaceParser = null;
 
+            // Process all the incoming data
             try {
                 while (processFrame()) {
                 }
@@ -149,6 +154,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 close();
                 return SocketState.CLOSED;
             }
+
+            // TODO process writes
 
             return SocketState.LONG;
 
@@ -292,6 +299,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         if (padLength > 0) {
             swallowPayload(padLength);
         }
+
+        // Process this stream on a container thread
+        StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
+        socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
     }
 
 
@@ -381,7 +392,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         // Acknowledge the settings
-        // TODO Need to coordinate writes with other threads
         socketWrapper.write(true, SETTINGS_ACK, 0, SETTINGS_ACK.length);
         socketWrapper.flush(true);
     }
@@ -590,6 +600,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         } catch (IOException ioe) {
             log.debug(sm.getString("upgradeHandler.socketCloseFailed"), ioe);
         }
+    }
+
+
+    String getProperty(String key) {
+        return socketWrapper.getEndpoint().getProperty(key);
     }
 
 
