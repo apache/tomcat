@@ -907,14 +907,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // result of calling AsyncContext.dispatch() from a non-container
             // thread
             synchronized (socket) {
-                if (waitingRequests.remove(socket)) {
-                    SocketProcessor proc = new SocketProcessor(socket, status);
-                    Executor executor = getExecutor();
-                    if (dispatch && executor != null) {
-                        executor.execute(proc);
-                    } else {
-                        proc.run();
-                    }
+                waitingRequests.remove(socket);
+                SocketProcessor proc = new SocketProcessor(socket, status);
+                Executor executor = getExecutor();
+                if (dispatch && executor != null) {
+                    executor.execute(proc);
+                } else {
+                    proc.run();
                 }
             }
         } catch (RejectedExecutionException ree) {
