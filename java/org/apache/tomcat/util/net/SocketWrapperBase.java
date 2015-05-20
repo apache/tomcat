@@ -596,6 +596,17 @@ public abstract class SocketWrapperBase<E> {
         holder.getBuf().put(buf,offset,length);
     }
 
+
+    public void processSocket(SocketStatus socketStatus, boolean dispatch) {
+        endpoint.processSocket(this, socketStatus, dispatch);
+    }
+
+
+    public void executeNonBlockingDispatches() {
+        endpoint.executeNonBlockingDispatches(this);
+    }
+
+
     public abstract void registerReadInterest();
 
     public abstract void registerWriteInterest();
@@ -625,28 +636,6 @@ public abstract class SocketWrapperBase<E> {
     public abstract void doClientAuth(SSLSupport sslSupport);
 
     public abstract SSLSupport getSslSupport(String clientCertProvider);
-
-
-    /*
-     * TODO
-     * Temporary method to aid in some refactoring.
-     * It is currently expected that this method will be removed in a subsequent
-     * refactoring.
-     */
-    public void processSocket(SocketStatus socketStatus, boolean dispatch) {
-        endpoint.processSocket(this, socketStatus, dispatch);
-    }
-
-
-    /*
-     * TODO
-     * Temporary method to aid in some refactoring.
-     * It is currently expected that this method will be removed in a subsequent
-     * refactoring.
-     */
-    public void executeNonBlockingDispatches() {
-        endpoint.executeNonBlockingDispatches(this);
-    }
 
 
     // ------------------------------------------------------- NIO 2 style APIs
