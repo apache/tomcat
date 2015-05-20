@@ -200,7 +200,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         serverSock.bind(addr,getBacklog());
 
         // Initialize thread count defaults for acceptor, poller
-        if (acceptorThreadCount == 0) {
+        if (acceptorThreadCount != 1) {
             // NIO2 does not allow any form of IO concurrency
             acceptorThreadCount = 1;
         }
