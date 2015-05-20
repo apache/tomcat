@@ -79,8 +79,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     public void action(ActionCode actionCode, Object param) {
         switch (actionCode) {
-        case REQ_HOST_ATTRIBUTE: {
-            request.remoteHost().setString(socketWrapper.getRemoteHost());
+        case REQ_HOST_ADDR_ATTRIBUTE: {
+            request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             break;
         }
         case IS_ERROR: {
@@ -99,6 +99,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             }
             break;
         }
+
+        //case REQ_HOST_ATTRIBUTE: {
+        //    request.remoteHost().setString(socketWrapper.getRemoteHost());
+        //    break;
+        //}
         default:
             // TODO
             log.debug("TODO: Action: " + actionCode);
