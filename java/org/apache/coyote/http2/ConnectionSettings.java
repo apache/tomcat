@@ -28,7 +28,8 @@ public class ConnectionSettings {
     private final StringManager sm = StringManager.getManager(ConnectionSettings.class);
 
     public static final int DEFAULT_WINDOW_SIZE = (1 << 16) - 1;
-    private static final int UNLIMITED = 1 << 32; // Use the maximum possible
+    // TODO: The maximum allowed in a settings frame as 2^32 (unsigned)
+    private static final int UNLIMITED = (1 << 31) -1; // Use the maximum possible
     private static final int MAX_WINDOW_SIZE = (1 << 31) - 1;
     private static final int MIN_MAX_FRAME_SIZE = 1 << 14;
     private static final int MAX_MAX_FRAME_SIZE = (1 << 24) - 1;
