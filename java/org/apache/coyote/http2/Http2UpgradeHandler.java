@@ -22,11 +22,15 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
+import org.apache.coyote.http2.WriteStateMachine.WriteState;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -52,6 +56,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
     private static final StringManager sm = StringManager.getManager(Http2UpgradeHandler.class);
 
+    private static final AtomicInteger connectionIdGenerator = new AtomicInteger(0);
     private static final Integer STREAM_ID_ZERO = Integer.valueOf(0);
 
     private static final int FRAME_TYPE_HEADERS = 1;
@@ -63,6 +68,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
 
+    private final int connectionId;
     private final Adapter adapter;
     private volatile SocketWrapperBase<?> socketWrapper;
     private volatile boolean initialized = false;
@@ -81,15 +87,22 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private final Map<Integer,Stream> streams = new HashMap<>();
 
+    private final WriteStateMachine writeStateMachine = new WriteStateMachine();
+    private final Queue<Object> writeQueue = new ConcurrentLinkedQueue<>();
 
     public Http2UpgradeHandler(Adapter adapter) {
         super (STREAM_ID_ZERO);
         this.adapter = adapter;
+        this.connectionId = connectionIdGenerator.getAndIncrement();
     }
 
 
     @Override
     public void init(WebConnection unused) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.init", Long.toString(connectionId)));
+        }
+
         initialized = true;
 
         // Send the initial settings frame
@@ -110,13 +123,21 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public SocketState upgradeDispatch(SocketStatus status) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.upgradeDispatch.entry",
+                    Long.toString(connectionId), status));
+        }
+
         if (!initialized) {
             // WebConnection is not used so passing null here is fine
             init(null);
         }
 
+        SocketState result = SocketState.CLOSED;
+
         switch(status) {
         case OPEN_READ:
+            writeStateMachine.startRead();
             // Gets set to null once the connection preface has been
             // successfully parsed.
             if (connectionPrefaceParser != null) {
@@ -124,10 +145,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     if (connectionPrefaceParser.isError()) {
                         // Any errors will have already been logged.
                         close();
-                        return SocketState.CLOSED;
+                        break;
                     } else {
                         // Incomplete
-                        return SocketState.LONG;
+                        result = SocketState.UPGRADED;
+                        break;
                     }
                 }
             }
@@ -142,7 +164,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     // Connection error
                     log.warn(sm.getString("upgradeHandler.connectionError"), h2e);
                     close(h2e);
-                    return SocketState.CLOSED;
+                    break;
                 } else {
                     // Stream error
                     // TODO Reset stream
@@ -152,15 +174,22 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     log.debug(sm.getString("upgradeHandler.processFrame.ioerror"), ioe);
                 }
                 close();
-                return SocketState.CLOSED;
+                result = SocketState.CLOSED;
+                break;
             }
 
-            // TODO process writes
+            if (writeStateMachine.endRead()) {
+                processWrites();
+            }
 
-            return SocketState.LONG;
+            result = SocketState.UPGRADED;
+            break;
 
         case OPEN_WRITE:
-            // TODO
+            if (writeStateMachine.startWrite()) {
+                processWrites();
+            }
+            result = SocketState.UPGRADED;
             break;
 
         case ASYNC_READ_ERROR:
@@ -178,13 +207,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // For all of the above, including the unexpected values, close the
             // connection.
             close();
-            return SocketState.CLOSED;
+            result = SocketState.CLOSED;
+            break;
         }
 
-        // TODO This is for debug purposes to make sure ALPN is working.
-        log.fatal("TODO: Handle SocketStatus: " + status);
-        close();
-        return SocketState.CLOSED;
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.upgradeDispatch.exit",
+                    Long.toString(connectionId), result));
+        }
+        return result;
     }
 
 
@@ -224,8 +255,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private void processFrameHeaders(int flags, int streamId, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.processFrame",
-                    Integer.toString(FRAME_TYPE_HEADERS), Integer.toString(flags),
-                    Integer.toString(streamId), Integer.toString(payloadSize)));
+                    Long.toString(connectionId), Integer.toString(streamId),
+                    Integer.toString(flags), Integer.toString(payloadSize)));
         }
 
         // Validate the stream
@@ -309,8 +340,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private void processFramePriority(int flags, int streamId, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.processFrame",
-                    Integer.toString(FRAME_TYPE_PRIORITY), Integer.toString(flags),
-                    Integer.toString(streamId), Integer.toString(payloadSize)));
+                    Long.toString(connectionId), Integer.toString(streamId),
+                    Integer.toString(flags), Integer.toString(payloadSize)));
         }
         // Validate the frame
         if (streamId == 0) {
@@ -353,8 +384,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private void processFrameSettings(int flags, int streamId, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.processFrame",
-                    Integer.toString(FRAME_TYPE_SETTINGS), Integer.toString(flags),
-                    Integer.toString(streamId), Integer.toString(payloadSize)));
+                    Long.toString(connectionId), Integer.toString(streamId),
+                    Integer.toString(flags), Integer.toString(payloadSize)));
         }
         // Validate the frame
         if (streamId != 0) {
@@ -401,8 +432,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.processFrame",
-                    Integer.toString(FRAME_TYPE_WINDOW_UPDATE), Integer.toString(flags),
-                    Integer.toString(streamId), Integer.toString(payloadSize)));
+                    Long.toString(connectionId), Integer.toString(streamId),
+                    Integer.toString(flags), Integer.toString(payloadSize)));
         }
         // Validate the frame
         if (payloadSize != 4) {
@@ -417,7 +448,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.processFrameWindowUpdate.debug",
-                    Integer.toString(streamId), Integer.toString(windowSizeIncrement)));
+                    Long.toString(connectionId), Integer.toString(streamId),
+                    Integer.toString(windowSizeIncrement)));
         }
 
         // Validate the data
@@ -579,6 +611,44 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
+    private void processWrites() {
+        Object obj;
+        while ((obj = getThingToWrite()) != null) {
+            // TODO
+            log.debug("TODO: write [" + obj.toString() + "]");
+        }
+    }
+
+
+    private Object getThingToWrite() {
+        synchronized (writeStateMachine) {
+            // TODO This is more complicated than pulling an object off a queue.
+
+            // Note: The checking of the queue for something to write and the
+            //       calling of endWrite() if nothing is found must be kept
+            //       within the same sync to avoid race conditions with adding
+            //       entries to the queue.
+            Object obj = writeQueue.poll();
+            if (obj == null) {
+                 writeStateMachine.endWrite(WriteState.IDLE);
+            }
+            return obj;
+        }
+    }
+
+
+    void addWrite(Object obj) {
+        boolean needDispatch;
+        synchronized (writeStateMachine) {
+            writeQueue.add(obj);
+            needDispatch = writeStateMachine.addWrite();
+        }
+        if (needDispatch) {
+            socketWrapper.processSocket(SocketStatus.OPEN_WRITE, true);
+        }
+    }
+
+
     private Stream getStream(int streamId) {
         Integer key = Integer.valueOf(streamId);
 
@@ -605,6 +675,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     String getProperty(String key) {
         return socketWrapper.getEndpoint().getProperty(key);
+    }
+
+
+    @Override
+    protected final int getConnectionId() {
+        return connectionId;
     }
 
 
