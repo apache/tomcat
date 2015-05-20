@@ -96,13 +96,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void writeHeaders() {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.write",
-                    Long.toString(getConnectionId()), getIdentifier()));
+        try {
+            handler.writeHeaders(this, coyoteResponse);
+        } catch (IOException e) {
+            // TODO Handle this
+            e.printStackTrace();
         }
-        // Format the frames.
-        // TODO
-        handler.addWrite("HEADERS");
     }
 
 

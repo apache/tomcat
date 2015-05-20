@@ -29,10 +29,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.Adapter;
+import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
+import org.apache.coyote.http2.HpackEncoder.State;
 import org.apache.coyote.http2.WriteStateMachine.WriteState;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -59,13 +62,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final AtomicInteger connectionIdGenerator = new AtomicInteger(0);
     private static final Integer STREAM_ID_ZERO = Integer.valueOf(0);
 
+    private static final int FLAG_END_OF_STREAM = 1;
+    private static final int FLAG_END_OF_HEADERS = 4;
+
     private static final int FRAME_TYPE_HEADERS = 1;
     private static final int FRAME_TYPE_PRIORITY = 2;
     private static final int FRAME_TYPE_SETTINGS = 4;
     private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
+    private static final int FRAME_TYPE_CONTINUATION = 9;
 
     private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
     private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
+
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
 
     private final int connectionId;
@@ -159,6 +167,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             try {
                 while (processFrame()) {
                 }
+
+                // We are on a container thread. There is no more data to read
+                // so check for writes (more efficient than dispatching to a new
+                // thread).
+                if (writeStateMachine.endRead()) {
+                    processWrites();
+                }
             } catch (Http2Exception h2e) {
                 if (h2e.getStreamId() == 0) {
                     // Connection error
@@ -171,15 +186,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 }
             } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.processFrame.ioerror"), ioe);
+                    log.debug(sm.getString("upgradeHandler.ioerror",
+                            Long.toString(connectionId)), ioe);
                 }
                 close();
                 result = SocketState.CLOSED;
                 break;
-            }
-
-            if (writeStateMachine.endRead()) {
-                processWrites();
             }
 
             result = SocketState.UPGRADED;
@@ -187,7 +199,28 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         case OPEN_WRITE:
             if (writeStateMachine.startWrite()) {
-                processWrites();
+                try {
+                    processWrites();
+                } catch (Http2Exception h2e) {
+                    if (h2e.getStreamId() == 0) {
+                        // Connection error
+                        log.warn(sm.getString("upgradeHandler.connectionError"), h2e);
+                        close(h2e);
+                        break;
+                    } else {
+                        // Stream error
+                        // TODO Reset stream
+                    }
+                } catch (IOException ioe) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("upgradeHandler.ioerror",
+                                Long.toString(connectionId)), ioe);
+                    }
+                    close();
+                    result = SocketState.CLOSED;
+                    break;
+                }
+
             }
             result = SocketState.UPGRADED;
             break;
@@ -611,7 +644,52 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void processWrites() {
+    void writeHeaders(Stream stream, Response coyoteResponse) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.writeHeaders",
+                    Integer.toString(connectionId), stream.getIdentifier()));
+        }
+        MimeHeaders headers = coyoteResponse.getMimeHeaders();
+        // Add the pseudo header for status
+        headers.addValue(":status").setString(Integer.toString(coyoteResponse.getStatus()));
+        // This ensures the Stream processing thread has control of the socket.
+        synchronized (socketWrapper) {
+            // Frame sizes are allowed to be bigger than 4k but for headers that
+            // should be plenty
+            byte[] header = new byte[9];
+            ByteBuffer target = ByteBuffer.allocate(4 * 1024);
+            boolean first = true;
+            State state = null;
+            while (state != State.COMPLETE) {
+                state = hpackEncoder.encode(coyoteResponse.getMimeHeaders(), target);
+                target.flip();
+                ByteUtil.setThreeBytes(header, 0, target.limit());
+                if (first) {
+                    header[3] = FRAME_TYPE_HEADERS;
+                } else {
+                    header[3] = FRAME_TYPE_CONTINUATION;
+                }
+                if (state == State.COMPLETE) {
+                    // TODO Determine end of stream correctly
+                    header[4] = FLAG_END_OF_HEADERS + FLAG_END_OF_STREAM;
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug(target.limit() + " bytes");
+                }
+                ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+                socketWrapper.write(true, header, 0, header.length);
+                socketWrapper.write(true, target.array(), target.arrayOffset(), target.limit());
+                socketWrapper.flush(true);
+            }
+        }
+    }
+
+    private void processWrites() throws IOException {
+        if (socketWrapper.flush(false)) {
+            socketWrapper.registerWriteInterest();
+            return;
+        }
+
         Object obj;
         while ((obj = getThingToWrite()) != null) {
             // TODO
