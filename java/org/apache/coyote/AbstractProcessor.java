@@ -61,15 +61,31 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
         response = null;
     }
 
+
+    /**
+     * Used by HTTP/2.
+     *
+     * @param coyoteRequest
+     * @param coyoteResponse
+     */
+    protected AbstractProcessor(Request coyoteRequest, Response coyoteResponse) {
+        this(null, coyoteRequest, coyoteResponse);
+    }
+
+
     public AbstractProcessor(AbstractEndpoint<?> endpoint) {
+        this(endpoint, new Request(), new Response());
+    }
+
+
+    private AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest, Response coyoteResponse) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine(this);
-        request = new Request();
-        response = new Response();
+        request = coyoteRequest;
+        response = coyoteResponse;
         response.setHook(this);
         request.setResponse(response);
     }
-
 
     /**
      * Update the current error state to the new error state if the new error
