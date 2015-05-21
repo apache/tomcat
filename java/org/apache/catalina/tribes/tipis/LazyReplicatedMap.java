@@ -173,7 +173,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 //we published out to a backup, mark the test success
                 success = true;
             }catch ( ChannelException x ) {
-                log.error("Unable to replicate backup key:"+key+" to backup:"+next+". Reason:"+x.getMessage(),x);
+                log.error(sm.getString("lazyReplicatedMap.unableReplicate.backup", key, next, x.getMessage()), x);
             }
             try {
                 //publish the data out to all nodes
@@ -189,7 +189,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 //log the error, but proceed, this should only happen if a node went down,
                 //and if the node went down, then it can't receive the message, the others
                 //should still get it.
-                log.error("Unable to replicate proxy key:"+key+" to backup:"+next+". Reason:"+x.getMessage(),x);
+                log.error(sm.getString("lazyReplicatedMap.unableReplicate.proxy", key, next, x.getMessage()), x);
             }
         } while ( !success && (firstIdx!=nextIdx));
         return backup;

@@ -151,7 +151,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
             }
         }
         if (log.isInfoEnabled())
-            log.info("Member["+member+"] disappeared. Related map entries will be relocated to the new node.");
+            log.info(sm.getString("replicatedMap.member.disappeared", member));
         long start = System.currentTimeMillis();
         Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
         while (i.hasNext()) {
@@ -169,7 +169,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                     entry.setBackupNodes(backup);
                     entry.setPrimary(channel.getLocalMember(false));
                 } catch (ChannelException x) {
-                    log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
+                    log.error(sm.getString("replicatedMap.unable.relocate", entry.getKey()), x);
                 }
             } else if (member.equals(entry.getPrimary())) {
                 entry.setPrimary(null);
@@ -195,13 +195,13 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                     if ( mapOwner!=null ) mapOwner.objectMadePrimary(entry.getKey(),entry.getValue());
 
                 } catch (ChannelException x) {
-                    log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
+                    log.error(sm.getString("replicatedMap.unable.relocate", entry.getKey()), x);
                 }
             }
 
         } //while
         long complete = System.currentTimeMillis() - start;
-        if (log.isInfoEnabled()) log.info("Relocation of map entries was complete in " + complete + " ms.");
+        if (log.isInfoEnabled()) log.info(sm.getString("replicatedMap.relocate.complete", complete));
     }
 
     @Override
