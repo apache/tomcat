@@ -56,6 +56,8 @@ import org.apache.tomcat.util.res.StringManager;
  * (tested with v37.0.2) needs to be configured with
  * network.http.spdy.enforce-tls-profile=false in order for FireFox to be able
  * to connect.
+ *
+ * TODO: Review cookie parsing
  */
 public class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler {
 
