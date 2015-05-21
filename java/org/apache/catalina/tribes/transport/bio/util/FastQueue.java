@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.InterceptorPayload;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -31,12 +32,12 @@ import org.apache.juli.logging.LogFactory;
  * A fast queue that remover thread lock the adder thread. <br>Limit the queue
  * length when you have strange producer thread problems.
  *
- * FIXME add i18n support to log messages
  * @author Peter Rossbach
  */
 public class FastQueue {
 
     private static final Log log = LogFactory.getLog(FastQueue.class);
+    protected static final StringManager sm = StringManager.getManager(FastQueue.class);
 
     /**
      * This is the actual queue
@@ -197,7 +198,7 @@ public class FastQueue {
 
         if (!enabled) {
             if (log.isInfoEnabled())
-                log.info("FastQueue.add: queue disabled, add aborted");
+                log.info(sm.getString("fastQueue.queue.disabled"));
             return false;
         }
 
@@ -220,7 +221,7 @@ public class FastQueue {
                 } else {
                     if (last == null) {
                         ok = false;
-                        log.error("FastQueue.add: Could not add, since last is null although size is "+ size.get() + " (>0)");
+                        log.error(sm.getString("fastQueue.last.null", size.get()));
                     } else {
                         last.append(element);
                         last = element;
@@ -230,10 +231,10 @@ public class FastQueue {
             }
 
             if (first == null) {
-                log.error("FastQueue.add: first is null, size is " + size.get() + " at end of add");
+                log.error(sm.getString("fastQueue.first.null", size.get()));
             }
             if (last == null) {
-                log.error("FastQueue.add: last is null, size is " + size.get() + " at end of add");
+                log.error(sm.getString("fastQueue.last.null.end", size.get()));
             }
 
             if (log.isTraceEnabled()) log.trace("FastQueue.add: add ending with size " + size.get());
@@ -254,7 +255,7 @@ public class FastQueue {
 
         if (!enabled) {
             if (log.isInfoEnabled())
-                log.info("FastQueue.remove: queue disabled, remove aborted");
+                log.info(sm.getString("fastQueue.remove.queue.disabled"));
             return null;
         }
 
@@ -264,10 +265,10 @@ public class FastQueue {
             if (!gotLock) {
                 if (enabled) {
                     if (log.isInfoEnabled())
-                        log.info("FastQueue.remove: Remove aborted although queue enabled");
+                        log.info(sm.getString("fastQueue.remove.aborted"));
                 } else {
                     if (log.isInfoEnabled())
-                        log.info("FastQueue.remove: queue disabled, remove aborted");
+                        log.info(sm.getString("fastQueue.remove.queue.disabled"));
                 }
                 return null;
             }
