@@ -37,6 +37,7 @@ import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.util.Logs;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -53,6 +54,7 @@ import org.apache.juli.logging.LogFactory;
 public class NioReplicationTask extends AbstractRxTask {
 
     private static final Log log = LogFactory.getLog(NioReplicationTask.class);
+    protected static final StringManager sm = StringManager.getManager(NioReplicationTask.class);
 
     private ByteBuffer buffer = null;
     private SelectionKey key;
@@ -106,10 +108,10 @@ public class NioReplicationTask extends AbstractRxTask {
             } else if ( e instanceof IOException ) {
                 //dont spew out stack traces for IO exceptions unless debug is enabled.
                 if (log.isDebugEnabled()) log.debug ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].", e);
-                else log.warn ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].");
+                else log.warn (sm.getString("nioReplicationTask.unable.drainChannel.ioe", e.getMessage()));
             } else if ( log.isErrorEnabled() ) {
                 //this is a real error, log it.
-                log.error("Exception caught in TcpReplicationThread.drainChannel.",e);
+                log.error(sm.getString("nioReplicationTask.exception.drainChannel"),e);
             }
             cancelKey(key);
         }
@@ -213,10 +215,10 @@ public class NioReplicationTask extends AbstractRxTask {
                  */
                 if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND,saddr);
             }catch ( RemoteProcessException e ) {
-                if ( log.isDebugEnabled() ) log.error("Processing of cluster message failed.",e);
+                if ( log.isDebugEnabled() ) log.error(sm.getString("nioReplicationTask.process.clusterMsg.failed"),e);
                 if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
             }catch ( Exception e ) {
-                log.error("Processing of cluster message failed.",e);
+                log.error(sm.getString("nioReplicationTask.process.clusterMsg.failed"),e);
                 if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
             }
             if ( getUseBufferPool() ) {
@@ -261,7 +263,7 @@ public class NioReplicationTask extends AbstractRxTask {
                         log.trace("CKX Cancelling key:"+key);
 
                 } catch (Exception x) {
-                    log.error("Error registering key for read:"+key,x);
+                    log.error(sm.getString("nioReplicationTask.error.register.key", key),x);
                 }
             }
         };
@@ -320,7 +322,7 @@ public class NioReplicationTask extends AbstractRxTask {
                           ((DatagramChannel)channel).socket().getInetAddress()));
             }
         } catch ( java.io.IOException x ) {
-            log.warn("Unable to send ACK back through channel, channel disconnected?: "+x.getMessage());
+            log.warn(sm.getString("nioReplicationTask.unable.ack", x.getMessage()));
         }
     }
 
