@@ -63,20 +63,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    public SocketState process(SocketWrapperBase<?> socket) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
-    public SocketState dispatch(SocketStatus status) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
     public void action(ActionCode actionCode, Object param) {
         switch (actionCode) {
         case REQ_HOST_ADDR_ATTRIBUTE: {
@@ -112,16 +98,20 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    public void recycle() {
+    public void setSslSupport(SSLSupport sslSupport) {
         // TODO Auto-generated method stub
 
     }
 
 
     @Override
-    public void setSslSupport(SSLSupport sslSupport) {
-        // TODO Auto-generated method stub
-
+    public void recycle() {
+        // StreamProcessor instances are not re-used.
+        // Clear fields that can be cleared to aid GC and trigger NPEs if this
+        // is reused
+        setSocketWrapper(null);
+        setAdapter(null);
+        setClientCertProvider(null);
     }
 
 
@@ -134,6 +124,20 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     protected Log getLog() {
         return log;
+    }
+
+
+    @Override
+    public SocketState process(SocketWrapperBase<?> socket) throws IOException {
+        // Should never happen
+        throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));
+    }
+
+
+    @Override
+    public SocketState dispatch(SocketStatus status) {
+        // Should never happen
+        throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));
     }
 
 
