@@ -100,14 +100,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
 
     /**
-     * Use the object caches to reduce GC at the expense of additional memory use.
-     */
-    private boolean useCaches = true;
-    public void setUseCaches(boolean useCaches) { this.useCaches = useCaches; }
-    public boolean getUseCaches() { return useCaches; }
-
-
-    /**
      * Handling of accepted sockets.
      */
     private Handler handler = null;
@@ -153,10 +145,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
 
     protected void releaseCaches() {
-        if (useCaches) {
-            this.nioChannels.clear();
-            this.processorCache.clear();
-        }
+        this.nioChannels.clear();
+        this.processorCache.clear();
         if ( handler != null ) handler.recycle();
     }
 
@@ -221,12 +211,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             running = true;
             paused = false;
 
-            if (useCaches) {
-                processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                        socketProperties.getProcessorCache());
-                nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
-                        socketProperties.getBufferPool());
-            }
+            processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                    socketProperties.getProcessorCache());
+            nioChannels = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                    socketProperties.getBufferPool());
 
             // Create worker collection
             if ( getExecutor() == null ) {
@@ -277,10 +265,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     }
                 }
             });
-            if (useCaches) {
-                nioChannels.clear();
-                processorCache.clear();
-            }
+            nioChannels.clear();
+            processorCache.clear();
         }
     }
 
@@ -355,7 +341,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         try {
             socketProperties.setProperties(socket);
 
-            Nio2Channel channel = (useCaches) ? nioChannels.pop() : null;
+            Nio2Channel channel = nioChannels.pop();
             if (channel == null) {
                 SocketBufferHandler bufhandler = new SocketBufferHandler(
                         socketProperties.getAppReadBufSize(),
@@ -407,7 +393,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
     protected boolean processSocket0(SocketWrapperBase<Nio2Channel> socketWrapper, SocketStatus status, boolean dispatch) {
         try {
-            SocketProcessor sc = (useCaches) ? processorCache.pop() : null;
+            SocketProcessor sc = processorCache.pop();
             if (sc == null) {
                 sc = new SocketProcessor(socketWrapper, status);
             } else {
@@ -1664,7 +1650,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         if (state == SocketState.CLOSED) {
                             // Close socket and pool
                             closeSocket(socket);
-                            if (useCaches && running && !paused) {
+                            if (running && !paused) {
                                 nioChannels.push(socket.getSocket());
                             }
                         } else if (state == SocketState.UPGRADING) {
@@ -1673,7 +1659,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         }
                     } else if (handshake == -1 ) {
                         closeSocket(socket);
-                        if (useCaches && running && !paused) {
+                        if (running && !paused) {
                             nioChannels.push(socket.getSocket());
                         }
                     }
@@ -1698,7 +1684,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     socket = null;
                     status = null;
                     //return to cache
-                    if (useCaches && running && !paused) {
+                    if (running && !paused) {
                         processorCache.push(this);
                     }
                 }

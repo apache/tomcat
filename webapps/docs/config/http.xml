@@ -786,12 +786,6 @@
 
     <attributes>
 
-      <attribute name="useCaches" required="false">
-        <p>(bool)Use this attribute to enable or disable object caching to
-        reduce the amount of GC objects produced.
-        The default value is <code>false</code>.</p>
-      </attribute>
-
       <attribute name="useSendfile" required="false">
         <p>(bool)Use this attribute to enable or disable sendfile capability.
         The default value is <code>true</code>. Note that the use of sendfile
@@ -841,7 +835,7 @@
         dealing with tens of thousands concurrent connections.</p>
       </attribute>
 
-      <attribute name="socket.bufferPoolSize" required="false">
+      <attribute name="socket.bufferPool" required="false">
         <p>(int)The NIO2 connector uses a class called Nio2Channel that holds
         elements linked to a socket. To reduce garbage collection, the NIO2
         connector caches these channel objects. This value specifies the size of
