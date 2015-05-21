@@ -27,6 +27,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class ExecutorFactory {
+    protected static final StringManager sm = StringManager.getManager(ExecutorFactory.class);
 
     public static ExecutorService newThreadPool(int minThreads, int maxThreads, long maxIdleTime, TimeUnit unit) {
         TaskQueue taskqueue = new TaskQueue();
@@ -69,7 +70,7 @@ public class ExecutorFactory {
                 if (super.getQueue() instanceof TaskQueue) {
                     TaskQueue queue = (TaskQueue)super.getQueue();
                     if (!queue.force(command)) {
-                        throw new RejectedExecutionException("Queue capacity is full.");
+                        throw new RejectedExecutionException(sm.getString("executorFactory.queue.full"));
                     }
                 }
             }
@@ -91,7 +92,7 @@ public class ExecutorFactory {
         }
 
         public boolean force(Runnable o) {
-            if ( parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
+            if ( parent.isShutdown() ) throw new RejectedExecutionException(sm.getString("executorFactory.not.running"));
             return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
         }
 
