@@ -68,11 +68,14 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final int FRAME_TYPE_HEADERS = 1;
     private static final int FRAME_TYPE_PRIORITY = 2;
     private static final int FRAME_TYPE_SETTINGS = 4;
+    private static final int FRAME_TYPE_PING = 6;
     private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
     private static final int FRAME_TYPE_CONTINUATION = 9;
 
-    private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    private static final byte[] PING_ACK = { 0x00, 0x00, 0x08, 0x06, 0x01, 0x00, 0x00, 0x00, 0x00 };
+
     private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
+    private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
 
@@ -274,6 +277,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         case FRAME_TYPE_SETTINGS:
             processFrameSettings(flags, streamId, payloadSize);
             break;
+        case FRAME_TYPE_PING:
+            processFramePing(flags, streamId, payloadSize);
+            break;
         case FRAME_TYPE_WINDOW_UPDATE:
             processFrameWindowUpdate(flags, streamId, payloadSize);
             break;
@@ -458,6 +464,38 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         // Acknowledge the settings
         socketWrapper.write(true, SETTINGS_ACK, 0, SETTINGS_ACK.length);
         socketWrapper.flush(true);
+    }
+
+
+    private void processFramePing(int flags, int streamId, int payloadSize)
+            throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.processFrame",
+                    Long.toString(connectionId), Integer.toString(streamId),
+                    Integer.toString(flags), Integer.toString(payloadSize)));
+        }
+        // Validate the frame
+        if (streamId != 0) {
+            throw new Http2Exception(sm.getString("upgradeHandler.processFramePing.invalidStream",
+                    Integer.toString(streamId)), 0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+        if (payloadSize != 8) {
+            throw new Http2Exception(sm.getString("upgradeHandler.processFramePing.invalidPayloadSize",
+                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+        if ((flags & 0x1) == 0) {
+            // Read the payload
+            byte[] payload = new byte[8];
+            readFully(payload);
+            // Echo it back
+            socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
+            socketWrapper.write(true, payload, 0, payload.length);
+            socketWrapper.flush(true);
+        } else {
+            // This is an ACK.
+            // NO-OP (until such time this implementation decides in initiate
+            // pings)
+        }
     }
 
 
