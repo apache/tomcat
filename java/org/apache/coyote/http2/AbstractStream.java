@@ -35,6 +35,7 @@ abstract class AbstractStream {
     private volatile AbstractStream parentStream = null;
     private final Set<AbstractStream> childStreams = new HashSet<>();
     private volatile int weight = Constants.DEFAULT_WEIGHT;
+    private volatile long windowSize = ConnectionSettings.DEFAULT_WINDOW_SIZE;
 
     public Integer getIdentifier() {
         return identifier;
@@ -119,6 +120,35 @@ abstract class AbstractStream {
     Set<AbstractStream> getChildStreams() {
         return childStreams;
     }
+
+
+    protected void setWindowSize(long windowSize) {
+        this.windowSize = windowSize;
+    }
+
+
+    protected long getWindowSize() {
+        return windowSize;
+    }
+
+
+    protected void incrementWindowSize(int increment) {
+        windowSize += increment;
+    }
+
+
+    protected void decrementWindowSize(int decrement) {
+        windowSize += decrement;
+    }
+
+    protected int reserveWindowSize(int reservation) {
+        if (reservation > windowSize) {
+            return (int) windowSize;
+        } else {
+            return reservation;
+        }
+    }
+
 
     protected abstract Log getLog();
 
