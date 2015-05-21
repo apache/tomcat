@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
-import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.catalina.tribes.util.ExceptionUtils;
@@ -49,8 +48,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(NioReceiver.class);
 
     private volatile boolean running = false;
 
@@ -80,7 +78,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         try {
             setPool(new RxTaskPool(getMaxThreads(),getMinThreads(),this));
         } catch (Exception x) {
-            log.fatal(sm.getString("NioReceiver.threadpool.fail"), x);
+            log.fatal(sm.getString("nioReceiver.threadpool.fail"), x);
             if ( x instanceof IOException ) throw (IOException)x;
             else throw new IOException(x.getMessage());
         }
@@ -91,7 +89,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             t.setDaemon(true);
             t.start();
         } catch (Exception x) {
-            log.fatal(sm.getString("NioReceiver.start.fail"), x);
+            log.fatal(sm.getString("nioReceiver.start.fail"), x);
             if ( x instanceof IOException ) throw (IOException)x;
             else throw new IOException(x.getMessage());
         }
@@ -211,7 +209,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                         if (delta > getTimeout() && (!ka.isAccessed())) {
                             if (log.isWarnEnabled())
                                 log.warn(sm.getString(
-                                        "NioReceiver.threadsExhausted",
+                                        "nioReceiver.threadsExhausted",
                                         Integer.valueOf(getTimeout()),
                                         Boolean.valueOf(ka.isCancelled()),
                                         key,
@@ -239,7 +237,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
      */
     protected void listen() throws Exception {
         if (doListen()) {
-            log.warn(sm.getString("NioReceiver.alreadyStarted"));
+            log.warn(sm.getString("nioReceiver.alreadyStarted"));
             return;
         }
 
@@ -309,10 +307,10 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             } catch (java.nio.channels.ClosedSelectorException cse) {
                 // ignore is normal at shutdown or stop listen socket
             } catch (java.nio.channels.CancelledKeyException nx) {
-                log.warn(sm.getString("NioReceiver.clientDisconnect"));
+                log.warn(sm.getString("nioReceiver.clientDisconnect"));
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                log.error(sm.getString("NioReceiver.requestError"), t);
+                log.error(sm.getString("nioReceiver.requestError"), t);
             }
 
         }
@@ -349,11 +347,11 @@ public class NioReceiver extends ReceiverBase implements Runnable {
                     count ++;
                 }
                 if (running) {
-                    log.warn(sm.getString("NioReceiver.stop.threadRunning"));
+                    log.warn(sm.getString("nioReceiver.stop.threadRunning"));
                 }
                 closeSelector();
             } catch (Exception x) {
-                log.error(sm.getString("NioReceiver.stop.fail"), x);
+                log.error(sm.getString("nioReceiver.stop.fail"), x);
             } finally {
                 this.selector.set(null);
             }
@@ -374,7 +372,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             }
         } catch (IOException ignore){
             if (log.isWarnEnabled()) {
-                log.warn(sm.getString("NioReceiver.cleanup.fail"), ignore);
+                log.warn(sm.getString("nioReceiver.cleanup.fail"), ignore);
             }
         } catch (ClosedSelectorException ignore){
             // Ignore
@@ -414,7 +412,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         try {
             listen();
         } catch (Exception x) {
-            log.error(sm.getString("NioReceiver.run.fail"), x);
+            log.error(sm.getString("nioReceiver.run.fail"), x);
         } finally {
             running = false;
         }
