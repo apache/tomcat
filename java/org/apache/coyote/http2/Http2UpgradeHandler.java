@@ -629,7 +629,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private void close(Http2Exception h2e) {
         // Write a GOAWAY frame.
         byte[] payload = h2e.getMessage().getBytes(StandardCharsets.UTF_8);
-        byte[] payloadLength = getPayloadLength(payload);
+        byte[] payloadLength = new byte[3];
+        ByteUtil.setThreeBytes(payloadLength, 0, payload.length);
 
         try {
             socketWrapper.write(true, payloadLength, 0, payloadLength.length);
@@ -641,19 +642,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // error has already been logged.
         }
         close();
-    }
-
-
-    private byte[] getPayloadLength(byte[] payload) {
-        byte[] result = new byte[3];
-        int len = payload.length;
-        result[2] = (byte) (len & 0xFF);
-        len = len >>> 8;
-        result[1] = (byte) (len & 0xFF);
-        len = len >>> 8;
-        result[0] = (byte) (len & 0xFF);
-
-        return result;
     }
 
 
