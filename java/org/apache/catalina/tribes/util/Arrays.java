@@ -31,11 +31,12 @@ import org.apache.catalina.tribes.membership.Membership;
  * @version 1.0
  */
 public class Arrays {
+    protected static final StringManager sm = StringManager.getManager(Arrays.class);
 
     public static boolean contains(byte[] source, int srcoffset, byte[] key, int keyoffset, int length) {
-        if ( srcoffset < 0 || srcoffset >= source.length) throw new ArrayIndexOutOfBoundsException("srcoffset is out of bounds.");
-        if ( keyoffset < 0 || keyoffset >= key.length) throw new ArrayIndexOutOfBoundsException("keyoffset is out of bounds.");
-        if ( length > (key.length-keyoffset) ) throw new ArrayIndexOutOfBoundsException("not enough data elements in the key, length is out of bounds.");
+        if ( srcoffset < 0 || srcoffset >= source.length) throw new ArrayIndexOutOfBoundsException(sm.getString("arrays.srcoffset.outOfBounds"));
+        if ( keyoffset < 0 || keyoffset >= key.length) throw new ArrayIndexOutOfBoundsException(sm.getString("arrays.keyoffset.outOfBounds"));
+        if ( length > (key.length-keyoffset) ) throw new ArrayIndexOutOfBoundsException(sm.getString("arrays.length.outOfBounds"));
         //we don't have enough data to validate it
         if ( length > (source.length-srcoffset) ) return false;
         boolean match = true;
@@ -203,7 +204,7 @@ public class Arrays {
 
     public static byte[] fromString(String value) {
         if ( value == null ) return null;
-        if ( !value.startsWith("{") ) throw new RuntimeException("byte arrays must be represented as {1,3,4,5,6}");
+        if ( !value.startsWith("{") ) throw new RuntimeException(sm.getString("arrays.malformed.arrays"));
         StringTokenizer t = new StringTokenizer(value,"{,}",false);
         byte[] result = new byte[t.countTokens()];
         for (int i=0; i<result.length; i++ ) result[i] = Byte.parseByte(t.nextToken());
