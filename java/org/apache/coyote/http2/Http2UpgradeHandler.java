@@ -400,21 +400,19 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         int weight = ByteUtil.getOneByte(payload, 4) + 1;
 
         Stream stream = getStream(streamId);
-        AbstractStream parentStream;
-        if (parentStreamId == 0) {
-            parentStream = this;
-        } else {
-            parentStream = getStream(parentStreamId);
-            if (parentStream == null) {
+        if (stream != null) {
+            // stream == null => an old stream already dropped from the map
+            AbstractStream parentStream;
+            if (parentStreamId == 0) {
                 parentStream = this;
-                weight = Constants.DEFAULT_WEIGHT;
-                exclusive = false;
+            } else {
+                parentStream = getStream(parentStreamId);
+                if (parentStream == null) {
+                    parentStream = this;
+                    weight = Constants.DEFAULT_WEIGHT;
+                    exclusive = false;
+                }
             }
-        }
-
-        if (stream == null) {
-            // Old stream. Already closed and dropped from the stream map.
-        } else {
             stream.rePrioritise(parentStream, exclusive, weight);
         }
     }
