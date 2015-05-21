@@ -38,20 +38,29 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private final Response coyoteResponse = new Response();
     private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
 
-    private volatile long flowControlWindowSize;
-
 
     public Stream(Integer identifier, Http2UpgradeHandler handler) {
         super(identifier);
         this.handler = handler;
         setParentStream(handler);
-        flowControlWindowSize = handler.getRemoteSettings().getInitialWindowSize();
+        setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
         coyoteResponse.setOutputBuffer(outputBuffer);
     }
 
 
+    @Override
     public void incrementWindowSize(int windowSizeIncrement) {
-        flowControlWindowSize += windowSizeIncrement;
+        // If this is zero then any thread that has been trying to write for
+        // this stream will be waiting. Notify that thread it can continue. Use
+        // notify all even though only one thread is waiting to be on the safe
+        // side.
+        boolean notify = getWindowSize() == 0;
+        super.incrementWindowSize(windowSizeIncrement);
+        if (notify) {
+            synchronized (this) {
+                notifyAll();
+            }
+        }
     }
 
 
@@ -176,11 +185,50 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
         public void flush() throws IOException {
+            if (!coyoteResponse.isCommitted()) {
+                coyoteResponse.sendHeaders();
+            }
             if (buffer.position() == 0) {
                 // Buffer is empty. Nothing to do.
                 return;
             }
-            handler.writeBody(Stream.this, buffer);
+            buffer.flip();
+            int left = buffer.remaining();
+            int thisWriteStream;
+            while (left > 0) {
+                // Flow control for the Stream
+                do {
+                    thisWriteStream = reserveWindowSize(left);
+                    if (thisWriteStream < 1) {
+                        // Need to block until a WindowUpdate message is
+                        // processed for this stream;
+                        synchronized (this) {
+                            try {
+                                wait();
+                            } catch (InterruptedException e) {
+                                // TODO. Possible shutdown?
+                            }
+                        }
+                    }
+                } while (thisWriteStream < 1);
+
+                // Flow control for the connection
+                int thisWrite;
+                do {
+                    thisWrite = handler.reserveWindowSize(thisWriteStream);
+                    if (thisWrite < 1) {
+                        // TODO Flow control when connection window is exhausted
+                    }
+                } while (thisWrite < 1);
+
+                decrementWindowSize(thisWrite);
+                handler.decrementWindowSize(thisWrite);
+
+                // Do the write
+                handler.writeBody(Stream.this, buffer, thisWrite);
+                left -= thisWrite;
+                buffer.position(buffer.position() + thisWrite);
+            }
             buffer.clear();
         }
 

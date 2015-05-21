@@ -32,7 +32,6 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http2.HpackEncoder.State;
-import org.apache.coyote.http2.WriteStateMachine.WriteState;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -94,7 +93,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private final ConnectionSettings remoteSettings = new ConnectionSettings();
     private final ConnectionSettings localSettings = new ConnectionSettings();
-    private volatile long flowControlWindowSize = ConnectionSettings.DEFAULT_WINDOW_SIZE;
     private volatile int maxRemoteStreamId = 0;
 
     private HpackDecoder hpackDecoder;
@@ -103,7 +101,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private final Map<Integer,Stream> streams = new HashMap<>();
 
-    private final WriteStateMachine writeStateMachine = new WriteStateMachine();
     private final Queue<Object> writeQueue = new ConcurrentLinkedQueue<>();
 
     public Http2UpgradeHandler(Adapter adapter) {
@@ -159,7 +156,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         switch(status) {
         case OPEN_READ:
-            writeStateMachine.startRead();
             // Gets set to null once the connection preface has been
             // successfully parsed.
             if (connectionPrefaceParser != null) {
@@ -180,13 +176,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // Process all the incoming data
             try {
                 while (processFrame()) {
-                }
-
-                // We are on a container thread. There is no more data to read
-                // so check for writes (more efficient than dispatching to a new
-                // thread).
-                if (writeStateMachine.endRead()) {
-                    processWrites();
                 }
             } catch (Http2Exception h2e) {
                 if (h2e.getStreamId() == 0) {
@@ -212,30 +201,28 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             break;
 
         case OPEN_WRITE:
-            if (writeStateMachine.startWrite()) {
-                try {
-                    processWrites();
-                } catch (Http2Exception h2e) {
-                    if (h2e.getStreamId() == 0) {
-                        // Connection error
-                        log.warn(sm.getString("upgradeHandler.connectionError"), h2e);
-                        close(h2e);
-                        break;
-                    } else {
-                        // Stream error
-                        // TODO Reset stream
-                    }
-                } catch (IOException ioe) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("upgradeHandler.ioerror",
-                                Long.toString(connectionId)), ioe);
-                    }
-                    close();
-                    result = SocketState.CLOSED;
+            try {
+                processWrites();
+            } catch (Http2Exception h2e) {
+                if (h2e.getStreamId() == 0) {
+                    // Connection error
+                    log.warn(sm.getString("upgradeHandler.connectionError"), h2e);
+                    close(h2e);
                     break;
+                } else {
+                    // Stream error
+                    // TODO Reset stream
                 }
-
+            } catch (IOException ioe) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.ioerror",
+                            Long.toString(connectionId)), ioe);
+                }
+                close();
+                result = SocketState.CLOSED;
+                break;
             }
+
             result = SocketState.UPGRADED;
             break;
 
@@ -539,7 +526,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     streamId, Http2Exception.PROTOCOL_ERROR);
         }
         if (streamId == 0) {
-            flowControlWindowSize += windowSizeIncrement;
+            incrementWindowSize(windowSizeIncrement);
         } else {
             Stream stream = getStream(streamId);
             if (stream == null) {
@@ -723,8 +710,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    void writeBody(Stream stream, ByteBuffer data) throws IOException {
-        data.flip();
+    void writeBody(Stream stream, ByteBuffer data, int len) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeBody", Integer.toString(connectionId),
                     stream.getIdentifier(), Integer.toString(data.remaining())));
@@ -732,14 +718,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         synchronized (socketWrapper) {
             // TODO Manage window sizes
             byte[] header = new byte[9];
-            ByteUtil.setThreeBytes(header, 0, data.remaining());
+            ByteUtil.setThreeBytes(header, 0, len);
             header[3] = FRAME_TYPE_DATA;
             if (stream.getOutputBuffer().isFinished()) {
                 header[4] = FLAG_END_OF_STREAM;
             }
             ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
             socketWrapper.write(true, header, 0, header.length);
-            socketWrapper.write(true, data.array(), data.arrayOffset(), data.limit());
+            socketWrapper.write(true, data.array(), data.arrayOffset() + data.position(),
+                    len);
             socketWrapper.flush(true);
         }
     }
@@ -760,31 +747,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     private Object getThingToWrite() {
-        synchronized (writeStateMachine) {
-            // TODO This is more complicated than pulling an object off a queue.
+        // TODO This is more complicated than pulling an object off a queue.
 
-            // Note: The checking of the queue for something to write and the
-            //       calling of endWrite() if nothing is found must be kept
-            //       within the same sync to avoid race conditions with adding
-            //       entries to the queue.
-            Object obj = writeQueue.poll();
-            if (obj == null) {
-                 writeStateMachine.endWrite(WriteState.IDLE);
-            }
-            return obj;
-        }
+        // Note: The checking of the queue for something to write and the
+        //       calling of endWrite() if nothing is found must be kept
+        //       within the same sync to avoid race conditions with adding
+        //       entries to the queue.
+        return writeQueue.poll();
     }
 
 
     void addWrite(Object obj) {
-        boolean needDispatch;
-        synchronized (writeStateMachine) {
-            writeQueue.add(obj);
-            needDispatch = writeStateMachine.addWrite();
-        }
-        if (needDispatch) {
-            socketWrapper.processSocket(SocketStatus.OPEN_WRITE, true);
-        }
+        writeQueue.add(obj);
     }
 
 
