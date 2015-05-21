@@ -37,11 +37,11 @@ public class ByteUtil {
     }
 
 
-    public static void set31Bits(byte[] input, int firstByte, int value) {
-        input[firstByte] = (byte) ((value & 0x7F000000) >> 24);
-        input[firstByte + 1] = (byte) ((value & 0xFF0000) >> 16);
-        input[firstByte + 2] = (byte) ((value & 0xFF00) >> 8);
-        input[firstByte + 3] = (byte) (value & 0xFF);
+    public static void set31Bits(byte[] output, int firstByte, int value) {
+        output[firstByte] = (byte) ((value & 0x7F000000) >> 24);
+        output[firstByte + 1] = (byte) ((value & 0xFF0000) >> 16);
+        output[firstByte + 2] = (byte) ((value & 0xFF00) >> 8);
+        output[firstByte + 3] = (byte) (value & 0xFF);
     }
 
 
@@ -61,10 +61,10 @@ public class ByteUtil {
     }
 
 
-    public static void setThreeBytes(byte[] input, int firstByte, int value) {
-        input[firstByte] = (byte) ((value & 0xFF0000) >> 16);
-        input[firstByte + 1] = (byte) ((value & 0xFF00) >> 8);
-        input[firstByte + 2] = (byte) (value & 0xFF);
+    public static void setThreeBytes(byte[] output, int firstByte, int value) {
+        output[firstByte] = (byte) ((value & 0xFF0000) >> 16);
+        output[firstByte + 1] = (byte) ((value & 0xFF00) >> 8);
+        output[firstByte + 2] = (byte) (value & 0xFF);
     }
 
 
