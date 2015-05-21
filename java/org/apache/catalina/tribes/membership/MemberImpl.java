@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.transport.SenderState;
+import org.apache.catalina.tribes.util.StringManager;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -41,6 +42,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
     public static final transient byte[] TRIBES_MBR_BEGIN = new byte[] {84, 82, 73, 66, 69, 83, 45, 66, 1, 0};
     public static final transient byte[] TRIBES_MBR_END   = new byte[] {84, 82, 73, 66, 69, 83, 45, 69, 1, 0};
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
      * The listen host for this member
@@ -315,11 +317,11 @@ public class MemberImpl implements Member, java.io.Externalizable {
         int pos = offset;
 
         if (XByteBuffer.firstIndexOf(data,offset,TRIBES_MBR_BEGIN)!=pos) {
-            throw new IllegalArgumentException("Invalid package, should start with:"+org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_BEGIN));
+            throw new IllegalArgumentException(sm.getString("memberImpl.invalid.package.begin", org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_BEGIN)));
         }
 
         if ( length < (TRIBES_MBR_BEGIN.length+4) ) {
-            throw new ArrayIndexOutOfBoundsException("Member package to small to validate.");
+            throw new ArrayIndexOutOfBoundsException(sm.getString("memberImpl.package.small"));
         }
 
         pos += TRIBES_MBR_BEGIN.length;
@@ -328,12 +330,12 @@ public class MemberImpl implements Member, java.io.Externalizable {
         pos += 4;
 
         if ( length < (bodylength+4+TRIBES_MBR_BEGIN.length+TRIBES_MBR_END.length) ) {
-            throw new ArrayIndexOutOfBoundsException("Not enough bytes in member package.");
+            throw new ArrayIndexOutOfBoundsException(sm.getString("memberImpl.notEnough.bytes"));
         }
 
         int endpos = pos+bodylength;
         if (XByteBuffer.firstIndexOf(data,endpos,TRIBES_MBR_END)!=endpos) {
-            throw new IllegalArgumentException("Invalid package, should end with:"+org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_END));
+            throw new IllegalArgumentException(sm.getString("memberImpl.invalid.package.end", org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_END)));
         }
 
 
@@ -444,7 +446,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
                     this.hostname = org.apache.catalina.tribes.util.Arrays.toString(host,0,host.length,true);
                 return this.hostname;
             }catch ( IOException x ) {
-                throw new RuntimeException("Unable to parse hostname.",x);
+                throw new RuntimeException(sm.getString("memberImpl.unableParse.hostname"),x);
             }
         }
     }
@@ -599,7 +601,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         this.payload = payload!=null?payload:new byte[0];
         if ( this.getData(true,true).length > McastServiceImpl.MAX_PACKET_SIZE ) {
             this.payload = oldpayload;
-            throw new IllegalArgumentException("Payload is to large for tribes to handle.");
+            throw new IllegalArgumentException(sm.getString("memberImpl.large.payload"));
         }
 
     }
