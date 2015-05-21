@@ -37,6 +37,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -80,8 +81,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
 
     private final int connectionId;
+
     private final Adapter adapter;
     private volatile SocketWrapperBase<?> socketWrapper;
+    private volatile SSLSupport sslSupport;
+
     private volatile boolean initialized = false;
     private volatile ConnectionPrefaceParser connectionPrefaceParser =
             new ConnectionPrefaceParser();
@@ -129,6 +133,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void setSocketWrapper(SocketWrapperBase<?> wrapper) {
         this.socketWrapper = wrapper;
+    }
+
+
+    @Override
+    public void setSslSupport(SSLSupport sslSupport) {
+        this.sslSupport = sslSupport;
     }
 
 
@@ -372,6 +382,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         // Process this stream on a container thread
         StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
+        streamProcessor.setSslSupport(sslSupport);
         socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
     }
 
