@@ -17,6 +17,7 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
@@ -35,6 +36,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private final Http2UpgradeHandler handler;
     private final Request coyoteRequest = new Request();
     private final Response coyoteResponse = new Response();
+    private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
 
     private volatile long flowControlWindowSize;
 
@@ -44,7 +46,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         this.handler = handler;
         setParentStream(handler);
         flowControlWindowSize = handler.getRemoteSettings().getInitialWindowSize();
-        coyoteResponse.setOutputBuffer(new StreamOutputBuffer());
+        coyoteResponse.setOutputBuffer(outputBuffer);
     }
 
 
@@ -110,8 +112,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             log.debug(sm.getString("stream.write",
                     Long.toString(getConnectionId()), getIdentifier()));
         }
-        // TODO
-        handler.addWrite("DATA");
+        try {
+            outputBuffer.flush();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 
@@ -127,31 +133,76 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    public Request getCoyoteRequest() {
+    Request getCoyoteRequest() {
         return coyoteRequest;
     }
 
 
-    public Response getCoyoteResponse() {
+    Response getCoyoteResponse() {
         return coyoteResponse;
     }
 
 
-    private class StreamOutputBuffer implements OutputBuffer {
+    StreamOutputBuffer getOutputBuffer() {
+        return outputBuffer;
+    }
 
+
+    class StreamOutputBuffer implements OutputBuffer {
+
+        private volatile ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
         private volatile long written = 0;
+        private volatile boolean finished = false;
 
         @Override
         public int doWrite(ByteChunk chunk) throws IOException {
-            // TODO Blocking. Write to buffer. flushData() if full.
-            log.debug("Write [" + chunk.getLength() + "] bytes");
-            written += chunk.getLength();
-            return chunk.getLength();
+            if (finished) {
+                // TODO i18n
+                throw new IllegalStateException();
+            }
+            int len = chunk.getLength();
+            int offset = 0;
+            while (len > 0) {
+                int thisTime = Math.min(buffer.remaining(), len);
+                buffer.put(chunk.getBytes(), chunk.getOffset() + offset, thisTime);
+                offset += thisTime;
+                len -= thisTime;
+                if (!buffer.hasRemaining()) {
+                    flush();
+                }
+            }
+            written += offset;
+            return offset;
+        }
+
+        public void flush() throws IOException {
+            if (buffer.position() == 0) {
+                // Buffer is empty. Nothing to do.
+                return;
+            }
+            handler.writeBody(Stream.this, buffer);
+            buffer.clear();
         }
 
         @Override
         public long getBytesWritten() {
             return written;
+        }
+
+        public void finished() {
+            finished = true;
+        }
+
+        public boolean isFinished() {
+            return finished;
+        }
+
+        /**
+         * @return <code>true</code> if it is certain that the associated
+         *         response has no body.
+         */
+        public boolean hasNoBody() {
+            return ((written == 0) && finished);
         }
     }
 }

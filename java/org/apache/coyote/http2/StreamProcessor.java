@@ -56,7 +56,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         try {
             adapter.service(request, response);
             // Ensure the response is complete
-            response.action(ActionCode.CLIENT_FLUSH, null);
+            response.action(ActionCode.CLOSE, null);
         } catch (Exception e) {
             // TODO
             e.printStackTrace();
@@ -67,12 +67,18 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     public void action(ActionCode actionCode, Object param) {
         switch (actionCode) {
-        case REQ_HOST_ADDR_ATTRIBUTE: {
-            request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+        case COMMIT: {
+            if (!response.isCommitted()) {
+                response.setCommitted(true);
+                stream.writeHeaders();
+            }
             break;
         }
-        case IS_ERROR: {
-            ((AtomicBoolean) param).set(getErrorState().isError());
+        case CLOSE: {
+            // Tell the output buffer there will be no more data
+            stream.getOutputBuffer().finished();
+            // Then flush it
+            action(ActionCode.CLIENT_FLUSH, null);
             break;
         }
         case CLIENT_FLUSH: {
@@ -80,11 +86,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             stream.flushData();
             break;
         }
-        case COMMIT: {
-            if (!response.isCommitted()) {
-                response.setCommitted(true);
-                stream.writeHeaders();
-            }
+        case REQ_HOST_ADDR_ATTRIBUTE: {
+            request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+            break;
+        }
+        case IS_ERROR: {
+            ((AtomicBoolean) param).set(getErrorState().isError());
             break;
         }
 

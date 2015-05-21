@@ -66,6 +66,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final int FLAG_END_OF_STREAM = 1;
     private static final int FLAG_END_OF_HEADERS = 4;
 
+    private static final int FRAME_TYPE_DATA = 0;
     private static final int FRAME_TYPE_HEADERS = 1;
     private static final int FRAME_TYPE_PRIORITY = 2;
     private static final int FRAME_TYPE_SETTINGS = 4;
@@ -701,12 +702,14 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 ByteUtil.setThreeBytes(header, 0, target.limit());
                 if (first) {
                     header[3] = FRAME_TYPE_HEADERS;
+                    if (stream.getOutputBuffer().hasNoBody()) {
+                        header[4] = FLAG_END_OF_STREAM;
+                    }
                 } else {
                     header[3] = FRAME_TYPE_CONTINUATION;
                 }
                 if (state == State.COMPLETE) {
-                    // TODO Determine end of stream correctly
-                    header[4] = FLAG_END_OF_HEADERS + FLAG_END_OF_STREAM;
+                    header[4] += FLAG_END_OF_HEADERS;
                 }
                 if (log.isDebugEnabled()) {
                     log.debug(target.limit() + " bytes");
@@ -718,6 +721,29 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             }
         }
     }
+
+
+    void writeBody(Stream stream, ByteBuffer data) throws IOException {
+        data.flip();
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.writeBody", Integer.toString(connectionId),
+                    stream.getIdentifier(), Integer.toString(data.remaining())));
+        }
+        synchronized (socketWrapper) {
+            // TODO Manage window sizes
+            byte[] header = new byte[9];
+            ByteUtil.setThreeBytes(header, 0, data.remaining());
+            header[3] = FRAME_TYPE_DATA;
+            if (stream.getOutputBuffer().isFinished()) {
+                header[4] = FLAG_END_OF_STREAM;
+            }
+            ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+            socketWrapper.write(true, header, 0, header.length);
+            socketWrapper.write(true, data.array(), data.arrayOffset(), data.limit());
+            socketWrapper.flush(true);
+        }
+    }
+
 
     private void processWrites() throws IOException {
         if (socketWrapper.flush(false)) {
