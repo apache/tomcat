@@ -40,6 +40,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     private final Stream stream;
 
+    private volatile SSLSupport sslSupport;
+
 
     public StreamProcessor(Stream stream, Adapter adapter, SocketWrapperBase<?> socketWrapper) {
         super(stream.getCoyoteRequest(), stream.getCoyoteResponse());
@@ -99,8 +101,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     @Override
     public void setSslSupport(SSLSupport sslSupport) {
-        // TODO Auto-generated method stub
-
+        this.sslSupport = sslSupport;
     }
 
 

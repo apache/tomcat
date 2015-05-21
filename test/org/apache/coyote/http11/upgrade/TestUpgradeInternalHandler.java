@@ -47,6 +47,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
@@ -254,6 +255,11 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         @Override
         public void setSocketWrapper(SocketWrapperBase<?> wrapper) {
             this.wrapper = wrapper;
+        }
+
+        @Override
+        public void setSslSupport(SSLSupport sslSupport) {
+            // NO-OP
         }
     }
 
