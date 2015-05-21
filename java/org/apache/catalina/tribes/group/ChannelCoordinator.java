@@ -31,6 +31,7 @@ import org.apache.catalina.tribes.transport.SenderState;
 import org.apache.catalina.tribes.transport.nio.NioReceiver;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.Logs;
+import org.apache.catalina.tribes.util.StringManager;
 
 
 /**
@@ -39,6 +40,7 @@ import org.apache.catalina.tribes.util.Logs;
  * This is the last interceptor in the chain.
  */
 public class ChannelCoordinator extends ChannelInterceptorBase implements MessageListener {
+    protected static final StringManager sm = StringManager.getManager(ChannelCoordinator.class);
     private ChannelReceiver clusterReceiver;
     private ChannelSender clusterSender;
     private MembershipService membershipService;
@@ -140,7 +142,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             if (svc == 0 ) return;//nothing to start
 
             if (svc == (svc & startLevel)) {
-                throw new ChannelException("Channel already started for level:"+svc);
+                throw new ChannelException(sm.getString("channelCoordinator.alreadyStarted", svc));
             }
 
             //must start the receiver first so that we can coordinate the port it
@@ -174,8 +176,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             }
 
             if (!valid) {
-                throw new IllegalArgumentException("Invalid start level, valid levels are:" +
-                        "SND_RX_SEQ,SND_TX_SEQ,MBR_TX_SEQ,MBR_RX_SEQ");
+                throw new IllegalArgumentException(sm.getString("channelCoordinator.invalid.startLevel"));
             }
             startLevel = (startLevel | svc);
         }catch ( ChannelException cx ) {
@@ -226,8 +227,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 membershipService.stop(MembershipService.MBR_TX);
             }
             if ( !valid) {
-                throw new IllegalArgumentException("Invalid start level, valid levels are:" +
-                        "SND_RX_SEQ,SND_TX_SEQ,MBR_TX_SEQ,MBR_RX_SEQ");
+                throw new IllegalArgumentException(sm.getString("channelCoordinator.invalid.startLevel"));
             }
 
             startLevel = (startLevel & (~svc));

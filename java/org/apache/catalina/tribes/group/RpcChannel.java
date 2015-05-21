@@ -27,6 +27,7 @@ import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ErrorHandler;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.UniqueId;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -36,6 +37,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class RpcChannel implements ChannelListener{
     private static final Log log = LogFactory.getLog(RpcChannel.class);
+    protected static final StringManager sm = StringManager.getManager(RpcChannel.class);
 
     public static final int FIRST_REPLY = 1;
     public static final int MAJORITY_REPLY = 2;
@@ -161,7 +163,7 @@ public class RpcChannel implements ChannelListener{
                 if (excallback != null && !asyncReply) {
                     excallback.replyFailed(rmsg.message, reply, sender, x);
                 } else {
-                    log.error("Unable to send back reply in RpcChannel.",x);
+                    log.error(sm.getString("rpcChannel.replyFailed"),x);
                 }
             }
             if (finished && excallback != null && !asyncReply) {

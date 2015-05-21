@@ -44,6 +44,7 @@ import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.Logs;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -56,6 +57,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class GroupChannel extends ChannelInterceptorBase implements ManagedChannel {
     private static final Log log = LogFactory.getLog(GroupChannel.class);
+    protected static final StringManager sm = StringManager.getManager(GroupChannel.class);
 
     /**
      * Flag to determine if the channel manages its own heartbeat
@@ -200,11 +202,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     @Override
     public UniqueId send(Member[] destination, Serializable msg, int options, ErrorHandler handler)
             throws ChannelException {
-        if ( msg == null ) throw new ChannelException("Cant send a NULL message");
+        if ( msg == null ) throw new ChannelException(sm.getString("groupChannel.nullMessage"));
         XByteBuffer buffer = null;
         try {
             if (destination == null || destination.length == 0) {
-                throw new ChannelException("No destination given");
+                throw new ChannelException(sm.getString("groupChannel.noDestination"));
             }
             ChannelData data = new ChannelData(true);//generates a unique Id
             data.setAddress(getLocalMember(false));
@@ -274,7 +276,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                     fwd = XByteBuffer.deserialize(msg.getMessage().getBytesDirect(), 0,
                             msg.getMessage().getLength());
                 }catch (Exception sx) {
-                    log.error("Unable to deserialize message:"+msg,sx);
+                    log.error(sm.getString("groupChannel.unable.deserialize", msg),sx);
                     return;
                 }
             }
@@ -310,7 +312,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         } catch ( Exception x ) {
             //this could be the channel listener throwing an exception, we should log it
             //as a warning.
-            if ( log.isWarnEnabled() ) log.warn("Error receiving message:",x);
+            if ( log.isWarnEnabled() ) log.warn(sm.getString("groupChannel.receiving.error"),x);
             throw new RemoteProcessException("Exception:"+x.getMessage(),x);
         }
     }
@@ -330,7 +332,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                     new RpcMessage.NoRpcChannelReply(msg.rpcId, msg.uuid);
             send(new Member[]{destination},reply,Channel.SEND_OPTIONS_ASYNCHRONOUS);
         } catch ( Exception x ) {
-            log.error("Unable to find rpc channel, failed to send NoRpcChannelReply.",x);
+            log.error(sm.getString("groupChannel.sendFail.noRpcChannelReply"),x);
         }
     }
 
@@ -404,7 +406,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             }//end if
             first = first.getNext();
         }//while
-        if ( conflicts.length() > 0 ) throw new ChannelException("Interceptor option flag conflict: "+conflicts.toString());
+        if ( conflicts.length() > 0 ) throw new ChannelException(sm.getString("groupChannel.optionFlag.conflict",
+                conflicts.toString()));
 
     }
 
@@ -535,7 +538,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         if (!this.channelListeners.contains(channelListener) ) {
             this.channelListeners.add(channelListener);
         } else {
-            throw new IllegalArgumentException("Listener already exists:"+channelListener+"["+channelListener.getClass().getName()+"]");
+            throw new IllegalArgumentException(sm.getString("groupChannel.listener.alreadyExist",
+                    channelListener,channelListener.getClass().getName()));
         }
     }
 
@@ -695,7 +699,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                     // In the highly unlikely event it was a different trigger,
                     // simply ignore it and continue.
                 } catch ( Exception x ) {
-                    log.error("Unable to send heartbeat through Tribes interceptor stack. Will try to sleep again.",x);
+                    log.error(sm.getString("groupChannel.unable.sendHeartbeat"),x);
                 }//catch
             }//while
         }//run
