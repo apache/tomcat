@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
@@ -32,6 +33,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
     private static final Log log = LogFactory.getLog(Stream.class);
     private static final StringManager sm = StringManager.getManager(Stream.class);
+
+    private volatile int weight = Constants.DEFAULT_WEIGHT;
 
     private final Http2UpgradeHandler handler;
     private final Request coyoteRequest = new Request();
@@ -48,6 +51,34 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    public void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("abstractStream.reprioritisation.debug",
+                    Long.toString(getConnectionId()), getIdentifier(), Boolean.toString(exclusive),
+                    parent.getIdentifier(), Integer.toString(weight)));
+        }
+
+        // Check if new parent is a descendant of this stream
+        if (isDescendant(parent)) {
+            parent.detachFromParent();
+            getParentStream().addChild(parent);
+        }
+
+        if (exclusive) {
+            // Need to move children of the new parent to be children of this
+            // stream. Slightly convoluted to avoid concurrent modification.
+            Iterator<AbstractStream> parentsChildren = parent.getChildStreams().iterator();
+            while (parentsChildren.hasNext()) {
+                AbstractStream parentsChild = parentsChildren.next();
+                parentsChildren.remove();
+                this.addChild(parentsChild);
+            }
+        }
+        parent.addChild(this);
+        this.weight = weight;
+    }
+
+
     @Override
     public void incrementWindowSize(int windowSizeIncrement) {
         // If this is zero then any thread that has been trying to write for
@@ -60,6 +91,16 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             synchronized (this) {
                 notifyAll();
             }
+        }
+    }
+
+
+    private int reserveWindowSize(int reservation) {
+        long windowSize = getWindowSize();
+        if (reservation > windowSize) {
+            return (int) windowSize;
+        } else {
+            return reservation;
         }
     }
 
@@ -142,6 +183,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    @Override
+    protected int getWeight() {
+        return weight;
+    }
+
+
     Request getCoyoteRequest() {
         return coyoteRequest;
     }
@@ -201,12 +248,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     thisWriteStream = reserveWindowSize(left);
                     if (thisWriteStream < 1) {
                         // Need to block until a WindowUpdate message is
-                        // processed for this stream;
+                        // processed for this stream
                         synchronized (this) {
                             try {
                                 wait();
                             } catch (InterruptedException e) {
-                                // TODO. Possible shutdown?
+                                // TODO: Possible shutdown?
                             }
                         }
                     }
@@ -215,14 +262,21 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 // Flow control for the connection
                 int thisWrite;
                 do {
-                    thisWrite = handler.reserveWindowSize(thisWriteStream);
+                    thisWrite = handler.reserveWindowSize(Stream.this, thisWriteStream);
                     if (thisWrite < 1) {
-                        // TODO Flow control when connection window is exhausted
+                        // Need to block until a WindowUpdate message is
+                        // processed for this connection
+                        synchronized (this) {
+                            try {
+                                wait();
+                            } catch (InterruptedException e) {
+                                // TODO: Possible shutdown?
+                            }
+                        }
                     }
                 } while (thisWrite < 1);
 
                 incrementWindowSize(-thisWrite);
-                handler.incrementWindowSize(-thisWrite);
 
                 // Do the write
                 handler.writeBody(Stream.this, buffer, thisWrite);

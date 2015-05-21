@@ -21,9 +21,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.WebConnection;
@@ -101,7 +104,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private final Map<Integer,Stream> streams = new HashMap<>();
 
-    private final Queue<Object> writeQueue = new ConcurrentLinkedQueue<>();
+    // Tracking for when the connection is blocked (windowSize < 1)
+    private final Object backLogLock = new Object();
+    private final Map<AbstractStream,int[]> backLogStreams = new ConcurrentHashMap<>();
+    private long backLogSize = 0;
+
 
     public Http2UpgradeHandler(Adapter adapter) {
         super (STREAM_ID_ZERO);
@@ -716,7 +723,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     stream.getIdentifier(), Integer.toString(data.remaining())));
         }
         synchronized (socketWrapper) {
-            // TODO Manage window sizes
             byte[] header = new byte[9];
             ByteUtil.setThreeBytes(header, 0, len);
             header[3] = FRAME_TYPE_DATA;
@@ -737,28 +743,137 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             socketWrapper.registerWriteInterest();
             return;
         }
+    }
 
-        Object obj;
-        while ((obj = getThingToWrite()) != null) {
-            // TODO
-            log.debug("TODO: write [" + obj.toString() + "]");
+
+    int reserveWindowSize(Stream stream, int toWrite) {
+        int result;
+        synchronized (backLogLock) {
+            long windowSize = getWindowSize();
+            if (windowSize < 1 || backLogSize > 0) {
+                // Has this stream been granted an allocation
+                int[] value = backLogStreams.remove(stream);
+                if (value[1] > 0) {
+                    result = value[1];
+                    value[0] = 0;
+                    value[1] = 1;
+                } else {
+                    value = new int[] { toWrite, 0 };
+                    backLogStreams.put(stream, value);
+                    backLogSize += toWrite;
+                    // Add the parents as well
+                    AbstractStream parent = stream.getParentStream();
+                    while (parent != null && backLogStreams.putIfAbsent(parent, new int[2]) == null) {
+                        parent = parent.getParentStream();
+                    }
+                    result = 0;
+                }
+            } else if (windowSize < toWrite) {
+                result = (int) windowSize;
+            } else {
+                result = toWrite;
+            }
+            incrementWindowSize(-result);
+        }
+        return result;
+    }
+
+
+
+    @Override
+    protected void incrementWindowSize(int increment) {
+        synchronized (backLogLock) {
+            if (getWindowSize() == 0) {
+                releaseBackLog(increment);
+            }
+            super.incrementWindowSize(increment);
         }
     }
 
 
-    private Object getThingToWrite() {
-        // TODO This is more complicated than pulling an object off a queue.
-
-        // Note: The checking of the queue for something to write and the
-        //       calling of endWrite() if nothing is found must be kept
-        //       within the same sync to avoid race conditions with adding
-        //       entries to the queue.
-        return writeQueue.poll();
+    private void releaseBackLog(int increment) {
+        if (backLogSize < increment) {
+            // Can clear the whole backlog
+            for (AbstractStream stream : backLogStreams.keySet()) {
+                synchronized (stream) {
+                    stream.notifyAll();
+                }
+            }
+            backLogStreams.clear();
+            backLogSize = 0;
+        } else {
+            int leftToAllocate = increment;
+            while (leftToAllocate > 0) {
+                leftToAllocate = allocate(this, leftToAllocate);
+            }
+            allocate(this, increment);
+            for (Entry<AbstractStream,int[]> entry : backLogStreams.entrySet()) {
+                int allocation = entry.getValue()[1];
+                if (allocation > 0) {
+                    backLogSize =- allocation;
+                    synchronized (entry.getKey()) {
+                        entry.getKey().notifyAll();
+                    }
+                }
+            }
+        }
     }
 
 
-    void addWrite(Object obj) {
-        writeQueue.add(obj);
+    private int allocate(AbstractStream stream, int allocation) {
+        // Allocate to the specified stream
+        int[] value = backLogStreams.get(stream);
+        if (value[0] >= allocation) {
+            value[0] -= allocation;
+            value[1] = allocation;
+            return 0;
+        }
+
+        // There was some left over so allocate that to the children of the
+        // stream.
+        int leftToAllocate = allocation;
+        value[1] = value[0];
+        value[0] = 0;
+        leftToAllocate -= value[1];
+
+        // Recipients are children of the current stream that are in the
+        // backlog.
+        Set<AbstractStream> recipients = new HashSet<>();
+        recipients.addAll(stream.getChildStreams());
+        recipients.retainAll(backLogStreams.keySet());
+
+        // Loop until we run out of allocation or recipients
+        while (leftToAllocate > 0) {
+            if (recipients.size() == 0) {
+                backLogStreams.remove(stream);
+                return leftToAllocate;
+            }
+
+            int totalWeight = 0;
+            for (AbstractStream recipient : recipients) {
+                totalWeight += recipient.getWeight();
+            }
+
+            // Use an Iterator so fully allocated children/recipients can be
+            // removed.
+            Iterator<AbstractStream> iter = recipients.iterator();
+            while (iter.hasNext()) {
+                AbstractStream recipient = iter.next();
+                // +1 is to avoid rounding issues triggering an infinite loop.
+                // Will cause a very slight over allocation but HTTP/2 should
+                // cope with that.
+                int share = 1 + leftToAllocate * recipient.getWeight() / totalWeight;
+                int remainder = allocate(recipient, share);
+                // Remove recipients that receive their full allocation so that
+                // they are excluded from the next allocation round.
+                if (remainder > 0) {
+                    iter.remove();
+                }
+                leftToAllocate -= (share - remainder);
+            }
+        }
+
+        return 0;
     }
 
 
@@ -800,5 +915,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     protected final Log getLog() {
         return log;
+    }
+
+
+    @Override
+    protected final int getWeight() {
+        return 0;
     }
 }
