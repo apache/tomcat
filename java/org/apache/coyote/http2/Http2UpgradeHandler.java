@@ -367,7 +367,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         if (padLength > 0) {
-            swallowPayload(padLength);
+            swallow(padLength);
         }
 
         // Process this stream on a container thread
@@ -544,15 +544,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         // Swallow the payload
         log.info("Swallowing [" + payloadSize + "] bytes of unknown frame type [" + type +
                 "] from stream [" + streamId + "]");
-        swallowPayload(payloadSize);
+        swallow(payloadSize);
     }
 
 
-    private void swallowPayload(int payloadSize) throws IOException {
+    private void swallow(int len) throws IOException {
         int read = 0;
         byte[] buffer = new byte[1024];
-        while (read < payloadSize) {
-            int toRead = Math.min(buffer.length, payloadSize - read);
+        while (read < len) {
+            int toRead = Math.min(buffer.length, len - read);
             int thisTime = socketWrapper.read(true, buffer, 0, toRead);
             if (thisTime == -1) {
                 throw new IOException("TODO: i18n");
@@ -603,7 +603,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         int payloadSize = ByteUtil.getThreeBytes(frameHeader, 0);
 
         if (payloadSize > remoteSettings.getMaxFrameSize()) {
-            swallowPayload(payloadSize);
+            swallow(payloadSize);
             throw new Http2Exception(sm.getString("upgradeHandler.payloadTooBig",
                     Integer.toString(payloadSize), Long.toString(remoteSettings.getMaxFrameSize())),
                     streamId, Http2Exception.FRAME_SIZE_ERROR);
