@@ -28,6 +28,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -42,6 +43,7 @@ import org.apache.juli.logging.LogFactory;
 public class TcpPingInterceptor extends ChannelInterceptorBase {
 
     private static final Log log = LogFactory.getLog(TcpPingInterceptor.class);
+    protected static final StringManager sm = StringManager.getManager(TcpPingInterceptor.class);
 
     protected static final byte[] TCP_PING_DATA = new byte[] {
         79, -89, 115, 72, 121, -33, 67, -55, -97, 111, -119, -128, -95, 91, 7, 20,
@@ -151,7 +153,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         try {
             super.sendMessage(members, data, null);
         }catch (ChannelException x) {
-            log.warn("Unable to send TCP ping.",x);
+            log.warn(sm.getString("tcpPingInterceptor.ping.failed"),x);
         }
     }
 
@@ -182,7 +184,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
                     // In the highly unlikely event it was a different trigger,
                     // simply ignore it and continue.
                 }catch ( Exception x )  {
-                    log.warn("Unable to send ping from TCP ping thread.",x);
+                    log.warn(sm.getString("tcpPingInterceptor.pingFailed.pingThread"),x);
                 }
             }
         }

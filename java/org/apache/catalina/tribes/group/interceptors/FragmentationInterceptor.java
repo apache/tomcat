@@ -27,6 +27,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -44,6 +45,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class FragmentationInterceptor extends ChannelInterceptorBase {
     private static final Log log = LogFactory.getLog(FragmentationInterceptor.class);
+    protected static final StringManager sm = StringManager.getManager(FragmentationInterceptor.class);
 
     protected final HashMap<FragKey, FragCollection> fragpieces = new HashMap<>();
     private int maxSize = 1024*100;
@@ -149,7 +151,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase {
             }
         }catch ( Exception x ) {
             if ( log.isErrorEnabled() ) {
-                log.error("Unable to perform heartbeat clean up in the frag interceptor",x);
+                log.error(sm.getString("fragmentationInterceptor.heartbeat.failed"),x);
             }
         }
         super.heartbeat();
@@ -201,7 +203,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase {
         }
 
         public ChannelMessage assemble() {
-            if ( !complete() ) throw new IllegalStateException("Fragments are missing.");
+            if ( !complete() ) throw new IllegalStateException(sm.getString("fragmentationInterceptor.fragments.missing"));
             int buffersize = 0;
             for (int i=0; i<frags.length; i++ ) buffersize += frags[i].getLength();
             XByteBuffer buf = new XByteBuffer(buffersize,false);

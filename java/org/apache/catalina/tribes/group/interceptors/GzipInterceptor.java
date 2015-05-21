@@ -28,6 +28,7 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -38,6 +39,7 @@ import org.apache.juli.logging.LogFactory;
 public class GzipInterceptor extends ChannelInterceptorBase {
 
     private static final Log log = LogFactory.getLog(GzipInterceptor.class);
+    protected static final StringManager sm = StringManager.getManager(GzipInterceptor.class);
 
     public static final int DEFAULT_BUFFER_SIZE = 2048;
 
@@ -49,7 +51,7 @@ public class GzipInterceptor extends ChannelInterceptorBase {
             msg.getMessage().append(data,0,data.length);
             super.sendMessage(destination, msg, payload);
         } catch ( IOException x ) {
-            log.error("Unable to compress byte contents");
+            log.error(sm.getString("gzipInterceptor.compress.failed"));
             throw new ChannelException(x);
         }
     }
@@ -62,7 +64,7 @@ public class GzipInterceptor extends ChannelInterceptorBase {
             msg.getMessage().append(data,0,data.length);
             super.messageReceived(msg);
         } catch ( IOException x ) {
-            log.error("Unable to decompress byte contents",x);
+            log.error(sm.getString("gzipInterceptor.decompress.failed"),x);
         }
     }
 

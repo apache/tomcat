@@ -26,6 +26,7 @@ import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.util.Arrays;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -35,6 +36,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     private static final byte[] START_DATA = new byte[] {113, 1, -58, 2, -34, -60, 75, -78, -101, -12, 32, -29, 32, 111, -40, 4};
     private static final byte[] END_DATA = new byte[] {54, -13, 90, 110, 47, -31, 75, -24, -81, -29, 36, 52, -58, 77, -110, 56};
     private static final Log log = LogFactory.getLog(TwoPhaseCommitInterceptor.class);
+    protected static final StringManager sm = StringManager.getManager(TwoPhaseCommitInterceptor.class);
 
     protected final HashMap<UniqueId, MapEntry> messages = new HashMap<>();
     protected long expire = 1000 * 60; //one minute expiration
@@ -77,7 +79,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
                 if ( original != null ) {
                     super.messageReceived(original.msg);
                     messages.remove(id);
-                } else log.warn("Received a confirmation, but original message is missing. Id:"+Arrays.toString(id.getBytes()));
+                } else log.warn(sm.getString("twoPhaseCommitInterceptor.originalMessage.missing", Arrays.toString(id.getBytes())));
             } else {
                 UniqueId id = new UniqueId(msg.getUniqueId());
                 MapEntry entry = new MapEntry((ChannelMessage)msg.deepclone(),id,System.currentTimeMillis());
@@ -119,7 +121,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
                 }//end if
             }
         } catch ( Exception x ) {
-            log.warn("Unable to perform heartbeat on the TwoPhaseCommit interceptor.",x);
+            log.warn(sm.getString("twoPhaseCommitInterceptor.heartbeat.failed"),x);
         } finally {
             super.heartbeat();
         }
