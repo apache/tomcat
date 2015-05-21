@@ -19,6 +19,7 @@ package org.apache.coyote.http2;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.res.StringManager;
@@ -35,7 +36,7 @@ abstract class AbstractStream {
     private volatile AbstractStream parentStream = null;
     private final Set<AbstractStream> childStreams = new HashSet<>();
     private volatile int weight = Constants.DEFAULT_WEIGHT;
-    private volatile long windowSize = ConnectionSettings.DEFAULT_WINDOW_SIZE;
+    private AtomicLong windowSize = new AtomicLong(ConnectionSettings.DEFAULT_WINDOW_SIZE);
 
     public Integer getIdentifier() {
         return identifier;
@@ -123,25 +124,22 @@ abstract class AbstractStream {
 
 
     protected void setWindowSize(long windowSize) {
-        this.windowSize = windowSize;
+        this.windowSize.set(windowSize);
     }
 
 
     protected long getWindowSize() {
-        return windowSize;
+        return windowSize.get();
     }
 
 
     protected void incrementWindowSize(int increment) {
-        windowSize += increment;
+        windowSize.addAndGet(increment);
     }
 
-
-    protected void decrementWindowSize(int decrement) {
-        windowSize += decrement;
-    }
 
     protected int reserveWindowSize(int reservation) {
+        long windowSize = this.windowSize.get();
         if (reservation > windowSize) {
             return (int) windowSize;
         } else {

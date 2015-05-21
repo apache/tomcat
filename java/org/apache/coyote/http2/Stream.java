@@ -221,8 +221,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     }
                 } while (thisWrite < 1);
 
-                decrementWindowSize(thisWrite);
-                handler.decrementWindowSize(thisWrite);
+                incrementWindowSize(-thisWrite);
+                handler.incrementWindowSize(-thisWrite);
 
                 // Do the write
                 handler.writeBody(Stream.this, buffer, thisWrite);
