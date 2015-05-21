@@ -28,6 +28,7 @@ import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.transport.Constants;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -43,8 +44,9 @@ import org.apache.juli.logging.LogFactory;
  */
 public class BioReplicationTask extends AbstractRxTask {
 
-
     private static final Log log = LogFactory.getLog( BioReplicationTask.class );
+
+    protected static final StringManager sm = StringManager.getManager(BioReplicationTask.class);
 
     protected Socket socket;
     protected ObjectReader reader;
@@ -61,20 +63,20 @@ public class BioReplicationTask extends AbstractRxTask {
         try {
             drainSocket();
         } catch ( Exception x ) {
-            log.error("Unable to service bio socket", x);
+            log.error(sm.getString("bioReplicationTask.unable.service"), x);
         }finally {
             try {
                 socket.close();
             }catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed to close socket", e);
+                    log.debug(sm.getString("bioReplicationTask.socket.closeFailed"), e);
                 }
             }
             try {
                 reader.close();
             }catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed to close reader", e);
+                    log.debug(sm.getString("bioReplicationTask.reader.closeFailed"), e);
                 }
             }
             reader = null;
@@ -113,7 +115,7 @@ public class BioReplicationTask extends AbstractRxTask {
                     if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(Constants.ACK_COMMAND);
                 }catch  ( Exception x ) {
                     if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(Constants.FAIL_ACK_COMMAND);
-                    log.error("Error thrown from messageDataReceived.",x);
+                    log.error(sm.getString("bioReplicationTask.messageDataReceived.error"),x);
                 }
                 if ( getUseBufferPool() ) {
                     BufferPool.getBufferPool().returnBuffer(msgs[i].getMessage());
@@ -159,7 +161,7 @@ public class BioReplicationTask extends AbstractRxTask {
                 log.trace("ACK sent to " + socket.getPort());
             }
         } catch ( java.io.IOException x ) {
-            log.warn("Unable to send ACK back through channel, channel disconnected?: "+x.getMessage());
+            log.warn(sm.getString("bioReplicationTask.unable.sendAck", x.getMessage()));
         }
     }
 
@@ -170,14 +172,14 @@ public class BioReplicationTask extends AbstractRxTask {
             socket.close();
         }catch (Exception e) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed to close socket", e);
+                log.debug(sm.getString("bioReplicationTask.socket.closeFailed"), e);
             }
         }
         try {
             reader.close();
         }catch (Exception e) {
             if (log.isDebugEnabled()) {
-                log.debug("Failed to close reader", e);
+                log.debug(sm.getString("bioReplicationTask.reader.closeFailed"), e);
             }
         }
         reader = null;
