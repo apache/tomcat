@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -37,6 +38,7 @@ import org.apache.juli.logging.LogFactory;
 public class ObjectReader {
 
     private static final Log log = LogFactory.getLog(ObjectReader.class);
+    protected static final StringManager sm = StringManager.getManager(ObjectReader.class);
 
     private XByteBuffer buffer;
 
@@ -65,7 +67,7 @@ public class ObjectReader {
             this.buffer = new XByteBuffer(socket.getReceiveBufferSize(), true);
         }catch ( IOException x ) {
             //unable to get buffer size
-            log.warn("Unable to retrieve the socket receiver buffer size, setting to default 43800 bytes.");
+            log.warn(sm.getString("objectReader.retrieveFailed.socketReceiverBufferSize"));
             this.buffer = new XByteBuffer(43800,true);
         }
     }

@@ -25,6 +25,8 @@ import java.io.ObjectStreamClass;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 
+import org.apache.catalina.tribes.util.StringManager;
+
 /**
  * Custom subclass of <code>ObjectInputStream</code> that loads from the
  * class loader for this web application.  This allows classes defined only
@@ -35,6 +37,7 @@ import java.lang.reflect.Proxy;
  */
 public final class ReplicationStream extends ObjectInputStream {
 
+    protected static final StringManager sm = StringManager.getManager(ReplicationStream.class);
 
     /**
      * The class loader we will use to resolve classes.
@@ -119,7 +122,7 @@ public final class ReplicationStream extends ObjectInputStream {
                 if (hasNonPublicInterface) {
                     if (nonPublicLoader != cl.getClassLoader()) {
                         throw new IllegalAccessError(
-                                "conflicting non-public interface class loaders");
+                                sm.getString("replicationStream.conflict"));
                     }
                 } else {
                     nonPublicLoader = cl.getClassLoader();
