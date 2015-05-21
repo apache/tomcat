@@ -160,7 +160,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         public synchronized DataSender getSender(long timeout) {
             long start = System.currentTimeMillis();
             while ( true ) {
-                if (!isOpen)throw new IllegalStateException("Queue is closed");
+                if (!isOpen)throw new IllegalStateException(sm.getString("pooledSender.closed.queue"));
                 DataSender sender = null;
                 if (notinuse.size() == 0 && inuse.size() < limit) {
                     sender = parent.getNewDataSender();
