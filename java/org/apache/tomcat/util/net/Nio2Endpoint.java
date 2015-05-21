@@ -102,7 +102,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     /**
      * Use the object caches to reduce GC at the expense of additional memory use.
      */
-    private boolean useCaches = false;
+    private boolean useCaches = true;
     public void setUseCaches(boolean useCaches) { this.useCaches = useCaches; }
     public boolean getUseCaches() { return useCaches; }
 
