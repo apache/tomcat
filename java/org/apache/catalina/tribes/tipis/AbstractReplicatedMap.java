@@ -42,6 +42,7 @@ import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.group.RpcChannel;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.util.Arrays;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -54,6 +55,8 @@ public abstract class AbstractReplicatedMap<K,V>
         MembershipListener, Heartbeat {
 
     private static final long serialVersionUID = 1L;
+
+    protected static final StringManager sm = StringManager.getManager(AbstractReplicatedMap.class);
 
     private final Log log = LogFactory.getLog(AbstractReplicatedMap.class);
 
@@ -200,7 +203,7 @@ public abstract class AbstractReplicatedMap<K,V>
     protected void init(MapOwner owner, Channel channel, String mapContextName,
             long timeout, int channelSendOptions,ClassLoader[] cls, boolean terminate) {
         long start = System.currentTimeMillis();
-        if (log.isInfoEnabled()) log.info("Initializing AbstractReplicatedMap with context name:"+mapContextName);
+        if (log.isInfoEnabled()) log.info(sm.getString("abstractReplicatedMap.init.start", mapContextName));
         this.mapOwner = owner;
         this.externalLoaders = cls;
         this.channelSendOptions = channelSendOptions;
@@ -228,15 +231,15 @@ public abstract class AbstractReplicatedMap<K,V>
             //state is transferred, we are ready for messaging
             broadcast(MapMessage.MSG_START, true);
         } catch (ChannelException x) {
-            log.warn("Unable to send map start message.");
+            log.warn(sm.getString("abstractReplicatedMap.unableSend.startMessage"));
             if (terminate) {
                 breakdown();
-                throw new RuntimeException("Unable to start replicated map.",x);
+                throw new RuntimeException(sm.getString("abstractReplicatedMap.unableStart"),x);
             }
         }
         long complete = System.currentTimeMillis() - start;
         if (log.isInfoEnabled())
-            log.info("AbstractReplicatedMap[" +mapContextName + "] initialization was completed in " + complete + " ms.");
+            log.info(sm.getString("abstractReplicatedMap.init.completed", mapContextName, complete));
     }
 
 
@@ -321,7 +324,7 @@ public abstract class AbstractReplicatedMap<K,V>
                     messageReceived(resp[i].getMessage(), resp[i].getSource());
                 }
             } else {
-                log.warn("broadcast received 0 replies, probably a timeout.");
+                log.warn(sm.getString("abstractReplicatedMap.broadcast.noReplies"));
             }
         } else {
             channel.send(channel.getMembers(),msg,channelSendOptions);
@@ -433,7 +436,7 @@ public abstract class AbstractReplicatedMap<K,V>
                                          entry.getBackupNodes());
                     rentry.resetDiff();
                 } catch (IOException x) {
-                    log.error("Unable to diff object. Will replicate the entire object instead.", x);
+                    log.error(sm.getString("abstractReplicatedMap.unable.diffObject"), x);
                 } finally {
                     rentry.unlock();
                 }
@@ -457,7 +460,7 @@ public abstract class AbstractReplicatedMap<K,V>
                     channel.send(entry.getBackupNodes(), msg, channelSendOptions);
                 }
             } catch (ChannelException x) {
-                log.error("Unable to replicate data.", x);
+                log.error(sm.getString("abstractReplicatedMap.unable.replicate"), x);
             }
         } //end if
 
@@ -497,15 +500,15 @@ public abstract class AbstractReplicatedMap<K,V>
                     }
                     stateTransferred = true;
                 } else {
-                    log.warn("Transfer state, 0 replies, probably a timeout.");
+                    log.warn(sm.getString("abstractReplicatedMap.transferState.noReplies"));
                 }
             }
         } catch (ChannelException x) {
-            log.error("Unable to transfer LazyReplicatedMap state.", x);
+            log.error(sm.getString("abstractReplicatedMap.unable.transferState"), x);
         } catch (IOException x) {
-            log.error("Unable to transfer LazyReplicatedMap state.", x);
+            log.error(sm.getString("abstractReplicatedMap.unable.transferState"), x);
         } catch (ClassNotFoundException x) {
-            log.error("Unable to transfer LazyReplicatedMap state.", x);
+            log.error(sm.getString("abstractReplicatedMap.unable.transferState"), x);
         }
     }
 
@@ -586,9 +589,9 @@ public abstract class AbstractReplicatedMap<K,V>
                 memberAlive(mapmsg.getPrimary());
             }
         } catch (IOException x ) {
-            log.error("Unable to deserialize MapMessage.",x);
+            log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"),x);
         } catch (ClassNotFoundException x ) {
-            log.error("Unable to deserialize MapMessage.",x);
+            log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"),x);
         }
     }
 
@@ -605,10 +608,10 @@ public abstract class AbstractReplicatedMap<K,V>
         try {
             mapmsg.deserialize(getExternalLoaders());
         } catch (IOException x) {
-            log.error("Unable to deserialize MapMessage.", x);
+            log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"), x);
             return;
         } catch (ClassNotFoundException x) {
-            log.error("Unable to deserialize MapMessage.", x);
+            log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"), x);
             return;
         }
         if ( log.isTraceEnabled() )
@@ -666,7 +669,7 @@ public abstract class AbstractReplicatedMap<K,V>
                         try {
                             diff.applyDiff(mapmsg.getDiffValue(), 0, mapmsg.getDiffValue().length);
                         } catch (Exception x) {
-                            log.error("Unable to apply diff to key:" + entry.getKey(), x);
+                            log.error(sm.getString("abstractReplicatedMap.unableApply.diff", entry.getKey()), x);
                         } finally {
                             diff.unlock();
                         }
@@ -748,7 +751,7 @@ public abstract class AbstractReplicatedMap<K,V>
                             entry.setBackupNodes(backup);
                             entry.setPrimary(channel.getLocalMember(false));
                         } catch (ChannelException x) {
-                            log.error("Unable to select backup node.", x);
+                            log.error(sm.getString("abstractReplicatedMap.unableSelect.backup"), x);
                         } //catch
                     } //end if
                 } //while
@@ -791,7 +794,7 @@ public abstract class AbstractReplicatedMap<K,V>
             }
         }
         if (log.isInfoEnabled())
-            log.info("Member["+member+"] disappeared. Related map entries will be relocated to the new node.");
+            log.info(sm.getString("abstractReplicatedMap.member.disappeared", member));
         long start = System.currentTimeMillis();
         Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
         while (i.hasNext()) {
@@ -805,7 +808,7 @@ public abstract class AbstractReplicatedMap<K,V>
                     entry.setBackupNodes(backup);
                     entry.setPrimary(channel.getLocalMember(false));
                 } catch (ChannelException x) {
-                    log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
+                    log.error(sm.getString("abstractReplicatedMap.unable.relocate", entry.getKey()), x);
                 }
             } else if (member.equals(entry.getPrimary())) {
                 if (log.isDebugEnabled()) log.debug("[2] Primary disappeared");
@@ -836,13 +839,13 @@ public abstract class AbstractReplicatedMap<K,V>
                     if ( mapOwner!=null ) mapOwner.objectMadePrimary(entry.getKey(),entry.getValue());
 
                 } catch (ChannelException x) {
-                    log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
+                    log.error(sm.getString("abstractReplicatedMap.unable.relocate", entry.getKey()), x);
                 }
             }
 
         } //while
         long complete = System.currentTimeMillis() - start;
-        if (log.isInfoEnabled()) log.info("Relocation of map entries was complete in " + complete + " ms.");
+        if (log.isInfoEnabled()) log.info(sm.getString("abstractReplicatedMap.relocate.complete", complete));
     }
 
     public int getNextBackupIndex() {
@@ -870,7 +873,7 @@ public abstract class AbstractReplicatedMap<K,V>
         try {
             ping(accessTimeout);
         }catch ( Exception x ) {
-            log.error("Unable to send AbstractReplicatedMap.ping message",x);
+            log.error(sm.getString("abstractReplicatedMap.heartbeat.failed"),x);
         }
     }
 
@@ -897,7 +900,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 getChannel().send(getMapMembers(), msg, getChannelSendOptions());
             }
         } catch ( ChannelException x ) {
-            log.error("Unable to replicate out data for a LazyReplicatedMap.remove operation",x);
+            log.error(sm.getString("abstractReplicatedMap.unable.remove"),x);
         }
         return entry!=null?entry.getValue():null;
     }
@@ -927,7 +930,7 @@ public abstract class AbstractReplicatedMap<K,V>
                     Response[] resp = getRpcChannel().send(entry.getBackupNodes(),msg, RpcChannel.FIRST_REPLY, Channel.SEND_OPTIONS_DEFAULT, getRpcTimeout());
                     if (resp == null || resp.length == 0) {
                         //no responses
-                        log.warn("Unable to retrieve remote object for key:" + key);
+                        log.warn(sm.getString("abstractReplicatedMap.unable.retrieve", key));
                         return null;
                     }
                     msg = (MapMessage) resp[0].getMessage();
@@ -961,7 +964,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 if ( getMapOwner()!=null ) getMapOwner().objectMadePrimary(key, entry.getValue());
 
             } catch (Exception x) {
-                log.error("Unable to replicate out data for a LazyReplicatedMap.get operation", x);
+                log.error(sm.getString("abstractReplicatedMap.unable.get"), x);
                 return null;
             }
         }
@@ -1027,7 +1030,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 entry.setBackupNodes(backup);
             }
         } catch (ChannelException x) {
-            log.error("Unable to replicate out data for a LazyReplicatedMap.put operation", x);
+            log.error(sm.getString("abstractReplicatedMap.unable.put"), x);
         }
         innerMap.put(key,entry);
         return old;
@@ -1080,7 +1083,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     @Override
     public Object clone() {
-        throw new UnsupportedOperationException("This operation is not valid on a replicated map");
+        throw new UnsupportedOperationException(sm.getString("abstractReplicatedMap.unsupport.operation"));
     }
 
     /**
@@ -1416,7 +1419,7 @@ public abstract class AbstractReplicatedMap<K,V>
             try {
                 return key(null);
             } catch ( Exception x ) {
-                throw new RuntimeException("Deserialization error of the MapMessage.key", x);
+                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.key"), x);
             }
         }
 
@@ -1436,7 +1439,7 @@ public abstract class AbstractReplicatedMap<K,V>
             try {
                 return value(null);
             } catch ( Exception x ) {
-                throw new RuntimeException("Deserialization error of the MapMessage.value", x);
+                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.value"), x);
             }
         }
 
