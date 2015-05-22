@@ -83,7 +83,6 @@ for use by web applications (by placing them in "lib"):
 * tomcat-dbcp.jar (package renamed database connection pool based on Commons DBCP)
 * tomcat-jdbc.jar (Tomcat's database connection pooling solution)
 * tomcat-jni.jar (Interface to the native component of the APR/native connector)
-* tomcat-spdy.jar (SPDY implementation)
 * tomcat-util.jar (Various utilities)
 * tomcat-websocket.jar (WebSocket 1.1 implementation)
 * websocket-api.jar (WebSocket 1.1 API)

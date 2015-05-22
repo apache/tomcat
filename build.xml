@@ -100,7 +100,6 @@
   <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
   <property name="tomcat-dbcp.jar" value="${tomcat.build}/lib/tomcat-dbcp.jar"/>
   <property name="tomcat-jni.jar" value="${tomcat.build}/lib/tomcat-jni.jar"/>
-  <property name="tomcat-spdy.jar" value="${tomcat.build}/lib/tomcat-spdy.jar"/>
   <property name="tomcat-api.jar" value="${tomcat.build}/lib/tomcat-api.jar"/>
   <property name="tomcat-util.jar" value="${tomcat.build}/lib/tomcat-util.jar"/>
   <property name="tomcat-util-scan.jar" value="${tomcat.build}/lib/tomcat-util-scan.jar"/>
@@ -124,7 +123,6 @@
   <property name="catalina-ant-src.jar" value="${tomcat.src.jars}/catalina-ant-src.jar"/>
   <property name="catalina-storeconfig-src.jar" value="${tomcat.src.jars}/catalina-storeconfig-src.jar"/>
   <property name="tomcat-jni-src.jar" value="${tomcat.src.jars}/tomcat-jni-src.jar"/>
-  <property name="tomcat-spdy-src.jar" value="${tomcat.src.jars}/tomcat-spdy-src.jar"/>
   <property name="tomcat-coyote-src.jar" value="${tomcat.src.jars}/tomcat-coyote-src.jar"/>
   <property name="tomcat-dbcp-src.jar" value="${tomcat.src.jars}/tomcat-dbcp-src.jar"/>
   <property name="tomcat-api-src.jar" value="${tomcat.src.jars}/tomcat-api-src.jar"/>
@@ -194,12 +192,9 @@
   <defaultexcludes remove="**/.gitignore" />
   <!--<defaultexcludes echo="true" />-->
 
-  <available file="${npn.jar}" property="npn.exists" />
-
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
-    <pathelement location="${npn.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -347,7 +342,6 @@
     <exclude name="org/apache/tomcat/buildutil" />
     <exclude name="org/apache/tomcat/dbcp" />
     <exclude name="org/apache/tomcat/jni" />
-    <exclude name="org/apache/tomcat/spdy" />
     <exclude name="org/apache/tomcat/util" />
     <exclude name="org/apache/tomcat/websocket" />
   </patternset>
@@ -412,8 +406,6 @@
 
   <patternset id="files.tomcat-coyote">
     <include name="org/apache/coyote/**" />
-    <!-- Included in tomcat-spdy -->
-    <exclude name="org/apache/coyote/spdy/**" />
     <!-- Remaining tomcat-util packages -->
     <include name="org/apache/tomcat/util/bcel/**" />
     <include name="org/apache/tomcat/util/collections/**" />
@@ -421,11 +413,6 @@
     <include name="org/apache/tomcat/util/log/**" />
     <include name="org/apache/tomcat/util/modeler/**" />
     <include name="org/apache/tomcat/util/net/**" />
-  </patternset>
-
-  <patternset id="files.tomcat-spdy">
-    <include name="org/apache/coyote/spdy/**" />
-    <include name="org/apache/tomcat/spdy/**" />
   </patternset>
 
   <patternset id="files.jasper">
@@ -661,10 +648,7 @@
       <compilerarg value="-Xlint:unchecked"/>
       -->
       <classpath refid="compile.classpath" />
-        <exclude name="org/apache/naming/factory/webservices/**" />
-        <exclude name="org/apache/tomcat/spdy/NetSupportJava7*" unless="npn.exists"/>
-        <exclude name="org/apache/coyote/spdy/*Nio*" unless="npn.exists"/>
-        <exclude name="org/apache/coyote/spdy/SpdyNpnHandler*" unless="npn.exists"/>
+      <exclude name="org/apache/naming/factory/webservices/**" />
     </javac>
     <!-- Copy static resource files -->
     <copy todir="${tomcat.classes}" encoding="ISO-8859-1">
@@ -795,10 +779,6 @@
     <jarIt jarfile="${tomcat-coyote.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-coyote" />
-
-    <jarIt jarfile="${tomcat-spdy.jar}"
-      filesDir="${tomcat.classes}"
-      filesId="files.tomcat-spdy" />
 
     <jarIt jarfile="${tomcat-jni.jar}"
       filesDir="${tomcat.classes}"
@@ -2696,11 +2676,6 @@ skip.installer property in build.properties" />
       notice="${tomcat.manifests}/tomcat-coyote.jar.notice"
       license="${tomcat.manifests}/tomcat-coyote.license" />
 
-    <!-- SPDY -->
-    <jarIt jarfile="${tomcat-spdy-src.jar}"
-      filesDir="java"
-      filesId="files.tomcat-spdy" />
-
     <!-- JNI -->
     <jarIt jarfile="${tomcat-jni-src.jar}"
       filesDir="java"
@@ -2786,15 +2761,6 @@ skip.installer property in build.properties" />
       <param name="destdir" value="${jdt.home}"/>
     </antcall>
 
-  </target>
-
-  <target name="download-npn"
-          description="Download optional NPN" >
-    <antcall target="downloadfile">
-     <param name="sourcefile" value="${npn.loc}"/>
-     <param name="destfile" value="${npn.jar}"/>
-     <param name="destdir" value="${npn.home}"/>
-    </antcall>
   </target>
 
   <target name="download-test-compile"
