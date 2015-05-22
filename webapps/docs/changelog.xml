@@ -84,6 +84,12 @@
         receives the correct error code rather than simply closing the
         connection. (markt)
       </fix>
+      <add>
+        <bug>57943</bug>: Added a work-around to catch
+        <code>ConcurrentModificationException</code>s during Poller timeout
+        processing that were causing the Poller thread to stop. The root cause
+        of these exceptions is currently unknown. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
