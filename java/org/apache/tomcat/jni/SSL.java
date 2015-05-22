@@ -345,6 +345,10 @@ public final class SSL {
      * You can use a low priority thread to generate them on the fly.
      * @param idx temporary key index.
      */
+    /**
+     * @deprecated Only useful in combination with EXPORT Cipher
+     */
+    @Deprecated
     public static native boolean generateRSATempKey(int idx);
 
     /**
@@ -360,6 +364,10 @@ public final class SSL {
      * @param idx temporary key index.
      * @param file File containing DH params.
      */
+    /**
+     * @deprecated Now automatically loaded from certificate file
+     */
+    @Deprecated
     public static native boolean loadDSATempKey(int idx, String file);
 
     /**
