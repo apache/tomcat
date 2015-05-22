@@ -144,12 +144,6 @@ jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 jdt.loc.1=http://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 
-# ---- NPN support
-npn.version=8.1.2.v20120308
-npn.home=${base.path}/npn-${npn.version}
-npn.jar=${npn.home}/npn-${npn.version}.jar
-npn.loc=http://repo1.maven.org/maven2/org/eclipse/jetty/npn/npn-api/${npn.version}/npn-api-${npn.version}.jar
-
 # ----- Tomcat native library -----
 tomcat-native.version=1.1.33
 tomcat-native.home=${base.path}/tomcat-native-${tomcat-native.version}

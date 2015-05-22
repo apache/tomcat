@@ -156,7 +156,6 @@ loaders as it is initialized:</p>
     <li><em>tomcat-jdbc.jar</em> &#8212; An alternative database connection pool
         implementation, known as Tomcat JDBC pool. See
         <a href="jdbc-pool.html">documentation</a> for more details.</li>
-    <li><em>tomcat-spdy.jar</em> &#8212; SPDY implementation</li>
     <li><em>tomcat-util.jar</em> &#8212; Common classes used by various components of
         Apache Tomcat.</li>
     <li><em>tomcat-websocket.jar</em> &#8212; WebSocket 1.1 implementation</li>

@@ -33,7 +33,7 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
 
  6. See what Java 8 language features we want to use.
 
- 7. Connector refactoring required for HTTP2/SPDY APIs that might be exposed in
+ 7. Connector refactoring required for HTTP/2 APIs that might be exposed in
     the Servlet API.
 
  8. Keep an eye on the other Java EE 8 EGs (no sign of any movement apart

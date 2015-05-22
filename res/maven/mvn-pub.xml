@@ -323,7 +323,6 @@
 
     <doMavenDeploy artifactId="tomcat-api"/>
     <doMavenDeploy artifactId="tomcat-jni"/>
-    <doMavenDeploy artifactId="tomcat-spdy"/>
     <doMavenDeploy artifactId="tomcat-util"/>
     <doMavenDeploy artifactId="tomcat-util-scan"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
