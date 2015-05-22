@@ -93,9 +93,8 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
     }
 
     public void report(double timeTx) {
-        
         if ( log.isInfoEnabled() )
-            log.info(sm.getString("throughputInterceptor.report", 
+            log.info(sm.getString("throughputInterceptor.report",
                     msgTxCnt, df.format(mbTx), df.format(mbAppTx), df.format(timeTx), df.format(mbTx/timeTx),
                     df.format(mbAppTx/timeTx), msgTxErr, msgRxCnt, df.format(mbRx/((System.currentTimeMillis()-rxStart)/1000)),
                     df.format(mbRx)));
