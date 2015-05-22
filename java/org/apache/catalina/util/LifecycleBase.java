@@ -117,7 +117,13 @@ public abstract class LifecycleBase implements Lifecycle {
         LifecycleEvent event = new LifecycleEvent(this, type, data);
         LifecycleListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++) {
-            interested[i].lifecycleEvent(event);
+            try {
+                interested[i].lifecycleEvent(event);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("lifecycleBase.listenerFail",
+                        type, interested[i].getClass().getName()), t);
+            }
         }
     }
 
