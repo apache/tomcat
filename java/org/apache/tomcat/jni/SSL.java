@@ -330,37 +330,6 @@ public final class SSL {
      public static native void setPassword(String password);
 
     /**
-     * Generate temporary RSA key.
-     * <br>
-     * Index can be one of:
-     * <PRE>
-     * SSL_TMP_KEY_RSA_512
-     * SSL_TMP_KEY_RSA_1024
-     * SSL_TMP_KEY_RSA_2048
-     * SSL_TMP_KEY_RSA_4096
-     * </PRE>
-     * By default 512 and 1024 keys are generated on startup.
-     * You can use a low priority thread to generate them on the fly.
-     * @param idx temporary key index.
-     */
-    public static native boolean generateRSATempKey(int idx);
-
-    /**
-     * Load temporary DSA key from file
-     * <br>
-     * Index can be one of:
-     * <PRE>
-     * SSL_TMP_KEY_DH_512
-     * SSL_TMP_KEY_DH_1024
-     * SSL_TMP_KEY_DH_2048
-     * SSL_TMP_KEY_DH_4096
-     * </PRE>
-     * @param idx temporary key index.
-     * @param file File containing DH params.
-     */
-    public static native boolean loadDSATempKey(int idx, String file);
-
-    /**
      * Return last SSL error string
      */
     public static native String getLastError();
