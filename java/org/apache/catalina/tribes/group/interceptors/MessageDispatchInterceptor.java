@@ -41,7 +41,7 @@ import org.apache.juli.logging.LogFactory;
 public class MessageDispatchInterceptor extends ChannelInterceptorBase implements Runnable {
     private static final Log log = LogFactory.getLog(MessageDispatchInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(MessageDispatchInterceptor.class);
-    
+
     protected long maxQueueSize = 1024*1024*64; //64MB
     protected final FastQueue queue = new FastQueue();
     protected volatile boolean run = false;
