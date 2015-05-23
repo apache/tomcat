@@ -55,7 +55,12 @@ public class TesterOpenSSL {
                     Cipher.SSL2_DES_192_EDE3_CBC_WITH_MD5,
                     Cipher.SSL2_IDEA_128_CBC_WITH_MD5,
                     Cipher.SSL2_RC2_CBC_128_CBC_WITH_MD5,
-                    Cipher.SSL2_RC4_128_EXPORT40_WITH_MD5)));
+                    Cipher.SSL2_RC4_128_EXPORT40_WITH_MD5,
+                    // The following have been removed from OpenSSL on 2015-05-23
+                    Cipher.TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA,
+                    Cipher.SSL_DH_RSA_EXPORT_WITH_DES40_CBC_SHA,
+                    Cipher.TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA,
+                    Cipher.SSL_DH_DSS_EXPORT_WITH_DES40_CBC_SHA)));
 
     static {
         // Note: The tests are configured for the OpenSSL 1.1.0 development
