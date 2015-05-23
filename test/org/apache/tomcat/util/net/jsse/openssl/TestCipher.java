@@ -101,6 +101,11 @@ public class TestCipher {
             if (openSSLAlias.contains("DHE-DSS-RC4-SHA")) {
                 continue;
             }
+            // OpenSSL removed (broken) support for EXP-DH-RSA-DES-CBC-SHA
+            // and EXP-DH-DSS-DES-CBC-SHA on 2015-05-23.
+            if (openSSLAlias.contains("EXP-DH-")) {
+                continue;
+            }
             // RC2-MD5 is not referenced in the OpenSSL source so exclude it
             // from the expected list
             if (openSSLAlias.contains("RC2-MD5")) {
