@@ -13,7 +13,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-Tomcat 5 Startup Sequence
+Tomcat Startup Sequence
 
 Sequence 1. Start from Command Line
 Class: org.apache.catalina.startup.Bootstrap
@@ -22,13 +22,15 @@ What it does:
         commonLoader (common)-> System Loader
         sharedLoader (shared)-> commonLoader -> System Loader
         catalinaLoader(server) -> commonLoader -> System Loader
+        (by default the commonLoader is used for the
+         sharedLoader and the serverLoader)
     b) Load startup class (reflection)
         org.apache.catalina.startup.Catalina
         setParentClassloader -> sharedLoader
         Thread.contextClassloader -> catalinaLoader
     c) Bootstrap.daemon.init() complete
 
-Sequence 2. Process command line argument (start, startd, stop, stopd)
+Sequence 2. Process command line argument (start, stop)
 Class: org.apache.catalina.startup.Bootstrap (assume command->start)
 What it does:
     a) Catalina.setAwait(true);
@@ -50,7 +52,7 @@ What it does:
                 The single entry for a set of connectors,
                 so that a container can listen to multiple connectors
                 ie, single entry
-            org.apache.coyote.tomcat5.CoyoteConnector
+            org.apache.catalina.Connector
                 Connectors to listen for incoming requests only
             It also adds the following rulesets to the digester
                 NamingRuleSet
@@ -67,13 +69,13 @@ What it does:
             During the process call the Connectors also initialize the adapters.
             The adapters are the components that do the request pre-processing.
             Typical adapters are HTTP1.1 (default if no protocol is specified,
-            org.apache.coyote.http11.Http11Protocol)
+            org.apache.coyote.http11.Http11NioProtocol)
             AJP1.3 for mod_jk etc.
 
     c) Catalina.start()
         c1) Starts the NamingContext and binds all JNDI references into it
         c2) Starts the services under <Server> which are:
-            StandardService -> starts Engine (ContainerBase ->Logger,Loader,Realm,Cluster etc)
+            StandardService -> starts Engine (ContainerBase -> Realm,Cluster etc)
         c3) StandardHost (started by the service)
                 Configures a ErrorReportValvem to do proper HTML output for different HTTP
                 errors codes
@@ -85,8 +87,7 @@ What it does:
                 Starts the HostConfig component
                     This component deploys all the webapps
                         (webapps & conf/Catalina/localhost/*.xml)
-                    Webapps are installed using the deployer (StandardHostDeployer)
-                    The deployer will create a Digester for your context, this digester
+                    HostConfig will create a Digester for your context, this digester
                     will then invoke ContextConfig.start()
                         The ContextConfig.start() will process the default web.xml (conf/web.xml)
                         and then process the applications web.xml (WEB-INF/web.xml)
@@ -96,23 +97,23 @@ What it does:
             context xml file, web.xml) then a reload is issued (stop/remove/deploy/start)
 
     d) Tomcat receives a request on an HTTP port
-        d1) The request is received by a separate thread which is waiting in the PoolTcpEndPoint
+        d1) The request is received by a separate thread which is waiting in the ThreadPoolExecutor
              class. It is waiting for a request in a regular ServerSocket.accept() method.
              When a request is received, this thread wakes up.
-        d2) The PoolTcpEndPoint assigns the a TcpConnection to handle the request.
+        d2) The ThreadPoolExecutor assigns the a TaskThread to handle the request.
             It also supplies a JMX object name to the catalina container (not used I believe)
         d3) The processor to handle the request in this case is Coyote Http11Processor,
             and the process method is invoked.
             This same processor is also continuing to check the input stream of the socket
             until the keep alive point is reached or the connection is disconnected.
-        d4) The HTTP request is parsed using an internal buffer class (Coyote Http11 Internal Buffer)
+        d4) The HTTP request is parsed using an internal buffer class (Http11InputBuffer)
             The buffer class parses the request line, the headers, etc and store the result in a
             Coyote request (not an HTTP request) This request contains all the HTTP info, such
             as servername, port, scheme, etc.
         d5) The processor contains a reference to an Adapter, in this case it is the
-            Coyote Tomcat 5 Adapter. Once the request has been parsed, the Http11 processor
+            CoyoteAdapter. Once the request has been parsed, the Http11Processor
             invokes service() on the adapter. In the service method, the Request contains a
-            CoyoteRequest and CoyoteRespons (null for the first time)
+            CoyoteRequest and CoyoteResponse (null for the first time)
             The CoyoteRequest(Response) implements HttpRequest(Response) and HttpServletRequest(Response)
             The adapter parses and associates everything with the request, cookies, the context through a
             Mapper, etc
