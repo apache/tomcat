@@ -32,7 +32,7 @@ import java.net.URL;
 public interface Jar extends AutoCloseable {
 
     /**
-     * Obtain the URL for accessing the JAR file.
+     * @return The URL for accessing the JAR file.
      */
     URL getJarFileURL();
 
@@ -42,6 +42,9 @@ public interface Jar extends AutoCloseable {
      * @param name  Entry to look for
      * @return      <code>true</code> if the specified entry exists else
      *               <code>false</code>
+     *
+     * @throws IOException if an I/O error occurs while processing the JAR file
+     *   entries
      */
     boolean entryExists(String name) throws IOException;
 
@@ -53,6 +56,8 @@ public interface Jar extends AutoCloseable {
      * @param name  Entry to obtain an {@link InputStream} for
      * @return      An {@link InputStream} for the specified entry or null if
      *              the entry does not exist
+     *
+     * @throws IOException if an I/O error occurs while processing the JAR file
      */
     InputStream getInputStream(String name) throws IOException;
 
@@ -64,6 +69,8 @@ public interface Jar extends AutoCloseable {
      * @return The time (in the same format as
      *         {@link System#currentTimeMillis()} that the resource was last
      *         modified. Returns -1 if the entry does not exist
+     *
+     * @throws IOException if an I/O error occurs while processing the JAR file
      */
     long getLastModified(String name) throws IOException;
 
