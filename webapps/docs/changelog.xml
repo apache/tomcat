@@ -90,6 +90,10 @@
         processing that were causing the Poller thread to stop. The root cause
         of these exceptions is currently unknown. (markt)
       </add>
+      <fix>
+        Fix possible very long (1000 seconds) timeout with APR/native connector.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
