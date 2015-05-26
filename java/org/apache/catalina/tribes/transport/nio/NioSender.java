@@ -125,8 +125,8 @@ public class NioSender extends AbstractSender {
             }//end if
         } else {
             //unknown state, should never happen
-            log.warn(sm.getString("nioSender.unknown.state", ops));
-            throw new IOException(sm.getString("nioSender.unknown.state", ops));
+            log.warn(sm.getString("nioSender.unknown.state", Integer.toString(ops)));
+            throw new IOException(sm.getString("nioSender.unknown.state", Integer.toString(ops)));
         }//end if
         return false;
     }

@@ -96,8 +96,12 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
             }
             if ( remaining > 0 ) {
                 //timeout has occurred
-                ChannelException cxtimeout = new ChannelException(sm.getString("parallelNioSender.operation.timedout", getTimeout()));
-                if ( cx==null ) cx = new ChannelException(sm.getString("parallelNioSender.operation.timedout", getTimeout()));
+                ChannelException cxtimeout = new ChannelException(sm.getString(
+                        "parallelNioSender.operation.timedout", Long.toString(getTimeout())));
+                if (cx == null) {
+                    cx = new ChannelException(sm.getString("parallelNioSender.operation.timedout",
+                            Long.toString(getTimeout())));
+                }
                 for (int i=0; i<senders.length; i++ ) {
                     if (!senders[i].isComplete()) {
                         cx.addFaultyMember(senders[i].getDestination(),cxtimeout);
@@ -183,8 +187,9 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                     }
                 } else {
                     ChannelException cx = new ChannelException(
-                            sm.getString("parallelNioSender.sendFailed.attempt", sender.getAttempt(), maxAttempts),
-                            x);
+                            sm.getString("parallelNioSender.sendFailed.attempt",
+                                    Integer.toString(sender.getAttempt()),
+                                    Integer.toString(maxAttempts)), x);
                     cx.addFaultyMember(sender.getDestination(),x);
                     throw cx;
                 }//end if

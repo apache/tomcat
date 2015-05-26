@@ -142,7 +142,8 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             if (svc == 0 ) return;//nothing to start
 
             if (svc == (svc & startLevel)) {
-                throw new ChannelException(sm.getString("channelCoordinator.alreadyStarted", svc));
+                throw new ChannelException(sm.getString("channelCoordinator.alreadyStarted",
+                        Integer.toString(svc)));
             }
 
             //must start the receiver first so that we can coordinate the port it

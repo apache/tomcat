@@ -39,7 +39,9 @@ public class PooledParallelSender extends PooledSender {
         if ( !connected ) throw new ChannelException(sm.getString("pooledParallelSender.sender.disconnected"));
         ParallelNioSender sender = (ParallelNioSender)getSender();
         if (sender == null) {
-            ChannelException cx = new ChannelException(sm.getString("pooledParallelSender.unable.retrieveSender.timeout", getMaxWait()));
+            ChannelException cx = new ChannelException(sm.getString(
+                    "pooledParallelSender.unable.retrieveSender.timeout",
+                    Long.toString(getMaxWait())));
             for (int i = 0; i < destination.length; i++)
                 cx.addFaultyMember(destination[i], new NullPointerException(sm.getString("pooledParallelSender.unable.retrieveSender")));
             throw cx;

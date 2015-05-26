@@ -210,7 +210,7 @@ public class McastServiceImpl {
     protected void setupSocket() throws IOException {
         if (mcastBindAddress != null) {
             try {
-                log.info(sm.getString("mcastServiceImpl.bind", address, port));
+                log.info(sm.getString("mcastServiceImpl.bind", address, Integer.toString(port)));
                 socket = new MulticastSocket(new InetSocketAddress(address,port));
             } catch (BindException e) {
                 /*
@@ -231,14 +231,16 @@ public class McastServiceImpl {
             socket.setInterface(mcastBindAddress);
         } //end if
         //force a so timeout so that we don't block forever
-        if ( mcastSoTimeout <= 0 ) mcastSoTimeout = (int)sendFrequency;
-        if(log.isInfoEnabled())
-            log.info(sm.getString("mcastServiceImpl.setSoTimeout", mcastSoTimeout));
+        if (mcastSoTimeout <= 0) mcastSoTimeout = (int)sendFrequency;
+        if (log.isInfoEnabled()) {
+            log.info(sm.getString("mcastServiceImpl.setSoTimeout",
+                    Integer.toString(mcastSoTimeout)));
+        }
         socket.setSoTimeout(mcastSoTimeout);
 
         if ( mcastTTL >= 0 ) {
             if(log.isInfoEnabled())
-                log.info(sm.getString("mcastServiceImpl.setTTL", mcastTTL));
+                log.info(sm.getString("mcastServiceImpl.setTTL", Integer.toString(mcastTTL)));
             socket.setTimeToLive(mcastTTL);
         }
     }
@@ -289,10 +291,11 @@ public class McastServiceImpl {
     private void waitForMembers(int level) {
         long memberwait = sendFrequency*2;
         if(log.isInfoEnabled())
-            log.info(sm.getString("mcastServiceImpl.waitForMembers.start", memberwait, level));
+            log.info(sm.getString("mcastServiceImpl.waitForMembers.start",
+                    Long.toString(memberwait), Integer.toString(level)));
         try {Thread.sleep(memberwait);}catch (InterruptedException ignore){}
         if(log.isInfoEnabled())
-            log.info(sm.getString("mcastServiceImpl.waitForMembers.done", level));
+            log.info(sm.getString("mcastServiceImpl.waitForMembers.done", Integer.toString(level)));
     }
 
     /**
@@ -343,7 +346,8 @@ public class McastServiceImpl {
 
             socket.receive(receivePacket);
             if(receivePacket.getLength() > MAX_PACKET_SIZE) {
-                log.error(sm.getString("mcastServiceImpl.packet.tooLong", receivePacket.getLength()));
+                log.error(sm.getString("mcastServiceImpl.packet.tooLong",
+                        Integer.toString(receivePacket.getLength())));
             } else {
                 byte[] data = new byte[receivePacket.getLength()];
                 System.arraycopy(receivePacket.getData(), receivePacket.getOffset(), data, 0, data.length);
@@ -644,7 +648,9 @@ public class McastServiceImpl {
                     try {
                         if (!success) {
                             if(log.isInfoEnabled())
-                                log.info(sm.getString("mcastServiceImpl.recovery.failed", ++attempt, parent.recoverySleepTime));
+                                log.info(sm.getString("mcastServiceImpl.recovery.failed",
+                                        Integer.toString(++attempt),
+                                        Long.toString(parent.recoverySleepTime)));
                             Thread.sleep(parent.recoverySleepTime);
                         }
                     }catch (InterruptedException ignore) {
