@@ -10,10 +10,10 @@ open source software.  The original software and
 related information is available at
 http://nsis.sourceforge.net.
 
-Java compilation software for JSP pages is provided by Eclipse,
-which is open source software.  The original software and
-related information is available at
-http://www.eclipse.org.
+Java compilation software for JSP pages is provided by the Eclipse
+JDT Core Batch Compiler component, which is open source software.
+The original software and related information is available at
+http://www.eclipse.org/jdt/core/.
 
 For the bayeux implementation
 The org.apache.cometd.bayeux API is derivative work originating at the Dojo Foundation
