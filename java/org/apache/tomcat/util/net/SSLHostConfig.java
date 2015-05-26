@@ -66,7 +66,7 @@ public class SSLHostConfig {
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     private int sessionCacheSize = 0;
     private int sessionTimeout = 86400;
-    private String sslProtocol = "TLS";
+    private String sslProtocol = Constants.SSL_PROTO_TLS;
     private String trustManagerClassName;
     private String truststoreAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
     private String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
@@ -86,7 +86,7 @@ public class SSLHostConfig {
 
     public SSLHostConfig() {
         // Set defaults that can't be (easily) set when defining the fields.
-        setProtocols("all");
+        setProtocols(Constants.SSL_PROTO_ALL);
         // Configure fall-back defaults if system property is not set.
         if (certificateKeystoreType == null) {
             certificateKeystoreType = "JKS";
@@ -238,11 +238,11 @@ public class SSLHostConfig {
         for (String value: values) {
             String trimmed = value.trim();
             if (trimmed.length() > 0) {
-                if (input.trim().equalsIgnoreCase("all")) {
-                    protocols.add("SSLv2Hello");
-                    protocols.add("TLSv1");
-                    protocols.add("TLSv1.1");
-                    protocols.add("TLSv1.2");
+                if (input.trim().equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
+                    protocols.add(Constants.SSL_PROTO_SSLv2Hello);
+                    protocols.add(Constants.SSL_PROTO_TLSv1);
+                    protocols.add(Constants.SSL_PROTO_TLSv1_1);
+                    protocols.add(Constants.SSL_PROTO_TLSv1_2);
                 } else {
                     protocols.add(trimmed);
                 }

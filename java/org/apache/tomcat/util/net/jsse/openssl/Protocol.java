@@ -17,12 +17,14 @@
 
 package org.apache.tomcat.util.net.jsse.openssl;
 
+import org.apache.tomcat.util.net.Constants;
+
 enum Protocol {
 
-    SSLv3("SSLv3"),
-    SSLv2("SSLv2"),
-    TLSv1("SSLv3"),
-    TLSv1_2("TLSv1.2");
+    SSLv3(Constants.SSL_PROTO_SSLv3),
+    SSLv2(Constants.SSL_PROTO_SSLv2),
+    TLSv1(Constants.SSL_PROTO_SSLv3),
+    TLSv1_2(Constants.SSL_PROTO_TLSv1_2);
 
     private final String openSSLName;
 

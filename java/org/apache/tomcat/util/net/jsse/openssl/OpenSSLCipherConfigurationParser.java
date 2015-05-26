@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -226,22 +227,6 @@ public class OpenSSLCipherConfigurationParser {
      * Ciphers suites using all FORTEZZA algorithms.
      */
     private static final String FZA = "FZA";
-    /**
-     * TLS v1.2 cipher suites. Note: there are no cipher suites specific to TLS v1.1.
-     */
-    private static final String TLSv1_2 = "TLSv1.2";
-    /**
-     * TLS v1.0 cipher suites.
-     */
-    private static final String TLSv1 = "TLSv1";
-    /**
-     * SSL v2.0 cipher suites.
-     */
-    private static final String SSLv2 = "SSLv2";
-    /**
-     * SSL v3.0 cipher suites.
-     */
-    private static final String SSLv3 = "SSLv3";
     /**
      * Cipher suites using DH, including anonymous DH, ephemeral DH and fixed DH.
      */
@@ -449,11 +434,11 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(aFZA, filterByAuthentication(allCiphers, Collections.singleton(Authentication.FZA)));
         addListAlias(eFZA, filterByEncryption(allCiphers, Collections.singleton(Encryption.FZA)));
         addListAlias(FZA, filter(allCiphers, null, Collections.singleton(KeyExchange.FZA), Collections.singleton(Authentication.FZA), Collections.singleton(Encryption.FZA), null, null));
-        addListAlias(TLSv1_2, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1_2)));
-        addListAlias("TLSv1.1", filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv3)));
-        addListAlias(TLSv1, filterByProtocol(allCiphers, new HashSet<>(Arrays.asList(Protocol.TLSv1, Protocol.SSLv3))));
-        aliases.put(SSLv3, aliases.get(TLSv1));
-        addListAlias(SSLv2, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv2)));
+        addListAlias(Constants.SSL_PROTO_TLSv1_2, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1_2)));
+        addListAlias(Constants.SSL_PROTO_TLSv1_1, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv3)));
+        addListAlias(Constants.SSL_PROTO_TLSv1, filterByProtocol(allCiphers, new HashSet<>(Arrays.asList(Protocol.TLSv1, Protocol.SSLv3))));
+        aliases.put(Constants.SSL_PROTO_SSLv3, aliases.get(Constants.SSL_PROTO_TLSv1));
+        addListAlias(Constants.SSL_PROTO_SSLv2, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv2)));
         addListAlias(DH, filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd, KeyExchange.EDH))));
         Set<Cipher> adh = filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EDH));
         adh.retainAll(filterByAuthentication(allCiphers, Collections.singleton(Authentication.aNULL)));
