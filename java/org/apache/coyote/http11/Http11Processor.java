@@ -1150,9 +1150,6 @@ public class Http11Processor extends AbstractProcessor {
         // Check to see if we have read any of the request line yet
         if (inputBuffer.getParsingRequestLinePhase() > 1) {
             // Started to read request line.
-            if (request.getStartTime() < 0) {
-                request.setStartTime(System.currentTimeMillis());
-            }
             if (endpoint.isPaused()) {
                 // Partially processed the request so need to respond
                 response.setStatus(503);
