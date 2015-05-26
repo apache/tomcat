@@ -66,7 +66,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
                     return;
                 } else {
                     throw new ChannelException(sm.getString("messageDispatchInterceptor.queue.full",
-                            maxQueueSize, getCurrentSize()));
+                            Long.toString(maxQueueSize), Long.toString(getCurrentSize())));
                 }//end if
             }//end if
             //add to queue

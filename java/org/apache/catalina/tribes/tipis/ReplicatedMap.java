@@ -201,7 +201,8 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 
         } //while
         long complete = System.currentTimeMillis() - start;
-        if (log.isInfoEnabled()) log.info(sm.getString("replicatedMap.relocate.complete", complete));
+        if (log.isInfoEnabled()) log.info(sm.getString("replicatedMap.relocate.complete",
+                Long.toString(complete)));
     }
 
     @Override

@@ -62,7 +62,8 @@ public class BufferPool {
                 if (instance == null) {
                    BufferPoolAPI pool = new BufferPool15Impl();
                    pool.setMaxSize(DEFAULT_POOL_SIZE);
-                   log.info(sm.getString("bufferPool.created", DEFAULT_POOL_SIZE, pool.getClass().getName()));
+                   log.info(sm.getString("bufferPool.created",
+                           Integer.toString(DEFAULT_POOL_SIZE), pool.getClass().getName()));
                    instance = new BufferPool(pool);
                 }
             }

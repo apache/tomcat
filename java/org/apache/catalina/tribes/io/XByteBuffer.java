@@ -114,7 +114,8 @@ public class XByteBuffer {
 
     public void trim(int length) {
         if ( (bufSize - length) < 0 )
-            throw new ArrayIndexOutOfBoundsException(sm.getString("xByteBuffer.unableTrim", bufSize, length));
+            throw new ArrayIndexOutOfBoundsException(sm.getString("xByteBuffer.unableTrim",
+                    Integer.toString(bufSize), Integer.toString(length)));
         bufSize -= length;
     }
 

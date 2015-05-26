@@ -221,7 +221,8 @@ public class FastQueue {
                 } else {
                     if (last == null) {
                         ok = false;
-                        log.error(sm.getString("fastQueue.last.null", size.get()));
+                        log.error(sm.getString("fastQueue.last.null",
+                                Integer.toString(size.get())));
                     } else {
                         last.append(element);
                         last = element;
@@ -231,10 +232,10 @@ public class FastQueue {
             }
 
             if (first == null) {
-                log.error(sm.getString("fastQueue.first.null", size.get()));
+                log.error(sm.getString("fastQueue.first.null", Integer.toString(size.get())));
             }
             if (last == null) {
-                log.error(sm.getString("fastQueue.last.null.end", size.get()));
+                log.error(sm.getString("fastQueue.last.null.end", Integer.toString(size.get())));
             }
 
             if (log.isTraceEnabled()) log.trace("FastQueue.add: add ending with size " + size.get());
