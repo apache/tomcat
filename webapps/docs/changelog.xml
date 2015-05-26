@@ -104,6 +104,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>57282</bug>: Update request processing sequence diagrams. Updated
+        diagrams provided by Stephen Chen. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>
