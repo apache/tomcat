@@ -251,7 +251,7 @@ public class SSLHostConfig {
 
         // Split using a positive lookahead to keep the separator in
         // the capture so we can check which case it is.
-        for (String value: input.split("(?=[-+,]")) {
+        for (String value: input.split("(?=[-+,])")) {
             String trimmed = value.trim();
             // Ignore token which only consists or prefix character
             if (trimmed.length() > 1) {
