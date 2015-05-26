@@ -39,6 +39,14 @@ public class SSLHostConfig {
     private static final StringManager sm = StringManager.getManager(SSLHostConfig.class);
 
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
+    protected static final Set<String> SSL_PROTO_ALL = new HashSet<>();
+
+    static {
+        SSL_PROTO_ALL.add(Constants.SSL_PROTO_SSLv2Hello);
+        SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1);
+        SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_1);
+        SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_2);
+    }
 
     private Type configType = null;
     private Map<Type,Set<String>> configuredProperties = new HashMap<>();
@@ -230,21 +238,50 @@ public class SSLHostConfig {
 
 
     public void setProtocols(String input) {
-        // OpenSSL and JSSE use the same names.
-        String[] values = input.split(",|\\+");
-
         protocols.clear();
 
-        for (String value: values) {
+        // List of protocol names, separated by ",", "+" or "-".
+        // Semantics is adding ("+") or removing ("-") from left
+        // to right, starting with an empty protocol set.
+        // Tokens are individual protocol names or "all" for a
+        // default set of suppported protocols.
+        // Separator "," is only kept for compatibility and has the
+        // same semantics as "+", except that it warns about a potentially
+        // missing "+" or "-".
+
+        // Split using a positive lookahead to keep the separator in
+        // the capture so we can check which case it is.
+        for (String value: input.split("(?=[-+,]")) {
             String trimmed = value.trim();
-            if (trimmed.length() > 0) {
-                if (input.trim().equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
-                    protocols.add(Constants.SSL_PROTO_SSLv2Hello);
-                    protocols.add(Constants.SSL_PROTO_TLSv1);
-                    protocols.add(Constants.SSL_PROTO_TLSv1_1);
-                    protocols.add(Constants.SSL_PROTO_TLSv1_2);
+            // Ignore token which only consists or prefix character
+            if (trimmed.length() > 1) {
+                if (trimmed.charAt(0) == '+') {
+                    trimmed = trimmed.substring(1).trim();
+                    if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
+                        protocols.addAll(SSL_PROTO_ALL);
+                    } else {
+                        protocols.add(trimmed);
+                    }
+                } else if (trimmed.charAt(0) == '-') {
+                    trimmed = trimmed.substring(1).trim();
+                    if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
+                        protocols.removeAll(SSL_PROTO_ALL);
+                    } else {
+                        protocols.remove(trimmed);
+                    }
                 } else {
-                    protocols.add(trimmed);
+                    if (trimmed.charAt(0) == ',') {
+                        trimmed = trimmed.substring(1).trim();
+                    }
+                    if (!protocols.isEmpty()) {
+                        log.warn(sm.getString("sslHostConfig.prefix_missing",
+                                 trimmed, getHostName()));
+                    }
+                    if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
+                        protocols.addAll(SSL_PROTO_ALL);
+                    } else {
+                        protocols.add(trimmed);
+                    }
                 }
             }
         }

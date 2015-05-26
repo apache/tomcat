@@ -1218,18 +1218,23 @@
     </attribute>
 
     <attribute name="protocols" required="false">
+      <p>OpenSSL only, for JSSE use <code>sslProtocol</code>.</p>
       <p>The names of the protocols to support when communicating with clients.
-      This should be a comma separated list of any combination of the following:
+      This should be a list of any combination of the following:
       </p>
       <ul><li>SSLv2Hello</li><li>SSLv2</li><li>SSLv3</li><li>TLSv1</li>
           <li>TLSv1.1</li><li>TLSv1.2</li><li>all</li></ul>
+      <p>Each token in the list can be prefixed with a plus sign ("+")
+      or a minus sign ("-"). A plus sign adds the protocol, a minus sign
+      removes it form the current list. The list is built starting from
+      an empty list.</p>
+      <p>The token <code>all</code> is an alias for
+      <code>SSLv2Hello,TLSv1,TLSv1.1,TLSv1.2</code>.</p>
       <p>Note that <code>SSLv2Hello</code> will be ignored for OpenSSL based
       secure connectors. If more than one protocol is specified for an OpenSSL
-      based secure connector it will support <code>SSLv2Hello</code>. If a
+      based secure connector it will always support <code>SSLv2Hello</code>. If a
       single protocol is specified it will not support
       <code>SSLv2Hello</code>.</p>
-      <p>Note that <code>all</code> is an alias for
-      <code>SSLv2Hello,TLSv1,TLSv1.1,TLSv1.2</code>.</p>
       <p>Note that <code>SSLv2</code> and <code>SSLv3</code> are inherently
       unsafe.</p>
       <p>If not specified, the default value of <code>all</code> will be
@@ -1251,7 +1256,7 @@
     </attribute>
 
     <attribute name="sslProtocol" required="false">
-      <p>JSSE only.</p>
+      <p>JSSE only, for OpenSSL use <code>protocols</code>.</p>
       <p>The the SSL protocol(s) to use (a single value may enable multiple
       protocols - see the JVM documentation for details). If not specified, the
       default is <code>TLS</code>. The permitted values may be obtained from the
