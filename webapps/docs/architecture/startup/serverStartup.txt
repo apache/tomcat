@@ -69,7 +69,7 @@ What it does:
             During the process call the Connectors also initialize the adapters.
             The adapters are the components that do the request pre-processing.
             Typical adapters are HTTP1.1 (default if no protocol is specified,
-            org.apache.coyote.http11.Http11NioProtocol)
+            org.apache.coyote.http11.Http11Protocol)
             AJP1.3 for mod_jk etc.
 
     c) Catalina.start()
