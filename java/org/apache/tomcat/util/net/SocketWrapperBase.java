@@ -41,8 +41,6 @@ public abstract class SocketWrapperBase<E> {
 
     // Volatile because I/O and setting the timeout values occurs on a different
     // thread to the thread checking the timeout.
-    private volatile long lastRead = System.currentTimeMillis();
-    private volatile long lastWrite = lastRead;
     private volatile long lastAsyncStart = 0;
     private volatile long asyncTimeout = -1;
     private volatile long readTimeout = -1;
@@ -201,9 +199,6 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    public void updateLastWrite() { lastWrite = System.currentTimeMillis(); }
-    public long getLastWrite() { return lastWrite; }
-    public long getLastRead() { return lastRead; }
     public IOException getError() { return error; }
     public void setError(IOException error) { this.error = error; }
     public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
@@ -389,8 +384,6 @@ public abstract class SocketWrapperBase<E> {
             return;
         }
 
-        lastWrite = System.currentTimeMillis();
-
         // While the implementations for blocking and non-blocking writes are
         // very similar they have been split into separate methods to allow
         // sub-classes to override them individually. NIO2, for example,
@@ -569,7 +562,6 @@ public abstract class SocketWrapperBase<E> {
      *                     write
      */
     protected final void doWrite(boolean block) throws IOException {
-        lastWrite = System.currentTimeMillis();
         doWriteInternal(block);
     }
 

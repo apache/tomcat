@@ -1068,7 +1068,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     public static class SocketInfo {
         public long socket;
-        public int timeout;
+        public long timeout;
         public int flags;
         public boolean read() {
             return (flags & Poll.APR_POLLIN) == Poll.APR_POLLIN;
@@ -1162,7 +1162,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         protected int pos;
 
         protected long[] sockets;
-        protected int[] timeouts;
+        protected long[] timeouts;
         protected int[] flags;
 
         protected SocketInfo info = new SocketInfo();
@@ -1171,7 +1171,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             this.size = 0;
             pos = 0;
             sockets = new long[size];
-            timeouts = new int[size];
+            timeouts = new long[size];
             flags = new int[size];
         }
 
@@ -1196,7 +1196,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             pos = 0;
         }
 
-        public boolean add(long socket, int timeout, int flag) {
+        public boolean add(long socket, long timeout, int flag) {
             if (size == sockets.length) {
                 return false;
             } else {
@@ -1461,14 +1461,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
          * be removed from the poller.
          *
          * @param socket to add to the poller
-         * @param timeout to use for this connection
+         * @param timeout to use for this connection in milliseconds
          * @param flags Events to poll for (Poll.APR_POLLIN and/or
          *              Poll.APR_POLLOUT)
          */
-        private void add(long socket, int timeout, int flags) {
+        private void add(long socket, long timeout, int flags) {
             if (log.isDebugEnabled()) {
                 String msg = sm.getString("endpoint.debug.pollerAdd",
-                        Long.valueOf(socket), Integer.valueOf(timeout),
+                        Long.valueOf(socket), Long.valueOf(timeout),
                         Integer.valueOf(flags));
                 if (log.isTraceEnabled()) {
                     log.trace(msg, new Exception());
@@ -2685,7 +2685,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     return;
                 }
                 ((AprEndpoint) getEndpoint()).getPoller().add(
-                        getSocket().longValue(), -1, Poll.APR_POLLIN);
+                        getSocket().longValue(), getReadTimeout(), Poll.APR_POLLIN);
             }
         }
 
@@ -2698,7 +2698,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     return;
                 }
                 ((AprEndpoint) getEndpoint()).getPoller().add(
-                        getSocket().longValue(), -1, Poll.APR_POLLOUT);
+                        getSocket().longValue(), getWriteTimeout(), Poll.APR_POLLOUT);
             }
         }
 

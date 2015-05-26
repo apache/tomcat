@@ -1148,13 +1148,7 @@ public class Http11Processor extends AbstractProcessor {
         // open
         openSocket = true;
         // Check to see if we have read any of the request line yet
-        if (inputBuffer.getParsingRequestLinePhase() < 1) {
-            if (keptAlive) {
-                // Haven't read the request line and have previously processed a
-                // request. Must be keep-alive. Make sure poller uses keepAlive.
-                socketWrapper.setReadTimeout(endpoint.getKeepAliveTimeout());
-            }
-        } else {
+        if (inputBuffer.getParsingRequestLinePhase() > 1) {
             // Started to read request line.
             if (request.getStartTime() < 0) {
                 request.setStartTime(System.currentTimeMillis());
@@ -1168,8 +1162,6 @@ public class Http11Processor extends AbstractProcessor {
             } else {
                 // Need to keep processor associated with socket
                 readComplete = false;
-                // Make sure poller uses soTimeout from here onwards
-                socketWrapper.setReadTimeout(endpoint.getSoTimeout());
             }
         }
         return true;
