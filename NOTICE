@@ -10,10 +10,10 @@ open source software.  The original software and
 related information is available at
 http://nsis.sourceforge.net.
 
-Java compilation software for JSP pages is provided by Eclipse,
-which is open source software.  The original software and
-related information is available at
-http://www.eclipse.org.
+Java compilation software for JSP pages is provided by the Eclipse
+JDT Core Batch Compiler component, which is open source software.
+The original software and related information is available at
+http://www.eclipse.org/jdt/core/.
 
 The original XML Schemas for Java EE Deployment Descriptors:
  - javaee_5.xsd
