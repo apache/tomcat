@@ -1119,6 +1119,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         private CountDownLatch readLatch = null;
         private CountDownLatch writeLatch = null;
         private volatile SendfileData sendfileData = null;
+        private volatile long lastRead = System.currentTimeMillis();
+        private volatile long lastWrite = lastRead;
 
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
@@ -1160,6 +1162,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
         public SendfileData getSendfileData() { return this.sendfileData;}
+
+        public void updateLastWrite() { lastWrite = System.currentTimeMillis(); }
+        public long getLastWrite() { return lastWrite; }
+        public void updateLastRead() { lastRead = System.currentTimeMillis(); }
+        public long getLastRead() { return lastRead; }
 
 
         @Override
@@ -1206,6 +1213,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
             // Fill the read buffer as best we can.
             int nRead = fillReadBuffer(block);
+            lastRead = System.currentTimeMillis();
 
             // Full as much of the remaining byte array as possible with the
             // data that was just read
@@ -1284,6 +1292,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         if (getSocket().flush(true, selector, writeTimeout)) break;
                     } while (true);
                 }
+                lastWrite = System.currentTimeMillis();
             } finally {
                 if (selector != null) {
                     pool.put(selector);
