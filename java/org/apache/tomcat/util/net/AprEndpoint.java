@@ -551,7 +551,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         value |= SSL.SSL_PROTOCOL_TLSV1;
                     } else if (Constants.SSL_PROTO_TLSv1_1.equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_TLSV1_1;
-                    } else if (Constants.SSL_PROTO_TLSv1_1.equalsIgnoreCase(protocol)) {
+                    } else if (Constants.SSL_PROTO_TLSv1_2.equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_TLSV1_2;
                     } else {
                         // Protocol not recognized, fail to start as it is safer than
