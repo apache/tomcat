@@ -259,7 +259,7 @@ public class SSLHostConfig {
         // the capture so we can check which case it is.
         for (String value: input.split("(?=[-+,])")) {
             String trimmed = value.trim();
-            // Ignore token which only consists or prefix character
+            // Ignore token which only consists of prefix character
             if (trimmed.length() > 1) {
                 if (trimmed.charAt(0) == '+') {
                     trimmed = trimmed.substring(1).trim();
