@@ -250,7 +250,7 @@ public class SSLHostConfig {
         // Semantics is adding ("+") or removing ("-") from left
         // to right, starting with an empty protocol set.
         // Tokens are individual protocol names or "all" for a
-        // default set of suppported protocols.
+        // default set of supported protocols.
         // Separator "," is only kept for compatibility and has the
         // same semantics as "+", except that it warns about a potentially
         // missing "+" or "-".
