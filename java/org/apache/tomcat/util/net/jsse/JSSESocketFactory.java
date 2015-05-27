@@ -89,7 +89,7 @@ public class JSSESocketFactory implements ServerSocketFactory, SSLUtil {
         StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
 
     // Defaults - made public where re-used
-    private static final String defaultProtocol = "TLS";
+    private static final String defaultProtocol = Constants.SSL_PROTO_TLS;
     private static final String defaultKeystoreType = "JKS";
     private static final String defaultKeystoreFile
         = System.getProperty("user.home") + "/.keystore";

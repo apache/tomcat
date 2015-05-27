@@ -497,17 +497,17 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
             } else {
                 for (String protocol : SSLProtocol.split("\\+")) {
                     protocol = protocol.trim();
-                    if ("SSLv2".equalsIgnoreCase(protocol)) {
+                    if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_SSLV2;
-                    } else if ("SSLv3".equalsIgnoreCase(protocol)) {
+                    } else if (Constants.SSL_PROTO_SSLv3.equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_SSLV3;
-                    } else if ("TLSv1".equalsIgnoreCase(protocol)) {
+                    } else if (Constants.SSL_PROTO_TLSv1.equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_TLSV1;
-                    } else if ("TLSv1.1".equalsIgnoreCase(protocol)) {
+                    } else if (Constants.SSL_PROTO_TLSv1_1.equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_TLSV1_1;
-                    } else if ("TLSv1.2".equalsIgnoreCase(protocol)) {
+                    } else if (Constants.SSL_PROTO_TLSv1_1.equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_TLSV1_2;
-                    } else if ("all".equalsIgnoreCase(protocol)) {
+                    } else if (Constants.SSL_PROTO_ALL.equalsIgnoreCase(protocol)) {
                         value |= SSL.SSL_PROTOCOL_ALL;
                     } else {
                         // Protocol not recognized, fail to start as it is safer than
