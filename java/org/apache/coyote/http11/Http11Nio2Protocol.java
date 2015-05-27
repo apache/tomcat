@@ -22,6 +22,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.Nio2Endpoint.Handler;
+import org.apache.tomcat.util.net.Nio2Endpoint.Nio2SocketWrapper;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
@@ -108,8 +109,9 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
             if (socket.isAsync()) {
                 ((Nio2Endpoint) getProtocol().getEndpoint()).removeTimeout(socket);
             }
-            // No need to add to poller. read() will have already been called
-            // with an appropriate completion handler.
+            if (addToPoller) {
+                ((Nio2SocketWrapper) socket).awaitBytes();
+            }
         }
 
 
