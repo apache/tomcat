@@ -107,6 +107,8 @@ public class LogFactory {
      *  returned (the meaning of this name is only known to the underlying
      *  logging implementation that is being wrapped)
      *
+     * @return A log instance with the requested name
+     *
      * @exception LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
      */
@@ -129,6 +131,8 @@ public class LogFactory {
      * call <code>getInstance(String)</code> with it.
      *
      * @param clazz Class for which a suitable Log name will be derived
+     *
+     * @return A log instance with a name of clazz.getName()
      *
      * @exception LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
@@ -166,6 +170,8 @@ public class LogFactory {
      * properties defined in this file will be set as configuration attributes
      * on the corresponding <code>LogFactory</code> instance.</p>
      *
+     * @return The singleton LogFactory instance
+     *
      * @exception LogConfigurationException if the implementation class is not
      *  available or cannot be instantiated.
      */
@@ -179,6 +185,8 @@ public class LogFactory {
      * having to care about factories.
      *
      * @param clazz Class from which a log name will be derived
+     *
+     * @return A log instance with a name of clazz.getName()
      *
      * @exception LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
@@ -197,6 +205,8 @@ public class LogFactory {
      * @param name Logical name of the <code>Log</code> instance to be
      *  returned (the meaning of this name is only known to the underlying
      *  logging implementation that is being wrapped)
+     *
+     * @return A log instance with the requested name
      *
      * @exception LogConfigurationException if a suitable <code>Log</code>
      *  instance cannot be returned
