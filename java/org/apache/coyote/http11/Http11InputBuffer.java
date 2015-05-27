@@ -398,9 +398,6 @@ public class Http11InputBuffer implements InputBuffer {
                         // Haven't read any request data yet so use the keep-alive
                         // timeout.
                         wrapper.setReadTimeout(wrapper.getEndpoint().getKeepAliveTimeout());
-                        if (!wrapper.isNonBlocking()) {
-                            return false;
-                        }
                     }
                     if (!fill(false)) {
                         // A read is pending, so no longer in initial state

@@ -1316,11 +1316,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             }
         }
 
-        @Override
-        public boolean isNonBlocking() {
-            return false;
-        }
-
         /*
          * This should only be called from a thread that currently holds a lock
          * on the socket. This prevents a race condition between a pending read
