@@ -400,6 +400,7 @@ public class JSSESocketFactory implements SSLUtil {
     @Override
     public String[] getEnableableProtocols(SSLContext context) {
         if (sslHostConfig.getProtocols().size() == 0) {
+            // JSSE fallback used if protocols=""
             return defaultServerProtocols;
         }
 

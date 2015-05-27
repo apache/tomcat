@@ -375,6 +375,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 // SSL protocol
                 int value = SSL.SSL_PROTOCOL_NONE;
                 if (sslHostConfig.getProtocols().size() == 0) {
+                    // Native fallback used if protocols=""
                     value = SSL.SSL_PROTOCOL_ALL;
                 } else {
                     for (String protocol : sslHostConfig.getProtocols()) {
@@ -390,8 +391,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                             value |= SSL.SSL_PROTOCOL_TLSV1_1;
                         } else if (Constants.SSL_PROTO_TLSv1_2.equalsIgnoreCase(protocol)) {
                             value |= SSL.SSL_PROTOCOL_TLSV1_2;
-                        } else if (Constants.SSL_PROTO_ALL.equalsIgnoreCase(protocol)) {
-                            value |= SSL.SSL_PROTOCOL_ALL;
                         } else {
                             // Protocol not recognized, fail to start as it is safer than
                             // continuing with the default which might enable more than the
