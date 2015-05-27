@@ -2683,8 +2683,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 if (closed) {
                     return;
                 }
-                ((AprEndpoint) getEndpoint()).getPoller().add(
-                        getSocket().longValue(), getReadTimeout(), Poll.APR_POLLIN);
+                Poller p = ((AprEndpoint) getEndpoint()).getPoller();
+                if (p != null) {
+                    p.add(getSocket().longValue(), getReadTimeout(), Poll.APR_POLLIN);
+                }
             }
         }
 
