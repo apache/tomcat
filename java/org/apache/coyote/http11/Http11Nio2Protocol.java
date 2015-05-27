@@ -45,17 +45,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
     protected Log getLog() { return log; }
 
 
-    // -------------------- Pool setup --------------------
-
-    public void setAcceptorThreadPriority(int threadPriority) {
-        ((Nio2Endpoint)getEndpoint()).setAcceptorThreadPriority(threadPriority);
-    }
-
-    public int getAcceptorThreadPriority() {
-      return ((Nio2Endpoint)getEndpoint()).getAcceptorThreadPriority();
-    }
-
-
     // ----------------------------------------------------- JMX related methods
 
     @Override

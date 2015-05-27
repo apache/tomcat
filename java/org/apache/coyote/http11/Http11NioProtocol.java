@@ -71,16 +71,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         return ((NioEndpoint)getEndpoint()).getSelectorTimeout();
     }
 
-    public void setAcceptorThreadPriority(int threadPriority) {
-        ((NioEndpoint)getEndpoint()).setAcceptorThreadPriority(threadPriority);
-    }
-
     public void setPollerThreadPriority(int threadPriority) {
         ((NioEndpoint)getEndpoint()).setPollerThreadPriority(threadPriority);
-    }
-
-    public int getAcceptorThreadPriority() {
-      return ((NioEndpoint)getEndpoint()).getAcceptorThreadPriority();
     }
 
     public int getPollerThreadPriority() {
