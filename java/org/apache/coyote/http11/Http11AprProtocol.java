@@ -100,7 +100,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 Processor processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
-            if (addToPoller && getProtocol().getEndpoint().isRunning()) {
+            if (addToPoller) {
                 socket.registerReadInterest();
             }
         }
