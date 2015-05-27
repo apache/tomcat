@@ -41,11 +41,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.SSLAuthenticator;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityCollection;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.TestTomcat.MapRealm;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.jni.SSL;
 
 public final class TesterSupport {
 
@@ -122,6 +124,16 @@ public final class TesterSupport {
         }
         tomcat.getConnector().setSecure(true);
         tomcat.getConnector().setProperty("SSLEnabled", "true");
+        // OpenSSL before 1.0.1 only supports TLSv1.
+        // Our default SSLProtocol setting "all" includes unsupported TLSv1.1 and 1.2
+        // and would produce an error during init.
+        // Furthermore old Java 6 uses SSLv2Hello which OpenSSL only
+        // supports if we choose multiple protocols.
+        // Trigger loading of the native library and choose old protocol
+        // if we use old OpenSSL.
+        if (AprLifecycleListener.isAprAvailable() && SSL.version() < 0x10001000L) {
+            tomcat.getConnector().setProperty("SSLProtocol", Constants.SSL_PROTO_TLSv1 + "+" + Constants.SSL_PROTO_SSLv3);
+        }
     }
 
     private static File toFile(java.net.URL url) {
