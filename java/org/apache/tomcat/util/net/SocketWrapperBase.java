@@ -266,6 +266,9 @@ public abstract class SocketWrapperBase<E> {
     public SocketBufferHandler getSocketBufferHandler() { return socketBufferHandler; }
     public abstract boolean isReadPending();
     public abstract boolean isWritePending();
+    public boolean isNonBlocking() {
+        return true;
+    }
 
     public boolean hasDataToWrite() {
         return !socketBufferHandler.isWriteBufferEmpty() || bufferedWrites.size() > 0;
