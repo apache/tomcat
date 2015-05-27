@@ -75,8 +75,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize));
 
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
         ctx.addServletMapping("/", "snoop");
@@ -111,7 +111,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             } else if (name.equals("REQUEST-SERVER-NAME")) {
                 ajpClient.setServerName(value);
             } else if (name.equals("REQUEST-SERVER-PORT")) {
-                ajpClient.setServerPort(Integer.valueOf(value));
+                ajpClient.setServerPort(Integer.valueOf(value).intValue());
             } else if (name.equals("REQUEST-IS-SECURE")) {
                 ajpClient.setSsl(Boolean.parseBoolean(value));
             } else if (name.equals("REQUEST-LOCAL-ADDR")) {
@@ -452,8 +452,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         tomcat.getConnector().setProperty("requiredSecret", "RIGHTSECRET");
         tomcat.start();
 
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
         ctx.addServletMapping("/", "helloWorld");
@@ -512,8 +512,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         tomcat.getConnector().setProperty("connectionTimeout", "-1");
         tomcat.start();
 
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
         ctx.addServletMapping("/", "helloWorld");
 
@@ -622,8 +622,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         Tomcat.addServlet(ctx, "bug55453", new Tester304WithBodyServlet());
         ctx.addServletMapping("/", "bug55453");
 
@@ -661,7 +661,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         tomcat.getConnector().setProperty("packetSize", Integer.toString(ajpPacketSize));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        Context ctx = tomcat.addContext("", null);
 
         FixedResponseSizeServlet servlet = new FixedResponseSizeServlet(15000, 16000);
         Tomcat.addServlet(ctx, "FixedResponseSizeServlet", servlet);
