@@ -582,13 +582,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     failed(new ClosedChannelException(), attachment);
                     return;
                 }
-                readPending.release();
                 getEndpoint().processSocket(attachment, SocketStatus.OPEN_READ, Nio2Endpoint.isInline());
             }
 
             @Override
             public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
-                readPending.release();
                 getEndpoint().processSocket(attachment, SocketStatus.DISCONNECT, true);
             }
         };
@@ -682,10 +680,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         if (nBytes.intValue() < 0) {
                             failed(new EOFException(), attachment);
                         } else {
-                            readPending.release();
                             if (readInterest && !Nio2Endpoint.isInline()) {
                                 readInterest = false;
                                 notify = true;
+                            } else {
+                                // Release here since there will be no
+                                // notify/dispatch to do the release.
+                                readPending.release();
                             }
                         }
                     }
@@ -702,8 +703,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         ioe = new IOException(exc);
                     }
                     Nio2SocketWrapper.this.setError(ioe);
-                    readPending.release();
                     if (exc instanceof AsynchronousCloseException) {
+                        // Release here since there will be no
+                        // notify/dispatch to do the release.
+                        readPending.release();
                         // If already closed, don't call onError and close again
                         return;
                     }
@@ -903,6 +906,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 if (log.isDebugEnabled()) {
                     log.debug("Socket: [" + this + "], Read from buffer: [" + len + "]");
                 }
+                // No read is going to take place so release here.
                 readPending.release();
                 return len;
             }
@@ -1142,6 +1146,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 try {
                     nRead = getSocket().read(socketBufferHandler.getReadBuffer()).get(
                             getNio2ReadTimeout(), TimeUnit.MILLISECONDS).intValue();
+                    // Blocking read so need to release here since there will
+                    // not be a callback to a completion handler.
                     readPending.release();
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
@@ -1311,14 +1317,28 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         }
 
 
+        /*
+         * This should only be called from a thread that currently holds a lock
+         * on the socket. This prevents a race condition between a pending read
+         * being completed and processed and a thread triggering a new read.
+         */
+        void releaseReadPending() {
+            synchronized (readCompletionHandler) {
+                if (readPending.availablePermits() == 0) {
+                    readPending.release();
+                }
+            }
+        }
+
+
         @Override
         public void registerReadInterest() {
             synchronized (readCompletionHandler) {
                 if (readPending.availablePermits() == 0) {
                     readInterest = true;
                 } else {
-                    // If no read is pending, notify
-                    getEndpoint().processSocket(this, SocketStatus.OPEN_READ, true);
+                    // If no read is pending, start waiting for data
+                    awaitBytes();
                 }
             }
         }
@@ -1341,6 +1361,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             if (getSocket() == null) {
                 return;
             }
+            // NO-OP is there is already a read in progress.
             if (readPending.tryAcquire()) {
                 getSocket().getBufHandler().configureReadBufferForWrite();
                 Nio2Endpoint.startInline();
@@ -1595,6 +1616,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         @Override
         public void run() {
             synchronized (socket) {
+                if (SocketStatus.OPEN_WRITE != status) {
+                    // Anything other than OPEN_WRITE is a genuine read or an
+                    // error condition so for all of those release the semaphore
+                    ((Nio2SocketWrapper) socket).releaseReadPending();
+                }
                 boolean launch = false;
                 try {
                     int handshake = -1;

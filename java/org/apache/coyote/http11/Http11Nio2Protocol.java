@@ -94,8 +94,9 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                 Processor processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
-            // No need to add to poller. read() will have already been called
-            // with an appropriate completion handler.
+            if (addToPoller) {
+                socket.registerReadInterest();
+            }
         }
 
 
@@ -108,8 +109,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                 //  - this is an upgraded connection
                 //  - the request line/headers have not been completely
                 //    read
-                // The completion handlers should be in place,
-                // so nothing to do here
+                socket.registerReadInterest();
             }
         }
 
