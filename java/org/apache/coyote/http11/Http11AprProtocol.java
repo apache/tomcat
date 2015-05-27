@@ -20,7 +20,6 @@ import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.AprEndpoint.Poller;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
@@ -108,19 +107,15 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
         @Override
         protected void longPoll(SocketWrapperBase<Long> socket, Processor processor) {
-
             if (processor.isAsync()) {
                 // Async
                 socket.setAsync(true);
             } else {
-                // Upgraded
-                Poller p = ((AprEndpoint) getProtocol().getEndpoint()).getPoller();
-                if (p == null) {
-                    // Connector has been stopped
-                    release(socket, processor, false);
-                } else {
-                    socket.registerReadInterest();
-                }
+                // Either:
+                //  - this is an upgraded connection
+                //  - the request line/headers have not been completely
+                //    read
+                socket.registerReadInterest();
             }
         }
     }
