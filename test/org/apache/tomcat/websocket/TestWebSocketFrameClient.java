@@ -42,9 +42,8 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
     public void testConnectToServerEndpoint() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(TesterFirehoseServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
@@ -85,13 +84,11 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
-        Context ctx2 =
-            tomcat.addContext("/foo", System.getProperty("java.io.tmpdir"));
+        Context ctx2 = tomcat.addContext("/foo", null);
         ctx2.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx2, "default", new DefaultServlet());
         ctx2.addServletMapping("/", "default");

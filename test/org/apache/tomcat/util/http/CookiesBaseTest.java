@@ -67,9 +67,8 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
 
 
     public static void addServlets(Tomcat tomcat) {
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "invalid", new CookieServlet("na;me", "value"));
         ctx.addServletMapping("/invalid", "invalid");

@@ -194,9 +194,8 @@ public final class TesterSupport {
         TesterSupport.initSsl(tomcat);
 
         // Need a web application with a protected and unprotected URL
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "simple", new SimpleServlet());
         ctx.addServletMapping("/unprotected", "simple");

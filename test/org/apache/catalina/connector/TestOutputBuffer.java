@@ -39,7 +39,8 @@ public class TestOutputBuffer extends TomcatBaseTest{
     public void testWriteSpeed() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context root = tomcat.addContext("", TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
 
         for (int i = 1; i <= WritingServlet.EXPECTED_CONTENT_LENGTH; i*=10) {
             WritingServlet servlet = new WritingServlet(i);
@@ -74,7 +75,8 @@ public class TestOutputBuffer extends TomcatBaseTest{
     public void testBug52577() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context root = tomcat.addContext("", TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
 
         Bug52577Servlet bug52577 = new Bug52577Servlet();
         Tomcat.addServlet(root, "bug52577", bug52577);

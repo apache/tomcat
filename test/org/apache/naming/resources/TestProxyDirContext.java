@@ -39,9 +39,8 @@ public class TestProxyDirContext extends TomcatBaseTest {
     public void testLookupException() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        StandardContext ctx = (StandardContext)
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
         ctx.setCacheTTL(500);
         tomcat.start();
 

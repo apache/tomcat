@@ -131,9 +131,8 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
         ctx.addServletMapping("/", "servlet");
@@ -185,9 +184,8 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("/testapp", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("/testapp", null);
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
         ctx.addServletMapping("*.txt", "servlet");
@@ -236,9 +234,8 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         tomcat.getConnector().setURIEncoding(encoding);
 
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         PathInfoServlet servlet = new PathInfoServlet();
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -278,9 +275,8 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         AsyncServlet servlet = new AsyncServlet();
         Wrapper w = Tomcat.addServlet(ctx, "async", servlet);

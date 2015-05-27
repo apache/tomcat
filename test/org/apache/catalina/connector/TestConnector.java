@@ -39,7 +39,8 @@ public class TestConnector extends TomcatBaseTest {
     public void testStop() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context root = tomcat.addContext("", TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
         Wrapper w =
             Tomcat.addServlet(root, "tester", new TesterServlet());
         w.setAsyncSupported(true);

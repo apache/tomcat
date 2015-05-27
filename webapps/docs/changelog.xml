@@ -73,6 +73,12 @@
         <code>applyJava8u40Fix</code> attribute of the SPNEGO authenticator if
         necessary. (markt) 
       </fix>
+      <add>
+        <bug>57154</bug>: Add support for web applications (Context elements)
+        that do not have a docBase. This is primarily for use when embedding but
+        it also fixes a rare issue when running the unit test. Patch provided by
+        Huxing Zhang. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

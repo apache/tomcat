@@ -269,9 +269,8 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         // Configure a context with digest auth and a single protected resource
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        Context ctxt = tomcat.addContext(CONTEXT_PATH,
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctxt = tomcat.addContext(CONTEXT_PATH, null);
 
         // Add protected servlet
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());

@@ -245,9 +245,8 @@ public class TestTomcat extends TomcatBaseTest {
     public void testProgrammatic() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
         // You can customize the context by calling
         // its API
 
@@ -294,9 +293,8 @@ public class TestTomcat extends TomcatBaseTest {
     public void testSession() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
         // You can customize the context by calling
         // its API
 
@@ -327,9 +325,8 @@ public class TestTomcat extends TomcatBaseTest {
     public void testEnableNaming() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
 
         // You can customise the context by calling its API
 
@@ -358,9 +355,8 @@ public class TestTomcat extends TomcatBaseTest {
     public void testEnableNamingGlobal() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
 
         // You can customise the context by calling its API
 
@@ -438,9 +434,8 @@ public class TestTomcat extends TomcatBaseTest {
     public void testBug53301() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
 
         InitCount initCount = new InitCount();
         Tomcat.addServlet(ctx, "initCount", initCount);

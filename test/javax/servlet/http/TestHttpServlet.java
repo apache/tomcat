@@ -38,9 +38,9 @@ public class TestHttpServlet extends TomcatBaseTest {
     public void testBug53454() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
+        // No file system docBase required
         StandardContext ctx = (StandardContext)
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+            tomcat.addContext("", null);
 
         // Map the test Servlet
         LargeBodyServlet largeBodyServlet = new LargeBodyServlet();
@@ -82,8 +82,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
 
         Bug57602ServletOuter outer = new Bug57602ServletOuter();
         Tomcat.addServlet(ctx, "Bug57602ServletOuter", outer);

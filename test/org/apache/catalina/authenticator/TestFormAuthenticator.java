@@ -656,8 +656,8 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
             Tomcat tomcat = getTomcatInstance();
 
-            Context ctx = tomcat.addContext(
-                    "", System.getProperty("java.io.tmpdir"));
+            // No file system docBase required
+            Context ctx = tomcat.addContext("", null);
             Tomcat.addServlet(ctx, "SelectedMethods",
                     new SelectedMethodsServlet());
             ctx.addServletMapping("/test", "SelectedMethods");

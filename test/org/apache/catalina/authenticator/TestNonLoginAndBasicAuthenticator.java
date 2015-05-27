@@ -505,9 +505,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
     private void setUpNonLogin() throws Exception {
 
-        // Must have a real docBase for webapps - just use temp
-        nonloginContext = tomcat.addContext(CONTEXT_PATH_NOLOGIN,
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        nonloginContext = tomcat.addContext(CONTEXT_PATH_NOLOGIN, null);
         nonloginContext.setSessionTimeout(LONG_SESSION_TIMEOUT_MINS);
 
         // Add protected servlet to the context
@@ -542,9 +541,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
     private void setUpLogin() throws Exception {
 
-        // Must have a real docBase for webapps - just use temp
-        basicContext = tomcat.addContext(CONTEXT_PATH_LOGIN,
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        basicContext = tomcat.addContext(CONTEXT_PATH_LOGIN, null);
         basicContext.setSessionTimeout(SHORT_SESSION_TIMEOUT_MINS);
 
         // Add protected servlet to the context

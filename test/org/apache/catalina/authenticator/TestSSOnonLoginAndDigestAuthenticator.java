@@ -329,9 +329,8 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
 
     private void setUpNonLogin(Tomcat tomcat) throws Exception {
 
-        // Must have a real docBase for webapps - just use temp
-        Context ctxt = tomcat.addContext(CONTEXT_PATH_NOLOGIN,
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctxt = tomcat.addContext(CONTEXT_PATH_NOLOGIN, null);
         ctxt.setSessionTimeout(LONG_TIMEOUT_SECS);
 
         // Add protected servlet
@@ -363,9 +362,8 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
 
     private void setUpDigest(Tomcat tomcat) throws Exception {
 
-        // Must have a real docBase for webapps - just use temp
-        Context ctxt = tomcat.addContext(CONTEXT_PATH_DIGEST,
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctxt = tomcat.addContext(CONTEXT_PATH_DIGEST, null);
         ctxt.setSessionTimeout(SHORT_TIMEOUT_SECS);
 
         // Add protected servlet

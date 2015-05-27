@@ -57,7 +57,8 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("", TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
         Tomcat.addServlet(root, "comet", new SimpleCometServlet());
         root.addServletMapping("/comet", "comet");
         Tomcat.addServlet(root, "hello", new HelloWorldServlet());
@@ -124,7 +125,8 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("", TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
         Tomcat.addServlet(root, "comet", new CometCloseServlet());
         root.addServletMapping("/comet", "comet");
         Tomcat.addServlet(root, "hello", new HelloWorldServlet());
@@ -195,7 +197,8 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("", TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
         Tomcat.addServlet(root, "comet", new ConnectionCloseServlet());
         root.addServletMapping("/comet", "comet");
         Tomcat.addServlet(root, "hello", new HelloWorldServlet());
@@ -268,7 +271,8 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("", TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
         Wrapper w = Tomcat.addServlet(root, "comet", new SimpleCometServlet());
         if (initParam != null) {
             w.addInitParameter(initParam, "true");
@@ -363,7 +367,8 @@ public class TestCometProcessor extends TomcatBaseTest {
         // Setup Tomcat instance
         SimpleCometServlet servlet = new SimpleCometServlet();
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("", TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
         Tomcat.addServlet(root, "comet", servlet);
         root.addServletMapping("/", "comet");
         tomcat.start();

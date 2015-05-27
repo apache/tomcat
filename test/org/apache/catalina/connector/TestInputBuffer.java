@@ -42,7 +42,8 @@ public class TestInputBuffer extends TomcatBaseTest {
     @Test
     public void testUtf8Body() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("", TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
         Tomcat.addServlet(root, "Echo", new Utf8Echo());
         root.addServletMapping("/test", "Echo");
 

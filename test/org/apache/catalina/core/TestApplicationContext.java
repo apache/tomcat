@@ -171,10 +171,12 @@ public class TestApplicationContext extends TomcatBaseTest {
         foo2.addLifecycleListener(new SetIdListener("foo2"));
         tomcat.getHost().addChild(foo2);
 
-        Context bar = tomcat.addContext("/bar", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context bar = tomcat.addContext("/bar", null);
         bar.addLifecycleListener(new SetIdListener("bar"));
 
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addLifecycleListener(new SetIdListener("ROOT"));
         ctx.setCrossContext(true);
 

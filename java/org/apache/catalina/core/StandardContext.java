@@ -120,6 +120,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ContextBindings;
 import org.apache.naming.resources.BaseDirContext;
 import org.apache.naming.resources.DirContextURLStreamHandler;
+import org.apache.naming.resources.EmptyDirContext;
 import org.apache.naming.resources.FileDirContext;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.WARDirContext;
@@ -5316,7 +5317,9 @@ public class StandardContext extends ContainerBase
             if (log.isDebugEnabled())
                 log.debug("Configuring default Resources");
             try {
-                if ((getDocBase() != null) && (getDocBase().endsWith(".war")) &&
+                if (getDocBase() == null)
+                    setResources(new EmptyDirContext());
+                else if ((getDocBase() != null) && (getDocBase().endsWith(".war")) &&
                         (!(new File(getBasePath())).isDirectory()))
                     setResources(new WARDirContext());
                 else

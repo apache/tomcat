@@ -68,9 +68,8 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testSimple() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(new ApplicationListener(
                 TesterEchoServer.Config.class.getName(), false));
 
@@ -114,9 +113,8 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testDetectWrongVersion() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(new ApplicationListener(
                 TesterEchoServer.Config.class.getName(), false));
 
@@ -157,9 +155,8 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testNoConnection() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(new ApplicationListener(
                 TesterEchoServer.Config.class.getName(), false));
 
@@ -191,9 +188,8 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testNoUpgrade() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(new ApplicationListener(
                 TesterEchoServer.Config.class.getName(), false));
 
@@ -226,9 +222,8 @@ public class TestWebSocket extends TomcatBaseTest {
     @Test
     public void testKey() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(new ApplicationListener(
                 TesterEchoServer.Config.class.getName(), false));
 
@@ -283,9 +278,8 @@ public class TestWebSocket extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "Bug53339", new Bug53339Servlet());
         ctx.addServletMapping("/*", "Bug53339");

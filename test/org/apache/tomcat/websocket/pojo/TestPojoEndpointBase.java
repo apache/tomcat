@@ -52,9 +52,8 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         ServerConfigListener.setPojoClazz(Bug54716.class);
 
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
@@ -84,9 +83,8 @@ public class TestPojoEndpointBase extends TomcatBaseTest {
         ServerConfigListener.setPojoClazz(OnOpenServerEndpoint.class);
 
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");

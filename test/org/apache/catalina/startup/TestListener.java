@@ -42,8 +42,8 @@ public class TestListener extends TomcatBaseTest {
     public void testServletContainerInitializer() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context context = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context context = tomcat.addContext("", null);
 
         context.addServletContainerInitializer(new SCI(), null);
         tomcat.start();
@@ -59,8 +59,8 @@ public class TestListener extends TomcatBaseTest {
     public void testServletContextListener() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context context = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context context = tomcat.addContext("", null);
 
         // SCL2 pretends to be in web.xml, and tries to install a
         // ServletContainerInitializer.

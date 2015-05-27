@@ -70,7 +70,8 @@ public class TestMaxConnections extends TomcatBaseTest {
 
     private synchronized void init() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("", SimpleHttpClient.TEMP_DIR);
+        // No file system docBase required
+        Context root = tomcat.addContext("", null);
         Tomcat.addServlet(root, "Simple", new SimpleServlet());
         root.addServletMapping("/test", "Simple");
         tomcat.getConnector().setProperty("maxKeepAliveRequests", "1");

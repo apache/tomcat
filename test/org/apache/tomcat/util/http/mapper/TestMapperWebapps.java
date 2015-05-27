@@ -45,9 +45,8 @@ public class TestMapperWebapps extends TomcatBaseTest{
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "Bug53356", new Bug53356Servlet());
         ctx.addServletMapping("", "Bug53356");

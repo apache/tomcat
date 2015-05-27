@@ -68,8 +68,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     @Test
     public void testProgrammaticEndPoints() throws Exception{
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(
                 ProgramaticServerEndpointConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
@@ -118,9 +118,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         ServerConfigListener.setPojoClazz(Server.class);
 
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
@@ -178,9 +177,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
         ServerConfigListener.setPojoClazz(GenericsServer.class);
 
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(ServerConfigListener.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");
@@ -608,8 +606,8 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     @Test
     public void testUnsupportedObject() throws Exception{
         Tomcat tomcat = getTomcatInstance();
-        // Must have a real docBase - just use temp
-        Context ctx = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(ProgramaticServerEndpointConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMapping("/", "default");

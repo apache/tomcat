@@ -56,7 +56,8 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             if (init) return;
 
             Tomcat tomcat = getTomcatInstance();
-            Context root = tomcat.addContext("", TEMP_DIR);
+            // No file system docBase required
+            Context root = tomcat.addContext("", null);
             Tomcat.addServlet(root, "Simple", new SimpleServlet());
             root.addServletMapping("/test", "Simple");
             tomcat.getConnector().setProperty("maxKeepAliveRequests", "5");

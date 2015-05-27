@@ -48,9 +48,8 @@ public class TestNamingContextListener extends TomcatBaseTest {
     public void testBug49132() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
 
         // Enable JNDI - it is disabled by default
         tomcat.enableNaming();
@@ -96,9 +95,8 @@ public class TestNamingContextListener extends TomcatBaseTest {
     public void testBug54096() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Must have a real docBase - just use temp
-        org.apache.catalina.Context ctx =
-            tomcat.addContext("", System.getProperty("java.io.tmpdir"));
+        // No file system docBase required
+        org.apache.catalina.Context ctx = tomcat.addContext("", null);
 
         // Enable JNDI - it is disabled by default
         tomcat.enableNaming();
