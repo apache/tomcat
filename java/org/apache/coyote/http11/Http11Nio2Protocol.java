@@ -105,9 +105,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
                 Processor processor, boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
-            if (socket.isAsync()) {
-                ((Nio2Endpoint) getProtocol().getEndpoint()).removeTimeout(socket);
-            }
             // No need to add to poller. read() will have already been called
             // with an appropriate completion handler.
         }
@@ -117,7 +114,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         protected void longPoll(SocketWrapperBase<Nio2Channel> socket, Processor processor) {
             if (processor.isAsync()) {
                 socket.setAsync(true);
-                ((Nio2Endpoint) getProtocol().getEndpoint()).addTimeout(socket);
             } else {
                 // Either:
                 //  - this is an upgraded connection

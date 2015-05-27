@@ -393,6 +393,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
     protected boolean processSocket0(SocketWrapperBase<Nio2Channel> socketWrapper, SocketStatus status, boolean dispatch) {
         try {
+            waitingRequests.remove(socketWrapper);
             SocketProcessor sc = processorCache.pop();
             if (sc == null) {
                 sc = new SocketProcessor(socketWrapper, status);
@@ -1554,14 +1555,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         public void closeAll();
     }
 
-    public void addTimeout(SocketWrapperBase<Nio2Channel> socket) {
-        waitingRequests.add(socket);
-    }
-
-    public boolean removeTimeout(SocketWrapperBase<Nio2Channel> socket) {
-        return waitingRequests.remove(socket);
-    }
-
     public static void startInline() {
         inlineCompletion.set(Boolean.TRUE);
     }
@@ -1644,6 +1637,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                             closeSocket(socket);
                             if (running && !paused) {
                                 nioChannels.push(socket.getSocket());
+                            }
+                        } else if (state == Handler.SocketState.LONG) {
+                            if (socket.isAsync()) {
+                                waitingRequests.add(socket);
                             }
                         } else if (state == SocketState.UPGRADING) {
                             socket.setKeptAlive(true);
