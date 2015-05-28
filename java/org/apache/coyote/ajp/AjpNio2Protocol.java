@@ -85,12 +85,11 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
         @Override
         public void release(SocketWrapperBase<Nio2Channel> socket,
                 Processor processor, boolean addToPoller) {
-            if (getLog().isDebugEnabled()) {
-                log.debug("Socket: [" + socket + "], Processor: [" + processor +
-                        "], addToPoller: [" + addToPoller + "]");
-            }
             processor.recycle();
             recycledProcessors.push(processor);
+            if (addToPoller) {
+                socket.registerReadInterest();
+            }
         }
 
         @Override
