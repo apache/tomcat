@@ -627,16 +627,5 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 return new UpgradeProcessorExternal(socket, leftoverInput, httpUpgradeHandler);
             }
         }
-
-
-        @Override
-        public void release(SocketWrapperBase<S> socket,
-                Processor processor, boolean addToPoller) {
-            processor.recycle();
-            recycledProcessors.push(processor);
-            if (addToPoller) {
-                socket.registerReadInterest();
-            }
-        }
     }
 }

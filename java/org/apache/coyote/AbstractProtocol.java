@@ -859,11 +859,19 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
          * @param addToPoller Should the socket be added to the poller for
          *                    reading
          */
-        protected abstract void release(SocketWrapperBase<S> socket,
-                Processor processor, boolean addToPoller);
+        public void release(SocketWrapperBase<S> socket, Processor processor, boolean addToPoller) {
+            processor.recycle();
+            recycledProcessors.push(processor);
+            if (addToPoller) {
+                socket.registerReadInterest();
+            }
+        }
+
+
         protected abstract Processor createUpgradeProcessor(
                 SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeHandler) throws IOException;
+
 
         protected void register(AbstractProcessor processor) {
             if (getProtocol().getDomain() != null) {
