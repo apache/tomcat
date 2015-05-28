@@ -51,7 +51,7 @@ class ConnectionImpl extends DelegatingConnection<Connection> {
      *
      * @param pooledConnection The PooledConnection that is calling the ctor.
      * @param connection The JDBC 1.x Connection to wrap.
-     * @param accessToUnderlyingConnectionAllowed if true, then access is allowed to the underlying connectiion
+     * @param accessToUnderlyingConnectionAllowed if true, then access is allowed to the underlying connection
      */
     ConnectionImpl(PooledConnectionImpl pooledConnection,
             Connection connection,
