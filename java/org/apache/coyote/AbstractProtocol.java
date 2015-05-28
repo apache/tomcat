@@ -831,8 +831,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
         protected abstract P createProcessor();
-        protected abstract void longPoll(SocketWrapperBase<?> socket,
-                Processor processor);
+
+
+        protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
+            if (processor.isAsync()) {
+                // Async
+                socket.setAsync(true);
+            } else {
+                // This branch is currently only used with HTTP
+                // Either:
+                //  - this is an upgraded connection
+                //  - the request line/headers have not been completely
+                //    read
+                socket.registerReadInterest();
+            }
+        }
+
 
         /**
          * Expected to be used by the handler once the processor is no longer
