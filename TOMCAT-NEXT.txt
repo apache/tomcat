@@ -29,7 +29,8 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
     - All implementation specific per connector code -> Endpoint
     - All implementation specific per connection code -> SocketWrapper
 
- 5. SNI support for JSSE.
+ 5. DONE
+    SNI support for JSSE.
 
  6. See what Java 8 language features we want to use.
 
@@ -39,7 +40,8 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
  8. Keep an eye on the other Java EE 8 EGs (no sign of any movement apart
     from the Servlet EG so far).
 
- 9. Refactor WebSocket I/O to go directly to Tomcat's internals rather than via
+ 9. DONE
+    Refactor WebSocket I/O to go directly to Tomcat's internals rather than via
     the Servlet API.
 
 10. Remove the use of system properties to control configuration wherever
