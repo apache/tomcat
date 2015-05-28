@@ -134,15 +134,18 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         }
 
         /**
-         * Expected to be used by the Poller to release resources on socket
+         * Expected to be used by the Endpoint to release resources on socket
          * close, errors etc.
          */
         @Override
-        public void release(SocketWrapperBase<NioChannel> socket) {
-            Processor processor = connections.remove(socket.getSocket());
-            if (processor != null) {
-                processor.recycle();
-                recycledProcessors.push(processor);
+        public void release(SocketWrapperBase<NioChannel> socketWrapper) {
+            NioChannel socket = socketWrapper.getSocket();
+            if (socket != null) {
+                Processor processor = connections.remove(socket);
+                if (processor != null) {
+                    processor.recycle();
+                    recycledProcessors.push(processor);
+                }
             }
         }
     }
