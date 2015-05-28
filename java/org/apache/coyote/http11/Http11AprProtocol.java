@@ -16,11 +16,9 @@
  */
 package org.apache.coyote.http11;
 
-import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -93,16 +91,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         @Override
         protected Log getLog() {
             return log;
-        }
-
-        @Override
-        public void release(SocketWrapperBase<Long> socket,
-                Processor processor, boolean addToPoller) {
-            processor.recycle();
-            recycledProcessors.push(processor);
-            if (addToPoller) {
-                socket.registerReadInterest();
-            }
         }
     }
 }

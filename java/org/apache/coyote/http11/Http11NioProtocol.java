@@ -145,16 +145,5 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                 recycledProcessors.push(processor);
             }
         }
-
-
-        @Override
-        public void release(SocketWrapperBase<NioChannel> socket,
-                Processor processor, boolean addToPoller) {
-            processor.recycle();
-            recycledProcessors.push(processor);
-            if (addToPoller) {
-                socket.registerReadInterest();
-            }
-        }
     }
 }
