@@ -39,20 +39,20 @@ public class ConstantPool {
 
 
     /**
-     * Read constants from given file stream.
+     * Read constants from given input stream.
      *
-     * @param file Input stream
+     * @param input Input stream
      * @throws IOException
      * @throws ClassFormatException
      */
-    ConstantPool(DataInput file) throws IOException, ClassFormatException {
-        int constant_pool_count = file.readUnsignedShort();
+    ConstantPool(DataInput input) throws IOException, ClassFormatException {
+        int constant_pool_count = input.readUnsignedShort();
         constant_pool = new Constant[constant_pool_count];
         /* constant_pool[0] is unused by the compiler and may be used freely
          * by the implementation.
          */
         for (int i = 1; i < constant_pool_count; i++) {
-            constant_pool[i] = Constant.readConstant(file);
+            constant_pool[i] = Constant.readConstant(input);
             /* Quote from the JVM specification:
              * "All eight byte constants take up two spots in the constant pool.
              * If this is the n'th byte in the constant pool, then the next item

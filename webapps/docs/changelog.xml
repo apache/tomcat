@@ -136,6 +136,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update package renamed Apache Commons BCEL to r1682271 to pick up some
+        some code clean up. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.62 (violetagg)" rtext="released 2015-05-14">
   <subsection name="Catalina">

@@ -57,28 +57,28 @@ public abstract class Constant {
 
 
     /**
-     * Read one constant from the given file, the type depends on a tag byte.
+     * Read one constant from the given input, the type depends on a tag byte.
      *
-     * @param file Input stream
+     * @param input Input stream
      * @return Constant object
      */
-    static Constant readConstant(DataInput file ) throws IOException,
+    static Constant readConstant(DataInput input) throws IOException,
             ClassFormatException {
-        byte b = file.readByte(); // Read tag byte
+        byte b = input.readByte(); // Read tag byte
         int skipSize;
         switch (b) {
             case Constants.CONSTANT_Class:
-                return new ConstantClass(file);
+                return new ConstantClass(input);
             case Constants.CONSTANT_Integer:
-                return new ConstantInteger(file);
+                return new ConstantInteger(input);
             case Constants.CONSTANT_Float:
-                return new ConstantFloat(file);
+                return new ConstantFloat(input);
             case Constants.CONSTANT_Long:
-                return new ConstantLong(file);
+                return new ConstantLong(input);
             case Constants.CONSTANT_Double:
-                return new ConstantDouble(file);
+                return new ConstantDouble(input);
             case Constants.CONSTANT_Utf8:
-                return ConstantUtf8.getInstance(file);
+                return ConstantUtf8.getInstance(input);
             case Constants.CONSTANT_String:
             case Constants.CONSTANT_MethodType:
                 skipSize = 2; // unsigned short
@@ -96,7 +96,7 @@ public abstract class Constant {
             default:
                 throw new ClassFormatException("Invalid byte tag in constant pool: " + b);
         }
-        Utility.skipFully(file, skipSize);
+        Utility.skipFully(input, skipSize);
         return null;
     }
 

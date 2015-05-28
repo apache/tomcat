@@ -40,20 +40,20 @@ public class AnnotationEntry implements Constants {
     /**
      * Creates an AnnotationEntry from a DataInputStream
      * 
-     * @param file
+     * @param input
      * @param constant_pool
      * @throws IOException
      */
-    AnnotationEntry(DataInput file, ConstantPool constant_pool) throws IOException {
+    AnnotationEntry(DataInput input, ConstantPool constant_pool) throws IOException {
 
         this.constant_pool = constant_pool;
 
-        type_index = file.readUnsignedShort();
-        int num_element_value_pairs = file.readUnsignedShort();
+        type_index = input.readUnsignedShort();
+        int num_element_value_pairs = input.readUnsignedShort();
 
         element_value_pairs = new ArrayList<ElementValuePair>(num_element_value_pairs);
         for (int i = 0; i < num_element_value_pairs; i++) {
-            element_value_pairs.add(new ElementValuePair(file, constant_pool));
+            element_value_pairs.add(new ElementValuePair(input, constant_pool));
         }
     }
     
