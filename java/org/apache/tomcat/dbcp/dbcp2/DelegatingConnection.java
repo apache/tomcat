@@ -94,7 +94,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
 
     /**
      * Returns a string representation of the metadata associated with
-     * the innnermost delegate connection.
+     * the innermost delegate connection.
      */
     @Override
     public String toString() {

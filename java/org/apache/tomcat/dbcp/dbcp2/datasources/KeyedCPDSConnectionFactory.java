@@ -39,7 +39,7 @@ import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
 
 /**
  * A {@link KeyedPooledObjectFactory} that creates
- * {@link PoolableConnection}s.
+ * {@link org.apache.tomcat.dbcp.dbcp2.PoolableConnection PoolableConnection}s.
  *
  * @author John D. McNally
  * @since 2.0
@@ -159,7 +159,7 @@ class KeyedCPDSConnectionFactory
      * @param key ignored
      * @param p wrapped {@link PooledConnectionAndInfo} containing the
      *          connection to validate
-     * @return true if validation suceeds
+     * @return true if validation succeeds
      */
     @Override
     public boolean validateObject(UserPassKey key,

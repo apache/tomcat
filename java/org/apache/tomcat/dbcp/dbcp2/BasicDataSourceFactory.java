@@ -21,9 +21,13 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -33,6 +37,11 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.dbcp.pool2.impl.BaseObjectPoolConfig;
+import org.apache.tomcat.dbcp.pool2.impl.GenericObjectPoolConfig;
+
 /**
  * <p>JNDI object factory that creates an instance of
  * <code>BasicDataSource</code> that has been configured based on the
@@ -41,7 +50,7 @@ import javax.naming.spi.ObjectFactory;
  * properties with the following exceptions:</p>
  * <ul>
  * <li><code>connectionInitSqls</code> must be passed to this factory as a
- *     single String using semi-colon to delimt the statements whereas
+ *     single String using semi-colon to delimit the statements whereas
  *     <code>BasicDataSource</code> requires a collection of Strings.</li>
  * </ul>
  *
@@ -50,6 +59,8 @@ import javax.naming.spi.ObjectFactory;
  * @since 2.0
  */
 public class BasicDataSourceFactory implements ObjectFactory {
+
+    private static final Log log = LogFactory.getLog(BasicDataSourceFactory.class);
 
     private static final String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
     private static final String PROP_DEFAULTREADONLY = "defaultReadOnly";
@@ -93,9 +104,34 @@ public class BasicDataSourceFactory implements ObjectFactory {
     private static final String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
     private static final String PROP_CONNECTIONPROPERTIES = "connectionProperties";
     private static final String PROP_MAXCONNLIFETIMEMILLIS = "maxConnLifetimeMillis";
+    private static final String PROP_LOGEXPIREDCONNECTIONS = "logExpiredConnections";
     private static final String PROP_ROLLBACK_ON_RETURN = "rollbackOnReturn";
     private static final String PROP_ENABLE_AUTOCOMMIT_ON_RETURN = "enableAutoCommitOnReturn";
     private static final String PROP_DEFAULT_QUERYTIMEOUT = "defaultQueryTimeout";
+    private static final String PROP_FASTFAIL_VALIDATION = "fastFailValidation";
+
+    /**
+     * Value string must be of the form [STATE_CODE,]*
+     */
+    private static final String PROP_DISCONNECTION_SQL_CODES = "disconnectionSqlCodes";
+
+    /*
+     * Block with obsolete properties from DBCP 1.x.
+     * Warn users that these are ignored and they should use the 2.x properties.
+     */
+    private static final String NUPROP_MAXACTIVE = "maxActive";
+    private static final String NUPROP_REMOVEABANDONED = "removeAbandoned";
+    private static final String NUPROP_MAXWAIT = "maxWait";
+
+    /*
+     * Block with properties expected in a DataSource
+     * This props will not be listed as ignored - we know that they may appear in Resource,
+     * and not listing them as ignored.
+     */
+    private static final String SILENTPROP_FACTORY = "factory";
+    private static final String SILENTPROP_SCOPE = "scope";
+    private static final String SILENTPROP_SINGLETON = "singleton";
+    private static final String SILENTPROP_AUTH = "auth";
 
     private static final String[] ALL_PROPERTIES = {
         PROP_DEFAULTAUTOCOMMIT,
@@ -134,10 +170,53 @@ public class BasicDataSourceFactory implements ObjectFactory {
         PROP_MAXOPENPREPAREDSTATEMENTS,
         PROP_CONNECTIONPROPERTIES,
         PROP_MAXCONNLIFETIMEMILLIS,
+        PROP_LOGEXPIREDCONNECTIONS,
         PROP_ROLLBACK_ON_RETURN,
         PROP_ENABLE_AUTOCOMMIT_ON_RETURN,
-        PROP_DEFAULT_QUERYTIMEOUT
+        PROP_DEFAULT_QUERYTIMEOUT,
+        PROP_FASTFAIL_VALIDATION,
+        PROP_DISCONNECTION_SQL_CODES
     };
+
+    /**
+     * Obsolete properties from DBCP 1.x. with warning strings suggesting
+     * new properties. LinkedHashMap will guarantee that properties will be listed
+     * to output in order of insertion into map.
+     */
+    private static final Map<String, String> NUPROP_WARNTEXT = new LinkedHashMap<>();
+
+    static {
+        NUPROP_WARNTEXT.put(
+                NUPROP_MAXACTIVE,
+                "Property " + NUPROP_MAXACTIVE + " is not used in DBCP2, use " + PROP_MAXTOTAL + " instead. "
+                        + PROP_MAXTOTAL + " default value is " + GenericObjectPoolConfig.DEFAULT_MAX_TOTAL+".");
+        NUPROP_WARNTEXT.put(
+                NUPROP_REMOVEABANDONED,
+                "Property " + NUPROP_REMOVEABANDONED + " is not used in DBCP2,"
+                        + " use one or both of "
+                        + PROP_REMOVEABANDONEDONBORROW + " or " + PROP_REMOVEABANDONEDONMAINTENANCE + " instead. "
+                        + "Both have default value set to false.");
+        NUPROP_WARNTEXT.put(
+                NUPROP_MAXWAIT,
+                "Property " + NUPROP_MAXWAIT + " is not used in DBCP2"
+                        + " , use " + PROP_MAXWAITMILLIS + " instead. "
+                        + PROP_MAXWAITMILLIS + " default value is " + BaseObjectPoolConfig.DEFAULT_MAX_WAIT_MILLIS+".");
+    }
+
+    /**
+     * Silent Properties.
+     * These properties will not be listed as ignored - we know that they may appear in JDBC Resource references,
+     * and we will not list them as ignored.
+     */
+    private static final List<String> SILENT_PROPERTIES = new ArrayList<>();
+
+    static {
+        SILENT_PROPERTIES.add(SILENTPROP_FACTORY);
+        SILENT_PROPERTIES.add(SILENTPROP_SCOPE);
+        SILENT_PROPERTIES.add(SILENTPROP_SINGLETON);
+        SILENT_PROPERTIES.add(SILENTPROP_AUTH);
+
+    }
 
     // -------------------------------------------------- ObjectFactory Methods
 
@@ -170,6 +249,17 @@ public class BasicDataSourceFactory implements ObjectFactory {
             return null;
         }
 
+        // Check property names and log warnings about obsolete and / or unknown properties
+        final List<String> warnings = new ArrayList<>();
+        final List<String> infoMessages = new ArrayList<>();
+        validatePropertyNames(ref, name, warnings, infoMessages);
+        for (String warning : warnings) {
+            log.warn(warning);
+        }
+        for (String infoMessage : infoMessages) {
+            log.info(infoMessage);
+        }
+
         Properties properties = new Properties();
         for (String propertyName : ALL_PROPERTIES) {
             RefAddr ra = ref.get(propertyName);
@@ -180,6 +270,58 @@ public class BasicDataSourceFactory implements ObjectFactory {
         }
 
         return createDataSource(properties);
+    }
+
+    /**
+     * Collects warnings and info messages.  Warnings are generated when an obsolete
+     * property is set.  Unknown properties generate info messages.
+     *
+     * @param ref Reference to check properties of
+     * @param name Name provided to getObject
+     * @param warnings container for warning messages
+     * @param infoMessages container for info messages
+     */
+    private void validatePropertyNames(Reference ref, Name name, List<String> warnings,
+                                      List<String> infoMessages) {
+        final List<String> allPropsAsList = Arrays.asList(ALL_PROPERTIES);
+        final String nameString = name != null ? "Name = " + name.toString() + " " : "";
+        if (NUPROP_WARNTEXT!=null && !NUPROP_WARNTEXT.keySet().isEmpty()) {
+            for (String propertyName : NUPROP_WARNTEXT.keySet()) {
+                final RefAddr ra = ref.get(propertyName);
+                if (ra != null && !allPropsAsList.contains(ra.getType())) {
+                    final StringBuilder stringBuilder = new StringBuilder(nameString);
+                    final String propertyValue = ra.getContent().toString();
+                    stringBuilder.append(NUPROP_WARNTEXT.get(propertyName))
+                            .append(" You have set value of \"")
+                            .append(propertyValue)
+                            .append("\" for \"")
+                            .append(propertyName)
+                            .append("\" property, which is being ignored.");
+                    warnings.add(stringBuilder.toString());
+                }
+            }
+        }
+
+        final Enumeration<RefAddr> allRefAddrs = ref.getAll();
+        while (allRefAddrs.hasMoreElements()) {
+            final RefAddr ra = allRefAddrs.nextElement();
+            final String propertyName = ra.getType();
+            // If property name is not in the properties list, we haven't warned on it
+            // and it is not in the "silent" list, tell user we are ignoring it.
+            if (!(allPropsAsList.contains(propertyName)
+                    || NUPROP_WARNTEXT.keySet().contains(propertyName)
+                    || SILENT_PROPERTIES.contains(propertyName))) {
+                final String propertyValue = ra.getContent().toString();
+                final StringBuilder stringBuilder = new StringBuilder(nameString);
+                stringBuilder.append("Ignoring unknown property: ")
+                        .append("value of \"")
+                        .append(propertyValue)
+                        .append("\" for \"")
+                        .append(propertyName)
+                        .append("\" property");
+                infoMessages.add(stringBuilder.toString());
+            }
+        }
     }
 
     /**
@@ -386,15 +528,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_CONNECTIONINITSQLS);
         if (value != null) {
-            StringTokenizer tokenizer = new StringTokenizer(value, ";");
-            // Have to jump through these hoops as StringTokenizer implements
-            // Enumeration<Object> rather than Enumeration<String>
-            Collection<String> tokens =
-                    new ArrayList<>(tokenizer.countTokens());
-            while (tokenizer.hasMoreTokens()) {
-                tokens.add(tokenizer.nextToken());
-            }
-            dataSource.setConnectionInitSqls(tokens);
+            dataSource.setConnectionInitSqls(parseList(value, ';'));
         }
 
         value = properties.getProperty(PROP_CONNECTIONPROPERTIES);
@@ -410,6 +544,11 @@ public class BasicDataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_MAXCONNLIFETIMEMILLIS);
         if (value != null) {
             dataSource.setMaxConnLifetimeMillis(Long.parseLong(value));
+        }
+
+        value = properties.getProperty(PROP_LOGEXPIREDCONNECTIONS);
+        if (value != null) {
+            dataSource.setLogExpiredConnections(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_JMX_NAME);
@@ -432,6 +571,15 @@ public class BasicDataSourceFactory implements ObjectFactory {
             dataSource.setDefaultQueryTimeout(Integer.valueOf(value));
         }
 
+        value = properties.getProperty(PROP_FASTFAIL_VALIDATION);
+        if (value != null) {
+            dataSource.setFastFailValidation(Boolean.valueOf(value).booleanValue());
+        }
+
+        value = properties.getProperty(PROP_DISCONNECTION_SQL_CODES);
+        if (value != null) {
+            dataSource.setDisconnectionSqlCodes(parseList(value, ','));
+        }
 
         // DBCP-215
         // Trick to make sure that initialSize connections are created
@@ -456,5 +604,20 @@ public class BasicDataSourceFactory implements ObjectFactory {
                 propText.replace(';', '\n').getBytes(StandardCharsets.ISO_8859_1)));
       }
       return p;
+    }
+
+    /**
+     * Parse list of property values from a delimited string
+     * @param value delimited list of values
+     * @param delimiter character used to separate values in the list
+     * @return String Collection of values
+     */
+    private static Collection<String> parseList(String value, char delimiter) {
+        StringTokenizer tokenizer = new StringTokenizer(value, Character.toString(delimiter));
+        Collection<String> tokens = new ArrayList<>(tokenizer.countTokens());
+        while (tokenizer.hasMoreTokens()) {
+            tokens.add(tokenizer.nextToken());
+        }
+        return tokens;
     }
 }
