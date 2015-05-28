@@ -64,10 +64,12 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
             super(proto);
         }
 
+
         @Override
         protected Log getLog() {
             return log;
         }
+
 
         /**
          * Expected to be used by the Poller to release resources on socket
@@ -82,15 +84,6 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
             }
         }
 
-        @Override
-        public void release(SocketWrapperBase<Nio2Channel> socket,
-                Processor processor, boolean addToPoller) {
-            processor.recycle();
-            recycledProcessors.push(processor);
-            if (addToPoller) {
-                socket.registerReadInterest();
-            }
-        }
 
         @Override
         public void closeAll() {
