@@ -38,7 +38,7 @@ public class StringUtils {
      * @param string
      *            The string to encode (if null, return null).
      * @param charset
-     *            The {@link Charset} to encode the {@code String}
+     *            The {@link Charset} to encode the <code>String</code>
      * @return the encoded bytes
      */
     private static byte[] getBytes(final String string, final Charset charset) {
@@ -53,8 +53,8 @@ public class StringUtils {
      * array.
      *
      * @param string
-     *            the String to encode, may be {@code null}
-     * @return encoded bytes, or {@code null} if the input string was {@code null}
+     *            the String to encode, may be <code>null</code>
+     * @return encoded bytes, or <code>null</code> if the input string was <code>null</code>
      * @see <a href="http://download.oracle.com/javase/6/docs/api/java/nio/charset/Charset.html">Standard charsets</a>
      */
     public static byte[] getBytesUtf8(final String string) {
@@ -67,9 +67,9 @@ public class StringUtils {
      * @param bytes
      *            The bytes to be decoded into characters
      * @param charset
-     *            The {@link Charset} to encode the {@code String}
+     *            The {@link Charset} to encode the <code>String</code>
      * @return A new <code>String</code> decoded from the specified array of bytes using the given charset,
-     *         or {@code null} if the input byte array was {@code null}.
+     *         or <code>null</code> if the input byte array was <code>null</code>.
      */
     private static String newString(final byte[] bytes, final Charset charset) {
         return bytes == null ? null : new String(bytes, charset);
@@ -81,10 +81,9 @@ public class StringUtils {
      * @param bytes
      *            The bytes to be decoded into characters
      * @return A new <code>String</code> decoded from the specified array of bytes using the UTF-8 charset,
-     *         or {@code null} if the input byte array was {@code null}.
+     *         or <code>null</code> if the input byte array was <code>null</code>.
      */
     public static String newStringUtf8(final byte[] bytes) {
         return newString(bytes, B2CConverter.UTF_8);
     }
-
 }
