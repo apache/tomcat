@@ -90,17 +90,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
 
 
         @Override
-        public void release(SocketWrapperBase<Nio2Channel> socket,
-                Processor processor, boolean addToPoller) {
-            processor.recycle();
-            recycledProcessors.push(processor);
-            if (addToPoller) {
-                socket.registerReadInterest();
-            }
-        }
-
-
-        @Override
         public void closeAll() {
             for (Nio2Channel channel : connections.keySet()) {
                 ((Nio2Endpoint) getProtocol().getEndpoint()).closeSocket(channel.getSocket());
