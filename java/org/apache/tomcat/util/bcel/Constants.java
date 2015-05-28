@@ -24,7 +24,11 @@ package org.apache.tomcat.util.bcel;
  */
 public interface Constants {
 
-  /** One of the access flags for fields, methods, or classes.
+  /**
+   * One of the access flags for fields, methods, or classes.
+   * @see "<a href='http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.5'>Flag definitions for Fields in the Java Virtual Machine Specification (Java SE 8 Edition).</a>"
+   * @see "<a href='http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.6'>Flag definitions for Methods in the Java Virtual Machine Specification (Java SE 8 Edition).</a>"
+   * @see "<a href='http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.6-300-D.1-D.1'>Flag definitions for Classes in the Java Virtual Machine Specification (Java SE 8 Edition).</a>"
    */
   public static final short ACC_FINAL        = 0x0010;
 
@@ -90,5 +94,4 @@ public interface Constants {
     "CONSTANT_Methodref", "CONSTANT_InterfaceMethodref",
     "CONSTANT_NameAndType", "", "", "CONSTANT_MethodHandle",
     "CONSTANT_MethodType", "", "CONSTANT_InvokeDynamic" };
-
 }

@@ -41,9 +41,9 @@ public final class ConstantLong extends Constant {
      * @param file Input stream
      * @throws IOException
      */
-    ConstantLong(DataInput file) throws IOException {
+    ConstantLong(DataInput input) throws IOException {
         super(Constants.CONSTANT_Long);
-        this.bytes = file.readLong();
+        this.bytes = input.readLong();
     }
 
 
