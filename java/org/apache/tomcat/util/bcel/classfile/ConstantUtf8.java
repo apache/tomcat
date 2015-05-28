@@ -34,8 +34,8 @@ public final class ConstantUtf8 extends Constant {
     private final String bytes;
 
 
-    static ConstantUtf8 getInstance(DataInput file) throws IOException {
-        return new ConstantUtf8(file.readUTF());
+    static ConstantUtf8 getInstance(DataInput input) throws IOException {
+        return new ConstantUtf8(input.readUTF());
     }
 
 
