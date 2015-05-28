@@ -101,19 +101,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
 
 
         @Override
-        protected void longPoll(SocketWrapperBase<Nio2Channel> socket, Processor processor) {
-            if (processor.isAsync()) {
-                socket.setAsync(true);
-            } else {
-                // Either:
-                //  - this is an upgraded connection
-                //  - the request line/headers have not been completely
-                //    read
-                socket.registerReadInterest();
-            }
-        }
-
-        @Override
         public void closeAll() {
             for (Nio2Channel channel : connections.keySet()) {
                 ((Nio2Endpoint) getProtocol().getEndpoint()).closeSocket(channel.getSocket());

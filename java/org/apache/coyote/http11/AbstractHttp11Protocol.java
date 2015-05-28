@@ -37,6 +37,7 @@ import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
+//import org.apache.coyote.http2.Http2Protocol;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -624,6 +625,21 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                         (InternalHttpUpgradeHandler) httpUpgradeHandler);
             } else {
                 return new UpgradeProcessorExternal(socket, leftoverInput, httpUpgradeHandler);
+            }
+        }
+
+
+        @Override
+        protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
+            if (processor.isAsync()) {
+                // Async
+                socket.setAsync(true);
+            } else {
+                // Either:
+                //  - this is an upgraded connection
+                //  - the request line/headers have not been completely
+                //    read
+                socket.registerReadInterest();
             }
         }
     }

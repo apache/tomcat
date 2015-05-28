@@ -104,19 +104,5 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                 socket.registerReadInterest();
             }
         }
-
-        @Override
-        protected void longPoll(SocketWrapperBase<Long> socket, Processor processor) {
-            if (processor.isAsync()) {
-                // Async
-                socket.setAsync(true);
-            } else {
-                // Either:
-                //  - this is an upgraded connection
-                //  - the request line/headers have not been completely
-                //    read
-                socket.registerReadInterest();
-            }
-        }
     }
 }

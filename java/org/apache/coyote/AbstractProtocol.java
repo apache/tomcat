@@ -831,7 +831,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
         protected abstract P createProcessor();
-        protected abstract void longPoll(SocketWrapperBase<S> socket,
+        protected abstract void longPoll(SocketWrapperBase<?> socket,
                 Processor processor);
 
         /**
