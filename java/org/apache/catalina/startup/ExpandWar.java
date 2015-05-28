@@ -111,7 +111,7 @@ public class ExpandWar {
         }
 
         // Create the new document base directory
-        if(!docBase.mkdir() && !docBase.isDirectory()) {
+        if(!docBase.mkdirs() && !docBase.isDirectory()) {
             throw new IOException(sm.getString("expandWar.createFailed", docBase));
         }
 
