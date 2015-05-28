@@ -284,12 +284,17 @@ public class JSSESocketFactory implements SSLUtil {
         kmf.init(ks, keyPass.toCharArray());
 
         kms = kmf.getKeyManagers();
+        if (kms == null) {
+            return kms;
+        }
+
         if (keyAlias != null) {
             String alias = keyAlias;
+            // JKS keystores always convert the alias name to lower case
             if ("JKS".equals(keystoreType)) {
                 alias = alias.toLowerCase(Locale.ENGLISH);
             }
-            for(int i=0; i<kms.length; i++) {
+            for(int i = 0; i < kms.length; i++) {
                 kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], alias);
             }
         }
