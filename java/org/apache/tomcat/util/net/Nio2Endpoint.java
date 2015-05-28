@@ -1571,7 +1571,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler<Nio2Channel> {
-        public void release(SocketWrapperBase<Nio2Channel> socket);
         public void closeAll();
     }
 
