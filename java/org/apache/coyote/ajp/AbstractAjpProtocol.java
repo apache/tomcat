@@ -169,7 +169,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         }
 
         @Override
-        protected void longPoll(SocketWrapperBase<S> socket, Processor processor) {
+        protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
             // Same requirements for all AJP connectors
             socket.setAsync(true);
         }
