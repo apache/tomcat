@@ -627,20 +627,5 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 return new UpgradeProcessorExternal(socket, leftoverInput, httpUpgradeHandler);
             }
         }
-
-
-        @Override
-        protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
-            if (processor.isAsync()) {
-                // Async
-                socket.setAsync(true);
-            } else {
-                // Either:
-                //  - this is an upgraded connection
-                //  - the request line/headers have not been completely
-                //    read
-                socket.registerReadInterest();
-            }
-        }
     }
 }

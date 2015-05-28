@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
-import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -168,11 +167,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
             return processor;
         }
 
-        @Override
-        protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
-            // Same requirements for all AJP connectors
-            socket.setAsync(true);
-        }
 
         @Override
         protected AjpProcessor createUpgradeProcessor(SocketWrapperBase<?> socket,
