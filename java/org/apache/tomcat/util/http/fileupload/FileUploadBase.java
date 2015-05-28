@@ -314,8 +314,8 @@ public abstract class FileUploadBase {
                 for (FileItem fileItem : items) {
                     try {
                         fileItem.delete();
-                    } catch (Exception e) {
-                        // ignore it
+                    } catch (Exception ignored) {
+                        // ignored TODO perhaps add to tracker delete failure list somehow?
                     }
                 }
             }
