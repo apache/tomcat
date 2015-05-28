@@ -706,13 +706,6 @@
         </p>
     </attribute>
 
-    <attribute name="pollerSize" required="false">
-      <p>Amount of sockets that the poller responsible for polling kept alive
-      connections can hold at a given time. Extra connections will be closed
-      right away. The default value is 8192, corresponding to 8192 keep-alive
-      connections.</p>
-    </attribute>
-
     </attributes>
 
   </subsection>

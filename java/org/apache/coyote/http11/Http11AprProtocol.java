@@ -54,9 +54,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     public int getPollTime() { return ((AprEndpoint)getEndpoint()).getPollTime(); }
     public void setPollTime(int pollTime) { ((AprEndpoint)getEndpoint()).setPollTime(pollTime); }
 
-    public void setPollerSize(int pollerSize) { getEndpoint().setMaxConnections(pollerSize); }
-    public int getPollerSize() { return getEndpoint().getMaxConnections(); }
-
     public int getSendfileSize() { return ((AprEndpoint)getEndpoint()).getSendfileSize(); }
     public void setSendfileSize(int sendfileSize) { ((AprEndpoint)getEndpoint()).setSendfileSize(sendfileSize); }
 
