@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -173,6 +174,18 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
                 ByteBuffer leftoverInput, HttpUpgradeHandler httpUpgradeHandler) {
             // TODO should fail - throw IOE
             return null;
+        }
+
+
+
+        @Override
+        public void release(SocketWrapperBase<S> socket,
+                Processor processor, boolean addToPoller) {
+            processor.recycle();
+            recycledProcessors.push(processor);
+            if (addToPoller) {
+                socket.registerReadInterest();
+            }
         }
     }
 }

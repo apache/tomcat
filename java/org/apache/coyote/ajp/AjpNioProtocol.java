@@ -110,16 +110,5 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
                 recycledProcessors.push(processor);
             }
         }
-
-
-        @Override
-        public void release(SocketWrapperBase<NioChannel> socket,
-               Processor processor,  boolean addToPoller) {
-            processor.recycle();
-            recycledProcessors.push(processor);
-            if (addToPoller) {
-                socket.registerReadInterest();
-            }
-        }
     }
 }
