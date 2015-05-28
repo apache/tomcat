@@ -1530,11 +1530,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                             try {
                                 if (socket.getPoller().cancelledKey(key) != null) {
                                     // SocketWrapper (attachment) was removed from the
-                                    // key - recycle both. This can only happen once
+                                    // key - recycle the key. This can only happen once
                                     // per attempted closure so it is used to determine
-                                    // whether or not to return socket and ka to
-                                    // their respective caches. We do NOT want to do
-                                    // this more than once - see BZ 57340.
+                                    // whether or not to return the key to the cache.
+                                    // We do NOT want to do this more than once - see BZ
+                                    // 57340.
                                     if (running && !paused) {
                                         nioChannels.push(socket);
                                     }
