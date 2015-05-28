@@ -86,6 +86,14 @@ public abstract class AbstractEndpoint<S> {
 
 
         /**
+         * Release any resources associated with the given SocketWrapper.
+         *
+         * @param socketWrapper The socketWrapper to release resources for
+         */
+        public void release(SocketWrapperBase<S> socketWrapper);
+
+
+        /**
          * Recycle resources associated with the handler.
          */
         public void recycle();

@@ -25,7 +25,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -131,22 +130,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
             }
             if (log.isDebugEnabled())
                 log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
-        }
-
-        /**
-         * Expected to be used by the Endpoint to release resources on socket
-         * close, errors etc.
-         */
-        @Override
-        public void release(SocketWrapperBase<NioChannel> socketWrapper) {
-            NioChannel socket = socketWrapper.getSocket();
-            if (socket != null) {
-                Processor processor = connections.remove(socket);
-                if (processor != null) {
-                    processor.recycle();
-                    recycledProcessors.push(processor);
-                }
-            }
         }
     }
 }

@@ -661,6 +661,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         if (running) {
             running = false;
             poller.stop();
+            for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
+                try {
+                    socketWrapper.close();
+                    handler.release(socketWrapper);
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
             getAsyncTimeout().stop();
             for (AbstractEndpoint.Acceptor acceptor : acceptors) {
                 long waitLeft = 10000;

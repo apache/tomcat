@@ -868,6 +868,23 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
 
+        /**
+         * Expected to be used by the Endpoint to release resources on socket
+         * close, errors etc.
+         */
+        @Override
+        public void release(SocketWrapperBase<S> socketWrapper) {
+            S socket = socketWrapper.getSocket();
+            if (socket != null) {
+                Processor processor = connections.remove(socket);
+                if (processor != null) {
+                    processor.recycle();
+                    recycledProcessors.push(processor);
+                }
+            }
+        }
+
+
         protected abstract Processor createUpgradeProcessor(
                 SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeHandler) throws IOException;

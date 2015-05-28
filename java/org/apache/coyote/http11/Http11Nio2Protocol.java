@@ -16,13 +16,11 @@
  */
 package org.apache.coyote.http11;
 
-import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
 import org.apache.tomcat.util.net.Nio2Endpoint.Handler;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -71,23 +69,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         protected Log getLog() {
             return log;
         }
-
-        /**
-         * Expected to be used by the Endpoint to release resources on socket
-         * close, errors etc.
-         */
-        @Override
-        public void release(SocketWrapperBase<Nio2Channel> socketWrapper) {
-            Nio2Channel socket = socketWrapper.getSocket();
-            if (socket != null) {
-                Processor processor = connections.remove(socket);
-                if (processor != null) {
-                    processor.recycle();
-                    recycledProcessors.push(processor);
-                }
-            }
-        }
-
 
         @Override
         public void closeAll() {
