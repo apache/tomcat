@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.management.ManagementFactory;
 import java.lang.ref.WeakReference;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicLong;
@@ -89,7 +90,7 @@ public abstract class BaseGenericObjectPool<T> {
     volatile boolean closed = false;
     final Object evictionLock = new Object();
     private Evictor evictor = null; // @GuardedBy("evictionLock")
-    Iterator<PooledObject<T>> evictionIterator = null; // @GuardedBy("evictionLock")
+    EvictionIterator evictionIterator = null; // @GuardedBy("evictionLock")
     /*
      * Class loader for evictor thread to use since, in a JavaEE or similar
      * environment, the context class loader for the evictor thread may not have
@@ -583,7 +584,9 @@ public abstract class BaseGenericObjectPool<T> {
 
     /**
      * Sets the name of the {@link EvictionPolicy} implementation that is
-     * used by this pool.
+     * used by this pool. The Pool will attempt to load the class using the
+     * thread context class loader. If that fails, the Pool will attempt to load
+     * the class using the class loader that loaded this class.
      *
      * @param evictionPolicyClassName   the fully qualified class name of the
      *                                  new eviction policy
@@ -593,8 +596,13 @@ public abstract class BaseGenericObjectPool<T> {
     public final void setEvictionPolicyClassName(
             String evictionPolicyClassName) {
         try {
-            Class<?> clazz = Class.forName(evictionPolicyClassName, true,
-                    Thread.currentThread().getContextClassLoader());
+            Class<?> clazz;
+            try {
+                clazz = Class.forName(evictionPolicyClassName, true,
+                        Thread.currentThread().getContextClassLoader());
+            } catch (ClassNotFoundException e) {
+                clazz = Class.forName(evictionPolicyClassName);
+            }
             Object policy = clazz.newInstance();
             if (policy instanceof EvictionPolicy<?>) {
                 @SuppressWarnings("unchecked") // safe, because we just checked the class
@@ -645,9 +653,11 @@ public abstract class BaseGenericObjectPool<T> {
 
     /**
      * Returns the {@link EvictionPolicy} defined for this pool.
+     *
      * @return the eviction policy
+     * @since 2.4
      */
-    final EvictionPolicy<T> getEvictionPolicy() {
+    protected EvictionPolicy<T> getEvictionPolicy() {
         return evictionPolicy;
     }
 
@@ -1098,4 +1108,96 @@ public abstract class BaseGenericObjectPool<T> {
             return (long) result;
         }
     }
+
+    /**
+     * The idle object eviction iterator. Holds a reference to the idle objects.
+     */
+    class EvictionIterator implements Iterator<PooledObject<T>> {
+
+        private final Deque<PooledObject<T>> idleObjects;
+        private final Iterator<PooledObject<T>> idleObjectIterator;
+
+        /**
+         * Create an EvictionIterator for the provided idle instance deque.
+         * @param idleObjects underlying deque
+         */
+        EvictionIterator(final Deque<PooledObject<T>> idleObjects) {
+            this.idleObjects = idleObjects;
+
+            if (getLifo()) {
+                idleObjectIterator = idleObjects.descendingIterator();
+            } else {
+                idleObjectIterator = idleObjects.iterator();
+            }
+        }
+
+        /**
+         * Returns the idle object deque referenced by this iterator.
+         * @return the idle object deque
+         */
+        public Deque<PooledObject<T>> getIdleObjects() {
+            return idleObjects;
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public boolean hasNext() {
+            return idleObjectIterator.hasNext();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public PooledObject<T> next() {
+            return idleObjectIterator.next();
+        }
+
+        /** {@inheritDoc} */
+        @Override
+        public void remove() {
+            idleObjectIterator.remove();
+        }
+
+    }
+
+    /**
+     * Wrapper for objects under management by the pool.
+     *
+     * GenericObjectPool and GenericKeyedObjectPool maintain references to all
+     * objects under management using maps keyed on the objects. This wrapper
+     * class ensures that objects can work as hash keys.
+     *
+     * @param <T> type of objects in the pool
+     */
+    static class IdentityWrapper<T> {
+        /** Wrapped object */
+        private final T instance;
+
+        /**
+         * Create a wrapper for an instance.
+         *
+         * @param instance object to wrap
+         */
+        public IdentityWrapper(T instance) {
+            this.instance = instance;
+        }
+
+        @Override
+        public int hashCode() {
+            return System.identityHashCode(instance);
+        }
+
+        @Override
+        @SuppressWarnings("rawtypes")
+        public boolean equals(Object other) {
+            return ((IdentityWrapper) other).instance == instance;
+        }
+
+        /**
+         * @return the wrapped object
+         */
+        public T getObject() {
+            return instance;
+        }
+    }
+
 }

@@ -47,7 +47,7 @@ public class GenericKeyedObjectPoolConfig extends BaseObjectPoolConfig {
     public static final int DEFAULT_MIN_IDLE_PER_KEY = 0;
 
     /**
-     * The default value for the {@code minIdlePerKey} configuration attribute.
+     * The default value for the {@code maxIdlePerKey} configuration attribute.
      * @see GenericKeyedObjectPool#getMaxIdlePerKey()
      */
     public static final int DEFAULT_MAX_IDLE_PER_KEY = 8;

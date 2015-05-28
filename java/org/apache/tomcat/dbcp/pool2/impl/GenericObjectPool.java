@@ -532,27 +532,24 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     @Override
     public void returnObject(T obj) {
-        PooledObject<T> p = allObjects.get(obj);
+        PooledObject<T> p = allObjects.get(new IdentityWrapper<>(obj));
 
-        if (!isAbandonedConfig()) {
-            if (p == null) {
+        if (p == null) {
+            if (!isAbandonedConfig()) {
                 throw new IllegalStateException(
                         "Returned object not currently part of this pool");
-            }
-        } else {
-            if (p == null) {
-                return;  // Object was abandoned and removed
             } else {
-                // Make sure object is not being reclaimed
-                synchronized(p) {
-                    final PooledObjectState state = p.getState();
-                    if (state != PooledObjectState.ALLOCATED) {
-                        throw new IllegalStateException(
-                                "Object has already been returned to this pool or is invalid");
-                    } else {
-                        p.markReturning(); // Keep from being marked abandoned
-                    }
-                }
+                return; // Object was abandoned and removed
+            }
+        }
+
+        synchronized(p) {
+            final PooledObjectState state = p.getState();
+            if (state != PooledObjectState.ALLOCATED) {
+                throw new IllegalStateException(
+                        "Object has already been returned to this pool or is invalid");
+            } else {
+                p.markReturning(); // Keep from being marked abandoned
             }
         }
 
@@ -633,7 +630,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     @Override
     public void invalidateObject(T obj) throws Exception {
-        PooledObject<T> p = allObjects.get(obj);
+        PooledObject<T> p = allObjects.get(new IdentityWrapper<>(obj));
         if (p == null) {
             if (isAbandonedConfig()) {
                 return;
@@ -751,11 +748,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
                 for (int i = 0, m = getNumTests(); i < m; i++) {
                     if (evictionIterator == null || !evictionIterator.hasNext()) {
-                        if (getLifo()) {
-                            evictionIterator = idleObjects.descendingIterator();
-                        } else {
-                            evictionIterator = idleObjects.iterator();
-                        }
+                        evictionIterator = new EvictionIterator(idleObjects);
                     }
                     if (!evictionIterator.hasNext()) {
                         // Pool exhausted, nothing to do here
@@ -837,6 +830,20 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     }
 
     /**
+     * Tries to ensure that {@link #getMinIdle()} idle instances are available
+     * in the pool.
+     *
+     * @throws Exception If the associated factory throws an exception
+     * @since 2.4
+     */
+    public void preparePool() throws Exception {
+        if (getMinIdle() < 1) {
+            return;
+        }
+        ensureMinIdle();
+    }
+
+    /**
      * Attempts to create a new wrapped pooled object.
      * <p>
      * If there are {@link #getMaxTotal()} objects already in circulation
@@ -869,7 +876,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         }
 
         createdCount.incrementAndGet();
-        allObjects.put(p.getObject(), p);
+        allObjects.put(new IdentityWrapper<>(p.getObject()), p);
         return p;
     }
 
@@ -884,7 +891,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     private void destroy(PooledObject<T> toDestory) throws Exception {
         toDestory.invalidate();
         idleObjects.remove(toDestory);
-        allObjects.remove(toDestory.getObject());
+        allObjects.remove(new IdentityWrapper<>(toDestory.getObject()));
         try {
             factory.destroyObject(toDestory);
         } finally {
@@ -939,6 +946,9 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     /**
      * Create an object, and place it into the pool. addObject() is useful for
      * "pre-loading" a pool with idle objects.
+     * <p>
+     * If there is no capacity available to add to the pool, this is a no-op
+     * (no exception, no impact to the pool). </p>
      */
     @Override
     public void addObject() throws Exception {
@@ -953,7 +963,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
     /**
      * Add the provided wrapped pooled object to the set of idle objects for
-     * this pool. The object must already be part of the pool.
+     * this pool. The object must already be part of the pool.  If {@code p}
+     * is null, this is a no-op (no exception, but no impact on the pool).
      *
      * @param p The object to make idle
      *
@@ -1032,7 +1043,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     public void use(T pooledObject) {
         AbandonedConfig ac = this.abandonedConfig;
         if (ac != null && ac.getUseUsageTracking()) {
-            PooledObject<T> wrapper = allObjects.get(pooledObject);
+            PooledObject<T> wrapper = allObjects.get(new IdentityWrapper<>(pooledObject));
             wrapper.use();
         }
     }
@@ -1118,7 +1129,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * #_maxActive}. Map keys are pooled objects, values are the PooledObject
      * wrappers used internally by the pool.
      */
-    private final Map<T, PooledObject<T>> allObjects =
+    private final Map<IdentityWrapper<T>, PooledObject<T>> allObjects =
         new ConcurrentHashMap<>();
     /*
      * The combined count of the currently created objects and those in the

@@ -17,6 +17,7 @@
 package org.apache.tomcat.dbcp.pool2.impl;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -468,11 +469,21 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
 
         ObjectDeque<T> objectDeque = poolMap.get(key);
 
-        PooledObject<T> p = objectDeque.getAllObjects().get(obj);
+        PooledObject<T> p = objectDeque.getAllObjects().get(new IdentityWrapper<>(obj));
 
         if (p == null) {
             throw new IllegalStateException(
                     "Returned object not currently part of this pool");
+        }
+
+        synchronized(p) {
+            final PooledObjectState state = p.getState();
+            if (state != PooledObjectState.ALLOCATED) {
+                throw new IllegalStateException(
+                        "Object has already been returned to this pool or is invalid");
+            } else {
+                p.markReturning(); // Keep from being marked abandoned (once GKOP does this)
+            }
         }
 
         long activeTime = p.getActiveTimeMillis();
@@ -572,7 +583,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
 
         ObjectDeque<T> objectDeque = poolMap.get(key);
 
-        PooledObject<T> p = objectDeque.getAllObjects().get(obj);
+        PooledObject<T> p = objectDeque.getAllObjects().get(new IdentityWrapper<>(obj));
         if (p == null) {
             throw new IllegalStateException(
                     "Object not currently part of this pool");
@@ -878,8 +889,6 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
 
             boolean testWhileIdle = getTestWhileIdle();
 
-            LinkedBlockingDeque<PooledObject<T>> idleObjects = null;
-
             for (int i = 0, m = getNumTests(); i < m; i++) {
                 if(evictionIterator == null || !evictionIterator.hasNext()) {
                     if (evictionKeyIterator == null ||
@@ -900,13 +909,9 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                         if (objectDeque == null) {
                             continue;
                         }
-                        idleObjects = objectDeque.getIdleObjects();
 
-                        if (getLifo()) {
-                            evictionIterator = idleObjects.descendingIterator();
-                        } else {
-                            evictionIterator = idleObjects.iterator();
-                        }
+                        final Deque<PooledObject<T>> idleObjects = objectDeque.getIdleObjects();
+                        evictionIterator = new EvictionIterator(idleObjects);
                         if (evictionIterator.hasNext()) {
                             break;
                         }
@@ -917,8 +922,10 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                     // Pools exhausted
                     return;
                 }
+                final Deque<PooledObject<T>> idleObjects;
                 try {
                     underTest = evictionIterator.next();
+                    idleObjects = evictionIterator.getIdleObjects();
                 } catch (NoSuchElementException nsee) {
                     // Object was borrowed in another thread
                     // Don't count this as an eviction test so reduce i;
@@ -964,14 +971,12 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                             destroyedByEvictorCount.incrementAndGet();
                         }
                         if (active) {
-                            if (!factory.validateObject(evictionKey,
-                                    underTest)) {
+                            if (!factory.validateObject(evictionKey, underTest)) {
                                 destroy(evictionKey, underTest, true);
                                 destroyedByEvictorCount.incrementAndGet();
                             } else {
                                 try {
-                                    factory.passivateObject(evictionKey,
-                                            underTest);
+                                    factory.passivateObject(evictionKey, underTest);
                                 } catch (Exception e) {
                                     destroy(evictionKey, underTest, true);
                                     destroyedByEvictorCount.incrementAndGet();
@@ -1040,7 +1045,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         }
 
         createdCount.incrementAndGet();
-        objectDeque.getAllObjects().put(p.getObject(), p);
+        objectDeque.getAllObjects().put(new IdentityWrapper<>(p.getObject()), p);
         return p;
     }
 
@@ -1063,7 +1068,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
             boolean isIdle = objectDeque.getIdleObjects().remove(toDestroy);
 
             if (isIdle || always) {
-                objectDeque.getAllObjects().remove(toDestroy.getObject());
+                objectDeque.getAllObjects().remove(new IdentityWrapper<>(toDestroy.getObject()));
                 toDestroy.invalidate();
 
                 try {
@@ -1247,8 +1252,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
      *
      * @param key - The key to register for pool control.
      *
-     * @throws Exception If the associated factory fails to create the necessary
-     *                   number of idle instances
+     * @throws Exception If the associated factory throws an exception
      */
     public void preparePool(K key) throws Exception {
         int minIdlePerKeySave = getMinIdlePerKey();
@@ -1432,11 +1436,10 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         private final AtomicInteger createCount = new AtomicInteger(0);
 
         /*
-         * The map is keyed on pooled instances.  Note: pooled instances
-         * <em>must</em> be distinguishable by equals for this structure to
-         * work properly.
+         * The map is keyed on pooled instances, wrapped to ensure that
+         * they work properly as keys.
          */
-        private final Map<S, PooledObject<S>> allObjects =
+        private final Map<IdentityWrapper<S>, PooledObject<S>> allObjects =
                 new ConcurrentHashMap<>();
 
         /*
@@ -1489,9 +1492,10 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
          *
          * @return All the objects
          */
-        public Map<S, PooledObject<S>> getAllObjects() {
+        public Map<IdentityWrapper<S>, PooledObject<S>> getAllObjects() {
             return allObjects;
         }
+
     }
 
     //--- configuration attributes ---------------------------------------------
