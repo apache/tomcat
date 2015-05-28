@@ -79,6 +79,11 @@
         it also fixes a rare issue when running the unit test. Patch provided by
         Huxing Zhang. (markt)
       </add>
+      <fix>
+        <bug>57959</bug>: Fixed deadlock in
+        <code>org.apache.juli.FileHandler</code> when log is rotated.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
