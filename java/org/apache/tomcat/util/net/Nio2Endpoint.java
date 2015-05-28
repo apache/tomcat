@@ -255,7 +255,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     for (SocketWrapperBase<Nio2Channel> socket : waitingRequests) {
                         processSocket(socket, SocketStatus.TIMEOUT, false);
                     }
-                    // Then close all active connections if any remains
+                    // Then close all active connections if any remain
                     try {
                         handler.closeAll();
                     } catch (Throwable t) {
