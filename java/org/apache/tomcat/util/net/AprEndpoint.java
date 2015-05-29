@@ -549,9 +549,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             Long defaultSSLContext = (Long) defaultSSLHostConfig.getSslContext();
             sslContext = defaultSSLContext.longValue();
             SSLContext.registerDefault(defaultSSLContext, this);
-
-        } else if (negotiableProtocols.size() > 0) {
-            log.info(sm.getString("endpoint.noNegotiation", getName(), negotiableProtocols.toString()));
         }
     }
 
