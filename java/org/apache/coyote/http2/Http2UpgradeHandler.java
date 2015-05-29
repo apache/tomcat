@@ -32,11 +32,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.Adapter;
+import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http2.HpackEncoder.State;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -92,6 +94,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
 
+    private static final String HTTP2_SETTINGS_HEADER = "HTTP2-Settings";
+    private static final byte[] HTTP2_UPGRADE_ACK = ("HTTP/1.1 101 Switching Protocols\r\n" +
+                "Connection: Upgrade\r\nUpgrade: h2c\r\n\r\n").getBytes(StandardCharsets.ISO_8859_1);
+
     private final int connectionId;
 
     private final Adapter adapter;
@@ -119,27 +125,84 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private long backLogSize = 0;
 
 
-    public Http2UpgradeHandler(Adapter adapter) {
+    public Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
         super (STREAM_ID_ZERO);
         this.adapter = adapter;
         this.connectionId = connectionIdGenerator.getAndIncrement();
+
+        // Initial HTTP request becomes stream 0.
+        if (coyoteRequest != null) {
+            Integer key = Integer.valueOf(1);
+            Stream stream = new Stream(key, this, coyoteRequest);
+            streams.put(key, stream);
+            maxRemoteStreamId = 1;
+        }
     }
 
 
     @Override
-    public void init(WebConnection unused) {
+    public void init(WebConnection webConnection) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.init", Long.toString(connectionId)));
         }
 
         initialized = true;
+        Stream stream = null;
+
+        if (webConnection != null) {
+            // HTTP/2 started via HTTP upgrade.
+            // The initial HTTP/1.1 request is available as Stream 1.
+
+            try {
+                // Acknowledge the upgrade request
+                socketWrapper.write(true, HTTP2_UPGRADE_ACK, 0, HTTP2_UPGRADE_ACK.length);
+                socketWrapper.flush(true);
+
+                // Process the initial settings frame
+                stream = getStream(1);
+                String base64Settings = stream.getCoyoteRequest().getHeader(HTTP2_SETTINGS_HEADER);
+                byte[] settings = Base64.decodeBase64(base64Settings);
+
+                if (settings.length % 6 != 0) {
+                    // Invalid payload length for settings
+                    // TODO i18n
+                    throw new IllegalStateException();
+                }
+
+                for (int i = 0; i < settings.length % 6; i++) {
+                    int id = ByteUtil.getTwoBytes(settings, i * 6);
+                    int value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
+                    remoteSettings.set(id, value);
+                }
+
+                firstFrame = false;
+                hpackDecoder = new HpackDecoder(remoteSettings.getHeaderTableSize());
+                hpackEncoder = new HpackEncoder(localSettings.getHeaderTableSize());
+
+                if (!connectionPrefaceParser.parse(socketWrapper, true)) {
+                    // TODO i18n
+                    throw new IllegalStateException();
+                }
+            } catch (IOException ioe) {
+                // TODO i18n
+                throw new IllegalStateException();
+            }
+        }
 
         // Send the initial settings frame
         try {
             socketWrapper.write(true, SETTINGS_EMPTY, 0, SETTINGS_EMPTY.length);
             socketWrapper.flush(true);
+
         } catch (IOException ioe) {
             throw new IllegalStateException(sm.getString("upgradeHandler.sendPrefaceFail"), ioe);
+        }
+
+        if (webConnection != null) {
+            // Process the initial request on a container thread
+            StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
+            streamProcessor.setSslSupport(sslSupport);
+            socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
         }
     }
 
@@ -175,7 +238,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // Gets set to null once the connection preface has been
             // successfully parsed.
             if (connectionPrefaceParser != null) {
-                if (!connectionPrefaceParser.parse(socketWrapper)) {
+                if (!connectionPrefaceParser.parse(socketWrapper, false)) {
                     if (connectionPrefaceParser.isError()) {
                         // Any errors will have already been logged.
                         close();

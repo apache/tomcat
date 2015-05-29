@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -32,7 +33,9 @@ import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ErrorState;
+import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
+import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedOutputFilter;
@@ -42,6 +45,7 @@ import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
+import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -238,8 +242,15 @@ public class Http11Processor extends AbstractProcessor {
     protected SSLSupport sslSupport;
 
 
+    /**
+     * UpgradeProtocol information
+     */
+    private final Map<String,UpgradeProtocol> httpUpgradeProtocols;
+
+
     public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<?> endpoint,int maxTrailerSize,
-            Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize) {
+            Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize,
+            Map<String,UpgradeProtocol> httpUpgradeProtocols) {
 
         super(endpoint);
         userDataHelper = new UserDataHelper(log);
@@ -271,6 +282,8 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.addFilter(new GzipOutputFilter());
 
         pluggableFilterIndex = inputBuffer.getFilters().length;
+
+        this.httpUpgradeProtocols = httpUpgradeProtocols;
     }
 
 
@@ -1014,6 +1027,25 @@ public class Http11Processor extends AbstractProcessor {
                 getAdapter().log(request, response, 0);
             }
 
+            // Has an upgrade been requested?
+            String connection = request.getHeader(Constants.CONNECTION);
+            if (connection != null && connection.toLowerCase().contains("upgrade")) {
+                // Check the protocol
+                String requestedProtocol = request.getHeader("Upgrade");
+
+                UpgradeProtocol upgradeProtocol = httpUpgradeProtocols.get(requestedProtocol);
+                if (upgradeProtocol != null) {
+                    // TODO Figure out how to handle request bodies at this
+                    // point.
+
+                    InternalHttpUpgradeHandler upgradeHandler =
+                            upgradeProtocol.getInteralUpgradeHandler(
+                                    getAdapter(), cloneRequest(request));
+                    action(ActionCode.UPGRADE, upgradeHandler);
+                    return SocketState.UPGRADING;
+                }
+            }
+
             if (!getErrorState().isError()) {
                 // Setting up filters, and parse some request headers
                 rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
@@ -1143,6 +1175,20 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    private Request cloneRequest(Request source) throws IOException {
+        Request dest = new Request();
+
+        // Transfer the minimal information required for the copy of the Request
+        // that is passed to the HTTP upgrade process
+
+        dest.decodedURI().duplicate(source.decodedURI());
+        dest.method().duplicate(source.method());
+        dest.getMimeHeaders().duplicate(source.getMimeHeaders());
+        dest.requestURI().duplicate(source.requestURI());
+
+        return dest;
+
+    }
     private boolean handleIncompleteRequestLineRead() {
         // Haven't finished reading the request so keep the socket
         // open

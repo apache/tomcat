@@ -293,6 +293,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * The upgrade protocol instances configured.
      */
     private final List<UpgradeProtocol> upgradeProtocols = new ArrayList<>();
+    @Override
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
         upgradeProtocols.add(upgradeProtocol);
     }
@@ -650,7 +651,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
             Http11Processor processor = new Http11Processor(
                     proto.getMaxHttpHeaderSize(), proto.getEndpoint(), proto.getMaxTrailerSize(),
                     proto.allowedTrailerHeaders, proto.getMaxExtensionSize(),
-                    proto.getMaxSwallowSize());
+                    proto.getMaxSwallowSize(), proto.httpUpgradeProtocols);
             proto.configureProcessor(processor);
             register(processor);
             return processor;

@@ -16,6 +16,7 @@
  */
 package org.apache.coyote;
 
+import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public interface UpgradeProtocol {
@@ -66,4 +67,14 @@ public interface UpgradeProtocol {
      *         protocol.
      */
     public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter);
+
+
+    /**
+     * @param adapter The Adapter to use to configure the new upgrade handler
+     * @param request A copy (may be incomplete) of the request that triggered
+     *                the upgrade
+     *
+     * @return An instance of the HTTP upgrade handler for this protocol
+     */
+    public InternalHttpUpgradeHandler getInteralUpgradeHandler(Adapter adapter, Request request);
 }

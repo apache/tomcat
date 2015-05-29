@@ -38,19 +38,26 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private volatile int weight = Constants.DEFAULT_WEIGHT;
 
     private final Http2UpgradeHandler handler;
-    private final Request coyoteRequest = new Request();
+    private final Request coyoteRequest;
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer = new StreamInputBuffer();
     private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
 
 
     public Stream(Integer identifier, Http2UpgradeHandler handler) {
+        this(identifier, handler, new Request());
+    }
+
+
+    public Stream(Integer identifier, Http2UpgradeHandler handler, Request coyoteRequest) {
         super(identifier);
         this.handler = handler;
         setParentStream(handler);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
-        coyoteRequest.setInputBuffer(inputBuffer);
-        coyoteResponse.setOutputBuffer(outputBuffer);
+        this.coyoteRequest = coyoteRequest;
+        this.coyoteRequest.setInputBuffer(inputBuffer);
+        this.coyoteResponse.setOutputBuffer(outputBuffer);
+        this.coyoteRequest.setResponse(coyoteResponse);
     }
 
 
