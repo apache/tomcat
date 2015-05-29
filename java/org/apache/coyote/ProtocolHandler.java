@@ -99,4 +99,7 @@ public interface ProtocolHandler {
 
 
     public void addSslHostConfig(SSLHostConfig sslHostConfig);
+
+
+    public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol);
 }

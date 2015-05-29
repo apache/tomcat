@@ -52,10 +52,17 @@ import org.apache.tomcat.util.res.StringManager;
  * For reading, this implementation is blocking within frames and non-blocking
  * between frames.
  * <br>
- * Note that unless Tomcat is configured with an ECC certificate, FireFox
- * (tested with v37.0.2) needs to be configured with
- * network.http.spdy.enforce-tls-profile=false in order for FireFox to be able
- * to connect.
+ * Note:
+ * <ul>
+ * <li>Unless Tomcat is configured with an ECC certificate, FireFox (tested with
+ *     v37.0.2) needs to be configured with
+ *     network.http.spdy.enforce-tls-profile=false in order for FireFox to be
+ *     able to connect.</li>
+ * <li>You will need to nest an &lt;UpgradeProtocol
+ *     className="org.apache.coyote.http2.Http2Protocol" /&gt; element inside
+ *     a TLS enabled Connector element in server.xml to enable HTTP/2 support.
+ *     </li>
+ * </ul>
  *
  * TODO: Review cookie parsing
  */
