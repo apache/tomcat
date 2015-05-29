@@ -41,10 +41,10 @@ public class ConnectionPrefaceParser {
     private volatile boolean error = false;
 
 
-    public boolean parse(SocketWrapperBase<?> socketWrapper) {
+    public boolean parse(SocketWrapperBase<?> socketWrapper, boolean block) {
         int read = 0;
         try {
-            read = socketWrapper.read(false, data, pos, EXPECTED.length - pos);
+            read = socketWrapper.read(block, data, pos, EXPECTED.length - pos);
         } catch (IOException ioe) {
             log.error(sm.getString("connectionPrefaceParser.ioError"), ioe);
             error = true;
