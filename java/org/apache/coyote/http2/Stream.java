@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
+import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
@@ -39,6 +40,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private final Http2UpgradeHandler handler;
     private final Request coyoteRequest = new Request();
     private final Response coyoteResponse = new Response();
+    private final StreamInputBuffer inputBuffer = new StreamInputBuffer();
     private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
 
 
@@ -47,6 +49,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         this.handler = handler;
         setParentStream(handler);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
+        coyoteRequest.setInputBuffer(inputBuffer);
         coyoteResponse.setOutputBuffer(outputBuffer);
     }
 
@@ -199,6 +202,17 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    ByteBuffer getInputByteBuffer() {
+        return inputBuffer.getInBuffer();
+    }
+
+
+    void setEndOfStream() {
+        // TODO This is temporary until the state machine for a stream is
+        // implemented
+        inputBuffer.endOfStream = true;
+    }
+
     StreamOutputBuffer getOutputBuffer() {
         return outputBuffer;
     }
@@ -206,7 +220,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
     class StreamOutputBuffer implements OutputBuffer {
 
-        private volatile ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
+        private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
         private volatile long written = 0;
         private volatile boolean finished = false;
 
@@ -305,6 +319,74 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          */
         public boolean hasNoBody() {
             return ((written == 0) && finished);
+        }
+    }
+
+
+    class StreamInputBuffer implements InputBuffer {
+
+        /* Two buffers are required to avoid various multi-threading issues.
+         * These issues arise from the fact that the Stream (or the
+         * Request/Response) used by the application is processed in one thread
+         * but the connection is processed in another. Therefore it is possible
+         * that a request body frame could be received before the application
+         * is ready to read it. If it isn't buffered, processing of the
+         * connection (and hence all streams) would block until the application
+         * read the data. Hence the incoming data has to be buffered.
+         * If only one buffer was used then it could become corrupted if the
+         * connection thread is trying to add to it at the same time as the
+         * application is read it. While it should be possible to avoid this
+         * corruption by careful use of the buffer it would still require the
+         * same copies as using two buffers and the behaviour would be less
+         * clear.
+         */
+        // This buffer is used to populate the ByteChunk passed in to the read
+        // method
+        private final byte[] outBuffer = new byte[8 * 1024];
+        // This buffer is the destination for incoming data. It is normally is
+        // 'write mode'.
+        private final ByteBuffer inBuffer = ByteBuffer.allocate(8 * 1024);
+
+        private boolean endOfStream = false;
+
+        @Override
+        public int doRead(ByteChunk chunk) throws IOException {
+
+            int written = 0;
+
+            // Ensure that only one thread accesses inBuffer at a time
+            synchronized (inBuffer) {
+                while (inBuffer.position() == 0 && !endOfStream) {
+                    // Need to block until some data is written
+                    try {
+                        inBuffer.wait();
+                    } catch (InterruptedException e) {
+                        // TODO: Possible shutdown?
+                    }
+                }
+
+                if (inBuffer.position() > 0) {
+                    // Data remains in the in buffer. Copy it to the out buffer.
+                    inBuffer.flip();
+                    written = inBuffer.remaining();
+                    inBuffer.get(outBuffer, 0, written);
+                    inBuffer.clear();
+                } else if (endOfStream) {
+                    return -1;
+                } else {
+                    // TODO Should never happen
+                    throw new IllegalStateException();
+                }
+            }
+
+            chunk.setBytes(outBuffer, 0,  written);
+
+            return written;
+        }
+
+
+        public ByteBuffer getInBuffer() {
+            return inBuffer;
         }
     }
 }

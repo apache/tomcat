@@ -275,6 +275,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         int payloadSize = getPayloadSize(streamId, frameHeader);
 
         switch (frameType) {
+        case FRAME_TYPE_DATA:
+            processFrameData(flags, streamId, payloadSize);
+            break;
         case FRAME_TYPE_HEADERS:
             processFrameHeaders(flags, streamId, payloadSize);
             break;
@@ -295,6 +298,46 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             processFrameUnknown(streamId, frameType, payloadSize);
         }
         return true;
+    }
+
+
+    private void processFrameData(int flags, int streamId, int payloadSize) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.processFrame",
+                    Long.toString(connectionId), Integer.toString(streamId),
+                    Integer.toString(flags), Integer.toString(payloadSize)));
+        }
+
+        // Validate the stream
+        if (streamId == 0) {
+            throw new Http2Exception(sm.getString("upgradeHandler.processFrameData.invalidStream"),
+                    0, Http2Exception.PROTOCOL_ERROR);
+        }
+
+        // Process the Stream
+        // TODO Handle end of stream flag
+        int padLength = 0;
+
+        boolean endOfStream = (flags & 0x01) > 0;
+        boolean padding = (flags & 0x08) > 0;
+
+        if (padding) {
+            byte[] b = new byte[1];
+            readFully(b);
+            padLength = b[0] & 0xFF;
+        }
+
+        Stream stream = getStream(streamId);
+        ByteBuffer dest = stream.getInputByteBuffer();
+        synchronized (dest) {
+            readFully(dest, payloadSize);
+            if (endOfStream) {
+                stream.setEndOfStream();
+            }
+            dest.notifyAll();
+        }
+
+        swallow(padLength);
     }
 
 
@@ -373,9 +416,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     0, Http2Exception.PROTOCOL_ERROR);
         }
 
-        if (padLength > 0) {
-            swallow(padLength);
-        }
+        swallow(padLength);
 
         // Process this stream on a container thread
         StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
@@ -557,6 +598,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     private void swallow(int len) throws IOException {
+        if (len == 0) {
+            return;
+        }
         int read = 0;
         byte[] buffer = new byte[1024];
         while (read < len) {
