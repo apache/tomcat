@@ -37,7 +37,6 @@ import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
-import org.apache.coyote.http2.Http2Protocol;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -57,9 +56,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     public void init() throws Exception {
-        // TODO: Make this configurable via nested UpgradeProtocol elements in
-        //       the Connector.
-        addUpgradeProtocol(new Http2Protocol());
+        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
+            configureUpgradeProtocol(upgradeProtocol);
+        }
 
         super.init();
     }
@@ -291,6 +290,14 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     /**
+     * The upgrade protocol instances configured.
+     */
+    private final List<UpgradeProtocol> upgradeProtocols = new ArrayList<>();
+    public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
+        upgradeProtocols.add(upgradeProtocol);
+    }
+
+    /**
      * The protocols that are available via internal Tomcat support for access
      * via HTTP upgrade.
      */
@@ -300,7 +307,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * via ALPN negotiation.
      */
     private final Map<String,UpgradeProtocol> negotiatedProtocols = new HashMap<>();
-    public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
+    private void configureUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
         boolean secure = getEndpoint().isSSLEnabled();
         // HTTP Upgrade
         String httpUpgradeName = upgradeProtocol.getHttpUpgradeName(secure);

@@ -135,6 +135,12 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
+    @Override
+    public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
+        getLog().warn(sm.getString("ajpprotocol.noUpgrade", upgradeProtocol.getClass().getName()));
+    }
+
+
     protected void configureProcessor(AjpProcessor processor) {
         processor.setAdapter(getAdapter());
         processor.setTomcatAuthentication(getTomcatAuthentication());

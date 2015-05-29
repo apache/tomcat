@@ -351,7 +351,15 @@ public class Catalina {
                             "addLifecycleListener",
                             "org.apache.catalina.LifecycleListener");
 
-        // Add RuleSets for nested elements
+        digester.addObjectCreate("Server/Service/Connector/UpgradeProtocol",
+                                  null, // MUST be specified in the element
+                                  "className");
+        digester.addSetProperties("Server/Service/Connector/UpgradeProtocol");
+        digester.addSetNext("Server/Service/Connector/UpgradeProtocol",
+                            "addUpgradeProtocol",
+                            "org.apache.coyote.UpgradeProtocol");
+
+// Add RuleSets for nested elements
         digester.addRuleSet(new NamingRuleSet("Server/GlobalNamingResources/"));
         digester.addRuleSet(new EngineRuleSet("Server/Service/"));
         digester.addRuleSet(new HostRuleSet("Server/Service/Engine/"));
