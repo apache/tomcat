@@ -90,7 +90,7 @@
     <changelog>
       <fix>
         <bug>57931</bug>: Ensure that TLS connections with the NIO or NIO2 HTTP
-        connectors that experience issues during the handhshake (e.g. missing or
+        connectors that experience issues during the handshake (e.g. missing or
         invalid client certificate) are closed cleanly and that the client
         receives the correct error code rather than simply closing the
         connection. (markt)
