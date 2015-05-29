@@ -31,8 +31,12 @@ public class Http2Protocol implements UpgradeProtocol {
     private static final byte[] ALPN_IDENTIFIER = ALPN_NAME.getBytes(StandardCharsets.UTF_8);
 
     @Override
-    public String getHttpUpgradeName() {
-        return HTTP_UPGRADE_NAME;
+    public String getHttpUpgradeName(boolean isSecure) {
+        if (isSecure) {
+            return null;
+        } else {
+            return HTTP_UPGRADE_NAME;
+        }
     }
 
     @Override

@@ -37,23 +37,31 @@ import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
-//import org.apache.coyote.http2.Http2Protocol;
+import org.apache.coyote.http2.Http2Protocol;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
+import org.apache.tomcat.util.res.StringManager;
 
 public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
+
+    protected static final StringManager sm =
+            StringManager.getManager(AbstractHttp11Protocol.class);
+
 
     public AbstractHttp11Protocol(AbstractEndpoint<S> endpoint) {
         super(endpoint);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
+    }
 
+
+    @Override
+    public void init() throws Exception {
         // TODO: Make this configurable via nested UpgradeProtocol elements in
         //       the Connector.
-        //       This is disabled by default otherwise it will break the
-        //       APR/native connector with clients that support h2 with ALPN
-        //       (because the Http2Protocol is only stubbed out)
-        //addUpgradeProtocol(new Http2Protocol());
+        addUpgradeProtocol(new Http2Protocol());
+
+        super.init();
     }
 
 
@@ -293,9 +301,36 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private final Map<String,UpgradeProtocol> negotiatedProtocols = new HashMap<>();
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
-        httpUpgradeProtocols.put(upgradeProtocol.getHttpUpgradeName(), upgradeProtocol);
-        negotiatedProtocols.put(upgradeProtocol.getAlpnName(), upgradeProtocol);
-        getEndpoint().addNegotiatedProtocol(upgradeProtocol.getAlpnName());
+        boolean secure = getEndpoint().isSSLEnabled();
+        // HTTP Upgrade
+        String httpUpgradeName = upgradeProtocol.getHttpUpgradeName(secure);
+        boolean httpUpgradeConfigured = false;
+        if (httpUpgradeName != null && httpUpgradeName.length() > 0) {
+            httpUpgradeProtocols.put(httpUpgradeName, upgradeProtocol);
+            httpUpgradeConfigured = true;
+            getLog().info(sm.getString("abstractHttp11Protocol.httpUpgradeConfigured",
+                    getName(), httpUpgradeName));
+        }
+
+        // ALPN
+        String alpnName = upgradeProtocol.getAlpnName();
+        if (alpnName != null && alpnName.length() > 0) {
+            // ALPN requires SSL
+            if (secure) {
+                negotiatedProtocols.put(alpnName, upgradeProtocol);
+                getEndpoint().addNegotiatedProtocol(alpnName);
+                getLog().info(sm.getString("abstractHttp11Protocol.alpnConfigured",
+                        getName(), alpnName));
+            } else {
+                if (!httpUpgradeConfigured) {
+                    // HTTP Upgrade is not available for this protocol so it
+                    // requires ALPN. It has been configured on a non-secure
+                    // connector where ALPN is not available.
+                    getLog().error(sm.getString("abstractHttp11Protocol.alpnWithNoTls",
+                            upgradeProtocol.getClass().getName(), alpnName, getName()));
+                }
+            }
+        }
     }
     @Override
     public UpgradeProtocol getNegotiatedProtocol(String negotiatedName) {

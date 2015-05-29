@@ -51,8 +51,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(AbstractProtocol.class);
 
 
     /**
