@@ -327,6 +327,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             padLength = b[0] & 0xFF;
         }
 
+        // TODO Flow control
         Stream stream = getStream(streamId);
         ByteBuffer dest = stream.getInputByteBuffer();
         synchronized (dest) {
