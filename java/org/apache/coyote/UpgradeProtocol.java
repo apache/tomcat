@@ -54,6 +54,10 @@ public interface UpgradeProtocol {
     public String getAlpnName();
 
     /**
+     * @param socketWrapper The socketWrapper for the connection that requires
+     *                      a processor
+     * @param adapter The Adapter instance that provides access to the standard
+     *                Engine/Host/Context/Wrapper processing chain
      *
      * @return A processor instance for processing a connection using this
      *         protocol.
