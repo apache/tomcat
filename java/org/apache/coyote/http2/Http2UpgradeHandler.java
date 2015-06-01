@@ -38,6 +38,7 @@ import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http2.HpackEncoder.State;
 import org.apache.coyote.http2.Http2Parser.Input;
+import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -71,7 +72,7 @@ import org.apache.tomcat.util.res.StringManager;
  * TODO: Review cookie parsing
  */
 public class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler,
-        Input {
+        Input, Output {
 
     private static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
     private static final StringManager sm = StringManager.getManager(Http2UpgradeHandler.class);
@@ -154,7 +155,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.init", connectionId));
         }
 
-        parser = new Http2Parser(this);
+        parser = new Http2Parser(connectionId, this, null);
 
         initialized = true;
         Stream stream = null;
@@ -384,7 +385,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         // Process the Stream
-        // TODO Handle end of stream flag
         int padLength = 0;
 
         boolean endOfStream = (flags & 0x01) > 0;
@@ -1077,9 +1077,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     // ----------------------------------------------- Http2Parser.Input methods
 
     @Override
-    public boolean fill(boolean block, byte[] data) throws IOException {
-        int len = data.length;
-        int pos = 0;
+    public boolean fill(boolean block, byte[] data, int offset, int length) throws IOException {
+        int len = length;
+        int pos = offset;
         boolean nextReadBlock = block;
         int thisRead = 0;
 
@@ -1102,5 +1102,75 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         return true;
+    }
+
+
+    // ---------------------------------------------- Http2Parser.Output methods
+
+    @Override
+    public HpackDecoder getHpackDecoder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public ByteBuffer getInputByteBuffer(int streamId, int payloadSize) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    @Override
+    public void endOfStream(int streamId) {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public void headersStart(int streamId) {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public void reprioritise(int streamId, int parentStreamId,
+            boolean exclusive, int weight) {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public void header(String name, String value) {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public void headersEnd() {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public void settingsAck() {
+        // TODO Auto-generated method stub
+    }
+
+
+    @Override
+    public void setting(int identifier, long value) throws IOException {
+        remoteSettings.set(identifier, value);
+    }
+
+
+    @Override
+    public void swallow(int streamId, int frameType, int flags, int size) throws IOException {
+        swallow(size);
     }
 }

@@ -33,7 +33,7 @@ public class ConnectionSettings {
 
     private static final int MIN_MAX_FRAME_SIZE = 1 << 14;
     private static final int MAX_MAX_FRAME_SIZE = (1 << 24) - 1;
-    private static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
+    static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
 
     private volatile int headerTableSize = 4096;
     private volatile boolean enablePush = true;

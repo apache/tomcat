@@ -55,8 +55,32 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     private Socket s;
     protected Input input;
+    protected TestOutput output;
     protected Http2Parser parser;
     protected OutputStream os;
+
+
+    /**
+     * Standard setup. Creates HTTP/2 connection via HTTP upgrade and ensures
+     * that the first response is correctly received.
+     */
+    protected void http2Connect() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade("h2c", true);
+        sendClientPreface();
+        // Need to read 3 frames (settings, headers and response body)
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+
+        Assert.assertEquals("1-HeadersStart\n"
+                + "1-Header-[:status]-[200]\n"
+                + "1-Body-8192\n"
+                + "1-EndOfStream", output.getTrace());
+        output.clearTrace();
+    }
 
 
     protected void enableHttp2() {
@@ -90,7 +114,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         InputStream is = s.getInputStream();
 
         input = new TestInput(is);
-        parser = new Http2Parser(input);
+        output = new TestOutput();
+        parser = new Http2Parser("0", input, output);
     }
 
 
@@ -175,6 +200,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    private void sendClientPreface() throws IOException {
+        os.write(Http2Parser.CLIENT_PREFACE_START);
+        os.flush();
+    }
+
+
     private static class TestInput implements Http2Parser.Input {
 
         private final InputStream is;
@@ -186,10 +217,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public boolean fill(boolean block, byte[] data) throws IOException {
+        public boolean fill(boolean block, byte[] data, int offset, int length) throws IOException {
             // Note: Block is ignored for this test class. Reads always block.
-            int off = 0;
-            int len = data.length;
+            int off = offset;
+            int len = length;
             while (len > 0) {
                 int read = is.read(data, off, len);
                 if (read == -1) {
@@ -199,6 +230,93 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 len -= read;
             }
             return true;
+        }
+    }
+
+
+    private static class TestOutput implements Http2Parser.Output {
+
+        private StringBuffer trace = new StringBuffer();
+        private String lastStreamId = "0";
+        private ConnectionSettings remoteSettings = new ConnectionSettings();
+
+
+        @Override
+        public HpackDecoder getHpackDecoder() {
+            return new HpackDecoder(remoteSettings.getHeaderTableSize());
+        }
+
+
+        @Override
+        public ByteBuffer getInputByteBuffer(int streamId, int payloadSize) {
+            lastStreamId = Integer.toString(streamId);
+            trace.append(lastStreamId + "-Body-" + payloadSize + "\n");
+            return null;
+        }
+
+
+        @Override
+        public void endOfStream(int streamId) {
+            lastStreamId = Integer.toString(streamId);
+            trace.append(lastStreamId + "-EndOfStream");
+        }
+
+
+        @Override
+        public void headersStart(int streamId) {
+            lastStreamId = Integer.toString(streamId);
+            trace.append(lastStreamId + "-HeadersStart\n");
+        }
+
+        @Override
+        public void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight) {
+            lastStreamId = Integer.toString(streamId);
+            trace.append(lastStreamId + "-Reprioritise-[" + parentStreamId + "]-[" + exclusive +
+                    "]-[" + weight + "]\n");
+        }
+
+        @Override
+        public void header(String name, String value) {
+            trace.append(lastStreamId + "-Header-[" + name + "]-[" + value + "]\n");
+        }
+
+        @Override
+        public void headersEnd() {
+            trace.append(lastStreamId + "-HeadersEnd\n");
+        }
+
+        @Override
+        public void settingsAck() {
+            trace.append("0-Settings-Ack");
+
+        }
+
+        @Override
+        public void setting(int identifier, long value) throws IOException {
+            trace.append("0-Settings-[" + identifier + "]-[" + value + "]");
+            remoteSettings.set(identifier, value);
+        }
+
+
+        @Override
+        public void swallow(int streamId, int frameType, int flags, int size) {
+            trace.append(streamId);
+            trace.append(",");
+            trace.append(frameType);
+            trace.append(",");
+            trace.append(flags);
+            trace.append(",");
+            trace.append(size);
+            trace.append("\n");
+        }
+
+        public void clearTrace() {
+            trace = new StringBuffer();
+        }
+
+
+        public String getTrace() {
+            return trace.toString();
         }
     }
 
