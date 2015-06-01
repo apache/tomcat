@@ -140,7 +140,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         // Looking for \r\n\r\n
         int seen = 0;
         while (seen < 4) {
-            input.fill(singleByte, true);
+            input.fill(true, singleByte);
             switch (seen) {
             case 0:
             case 2: {
@@ -186,7 +186,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public boolean fill(byte[] data, boolean block) throws IOException {
+        public boolean fill(boolean block, byte[] data) throws IOException {
             // Note: Block is ignored for this test class. Reads always block.
             int off = 0;
             int len = data.length;
