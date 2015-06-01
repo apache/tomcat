@@ -32,6 +32,11 @@ public class Http2Protocol implements UpgradeProtocol {
     private static final String ALPN_NAME = "h2";
     private static final byte[] ALPN_IDENTIFIER = ALPN_NAME.getBytes(StandardCharsets.UTF_8);
 
+    // All timeouts in milliseconds
+    private long readTimeout = 10000;
+    private long keepAliveTimeout = 30000;
+    private long writeTimeout = 10000;
+
     @Override
     public String getHttpUpgradeName(boolean isSecure) {
         if (isSecure) {
@@ -62,6 +67,42 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public InternalHttpUpgradeHandler getInteralUpgradeHandler(Adapter adapter,
             Request coyoteRequest) {
-        return new Http2UpgradeHandler(adapter, coyoteRequest);
+        Http2UpgradeHandler result = new Http2UpgradeHandler(adapter, coyoteRequest);
+
+        result.setReadTimeout(getReadTimeout());
+        result.setKeepAliveTimeout(getKeepAliveTimeout());
+        result.setWriteTimeout(getWriteTimeout());
+
+        return result;
+    }
+
+
+    public long getReadTimeout() {
+        return readTimeout;
+    }
+
+
+    public void setReadTimeout(long readTimeout) {
+        this.readTimeout = readTimeout;
+    }
+
+
+    public long getKeepAliveTimeout() {
+        return keepAliveTimeout;
+    }
+
+
+    public void setKeepAliveTimeout(long keepAliveTimeout) {
+        this.keepAliveTimeout = keepAliveTimeout;
+    }
+
+
+    public long getWriteTimeout() {
+        return writeTimeout;
+    }
+
+
+    public void setWriteTimeout(long writeTimeout) {
+        this.writeTimeout = writeTimeout;
     }
 }

@@ -32,10 +32,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.Adapter;
+import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http2.HpackEncoder.State;
+import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
@@ -68,7 +70,8 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * TODO: Review cookie parsing
  */
-public class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler {
+public class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler,
+        Input {
 
     private static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
     private static final StringManager sm = StringManager.getManager(Http2UpgradeHandler.class);
@@ -104,9 +107,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private volatile SocketWrapperBase<?> socketWrapper;
     private volatile SSLSupport sslSupport;
 
+    private volatile Http2Parser parser;
+
     private volatile boolean initialized = false;
-    private volatile ConnectionPrefaceParser connectionPrefaceParser =
-            new ConnectionPrefaceParser();
     private volatile boolean firstFrame = true;
 
     private final ConnectionSettings remoteSettings = new ConnectionSettings();
@@ -116,6 +119,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private HpackDecoder hpackDecoder;
     private ByteBuffer headerReadBuffer = ByteBuffer.allocate(1024);
     private HpackEncoder hpackEncoder;
+
+    // All timeouts in milliseconds
+    private long readTimeout = 10000;
+    private long keepAliveTimeout = 30000;
+    private long writeTimeout = 10000;
 
     private final Map<Integer,Stream> streams = new HashMap<>();
 
@@ -146,8 +154,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.init", Long.toString(connectionId)));
         }
 
+        parser = new Http2Parser(this);
+
         initialized = true;
         Stream stream = null;
+
+        socketWrapper.setReadTimeout(getReadTimeout());
+        socketWrapper.setWriteTimeout(getWriteTimeout());
 
         if (webConnection != null) {
             // HTTP/2 started via HTTP upgrade.
@@ -166,7 +179,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 if (settings.length % 6 != 0) {
                     // Invalid payload length for settings
                     // TODO i18n
-                    throw new IllegalStateException();
+                    throw new ProtocolException();
                 }
 
                 for (int i = 0; i < settings.length % 6; i++) {
@@ -179,13 +192,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 hpackDecoder = new HpackDecoder(remoteSettings.getHeaderTableSize());
                 hpackEncoder = new HpackEncoder(localSettings.getHeaderTableSize());
 
-                if (!connectionPrefaceParser.parse(socketWrapper, true)) {
-                    // TODO i18n
-                    throw new IllegalStateException();
+                if (!parser.readConnectionPreface()) {
+                    throw new ProtocolException(sm.getString("upgradeHandler.invalidPreface"));
                 }
             } catch (IOException ioe) {
                 // TODO i18n
-                throw new IllegalStateException();
+                throw new ProtocolException();
             }
         }
 
@@ -235,22 +247,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         switch(status) {
         case OPEN_READ:
-            // Gets set to null once the connection preface has been
-            // successfully parsed.
-            if (connectionPrefaceParser != null) {
-                if (!connectionPrefaceParser.parse(socketWrapper, false)) {
-                    if (connectionPrefaceParser.isError()) {
-                        // Any errors will have already been logged.
-                        close();
-                        break;
-                    } else {
-                        // Incomplete
-                        result = SocketState.UPGRADED;
-                        break;
-                    }
-                }
+            if (!parser.readConnectionPreface()) {
+                close();
+                result = SocketState.CLOSED;
+                break;
             }
-            connectionPrefaceParser = null;
 
             // Process all the incoming data
             try {
@@ -336,6 +337,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         // TODO: Consider refactoring and making this a field to reduce GC.
         byte[] frameHeader = new byte[9];
         if (!getFrameHeader(frameHeader)) {
+            // Switch to keep-alive timeout between frames
+            socketWrapper.setReadTimeout(getKeepAliveTimeout());
             return false;
         }
 
@@ -694,6 +697,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             return false;
         }
 
+        // Switch to read timeout
+        socketWrapper.setReadTimeout(getReadTimeout());
+
         // Partial header read. Blocking within a frame to block while the
         // remainder is read.
         while (headerBytesRead < frameHeader.length) {
@@ -1038,5 +1044,68 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     protected final int getWeight() {
         return 0;
+    }
+
+
+    // ------------------------------------------- Configuration getters/setters
+
+    public long getReadTimeout() {
+        return readTimeout;
+    }
+
+
+    public void setReadTimeout(long readTimeout) {
+        this.readTimeout = readTimeout;
+    }
+
+
+    public long getKeepAliveTimeout() {
+        return keepAliveTimeout;
+    }
+
+
+    public void setKeepAliveTimeout(long keepAliveTimeout) {
+        this.keepAliveTimeout = keepAliveTimeout;
+    }
+
+
+    public long getWriteTimeout() {
+        return writeTimeout;
+    }
+
+
+    public void setWriteTimeout(long writeTimeout) {
+        this.writeTimeout = writeTimeout;
+    }
+
+
+    // ----------------------------------------------- Http2Parser.Input methods
+
+    @Override
+    public boolean fill(byte[] data, boolean block) throws IOException {
+        int len = data.length;
+        int pos = 0;
+        boolean nextReadBlock = block;
+        int thisRead = 0;
+
+        while (len > 0) {
+            thisRead = socketWrapper.read(nextReadBlock, data, pos, len);
+            if (thisRead == 0) {
+                if (nextReadBlock) {
+                    // Should never happen
+                    throw new IllegalStateException();
+                } else {
+                    return false;
+                }
+            } else if (thisRead == -1) {
+                throw new EOFException();
+            } else {
+                pos += thisRead;
+                len -= thisRead;
+                nextReadBlock = true;
+            }
+        }
+
+        return true;
     }
 }
