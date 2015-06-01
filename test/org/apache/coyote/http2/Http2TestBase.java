@@ -42,7 +42,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
  * Tests for compliance with the <a href="https://tools.ietf.org/html/rfc7540">
  * HTTP/2 specification</a>.
  */
-public abstract class TestHttp2Base extends TomcatBaseTest {
+public abstract class Http2TestBase extends TomcatBaseTest {
 
     private static final String HTTP2_SETTINGS;
 
