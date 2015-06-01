@@ -68,8 +68,8 @@ public class ByteUtil {
     }
 
 
-    public static int getFourBytes(byte[] input, int firstByte) {
-        return ((input[firstByte] & 0xFF) << 24) + ((input[firstByte + 1] & 0xFF) << 16) +
+    public static long getFourBytes(byte[] input, int firstByte) {
+        return ((long)(input[firstByte] & 0xFF) << 24) + ((input[firstByte + 1] & 0xFF) << 16) +
                 ((input[firstByte + 2] & 0xFF) << 8) + (input[firstByte + 3] & 0xFF);
     }
 }

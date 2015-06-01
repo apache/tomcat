@@ -184,7 +184,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
                 for (int i = 0; i < settings.length % 6; i++) {
                     int id = ByteUtil.getTwoBytes(settings, i * 6);
-                    int value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
+                    long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
                     remoteSettings.set(id, value);
                 }
 
@@ -568,7 +568,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             for (int i = 0; i < payloadSize / 6; i++) {
                 readFully(setting);
                 int id = ByteUtil.getTwoBytes(setting, 0);
-                int value = ByteUtil.getFourBytes(setting, 2);
+                long value = ByteUtil.getFourBytes(setting, 2);
                 remoteSettings.set(id, value);
             }
         }

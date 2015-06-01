@@ -28,20 +28,19 @@ public class ConnectionSettings {
     private final StringManager sm = StringManager.getManager(ConnectionSettings.class);
 
     public static final int DEFAULT_WINDOW_SIZE = (1 << 16) - 1;
-    // TODO: The maximum allowed in a settings frame as 2^32 (unsigned)
-    private static final int UNLIMITED = (1 << 31) -1; // Use the maximum possible
+    private static final long UNLIMITED = ((long)1 << 32); // Use the maximum possible
     private static final int MAX_WINDOW_SIZE = (1 << 31) - 1;
     private static final int MIN_MAX_FRAME_SIZE = 1 << 14;
     private static final int MAX_MAX_FRAME_SIZE = (1 << 24) - 1;
 
     private volatile int headerTableSize = 4096;
-    private volatile int enablePush = 1;
-    private volatile int maxConcurrentStreams = UNLIMITED;
+    private volatile boolean enablePush = true;
+    private volatile long maxConcurrentStreams = UNLIMITED;
     private volatile int initialWindowSize = DEFAULT_WINDOW_SIZE;
     private volatile int maxFrameSize = MIN_MAX_FRAME_SIZE;
-    private volatile int maxHeaderListSize = UNLIMITED;
+    private volatile long maxHeaderListSize = UNLIMITED;
 
-    public void set(int parameterId, int value) throws IOException {
+    public void set(int parameterId, long value) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("connectionSettings.debug",
                     Integer.toString(parameterId), Long.toString(value)));
@@ -77,29 +76,34 @@ public class ConnectionSettings {
     public int getHeaderTableSize() {
         return headerTableSize;
     }
-    public void setHeaderTableSize(int headerTableSize) {
-        this.headerTableSize = headerTableSize;
+    public void setHeaderTableSize(long headerTableSize) throws IOException {
+        // Need to put a sensible limit on this. Start with 16k (default is 4k)
+        if (headerTableSize > (16 * 1024)) {
+            throw new Http2Exception(sm.getString("connectionSettings.headerTableSizeLimit",
+                    Long.toString(headerTableSize)), 0, Http2Exception.PROTOCOL_ERROR);
+        }
+        this.headerTableSize = (int) headerTableSize;
     }
 
 
-    public int getEnablePush() {
+    public boolean getEnablePush() {
         return enablePush;
     }
-    public void setEnablePush(int enablePush) throws IOException {
+    public void setEnablePush(long enablePush) throws IOException {
         // Can't be less than zero since the result of the byte->long conversion
         // will never be negative
         if (enablePush > 1) {
             throw new Http2Exception(sm.getString("connectionSettings.enablePushInvalid",
                     Long.toString(enablePush)), 0, Http2Exception.PROTOCOL_ERROR);
         }
-        this.enablePush = enablePush;
+        this.enablePush = (enablePush  == 1);
     }
 
 
-    public int getMaxConcurrentStreams() {
+    public long getMaxConcurrentStreams() {
         return maxConcurrentStreams;
     }
-    public void setMaxConcurrentStreams(int maxConcurrentStreams) {
+    public void setMaxConcurrentStreams(long maxConcurrentStreams) {
         this.maxConcurrentStreams = maxConcurrentStreams;
     }
 
@@ -107,33 +111,33 @@ public class ConnectionSettings {
     public int getInitialWindowSize() {
         return initialWindowSize;
     }
-    public void setInitialWindowSize(int initialWindowSize) throws IOException {
+    public void setInitialWindowSize(long initialWindowSize) throws IOException {
         if (initialWindowSize > MAX_WINDOW_SIZE) {
             throw new Http2Exception(sm.getString("connectionSettings.windowSizeTooBig",
                     Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE)),
                     0, Http2Exception.PROTOCOL_ERROR);
         }
-        this.initialWindowSize = initialWindowSize;
+        this.initialWindowSize = (int) initialWindowSize;
     }
 
 
     public int getMaxFrameSize() {
         return maxFrameSize;
     }
-    public void setMaxFrameSize(int maxFrameSize) throws IOException {
+    public void setMaxFrameSize(long maxFrameSize) throws IOException {
         if (maxFrameSize < MIN_MAX_FRAME_SIZE || maxFrameSize > MAX_MAX_FRAME_SIZE) {
             throw new Http2Exception(sm.getString("connectionSettings.maxFrameSizeInvalid",
-                    Long.toString(maxFrameSize), Long.toString(MIN_MAX_FRAME_SIZE),
-                    Long.toString(MAX_MAX_FRAME_SIZE)), 0, Http2Exception.PROTOCOL_ERROR);
+                    Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
+                    Integer.toString(MAX_MAX_FRAME_SIZE)), 0, Http2Exception.PROTOCOL_ERROR);
         }
-        this.maxFrameSize = maxFrameSize;
+        this.maxFrameSize = (int) maxFrameSize;
     }
 
 
-    public int getMaxHeaderListSize() {
+    public long getMaxHeaderListSize() {
         return maxHeaderListSize;
     }
-    public void setMaxHeaderListSize(int maxHeaderListSize) {
+    public void setMaxHeaderListSize(long maxHeaderListSize) {
         this.maxHeaderListSize = maxHeaderListSize;
     }
 }
