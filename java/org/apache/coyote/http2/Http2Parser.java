@@ -62,7 +62,7 @@ class Http2Parser {
      *
      * @return <code>true</code> if a valid preface was read, otherwise false.
      */
-    public boolean readConnectionPreface() {
+    boolean readConnectionPreface() {
         if (readPreface) {
             return true;
         }

@@ -213,13 +213,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             // Generate content with a simple known format.
             resp.setContentType("application/octet-stream");
 
-            int count = 16 * 1024;
+            int count = 4 * 1024;
             // Two bytes per entry
             resp.setContentLengthLong(count * 2);
 
             OutputStream os = resp.getOutputStream();
             byte[] data = new byte[2];
-            // 1024 * 16 * 2 bytes = 32k of content.
             for (int i = 0; i < count; i++) {
                 data[0] = (byte) (i & 0xFF);
                 data[1] = (byte) ((i >> 8) & 0xFF);
