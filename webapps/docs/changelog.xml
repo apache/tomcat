@@ -119,6 +119,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        <bug>57676</bug>: List conflicting WebSocket endpoint classes when
+        there is a path conflict. Based upon a patch proposed by yangkun.
+        (schultz)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
