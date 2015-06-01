@@ -28,7 +28,10 @@ import org.junit.Test;
  * The order of tests in this class is aligned with the order of the
  * requirements in the RFC.
  */
-public class TestHttp2Section_3_2 extends TestHttp2Base {
+public class TestHttp2Section_3_2 extends Http2TestBase {
+
+    // Note: Tests for zero/multiple HTTP2-Settings fields can be found in
+    //       TestHttp2Section_3_2_1
 
     // TODO: Test initial requests with bodies of various sizes
 

@@ -16,7 +16,7 @@
  */
 package org.apache.coyote.http2;
 
-public class TestHttp2Section_3_2_1 extends TestHttp2Base {
+public class TestHttp2Section_3_2_1 extends Http2TestBase {
 
     // TODO: Test zero Http2-Settings headers
 
