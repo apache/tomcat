@@ -138,6 +138,6 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
                 return;
             }
         }
-        Assert.fail("No content-length");
+        Assert.fail("No content-length in response");
     }
 }
