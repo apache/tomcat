@@ -28,8 +28,8 @@ class Http2Parser {
     private static final Log log = LogFactory.getLog(Http2Parser.class);
     private static final StringManager sm = StringManager.getManager(Http2Parser.class);
 
-    private static final byte[] CLIENT_PREFACE_START =
-            "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n ".getBytes(StandardCharsets.ISO_8859_1);
+    static final byte[] CLIENT_PREFACE_START =
+            "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
     private final Input input;
     private final byte[] frameHeaderBuffer = new byte[9];
