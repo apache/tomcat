@@ -30,14 +30,16 @@ public class ConnectionSettings {
     public static final int DEFAULT_WINDOW_SIZE = (1 << 16) - 1;
     private static final long UNLIMITED = ((long)1 << 32); // Use the maximum possible
     private static final int MAX_WINDOW_SIZE = (1 << 31) - 1;
+
     private static final int MIN_MAX_FRAME_SIZE = 1 << 14;
     private static final int MAX_MAX_FRAME_SIZE = (1 << 24) - 1;
+    private static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
 
     private volatile int headerTableSize = 4096;
     private volatile boolean enablePush = true;
     private volatile long maxConcurrentStreams = UNLIMITED;
     private volatile int initialWindowSize = DEFAULT_WINDOW_SIZE;
-    private volatile int maxFrameSize = MIN_MAX_FRAME_SIZE;
+    private volatile int maxFrameSize = DEFAULT_MAX_FRAME_SIZE;
     private volatile long maxHeaderListSize = UNLIMITED;
 
     public void set(int parameterId, long value) throws IOException {
