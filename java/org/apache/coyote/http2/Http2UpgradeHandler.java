@@ -610,7 +610,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             socketWrapper.flush(true);
         } else {
             // This is an ACK.
-            // NO-OP (until such time this implementation decides in initiate
+            // NO-OP (until such time this implementation decides to initiate
             // pings)
         }
     }
