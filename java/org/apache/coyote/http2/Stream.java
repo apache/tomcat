@@ -243,7 +243,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 buffer.put(chunk.getBytes(), chunk.getOffset() + offset, thisTime);
                 offset += thisTime;
                 len -= thisTime;
-                if (!buffer.hasRemaining()) {
+                if (len > 0 && !buffer.hasRemaining()) {
+                    // Only flush if we have more data to write and the buffer
+                    // is full
                     flush();
                 }
             }
