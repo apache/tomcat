@@ -19,7 +19,6 @@ package org.apache.tomcat.websocket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import javax.websocket.Extension;
 
@@ -62,8 +61,6 @@ public class Constants {
             "Sec-WebSocket-Protocol";
     public static final String WS_EXTENSIONS_HEADER_NAME =
             "Sec-WebSocket-Extensions";
-    public static final String WS_EXTENSIONS_HEADER_NAME_LOWER =
-            WS_EXTENSIONS_HEADER_NAME.toLowerCase(Locale.ENGLISH);
 
     // Configuration for Origin header in client
     static final String DEFAULT_ORIGIN_HEADER_VALUE =

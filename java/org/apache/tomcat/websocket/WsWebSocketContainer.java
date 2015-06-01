@@ -343,7 +343,7 @@ public class WsWebSocketContainer
             // Should normally only be one header but handle the case of
             // multiple headers
             List<String> extHeaders = handshakeResponse.getHeaders().get(
-                    Constants.WS_EXTENSIONS_HEADER_NAME_LOWER);
+                    Constants.WS_EXTENSIONS_HEADER_NAME);
             if (extHeaders != null) {
                 for (String extHeader : extHeaders) {
                     Util.parseExtensionHeader(extensionsAgreed, extHeader);
