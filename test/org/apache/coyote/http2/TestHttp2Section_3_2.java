@@ -105,11 +105,10 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
     }
 
 
-    // TODO: Test if server sends settings frame
-
-    // TODO: Test if client doesn't send SETTINGS as part of the preface
-
-    // TODO: Test response is received on stream 1
+    @Test
+    public void testConnectionUpgradeFirstResponse() throws Exception{
+        super.http2Connect();
+    }
 
 
     private void setupAsFarAsUpgrade() throws Exception {
