@@ -1077,7 +1077,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     // ----------------------------------------------- Http2Parser.Input methods
 
     @Override
-    public boolean fill(byte[] data, boolean block) throws IOException {
+    public boolean fill(boolean block, byte[] data) throws IOException {
         int len = data.length;
         int pos = 0;
         boolean nextReadBlock = block;

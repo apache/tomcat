@@ -134,7 +134,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
                 }
                 int len = Integer.parseInt(cl.substring(pos + 1).trim());
                 byte[] content = new byte[len];
-                input.fill(content, true);
+                input.fill(true, content);
                 return;
             }
         }

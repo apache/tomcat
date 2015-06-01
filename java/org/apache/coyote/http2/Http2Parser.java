@@ -51,7 +51,7 @@ class Http2Parser {
      * @throws IOException If an IO error occurs while trying to read a frame
      */
     public void readFrame(boolean block) throws IOException {
-        input.fill(frameHeaderBuffer, block);
+        input.fill(block, frameHeaderBuffer);
 
         // TODO: This is incomplete
     }
@@ -69,7 +69,7 @@ class Http2Parser {
 
         byte[] data = new byte[CLIENT_PREFACE_START.length];
         try {
-            input.fill(data, true);
+            input.fill(true, data);
         } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("http2Parser.preface.io"), ioe);
@@ -102,9 +102,9 @@ class Http2Parser {
          * no data is available. If any data is available then the buffer will
          * be filled with blocking I/O.
          *
-         * @param data  Buffer to fill
          * @param block Should the first read into the provided buffer be a
          *              blocking read or not.
+         * @param data  Buffer to fill
          *
          * @return <code>true</code> if the buffer was filled otherwise
          *         <code>false</code>
@@ -112,6 +112,6 @@ class Http2Parser {
          * @throws IOException If an I/O occurred while obtaining data with
          *                     which to fill the buffer
          */
-        boolean fill(byte[] data, boolean block) throws IOException;
+        boolean fill(boolean block, byte[] data) throws IOException;
     }
 }
