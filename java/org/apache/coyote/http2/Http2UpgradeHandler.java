@@ -101,7 +101,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] HTTP2_UPGRADE_ACK = ("HTTP/1.1 101 Switching Protocols\r\n" +
                 "Connection: Upgrade\r\nUpgrade: h2c\r\n\r\n").getBytes(StandardCharsets.ISO_8859_1);
 
-    private final int connectionId;
+    private final String connectionId;
 
     private final Adapter adapter;
     private volatile SocketWrapperBase<?> socketWrapper;
@@ -136,7 +136,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     public Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
         super (STREAM_ID_ZERO);
         this.adapter = adapter;
-        this.connectionId = connectionIdGenerator.getAndIncrement();
+        this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
 
         // Initial HTTP request becomes stream 0.
         if (coyoteRequest != null) {
@@ -151,7 +151,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void init(WebConnection webConnection) {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.init", Long.toString(connectionId)));
+            log.debug(sm.getString("upgradeHandler.init", connectionId));
         }
 
         parser = new Http2Parser(this);
@@ -234,8 +234,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public SocketState upgradeDispatch(SocketStatus status) {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.upgradeDispatch.entry",
-                    Long.toString(connectionId), status));
+            log.debug(sm.getString("upgradeHandler.upgradeDispatch.entry", connectionId, status));
         }
 
         if (!initialized) {
@@ -269,8 +268,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 }
             } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.ioerror",
-                            Long.toString(connectionId)), ioe);
+                    log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
                 }
                 close();
                 result = SocketState.CLOSED;
@@ -295,8 +293,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 }
             } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.ioerror",
-                            Long.toString(connectionId)), ioe);
+                    log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
                 }
                 close();
                 result = SocketState.CLOSED;
@@ -326,8 +323,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.upgradeDispatch.exit",
-                    Long.toString(connectionId), result));
+            log.debug(sm.getString("upgradeHandler.upgradeDispatch.exit", connectionId, result));
         }
         return result;
     }
@@ -376,9 +372,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private void processFrameData(int flags, int streamId, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame",
-                    Long.toString(connectionId), Integer.toString(streamId),
-                    Integer.toString(flags), Integer.toString(payloadSize)));
+            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
         }
 
         // Validate the stream
@@ -417,9 +413,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private void processFrameHeaders(int flags, int streamId, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame",
-                    Long.toString(connectionId), Integer.toString(streamId),
-                    Integer.toString(flags), Integer.toString(payloadSize)));
+            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
         }
 
         // Validate the stream
@@ -501,9 +497,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private void processFramePriority(int flags, int streamId, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame",
-                    Long.toString(connectionId), Integer.toString(streamId),
-                    Integer.toString(flags), Integer.toString(payloadSize)));
+            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
         }
         // Validate the frame
         if (streamId == 0) {
@@ -543,9 +539,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private void processFrameSettings(int flags, int streamId, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame",
-                    Long.toString(connectionId), Integer.toString(streamId),
-                    Integer.toString(flags), Integer.toString(payloadSize)));
+            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
         }
         // Validate the frame
         if (streamId != 0) {
@@ -591,9 +587,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private void processFramePing(int flags, int streamId, int payloadSize)
             throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame",
-                    Long.toString(connectionId), Integer.toString(streamId),
-                    Integer.toString(flags), Integer.toString(payloadSize)));
+            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
         }
         // Validate the frame
         if (streamId != 0) {
@@ -623,9 +619,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private void processFrameWindowUpdate(int flags, int streamId, int payloadSize)
             throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame",
-                    Long.toString(connectionId), Integer.toString(streamId),
-                    Integer.toString(flags), Integer.toString(payloadSize)));
+            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
         }
         // Validate the frame
         if (payloadSize != 4) {
@@ -639,9 +635,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         int windowSizeIncrement = ByteUtil.get31Bits(payload, 0);
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrameWindowUpdate.debug",
-                    Long.toString(connectionId), Integer.toString(streamId),
-                    Integer.toString(windowSizeIncrement)));
+            log.debug(sm.getString("upgradeHandler.processFrameWindowUpdate.debug", connectionId,
+                    Integer.toString(streamId), Integer.toString(windowSizeIncrement)));
         }
 
         // Validate the data
@@ -799,8 +794,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     void writeHeaders(Stream stream, Response coyoteResponse) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.writeHeaders",
-                    Integer.toString(connectionId), stream.getIdentifier()));
+            log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
+                    stream.getIdentifier()));
         }
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         // Add the pseudo header for status
@@ -842,8 +837,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     void writeBody(Stream stream, ByteBuffer data, int len) throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.writeBody", Integer.toString(connectionId),
-                    stream.getIdentifier(), Integer.toString(data.remaining())));
+            log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdentifier(),
+                    Integer.toString(data.remaining())));
         }
         synchronized (socketWrapper) {
             byte[] header = new byte[9];
@@ -1030,7 +1025,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    protected final int getConnectionId() {
+    protected final String getConnectionId() {
         return connectionId;
     }
 

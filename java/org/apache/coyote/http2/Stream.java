@@ -64,7 +64,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     public void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
         if (getLog().isDebugEnabled()) {
             getLog().debug(sm.getString("abstractStream.reprioritisation.debug",
-                    Long.toString(getConnectionId()), getIdentifier(), Boolean.toString(exclusive),
+                    getConnectionId(), getIdentifier(), Boolean.toString(exclusive),
                     parent.getIdentifier(), Integer.toString(weight)));
         }
 
@@ -118,8 +118,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     @Override
     public void emitHeader(String name, String value, boolean neverIndex) {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.header.debug",
-                    Long.toString(getConnectionId()), getIdentifier(), name, value));
+            log.debug(sm.getString("stream.header.debug",getConnectionId(), getIdentifier(),
+                    name, value));
         }
 
         switch(name) {
@@ -169,8 +169,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
     void flushData() {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.write",
-                    Long.toString(getConnectionId()), getIdentifier()));
+            log.debug(sm.getString("stream.write",getConnectionId(), getIdentifier()));
         }
         try {
             outputBuffer.flush();
@@ -188,7 +187,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
-    protected final int getConnectionId() {
+    protected final String getConnectionId() {
         return getParentStream().getConnectionId();
     }
 

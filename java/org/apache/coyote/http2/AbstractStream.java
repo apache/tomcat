@@ -107,7 +107,7 @@ abstract class AbstractStream {
 
     protected abstract Log getLog();
 
-    protected abstract int getConnectionId();
+    protected abstract String getConnectionId();
 
     protected abstract int getWeight();
 }
