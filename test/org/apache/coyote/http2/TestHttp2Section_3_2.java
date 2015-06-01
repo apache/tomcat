@@ -18,7 +18,9 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -35,13 +37,28 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
 
     // TODO: Test initial requests with bodies of various sizes
 
-    // TODO: Test response with HTTP/2 is not enabled
+    @Test
+    public void testConnectionNoHttp2Support() throws Exception {
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade("h2c", false);
+        parseHttp11Response();
+    }
 
-    // TODO: Test HTTP upgrade with h2 rather tan h2c
+
+    @Test
+    public void testConnectionUpgradeWrongProtocol() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade("h2", false);
+        parseHttp11Response();
+    }
+
 
     @Test(timeout=10000)
-    public void testConnectionNoPreface() throws IOException {
-        doHttpUpgrade();
+    public void testConnectionNoPreface() throws Exception {
+        setupAsFarAsUpgrade();
 
         // If we don't send the preface the server should kill the connection.
         try {
@@ -54,8 +71,8 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
 
 
     @Test(timeout=10000)
-    public void testConnectionIncompletePrefaceStart() throws IOException {
-        doHttpUpgrade();
+    public void testConnectionIncompletePrefaceStart() throws Exception {
+        setupAsFarAsUpgrade();
 
         // If we send an incomplete preface the server should kill the
         // connection.
@@ -71,8 +88,8 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
 
 
     @Test(timeout=10000)
-    public void testConnectionInvalidPrefaceStart() throws IOException {
-        doHttpUpgrade();
+    public void testConnectionInvalidPrefaceStart() throws Exception {
+        setupAsFarAsUpgrade();
 
         // If we send an incomplete preface the server should kill the
         // connection.
@@ -93,4 +110,34 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
     // TODO: Test if client doesn't send SETTINGS as part of the preface
 
     // TODO: Test response is received on stream 1
+
+
+    private void setupAsFarAsUpgrade() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade("h2c", true);
+    }
+
+
+    private void parseHttp11Response() throws IOException {
+        String[] responseHeaders = readHttpResponseHeaders();
+        Assert.assertTrue(responseHeaders[0], responseHeaders[0].startsWith("HTTP/1.1 200"));
+
+        // Find the content length (chunked responses not handled)
+        for (int i = 1; i < responseHeaders.length; i++) {
+            if (responseHeaders[i].toLowerCase(Locale.ENGLISH).startsWith("content-length")) {
+                String cl = responseHeaders[i];
+                int pos = cl.indexOf(':');
+                if (pos == -1) {
+                    throw new IOException("Invalid: [" + cl + "]");
+                }
+                int len = Integer.parseInt(cl.substring(pos + 1).trim());
+                byte[] content = new byte[len];
+                input.fill(content, true);
+                return;
+            }
+        }
+        throw new IOException("No content-length");
+    }
 }

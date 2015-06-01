@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import javax.net.SocketFactory;
@@ -29,12 +30,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Before;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 
@@ -52,31 +54,34 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
     private Socket s;
+    protected Input input;
     protected Http2Parser parser;
     protected OutputStream os;
 
 
-    @Before
-    public void setup() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
-
-        // Enable HTTP/2
-        Connector connector = tomcat.getConnector();
+    protected void enableHttp2() {
+        Connector connector = getTomcatInstance().getConnector();
         Http2Protocol http2Protocol = new Http2Protocol();
         // Short timeouts for now. May need to increase these for CI systems.
         http2Protocol.setReadTimeout(2000);
         http2Protocol.setKeepAliveTimeout(5000);
         http2Protocol.setWriteTimeout(2000);
         connector.addUpgradeProtocol(http2Protocol);
+    }
 
-        // Add a web application
+
+    protected void configureAndStartWebApplication() throws LifecycleException {
+        Tomcat tomcat = getTomcatInstance();
+
         Context ctxt = tomcat.addContext("", null);
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMapping("/*", "simple");
 
-        // Start the Tomcat instance
         tomcat.start();
+    }
 
+
+    protected void openClientConnection() throws IOException {
         // Open a connection
         s = SocketFactory.getDefault().createSocket("localhost", getPort());
         s.setSoTimeout(30000);
@@ -84,23 +89,89 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         os = s.getOutputStream();
         InputStream is = s.getInputStream();
 
-        TestInput testInput = new TestInput(is);
-        parser = new Http2Parser(testInput);
+        input = new TestInput(is);
+        parser = new Http2Parser(input);
     }
 
 
-    protected void doHttpUpgrade() throws IOException {
+    protected void doHttpUpgrade(String upgrade, boolean validate) throws IOException {
         byte[] upgradeRequest = ("GET / HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
                 "Connection: Upgrade, HTTP2-Settings\r\n" +
-                "Upgrade: h2c\r\n" +
+                "Upgrade: " + upgrade + "\r\n" +
                 "HTTP2-Settings: "+ HTTP2_SETTINGS + "\r\n" +
                 "\r\n").getBytes(StandardCharsets.ISO_8859_1);
         os.write(upgradeRequest);
         os.flush();
 
-        Assert.assertTrue("Failed to read HTTP Upgrade response", parser.readHttpUpgradeResponse());
+        if (validate) {
+            Assert.assertTrue("Failed to read HTTP Upgrade response",
+                    readHttpUpgradeResponse());
+        }
+    }
 
+
+    boolean readHttpUpgradeResponse() throws IOException {
+        String[] responseHeaders = readHttpResponseHeaders();
+
+        if (responseHeaders.length < 3) {
+            return false;
+        }
+        if (!responseHeaders[0].startsWith("HTTP/1.1 101")) {
+            return false;
+        }
+        // TODO: There may be other headers.
+        if (!responseHeaders[1].equals("Connection: Upgrade")) {
+            return false;
+        }
+        if (!responseHeaders[2].startsWith("Upgrade: h2c")) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    String[] readHttpResponseHeaders() throws IOException {
+        // Only used by test code so safe to keep this just a little larger than
+        // we are expecting.
+        ByteBuffer data = ByteBuffer.allocate(256);
+        byte[] singleByte = new byte[1];
+        // Looking for \r\n\r\n
+        int seen = 0;
+        while (seen < 4) {
+            input.fill(singleByte, true);
+            switch (seen) {
+            case 0:
+            case 2: {
+                if (singleByte[0] == '\r') {
+                    seen++;
+                } else {
+                    seen = 0;
+                }
+                break;
+            }
+            case 1:
+            case 3: {
+                if (singleByte[0] == '\n') {
+                    seen++;
+                } else {
+                    seen = 0;
+                }
+                break;
+            }
+            }
+            data.put(singleByte[0]);
+        }
+
+        if (seen != 4) {
+            throw new IOException("End of headers not found");
+        }
+
+        String response = new String(data.array(), data.arrayOffset(),
+                data.arrayOffset() + data.position(), StandardCharsets.ISO_8859_1);
+
+        return response.split("\r\n");
     }
 
 
@@ -141,10 +212,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 throws ServletException, IOException {
             // Generate content with a simple known format.
             resp.setContentType("application/octet-stream");
+
+            int count = 16 * 1024;
+            // Two bytes per entry
+            resp.setContentLengthLong(count * 2);
+
             OutputStream os = resp.getOutputStream();
             byte[] data = new byte[2];
             // 1024 * 16 * 2 bytes = 32k of content.
-            for (int i = 0; i < 1024 * 16; i++) {
+            for (int i = 0; i < count; i++) {
                 data[0] = (byte) (i & 0xFF);
                 data[1] = (byte) ((i >> 8) & 0xFF);
                 os.write(data);

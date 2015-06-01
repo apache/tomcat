@@ -17,7 +17,6 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.juli.logging.Log;
@@ -89,61 +88,6 @@ class Http2Parser {
         }
 
         readPreface = true;
-        return true;
-    }
-
-
-    boolean readHttpUpgradeResponse() throws IOException {
-        // Only used by test code so safe to keep this just a little larger than
-        // we are expecting.
-        ByteBuffer data = ByteBuffer.allocate(128);
-        byte[] singleByte = new byte[1];
-        // Looking for \r\n\r\n
-        int seen = 0;
-        while (seen < 4) {
-            input.fill(singleByte, true);
-            switch (seen) {
-            case 0:
-            case 2: {
-                if (singleByte[0] == '\r') {
-                    seen++;
-                } else {
-                    seen = 0;
-                }
-                break;
-            }
-            case 1:
-            case 3: {
-                if (singleByte[0] == '\n') {
-                    seen++;
-                } else {
-                    seen = 0;
-                }
-                break;
-            }
-            }
-            data.put(singleByte[0]);
-        }
-
-        String response = new String(data.array(), data.arrayOffset(),
-                data.arrayOffset() + data.position(), StandardCharsets.ISO_8859_1);
-
-        String[] responseLines = response.split("\r\n");
-
-        if (responseLines.length < 3) {
-            return false;
-        }
-        if (!responseLines[0].startsWith("HTTP/1.1 101")) {
-            return false;
-        }
-        // TODO: There may be other headers.
-        if (!responseLines[1].equals("Connection: Upgrade")) {
-            return false;
-        }
-        if (!responseLines[2].startsWith("Upgrade: h2c")) {
-            return false;
-        }
-
         return true;
     }
 
