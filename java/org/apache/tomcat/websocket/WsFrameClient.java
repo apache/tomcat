@@ -32,9 +32,8 @@ public class WsFrameClient extends WsFrameBase {
     private ByteBuffer response;
 
     public WsFrameClient(ByteBuffer response, AsyncChannelWrapper channel,
-            WsSession wsSession) {
-        // TODO Add support for extensions to the client side code
-        super(wsSession, null);
+            WsSession wsSession, Transformation transformation) {
+        super(wsSession, transformation);
         this.response = response;
         this.channel = channel;
         this.handler = new WsFrameClientCompletionHandler();

@@ -126,6 +126,10 @@
         there is a path conflict. Based upon a patch proposed by yangkun.
         (schultz)
       </add>
+      <add>
+        Extend support for the <code>permessage-deflate</code> extension to the
+        client implementation. 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

@@ -268,7 +268,7 @@ public class UpgradeUtil {
 
         for (Map.Entry<String,List<List<Extension.Parameter>>> entry :
             extensionPreferences.entrySet()) {
-            Transformation transformation = factory.create(entry.getKey(), entry.getValue());
+            Transformation transformation = factory.create(entry.getKey(), entry.getValue(), true);
             if (transformation != null) {
                 result.add(transformation);
             }
