@@ -17,6 +17,7 @@
 package org.apache.coyote.http2;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.Processor;
@@ -74,6 +75,23 @@ public class Http2Protocol implements UpgradeProtocol {
         result.setWriteTimeout(getWriteTimeout());
 
         return result;
+    }
+
+
+    @Override
+    public boolean accept(Request request) {
+        // Should only be one HTTP2-Settings header
+        Enumeration<String> headers = request.getMimeHeaders().values("HTTP2-Settings");
+        int count = 0;
+        while (headers.hasMoreElements()) {
+            count++;
+            headers.nextElement();
+        }
+        if (count != 1) {
+            return false;
+        }
+
+        return true;
     }
 
 

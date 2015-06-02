@@ -1035,14 +1035,16 @@ public class Http11Processor extends AbstractProcessor {
 
                 UpgradeProtocol upgradeProtocol = httpUpgradeProtocols.get(requestedProtocol);
                 if (upgradeProtocol != null) {
-                    // TODO Figure out how to handle request bodies at this
-                    // point.
+                    if (upgradeProtocol.accept(request)) {
+                        // TODO Figure out how to handle request bodies at this
+                        // point.
 
-                    InternalHttpUpgradeHandler upgradeHandler =
-                            upgradeProtocol.getInteralUpgradeHandler(
-                                    getAdapter(), cloneRequest(request));
-                    action(ActionCode.UPGRADE, upgradeHandler);
-                    return SocketState.UPGRADING;
+                        InternalHttpUpgradeHandler upgradeHandler =
+                                upgradeProtocol.getInteralUpgradeHandler(
+                                        getAdapter(), cloneRequest(request));
+                        action(ActionCode.UPGRADE, upgradeHandler);
+                        return SocketState.UPGRADING;
+                    }
                 }
             }
 
