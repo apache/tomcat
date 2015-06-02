@@ -75,8 +75,7 @@ public class TestHttp2Section_3_2_1 extends Http2TestBase {
         validateHttp2InitialResponse();
     }
 
-
-    // TODO: Test trailing '=' are omitted
-
-    // TODO: Test invalid Http2-Settings header (wrong length, invalid encoding)
+    // No need to test how trailing '=' are handled here. HTTP2Settings payloads
+    // are always a multiple of 6 long which means valid payloads never end in
+    // '='. Invalid payloads will be rejected anyway.
 }
