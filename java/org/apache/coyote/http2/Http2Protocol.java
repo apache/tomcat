@@ -81,17 +81,22 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public boolean accept(Request request) {
         // Should only be one HTTP2-Settings header
-        Enumeration<String> headers = request.getMimeHeaders().values("HTTP2-Settings");
+        Enumeration<String> settings = request.getMimeHeaders().values("HTTP2-Settings");
         int count = 0;
-        while (headers.hasMoreElements()) {
+        while (settings.hasMoreElements()) {
             count++;
-            headers.nextElement();
+            settings.nextElement();
         }
         if (count != 1) {
             return false;
         }
 
-        return true;
+        Enumeration<String> connection = request.getMimeHeaders().values("Connection");
+        boolean found = false;
+        while (connection.hasMoreElements() && !found) {
+            found = connection.nextElement().contains("HTTP2-Settings");
+        }
+        return found;
     }
 
 

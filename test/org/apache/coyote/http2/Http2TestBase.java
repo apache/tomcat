@@ -49,6 +49,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
  */
 public abstract class Http2TestBase extends TomcatBaseTest {
 
+    static final String DEFAULT_CONNECTION_HEADER_VALUE = "Upgrade, HTTP2-Settings";
     private static final byte[] EMPTY_SETTINGS_FRAME =
         { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
     static final String EMPTY_HTTP2_SETTINGS_HEADER;
@@ -75,6 +76,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         openClientConnection();
         doHttpUpgrade();
         sendClientPreface();
+        validateHttp2InitialResponse();
+    }
+
+    protected void validateHttp2InitialResponse() throws Exception {
         // - 101 response acts as acknowledgement of the HTTP2-Settings header
         // Need to read 4 frames
         // - settings (server settings - must be first)
@@ -134,14 +139,14 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void doHttpUpgrade() throws IOException {
-        doHttpUpgrade("h2c", EMPTY_HTTP2_SETTINGS_HEADER, true);
+        doHttpUpgrade(DEFAULT_CONNECTION_HEADER_VALUE, "h2c", EMPTY_HTTP2_SETTINGS_HEADER, true);
     }
 
-    protected void doHttpUpgrade(String upgrade, String settings, boolean validate)
-            throws IOException {
+    protected void doHttpUpgrade(String connection, String upgrade, String settings,
+            boolean validate) throws IOException {
         byte[] upgradeRequest = ("GET / HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
-                "Connection: Upgrade, HTTP2-Settings\r\n" +
+                "Connection: "+ connection + "\r\n" +
                 "Upgrade: " + upgrade + "\r\n" +
                 settings +
                 "\r\n").getBytes(StandardCharsets.ISO_8859_1);
@@ -241,7 +246,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    private void sendClientPreface() throws IOException {
+    void sendClientPreface() throws IOException {
         os.write(Http2Parser.CLIENT_PREFACE_START);
         os.write(EMPTY_SETTINGS_FRAME);
         os.flush();

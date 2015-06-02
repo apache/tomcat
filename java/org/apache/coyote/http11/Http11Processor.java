@@ -19,6 +19,7 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
+import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -1028,8 +1029,14 @@ public class Http11Processor extends AbstractProcessor {
             }
 
             // Has an upgrade been requested?
-            String connection = request.getHeader(Constants.CONNECTION);
-            if (connection != null && connection.toLowerCase().contains("upgrade")) {
+            Enumeration<String> connectionValues = request.getMimeHeaders().values("Connection");
+            boolean foundUpgrade = false;
+            while (connectionValues.hasMoreElements() && !foundUpgrade) {
+                foundUpgrade = connectionValues.nextElement().toLowerCase(
+                        Locale.ENGLISH).contains("upgrade");
+            }
+
+            if (foundUpgrade) {
                 // Check the protocol
                 String requestedProtocol = request.getHeader("Upgrade");
 
