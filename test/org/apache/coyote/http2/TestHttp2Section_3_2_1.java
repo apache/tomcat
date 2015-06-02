@@ -25,14 +25,21 @@ public class TestHttp2Section_3_2_1 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("h2", "", false);
+        doHttpUpgrade("h2c", "", false);
         parseHttp11Response();
     }
 
 
-    // TODO: Test zero Http2-Settings headers
+    @Test
+    public void testMultipleHttp2Settings() throws Exception{
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade("h2c", Http2TestBase.EMPTY_HTTP2_SETTINGS + Http2TestBase.EMPTY_HTTP2_SETTINGS,
+                false);
+        parseHttp11Response();
+    }
 
-    // TODO: Test multiple Http2-Settings headers
 
     // TODO: Test trailing '=' are omitted
 
