@@ -35,6 +35,7 @@ class Http2Parser implements HeaderEmitter {
 
     private static final int FRAME_TYPE_DATA = 0;
     private static final int FRAME_TYPE_HEADERS = 1;
+    private static final int FRAME_TYPE_PRIORITY = 2;
     private static final int FRAME_TYPE_SETTINGS = 4;
 
     private final String connectionId;
@@ -91,6 +92,9 @@ class Http2Parser implements HeaderEmitter {
         case FRAME_TYPE_HEADERS:
             readHeadersFrame(streamId, flags, payloadSize);
             break;
+        case FRAME_TYPE_PRIORITY:
+            processFramePriority(streamId, flags, payloadSize);
+            break;
         case FRAME_TYPE_SETTINGS:
             readSettingsFrame(streamId, flags, payloadSize);
             break;
@@ -145,45 +149,6 @@ class Http2Parser implements HeaderEmitter {
             }
         }
         swallow(padLength);
-    }
-
-
-    private void readSettingsFrame(int streamId, int flags, int payloadSize) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-
-        // Validate the frame
-        if (streamId != 0) {
-            throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.invalidStream",
-                    Integer.toString(streamId)), 0, Http2Exception.FRAME_SIZE_ERROR);
-        }
-        if (payloadSize % 6 != 0) {
-            throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.invalidPayloadSize",
-                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
-        }
-        if (payloadSize > 0 && (flags & 0x1) != 0) {
-            throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.ackWithNonZeroPayload"),
-                    0, Http2Exception.FRAME_SIZE_ERROR);
-        }
-
-        if (payloadSize == 0) {
-            // Either an ACK or an empty settings frame
-            if ((flags & 0x1) != 0) {
-                output.settingsAck();
-            }
-        } else {
-            // Process the settings
-            byte[] setting = new byte[6];
-            for (int i = 0; i < payloadSize / 6; i++) {
-                input.fill(true, setting);
-                int id = ByteUtil.getTwoBytes(setting, 0);
-                long value = ByteUtil.getFourBytes(setting, 2);
-                output.setting(id, value);
-            }
-        }
     }
 
 
@@ -263,6 +228,72 @@ class Http2Parser implements HeaderEmitter {
         }
 
         swallow(padLength);
+    }
+
+
+    private void processFramePriority(int flags, int streamId, int payloadSize) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
+        }
+        // Validate the frame
+        if (streamId == 0) {
+            throw new Http2Exception(sm.getString("http2Parser.processFramePriority.invalidStream"),
+                    0, Http2Exception.PROTOCOL_ERROR);
+        }
+        if (payloadSize != 5) {
+            throw new Http2Exception(sm.getString("http2Parser.processFramePriority.invalidPayloadSize",
+                    Integer.toString(payloadSize)), streamId, Http2Exception.FRAME_SIZE_ERROR);
+        }
+
+        byte[] payload = new byte[5];
+        input.fill(true, payload);
+
+        boolean exclusive = ByteUtil.isBit7Set(payload[0]);
+        int parentStreamId = ByteUtil.get31Bits(payload, 0);
+        int weight = ByteUtil.getOneByte(payload, 4) + 1;
+
+        output.reprioritise(streamId, parentStreamId, exclusive, weight);
+    }
+
+
+    private void readSettingsFrame(int streamId, int flags, int payloadSize) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
+        }
+
+        // Validate the frame
+        if (streamId != 0) {
+            throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.invalidStream",
+                    Integer.toString(streamId)), 0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+        if (payloadSize % 6 != 0) {
+            throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.invalidPayloadSize",
+                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+        if (payloadSize > 0 && (flags & 0x1) != 0) {
+            throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.ackWithNonZeroPayload"),
+                    0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+
+        if (payloadSize == 0) {
+            // Either an ACK or an empty settings frame
+            if ((flags & 0x1) != 0) {
+                output.settingsAck();
+            }
+        } else {
+            // Process the settings
+            byte[] setting = new byte[6];
+            for (int i = 0; i < payloadSize / 6; i++) {
+                input.fill(true, setting);
+                int id = ByteUtil.getTwoBytes(setting, 0);
+                long value = ByteUtil.getFourBytes(setting, 2);
+                output.setting(id, value);
+            }
+        }
     }
 
 
