@@ -287,14 +287,42 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         @Override
         public void settingsAck() {
-            trace.append("0-Settings-Ack");
+            trace.append("0-Settings-Ack\n");
 
         }
 
         @Override
         public void setting(int identifier, long value) throws IOException {
-            trace.append("0-Settings-[" + identifier + "]-[" + value + "]");
+            trace.append("0-Settings-[" + identifier + "]-[" + value + "]\n");
             remoteSettings.set(identifier, value);
+        }
+
+
+        @Override
+        public void pingReceive(byte[] payload) {
+            trace.append("0-Ping-[");
+            boolean first = true;
+            for (byte b : payload) {
+                if (first) {
+                    first = false;
+                } else {
+                    trace.append(',');
+                }
+                trace.append(b & 0xFF);
+            }
+            trace.append("]\n");
+        }
+
+
+        @Override
+        public void pingAck() {
+            trace.append("0-Ping-Ack\n");
+        }
+
+
+        @Override
+        public void incrementWindowSize(int streamId, int increment) {
+            trace.append(streamId + "-WindowSize-[" + increment + "]\n");
         }
 
 

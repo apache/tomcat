@@ -37,6 +37,8 @@ class Http2Parser implements HeaderEmitter {
     private static final int FRAME_TYPE_HEADERS = 1;
     private static final int FRAME_TYPE_PRIORITY = 2;
     private static final int FRAME_TYPE_SETTINGS = 4;
+    private static final int FRAME_TYPE_PING = 6;
+    private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
 
     private final String connectionId;
     private final Input input;
@@ -93,10 +95,16 @@ class Http2Parser implements HeaderEmitter {
             readHeadersFrame(streamId, flags, payloadSize);
             break;
         case FRAME_TYPE_PRIORITY:
-            processFramePriority(streamId, flags, payloadSize);
+            readPriorityFrame(streamId, flags, payloadSize);
             break;
         case FRAME_TYPE_SETTINGS:
             readSettingsFrame(streamId, flags, payloadSize);
+            break;
+        case FRAME_TYPE_PING:
+            readPingFrame(streamId, flags, payloadSize);
+            break;
+        case FRAME_TYPE_WINDOW_UPDATE:
+            readWindowUpdateFrame(streamId, flags, payloadSize);
             break;
         // TODO: Missing types
         default:
@@ -231,7 +239,7 @@ class Http2Parser implements HeaderEmitter {
     }
 
 
-    private void processFramePriority(int flags, int streamId, int payloadSize) throws IOException {
+    private void readPriorityFrame(int flags, int streamId, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.processFrame", connectionId,
                     Integer.toString(streamId), Integer.toString(flags),
@@ -294,6 +302,66 @@ class Http2Parser implements HeaderEmitter {
                 output.setting(id, value);
             }
         }
+    }
+
+
+    private void readPingFrame(int flags, int streamId, int payloadSize)
+            throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
+        }
+        // Validate the frame
+        if (streamId != 0) {
+            throw new Http2Exception(sm.getString("http2Parser.processFramePing.invalidStream",
+                    Integer.toString(streamId)), 0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+        if (payloadSize != 8) {
+            throw new Http2Exception(sm.getString("http2Parser.processFramePing.invalidPayloadSize",
+                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+        if ((flags & 0x1) == 0) {
+            // Read the payload
+            byte[] payload = new byte[8];
+            input.fill(true, payload);
+            output.pingReceive(payload);
+        } else {
+            output.pingAck();
+        }
+    }
+
+
+    private void readWindowUpdateFrame(int flags, int streamId, int payloadSize)
+            throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
+        }
+        // Validate the frame
+        if (payloadSize != 4) {
+            // Use stream 0 since this is always a connection error
+            throw new Http2Exception(sm.getString("http2Parser.processFrameWindowUpdate.invalidPayloadSize",
+                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
+        }
+
+        byte[] payload = new byte[4];
+        input.fill(true,  payload);
+        int windowSizeIncrement = ByteUtil.get31Bits(payload, 0);
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFrameWindowUpdate.debug", connectionId,
+                    Integer.toString(streamId), Integer.toString(windowSizeIncrement)));
+        }
+
+        // Validate the data
+        if (windowSizeIncrement == 0) {
+            throw new Http2Exception("http2Parser.processFrameWindowUpdate.invalidIncrement",
+                    streamId, Http2Exception.PROTOCOL_ERROR);
+        }
+
+        output.incrementWindowSize(streamId, windowSizeIncrement);
     }
 
 
@@ -423,6 +491,13 @@ class Http2Parser implements HeaderEmitter {
         // Settings frames
         void settingsAck();
         void setting(int identifier, long value) throws IOException;
+
+        // Ping frames
+        void pingReceive(byte[] payload);
+        void pingAck();
+
+        // Window size
+        void incrementWindowSize(int streamId, int increment);
 
         // Testing
         void swallow(int streamId, int frameType, int flags, int size) throws IOException;

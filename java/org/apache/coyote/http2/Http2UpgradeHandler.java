@@ -1170,6 +1170,24 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
+    public void pingReceive(byte[] payload) {
+        // TODO Auto-generated method stub
+    }
+
+
+    @Override
+    public void pingAck() {
+        // TODO Auto-generated method stub
+    }
+
+
+    @Override
+    public void incrementWindowSize(int streamId, int increment) {
+        // TODO Auto-generated method stub
+    }
+
+
+    @Override
     public void swallow(int streamId, int frameType, int flags, int size) throws IOException {
         swallow(size);
     }
