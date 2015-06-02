@@ -91,6 +91,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] PING_ACK = { 0x00, 0x00, 0x08, 0x06, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
     private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
 
@@ -182,10 +183,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
                     remoteSettings.set(id, value);
                 }
-
-                if (!parser.readConnectionPreface()) {
-                    throw new ProtocolException(sm.getString("upgradeHandler.invalidPreface"));
-                }
             } catch (IOException ioe) {
                 // TODO i18n
                 throw new ProtocolException();
@@ -196,7 +193,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         try {
             socketWrapper.write(true, SETTINGS_EMPTY, 0, SETTINGS_EMPTY.length);
             socketWrapper.flush(true);
-
         } catch (IOException ioe) {
             throw new IllegalStateException(sm.getString("upgradeHandler.sendPrefaceFail"), ioe);
         }
@@ -237,14 +233,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         switch(status) {
         case OPEN_READ:
-            if (!parser.readConnectionPreface()) {
-                close();
-                result = SocketState.CLOSED;
-                break;
-            }
-
-            // Process all the incoming data
             try {
+                if (!parser.readConnectionPreface()) {
+                    close();
+                    result = SocketState.CLOSED;
+                    break;
+                }
+
                 while (parser.readFrame(false)) {
                 }
             } catch (Http2Exception h2e) {
@@ -751,16 +746,21 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void settingsEmpty(boolean ack) {
-        if (ack) {
-            // TODO Process ACK
-        }
+    public void setting(int identifier, long value) throws IOException {
+        remoteSettings.set(identifier, value);
     }
 
 
     @Override
-    public void setting(int identifier, long value) throws IOException {
-        remoteSettings.set(identifier, value);
+    public void settingsEnd(boolean ack) throws IOException {
+        if (ack) {
+            // TODO Process ACK
+        } else {
+            synchronized (socketWrapper) {
+                socketWrapper.write(true, SETTINGS_ACK, 0, SETTINGS_ACK.length);
+                socketWrapper.flush(true);
+            }
+        }
     }
 
 
