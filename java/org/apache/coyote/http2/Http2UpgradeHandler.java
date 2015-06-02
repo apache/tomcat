@@ -36,6 +36,7 @@ import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
+import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.HpackEncoder.State;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
@@ -85,15 +86,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private static final int FRAME_TYPE_DATA = 0;
     private static final int FRAME_TYPE_HEADERS = 1;
-    private static final int FRAME_TYPE_PRIORITY = 2;
-    private static final int FRAME_TYPE_SETTINGS = 4;
-    private static final int FRAME_TYPE_PING = 6;
-    private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
     private static final int FRAME_TYPE_CONTINUATION = 9;
 
     private static final byte[] PING_ACK = { 0x00, 0x00, 0x08, 0x06, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
-    private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
     private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
@@ -111,14 +107,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private volatile Http2Parser parser;
 
     private volatile boolean initialized = false;
-    private volatile boolean firstFrame = true;
 
     private final ConnectionSettings remoteSettings = new ConnectionSettings();
     private final ConnectionSettings localSettings = new ConnectionSettings();
     private volatile int maxRemoteStreamId = 0;
 
     private HpackDecoder hpackDecoder;
-    private ByteBuffer headerReadBuffer = ByteBuffer.allocate(1024);
     private HpackEncoder hpackEncoder;
 
     // All timeouts in milliseconds
@@ -155,7 +149,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.init", connectionId));
         }
 
-        parser = new Http2Parser(connectionId, this, null);
+        parser = new Http2Parser(connectionId, this, this);
 
         initialized = true;
         Stream stream = null;
@@ -188,10 +182,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
                     remoteSettings.set(id, value);
                 }
-
-                firstFrame = false;
-                hpackDecoder = new HpackDecoder(remoteSettings.getHeaderTableSize());
-                hpackEncoder = new HpackEncoder(localSettings.getHeaderTableSize());
 
                 if (!parser.readConnectionPreface()) {
                     throw new ProtocolException(sm.getString("upgradeHandler.invalidPreface"));
@@ -255,7 +245,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
             // Process all the incoming data
             try {
-                while (processFrame()) {
+                while (parser.readFrame(false)) {
                 }
             } catch (Http2Exception h2e) {
                 if (h2e.getStreamId() == 0) {
@@ -330,342 +320,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private boolean processFrame() throws IOException {
-        // TODO: Consider refactoring and making this a field to reduce GC.
-        byte[] frameHeader = new byte[9];
-        if (!getFrameHeader(frameHeader)) {
-            // Switch to keep-alive timeout between frames
-            socketWrapper.setReadTimeout(getKeepAliveTimeout());
-            return false;
-        }
-
-        int frameType = getFrameType(frameHeader);
-        int flags = ByteUtil.getOneByte(frameHeader, 4);
-        int streamId = ByteUtil.get31Bits(frameHeader, 5);
-        int payloadSize = getPayloadSize(streamId, frameHeader);
-
-        switch (frameType) {
-        case FRAME_TYPE_DATA:
-            processFrameData(flags, streamId, payloadSize);
-            break;
-        case FRAME_TYPE_HEADERS:
-            processFrameHeaders(flags, streamId, payloadSize);
-            break;
-        case FRAME_TYPE_PRIORITY:
-            processFramePriority(flags, streamId, payloadSize);
-            break;
-        case FRAME_TYPE_SETTINGS:
-            processFrameSettings(flags, streamId, payloadSize);
-            break;
-        case FRAME_TYPE_PING:
-            processFramePing(flags, streamId, payloadSize);
-            break;
-        case FRAME_TYPE_WINDOW_UPDATE:
-            processFrameWindowUpdate(flags, streamId, payloadSize);
-            break;
-        default:
-            // Unknown frame type.
-            processFrameUnknown(streamId, frameType, payloadSize);
-        }
-        return true;
-    }
-
-
-    private void processFrameData(int flags, int streamId, int payloadSize) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-
-        // Validate the stream
-        if (streamId == 0) {
-            throw new Http2Exception(sm.getString("upgradeHandler.processFrameData.invalidStream"),
-                    0, Http2Exception.PROTOCOL_ERROR);
-        }
-
-        // Process the Stream
-        int padLength = 0;
-
-        boolean endOfStream = (flags & 0x01) > 0;
-        boolean padding = (flags & 0x08) > 0;
-
-        if (padding) {
-            byte[] b = new byte[1];
-            readFully(b);
-            padLength = b[0] & 0xFF;
-        }
-
-        // TODO Flow control
-        Stream stream = getStream(streamId);
-        ByteBuffer dest = stream.getInputByteBuffer();
-        synchronized (dest) {
-            readFully(dest, payloadSize);
-            if (endOfStream) {
-                stream.setEndOfStream();
-            }
-            dest.notifyAll();
-        }
-
-        swallow(padLength);
-    }
-
-
-    private void processFrameHeaders(int flags, int streamId, int payloadSize) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-
-        // Validate the stream
-        if (streamId == 0) {
-            throw new Http2Exception(sm.getString("upgradeHandler.processFrameHeaders.invalidStream"),
-                    0, Http2Exception.PROTOCOL_ERROR);
-        }
-
-        // Process the stream
-        // TODO Handle end of headers flag
-        // TODO Handle end of stream flag
-        // TODO Handle continutation frames
-        Stream stream = getStream(streamId);
-        int padLength = 0;
-
-        boolean padding = (flags & 0x08) > 0;
-        boolean priority = (flags & 0x20) > 0;
-        int optionalLen = 0;
-        if (padding) {
-            optionalLen = 1;
-        }
-        if (priority) {
-            optionalLen += 5;
-        }
-        if (optionalLen > 0) {
-            byte[] optional = new byte[optionalLen];
-            readFully(optional);
-            int optionalPos = 0;
-            if (padding) {
-                padLength = ByteUtil.getOneByte(optional, optionalPos++);
-            }
-            if (priority) {
-                boolean exclusive = ByteUtil.isBit7Set(optional[optionalPos]);
-                int parentStreamId = ByteUtil.get31Bits(optional, optionalPos);
-                int weight = ByteUtil.getOneByte(optional, optionalPos + 4) + 1;
-                AbstractStream parentStream = getStream(parentStreamId);
-                if (parentStream == null) {
-                    parentStream = this;
-                }
-                stream.rePrioritise(parentStream, exclusive, weight);
-            }
-
-            payloadSize -= optionalLen;
-        }
-
-        hpackDecoder.setHeaderEmitter(stream);
-        while (payloadSize > 0) {
-            int toRead = Math.min(headerReadBuffer.remaining(), payloadSize);
-            // headerReadBuffer in write mode
-            readFully(headerReadBuffer, toRead);
-            // switch to read mode
-            headerReadBuffer.flip();
-            try {
-                hpackDecoder.decode(headerReadBuffer);
-            } catch (HpackException hpe) {
-                throw new Http2Exception(
-                        sm.getString("upgradeHandler.processFrameHeaders.decodingFailed"),
-                        0, Http2Exception.PROTOCOL_ERROR);
-            }
-            // switches to write mode
-            headerReadBuffer.compact();
-            payloadSize -= toRead;
-        }
-        // Should be empty at this point
-        if (headerReadBuffer.position() > 0) {
-            throw new Http2Exception(
-                    sm.getString("upgradeHandler.processFrameHeaders.decodingDataLeft"),
-                    0, Http2Exception.PROTOCOL_ERROR);
-        }
-
-        swallow(padLength);
-
-        // Process this stream on a container thread
-        StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
-        streamProcessor.setSslSupport(sslSupport);
-        socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
-    }
-
-
-    private void processFramePriority(int flags, int streamId, int payloadSize) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-        // Validate the frame
-        if (streamId == 0) {
-            throw new Http2Exception(sm.getString("upgradeHandler.processFramePriority.invalidStream"),
-                    0, Http2Exception.PROTOCOL_ERROR);
-        }
-        if (payloadSize != 5) {
-            throw new Http2Exception(sm.getString("upgradeHandler.processFramePriority.invalidPayloadSize",
-                    Integer.toString(payloadSize)), streamId, Http2Exception.FRAME_SIZE_ERROR);
-        }
-
-        byte[] payload = new byte[5];
-        readFully(payload);
-
-        boolean exclusive = ByteUtil.isBit7Set(payload[0]);
-        int parentStreamId = ByteUtil.get31Bits(payload, 0);
-        int weight = ByteUtil.getOneByte(payload, 4) + 1;
-
-        Stream stream = getStream(streamId);
-        if (stream != null) {
-            // stream == null => an old stream already dropped from the map
-            AbstractStream parentStream;
-            if (parentStreamId == 0) {
-                parentStream = this;
-            } else {
-                parentStream = getStream(parentStreamId);
-                if (parentStream == null) {
-                    parentStream = this;
-                    weight = Constants.DEFAULT_WEIGHT;
-                    exclusive = false;
-                }
-            }
-            stream.rePrioritise(parentStream, exclusive, weight);
-        }
-    }
-
-
-    private void processFrameSettings(int flags, int streamId, int payloadSize) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-        // Validate the frame
-        if (streamId != 0) {
-            throw new Http2Exception(sm.getString("upgradeHandler.processFrameSettings.invalidStream",
-                    Integer.toString(streamId)), 0, Http2Exception.FRAME_SIZE_ERROR);
-        }
-        if (payloadSize % 6 != 0) {
-            throw new Http2Exception(sm.getString("upgradeHandler.processFrameSettings.invalidPayloadSize",
-                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
-        }
-        if (payloadSize > 0 && (flags & 0x1) != 0) {
-            throw new Http2Exception(sm.getString("upgradeHandler.processFrameSettings.ackWithNonZeroPayload"),
-                    0, Http2Exception.FRAME_SIZE_ERROR);
-        }
-
-        if (payloadSize == 0) {
-            // Either an ACK or an empty settings frame
-            if ((flags & 0x1) != 0) {
-                // TODO process ACK
-            }
-        } else {
-            // Process the settings
-            byte[] setting = new byte[6];
-            for (int i = 0; i < payloadSize / 6; i++) {
-                readFully(setting);
-                int id = ByteUtil.getTwoBytes(setting, 0);
-                long value = ByteUtil.getFourBytes(setting, 2);
-                remoteSettings.set(id, value);
-            }
-        }
-        if (firstFrame) {
-            firstFrame = false;
-            hpackDecoder = new HpackDecoder(remoteSettings.getHeaderTableSize());
-            hpackEncoder = new HpackEncoder(localSettings.getHeaderTableSize());
-        }
-
-        // Acknowledge the settings
-        socketWrapper.write(true, SETTINGS_ACK, 0, SETTINGS_ACK.length);
-        socketWrapper.flush(true);
-    }
-
-
-    private void processFramePing(int flags, int streamId, int payloadSize)
-            throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-        // Validate the frame
-        if (streamId != 0) {
-            throw new Http2Exception(sm.getString("upgradeHandler.processFramePing.invalidStream",
-                    Integer.toString(streamId)), 0, Http2Exception.FRAME_SIZE_ERROR);
-        }
-        if (payloadSize != 8) {
-            throw new Http2Exception(sm.getString("upgradeHandler.processFramePing.invalidPayloadSize",
-                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
-        }
-        if ((flags & 0x1) == 0) {
-            // Read the payload
-            byte[] payload = new byte[8];
-            readFully(payload);
-            // Echo it back
-            socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
-            socketWrapper.write(true, payload, 0, payload.length);
-            socketWrapper.flush(true);
-        } else {
-            // This is an ACK.
-            // NO-OP (until such time this implementation decides to initiate
-            // pings)
-        }
-    }
-
-
-    private void processFrameWindowUpdate(int flags, int streamId, int payloadSize)
-            throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-        // Validate the frame
-        if (payloadSize != 4) {
-            // Use stream 0 since this is always a connection error
-            throw new Http2Exception(sm.getString("upgradeHandler.processFrameWindowUpdate.invalidPayloadSize",
-                    Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
-        }
-
-        byte[] payload = new byte[4];
-        readFully(payload);
-        int windowSizeIncrement = ByteUtil.get31Bits(payload, 0);
-
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.processFrameWindowUpdate.debug", connectionId,
-                    Integer.toString(streamId), Integer.toString(windowSizeIncrement)));
-        }
-
-        // Validate the data
-        if (windowSizeIncrement == 0) {
-            throw new Http2Exception("upgradeHandler.processFrameWindowUpdate.invalidIncrement",
-                    streamId, Http2Exception.PROTOCOL_ERROR);
-        }
-        if (streamId == 0) {
-            incrementWindowSize(windowSizeIncrement);
-        } else {
-            Stream stream = getStream(streamId);
-            if (stream == null) {
-                // Old stream already closed.
-                // Ignore
-            } else {
-                stream.incrementWindowSize(windowSizeIncrement);
-            }
-        }
-    }
-
-
-    private void processFrameUnknown(int streamId, int type, int payloadSize) throws IOException {
-        // Swallow the payload
-        log.info("Swallowing [" + payloadSize + "] bytes of unknown frame type [" + type +
-                "] from stream [" + streamId + "]");
-        swallow(payloadSize);
-    }
-
-
     private void swallow(int len) throws IOException {
         if (len == 0) {
             return;
@@ -680,60 +334,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             }
             read += thisTime;
         }
-    }
-
-
-    private boolean getFrameHeader(byte[] frameHeader) throws IOException {
-        // All frames start with a fixed size header.
-        int headerBytesRead = socketWrapper.read(false, frameHeader, 0, frameHeader.length);
-
-        // No frame header read. Non-blocking between frames, so return.
-        if (headerBytesRead == 0) {
-            return false;
-        }
-
-        // Switch to read timeout
-        socketWrapper.setReadTimeout(getReadTimeout());
-
-        // Partial header read. Blocking within a frame to block while the
-        // remainder is read.
-        while (headerBytesRead < frameHeader.length) {
-            int read = socketWrapper.read(true, frameHeader, headerBytesRead,
-                    frameHeader.length - headerBytesRead);
-            if (read == -1) {
-                throw new EOFException(sm.getString("upgradeHandler.unexpectedEos"));
-            }
-        }
-
-        return true;
-    }
-
-
-    private int getFrameType(byte[] frameHeader) throws IOException {
-        int frameType = ByteUtil.getOneByte(frameHeader, 3);
-        // Make sure the first frame is a settings frame
-        if (firstFrame) {
-            if (frameType != FRAME_TYPE_SETTINGS) {
-                throw new Http2Exception(sm.getString("upgradeHandler.receivePrefaceNotSettings"),
-                        0, Http2Exception.PROTOCOL_ERROR);
-            }
-        }
-        return frameType;
-    }
-
-
-    private int getPayloadSize(int streamId, byte[] frameHeader) throws IOException {
-        // Make sure the payload size is valid
-        int payloadSize = ByteUtil.getThreeBytes(frameHeader, 0);
-
-        if (payloadSize > remoteSettings.getMaxFrameSize()) {
-            swallow(payloadSize);
-            throw new Http2Exception(sm.getString("upgradeHandler.payloadTooBig",
-                    Integer.toString(payloadSize), Long.toString(remoteSettings.getMaxFrameSize())),
-                    streamId, Http2Exception.FRAME_SIZE_ERROR);
-        }
-
-        return payloadSize;
     }
 
 
@@ -767,31 +367,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void readFully(byte[] dest) throws IOException {
-        int read = 0;
-        while (read < dest.length) {
-            int thisTime = socketWrapper.read(true, dest, read, dest.length - read);
-            if (thisTime == -1) {
-                throw new EOFException(sm.getString("upgradeHandler.unexpectedEos"));
-            }
-            read += thisTime;
-        }
-    }
-
-
-    private void readFully(ByteBuffer dest, int len) throws IOException {
-        int read = 0;
-        while (read < len) {
-            int thisTime = socketWrapper.read(true, dest.array(), dest.arrayOffset(), len -read);
-            if (thisTime == -1) {
-                throw new EOFException(sm.getString("upgradeHandler.unexpectedEos"));
-            }
-            read += thisTime;
-        }
-        dest.position(dest.position() + read);
-    }
-
-
     void writeHeaders(Stream stream, Response coyoteResponse) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
@@ -809,7 +384,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             boolean first = true;
             State state = null;
             while (state != State.COMPLETE) {
-                state = hpackEncoder.encode(coyoteResponse.getMimeHeaders(), target);
+                state = getHpackEncoder().encode(coyoteResponse.getMimeHeaders(), target);
                 target.flip();
                 ByteUtil.setThreeBytes(header, 0, target.limit());
                 if (first) {
@@ -832,6 +407,14 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 socketWrapper.flush(true);
             }
         }
+    }
+
+
+    private HpackEncoder getHpackEncoder() {
+        if (hpackEncoder == null) {
+            hpackEncoder = new HpackEncoder(localSettings.getHeaderTableSize());
+        }
+        return hpackEncoder;
     }
 
 
@@ -1109,51 +692,57 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public HpackDecoder getHpackDecoder() {
-        // TODO Auto-generated method stub
-        return null;
+        if (hpackDecoder == null) {
+            hpackDecoder = new HpackDecoder(remoteSettings.getHeaderTableSize());
+        }
+        return hpackDecoder;
     }
 
 
     @Override
     public ByteBuffer getInputByteBuffer(int streamId, int payloadSize) {
-        // TODO Auto-generated method stub
-        return null;
+        Stream stream = getStream(streamId);
+        if (stream == null) {
+            return null;
+        }
+        return stream.getInputByteBuffer();
     }
 
 
     @Override
     public void endOfStream(int streamId) {
-        // TODO Auto-generated method stub
-
+        Stream stream = getStream(streamId);
+        if (stream != null) {
+            stream.setEndOfStream();
+        }
     }
 
 
     @Override
-    public void headersStart(int streamId) {
-        // TODO Auto-generated method stub
-
+    public HeaderEmitter headersStart(int streamId) {
+        return getStream(streamId);
     }
 
 
     @Override
     public void reprioritise(int streamId, int parentStreamId,
             boolean exclusive, int weight) {
-        // TODO Auto-generated method stub
-
+        Stream stream = getStream(streamId);
+        AbstractStream parentStream = getStream(parentStreamId);
+        if (parentStream == null) {
+            parentStream = this;
+        }
+        stream.rePrioritise(parentStream, exclusive, weight);
     }
 
 
     @Override
-    public void header(String name, String value) {
-        // TODO Auto-generated method stub
-
-    }
-
-
-    @Override
-    public void headersEnd() {
-        // TODO Auto-generated method stub
-
+    public void headersEnd(int streamId) {
+        // Process this stream on a container thread
+        StreamProcessor streamProcessor = new StreamProcessor(
+                getStream(streamId), adapter, socketWrapper);
+        streamProcessor.setSslSupport(sslSupport);
+        socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
     }
 
 
@@ -1170,8 +759,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void pingReceive(byte[] payload) {
-        // TODO Auto-generated method stub
+    public void pingReceive(byte[] payload) throws IOException {
+        // Echo it back
+        socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
+        socketWrapper.write(true, payload, 0, payload.length);
+        socketWrapper.flush(true);
     }
 
 
@@ -1183,7 +775,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void incrementWindowSize(int streamId, int increment) {
-        // TODO Auto-generated method stub
+        AbstractStream stream = getStream(streamId);
+        if (stream != null) {
+            stream.incrementWindowSize(increment);
+        }
     }
 
 
