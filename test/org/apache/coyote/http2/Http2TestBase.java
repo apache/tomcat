@@ -49,11 +49,13 @@ import org.apache.tomcat.util.codec.binary.Base64;
  */
 public abstract class Http2TestBase extends TomcatBaseTest {
 
-    static final String EMPTY_HTTP2_SETTINGS;
+    private static final byte[] EMPTY_SETTINGS_FRAME =
+        { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
+    static final String EMPTY_HTTP2_SETTINGS_HEADER;
 
     static {
         byte[] empty = new byte[0];
-        EMPTY_HTTP2_SETTINGS = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
+        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
     }
 
     private Socket s;
@@ -73,12 +75,19 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         openClientConnection();
         doHttpUpgrade();
         sendClientPreface();
-        // Need to read 3 frames (settings, headers and response body)
+        // - 101 response acts as acknowledgement of the HTTP2-Settings header
+        // Need to read 4 frames
+        // - settings (server settings - must be first)
+        // - settings ack (for the settings frame in the client preface)
+        // - headers (for response)
+        // - data (for response body)
+        parser.readFrame(true);
         parser.readFrame(true);
         parser.readFrame(true);
         parser.readFrame(true);
 
-        Assert.assertEquals("0-Settings-Empty\n" +
+        Assert.assertEquals("0-Settings-End\n" +
+                "0-Settings-Ack\n" +
                 "1-HeadersStart\n" +
                 "1-Header-[:status]-[200]\n" +
                 "1-HeadersEnd\n" +
@@ -125,7 +134,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void doHttpUpgrade() throws IOException {
-        doHttpUpgrade("h2c", EMPTY_HTTP2_SETTINGS, true);
+        doHttpUpgrade("h2c", EMPTY_HTTP2_SETTINGS_HEADER, true);
     }
 
     protected void doHttpUpgrade(String upgrade, String settings, boolean validate)
@@ -234,6 +243,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     private void sendClientPreface() throws IOException {
         os.write(Http2Parser.CLIENT_PREFACE_START);
+        os.write(EMPTY_SETTINGS_FRAME);
         os.flush();
     }
 
@@ -322,19 +332,19 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void settingsEmpty(boolean ack) {
-            if (ack) {
-                trace.append("0-Settings-Ack\n");
-            } else {
-                trace.append("0-Settings-Empty\n");
-            }
+        public void setting(int identifier, long value) throws IOException {
+            trace.append("0-Settings-[" + identifier + "]-[" + value + "]\n");
+            remoteSettings.set(identifier, value);
         }
 
 
         @Override
-        public void setting(int identifier, long value) throws IOException {
-            trace.append("0-Settings-[" + identifier + "]-[" + value + "]\n");
-            remoteSettings.set(identifier, value);
+        public void settingsEnd(boolean ack) {
+            if (ack) {
+                trace.append("0-Settings-Ack\n");
+            } else {
+                trace.append("0-Settings-End\n");
+            }
         }
 
 

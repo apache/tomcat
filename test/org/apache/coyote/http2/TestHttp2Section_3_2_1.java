@@ -35,8 +35,8 @@ public class TestHttp2Section_3_2_1 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("h2c", Http2TestBase.EMPTY_HTTP2_SETTINGS + Http2TestBase.EMPTY_HTTP2_SETTINGS,
-                false);
+        doHttpUpgrade("h2c", Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER +
+                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, false);
         parseHttp11Response();
     }
 

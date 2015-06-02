@@ -39,7 +39,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
     public void testConnectionNoHttp2Support() throws Exception {
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("h2c", EMPTY_HTTP2_SETTINGS, false);
+        doHttpUpgrade("h2c", EMPTY_HTTP2_SETTINGS_HEADER, false);
         parseHttp11Response();
     }
 
@@ -49,7 +49,7 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("h2", EMPTY_HTTP2_SETTINGS, false);
+        doHttpUpgrade("h2", EMPTY_HTTP2_SETTINGS_HEADER, false);
         parseHttp11Response();
     }
 

@@ -72,6 +72,10 @@ class Http2Parser {
      * @throws IOException If an IO error occurs while trying to read a frame
      */
     boolean readFrame(boolean block) throws IOException {
+        return readFrame(block, null);
+    }
+
+    private boolean readFrame(boolean block, Integer expected) throws IOException {
         if (!input.fill(block, frameHeaderBuffer)) {
             return false;
         }
@@ -80,6 +84,12 @@ class Http2Parser {
         int frameType = ByteUtil.getOneByte(frameHeaderBuffer, 3);
         int flags = ByteUtil.getOneByte(frameHeaderBuffer, 4);
         int streamId = ByteUtil.get31Bits(frameHeaderBuffer, 5);
+
+        if (expected != null && frameType != expected.intValue()) {
+            throw new Http2Exception(sm.getString("http2Parser.processFrame.unexpectedType",
+                    expected, Integer.toString(frameType)),
+                    streamId, Http2Exception.PROTOCOL_ERROR);
+        }
 
         if (payloadSize > maxPayloadSize) {
             throw new Http2Exception(sm.getString("http2Parser.payloadTooBig",
@@ -282,15 +292,13 @@ class Http2Parser {
             throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.invalidPayloadSize",
                     Integer.toString(payloadSize)), 0, Http2Exception.FRAME_SIZE_ERROR);
         }
-        if (payloadSize > 0 && (flags & 0x1) != 0) {
+        boolean ack = (flags & 0x1) != 0;
+        if (payloadSize > 0 && ack) {
             throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.ackWithNonZeroPayload"),
                     0, Http2Exception.FRAME_SIZE_ERROR);
         }
 
-        if (payloadSize == 0) {
-            // Either an ACK or an empty settings frame
-            output.settingsEmpty((flags & 0x1) != 0);
-        } else {
+        if (payloadSize != 0) {
             // Process the settings
             byte[] setting = new byte[6];
             for (int i = 0; i < payloadSize / 6; i++) {
@@ -300,6 +308,7 @@ class Http2Parser {
                 output.setting(id, value);
             }
         }
+        output.settingsEnd(ack);
     }
 
 
@@ -389,7 +398,7 @@ class Http2Parser {
      *
      * @return <code>true</code> if a valid preface was read, otherwise false.
      */
-    boolean readConnectionPreface() {
+    boolean readConnectionPreface() throws IOException {
         if (readPreface) {
             return true;
         }
@@ -413,6 +422,9 @@ class Http2Parser {
                 return false;
             }
         }
+
+        // Must always be followed by a settings frame
+        readFrame(true, Integer.valueOf(FRAME_TYPE_SETTINGS));
 
         readPreface = true;
         return true;
@@ -480,8 +492,8 @@ class Http2Parser {
         void headersEnd(int streamId);
 
         // Settings frames
-        void settingsEmpty(boolean ack);
         void setting(int identifier, long value) throws IOException;
+        void settingsEnd(boolean ack) throws IOException;
 
         // Ping frames
         void pingReceive(byte[] payload) throws IOException;
