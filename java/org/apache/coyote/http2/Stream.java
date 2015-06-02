@@ -42,6 +42,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer = new StreamInputBuffer();
     private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
+    private final StreamStateMachine state = new StreamStateMachine();
 
 
     public Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -58,6 +59,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         this.coyoteRequest.setInputBuffer(inputBuffer);
         this.coyoteResponse.setOutputBuffer(outputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
+        if (coyoteRequest.isFinished()) {
+            // Update the state machine
+            state.receiveHeaders();
+            state.recieveEndOfStream();
+        }
     }
 
 
@@ -210,6 +216,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
     ByteBuffer getInputByteBuffer() {
         return inputBuffer.getInBuffer();
+    }
+
+
+    void headersEnd() {
+        state.receiveHeaders();
     }
 
 

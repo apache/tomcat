@@ -737,9 +737,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void headersEnd(int streamId) {
+        Stream stream = getStream(streamId);
+        stream.headersEnd();
         // Process this stream on a container thread
-        StreamProcessor streamProcessor = new StreamProcessor(
-                getStream(streamId), adapter, socketWrapper);
+        StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
         streamProcessor.setSslSupport(sslSupport);
         socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
     }
