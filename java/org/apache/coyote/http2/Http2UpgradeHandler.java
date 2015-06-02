@@ -751,8 +751,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void settingsAck() {
-        // TODO Auto-generated method stub
+    public void settingsEmpty(boolean ack) {
+        if (ack) {
+            // TODO Process ACK
+        }
     }
 
 

@@ -16,7 +16,19 @@
  */
 package org.apache.coyote.http2;
 
+import org.junit.Test;
+
 public class TestHttp2Section_3_2_1 extends Http2TestBase {
+
+    @Test
+    public void testZeroHttp2Settings() throws Exception{
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade("h2", "", false);
+        parseHttp11Response();
+    }
+
 
     // TODO: Test zero Http2-Settings headers
 

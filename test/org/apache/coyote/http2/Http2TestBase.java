@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 import javax.net.SocketFactory;
 import javax.servlet.ServletException;
@@ -48,11 +49,11 @@ import org.apache.tomcat.util.codec.binary.Base64;
  */
 public abstract class Http2TestBase extends TomcatBaseTest {
 
-    private static final String HTTP2_SETTINGS;
+    static final String EMPTY_HTTP2_SETTINGS;
 
     static {
         byte[] empty = new byte[0];
-        HTTP2_SETTINGS = Base64.encodeBase64String(empty);
+        EMPTY_HTTP2_SETTINGS = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
     }
 
     private Socket s;
@@ -70,14 +71,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         enableHttp2();
         configureAndStartWebApplication();
         openClientConnection();
-        doHttpUpgrade("h2c", true);
+        doHttpUpgrade();
         sendClientPreface();
         // Need to read 3 frames (settings, headers and response body)
         parser.readFrame(true);
         parser.readFrame(true);
         parser.readFrame(true);
 
-        Assert.assertEquals("1-HeadersStart\n" +
+        Assert.assertEquals("0-Settings-Empty\n" +
+                "1-HeadersStart\n" +
                 "1-Header-[:status]-[200]\n" +
                 "1-HeadersEnd\n" +
                 "1-Body-8192\n" +
@@ -122,12 +124,17 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void doHttpUpgrade(String upgrade, boolean validate) throws IOException {
+    protected void doHttpUpgrade() throws IOException {
+        doHttpUpgrade("h2c", EMPTY_HTTP2_SETTINGS, true);
+    }
+
+    protected void doHttpUpgrade(String upgrade, String settings, boolean validate)
+            throws IOException {
         byte[] upgradeRequest = ("GET / HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
                 "Connection: Upgrade, HTTP2-Settings\r\n" +
                 "Upgrade: " + upgrade + "\r\n" +
-                "HTTP2-Settings: "+ HTTP2_SETTINGS + "\r\n" +
+                settings +
                 "\r\n").getBytes(StandardCharsets.ISO_8859_1);
         os.write(upgradeRequest);
         os.flush();
@@ -200,6 +207,28 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 data.arrayOffset() + data.position(), StandardCharsets.ISO_8859_1);
 
         return response.split("\r\n");
+    }
+
+
+    void parseHttp11Response() throws IOException {
+        String[] responseHeaders = readHttpResponseHeaders();
+        Assert.assertTrue(responseHeaders[0], responseHeaders[0].startsWith("HTTP/1.1 200"));
+
+        // Find the content length (chunked responses not handled)
+        for (int i = 1; i < responseHeaders.length; i++) {
+            if (responseHeaders[i].toLowerCase(Locale.ENGLISH).startsWith("content-length")) {
+                String cl = responseHeaders[i];
+                int pos = cl.indexOf(':');
+                if (pos == -1) {
+                    throw new IOException("Invalid: [" + cl + "]");
+                }
+                int len = Integer.parseInt(cl.substring(pos + 1).trim());
+                byte[] content = new byte[len];
+                input.fill(true, content);
+                return;
+            }
+        }
+        Assert.fail("No content-length in response");
     }
 
 
@@ -293,10 +322,14 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void settingsAck() {
-            trace.append("0-Settings-Ack\n");
-
+        public void settingsEmpty(boolean ack) {
+            if (ack) {
+                trace.append("0-Settings-Ack\n");
+            } else {
+                trace.append("0-Settings-Empty\n");
+            }
         }
+
 
         @Override
         public void setting(int identifier, long value) throws IOException {
