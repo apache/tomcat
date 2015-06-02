@@ -289,9 +289,7 @@ class Http2Parser {
 
         if (payloadSize == 0) {
             // Either an ACK or an empty settings frame
-            if ((flags & 0x1) != 0) {
-                output.settingsAck();
-            }
+            output.settingsEmpty((flags & 0x1) != 0);
         } else {
             // Process the settings
             byte[] setting = new byte[6];
@@ -482,7 +480,7 @@ class Http2Parser {
         void headersEnd(int streamId);
 
         // Settings frames
-        void settingsAck();
+        void settingsEmpty(boolean ack);
         void setting(int identifier, long value) throws IOException;
 
         // Ping frames
