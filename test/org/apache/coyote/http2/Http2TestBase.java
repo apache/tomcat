@@ -54,6 +54,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
     static final String EMPTY_HTTP2_SETTINGS_HEADER;
 
+    private static final byte[] PING_FRAME = new byte[] {
+        0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
     static {
         byte[] empty = new byte[0];
         EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
@@ -249,6 +253,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     void sendClientPreface() throws IOException {
         os.write(Http2Parser.CLIENT_PREFACE_START);
         os.write(EMPTY_SETTINGS_FRAME);
+        os.flush();
+    }
+
+
+    void sendPing() throws IOException {
+        os.write(PING_FRAME);
         os.flush();
     }
 
