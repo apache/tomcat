@@ -355,10 +355,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         ByteUtil.setThreeBytes(payloadLength, 0, payload.length);
 
         try {
-            socketWrapper.write(true, payloadLength, 0, payloadLength.length);
-            socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
-            socketWrapper.write(true, payload, 0,  payload.length);
-            socketWrapper.flush(true);
+            synchronized (socketWrapper) {
+                socketWrapper.write(true, payloadLength, 0, payloadLength.length);
+                socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
+                socketWrapper.write(true, payload, 0,  payload.length);
+                socketWrapper.flush(true);
+            }
         } catch (IOException ioe) {
             // Ignore. GOAWAY is sent on a best efforts basis and the original
             // error has already been logged.
@@ -440,9 +442,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     private void processWrites() throws IOException {
-        if (socketWrapper.flush(false)) {
-            socketWrapper.registerWriteInterest();
-            return;
+        synchronized (socketWrapper) {
+            if (socketWrapper.flush(false)) {
+                socketWrapper.registerWriteInterest();
+                return;
+            }
         }
     }
 
@@ -761,9 +765,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void pingReceive(byte[] payload) throws IOException {
         // Echo it back
-        socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
-        socketWrapper.write(true, payload, 0, payload.length);
-        socketWrapper.flush(true);
+        synchronized (socketWrapper) {
+            socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
+            socketWrapper.write(true, payload, 0, payload.length);
+            socketWrapper.flush(true);
+        }
     }
 
 
