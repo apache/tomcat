@@ -36,7 +36,9 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
+import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.codec.binary.Base64;
 
 
@@ -75,10 +77,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         parser.readFrame(true);
         parser.readFrame(true);
 
-        Assert.assertEquals("1-HeadersStart\n"
-                + "1-Header-[:status]-[200]\n"
-                + "1-Body-8192\n"
-                + "1-EndOfStream", output.getTrace());
+        Assert.assertEquals("1-HeadersStart\n" +
+                "1-Header-[:status]-[200]\n" +
+                "1-HeadersEnd\n" +
+                "1-Body-8192\n" +
+                "1-EndOfStream", output.getTrace());
         output.clearTrace();
     }
 
@@ -234,7 +237,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    private static class TestOutput implements Http2Parser.Output {
+    private static class TestOutput implements Output, HeaderEmitter {
 
         private StringBuffer trace = new StringBuffer();
         private String lastStreamId = "0";
@@ -263,9 +266,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void headersStart(int streamId) {
+        public HeaderEmitter headersStart(int streamId) {
             lastStreamId = Integer.toString(streamId);
             trace.append(lastStreamId + "-HeadersStart\n");
+            return this;
         }
 
         @Override
@@ -275,15 +279,18 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                     "]-[" + weight + "]\n");
         }
 
+
         @Override
-        public void header(String name, String value) {
+        public void emitHeader(String name, String value, boolean neverIndex) {
             trace.append(lastStreamId + "-Header-[" + name + "]-[" + value + "]\n");
         }
 
+
         @Override
-        public void headersEnd() {
-            trace.append(lastStreamId + "-HeadersEnd\n");
+        public void headersEnd(int streamId) {
+            trace.append(streamId + "-HeadersEnd\n");
         }
+
 
         @Override
         public void settingsAck() {

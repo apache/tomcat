@@ -25,7 +25,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-class Http2Parser implements HeaderEmitter {
+class Http2Parser {
 
     private static final Log log = LogFactory.getLog(Http2Parser.class);
     private static final StringManager sm = StringManager.getManager(Http2Parser.class);
@@ -175,9 +175,12 @@ class Http2Parser implements HeaderEmitter {
 
         // TODO Handle end of headers flag
         // TODO Handle end of stream flag
-        // TODO Handle continutation frames
+        // TODO Handle continuation frames
 
-        output.headersStart(streamId);
+        if (hpackDecoder == null) {
+            hpackDecoder = output.getHpackDecoder();
+        }
+        hpackDecoder.setHeaderEmitter(output.headersStart(streamId));
 
         int padLength = 0;
         boolean padding = (flags & 0x08) > 0;
@@ -206,11 +209,6 @@ class Http2Parser implements HeaderEmitter {
             payloadSize -= optionalLen;
         }
 
-        if (hpackDecoder == null) {
-            hpackDecoder = output.getHpackDecoder();
-            hpackDecoder.setHeaderEmitter(this);
-        }
-
         while (payloadSize > 0) {
             int toRead = Math.min(headerReadBuffer.remaining(), payloadSize);
             // headerReadBuffer in write mode
@@ -236,10 +234,12 @@ class Http2Parser implements HeaderEmitter {
         }
 
         swallow(padLength);
+
+        output.headersEnd(streamId);
     }
 
 
-    private void readPriorityFrame(int flags, int streamId, int payloadSize) throws IOException {
+    private void readPriorityFrame(int streamId, int flags, int payloadSize) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.processFrame", connectionId,
                     Integer.toString(streamId), Integer.toString(flags),
@@ -305,7 +305,7 @@ class Http2Parser implements HeaderEmitter {
     }
 
 
-    private void readPingFrame(int flags, int streamId, int payloadSize)
+    private void readPingFrame(int streamId, int flags, int payloadSize)
             throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.processFrame", connectionId,
@@ -332,7 +332,7 @@ class Http2Parser implements HeaderEmitter {
     }
 
 
-    private void readWindowUpdateFrame(int flags, int streamId, int payloadSize)
+    private void readWindowUpdateFrame(int streamId, int flags, int payloadSize)
             throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.processFrame", connectionId,
@@ -423,13 +423,6 @@ class Http2Parser implements HeaderEmitter {
 
     void setHpackDecoder(HpackDecoder hpackDecoder) {
         this.hpackDecoder = hpackDecoder;
-        hpackDecoder.setHeaderEmitter(this);
-    }
-
-
-    @Override
-    public void emitHeader(String name, String value, boolean neverIndex) {
-        output.header(name, value);
     }
 
 
@@ -441,7 +434,7 @@ class Http2Parser implements HeaderEmitter {
         /**
          * Fill the given array with data unless non-blocking is requested and
          * no data is available. If any data is available then the buffer will
-         * be filled with blocking I/O.
+         * be filled using blocking I/O.
          *
          * @param block Should the first read into the provided buffer be a
          *              blocking read or not.
@@ -472,7 +465,8 @@ class Http2Parser implements HeaderEmitter {
 
 
     /**
-     *
+     * Interface that must be implemented to receive notifications from the
+     * parser as it processes incoming frames.
      */
     static interface Output {
 
@@ -483,17 +477,16 @@ class Http2Parser implements HeaderEmitter {
         void endOfStream(int streamId);
 
         // Header frames
-        void headersStart(int streamId);
+        HeaderEmitter headersStart(int streamId);
         void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight);
-        void header(String name, String value);
-        void headersEnd();
+        void headersEnd(int streamId);
 
         // Settings frames
         void settingsAck();
         void setting(int identifier, long value) throws IOException;
 
         // Ping frames
-        void pingReceive(byte[] payload);
+        void pingReceive(byte[] payload) throws IOException;
         void pingAck();
 
         // Window size
