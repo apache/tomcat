@@ -234,7 +234,7 @@ class Http2Parser {
             } catch (HpackException hpe) {
                 throw new Http2Exception(
                         sm.getString("http2Parser.processFrameHeaders.decodingFailed"),
-                        0, ErrorCode.PROTOCOL_ERROR);
+                        0, ErrorCode.COMPRESSION_ERROR);
             }
             // switches to write mode
             headerReadBuffer.compact();
@@ -244,7 +244,7 @@ class Http2Parser {
         if (headerReadBuffer.position() > 0) {
             throw new Http2Exception(
                     sm.getString("http2Parser.processFrameHeaders.decodingDataLeft"),
-                    0, ErrorCode.PROTOCOL_ERROR);
+                    0, ErrorCode.COMPRESSION_ERROR);
         }
 
         swallow(padLength);
