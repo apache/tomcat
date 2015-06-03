@@ -244,8 +244,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 }
             } catch (Http2Exception h2e) {
                 if (h2e.getStreamId() == 0) {
-                    // Connection error
-                    log.warn(sm.getString("upgradeHandler.connectionError"), h2e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("upgradeHandler.connectionError"), h2e);
+                    }
                     close(h2e);
                     break;
                 } else {
