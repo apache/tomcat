@@ -35,7 +35,9 @@ public class ConnectionSettings {
     private static final int MAX_MAX_FRAME_SIZE = (1 << 24) - 1;
     static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
 
-    private volatile int headerTableSize = 4096;
+    static final int DEFAULT_HEADER_TABLE_SIZE = 4096;
+    private volatile int headerTableSize = DEFAULT_HEADER_TABLE_SIZE;
+
     private volatile boolean enablePush = true;
     private volatile long maxConcurrentStreams = UNLIMITED;
     private volatile int initialWindowSize = DEFAULT_WINDOW_SIZE;

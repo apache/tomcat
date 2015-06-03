@@ -41,6 +41,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.http.MimeHeaders;
 
 
 /**
@@ -64,6 +65,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
     private Socket s;
+    protected HpackEncoder hpackEncoder;
     protected Input input;
     protected TestOutput output;
     protected Http2Parser parser;
@@ -83,6 +85,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         validateHttp2InitialResponse();
     }
 
+
     protected void validateHttp2InitialResponse() throws Exception {
         // - 101 response acts as acknowledgement of the HTTP2-Settings header
         // Need to read 4 frames
@@ -97,12 +100,58 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         Assert.assertEquals("0-Settings-End\n" +
                 "0-Settings-Ack\n" +
-                "1-HeadersStart\n" +
-                "1-Header-[:status]-[200]\n" +
-                "1-HeadersEnd\n" +
-                "1-Body-8192\n" +
-                "1-EndOfStream", output.getTrace());
+                getSimpleResponseTrace(1)
+                , output.getTrace());
         output.clearTrace();
+    }
+
+
+    protected void sendSimpleRequest(int streamId) throws IOException {
+        MimeHeaders headers = new MimeHeaders();
+        headers.addValue(":method").setString("GET");
+        headers.addValue(":path").setString("/any");
+        headers.addValue(":authority").setString("localhost:" + getPort());
+        ByteBuffer buf = ByteBuffer.allocate(128);
+        hpackEncoder.encode(headers, buf);
+
+        buf.flip();
+        byte[] frameHeader = new byte[9];
+
+        ByteUtil.setThreeBytes(frameHeader, 0, buf.limit());
+        // Header frame is type 0x01
+        frameHeader[3] = 0x01;
+        // Flags. end of headers (0x04). end of stream (0x01)
+        frameHeader[4] = 0x05;
+        // Stream id
+        ByteUtil.set31Bits(frameHeader, 5, streamId);
+        os.write(frameHeader);
+        os.write(buf.array(), buf.arrayOffset(), buf.limit());
+        os.flush();
+    }
+
+
+    protected void readSimpleResponse() throws IOException {
+        // Headers
+        parser.readFrame(true);
+        // Body
+        parser.readFrame(true);
+    }
+
+
+    protected String getSimpleResponseTrace(int streamId) {
+        StringBuilder result = new StringBuilder();
+        result.append(streamId);
+        result.append("-HeadersStart\n");
+        result.append(streamId);
+        result.append("-Header-[:status]-[200]\n");
+        result.append(streamId);
+        result.append("-HeadersEnd\n");
+        result.append(streamId);
+        result.append("-Body-8192\n");
+        result.append(streamId);
+        result.append("-EndOfStream\n");
+
+        return result.toString();
     }
 
 
@@ -291,7 +340,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    private static class TestOutput implements Output, HeaderEmitter {
+    static class TestOutput implements Output, HeaderEmitter {
 
         private StringBuffer trace = new StringBuffer();
         private String lastStreamId = "0";
@@ -315,7 +364,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         public void endOfStream(int streamId) {
             lastStreamId = Integer.toString(streamId);
-            trace.append(lastStreamId + "-EndOfStream");
+            trace.append(lastStreamId + "-EndOfStream\n");
         }
 
 
