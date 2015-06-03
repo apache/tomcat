@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.nio.ByteBuffer;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,6 +35,7 @@ public class TestHttp2Section_4_1 extends Http2TestBase {
 
     // TODO: Tests for over-sized frames. Better located in tests for section 6?
 
+
     @Test
     public void testUnknownFrameType() throws Exception {
         hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
@@ -45,7 +48,29 @@ public class TestHttp2Section_4_1 extends Http2TestBase {
         Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
     }
 
+
     // TODO: Tests for unexpected flags. Better located in tests for section 6?
 
-    // TODO: Test that set reserved bit is ignored.
+
+    @Test
+    public void testReservedBitIgnored() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Build the simple request
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleRequest(frameHeader, headersPayload, 3);
+
+        // Tweak the header to set the reserved bit
+        frameHeader[5] = (byte) (frameHeader[5] | 0x80);
+
+        // Process the request
+        writeSimpleRequest(frameHeader, headersPayload);
+
+        readSimpleResponse();
+        Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
+    }
 }

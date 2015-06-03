@@ -107,25 +107,37 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void sendSimpleRequest(int streamId) throws IOException {
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildSimpleRequest(frameHeader, headersPayload, streamId);
+        writeSimpleRequest(frameHeader, headersPayload);
+    }
+
+
+    protected void buildSimpleRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("GET");
         headers.addValue(":path").setString("/any");
         headers.addValue(":authority").setString("localhost:" + getPort());
-        ByteBuffer buf = ByteBuffer.allocate(128);
-        hpackEncoder.encode(headers, buf);
+        hpackEncoder.encode(headers, headersPayload);
 
-        buf.flip();
-        byte[] frameHeader = new byte[9];
+        headersPayload.flip();
 
-        ByteUtil.setThreeBytes(frameHeader, 0, buf.limit());
+        ByteUtil.setThreeBytes(frameHeader, 0, headersPayload.limit());
         // Header frame is type 0x01
         frameHeader[3] = 0x01;
         // Flags. end of headers (0x04). end of stream (0x01)
         frameHeader[4] = 0x05;
         // Stream id
         ByteUtil.set31Bits(frameHeader, 5, streamId);
+    }
+
+
+    protected void writeSimpleRequest(byte[] frameHeader, ByteBuffer headersPayload)
+            throws IOException {
         os.write(frameHeader);
-        os.write(buf.array(), buf.arrayOffset(), buf.limit());
+        os.write(headersPayload.array(), headersPayload.arrayOffset(), headersPayload.limit());
         os.flush();
     }
 
