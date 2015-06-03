@@ -72,4 +72,12 @@ public class ByteUtil {
         return ((long)(input[firstByte] & 0xFF) << 24) + ((input[firstByte + 1] & 0xFF) << 16) +
                 ((input[firstByte + 2] & 0xFF) << 8) + (input[firstByte + 3] & 0xFF);
     }
+
+
+    public static void setFourBytes(byte[] output, int firstByte, long value) {
+        output[firstByte]     = (byte) ((value & 0xFF000000) >> 24);
+        output[firstByte + 1] = (byte) ((value & 0xFF0000) >> 16);
+        output[firstByte + 2] = (byte) ((value & 0xFF00) >> 8);
+        output[firstByte + 3] = (byte) (value & 0xFF);
+    }
 }
