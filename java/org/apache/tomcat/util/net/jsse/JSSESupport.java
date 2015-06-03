@@ -74,7 +74,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     private SSLSession session;
 
 
-    JSSESupport(SSLSession session) {
+    public JSSESupport(SSLSession session) {
         this.session = session;
     }
 
