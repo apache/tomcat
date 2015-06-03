@@ -93,7 +93,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
     private static final byte[] SETTINGS_ACK = { 0x00, 0x00, 0x00, 0x04, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
-    private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00 };
+    private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     private static final String HTTP2_SETTINGS_HEADER = "HTTP2-Settings";
     private static final byte[] HTTP2_UPGRADE_ACK = ("HTTP/1.1 101 Switching Protocols\r\n" +
