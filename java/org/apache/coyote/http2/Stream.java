@@ -358,18 +358,23 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          * corruption by careful use of the buffer it would still require the
          * same copies as using two buffers and the behaviour would be less
          * clear.
+         *
+         * The buffers are created lazily because 32K per stream quickly adds
+         * up to a lot of memory and most requests do not have bodies.
          */
         // This buffer is used to populate the ByteChunk passed in to the read
         // method
-        private final byte[] outBuffer = new byte[8 * 1024];
+        private byte[] outBuffer;
         // This buffer is the destination for incoming data. It is normally is
         // 'write mode'.
-        private final ByteBuffer inBuffer = ByteBuffer.allocate(8 * 1024);
+        private ByteBuffer inBuffer;
 
         private boolean endOfStream = false;
 
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
+
+            ensureBuffersExist();
 
             int written = 0;
 
@@ -405,7 +410,21 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
         public ByteBuffer getInBuffer() {
+            ensureBuffersExist();
             return inBuffer;
+        }
+
+
+        private void ensureBuffersExist() {
+            if (inBuffer != null) {
+                return;
+            }
+            synchronized (this) {
+                if (inBuffer == null) {
+                    inBuffer = ByteBuffer.allocate(16 * 1024);
+                    outBuffer = new byte[16 * 1024];
+                }
+            }
         }
     }
 }
