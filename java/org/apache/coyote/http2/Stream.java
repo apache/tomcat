@@ -367,7 +367,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         private byte[] outBuffer;
         // This buffer is the destination for incoming data. It is normally is
         // 'write mode'.
-        private ByteBuffer inBuffer;
+        private volatile ByteBuffer inBuffer;
 
         private boolean endOfStream = false;
 
