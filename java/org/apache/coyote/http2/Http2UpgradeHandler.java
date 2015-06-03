@@ -122,6 +122,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private long writeTimeout = 10000;
 
     private final Map<Integer,Stream> streams = new HashMap<>();
+    private int maxStreamId = -1;
 
     // Tracking for when the connection is blocked (windowSize < 1)
     private final Object backLogLock = new Object();
@@ -346,15 +347,20 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private void close(Http2Exception h2e) {
         // Write a GOAWAY frame.
-        byte[] payload = h2e.getMessage().getBytes(StandardCharsets.UTF_8);
+        byte[] fixedPayload = new byte[8];
+        // TODO needs to be correct value
+        ByteUtil.set31Bits(fixedPayload, 0, (2 << 31) - 1);
+        ByteUtil.setFourBytes(fixedPayload, 4, h2e.getErrorCode().getErrorCode());
+        byte[] debugMessage = h2e.getMessage().getBytes(StandardCharsets.UTF_8);
         byte[] payloadLength = new byte[3];
-        ByteUtil.setThreeBytes(payloadLength, 0, payload.length);
+        ByteUtil.setThreeBytes(payloadLength, 0, debugMessage.length + 8);
 
         try {
             synchronized (socketWrapper) {
                 socketWrapper.write(true, payloadLength, 0, payloadLength.length);
                 socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
-                socketWrapper.write(true, payload, 0,  payload.length);
+                socketWrapper.write(true, fixedPayload, 0, 8);
+                socketWrapper.write(true, debugMessage, 0, debugMessage.length);
                 socketWrapper.flush(true);
             }
         } catch (IOException ioe) {
@@ -780,6 +786,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void pingAck() {
         // TODO Auto-generated method stub
+    }
+
+
+    @Override
+    public void goaway(int lastStreamId, long errorCode, String debugData) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.goaway.debug", connectionId,
+                    Integer.toString(lastStreamId), Long.toHexString(errorCode), debugData));
+        }
+
+        // TODO: Do more than just record this
+        maxStreamId = lastStreamId;
     }
 
 

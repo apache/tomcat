@@ -19,7 +19,6 @@ package org.apache.coyote.http2;
 import java.nio.ByteBuffer;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -31,7 +30,6 @@ import org.junit.Test;
  */
 public class TestHttp2Section_4_3 extends Http2TestBase {
 
-    @Ignore // Appears to trigger various problems
     @Test
     public void testHeaderDecodingError() throws Exception {
         hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
@@ -50,9 +48,11 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
         // Process the request
         writeSimpleRequest(frameHeader, headersPayload);
 
-        readSimpleResponse();
-        Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
+        // Read GOAWAY frame
+        parser.readFrame(true);
 
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("0-Goaway-[2147483647]-[1]-["));
     }
 
 

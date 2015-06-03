@@ -447,6 +447,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
+        public void goaway(int lastStreamId, long errorCode, String debugData) {
+            trace.append("0-Goaway-[" + lastStreamId + "]-[" + errorCode + "]-[" + debugData + "]");
+        }
+
+
+        @Override
         public void incrementWindowSize(int streamId, int increment) {
             trace.append(streamId + "-WindowSize-[" + increment + "]\n");
         }

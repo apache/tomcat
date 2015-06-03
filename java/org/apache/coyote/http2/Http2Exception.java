@@ -22,27 +22,11 @@ public class Http2Exception extends IOException {
 
     private static final long serialVersionUID = 1L;
 
-    public static final byte[] NO_ERROR = { 0x00, 0x00, 0x00, 0x00 };
-    public static final byte[] PROTOCOL_ERROR = { 0x00, 0x00, 0x00, 0x01 };
-    public static final byte[] INTERNAL_ERROR = { 0x00, 0x00, 0x00, 0x02 };
-    public static final byte[] FLOW_CONTROL_ERROR = { 0x00, 0x00, 0x00, 0x03 };
-    public static final byte[] SETTINGS_TIMEOUT = { 0x00, 0x00, 0x00, 0x04 };
-    public static final byte[] STREAM_CLOSED = { 0x00, 0x00, 0x00, 0x05 };
-    public static final byte[] FRAME_SIZE_ERROR = { 0x00, 0x00, 0x00, 0x06};
-    public static final byte[] REFUSED_STREAM = { 0x00, 0x00, 0x00, 0x07};
-    public static final byte[] CANCEL = { 0x00, 0x00, 0x00, 0x08};
-    public static final byte[] COMPRESSION_ERROR= { 0x00, 0x00, 0x00, 0x09};
-    public static final byte[] CONNECT_ERROR = { 0x00, 0x00, 0x00, 0x0a};
-    public static final byte[] ENHANCE_YOUR_CALM = { 0x00, 0x00, 0x00, 0x0b};
-    public static final byte[] INADEQUATE_SECURITY = { 0x00, 0x00, 0x00, 0x0c};
-    public static final byte[]  HTTP_1_1_REQUIRED = { 0x00, 0x00, 0x00, 0x0d};
-
-
     private final int streamId;
-    private final byte[] errorCode;
+    private final ErrorCode errorCode;
 
 
-    public Http2Exception(String msg, int streamId, byte[] errorCode) {
+    public Http2Exception(String msg, int streamId, ErrorCode errorCode) {
         super(msg);
         this.streamId = streamId;
         this.errorCode = errorCode;
@@ -54,7 +38,7 @@ public class Http2Exception extends IOException {
     }
 
 
-    public byte[] getErrorCode() {
+    public ErrorCode getErrorCode() {
         return errorCode;
     }
 }
