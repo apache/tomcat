@@ -413,6 +413,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
             chunk.setBytes(outBuffer, 0,  written);
 
+            // Increment client-side flow control windows by the number of bytes
+            // read
+            handler.writeWindowUpdate(Stream.this, written);
+
             return written;
         }
 

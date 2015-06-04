@@ -134,7 +134,6 @@ class Http2Parser {
             padLength = b[0] & 0xFF;
         }
 
-        // TODO Flow control
         ByteBuffer dest = output.getInputByteBuffer(streamId, payloadSize);
         if (dest == null) {
             swallow(payloadSize);
