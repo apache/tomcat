@@ -37,6 +37,7 @@ class Http2Parser {
     private static final int FRAME_TYPE_HEADERS = 1;
     private static final int FRAME_TYPE_PRIORITY = 2;
     private static final int FRAME_TYPE_SETTINGS = 4;
+    private static final int FRAME_TYPE_PUSH_PROMISE = 5;
     private static final int FRAME_TYPE_PING = 6;
     private static final int FRAME_TYPE_GOAWAY = 7;
     private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
@@ -127,6 +128,8 @@ class Http2Parser {
         case FRAME_TYPE_SETTINGS:
             readSettingsFrame(streamId, flags, payloadSize);
             break;
+        case FRAME_TYPE_PUSH_PROMISE:
+            readPushPromiseFrame(streamId, flags, payloadSize);
         case FRAME_TYPE_PING:
             readPingFrame(streamId, flags, payloadSize);
             break;
@@ -319,6 +322,17 @@ class Http2Parser {
             }
         }
         output.settingsEnd(ack);
+    }
+
+
+    private void readPushPromiseFrame(int streamId, int flags, int payloadSize) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
+        }
+
+        // TODO: Should never be received by a server
     }
 
 
@@ -586,7 +600,7 @@ class Http2Parser {
         HpackDecoder getHpackDecoder();
 
         // Data frames
-        ByteBuffer getInputByteBuffer(int streamId, int payloadSize);
+        ByteBuffer getInputByteBuffer(int streamId, int payloadSize) throws Http2Exception;
         void endOfStream(int streamId);
 
         // Header frames
@@ -606,7 +620,7 @@ class Http2Parser {
         void goaway(int lastStreamId, long errorCode, String debugData);
 
         // Window size
-        void incrementWindowSize(int streamId, int increment);
+        void incrementWindowSize(int streamId, int increment) throws Http2Exception;
 
         // Testing
         void swallow(int streamId, int frameType, int flags, int size) throws IOException;

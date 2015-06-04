@@ -42,7 +42,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer = new StreamInputBuffer();
     private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
-    private final StreamStateMachine state = new StreamStateMachine();
+    private final StreamStateMachine state;
 
 
     public Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -55,6 +55,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         this.handler = handler;
         setParentStream(handler);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
+        state = new StreamStateMachine(this);
         this.coyoteRequest = coyoteRequest;
         this.coyoteRequest.setInputBuffer(inputBuffer);
         this.coyoteResponse.setOutputBuffer(outputBuffer);
@@ -96,11 +97,14 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
-    public void incrementWindowSize(int windowSizeIncrement) {
+    public void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
         // If this is zero then any thread that has been trying to write for
         // this stream will be waiting. Notify that thread it can continue. Use
         // notify all even though only one thread is waiting to be on the safe
         // side.
+        if (windowSizeIncrement > 0) {
+            state.receivedWindowUpdate();
+        }
         boolean notify = getWindowSize() == 0;
         super.incrementWindowSize(windowSizeIncrement);
         if (notify) {
@@ -214,7 +218,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    ByteBuffer getInputByteBuffer() {
+    ByteBuffer getInputByteBuffer() throws Http2Exception {
+        state.receivedData();
         return inputBuffer.getInBuffer();
     }
 

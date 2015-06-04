@@ -453,7 +453,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    int reserveWindowSize(Stream stream, int toWrite) {
+    int reserveWindowSize(Stream stream, int toWrite) throws Http2Exception {
         int result;
         synchronized (backLogLock) {
             long windowSize = getWindowSize();
@@ -488,7 +488,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    protected void incrementWindowSize(int increment) {
+    protected void incrementWindowSize(int increment) throws Http2Exception {
         synchronized (backLogLock) {
             if (getWindowSize() == 0) {
                 releaseBackLog(increment);
@@ -706,7 +706,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public ByteBuffer getInputByteBuffer(int streamId, int payloadSize) {
+    public ByteBuffer getInputByteBuffer(int streamId, int payloadSize) throws Http2Exception {
         Stream stream = getStream(streamId);
         if (stream == null) {
             return null;
@@ -802,7 +802,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void incrementWindowSize(int streamId, int increment) {
+    public void incrementWindowSize(int streamId, int increment) throws Http2Exception {
         AbstractStream stream = getStream(streamId);
         if (stream != null) {
             stream.incrementWindowSize(increment);

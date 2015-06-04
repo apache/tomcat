@@ -100,7 +100,11 @@ abstract class AbstractStream {
     }
 
 
-    protected void incrementWindowSize(int increment) {
+    /**
+s     * @param increment
+     * @throws Http2Exception
+     */
+    protected void incrementWindowSize(int increment) throws Http2Exception {
         windowSize.addAndGet(increment);
     }
 

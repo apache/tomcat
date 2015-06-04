@@ -361,6 +361,37 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    void sendWindowUpdate(int streamId, int increment) throws IOException {
+        byte[] updateFrame = new byte[13];
+        // length is always 4
+        updateFrame[2] = 0x04;
+        // type is always 8
+        updateFrame[3] = 0x08;
+        // no flags
+        // Stream ID
+        ByteUtil.set31Bits(updateFrame, 5, streamId);
+        // Payload
+        ByteUtil.set31Bits(updateFrame, 9, increment);
+
+        os.write(updateFrame);
+        os.flush();
+    }
+
+
+    void sendData(int streamId, byte[] payload) throws IOException {
+        byte[] header = new byte[9];
+        // length
+        ByteUtil.setThreeBytes(header, 0, payload.length);
+        // Type is zero
+        // No flags
+        // Stream ID
+        ByteUtil.set31Bits(header, 5, streamId);
+
+        os.write(header);
+        os.write(payload);
+        os.flush();
+    }
+
     private static class TestInput implements Http2Parser.Input {
 
         private final InputStream is;
