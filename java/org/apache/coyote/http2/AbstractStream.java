@@ -20,8 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.juli.logging.Log;
-
 /**
  * Used to managed prioritisation.
  */
@@ -108,8 +106,6 @@ s     * @param increment
         windowSize.addAndGet(increment);
     }
 
-
-    protected abstract Log getLog();
 
     protected abstract String getConnectionId();
 

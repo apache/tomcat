@@ -616,12 +616,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    protected final Log getLog() {
-        return log;
-    }
-
-
-    @Override
     protected final int getWeight() {
         return 0;
     }
@@ -746,6 +740,16 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
         streamProcessor.setSslSupport(sslSupport);
         socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
+    }
+
+
+
+    @Override
+    public void reset(int streamId, long errorCode) {
+        Stream stream = getStream(streamId);
+        if (stream != null) {
+            stream.reset(errorCode);
+        }
     }
 
 
