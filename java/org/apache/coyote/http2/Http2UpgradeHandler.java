@@ -169,11 +169,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 String base64Settings = stream.getCoyoteRequest().getHeader(HTTP2_SETTINGS_HEADER);
                 byte[] settings = Base64.decodeBase64(base64Settings);
 
-                if (settings.length % 6 != 0) {
-                    // Invalid payload length for settings
-                    // TODO i18n
-                    throw new ProtocolException();
-                }
+                FrameType.SETTINGS.checkPayloadSize(connectionId, 1, settings.length);
 
                 for (int i = 0; i < settings.length % 6; i++) {
                     int id = ByteUtil.getTwoBytes(settings, i * 6);
