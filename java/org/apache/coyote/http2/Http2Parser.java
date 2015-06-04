@@ -100,7 +100,7 @@ class Http2Parser {
             readSettingsFrame(flags, payloadSize);
             break;
         case PUSH_PROMISE:
-            readPushPromiseFrame(streamId, flags, payloadSize);
+            readPushPromiseFrame(streamId);
             break;
         case PING:
             readPingFrame(flags);
@@ -251,9 +251,9 @@ class Http2Parser {
     }
 
 
-    private void readPushPromiseFrame(int streamId, int flags, int payloadSize) throws IOException {
-        // TODO: Should never be received by a server
-        swallow(payloadSize);
+    private void readPushPromiseFrame(int streamId) throws IOException {
+        throw new Http2Exception(sm.getString("http2Parser.processFramePushPromise",
+                connectionId, Integer.valueOf(streamId)), 0, ErrorCode.PROTOCOL_ERROR);
     }
 
 
