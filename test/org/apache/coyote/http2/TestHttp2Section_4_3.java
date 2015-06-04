@@ -46,7 +46,7 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
         headersPayload.put(0, (byte) (headersPayload.get(0) + 128));
 
         // Process the request
-        writeSimpleRequest(frameHeader, headersPayload);
+        writeFrame(frameHeader, headersPayload);
 
         // Read GOAWAY frame
         parser.readFrame(true);
@@ -57,5 +57,57 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
     }
 
 
-    // TODO: Header frames must be a contiguous sequence
+    @Test
+    public void testHeaderContinuationContiguous() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Part 1
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleRequestPart1(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Part 2
+        headersPayload.clear();
+        buildSimpleRequestPart2(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // headers, body
+        parser.readFrame(true);
+        parser.readFrame(true);
+
+        Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
+    }
+
+
+    @Test
+    public void testHeaderContinuationNonContiguous() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Part 1
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleRequestPart1(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        sendPing();
+
+        // Part 2
+        headersPayload.clear();
+        buildSimpleRequestPart2(frameHeader, headersPayload, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Read GOAWAY frame
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
+                        ErrorCode.COMPRESSION_ERROR.getErrorCode() + "]-["));
+    }
 }

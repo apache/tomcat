@@ -68,7 +68,7 @@ public class TestHttp2Section_4_1 extends Http2TestBase {
         frameHeader[5] = (byte) (frameHeader[5] | 0x80);
 
         // Process the request
-        writeSimpleRequest(frameHeader, headersPayload);
+        writeFrame(frameHeader, headersPayload);
 
         readSimpleResponse();
         Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
