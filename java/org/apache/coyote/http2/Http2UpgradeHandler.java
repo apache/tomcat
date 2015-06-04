@@ -84,10 +84,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final int FLAG_END_OF_STREAM = 1;
     private static final int FLAG_END_OF_HEADERS = 4;
 
-    private static final int FRAME_TYPE_DATA = 0;
-    private static final int FRAME_TYPE_HEADERS = 1;
-    private static final int FRAME_TYPE_CONTINUATION = 9;
-
     private static final byte[] PING_ACK = { 0x00, 0x00, 0x08, 0x06, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
     private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -392,12 +388,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 target.flip();
                 ByteUtil.setThreeBytes(header, 0, target.limit());
                 if (first) {
-                    header[3] = FRAME_TYPE_HEADERS;
+                    header[3] = FrameType.HEADERS.getIdByte();
                     if (stream.getOutputBuffer().hasNoBody()) {
                         header[4] = FLAG_END_OF_STREAM;
                     }
                 } else {
-                    header[3] = FRAME_TYPE_CONTINUATION;
+                    header[3] = FrameType.CONTINUATION.getIdByte();
                 }
                 if (state == State.COMPLETE) {
                     header[4] += FLAG_END_OF_HEADERS;
@@ -430,7 +426,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         synchronized (socketWrapper) {
             byte[] header = new byte[9];
             ByteUtil.setThreeBytes(header, 0, len);
-            header[3] = FRAME_TYPE_DATA;
+            header[3] = FrameType.DATA.getIdByte();
             if (stream.getOutputBuffer().isFinished()) {
                 header[4] = FLAG_END_OF_STREAM;
             }
@@ -460,7 +456,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             if (windowSize < 1 || backLogSize > 0) {
                 // Has this stream been granted an allocation
                 int[] value = backLogStreams.remove(stream);
-                if (value[1] > 0) {
+                if (value != null && value[1] > 0) {
                     result = value[1];
                     value[0] = 0;
                     value[1] = 1;
@@ -811,7 +807,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void swallow(int streamId, int frameType, int flags, int size) throws IOException {
+    public void swallow(int streamId, FrameType frameType, int flags, int size) throws IOException {
         swallow(size);
     }
 }

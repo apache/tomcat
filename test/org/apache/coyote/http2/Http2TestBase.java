@@ -527,7 +527,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void swallow(int streamId, int frameType, int flags, int size) {
+        public void swallow(int streamId, FrameType frameType, int flags, int size) {
             trace.append(streamId);
             trace.append(",");
             trace.append(frameType);
@@ -537,6 +537,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             trace.append(size);
             trace.append("\n");
         }
+
 
         public void clearTrace() {
             trace = new StringBuffer();
