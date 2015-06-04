@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * See <a href="https://tools.ietf.org/html/rfc7540#section-5.1">state
  * diagram</a> in RFC 7540.
@@ -23,13 +25,20 @@ package org.apache.coyote.http2;
  * The following additions are supported by this state machine:
  * <ul>
  * <li>differentiate between closed (normal) and closed caused by reset</li>
- * <li>allow a transition from idle to closed if reset is sent or received</li>
  * </ul>
  *
  */
 public class StreamStateMachine {
 
+    private static final StringManager sm = StringManager.getManager(StreamStateMachine.class);
+
+    private final Stream stream;
     private State state = State.IDLE;
+
+
+    public StreamStateMachine(Stream stream) {
+        this.stream = stream;
+    }
 
 
     public synchronized void sendPushPromise() {
@@ -111,6 +120,11 @@ public class StreamStateMachine {
 
 
     public synchronized void recieveReset() {
+        if (state == State.IDLE) {
+            // This should never happen
+            // TODO: ProtocolExcpetion? i18n
+            throw new IllegalStateException();
+        }
         state = State.CLOSED_RESET;
     }
 
@@ -130,14 +144,52 @@ public class StreamStateMachine {
     }
 
 
+    public synchronized void receivedWindowUpdate() throws Http2Exception {
+        // No state change. Just checks state is valid for receiving window
+        // update.
+        if (!state.isWindowUpdatePermitted()) {
+            throw new Http2Exception(sm.getString("streamStateMachine.invalidFrame.windowUpdate",
+                    stream.getConnectionId(), stream.getIdentifier(), state),
+                    0, ErrorCode.PROTOCOL_ERROR);
+        }
+    }
+
+
+    public synchronized void receivedData() throws Http2Exception {
+        // No state change. Just checks state is valid for receiving window
+        // update.
+        if (!state.isDataPermitted()) {
+            throw new Http2Exception(sm.getString("streamStateMachine.invalidFrame.data",
+                    stream.getConnectionId(), stream.getIdentifier(), state),
+                    0, ErrorCode.PROTOCOL_ERROR);
+        }
+    }
+
+
     private enum State {
-        IDLE,
-        OPEN,
-        RESERVED_LOCAL,
-        RESERVED_REMOTE,
-        HALF_CLOSED_LOCAL,
-        HALF_CLOSED_REMOTE,
-        CLOSED,
-        CLOSED_RESET
+        IDLE               (false, false),
+        OPEN               ( true,  true),
+        RESERVED_LOCAL     ( true, false),
+        RESERVED_REMOTE    (false, false),
+        HALF_CLOSED_LOCAL  ( true,  true),
+        HALF_CLOSED_REMOTE ( true, false),
+        CLOSED             (false, false),
+        CLOSED_RESET       ( true,  true);
+
+        private final boolean windowUpdatePermitted;
+        private final boolean dataPermitted;
+
+        private State(boolean windowUpdatePermitted, boolean dataPermitted) {
+            this.windowUpdatePermitted = windowUpdatePermitted;
+            this.dataPermitted = dataPermitted;
+        }
+
+        public boolean isWindowUpdatePermitted() {
+            return windowUpdatePermitted;
+        }
+
+        public boolean isDataPermitted() {
+            return dataPermitted;
+        }
     }
 }
