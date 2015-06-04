@@ -70,6 +70,7 @@ class Http2Parser {
         return readFrame(block, null);
     }
 
+
     private boolean readFrame(boolean block, FrameType expected) throws IOException {
         if (!input.fill(block, frameHeaderBuffer)) {
             return false;
@@ -93,7 +94,7 @@ class Http2Parser {
             readPriorityFrame(streamId);
             break;
         case RST:
-            readRstFrame(streamId, payloadSize);
+            readRstFrame(streamId);
             break;
         case SETTINGS:
             readSettingsFrame(flags, payloadSize);
@@ -220,7 +221,7 @@ class Http2Parser {
     }
 
 
-    private void readRstFrame(int streamId, int payloadSize) throws IOException {
+    private void readRstFrame(int streamId) throws IOException {
         byte[] payload = new byte[4];
         input.fill(true, payload);
 
@@ -257,7 +258,6 @@ class Http2Parser {
 
 
     private void readPingFrame(int flags) throws IOException {
-
         if (Flags.isAck(flags)) {
             // Read the payload
             byte[] payload = new byte[8];
@@ -270,7 +270,6 @@ class Http2Parser {
 
 
     private void readGoawayFrame(int payloadSize) throws IOException {
-
         byte[] payload = new byte[payloadSize];
         input.fill(true, payload);
 
@@ -283,9 +282,8 @@ class Http2Parser {
         output.goaway(lastStreamId, errorCode, debugData);
     }
 
-    private void readWindowUpdateFrame(int streamId)
-            throws IOException {
 
+    private void readWindowUpdateFrame(int streamId) throws IOException {
         byte[] payload = new byte[4];
         input.fill(true,  payload);
         int windowSizeIncrement = ByteUtil.get31Bits(payload, 0);
