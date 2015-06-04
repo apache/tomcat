@@ -90,30 +90,7 @@ class Http2Parser {
         int flags = ByteUtil.getOneByte(frameHeaderBuffer, 4);
         int streamId = ByteUtil.get31Bits(frameHeaderBuffer, 5);
 
-        if (expected != null && frameType != expected.intValue()) {
-            throw new Http2Exception(sm.getString("http2Parser.processFrame.unexpectedType",
-                    expected, Integer.toString(frameType)),
-                    streamId, ErrorCode.PROTOCOL_ERROR);
-        }
-
-        if (payloadSize > maxPayloadSize) {
-            throw new Http2Exception(sm.getString("http2Parser.payloadTooBig",
-                    Integer.toString(payloadSize), Integer.toString(maxPayloadSize)),
-                    streamId, ErrorCode.FRAME_SIZE_ERROR);
-        }
-
-        if (headersCurrentStream != -1) {
-            if (headersCurrentStream != streamId) {
-                throw new Http2Exception(sm.getString("http2Parser.headers.wrongStream",
-                        connectionId, Integer.toString(headersCurrentStream),
-                        Integer.toString(streamId)), streamId, ErrorCode.COMPRESSION_ERROR);
-            }
-            if (frameType != FRAME_TYPE_CONTINUATION) {
-                throw new Http2Exception(sm.getString("http2Parser.headers.wrongFrameType",
-                        connectionId, Integer.toString(headersCurrentStream),
-                        Integer.toString(frameType)), streamId, ErrorCode.COMPRESSION_ERROR);
-            }
-        }
+        validateFrame(expected, frameType, streamId, flags, payloadSize);
 
         switch (frameType) {
         case FRAME_TYPE_DATA:
@@ -153,12 +130,6 @@ class Http2Parser {
 
 
     private void readDataFrame(int streamId, int flags, int payloadSize) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-
         // Validate the stream
         if (streamId == 0) {
             throw new Http2Exception(sm.getString("http2Parser.processFrameData.invalidStream"),
@@ -197,12 +168,6 @@ class Http2Parser {
 
 
     private void readHeadersFrame(int streamId, int flags, int payloadSize) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-
         // Validate the stream
         if (streamId == 0) {
             throw new Http2Exception(sm.getString("http2Parser.processFrameHeaders.invalidStream"),
@@ -264,11 +229,6 @@ class Http2Parser {
 
 
     private void readPriorityFrame(int streamId, int flags, int payloadSize) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
         // Validate the frame
         if (streamId == 0) {
             throw new Http2Exception(sm.getString("http2Parser.processFramePriority.invalidStream"),
@@ -291,12 +251,6 @@ class Http2Parser {
 
 
     private void readSettingsFrame(int streamId, int flags, int payloadSize) throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-
         // Validate the frame
         if (streamId != 0) {
             throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.invalidStream",
@@ -326,24 +280,14 @@ class Http2Parser {
     }
 
 
-    private void readPushPromiseFrame(int streamId, int flags, int payloadSize) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-
+    private void readPushPromiseFrame(int streamId, int flags, int payloadSize) throws IOException {
         // TODO: Should never be received by a server
+        swallow(payloadSize);
     }
 
 
     private void readPingFrame(int streamId, int flags, int payloadSize)
             throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
         // Validate the frame
         if (streamId != 0) {
             throw new Http2Exception(sm.getString("http2Parser.processFramePing.invalidStream",
@@ -366,12 +310,6 @@ class Http2Parser {
 
     private void readGoawayFrame(int streamId, int flags, int payloadSize)
             throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-
         // Validate the frame
         if (streamId != 0) {
             throw new Http2Exception(sm.getString("http2Parser.processFrameGoaway.invalidStream",
@@ -397,11 +335,6 @@ class Http2Parser {
 
     private void readWindowUpdateFrame(int streamId, int flags, int payloadSize)
             throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
         // Validate the frame
         if (payloadSize != 4) {
             // Use stream 0 since this is always a connection error
@@ -430,12 +363,6 @@ class Http2Parser {
 
     private void readContinuationFrame(int streamId, int flags, int payloadSize)
             throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
-                    Integer.toString(payloadSize)));
-        }
-
         if (streamId == 0) {
             throw new Http2Exception(sm.getString(
                     "http2Parser.processFrameContinuation.invalidStream", connectionId),
@@ -508,6 +435,43 @@ class Http2Parser {
             input.fill(true, buffer, 0, thisTime);
             read += thisTime;
         }
+    }
+
+
+    private void validateFrame(Integer expected, int frameType, int streamId, int flags,
+            int payloadSize) throws Http2Exception {
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
+        }
+
+        if (expected != null && frameType != expected.intValue()) {
+            throw new Http2Exception(sm.getString("http2Parser.processFrame.unexpectedType",
+                    expected, Integer.toString(frameType)),
+                    streamId, ErrorCode.PROTOCOL_ERROR);
+        }
+
+        if (payloadSize > maxPayloadSize) {
+            throw new Http2Exception(sm.getString("http2Parser.payloadTooBig",
+                    Integer.toString(payloadSize), Integer.toString(maxPayloadSize)),
+                    streamId, ErrorCode.FRAME_SIZE_ERROR);
+        }
+
+        if (headersCurrentStream != -1) {
+            if (headersCurrentStream != streamId) {
+                throw new Http2Exception(sm.getString("http2Parser.headers.wrongStream",
+                        connectionId, Integer.toString(headersCurrentStream),
+                        Integer.toString(streamId)), streamId, ErrorCode.COMPRESSION_ERROR);
+            }
+            if (frameType != FRAME_TYPE_CONTINUATION) {
+                throw new Http2Exception(sm.getString("http2Parser.headers.wrongFrameType",
+                        connectionId, Integer.toString(headersCurrentStream),
+                        Integer.toString(frameType)), streamId, ErrorCode.COMPRESSION_ERROR);
+            }
+        }
+
     }
 
 
