@@ -30,8 +30,8 @@ import org.junit.Test;
  */
 public class TestHttp2Section_3_2 extends Http2TestBase {
 
-    // Note: Tests for zero/multiple HTTP2-Settings fields can be found in
-    //       TestHttp2Section_3_2_1
+    // Note: Tests for zero/multiple HTTP2-Settings fields can be found below
+    //       in the tests for section 3.2.1
 
     // TODO: Test initial requests with bodies of various sizes
 
@@ -115,4 +115,66 @@ public class TestHttp2Section_3_2 extends Http2TestBase {
         openClientConnection();
         doHttpUpgrade();
     }
+
+
+    //------------------------------------------------------------ Section 3.2.1
+
+    @Test
+    public void testZeroHttp2Settings() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade(Http2TestBase.DEFAULT_CONNECTION_HEADER_VALUE, "h2c", "", false);
+        parseHttp11Response();
+    }
+
+
+    @Test
+    public void testMultipleHttp2Settings() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade(Http2TestBase.DEFAULT_CONNECTION_HEADER_VALUE, "h2c",
+                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER +
+                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, false);
+        parseHttp11Response();
+    }
+
+
+    @Test
+    public void testMissingConnectionValue() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade("Upgrade", "h2c", Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, false);
+        parseHttp11Response();
+    }
+
+
+    @Test
+    public void testSplitConnectionValue01() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade("Upgrade\r\nConnection: HTTP2-Settings", "h2c",
+                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, true);
+        sendClientPreface();
+        validateHttp2InitialResponse();
+    }
+
+
+    @Test
+    public void testSplitConnectionValue02() throws Exception {
+        enableHttp2();
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade("HTTP2-Settings\r\nConnection: Upgrade", "h2c",
+                Http2TestBase.EMPTY_HTTP2_SETTINGS_HEADER, true);
+        sendClientPreface();
+        validateHttp2InitialResponse();
+    }
+
+    // No need to test how trailing '=' are handled here. HTTP2Settings payloads
+    // are always a multiple of 6 long which means valid payloads never end in
+    // '='. Invalid payloads will be rejected anyway.
 }
