@@ -111,7 +111,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
         buildSimpleRequest(frameHeader, headersPayload, streamId);
-        writeSimpleRequest(frameHeader, headersPayload);
+        writeFrame(frameHeader, headersPayload);
     }
 
 
@@ -134,10 +134,47 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void writeSimpleRequest(byte[] frameHeader, ByteBuffer headersPayload)
+    protected void buildSimpleRequestPart1(byte[] frameHeader, ByteBuffer headersPayload,
+            int streamId) {
+        MimeHeaders headers = new MimeHeaders();
+        headers.addValue(":method").setString("GET");
+        headers.addValue(":path").setString("/any");
+        hpackEncoder.encode(headers, headersPayload);
+
+        headersPayload.flip();
+
+        ByteUtil.setThreeBytes(frameHeader, 0, headersPayload.limit());
+        // Header frame is type 0x01
+        frameHeader[3] = 0x01;
+        // Flags. end of stream (0x01)
+        frameHeader[4] = 0x01;
+        // Stream id
+        ByteUtil.set31Bits(frameHeader, 5, streamId);
+    }
+
+
+    protected void buildSimpleRequestPart2(byte[] frameHeader, ByteBuffer headersPayload,
+            int streamId) {
+        MimeHeaders headers = new MimeHeaders();
+        headers.addValue(":authority").setString("localhost:" + getPort());
+        hpackEncoder.encode(headers, headersPayload);
+
+        headersPayload.flip();
+
+        ByteUtil.setThreeBytes(frameHeader, 0, headersPayload.limit());
+        // Continuation frame is type 0x09
+        frameHeader[3] = 0x09;
+        // Flags. end of headers (0x04)
+        frameHeader[4] = 0x04;
+        // Stream id
+        ByteUtil.set31Bits(frameHeader, 5, streamId);
+    }
+
+
+    protected void writeFrame(byte[] header, ByteBuffer payload)
             throws IOException {
-        os.write(frameHeader);
-        os.write(headersPayload.array(), headersPayload.arrayOffset(), headersPayload.limit());
+        os.write(header);
+        os.write(payload.array(), payload.arrayOffset(), payload.limit());
         os.flush();
     }
 
