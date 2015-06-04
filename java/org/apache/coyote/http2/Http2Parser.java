@@ -40,6 +40,7 @@ class Http2Parser {
     private static final int FRAME_TYPE_PING = 6;
     private static final int FRAME_TYPE_GOAWAY = 7;
     private static final int FRAME_TYPE_WINDOW_UPDATE = 8;
+    private static final int FRAME_TYPE_CONTINUATION = 9;
 
     private final String connectionId;
     private final Input input;
@@ -48,6 +49,8 @@ class Http2Parser {
 
     private volatile HpackDecoder hpackDecoder;
     private final ByteBuffer headerReadBuffer = ByteBuffer.allocate(1024);
+    private volatile int headersCurrentStream = -1;
+    private volatile boolean headersEndStream = false;
 
     private volatile boolean readPreface = false;
     private volatile int maxPayloadSize = ConnectionSettings.DEFAULT_MAX_FRAME_SIZE;
@@ -98,6 +101,19 @@ class Http2Parser {
                     streamId, ErrorCode.FRAME_SIZE_ERROR);
         }
 
+        if (headersCurrentStream != -1) {
+            if (headersCurrentStream != streamId) {
+                throw new Http2Exception(sm.getString("http2Parser.headers.wrongStream",
+                        connectionId, Integer.toString(headersCurrentStream),
+                        Integer.toString(streamId)), streamId, ErrorCode.COMPRESSION_ERROR);
+            }
+            if (frameType != FRAME_TYPE_CONTINUATION) {
+                throw new Http2Exception(sm.getString("http2Parser.headers.wrongFrameType",
+                        connectionId, Integer.toString(headersCurrentStream),
+                        Integer.toString(frameType)), streamId, ErrorCode.COMPRESSION_ERROR);
+            }
+        }
+
         switch (frameType) {
         case FRAME_TYPE_DATA:
             readDataFrame(streamId, flags, payloadSize);
@@ -119,6 +135,9 @@ class Http2Parser {
             break;
         case FRAME_TYPE_WINDOW_UPDATE:
             readWindowUpdateFrame(streamId, flags, payloadSize);
+            break;
+        case FRAME_TYPE_CONTINUATION:
+            readContinuationFrame(streamId, flags, payloadSize);
             break;
         // TODO: Missing types
         default:
@@ -145,10 +164,9 @@ class Http2Parser {
         // Process the Stream
         int padLength = 0;
 
-        boolean endOfStream = (flags & 0x01) > 0;
-        boolean padding = (flags & 0x08) > 0;
+        boolean endOfStream = Flags.isEndOfStream(flags);
 
-        if (padding) {
+        if (Flags.hasPadding(flags)) {
             byte[] b = new byte[1];
             input.fill(true, b);
             padLength = b[0] & 0xFF;
@@ -187,18 +205,14 @@ class Http2Parser {
                     0, ErrorCode.PROTOCOL_ERROR);
         }
 
-        // TODO Handle end of headers flag
-        // TODO Handle end of stream flag
-        // TODO Handle continuation frames
-
         if (hpackDecoder == null) {
             hpackDecoder = output.getHpackDecoder();
         }
         hpackDecoder.setHeaderEmitter(output.headersStart(streamId));
 
         int padLength = 0;
-        boolean padding = (flags & 0x08) > 0;
-        boolean priority = (flags & 0x20) > 0;
+        boolean padding = Flags.hasPadding(flags);
+        boolean priority = Flags.hasPriority(flags);
         int optionalLen = 0;
         if (padding) {
             optionalLen = 1;
@@ -223,33 +237,25 @@ class Http2Parser {
             payloadSize -= optionalLen;
         }
 
-        while (payloadSize > 0) {
-            int toRead = Math.min(headerReadBuffer.remaining(), payloadSize);
-            // headerReadBuffer in write mode
-            input.fill(true, headerReadBuffer, toRead);
-            // switch to read mode
-            headerReadBuffer.flip();
-            try {
-                hpackDecoder.decode(headerReadBuffer);
-            } catch (HpackException hpe) {
-                throw new Http2Exception(
-                        sm.getString("http2Parser.processFrameHeaders.decodingFailed"),
-                        0, ErrorCode.COMPRESSION_ERROR);
-            }
-            // switches to write mode
-            headerReadBuffer.compact();
-            payloadSize -= toRead;
-        }
-        // Should be empty at this point
-        if (headerReadBuffer.position() > 0) {
-            throw new Http2Exception(
-                    sm.getString("http2Parser.processFrameHeaders.decodingDataLeft"),
-                    0, ErrorCode.COMPRESSION_ERROR);
-        }
+        boolean endOfHeaders = Flags.isEndOfHeaders(flags);
+
+        readHeaderBlock(payloadSize, endOfHeaders);
 
         swallow(padLength);
 
-        output.headersEnd(streamId);
+        if (endOfHeaders) {
+            output.headersEnd(streamId);
+        } else {
+            headersCurrentStream = streamId;
+        }
+
+        if (Flags.isEndOfStream(flags)) {
+            if (headersCurrentStream == -1) {
+                output.endOfStream(streamId);
+            } else {
+                headersEndStream = true;
+            }
+        }
     }
 
 
@@ -296,7 +302,7 @@ class Http2Parser {
             throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.invalidPayloadSize",
                     Integer.toString(payloadSize)), 0, ErrorCode.FRAME_SIZE_ERROR);
         }
-        boolean ack = (flags & 0x1) != 0;
+        boolean ack = Flags.isAck(flags);
         if (payloadSize > 0 && ack) {
             throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.ackWithNonZeroPayload"),
                     0, ErrorCode.FRAME_SIZE_ERROR);
@@ -332,7 +338,7 @@ class Http2Parser {
             throw new Http2Exception(sm.getString("http2Parser.processFramePing.invalidPayloadSize",
                     Integer.toString(payloadSize)), 0, ErrorCode.FRAME_SIZE_ERROR);
         }
-        if ((flags & 0x1) == 0) {
+        if (Flags.isAck(flags)) {
             // Read the payload
             byte[] payload = new byte[8];
             input.fill(true, payload);
@@ -404,6 +410,68 @@ class Http2Parser {
         }
 
         output.incrementWindowSize(streamId, windowSizeIncrement);
+    }
+
+
+    private void readContinuationFrame(int streamId, int flags, int payloadSize)
+            throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFrame", connectionId,
+                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(payloadSize)));
+        }
+
+        if (streamId == 0) {
+            throw new Http2Exception(sm.getString(
+                    "http2Parser.processFrameContinuation.invalidStream", connectionId),
+                    0, ErrorCode.PROTOCOL_ERROR);
+        }
+
+        if (headersCurrentStream == -1) {
+            // No headers to continue
+            throw new Http2Exception(sm.getString(
+                    "http2Parser.processFrameContinuation.notExpected", connectionId,
+                    Integer.toString(streamId)), 0, ErrorCode.PROTOCOL_ERROR);
+        }
+
+        boolean endOfHeaders = Flags.isEndOfHeaders(flags);
+        readHeaderBlock(payloadSize, endOfHeaders);
+
+        if (endOfHeaders) {
+            output.headersEnd(streamId);
+            headersCurrentStream = -1;
+            if (headersEndStream) {
+                output.endOfStream(streamId);
+                headersEndStream = false;
+            }
+        }
+    }
+
+
+    private void readHeaderBlock(int payloadSize, boolean endOfHeaders) throws IOException {
+        while (payloadSize > 0) {
+            int toRead = Math.min(headerReadBuffer.remaining(), payloadSize);
+            // headerReadBuffer in write mode
+            input.fill(true, headerReadBuffer, toRead);
+            // switch to read mode
+            headerReadBuffer.flip();
+            try {
+                hpackDecoder.decode(headerReadBuffer);
+            } catch (HpackException hpe) {
+                throw new Http2Exception(
+                        sm.getString("http2Parser.processFrameHeaders.decodingFailed"),
+                        0, ErrorCode.COMPRESSION_ERROR);
+            }
+            // switches to write mode
+            headerReadBuffer.compact();
+            payloadSize -= toRead;
+        }
+
+        if (headerReadBuffer.position() > 0 && endOfHeaders) {
+            throw new Http2Exception(
+                    sm.getString("http2Parser.processFrameHeaders.decodingDataLeft"),
+                    0, ErrorCode.COMPRESSION_ERROR);
+        }
     }
 
 
