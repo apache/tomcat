@@ -221,8 +221,11 @@ class Http2Parser {
 
 
     private void readRstFrame(int streamId, int payloadSize) throws IOException {
-        // TODO: Process this
-        swallow(payloadSize);
+        byte[] payload = new byte[4];
+        input.fill(true, payload);
+
+        long errorCode = ByteUtil.getFourBytes(payload, 0);
+        output.reset(streamId, errorCode);
     }
 
 
@@ -516,6 +519,9 @@ class Http2Parser {
         HeaderEmitter headersStart(int streamId);
         void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight);
         void headersEnd(int streamId);
+
+        // Reset frames
+        void reset(int streamId, long errorCode);
 
         // Settings frames
         void setting(int identifier, long value) throws IOException;

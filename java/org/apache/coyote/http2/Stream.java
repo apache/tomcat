@@ -69,8 +69,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     public void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
-        if (getLog().isDebugEnabled()) {
-            getLog().debug(sm.getString("abstractStream.reprioritisation.debug",
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("stream.reprioritisation.debug",
                     getConnectionId(), getIdentifier(), Boolean.toString(exclusive),
                     parent.getIdentifier(), Integer.toString(weight)));
         }
@@ -93,6 +93,15 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
         parent.addChild(this);
         this.weight = weight;
+    }
+
+
+    public void reset(long errorCode) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("stream.reset.debug", getConnectionId(), getIdentifier(),
+                    Long.toString(errorCode)));
+        }
+        state.recieveReset();
     }
 
 
@@ -187,12 +196,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-
-    @Override
-    protected final Log getLog() {
-        return log;
     }
 
 
