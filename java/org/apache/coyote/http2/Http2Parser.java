@@ -130,6 +130,7 @@ class Http2Parser {
             break;
         case FRAME_TYPE_PUSH_PROMISE:
             readPushPromiseFrame(streamId, flags, payloadSize);
+            break;
         case FRAME_TYPE_PING:
             readPingFrame(streamId, flags, payloadSize);
             break;
@@ -325,7 +326,7 @@ class Http2Parser {
     }
 
 
-    private void readPushPromiseFrame(int streamId, int flags, int payloadSize) throws IOException {
+    private void readPushPromiseFrame(int streamId, int flags, int payloadSize) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.processFrame", connectionId,
                     Integer.toString(streamId), Integer.toString(flags),
