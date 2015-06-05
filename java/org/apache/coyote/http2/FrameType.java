@@ -61,7 +61,7 @@ public enum FrameType {
             throw new Http2Exception(sm.getString("frameType.checkStream.invalidForZero",
                     connectionId, this), 0, ErrorCode.PROTOCOL_ERROR);
         } else if (streamId != 0 && !streamNonZero) {
-            throw new Http2Exception(sm.getString("frameType.checkStream.invalidForZero",
+            throw new Http2Exception(sm.getString("frameType.checkStream.invalidForNonZero",
                     connectionId, Integer.valueOf(streamId), this), 0, ErrorCode.PROTOCOL_ERROR);
         }
     }
