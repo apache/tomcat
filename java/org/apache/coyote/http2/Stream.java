@@ -66,7 +66,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             this.coyoteRequest = coyoteRequest;
             this.inputBuffer = null;
             // Headers have been populated by this point
-            state.receivedEndOfHeaders();
+            state.receivedStartOfHeaders();
             // TODO Assuming the body has been read at this point is not valid
             state.recievedEndOfStream();
         }
@@ -235,8 +235,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void receivedEndOfHeaders() {
-        state.receivedEndOfHeaders();
+    void receivedStartOfHeaders() {
+        state.receivedStartOfHeaders();
     }
 
 

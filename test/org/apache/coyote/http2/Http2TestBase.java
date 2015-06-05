@@ -355,6 +355,23 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    void sendRst(int streamId, long errorCode) throws IOException {
+        byte[] rstFrame = new byte[13];
+        // length is always 4
+        rstFrame[2] = 0x04;
+        // type is always 3
+        rstFrame[3] = 0x03;
+        // no flags
+        // Stream ID
+        ByteUtil.set31Bits(rstFrame, 5, streamId);
+        // Payload
+        ByteUtil.setFourBytes(rstFrame, 9, errorCode);
+
+        os.write(rstFrame);
+        os.flush();
+    }
+
+
     void sendPing() throws IOException {
         os.write(PING_FRAME);
         os.flush();
