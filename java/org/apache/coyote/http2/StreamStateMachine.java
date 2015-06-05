@@ -113,21 +113,11 @@ public class StreamStateMachine {
 
 
     public synchronized void sendReset() {
-        if (state == State.CLOSED) {
-            // This should never happen
-            // TODO: ProtocolExcpetion? i18n
-            throw new IllegalStateException();
-        }
-        state = State.CLOSED_RESET;
+        state = State.CLOSED;
     }
 
 
     public synchronized void recieveReset() {
-        if (state == State.IDLE) {
-            // This should never happen
-            // TODO: ProtocolExcpetion? i18n
-            throw new IllegalStateException();
-        }
         state = State.CLOSED_RESET;
     }
 
