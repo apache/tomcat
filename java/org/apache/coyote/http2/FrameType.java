@@ -72,7 +72,7 @@ public enum FrameType {
         if (payloadSizeValidator != null && !payloadSizeValidator.test(payloadSize)) {
             throw new Http2Exception(sm.getString("frameType.checkPayloadSize",
                     connectionId, Integer.toString(streamId), this, Integer.toString(payloadSize)),
-                    0, ErrorCode.PROTOCOL_ERROR);
+                    0, ErrorCode.FRAME_SIZE_ERROR);
         }
     }
 
