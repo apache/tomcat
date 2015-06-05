@@ -138,13 +138,13 @@ class Http2Parser {
         if (dest == null) {
             swallow(payloadSize);
             if (endOfStream) {
-                output.endOfStream(streamId);
+                output.receiveEndOfStream(streamId);
             }
         } else {
             synchronized (dest) {
                 input.fill(true, dest, payloadSize);
                 if (endOfStream) {
-                    output.endOfStream(streamId);
+                    output.receiveEndOfStream(streamId);
                 }
                 dest.notifyAll();
             }
@@ -200,7 +200,7 @@ class Http2Parser {
 
         if (Flags.isEndOfStream(flags)) {
             if (headersCurrentStream == -1) {
-                output.endOfStream(streamId);
+                output.receiveEndOfStream(streamId);
             } else {
                 headersEndStream = true;
             }
@@ -318,7 +318,7 @@ class Http2Parser {
             output.headersEnd(streamId);
             headersCurrentStream = -1;
             if (headersEndStream) {
-                output.endOfStream(streamId);
+                output.receiveEndOfStream(streamId);
                 headersEndStream = false;
             }
         }
@@ -494,7 +494,7 @@ class Http2Parser {
 
         // Data frames
         ByteBuffer getInputByteBuffer(int streamId, int payloadSize) throws Http2Exception;
-        void endOfStream(int streamId);
+        void receiveEndOfStream(int streamId);
 
         // Header frames
         HeaderEmitter headersStart(int streamId) throws Http2Exception;

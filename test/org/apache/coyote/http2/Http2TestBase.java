@@ -236,7 +236,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         input = new TestInput(is);
         output = new TestOutput();
-        parser = new Http2Parser("0", input, output);
+        parser = new Http2Parser("-1", input, output);
     }
 
 
@@ -442,7 +442,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void endOfStream(int streamId) {
+        public void receiveEndOfStream(int streamId) {
             lastStreamId = Integer.toString(streamId);
             trace.append(lastStreamId + "-EndOfStream\n");
         }

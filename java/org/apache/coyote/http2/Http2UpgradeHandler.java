@@ -131,7 +131,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         this.adapter = adapter;
         this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
 
-        // Initial HTTP request becomes stream 0.
+        // Initial HTTP request becomes stream 1.
         if (coyoteRequest != null) {
             Integer key = Integer.valueOf(1);
             Stream stream = new Stream(key, this, coyoteRequest);
@@ -423,6 +423,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             header[3] = FrameType.DATA.getIdByte();
             if (stream.getOutputBuffer().isFinished()) {
                 header[4] = FLAG_END_OF_STREAM;
+                stream.sendEndOfStream();
             }
             ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
             socketWrapper.write(true, header, 0, header.length);
@@ -716,10 +717,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void endOfStream(int streamId) {
+    public void receiveEndOfStream(int streamId) {
         Stream stream = getStream(streamId);
         if (stream != null) {
-            stream.setEndOfStream();
+            stream.receiveEndOfStream();
         }
     }
 
