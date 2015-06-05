@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.coyote.ProtocolException;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -43,7 +44,6 @@ class Http2Parser {
     private volatile int headersCurrentStream = -1;
     private volatile boolean headersEndStream = false;
 
-    private volatile boolean readPreface = false;
     private volatile int maxPayloadSize = ConnectionSettings.DEFAULT_MAX_FRAME_SIZE;
 
 
@@ -421,39 +421,23 @@ class Http2Parser {
 
     /**
      * Read and validate the connection preface from input using blocking IO.
-     *
-     * @return <code>true</code> if a valid preface was read, otherwise false.
      */
-    boolean readConnectionPreface() throws IOException {
-        if (readPreface) {
-            return true;
-        }
-
+    void readConnectionPreface() {
         byte[] data = new byte[CLIENT_PREFACE_START.length];
         try {
             input.fill(true, data);
-        } catch (IOException ioe) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("http2Parser.preface.io"), ioe);
-            }
-            return false;
-        }
 
-        for (int i = 0; i < CLIENT_PREFACE_START.length; i++) {
-            if (CLIENT_PREFACE_START[i] != data[i]) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http2Parser.preface.invalid",
-                            new String(data, StandardCharsets.ISO_8859_1)));
+            for (int i = 0; i < CLIENT_PREFACE_START.length; i++) {
+                if (CLIENT_PREFACE_START[i] != data[i]) {
+                    throw new ProtocolException(sm.getString("http2Parser.preface.invalid"));
                 }
-                return false;
             }
+
+            // Must always be followed by a settings frame
+            readFrame(true, FrameType.SETTINGS);
+        } catch (IOException ioe) {
+            throw new ProtocolException(sm.getString("http2Parser.preface.io"), ioe);
         }
-
-        // Must always be followed by a settings frame
-        readFrame(true, FrameType.SETTINGS);
-
-        readPreface = true;
-        return true;
     }
 
 

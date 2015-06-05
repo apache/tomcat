@@ -190,6 +190,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             throw new IllegalStateException(sm.getString("upgradeHandler.sendPrefaceFail"), ioe);
         }
 
+        // Make sure the client has sent a valid connection preface before we
+        // send the response to the original request over HTTP/2.
+        parser.readConnectionPreface();
+
         if (webConnection != null) {
             // Process the initial request on a container thread
             StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
@@ -227,12 +231,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         switch(status) {
         case OPEN_READ:
             try {
-                if (!parser.readConnectionPreface()) {
-                    close();
-                    result = SocketState.CLOSED;
-                    break;
-                }
-
                 while (parser.readFrame(false)) {
                 }
             } catch (Http2Exception h2e) {
