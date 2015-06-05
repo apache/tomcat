@@ -16,7 +16,10 @@
  */
 package org.apache.coyote.http2;
 
+import java.nio.ByteBuffer;
+
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -82,7 +85,39 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
 
     @Test
-    public void testClosedInvalidFrame() throws Exception {
+    @Ignore // Need to handle stream closes
+    public void testClosedInvalidFrame01() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Build the simple request
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleRequest(frameHeader, headersPayload, 3);
+
+        // Remove the end of stream and end of headers flags
+        frameHeader[4] = 0;
+
+        // Process the request
+        writeFrame(frameHeader, headersPayload);
+
+        // Send a rst
+        sendRst(3, ErrorCode.INTERNAL_ERROR.getErrorCode());
+
+        // Then try sending some data (which should fail)
+        sendData(3, new byte[] {});
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
+                        ErrorCode.STREAM_CLOSED.getErrorCode() + "]-["));
+    }
+
+
+    @Test
+    public void testClosedInvalidFrame02() throws Exception {
         http2Connect();
 
         // Stream 1 is closed. This should trigger a stream error

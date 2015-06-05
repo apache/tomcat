@@ -58,13 +58,13 @@ public class StreamStateMachine {
     }
 
 
-    public synchronized void sentEndOfHeaders() {
+    public synchronized void sentStartOfHeaders() {
         stateChange(State.IDLE, State.OPEN);
         stateChange(State.RESERVED_LOCAL, State.HALF_CLOSED_REMOTE);
     }
 
 
-    public synchronized void receivedEndOfHeaders() {
+    public synchronized void receivedStartOfHeaders() {
         stateChange(State.IDLE, State.OPEN);
         stateChange(State.RESERVED_REMOTE, State.HALF_CLOSED_LOCAL);
     }
@@ -82,6 +82,16 @@ public class StreamStateMachine {
     }
 
 
+    public synchronized void sendReset() {
+        stateChange(state, State.CLOSED_TX);
+    }
+
+
+    public synchronized void receiveReset() {
+        stateChange(state, State.CLOSED_RST);
+    }
+
+
     private void stateChange(State oldState, State newState) {
         if (state == oldState) {
             state = newState;
@@ -90,16 +100,6 @@ public class StreamStateMachine {
                         stream.getIdentifier(), oldState, newState));
             }
         }
-    }
-
-
-    public synchronized void sendReset() {
-        state = State.CLOSED_TX;
-    }
-
-
-    public synchronized void receiveReset() {
-        state = State.CLOSED_RST;
     }
 
 

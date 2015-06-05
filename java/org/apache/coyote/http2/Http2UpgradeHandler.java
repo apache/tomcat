@@ -133,6 +133,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         // Initial HTTP request becomes stream 1.
         if (coyoteRequest != null) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.upgrade", connectionId));
+            }
             Integer key = Integer.valueOf(1);
             Stream stream = new Stream(key, this, coyoteRequest);
             streams.put(key, stream);
@@ -238,9 +241,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("upgradeHandler.connectionError"), h2e);
                     }
-                    close(h2e);
+                    closeConnecion(h2e);
                     break;
                 } else {
+
                     // Stream error
                     // TODO Reset stream
                 }
@@ -263,7 +267,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 if (h2e.getStreamId() == 0) {
                     // Connection error
                     log.warn(sm.getString("upgradeHandler.connectionError"), h2e);
-                    close(h2e);
+                    closeConnecion(h2e);
                     break;
                 } else {
                     // Stream error
@@ -335,7 +339,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void close(Http2Exception h2e) {
+    private void closeConnecion(Http2Exception h2e) {
         // Write a GOAWAY frame.
         byte[] fixedPayload = new byte[8];
         // TODO needs to be correct value
@@ -729,6 +733,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     public HeaderEmitter headersStart(int streamId) throws Http2Exception {
         Stream stream = getStream(streamId);
         stream.checkState(FrameType.HEADERS);
+        stream.receivedStartOfHeaders();
         return stream;
     }
 
@@ -749,7 +754,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void headersEnd(int streamId) {
         Stream stream = getStream(streamId);
-        stream.receivedEndOfHeaders();
         // Process this stream on a container thread
         StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
         streamProcessor.setSslSupport(sslSupport);
