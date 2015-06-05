@@ -19,6 +19,8 @@ package org.apache.coyote.http2;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -33,107 +35,71 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class StreamStateMachine {
 
+    private static final Log log = LogFactory.getLog(StreamStateMachine.class);
     private static final StringManager sm = StringManager.getManager(StreamStateMachine.class);
 
     private final Stream stream;
-    private State state = State.IDLE;
+    private State state;
 
 
     public StreamStateMachine(Stream stream) {
         this.stream = stream;
+        stateChange(null, State.IDLE);
     }
 
 
     public synchronized void sendPushPromise() {
-        if (state == State.IDLE) {
-            state = State.RESERVED_LOCAL;
-        } else {
-            // TODO: ProtocolExcpetion? i18n
-            throw new IllegalStateException();
-        }
+        stateChange(State.IDLE, State.RESERVED_LOCAL);
     }
 
 
     public synchronized void receivePushPromis() {
-        if (state == State.IDLE) {
-            state = State.RESERVED_REMOTE;
-        } else {
-            // TODO: ProtocolExcpetion? i18n
-            throw new IllegalStateException();
-        }
+        stateChange(State.IDLE, State.RESERVED_REMOTE);
     }
 
 
     public synchronized void sendHeaders() {
-        if (state == State.IDLE) {
-            state = State.OPEN;
-        } else if (state == State.RESERVED_LOCAL) {
-            state = State.HALF_CLOSED_REMOTE;
-        } else {
-            // TODO: ProtocolExcpetion? i18n
-            throw new IllegalStateException();
-        }
+        stateChange(State.IDLE, State.OPEN);
+        stateChange(State.RESERVED_LOCAL, State.HALF_CLOSED_REMOTE);
     }
 
 
     public synchronized void receiveHeaders() {
-        if (state == State.IDLE) {
-            state = State.OPEN;
-        } else if (state == State.RESERVED_REMOTE) {
-            state = State.HALF_CLOSED_LOCAL;
-        } else {
-            // TODO: ProtocolExcpetion? i18n
-            throw new IllegalStateException();
-        }
+        stateChange(State.IDLE, State.OPEN);
+        stateChange(State.RESERVED_REMOTE, State.HALF_CLOSED_LOCAL);
     }
 
 
     public synchronized void sendEndOfStream() {
-        if (state == State.OPEN) {
-            state = State.HALF_CLOSED_LOCAL;
-        } else if (state == State.HALF_CLOSED_REMOTE) {
-            state = State.CLOSED;
-        } else {
-            // TODO: ProtocolExcpetion? i18n
-            throw new IllegalStateException();
-        }
+        stateChange(State.OPEN, State.HALF_CLOSED_LOCAL);
+        stateChange(State.HALF_CLOSED_REMOTE, State.CLOSED_TX);
     }
 
 
     public synchronized void recieveEndOfStream() {
-        if (state == State.OPEN) {
-            state = State.HALF_CLOSED_REMOTE;
-        } else if (state == State.HALF_CLOSED_LOCAL) {
-            state = State.CLOSED;
-        } else {
-            // TODO: ProtocolExcpetion? i18n
-            throw new IllegalStateException();
+        stateChange(State.OPEN, State.HALF_CLOSED_REMOTE);
+        stateChange(State.HALF_CLOSED_LOCAL, State.CLOSED_RX);
+    }
+
+
+    private void stateChange(State oldState, State newState) {
+        if (state == oldState) {
+            state = newState;
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("streamStateMachine.debug.change", stream.getConnectionId(),
+                        stream.getIdentifier(), oldState, newState));
+            }
         }
     }
 
 
     public synchronized void sendReset() {
-        state = State.CLOSED;
+        state = State.CLOSED_TX;
     }
 
 
-    public synchronized void recieveReset() {
-        state = State.CLOSED_RESET;
-    }
-
-
-    public synchronized void receiveHeader() {
-        // Doesn't change state (that happens at the end of the headers when
-        // receiveHeaders() is called. This just checks that the stream is in a
-        // valid state to receive headers.
-        if (state == State.CLOSED_RESET) {
-            // Allow this. Client may not know that stream has been reset.
-        } else if (state == State.IDLE || state == State.RESERVED_REMOTE) {
-            // Allow these. This is normal operation.
-        } else {
-            // TODO: ProtocolExcpetion? i18n
-            throw new IllegalStateException();
-        }
+    public synchronized void receiveReset() {
+        state = State.CLOSED_RST;
     }
 
 
@@ -141,9 +107,15 @@ public class StreamStateMachine {
         // No state change. Checks that the frame type is valid for the current
         // state of this stream.
         if (!isFrameTypePermitted(frameType)) {
+            int errorStream;
+            if (state.connectionErrorForInvalidFrame) {
+                errorStream = 0;
+            } else {
+                errorStream = stream.getIdentifier().intValue();
+            }
             throw new Http2Exception(sm.getString("streamStateMachine.invalidFrame",
                     stream.getConnectionId(), stream.getIdentifier(), state, frameType),
-                    0, state.errorCodeForInvalidFrame);
+                    errorStream, state.errorCodeForInvalidFrame);
         }
     }
 
@@ -154,27 +126,31 @@ public class StreamStateMachine {
 
 
     private enum State {
-        IDLE               (ErrorCode.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY),
-        OPEN               (ErrorCode.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
+        IDLE               (true,  ErrorCode.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY),
+        OPEN               (true,  ErrorCode.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
                                     FrameType.PRIORITY, FrameType.RST, FrameType.PUSH_PROMISE,
                                     FrameType.WINDOW_UPDATE),
-        RESERVED_LOCAL     (ErrorCode.PROTOCOL_ERROR, FrameType.PRIORITY, FrameType.RST,
+        RESERVED_LOCAL     (true,  ErrorCode.PROTOCOL_ERROR, FrameType.PRIORITY, FrameType.RST,
                                     FrameType.WINDOW_UPDATE),
-        RESERVED_REMOTE    (ErrorCode.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY,
+        RESERVED_REMOTE    (true,  ErrorCode.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY,
                                     FrameType.RST),
-        HALF_CLOSED_LOCAL  (ErrorCode.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
+        HALF_CLOSED_LOCAL  (true,  ErrorCode.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
                                     FrameType.PRIORITY, FrameType.RST, FrameType.PUSH_PROMISE,
                                     FrameType.WINDOW_UPDATE),
-        HALF_CLOSED_REMOTE (ErrorCode.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
+        HALF_CLOSED_REMOTE (true,  ErrorCode.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
                                     FrameType.WINDOW_UPDATE),
-        CLOSED             (ErrorCode.PROTOCOL_ERROR, FrameType.PRIORITY, FrameType.RST,
-                                    FrameType.WINDOW_UPDATE),
-        CLOSED_RESET       (ErrorCode.PROTOCOL_ERROR, FrameType.PRIORITY);
+        CLOSED_RX          (true,  ErrorCode.STREAM_CLOSED, FrameType.PRIORITY),
+        CLOSED_RST         (false, ErrorCode.STREAM_CLOSED, FrameType.PRIORITY),
+        CLOSED_TX          (true,  ErrorCode.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
+                                    FrameType.WINDOW_UPDATE);
 
+        private final boolean connectionErrorForInvalidFrame;
         private final ErrorCode errorCodeForInvalidFrame;
         private final Set<FrameType> frameTypesPermitted = new HashSet<>();
 
-        private State(ErrorCode errorCode, FrameType... frameTypes) {
+        private State(boolean connectionErrorForInvalidFrame, ErrorCode errorCode,
+                FrameType... frameTypes) {
+            this.connectionErrorForInvalidFrame = connectionErrorForInvalidFrame;
             this.errorCodeForInvalidFrame = errorCode;
             for (FrameType frameType : frameTypes) {
                 frameTypesPermitted.add(frameType);

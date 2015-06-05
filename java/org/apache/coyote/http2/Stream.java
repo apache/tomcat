@@ -40,13 +40,13 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private final Http2UpgradeHandler handler;
     private final Request coyoteRequest;
     private final Response coyoteResponse = new Response();
-    private final StreamInputBuffer inputBuffer = new StreamInputBuffer();
+    private final StreamInputBuffer inputBuffer;
     private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
     private final StreamStateMachine state;
 
 
     public Stream(Integer identifier, Http2UpgradeHandler handler) {
-        this(identifier, handler, new Request());
+        this(identifier, handler, null);
     }
 
 
@@ -56,15 +56,22 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         setParentStream(handler);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
         state = new StreamStateMachine(this);
-        this.coyoteRequest = coyoteRequest;
-        this.coyoteRequest.setInputBuffer(inputBuffer);
-        this.coyoteResponse.setOutputBuffer(outputBuffer);
-        this.coyoteRequest.setResponse(coyoteResponse);
-        if (coyoteRequest.isFinished()) {
-            // Update the state machine
+        if (coyoteRequest == null) {
+            // HTTP/2 new request
+            this.coyoteRequest = new Request();
+            this.inputBuffer = new StreamInputBuffer();
+            this.coyoteRequest.setInputBuffer(inputBuffer);
+        } else {
+            // HTTP/1.1 upgrade
+            this.coyoteRequest = coyoteRequest;
+            this.inputBuffer = null;
+            // Headers have been populated by this point
             state.receiveHeaders();
+            // TODO Assuming the body has been read at this point is not valid
             state.recieveEndOfStream();
         }
+        this.coyoteResponse.setOutputBuffer(outputBuffer);
+        this.coyoteRequest.setResponse(coyoteResponse);
     }
 
 
@@ -101,7 +108,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             log.debug(sm.getString("stream.reset.debug", getConnectionId(), getIdentifier(),
                     Long.toString(errorCode)));
         }
-        state.recieveReset();
+        state.receiveReset();
     }
 
 
@@ -233,9 +240,15 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void setEndOfStream() {
+    void receiveEndOfStream() {
         state.recieveEndOfStream();
     }
+
+
+    void sendEndOfStream() {
+        state.sendEndOfStream();
+    }
+
 
     StreamOutputBuffer getOutputBuffer() {
         return outputBuffer;

@@ -73,7 +73,20 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // This should trigger a stream error
         sendData(3, new byte[] {});
+        parser.readFrame(true);
 
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
+                        ErrorCode.STREAM_CLOSED.getErrorCode() + "]-["));
+    }
+
+
+    @Test
+    public void testClosedInvalidFrame() throws Exception {
+        http2Connect();
+
+        // Stream 1 is closed. This should trigger a stream error
+        sendData(1, new byte[] {});
         parser.readFrame(true);
 
         Assert.assertTrue(output.getTrace(),
