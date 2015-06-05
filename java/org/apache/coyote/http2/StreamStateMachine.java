@@ -48,35 +48,35 @@ public class StreamStateMachine {
     }
 
 
-    public synchronized void sendPushPromise() {
+    public synchronized void sentPushPromise() {
         stateChange(State.IDLE, State.RESERVED_LOCAL);
     }
 
 
-    public synchronized void receivePushPromis() {
+    public synchronized void receivedPushPromis() {
         stateChange(State.IDLE, State.RESERVED_REMOTE);
     }
 
 
-    public synchronized void sendHeaders() {
+    public synchronized void sentEndOfHeaders() {
         stateChange(State.IDLE, State.OPEN);
         stateChange(State.RESERVED_LOCAL, State.HALF_CLOSED_REMOTE);
     }
 
 
-    public synchronized void receiveHeaders() {
+    public synchronized void receivedEndOfHeaders() {
         stateChange(State.IDLE, State.OPEN);
         stateChange(State.RESERVED_REMOTE, State.HALF_CLOSED_LOCAL);
     }
 
 
-    public synchronized void sendEndOfStream() {
+    public synchronized void sentEndOfStream() {
         stateChange(State.OPEN, State.HALF_CLOSED_LOCAL);
         stateChange(State.HALF_CLOSED_REMOTE, State.CLOSED_TX);
     }
 
 
-    public synchronized void recieveEndOfStream() {
+    public synchronized void recievedEndOfStream() {
         stateChange(State.OPEN, State.HALF_CLOSED_REMOTE);
         stateChange(State.HALF_CLOSED_LOCAL, State.CLOSED_RX);
     }

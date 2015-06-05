@@ -423,7 +423,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             header[3] = FrameType.DATA.getIdByte();
             if (stream.getOutputBuffer().isFinished()) {
                 header[4] = FLAG_END_OF_STREAM;
-                stream.sendEndOfStream();
+                stream.sentEndOfStream();
             }
             ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
             socketWrapper.write(true, header, 0, header.length);
@@ -720,7 +720,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     public void receiveEndOfStream(int streamId) {
         Stream stream = getStream(streamId);
         if (stream != null) {
-            stream.receiveEndOfStream();
+            stream.receivedEndOfStream();
         }
     }
 
@@ -749,7 +749,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void headersEnd(int streamId) {
         Stream stream = getStream(streamId);
-        stream.headersEnd();
+        stream.receivedEndOfHeaders();
         // Process this stream on a container thread
         StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
         streamProcessor.setSslSupport(sslSupport);
