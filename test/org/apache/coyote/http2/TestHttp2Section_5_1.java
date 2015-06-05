@@ -56,5 +56,31 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
     }
 
 
+    // TODO: reserved local
+    // TODO: reserved remote
+
+
+    @Test
+    public void halfClosedRemoteInvalidFrame() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+        http2Connect();
+
+        // This half-closes the stream since it includes the end of stream flag
+        sendSimpleRequest(3);
+        readSimpleResponse();
+        Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
+        output.clearTrace();
+
+        // This should trigger a stream error
+        sendData(3, new byte[] {});
+
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
+                        ErrorCode.STREAM_CLOSED.getErrorCode() + "]-["));
+    }
+
+
     // TODO: Invalid frames for each of the remaining states
 }

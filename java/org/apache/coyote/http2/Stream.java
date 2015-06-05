@@ -105,15 +105,17 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    void checkState(FrameType frameType) throws Http2Exception {
+        state.checkFrameType(frameType);
+    }
+
+
     @Override
     public void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
         // If this is zero then any thread that has been trying to write for
         // this stream will be waiting. Notify that thread it can continue. Use
         // notify all even though only one thread is waiting to be on the safe
         // side.
-        if (windowSizeIncrement > 0) {
-            state.receivedWindowUpdate();
-        }
         boolean notify = getWindowSize() == 0;
         super.incrementWindowSize(windowSizeIncrement);
         if (notify) {
@@ -221,8 +223,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    ByteBuffer getInputByteBuffer() throws Http2Exception {
-        state.receivedData();
+    ByteBuffer getInputByteBuffer() {
         return inputBuffer.getInBuffer();
     }
 
@@ -233,9 +234,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void setEndOfStream() {
-        // TODO This is temporary until the state machine for a stream is
-        // implemented
-        inputBuffer.endOfStream = true;
+        state.recieveEndOfStream();
     }
 
     StreamOutputBuffer getOutputBuffer() {
@@ -317,7 +316,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     }
                 } while (thisWrite < 1);
 
-                incrementWindowSize(-thisWrite);
+                decrementWindowSize(thisWrite);
 
                 // Do the write
                 handler.writeBody(Stream.this, buffer, thisWrite);
@@ -377,8 +376,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         // 'write mode'.
         private volatile ByteBuffer inBuffer;
 
-        private boolean endOfStream = false;
-
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
 
@@ -388,7 +385,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
             // Ensure that only one thread accesses inBuffer at a time
             synchronized (inBuffer) {
-                while (inBuffer.position() == 0 && !endOfStream) {
+                while (inBuffer.position() == 0 && !state.isFrameTypePermitted(FrameType.DATA)) {
                     // Need to block until some data is written
                     try {
                         inBuffer.wait();
@@ -403,7 +400,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     written = inBuffer.remaining();
                     inBuffer.get(outBuffer, 0, written);
                     inBuffer.clear();
-                } else if (endOfStream) {
+                } else if (state.isFrameTypePermitted(FrameType.DATA)) {
                     return -1;
                 } else {
                     // TODO Should never happen

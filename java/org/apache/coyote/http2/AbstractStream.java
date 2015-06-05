@@ -99,11 +99,16 @@ abstract class AbstractStream {
 
 
     /**
-s     * @param increment
+     * @param increment
      * @throws Http2Exception
      */
     protected void incrementWindowSize(int increment) throws Http2Exception {
         windowSize.addAndGet(increment);
+    }
+
+
+    protected void decrementWindowSize(int decrement) {
+        windowSize.addAndGet(-decrement);
     }
 
 

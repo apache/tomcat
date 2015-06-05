@@ -16,6 +16,9 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -144,52 +147,52 @@ public class StreamStateMachine {
     }
 
 
-    public synchronized void receivedWindowUpdate() throws Http2Exception {
-        // No state change. Just checks state is valid for receiving window
-        // update.
-        if (!state.isWindowUpdatePermitted()) {
-            throw new Http2Exception(sm.getString("streamStateMachine.invalidFrame.windowUpdate",
-                    stream.getConnectionId(), stream.getIdentifier(), state),
-                    0, ErrorCode.PROTOCOL_ERROR);
+    public synchronized void checkFrameType(FrameType frameType) throws Http2Exception {
+        // No state change. Checks that the frame type is valid for the current
+        // state of this stream.
+        if (!isFrameTypePermitted(frameType)) {
+            throw new Http2Exception(sm.getString("streamStateMachine.invalidFrame",
+                    stream.getConnectionId(), stream.getIdentifier(), state, frameType),
+                    0, state.errorCodeForInvalidFrame);
         }
     }
 
 
-    public synchronized void receivedData() throws Http2Exception {
-        // No state change. Just checks state is valid for receiving window
-        // update.
-        if (!state.isDataPermitted()) {
-            throw new Http2Exception(sm.getString("streamStateMachine.invalidFrame.data",
-                    stream.getConnectionId(), stream.getIdentifier(), state),
-                    0, ErrorCode.PROTOCOL_ERROR);
-        }
+    public synchronized boolean isFrameTypePermitted(FrameType frameType) {
+        return state.isFrameTypePermitted(frameType);
     }
 
 
     private enum State {
-        IDLE               (false, false),
-        OPEN               ( true,  true),
-        RESERVED_LOCAL     ( true, false),
-        RESERVED_REMOTE    (false, false),
-        HALF_CLOSED_LOCAL  ( true,  true),
-        HALF_CLOSED_REMOTE ( true, false),
-        CLOSED             (false, false),
-        CLOSED_RESET       ( true,  true);
+        IDLE               (ErrorCode.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY),
+        OPEN               (ErrorCode.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
+                                    FrameType.PRIORITY, FrameType.RST, FrameType.PUSH_PROMISE,
+                                    FrameType.WINDOW_UPDATE),
+        RESERVED_LOCAL     (ErrorCode.PROTOCOL_ERROR, FrameType.PRIORITY, FrameType.RST,
+                                    FrameType.WINDOW_UPDATE),
+        RESERVED_REMOTE    (ErrorCode.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY,
+                                    FrameType.RST),
+        HALF_CLOSED_LOCAL  (ErrorCode.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
+                                    FrameType.PRIORITY, FrameType.RST, FrameType.PUSH_PROMISE,
+                                    FrameType.WINDOW_UPDATE),
+        HALF_CLOSED_REMOTE (ErrorCode.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
+                                    FrameType.WINDOW_UPDATE),
+        CLOSED             (ErrorCode.PROTOCOL_ERROR, FrameType.PRIORITY, FrameType.RST,
+                                    FrameType.WINDOW_UPDATE),
+        CLOSED_RESET       (ErrorCode.PROTOCOL_ERROR, FrameType.PRIORITY);
 
-        private final boolean windowUpdatePermitted;
-        private final boolean dataPermitted;
+        private final ErrorCode errorCodeForInvalidFrame;
+        private final Set<FrameType> frameTypesPermitted = new HashSet<>();
 
-        private State(boolean windowUpdatePermitted, boolean dataPermitted) {
-            this.windowUpdatePermitted = windowUpdatePermitted;
-            this.dataPermitted = dataPermitted;
+        private State(ErrorCode errorCode, FrameType... frameTypes) {
+            this.errorCodeForInvalidFrame = errorCode;
+            for (FrameType frameType : frameTypes) {
+                frameTypesPermitted.add(frameType);
+            }
         }
 
-        public boolean isWindowUpdatePermitted() {
-            return windowUpdatePermitted;
-        }
-
-        public boolean isDataPermitted() {
-            return dataPermitted;
+        public boolean isFrameTypePermitted(FrameType frameType) {
+            return frameTypesPermitted.contains(frameType);
         }
     }
 }

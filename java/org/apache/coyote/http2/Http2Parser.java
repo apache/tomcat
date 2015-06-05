@@ -386,7 +386,7 @@ class Http2Parser {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.processFrame", connectionId,
-                    Integer.toString(streamId), Integer.toString(flags),
+                    Integer.toString(streamId), frameType, Integer.toString(flags),
                     Integer.toString(payloadSize)));
         }
 
@@ -497,12 +497,15 @@ class Http2Parser {
         void endOfStream(int streamId);
 
         // Header frames
-        HeaderEmitter headersStart(int streamId);
-        void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight);
+        HeaderEmitter headersStart(int streamId) throws Http2Exception;
         void headersEnd(int streamId);
 
+        // Priority frames (also headers)
+        void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight)
+                throws Http2Exception;
+
         // Reset frames
-        void reset(int streamId, long errorCode);
+        void reset(int streamId, long errorCode) throws Http2Exception;
 
         // Settings frames
         void setting(int identifier, long value) throws IOException;

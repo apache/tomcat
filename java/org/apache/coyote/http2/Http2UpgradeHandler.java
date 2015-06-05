@@ -458,7 +458,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    int reserveWindowSize(Stream stream, int toWrite) throws Http2Exception {
+    int reserveWindowSize(Stream stream, int toWrite) {
         int result;
         synchronized (backLogLock) {
             long windowSize = getWindowSize();
@@ -485,7 +485,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             } else {
                 result = toWrite;
             }
-            incrementWindowSize(-result);
+            decrementWindowSize(-result);
         }
         return result;
     }
@@ -710,6 +710,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         if (stream == null) {
             return null;
         }
+        stream.checkState(FrameType.DATA);
         return stream.getInputByteBuffer();
     }
 
@@ -724,15 +725,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public HeaderEmitter headersStart(int streamId) {
-        return getStream(streamId);
+    public HeaderEmitter headersStart(int streamId) throws Http2Exception {
+        Stream stream = getStream(streamId);
+        stream.checkState(FrameType.HEADERS);
+        return stream;
     }
 
 
     @Override
     public void reprioritise(int streamId, int parentStreamId,
-            boolean exclusive, int weight) {
+            boolean exclusive, int weight) throws Http2Exception {
         Stream stream = getStream(streamId);
+        stream.checkState(FrameType.PRIORITY);
         AbstractStream parentStream = getStream(parentStreamId);
         if (parentStream == null) {
             parentStream = this;
@@ -754,9 +758,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void reset(int streamId, long errorCode) {
+    public void reset(int streamId, long errorCode) throws Http2Exception  {
         Stream stream = getStream(streamId);
         if (stream != null) {
+            stream.checkState(FrameType.RST);
             stream.reset(errorCode);
         }
     }
@@ -814,6 +819,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     public void incrementWindowSize(int streamId, int increment) throws Http2Exception {
         AbstractStream stream = getStream(streamId);
         if (stream != null) {
+            if (streamId > 0) {
+                ((Stream) stream).checkState(FrameType.WINDOW_UPDATE);
+            }
             stream.incrementWindowSize(increment);
         }
     }
