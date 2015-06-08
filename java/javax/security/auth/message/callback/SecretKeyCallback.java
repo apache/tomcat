@@ -16,8 +16,8 @@
  */
 package javax.security.auth.message.callback;
 
-import javax.security.auth.callback.Callback;
 import javax.crypto.SecretKey;
+import javax.security.auth.callback.Callback;
 
 /**
  * A callback enabling an authentication module to request a secret key from the runtime, by supplying an alias.

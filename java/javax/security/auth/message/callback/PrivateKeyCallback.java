@@ -16,12 +16,12 @@
  */
 package javax.security.auth.message.callback;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.x500.X500Principal;
-
 import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.x500.X500Principal;
 
 /**
  * Callback that enables an authentication module to request a certificate chain and private key from the runtime.
