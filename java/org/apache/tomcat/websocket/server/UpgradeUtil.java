@@ -220,6 +220,9 @@ public class UpgradeUtil {
                         clazz);
             } else {
                 ep = new PojoEndpointServer();
+                // Need to make path params available to POJO
+                perSessionServerEndpointConfig.getUserProperties().put(
+                        PojoEndpointServer.POJO_PATH_PARAM_KEY, pathParams);
             }
         } catch (InstantiationException e) {
             throw new ServletException(e);

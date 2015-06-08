@@ -130,6 +130,11 @@
         Extend support for the <code>permessage-deflate</code> extension to the
         client implementation. 
       </add>
+      <fix>
+        <bug>57969</bug>: Provide path parameters to POJO via per session
+        <code>javax.websocket.server.ServerEndpointConfig</code> as they vary
+        between different requests. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
