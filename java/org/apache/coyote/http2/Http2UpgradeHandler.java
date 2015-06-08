@@ -414,6 +414,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 target.flip();
                 ByteUtil.setThreeBytes(header, 0, target.limit());
                 if (first) {
+                    first = false;
                     header[3] = FrameType.HEADERS.getIdByte();
                     if (stream.getOutputBuffer().hasNoBody()) {
                         header[4] = FLAG_END_OF_STREAM;
