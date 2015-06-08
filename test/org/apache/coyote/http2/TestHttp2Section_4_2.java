@@ -28,7 +28,42 @@ import org.junit.Test;
  */
 public class TestHttp2Section_4_2 extends Http2TestBase {
 
-    // TODO Exceeds SETTINGS_MAX_FRAME_SIZE
+    @Test
+    public void testFrameSizeLimitsTooBig() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Overly large settings
+        // Settings have to be a multiple of six
+        int settingsCount = (ConnectionSettings.DEFAULT_MAX_FRAME_SIZE / 6) + 1;
+        int size = settingsCount * 6;
+        byte[] settings = new byte[size + 9];
+        // Header
+        // Length
+        ByteUtil.setThreeBytes(settings, 0, size);
+        // Type
+        settings[3] = FrameType.SETTINGS.getIdByte();
+        // No flags
+        // Stream 0
+
+        // payload
+        for (int i = 0; i < settingsCount; i++) {
+            // Enable server push over and over again
+            ByteUtil.setTwoBytes(settings, (i * 6) + 9, 2);
+            ByteUtil.setFourBytes(settings, (i * 6) + 9 + 2, 1);
+        }
+
+        os.write(settings);
+
+        // Read GOAWAY frame
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
+                        Error.FRAME_SIZE_ERROR.getCode() + "]-["));
+    }
 
     @Test
     public void testFrameTypeLimitsTooBig() throws Exception {
