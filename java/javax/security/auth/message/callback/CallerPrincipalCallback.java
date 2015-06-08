@@ -16,9 +16,10 @@
  */
 package javax.security.auth.message.callback;
 
+import java.security.Principal;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
-import java.security.Principal;
 
 /**
  * Callback that enables an authentication module to inform the runtime of the call principal or name of the caller principal.

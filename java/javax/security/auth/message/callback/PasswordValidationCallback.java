@@ -16,10 +16,11 @@
  */
 package javax.security.auth.message.callback;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.Subject;
-
 import java.util.Arrays;
+
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
+
 
 /**
  * Callback that enables an authentication module to supply a username and password (to a runtime?) and determine if
