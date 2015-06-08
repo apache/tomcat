@@ -338,8 +338,32 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void closeStream(StreamError se) {
-        // TODO
+    private void closeStream(StreamError se) throws IOException {
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
+                    Integer.toString(se.getStreamId()), se.getError()));
+        }
+
+        Stream stream = getStream(se.getStreamId());
+        stream.sendRst();
+
+        // Write a RST frame
+        byte[] rstFrame = new byte[13];
+        // Length
+        ByteUtil.setThreeBytes(rstFrame, 0, 4);
+        // Type
+        rstFrame[3] = FrameType.RST.getIdByte();
+        // No flags
+        // Stream ID
+        ByteUtil.set31Bits(rstFrame, 5, se.getStreamId());
+        // Payload
+        ByteUtil.setFourBytes(rstFrame, 9, se.getError().getCode());
+
+        synchronized (socketWrapper) {
+            socketWrapper.write(true, rstFrame, 0, rstFrame.length);
+            socketWrapper.flush(true);
+        }
     }
 
 
