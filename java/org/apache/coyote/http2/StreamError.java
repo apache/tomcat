@@ -20,7 +20,7 @@ public class StreamError extends Http2Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public StreamError(String msg, int streamId, Error error) {
-        super(msg, streamId, error);
+    public StreamError(String msg, Error error) {
+        super(msg, error);
     }
 }

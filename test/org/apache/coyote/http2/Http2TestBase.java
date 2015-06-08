@@ -499,7 +499,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void setting(int identifier, long value) throws IOException {
+        public void setting(int identifier, long value) throws ConnectionError {
             trace.append("0-Settings-[" + identifier + "]-[" + value + "]\n");
             remoteSettings.set(identifier, value);
         }
