@@ -23,6 +23,7 @@ import java.util.Map;
  */
 public interface MessageInfo {
 
+    @SuppressWarnings("rawtypes") // JASPIC API uses raw types
     Map getMap();
 
     Object getRequestMessage();
