@@ -20,9 +20,6 @@ import java.security.PrivilegedActionException;
 import java.util.Map;
 
 import javax.security.auth.AuthPermission;
-import javax.security.auth.message.AuthException;
-
-import org.apache.geronimo.osgi.locator.ProviderLocator;
 
 /**
  * @version $Rev$ $Date$
