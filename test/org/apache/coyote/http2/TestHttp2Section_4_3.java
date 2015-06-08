@@ -53,7 +53,7 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        ErrorCode.COMPRESSION_ERROR.getErrorCode() + "]-["));
+                        Error.COMPRESSION_ERROR.getCode() + "]-["));
     }
 
 
@@ -108,6 +108,6 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        ErrorCode.COMPRESSION_ERROR.getErrorCode() + "]-["));
+                        Error.COMPRESSION_ERROR.getCode() + "]-["));
     }
 }

@@ -23,13 +23,13 @@ public class Http2Exception extends IOException {
     private static final long serialVersionUID = 1L;
 
     private final int streamId;
-    private final ErrorCode errorCode;
+    private final Error error;
 
 
-    public Http2Exception(String msg, int streamId, ErrorCode errorCode) {
+    public Http2Exception(String msg, int streamId, Error error) {
         super(msg);
         this.streamId = streamId;
-        this.errorCode = errorCode;
+        this.error = error;
     }
 
 
@@ -38,7 +38,7 @@ public class Http2Exception extends IOException {
     }
 
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
+    public Error getError() {
+        return error;
     }
 }

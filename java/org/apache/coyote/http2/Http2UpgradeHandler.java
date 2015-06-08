@@ -344,7 +344,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         byte[] fixedPayload = new byte[8];
         // TODO needs to be correct value
         ByteUtil.set31Bits(fixedPayload, 0, (2 << 31) - 1);
-        ByteUtil.setFourBytes(fixedPayload, 4, h2e.getErrorCode().getErrorCode());
+        ByteUtil.setFourBytes(fixedPayload, 4, h2e.getError().getCode());
         byte[] debugMessage = h2e.getMessage().getBytes(StandardCharsets.UTF_8);
         byte[] payloadLength = new byte[3];
         ByteUtil.setThreeBytes(payloadLength, 0, debugMessage.length + 8);

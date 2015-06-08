@@ -126,29 +126,29 @@ public class StreamStateMachine {
 
 
     private enum State {
-        IDLE               (true,  ErrorCode.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY),
-        OPEN               (true,  ErrorCode.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
+        IDLE               (true,  Error.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY),
+        OPEN               (true,  Error.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
                                     FrameType.PRIORITY, FrameType.RST, FrameType.PUSH_PROMISE,
                                     FrameType.WINDOW_UPDATE),
-        RESERVED_LOCAL     (true,  ErrorCode.PROTOCOL_ERROR, FrameType.PRIORITY, FrameType.RST,
+        RESERVED_LOCAL     (true,  Error.PROTOCOL_ERROR, FrameType.PRIORITY, FrameType.RST,
                                     FrameType.WINDOW_UPDATE),
-        RESERVED_REMOTE    (true,  ErrorCode.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY,
+        RESERVED_REMOTE    (true,  Error.PROTOCOL_ERROR, FrameType.HEADERS, FrameType.PRIORITY,
                                     FrameType.RST),
-        HALF_CLOSED_LOCAL  (true,  ErrorCode.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
+        HALF_CLOSED_LOCAL  (true,  Error.PROTOCOL_ERROR, FrameType.DATA, FrameType.HEADERS,
                                     FrameType.PRIORITY, FrameType.RST, FrameType.PUSH_PROMISE,
                                     FrameType.WINDOW_UPDATE),
-        HALF_CLOSED_REMOTE (true,  ErrorCode.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
+        HALF_CLOSED_REMOTE (true,  Error.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
                                     FrameType.WINDOW_UPDATE),
-        CLOSED_RX          (true,  ErrorCode.STREAM_CLOSED, FrameType.PRIORITY),
-        CLOSED_RST         (false, ErrorCode.STREAM_CLOSED, FrameType.PRIORITY),
-        CLOSED_TX          (true,  ErrorCode.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
+        CLOSED_RX          (true,  Error.STREAM_CLOSED, FrameType.PRIORITY),
+        CLOSED_RST         (false, Error.STREAM_CLOSED, FrameType.PRIORITY),
+        CLOSED_TX          (true,  Error.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
                                     FrameType.WINDOW_UPDATE);
 
         private final boolean connectionErrorForInvalidFrame;
-        private final ErrorCode errorCodeForInvalidFrame;
+        private final Error errorCodeForInvalidFrame;
         private final Set<FrameType> frameTypesPermitted = new HashSet<>();
 
-        private State(boolean connectionErrorForInvalidFrame, ErrorCode errorCode,
+        private State(boolean connectionErrorForInvalidFrame, Error errorCode,
                 FrameType... frameTypes) {
             this.connectionErrorForInvalidFrame = connectionErrorForInvalidFrame;
             this.errorCodeForInvalidFrame = errorCode;
