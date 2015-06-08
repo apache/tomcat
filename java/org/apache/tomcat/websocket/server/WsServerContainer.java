@@ -54,7 +54,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
-import org.apache.tomcat.websocket.pojo.PojoEndpointServer;
 import org.apache.tomcat.websocket.pojo.PojoMethodMapping;
 
 /**
