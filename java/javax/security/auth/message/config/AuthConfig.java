@@ -16,7 +16,6 @@
  */
 package javax.security.auth.message.config;
 
-import javax.security.auth.message.AuthException;
 import javax.security.auth.message.MessageInfo;
 
 /**
