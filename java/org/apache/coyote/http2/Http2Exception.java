@@ -20,19 +20,12 @@ public abstract class Http2Exception extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private final int streamId;
     private final Error error;
 
 
-    public Http2Exception(String msg, int streamId, Error error) {
+    public Http2Exception(String msg, Error error) {
         super(msg);
-        this.streamId = streamId;
         this.error = error;
-    }
-
-
-    public int getStreamId() {
-        return streamId;
     }
 
 

@@ -16,8 +16,6 @@
  */
 package org.apache.coyote.http2;
 
-import java.io.IOException;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -44,7 +42,7 @@ public class ConnectionSettings {
     private volatile int maxFrameSize = DEFAULT_MAX_FRAME_SIZE;
     private volatile long maxHeaderListSize = UNLIMITED;
 
-    public void set(int parameterId, long value) throws IOException {
+    public void set(int parameterId, long value) throws ConnectionError {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("connectionSettings.debug",
                     Integer.toString(parameterId), Long.toString(value)));
@@ -80,11 +78,11 @@ public class ConnectionSettings {
     public int getHeaderTableSize() {
         return headerTableSize;
     }
-    public void setHeaderTableSize(long headerTableSize) throws IOException {
+    public void setHeaderTableSize(long headerTableSize) throws ConnectionError {
         // Need to put a sensible limit on this. Start with 16k (default is 4k)
         if (headerTableSize > (16 * 1024)) {
             throw new ConnectionError(sm.getString("connectionSettings.headerTableSizeLimit",
-                    Long.toString(headerTableSize)), 0, Error.PROTOCOL_ERROR);
+                    Long.toString(headerTableSize)), Error.PROTOCOL_ERROR);
         }
         this.headerTableSize = (int) headerTableSize;
     }
@@ -93,12 +91,12 @@ public class ConnectionSettings {
     public boolean getEnablePush() {
         return enablePush;
     }
-    public void setEnablePush(long enablePush) throws IOException {
+    public void setEnablePush(long enablePush) throws ConnectionError {
         // Can't be less than zero since the result of the byte->long conversion
         // will never be negative
         if (enablePush > 1) {
             throw new ConnectionError(sm.getString("connectionSettings.enablePushInvalid",
-                    Long.toString(enablePush)), 0, Error.PROTOCOL_ERROR);
+                    Long.toString(enablePush)), Error.PROTOCOL_ERROR);
         }
         this.enablePush = (enablePush  == 1);
     }
@@ -115,11 +113,11 @@ public class ConnectionSettings {
     public int getInitialWindowSize() {
         return initialWindowSize;
     }
-    public void setInitialWindowSize(long initialWindowSize) throws IOException {
+    public void setInitialWindowSize(long initialWindowSize) throws ConnectionError {
         if (initialWindowSize > MAX_WINDOW_SIZE) {
             throw new ConnectionError(sm.getString("connectionSettings.windowSizeTooBig",
                     Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE)),
-                    0, Error.PROTOCOL_ERROR);
+                    Error.PROTOCOL_ERROR);
         }
         this.initialWindowSize = (int) initialWindowSize;
     }
@@ -128,11 +126,11 @@ public class ConnectionSettings {
     public int getMaxFrameSize() {
         return maxFrameSize;
     }
-    public void setMaxFrameSize(long maxFrameSize) throws IOException {
+    public void setMaxFrameSize(long maxFrameSize) throws ConnectionError {
         if (maxFrameSize < MIN_MAX_FRAME_SIZE || maxFrameSize > MAX_MAX_FRAME_SIZE) {
             throw new ConnectionError(sm.getString("connectionSettings.maxFrameSizeInvalid",
                     Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
-                    Integer.toString(MAX_MAX_FRAME_SIZE)), 0, Error.PROTOCOL_ERROR);
+                    Integer.toString(MAX_MAX_FRAME_SIZE)), Error.PROTOCOL_ERROR);
         }
         this.maxFrameSize = (int) maxFrameSize;
     }

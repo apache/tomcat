@@ -766,7 +766,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void setting(int identifier, long value) throws IOException {
+    public void setting(int identifier, long value) throws ConnectionError {
         remoteSettings.set(identifier, value);
     }
 
