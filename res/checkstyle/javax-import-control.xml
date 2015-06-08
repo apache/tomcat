@@ -36,6 +36,27 @@
   <subpackage name="persistence">
     <allow pkg="javax.persistence"/>
   </subpackage>
+  <subpackage name="security">
+    <subpackage name="auth">
+      <subpackage name="message">
+        <allow pkg="javax.crypto" />
+        <allow class="javax.security.auth.Subject"/>
+        <allow pkg="javax.security.auth.callback"/>
+        <allow pkg="javax.security.auth.login"/>
+        <allow pkg="javax.security.auth.x500"/>
+        <disallow pkg="javax.security.auth.message.callback" local-only="true"/>
+        <disallow pkg="javax.security.auth.message.config" local-only="true"/>
+        <disallow pkg="javax.security.auth.message.module" local-only="true"/>
+        <subpackage name="config">
+        <allow class="javax.security.auth.AuthPermission"/>
+          <allow pkg="javax.security.auth.message"/>
+        </subpackage>
+        <subpackage name="module">
+          <allow pkg="javax.security.auth.message"/>
+        </subpackage>
+      </subpackage>
+    </subpackage>
+  </subpackage>
   <subpackage name="servlet">
     <allow pkg="javax.servlet"/>
     <disallow pkg="javax.servlet.jsp" local-only="true"/>
