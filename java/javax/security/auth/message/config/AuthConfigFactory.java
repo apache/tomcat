@@ -35,6 +35,7 @@ public abstract class AuthConfigFactory {
     static {
         contextClassLoader = (ClassLoader) java.security.AccessController
                 .doPrivileged(new java.security.PrivilegedAction() {
+                    @Override
                     public Object run() {
                         return Thread.currentThread().getContextClassLoader();
                     }
@@ -49,6 +50,7 @@ public abstract class AuthConfigFactory {
         if (factory == null) {
             String className = (String) java.security.AccessController
                     .doPrivileged(new java.security.PrivilegedAction() {
+                        @Override
                         public Object run() {
                             return java.security.Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
                         }
@@ -60,6 +62,7 @@ public abstract class AuthConfigFactory {
                 final String finalClassName = className;
                 factory = (AuthConfigFactory) java.security.AccessController
                         .doPrivileged(new java.security.PrivilegedExceptionAction() {
+                            @Override
                             public Object run() throws ClassNotFoundException, InstantiationException,
                                     IllegalAccessException {
                                 // TODO Review this
