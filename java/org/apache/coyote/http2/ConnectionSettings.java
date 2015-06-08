@@ -83,7 +83,7 @@ public class ConnectionSettings {
     public void setHeaderTableSize(long headerTableSize) throws IOException {
         // Need to put a sensible limit on this. Start with 16k (default is 4k)
         if (headerTableSize > (16 * 1024)) {
-            throw new Http2Exception(sm.getString("connectionSettings.headerTableSizeLimit",
+            throw new ConnectionError(sm.getString("connectionSettings.headerTableSizeLimit",
                     Long.toString(headerTableSize)), 0, Error.PROTOCOL_ERROR);
         }
         this.headerTableSize = (int) headerTableSize;
@@ -97,7 +97,7 @@ public class ConnectionSettings {
         // Can't be less than zero since the result of the byte->long conversion
         // will never be negative
         if (enablePush > 1) {
-            throw new Http2Exception(sm.getString("connectionSettings.enablePushInvalid",
+            throw new ConnectionError(sm.getString("connectionSettings.enablePushInvalid",
                     Long.toString(enablePush)), 0, Error.PROTOCOL_ERROR);
         }
         this.enablePush = (enablePush  == 1);
@@ -117,7 +117,7 @@ public class ConnectionSettings {
     }
     public void setInitialWindowSize(long initialWindowSize) throws IOException {
         if (initialWindowSize > MAX_WINDOW_SIZE) {
-            throw new Http2Exception(sm.getString("connectionSettings.windowSizeTooBig",
+            throw new ConnectionError(sm.getString("connectionSettings.windowSizeTooBig",
                     Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE)),
                     0, Error.PROTOCOL_ERROR);
         }
@@ -130,7 +130,7 @@ public class ConnectionSettings {
     }
     public void setMaxFrameSize(long maxFrameSize) throws IOException {
         if (maxFrameSize < MIN_MAX_FRAME_SIZE || maxFrameSize > MAX_MAX_FRAME_SIZE) {
-            throw new Http2Exception(sm.getString("connectionSettings.maxFrameSizeInvalid",
+            throw new ConnectionError(sm.getString("connectionSettings.maxFrameSizeInvalid",
                     Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
                     Integer.toString(MAX_MAX_FRAME_SIZE)), 0, Error.PROTOCOL_ERROR);
         }

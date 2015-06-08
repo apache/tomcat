@@ -179,7 +179,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void readSimpleResponse() throws IOException {
+    protected void readSimpleResponse() throws Http2Exception, IOException {
         // Headers
         parser.readFrame(true);
         // Body

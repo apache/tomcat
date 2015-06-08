@@ -107,15 +107,15 @@ public class StreamStateMachine {
         // No state change. Checks that the frame type is valid for the current
         // state of this stream.
         if (!isFrameTypePermitted(frameType)) {
-            int errorStream;
             if (state.connectionErrorForInvalidFrame) {
-                errorStream = 0;
+                throw new ConnectionError(sm.getString("streamStateMachine.invalidFrame",
+                        stream.getConnectionId(), stream.getIdentifier(), state, frameType),
+                        stream.getIdentifier().intValue(), state.errorCodeForInvalidFrame);
             } else {
-                errorStream = stream.getIdentifier().intValue();
+                throw new StreamError(sm.getString("streamStateMachine.invalidFrame",
+                        stream.getConnectionId(), stream.getIdentifier(), state, frameType),
+                        stream.getIdentifier().intValue(), state.errorCodeForInvalidFrame);
             }
-            throw new Http2Exception(sm.getString("streamStateMachine.invalidFrame",
-                    stream.getConnectionId(), stream.getIdentifier(), state, frameType),
-                    errorStream, state.errorCodeForInvalidFrame);
         }
     }
 
