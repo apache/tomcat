@@ -33,10 +33,10 @@ public abstract class AuthConfigFactory {
     private static ClassLoader contextClassLoader;
 
     static {
-        contextClassLoader = (ClassLoader) java.security.AccessController
-                .doPrivileged(new java.security.PrivilegedAction() {
+        contextClassLoader = java.security.AccessController
+                .doPrivileged(new java.security.PrivilegedAction<ClassLoader>() {
                     @Override
-                    public Object run() {
+                    public ClassLoader run() {
                         return Thread.currentThread().getContextClassLoader();
                     }
                 });
@@ -48,10 +48,10 @@ public abstract class AuthConfigFactory {
             sm.checkPermission(new AuthPermission("getAuthConfigFactory"));
         }
         if (factory == null) {
-            String className = (String) java.security.AccessController
-                    .doPrivileged(new java.security.PrivilegedAction() {
+            String className = java.security.AccessController
+                    .doPrivileged(new java.security.PrivilegedAction<String>() {
                         @Override
-                        public Object run() {
+                        public String run() {
                             return java.security.Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
                         }
                     });
@@ -60,14 +60,14 @@ public abstract class AuthConfigFactory {
             }
             try {
                 final String finalClassName = className;
-                factory = (AuthConfigFactory) java.security.AccessController
-                        .doPrivileged(new java.security.PrivilegedExceptionAction() {
+                factory = java.security.AccessController
+                        .doPrivileged(new java.security.PrivilegedExceptionAction<AuthConfigFactory>() {
                             @Override
-                            public Object run() throws ClassNotFoundException, InstantiationException,
+                            public AuthConfigFactory run() throws ClassNotFoundException, InstantiationException,
                                     IllegalAccessException {
                                 // TODO Review this
-                                Class clazz = Class.forName(finalClassName, true, contextClassLoader);
-                                return clazz.newInstance();
+                                Class<?> clazz = Class.forName(finalClassName, true, contextClassLoader);
+                                return (AuthConfigFactory) clazz.newInstance();
                             }
                         });
             } catch (PrivilegedActionException e) {
@@ -107,6 +107,7 @@ public abstract class AuthConfigFactory {
 
     public abstract String registerConfigProvider(AuthConfigProvider provider, String layer, String appContext, String description);
 
+    @SuppressWarnings("rawtypes") // JASPIC API uses raw types
     public abstract String registerConfigProvider(String className, Map properties, String layer, String appContext, String description);
 
     public abstract boolean removeRegistration(String registrationID);
