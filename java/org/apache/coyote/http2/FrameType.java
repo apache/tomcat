@@ -22,17 +22,17 @@ import org.apache.tomcat.util.res.StringManager;
 
 public enum FrameType {
 
-    DATA          (0,   false,  true, null),
-    HEADERS       (1,   false,  true, null),
-    PRIORITY      (2,   false,  true, (x) -> x == 5),
-    RST           (3,   false,  true, (x) -> x == 4),
-    SETTINGS      (4,    true, false, (x) -> x % 6 == 0),
-    PUSH_PROMISE  (5,   false,  true, (x) -> x >= 4),
-    PING          (6,    true, false, (x) -> x == 8),
-    GOAWAY        (7,    true, false, (x) -> x >= 8),
-    WINDOW_UPDATE (8,    true,  true, (x) -> x == 4),
-    CONTINUATION  (9,   false,  true, null),
-    UNKNOWN       (256,  true,  true, null);
+    DATA          (0,   false,  true, null,              false),
+    HEADERS       (1,   false,  true, null,               true),
+    PRIORITY      (2,   false,  true, (x) -> x == 5,     false),
+    RST           (3,   false,  true, (x) -> x == 4,     false),
+    SETTINGS      (4,    true, false, (x) -> x % 6 == 0,  true),
+    PUSH_PROMISE  (5,   false,  true, (x) -> x >= 4,      true),
+    PING          (6,    true, false, (x) -> x == 8,     false),
+    GOAWAY        (7,    true, false, (x) -> x >= 8,     false),
+    WINDOW_UPDATE (8,    true,  true, (x) -> x == 4,     false),
+    CONTINUATION  (9,   false,  true, null,               true),
+    UNKNOWN       (256,  true,  true, null,              false);
 
     private static final StringManager sm = StringManager.getManager(FrameType.class);
 
@@ -40,14 +40,16 @@ public enum FrameType {
     private final boolean streamZero;
     private final boolean streamNonZero;
     private final IntPredicate payloadSizeValidator;
+    private final boolean payloadErrorFatal;
 
 
     private FrameType(int id, boolean streamZero, boolean streamNonZero,
-            IntPredicate payloadSizeValidator) {
+            IntPredicate payloadSizeValidator,  boolean payloadErrorFatal) {
         this.id = id;
         this.streamZero = streamZero;
         this.streamNonZero = streamNonZero;
         this.payloadSizeValidator =  payloadSizeValidator;
+        this.payloadErrorFatal = payloadErrorFatal;
     }
 
 
@@ -64,11 +66,17 @@ public enum FrameType {
     }
 
 
-    public void checkPayloadSize(int payloadSize) throws Http2Exception {
+    public void checkPayloadSize(int streamId, int payloadSize) throws Http2Exception {
         if (payloadSizeValidator != null && !payloadSizeValidator.test(payloadSize)) {
-            throw new ConnectionError(sm.getString("frameType.checkPayloadSize",
-                    Integer.toString(payloadSize), this),
-                    Error.FRAME_SIZE_ERROR);
+            if (payloadErrorFatal) {
+                throw new ConnectionError(sm.getString("frameType.checkPayloadSize",
+                        Integer.toString(payloadSize), this),
+                        Error.FRAME_SIZE_ERROR);
+            } else {
+                throw new StreamError(sm.getString("frameType.checkPayloadSize",
+                        Integer.toString(payloadSize), this),
+                        Error.FRAME_SIZE_ERROR, streamId);
+            }
         }
     }
 
