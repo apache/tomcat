@@ -89,5 +89,31 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
     }
 
 
-    // TODO Test connection vs stream error on a stream other than zero
+    @Test
+    public void testFrameTypeLimitsStream() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Invalid priority
+        byte[] ping = new byte[9];
+
+        // Header
+        // Length 0
+        // Type
+        ping[3] = FrameType.PRIORITY.getIdByte();
+        // No flags
+        // Stream 3
+        ByteUtil.set31Bits(ping, 5, 3);
+        // Empty payload
+
+        os.write(ping);
+
+        // Read GOAWAY frame
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("3-RST-[6]"));
+    }
 }
