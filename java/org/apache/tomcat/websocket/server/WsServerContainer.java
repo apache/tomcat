@@ -380,13 +380,6 @@ public class WsServerContainer extends WsWebSocketContainer
             return null;
         }
 
-        if (!PojoEndpointServer.class.isAssignableFrom(sec.getEndpointClass())) {
-            // Need to make path params available to POJO
-            sec.getUserProperties().put(
-                    org.apache.tomcat.websocket.pojo.Constants.POJO_PATH_PARAM_KEY,
-                    pathParams);
-        }
-
         return new WsMappingResult(sec, pathParams);
     }
 
