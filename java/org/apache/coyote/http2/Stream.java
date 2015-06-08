@@ -255,6 +255,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    void sendRst() {
+        state.sendReset();
+    }
+
+
     class StreamOutputBuffer implements OutputBuffer {
 
         private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
