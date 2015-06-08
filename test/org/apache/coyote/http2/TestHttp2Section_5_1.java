@@ -41,7 +41,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        ErrorCode.PROTOCOL_ERROR.getErrorCode() + "]-["));
+                        Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
@@ -55,7 +55,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        ErrorCode.PROTOCOL_ERROR.getErrorCode() + "]-["));
+                        Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
@@ -80,7 +80,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        ErrorCode.STREAM_CLOSED.getErrorCode() + "]-["));
+                        Error.STREAM_CLOSED.getCode() + "]-["));
     }
 
 
@@ -104,7 +104,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // Send a rst
-        sendRst(3, ErrorCode.INTERNAL_ERROR.getErrorCode());
+        sendRst(3, Error.INTERNAL_ERROR.getCode());
 
         // Then try sending some data (which should fail)
         sendData(3, new byte[] {});
@@ -112,7 +112,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        ErrorCode.STREAM_CLOSED.getErrorCode() + "]-["));
+                        Error.STREAM_CLOSED.getCode() + "]-["));
     }
 
 
@@ -126,7 +126,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        ErrorCode.STREAM_CLOSED.getErrorCode() + "]-["));
+                        Error.STREAM_CLOSED.getCode() + "]-["));
     }
 
 

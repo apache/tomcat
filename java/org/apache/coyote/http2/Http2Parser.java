@@ -233,7 +233,7 @@ class Http2Parser {
         boolean ack = Flags.isAck(flags);
         if (payloadSize > 0 && ack) {
             throw new Http2Exception(sm.getString("http2Parser.processFrameSettings.ackWithNonZeroPayload"),
-                    0, ErrorCode.FRAME_SIZE_ERROR);
+                    0, Error.FRAME_SIZE_ERROR);
         }
 
         if (payloadSize != 0) {
@@ -252,7 +252,7 @@ class Http2Parser {
 
     private void readPushPromiseFrame(int streamId) throws IOException {
         throw new Http2Exception(sm.getString("http2Parser.processFramePushPromise",
-                connectionId, Integer.valueOf(streamId)), 0, ErrorCode.PROTOCOL_ERROR);
+                connectionId, Integer.valueOf(streamId)), 0, Error.PROTOCOL_ERROR);
     }
 
 
@@ -295,7 +295,7 @@ class Http2Parser {
         // Validate the data
         if (windowSizeIncrement == 0) {
             throw new Http2Exception("http2Parser.processFrameWindowUpdate.invalidIncrement",
-                    streamId, ErrorCode.PROTOCOL_ERROR);
+                    streamId, Error.PROTOCOL_ERROR);
         }
 
         output.incrementWindowSize(streamId, windowSizeIncrement);
@@ -308,7 +308,7 @@ class Http2Parser {
             // No headers to continue
             throw new Http2Exception(sm.getString(
                     "http2Parser.processFrameContinuation.notExpected", connectionId,
-                    Integer.toString(streamId)), 0, ErrorCode.PROTOCOL_ERROR);
+                    Integer.toString(streamId)), 0, Error.PROTOCOL_ERROR);
         }
 
         boolean endOfHeaders = Flags.isEndOfHeaders(flags);
@@ -337,7 +337,7 @@ class Http2Parser {
             } catch (HpackException hpe) {
                 throw new Http2Exception(
                         sm.getString("http2Parser.processFrameHeaders.decodingFailed"),
-                        0, ErrorCode.COMPRESSION_ERROR);
+                        0, Error.COMPRESSION_ERROR);
             }
             // switches to write mode
             headerReadBuffer.compact();
@@ -347,7 +347,7 @@ class Http2Parser {
         if (headerReadBuffer.position() > 0 && endOfHeaders) {
             throw new Http2Exception(
                     sm.getString("http2Parser.processFrameHeaders.decodingDataLeft"),
-                    0, ErrorCode.COMPRESSION_ERROR);
+                    0, Error.COMPRESSION_ERROR);
         }
     }
 
@@ -392,25 +392,25 @@ class Http2Parser {
 
         if (expected != null && frameType != expected) {
             throw new Http2Exception(sm.getString("http2Parser.processFrame.unexpectedType",
-                    expected, frameType), streamId, ErrorCode.PROTOCOL_ERROR);
+                    expected, frameType), streamId, Error.PROTOCOL_ERROR);
         }
 
         if (payloadSize > maxPayloadSize) {
             throw new Http2Exception(sm.getString("http2Parser.payloadTooBig",
                     Integer.toString(payloadSize), Integer.toString(maxPayloadSize)),
-                    streamId, ErrorCode.FRAME_SIZE_ERROR);
+                    streamId, Error.FRAME_SIZE_ERROR);
         }
 
         if (headersCurrentStream != -1) {
             if (headersCurrentStream != streamId) {
                 throw new Http2Exception(sm.getString("http2Parser.headers.wrongStream",
                         connectionId, Integer.toString(headersCurrentStream),
-                        Integer.toString(streamId)), streamId, ErrorCode.COMPRESSION_ERROR);
+                        Integer.toString(streamId)), streamId, Error.COMPRESSION_ERROR);
             }
             if (frameType != FrameType.CONTINUATION) {
                 throw new Http2Exception(sm.getString("http2Parser.headers.wrongFrameType",
                         connectionId, Integer.toString(headersCurrentStream),
-                        frameType), streamId, ErrorCode.COMPRESSION_ERROR);
+                        frameType), streamId, Error.COMPRESSION_ERROR);
             }
         }
 

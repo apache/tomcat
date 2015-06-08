@@ -59,10 +59,10 @@ public enum FrameType {
     public void checkStream(String connectionId, int streamId) throws Http2Exception {
         if (streamId == 0 && !streamZero) {
             throw new Http2Exception(sm.getString("frameType.checkStream.invalidForZero",
-                    connectionId, this), 0, ErrorCode.PROTOCOL_ERROR);
+                    connectionId, this), 0, Error.PROTOCOL_ERROR);
         } else if (streamId != 0 && !streamNonZero) {
             throw new Http2Exception(sm.getString("frameType.checkStream.invalidForNonZero",
-                    connectionId, Integer.valueOf(streamId), this), 0, ErrorCode.PROTOCOL_ERROR);
+                    connectionId, Integer.valueOf(streamId), this), 0, Error.PROTOCOL_ERROR);
         }
     }
 
@@ -72,7 +72,7 @@ public enum FrameType {
         if (payloadSizeValidator != null && !payloadSizeValidator.test(payloadSize)) {
             throw new Http2Exception(sm.getString("frameType.checkPayloadSize",
                     connectionId, Integer.toString(streamId), this, Integer.toString(payloadSize)),
-                    0, ErrorCode.FRAME_SIZE_ERROR);
+                    0, Error.FRAME_SIZE_ERROR);
         }
     }
 

@@ -16,7 +16,7 @@
  */
 package org.apache.coyote.http2;
 
-public enum ErrorCode {
+public enum Error {
 
     NO_ERROR            (0x00),
     PROTOCOL_ERROR      (0x01),
@@ -33,21 +33,21 @@ public enum ErrorCode {
     INADEQUATE_SECURITY (0x0c),
     HTTP_1_1_REQUIRED   (0x0d);
 
-    private final long errorCode;
+    private final long code;
 
-    private ErrorCode(long errorCode) {
-        this.errorCode = errorCode;
+    private Error(long code) {
+        this.code = code;
     }
 
 
-    public long getErrorCode() {
-        return errorCode;
+    public long getCode() {
+        return code;
     }
 
 
-    public byte[] getErrorCodeBytes() {
-        byte[] errorCodeByte = new byte[4];
-        ByteUtil.setFourBytes(errorCodeByte, 0, errorCode);
-        return errorCodeByte;
+    public byte[] getCodeBytes() {
+        byte[] codeByte = new byte[4];
+        ByteUtil.setFourBytes(codeByte, 0, code);
+        return codeByte;
     }
 }
