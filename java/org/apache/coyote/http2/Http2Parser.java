@@ -86,9 +86,8 @@ class Http2Parser {
         try {
             validateFrame(expected, frameType, streamId, flags, payloadSize);
         } catch (StreamError se) {
-            // TODO debug log
             swallow(payloadSize);
-            return true;
+            throw se;
         }
 
         switch (frameType) {
@@ -313,7 +312,7 @@ class Http2Parser {
             } else {
                 throw new StreamError(
                         sm.getString("http2Parser.processFrameWindowUpdate.invalidIncrement"),
-                        Error.PROTOCOL_ERROR);
+                        Error.PROTOCOL_ERROR, streamId);
             }
         }
 
@@ -413,7 +412,7 @@ class Http2Parser {
 
         if (expected != null && frameType != expected) {
             throw new StreamError(sm.getString("http2Parser.processFrame.unexpectedType",
-                    expected, frameType), Error.PROTOCOL_ERROR);
+                    expected, frameType), Error.PROTOCOL_ERROR, streamId);
         }
 
         if (payloadSize > maxPayloadSize) {
@@ -435,8 +434,8 @@ class Http2Parser {
             }
         }
 
-        frameType.checkStream(connectionId, streamId);
-        frameType.checkPayloadSize(connectionId, streamId, payloadSize);
+        frameType.checkStream(streamId);
+        frameType.checkPayloadSize(payloadSize);
     }
 
 

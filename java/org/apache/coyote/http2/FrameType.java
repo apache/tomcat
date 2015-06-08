@@ -56,22 +56,18 @@ public enum FrameType {
     }
 
 
-    public void checkStream(String connectionId, int streamId) throws Http2Exception {
-        if (streamId == 0 && !streamZero) {
-            throw new ConnectionError(sm.getString("frameType.checkStream.invalidForZero",
-                    connectionId, this), Error.PROTOCOL_ERROR);
-        } else if (streamId != 0 && !streamNonZero) {
-            throw new ConnectionError(sm.getString("frameType.checkStream.invalidForNonZero",
-                    connectionId, Integer.valueOf(streamId), this), Error.PROTOCOL_ERROR);
+    public void checkStream(int streamId) throws Http2Exception {
+        if (streamId == 0 && !streamZero || streamId != 0 && !streamNonZero) {
+            throw new ConnectionError(sm.getString("frameType.checkStream", this),
+                    Error.PROTOCOL_ERROR);
         }
     }
 
 
-    public void checkPayloadSize(String connectionId, int streamId, int payloadSize)
-            throws Http2Exception {
+    public void checkPayloadSize(int payloadSize) throws Http2Exception {
         if (payloadSizeValidator != null && !payloadSizeValidator.test(payloadSize)) {
             throw new ConnectionError(sm.getString("frameType.checkPayloadSize",
-                    connectionId, Integer.toString(streamId), this, Integer.toString(payloadSize)),
+                    Integer.toString(payloadSize), this),
                     Error.FRAME_SIZE_ERROR);
         }
     }
