@@ -179,7 +179,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
                     remoteSettings.set(id, value);
                 }
-            } catch (IOException ioe) {
+            } catch (Http2Exception | IOException ioe) {
                 // TODO i18n
                 throw new ProtocolException();
             }
@@ -195,7 +195,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         // Make sure the client has sent a valid connection preface before we
         // send the response to the original request over HTTP/2.
-        parser.readConnectionPreface();
+        try {
+            parser.readConnectionPreface();
+        } catch (Http2Exception e) {
+            // TODO i18n
+            throw new ProtocolException();
+        }
 
         if (webConnection != null) {
             // Process the initial request on a container thread
@@ -236,18 +241,16 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             try {
                 while (parser.readFrame(false)) {
                 }
-            } catch (Http2Exception h2e) {
-                if (h2e.getStreamId() == 0) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("upgradeHandler.connectionError"), h2e);
-                    }
-                    closeConnecion(h2e);
-                    break;
-                } else {
-
-                    // Stream error
-                    // TODO Reset stream
+            } catch (StreamError se) {
+                // Stream error
+                // TODO Reset stream
+            } catch (Http2Exception ce) {
+                // This should be a connection error
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.connectionError"), ce);
                 }
+                closeConnecion(ce);
+                break;
             } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
@@ -263,16 +266,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         case OPEN_WRITE:
             try {
                 processWrites();
-            } catch (Http2Exception h2e) {
-                if (h2e.getStreamId() == 0) {
-                    // Connection error
-                    log.warn(sm.getString("upgradeHandler.connectionError"), h2e);
-                    closeConnecion(h2e);
-                    break;
-                } else {
-                    // Stream error
-                    // TODO Reset stream
-                }
             } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
@@ -339,13 +332,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void closeConnecion(Http2Exception h2e) {
+    private void closeConnecion(Http2Exception ce) {
         // Write a GOAWAY frame.
         byte[] fixedPayload = new byte[8];
         // TODO needs to be correct value
         ByteUtil.set31Bits(fixedPayload, 0, (2 << 31) - 1);
-        ByteUtil.setFourBytes(fixedPayload, 4, h2e.getError().getCode());
-        byte[] debugMessage = h2e.getMessage().getBytes(StandardCharsets.UTF_8);
+        ByteUtil.setFourBytes(fixedPayload, 4, ce.getError().getCode());
+        byte[] debugMessage = ce.getMessage().getBytes(StandardCharsets.UTF_8);
         byte[] payloadLength = new byte[3];
         ByteUtil.setThreeBytes(payloadLength, 0, debugMessage.length + 8);
 
