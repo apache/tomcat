@@ -192,6 +192,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     protected final Matcher packageTriggersDeny = Pattern.compile(
             "^javax\\.el\\.|" +
             "^javax\\.servlet\\.|" +
+            "^javax\\.websocket\\.|" +
             "^org\\.apache\\.(catalina|coyote|el|jasper|juli|naming|tomcat)\\."
             ).matcher("");
 
