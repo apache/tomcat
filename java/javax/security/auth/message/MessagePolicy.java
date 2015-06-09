@@ -21,7 +21,8 @@ public class MessagePolicy {
     private final TargetPolicy[] targetPolicies;
     private final boolean mandatory;
 
-    public MessagePolicy(TargetPolicy[] targetPolicies, boolean mandatory) throws IllegalArgumentException {
+    public MessagePolicy(TargetPolicy[] targetPolicies, boolean mandatory)
+            throws IllegalArgumentException {
         if (targetPolicies == null) {
             throw new IllegalArgumentException("targetPolicies is null");
         }
@@ -63,7 +64,8 @@ public class MessagePolicy {
         private final Target[] targets;
         private final ProtectionPolicy protectionPolicy;
 
-        public TargetPolicy(Target[] targets, ProtectionPolicy protectionPolicy) throws IllegalArgumentException {
+        public TargetPolicy(Target[] targets, ProtectionPolicy protectionPolicy)
+                throws IllegalArgumentException {
             if (protectionPolicy == null) {
                 throw new IllegalArgumentException("protectionPolicy is null");
             }

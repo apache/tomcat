@@ -22,7 +22,8 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 
 /**
- * Callback that enables an authentication module to inform the runtime of the call principal or name of the caller principal.
+ * Callback that enables an authentication module to inform the runtime of the
+ * call principal or name of the caller principal.
  */
 public class CallerPrincipalCallback implements Callback {
 

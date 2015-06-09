@@ -16,7 +16,11 @@
  */
 package javax.security.auth.message.config;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.security.Security;
 import java.util.Map;
 
 import javax.security.auth.AuthPermission;
@@ -24,7 +28,7 @@ import javax.security.auth.AuthPermission;
 public abstract class AuthConfigFactory {
 
     public static final String DEFAULT_FACTORY_SECURITY_PROPERTY = "authconfigprovider.factory";
-    private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL = "org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl";
+    private static final String DEFAULT_JASPI_AUTH_CONFIG_FACTORY_IMPL = "org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl";
 
     private static AuthConfigFactory factory;
     private static ClassLoader contextClassLoader;
@@ -45,25 +49,15 @@ public abstract class AuthConfigFactory {
             sm.checkPermission(new AuthPermission("getAuthConfigFactory"));
         }
         if (factory == null) {
-            String className = java.security.AccessController
-                    .doPrivileged(new java.security.PrivilegedAction<String>() {
-                        @Override
-                        public String run() {
-                            return java.security.Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
-                        }
-                    });
-            if (className == null) {
-                className = DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL;
-            }
+            final String className = getFactoryClassName();
             try {
-                final String finalClassName = className;
-                factory = java.security.AccessController
-                        .doPrivileged(new java.security.PrivilegedExceptionAction<AuthConfigFactory>() {
+                return AccessController
+                        .doPrivileged(new PrivilegedExceptionAction<AuthConfigFactory>() {
                             @Override
-                            public AuthConfigFactory run() throws ClassNotFoundException, InstantiationException,
-                                    IllegalAccessException {
+                            public AuthConfigFactory run() throws ClassNotFoundException,
+                                    InstantiationException, IllegalAccessException {
                                 // TODO Review this
-                                Class<?> clazz = Class.forName(finalClassName, true, contextClassLoader);
+                                Class<?> clazz = Class.forName(className, true, contextClassLoader);
                                 return (AuthConfigFactory) clazz.newInstance();
                             }
                         });
@@ -72,12 +66,25 @@ public abstract class AuthConfigFactory {
                 if (inner instanceof InstantiationException) {
                     throw (SecurityException) new SecurityException("AuthConfigFactory error:"
                             + inner.getCause().getMessage()).initCause(inner.getCause());
-                } else {
-                    throw (SecurityException) new SecurityException("AuthConfigFactory error: " + inner).initCause(inner);
                 }
+                throw (SecurityException) new SecurityException("AuthConfigFactory error: " + inner)
+                        .initCause(inner);
             }
         }
         return factory;
+    }
+
+    private static String getFactoryClassName() {
+        String className = AccessController.doPrivileged(new PrivilegedAction<String>() {
+            @Override
+            public String run() {
+                return Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
+            }
+        });
+        if (className != null) {
+            return className;
+        }
+        return DEFAULT_JASPI_AUTH_CONFIG_FACTORY_IMPL;
     }
 
     public static void setFactory(AuthConfigFactory factory) {
