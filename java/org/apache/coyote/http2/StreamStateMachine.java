@@ -83,12 +83,12 @@ public class StreamStateMachine {
 
 
     public synchronized void sendReset() {
-        stateChange(state, State.CLOSED_TX);
+        stateChange(state, State.CLOSED_RST_TX);
     }
 
 
     public synchronized void receiveReset() {
-        stateChange(state, State.CLOSED_RST);
+        stateChange(state, State.CLOSED_RST_RX);
     }
 
 
@@ -140,9 +140,13 @@ public class StreamStateMachine {
         HALF_CLOSED_REMOTE (true,  Error.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
                                     FrameType.WINDOW_UPDATE),
         CLOSED_RX          (true,  Error.STREAM_CLOSED, FrameType.PRIORITY),
-        CLOSED_RST         (false, Error.STREAM_CLOSED, FrameType.PRIORITY),
         CLOSED_TX          (true,  Error.STREAM_CLOSED, FrameType.PRIORITY, FrameType.RST,
-                                    FrameType.WINDOW_UPDATE);
+                                    FrameType.WINDOW_UPDATE),
+        CLOSED_RST_RX      (false, Error.STREAM_CLOSED, FrameType.PRIORITY),
+        CLOSED_RST_TX      (false, Error.STREAM_CLOSED, FrameType.DATA, FrameType.HEADERS,
+                                    FrameType.PRIORITY, FrameType.RST, FrameType.PUSH_PROMISE,
+                                    FrameType.WINDOW_UPDATE),
+        CLOSED_FINAL       (true,  Error.PROTOCOL_ERROR, FrameType.PRIORITY);
 
         private final boolean connectionErrorForInvalidFrame;
         private final Error errorCodeForInvalidFrame;

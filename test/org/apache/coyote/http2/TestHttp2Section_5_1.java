@@ -19,7 +19,6 @@ package org.apache.coyote.http2;
 import java.nio.ByteBuffer;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -85,7 +84,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
 
     @Test
-    @Ignore // Need to handle stream closes
     public void testClosedInvalidFrame01() throws Exception {
         hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
 
@@ -111,8 +109,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         parser.readFrame(true);
 
         Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Error.STREAM_CLOSED.getCode() + "]-["));
+                output.getTrace().startsWith("3-RST-[" + Error.STREAM_CLOSED.getCode() + "]"));
     }
 
 
