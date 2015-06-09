@@ -28,7 +28,6 @@ import javax.security.auth.x500.X500Principal;
  * The information specifying the chain and key may be an alias, a digest, a subject key, or an issuer ID.
  * Other request types may be supported.
  *
- * @version $Rev$ $Date$
  */
 public class PrivateKeyCallback implements Callback {
 

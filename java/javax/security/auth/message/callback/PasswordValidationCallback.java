@@ -26,7 +26,6 @@ import javax.security.auth.callback.Callback;
  * Callback that enables an authentication module to supply a username and password (to a runtime?) and determine if
  * the result of validation.
  *
- * @version $Rev$ $Date$
  */
 public class PasswordValidationCallback implements Callback {
 

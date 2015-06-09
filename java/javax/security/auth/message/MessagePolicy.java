@@ -16,9 +16,6 @@
  */
 package javax.security.auth.message;
 
-/**
- * @version $Rev$ $Date$
- */
 public class MessagePolicy {
 
     private final TargetPolicy[] targetPolicies;

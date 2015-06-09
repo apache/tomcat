@@ -16,9 +16,6 @@
  */
 package javax.security.auth.message;
 
-/**
- * @version $Rev$ $Date$
- */
 public class AuthStatus {
 
     public static final AuthStatus FAILURE = new AuthStatus("FAILURE");

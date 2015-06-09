@@ -18,9 +18,6 @@ package javax.security.auth.message;
 
 import javax.security.auth.Subject;
 
-/**
- * @version $Rev$ $Date$
- */
 public interface ServerAuth {
 
     void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException;

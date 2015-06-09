@@ -24,9 +24,6 @@ import javax.security.auth.message.ClientAuth;
 import javax.security.auth.message.MessagePolicy;
 
 
-/**
- * @version $Rev$ $Date$
- */
 public interface ClientAuthModule extends ClientAuth {
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
