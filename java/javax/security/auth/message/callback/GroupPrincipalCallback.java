@@ -20,7 +20,8 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 
 /**
- * Callback that enables an authentication module to inform the runtime of the groups a user is in.
+ * Callback that enables an authentication module to inform the runtime of the
+ * groups a user is in.
  */
 public class GroupPrincipalCallback implements Callback {
 

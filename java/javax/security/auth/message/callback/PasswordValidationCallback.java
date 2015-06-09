@@ -21,7 +21,6 @@ import java.util.Arrays;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 
-
 /**
  * Callback that enables an authentication module to supply a user name and
  * password (to a runtime?) and determine if the result of validation.
