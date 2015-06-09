@@ -102,7 +102,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         // HTTP2 upgrade
         http2Connect();
 
-        // Overly large ping
+        // Too small ping
         byte[] ping = new byte[9];
 
         // Header
