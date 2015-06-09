@@ -2741,7 +2741,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         String packageName = null;
         int pos = name.lastIndexOf('.');
         if (pos != -1)
-            packageName = name.substring(0, pos);
+            // Package names in the filters include the last '.'
+            packageName = name.substring(0, pos + 1);
         else
             return false;
 
