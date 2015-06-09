@@ -168,7 +168,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 socketWrapper.flush(true);
 
                 // Process the initial settings frame
-                stream = getStream(1);
+                stream = getStream(1, true);
                 String base64Settings = stream.getCoyoteRequest().getHeader(HTTP2_SETTINGS_HEADER);
                 byte[] settings = Base64.decodeBase64(base64Settings);
 
@@ -321,7 +321,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             int toRead = Math.min(buffer.length, len - read);
             int thisTime = socketWrapper.read(true, buffer, 0, toRead);
             if (thisTime == -1) {
-                throw new IOException("TODO: i18n");
+                throw new IOException(
+                        sm.getString("upgradeHandler.swallow.eos", Integer.valueOf(len)));
             }
             read += thisTime;
         }
@@ -339,15 +340,17 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void closeStream(StreamError se) throws IOException {
+    private void closeStream(StreamError se) throws ConnectionError, IOException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
                     Integer.toString(se.getStreamId()), se.getError()));
         }
 
-        Stream stream = getStream(se.getStreamId());
-        stream.sendRst();
+        Stream stream = getStream(se.getStreamId(), false);
+        if (stream != null) {
+            stream.sendRst();
+        }
 
         // Write a RST frame
         byte[] rstFrame = new byte[13];
@@ -624,18 +627,33 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private Stream getStream(int streamId) {
+    private Stream getStream(int streamId, boolean unknownIsError) throws ConnectionError{
+        Integer key = Integer.valueOf(streamId);
+        Stream result = streams.get(key);
+        if (result == null && unknownIsError) {
+            // Stream has been closed and removed from the map
+            throw new ConnectionError(sm.getString("upgradeHandler.stream.closed", key), Error.PROTOCOL_ERROR);
+        }
+        return result;
+    }
+
+
+    private Stream createRemoteStream(int streamId) throws ConnectionError {
         Integer key = Integer.valueOf(streamId);
 
-        if (streamId > maxRemoteStreamId) {
-            // Must be a new stream
-            maxRemoteStreamId = streamId;
-            Stream stream = new Stream(key, this);
-            streams.put(key, stream);
-            return stream;
-        } else {
-            return streams.get(key);
+        if (streamId %2 != 1) {
+            throw new ConnectionError(
+                    sm.getString("upgradeHandler.stream.even", key), Error.PROTOCOL_ERROR);
         }
+
+        if (streamId <= maxRemoteStreamId) {
+            throw new ConnectionError(sm.getString("upgradeHandler.stream.old", key,
+                    Integer.valueOf(maxRemoteStreamId)), Error.PROTOCOL_ERROR);
+        }
+
+        Stream result = new Stream(key, this);
+        streams.put(key, result);
+        return result;
     }
 
 
@@ -741,7 +759,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public ByteBuffer getInputByteBuffer(int streamId, int payloadSize) throws Http2Exception {
-        Stream stream = getStream(streamId);
+        Stream stream = getStream(streamId, true);
         if (stream == null) {
             return null;
         }
@@ -751,8 +769,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void receiveEndOfStream(int streamId) {
-        Stream stream = getStream(streamId);
+    public void receiveEndOfStream(int streamId) throws ConnectionError {
+        Stream stream = getStream(streamId, true);
         if (stream != null) {
             stream.receivedEndOfStream();
         }
@@ -761,7 +779,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public HeaderEmitter headersStart(int streamId) throws Http2Exception {
-        Stream stream = getStream(streamId);
+        Stream stream = getStream(streamId, false);
+        if (stream == null) {
+            stream = createRemoteStream(streamId);
+        }
         stream.checkState(FrameType.HEADERS);
         stream.receivedStartOfHeaders();
         return stream;
@@ -771,9 +792,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void reprioritise(int streamId, int parentStreamId,
             boolean exclusive, int weight) throws Http2Exception {
-        Stream stream = getStream(streamId);
+        Stream stream = getStream(streamId, false);
+        if (stream == null) {
+            stream = createRemoteStream(streamId);
+        }
         stream.checkState(FrameType.PRIORITY);
-        AbstractStream parentStream = getStream(parentStreamId);
+        AbstractStream parentStream = getStream(parentStreamId, false);
         if (parentStream == null) {
             parentStream = this;
         }
@@ -782,8 +806,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void headersEnd(int streamId) {
-        Stream stream = getStream(streamId);
+    public void headersEnd(int streamId) throws ConnectionError {
+        Stream stream = getStream(streamId, true);
         // Process this stream on a container thread
         StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
         streamProcessor.setSslSupport(sslSupport);
@@ -794,7 +818,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void reset(int streamId, long errorCode) throws Http2Exception  {
-        Stream stream = getStream(streamId);
+        Stream stream = getStream(streamId, true);
         if (stream != null) {
             stream.checkState(FrameType.RST);
             stream.reset(errorCode);
@@ -852,13 +876,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void incrementWindowSize(int streamId, int increment) throws Http2Exception {
-        AbstractStream stream = getStream(streamId);
-        if (stream != null) {
-            if (streamId > 0) {
-                ((Stream) stream).checkState(FrameType.WINDOW_UPDATE);
-            }
-            stream.incrementWindowSize(increment);
+        AbstractStream stream = getStream(streamId, true);
+        if (streamId > 0) {
+            ((Stream) stream).checkState(FrameType.WINDOW_UPDATE);
         }
+        stream.incrementWindowSize(increment);
     }
 
 

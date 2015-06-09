@@ -517,11 +517,11 @@ class Http2Parser {
 
         // Data frames
         ByteBuffer getInputByteBuffer(int streamId, int payloadSize) throws Http2Exception;
-        void receiveEndOfStream(int streamId);
+        void receiveEndOfStream(int streamId) throws ConnectionError;
 
         // Header frames
         HeaderEmitter headersStart(int streamId) throws Http2Exception;
-        void headersEnd(int streamId);
+        void headersEnd(int streamId) throws ConnectionError;
 
         // Priority frames (also headers)
         void reprioritise(int streamId, int parentStreamId, boolean exclusive, int weight)
