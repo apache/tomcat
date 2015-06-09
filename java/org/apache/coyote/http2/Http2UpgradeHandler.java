@@ -255,7 +255,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("upgradeHandler.connectionError"), ce);
                 }
-                closeConnecion(ce);
+                closeConnection(ce);
                 break;
             } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
@@ -367,7 +367,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void closeConnecion(Http2Exception ce) {
+    private void closeConnection(Http2Exception ce) {
         // Write a GOAWAY frame.
         byte[] fixedPayload = new byte[8];
         // TODO needs to be correct value
