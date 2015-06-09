@@ -877,11 +877,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void incrementWindowSize(int streamId, int increment) throws Http2Exception {
-        AbstractStream stream = getStream(streamId, true);
-        if (streamId > 0) {
-            ((Stream) stream).checkState(FrameType.WINDOW_UPDATE);
+        if (streamId == 0) {
+            incrementWindowSize(increment);
+        } else {
+            Stream stream = getStream(streamId, true);
+            stream.checkState(FrameType.WINDOW_UPDATE);
+            stream.incrementWindowSize(increment);
         }
-        stream.incrementWindowSize(increment);
     }
 
 
