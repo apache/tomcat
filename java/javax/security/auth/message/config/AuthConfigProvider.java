@@ -21,10 +21,11 @@ import javax.security.auth.message.AuthException;
 
 public interface AuthConfigProvider {
 
-    ClientAuthConfig getClientAuthConfig(String layer, String appContext, CallbackHandler handler) throws AuthException, SecurityException;
+    ClientAuthConfig getClientAuthConfig(String layer, String appContext, CallbackHandler handler)
+            throws AuthException, SecurityException;
 
-    ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler) throws AuthException, SecurityException;
+    ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler)
+            throws AuthException, SecurityException;
 
     void refresh();
 }
-

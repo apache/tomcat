@@ -24,5 +24,6 @@ public interface ServerAuth {
 
     AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject) throws AuthException;
 
-    AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject) throws AuthException;
+    AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
+            Subject serviceSubject) throws AuthException;
 }
