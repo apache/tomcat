@@ -132,18 +132,18 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         http2Connect();
 
         // Invalid priority
-        byte[] ping = new byte[9];
+        byte[] priority = new byte[9];
 
         // Header
         // Length 0
         // Type
-        ping[3] = FrameType.PRIORITY.getIdByte();
+        priority[3] = FrameType.PRIORITY.getIdByte();
         // No flags
         // Stream 3
-        ByteUtil.set31Bits(ping, 5, 3);
+        ByteUtil.set31Bits(priority, 5, 3);
         // Empty payload
 
-        os.write(ping);
+        os.write(priority);
 
         // Read GOAWAY frame
         parser.readFrame(true);
