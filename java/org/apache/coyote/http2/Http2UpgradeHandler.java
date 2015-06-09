@@ -653,6 +653,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         Stream result = new Stream(key, this);
         streams.put(key, result);
+        maxRemoteStreamId = streamId;
         return result;
     }
 
