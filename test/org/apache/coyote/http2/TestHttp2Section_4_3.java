@@ -98,11 +98,6 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
         sendPing();
 
-        // Part 2
-        headersPayload.clear();
-        buildSimpleRequestPart2(frameHeader, headersPayload, 3);
-        writeFrame(frameHeader, headersPayload);
-
         // Read GOAWAY frame
         parser.readFrame(true);
 
