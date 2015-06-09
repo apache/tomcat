@@ -67,7 +67,7 @@ public enum FrameType {
 
         // Is the payload size valid for the given FrameType
         if (payloadSizeValidator != null && !payloadSizeValidator.test(payloadSize)) {
-            if (payloadErrorFatal) {
+            if (payloadErrorFatal || streamId == 0) {
                 throw new ConnectionError(sm.getString("frameType.checkPayloadSize",
                         Integer.toString(payloadSize), this),
                         Error.FRAME_SIZE_ERROR);
