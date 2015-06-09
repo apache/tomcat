@@ -51,7 +51,7 @@ public class NioChannel implements ByteChannel{
 
     protected Poller poller;
 
-    protected boolean sendFile = false;
+    protected volatile boolean sendFile = false;
 
     public NioChannel(SocketChannel channel, ApplicationBufferHandler bufHandler) throws IOException {
         this.sc = channel;
