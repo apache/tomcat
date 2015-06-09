@@ -144,13 +144,43 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         buildSimpleRequestPart1(frameHeader, headersPayload, 4);
         writeFrame(frameHeader, headersPayload);
 
-        // headers, body
+        // headers
         parser.readFrame(true);
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
                         Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
+
+
+    @Test
+    public void testClientSendOldStream() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+
+        http2Connect();
+        sendSimpleRequest(5);
+        readSimpleResponse();
+        Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
+        output.clearTrace();
+
+
+        // Build the simple request on an old stream
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleRequest(frameHeader, headersPayload, 3);
+
+        os.write(frameHeader);
+        os.flush();
+
+        // headers
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
+                        Error.PROTOCOL_ERROR.getCode() + "]-["));
+
+    }
+
 
     // TODO Remaining 5.1.1 tests
 
