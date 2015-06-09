@@ -434,8 +434,7 @@ class Http2Parser {
             }
         }
 
-        frameType.checkStream(streamId);
-        frameType.checkPayloadSize(streamId, payloadSize);
+        frameType.check(streamId, payloadSize);
     }
 
 
