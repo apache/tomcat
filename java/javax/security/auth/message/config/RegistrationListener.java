@@ -16,9 +16,6 @@
  */
 package javax.security.auth.message.config;
 
-/**
- * @version $Rev$ $Date$
- */
 public interface RegistrationListener {
 
     void notify(String layer, String appContext);

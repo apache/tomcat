@@ -18,9 +18,6 @@ package javax.security.auth.message;
 
 import java.util.Map;
 
-/**
- * @version $Rev$ $Date: $
- */
 public interface MessageInfo {
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types

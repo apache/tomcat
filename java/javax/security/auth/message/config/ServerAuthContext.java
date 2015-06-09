@@ -18,8 +18,5 @@ package javax.security.auth.message.config;
 
 import javax.security.auth.message.ServerAuth;
 
-/**
- * @version $Rev$ $Date$
- */
 public interface ServerAuthContext extends ServerAuth {
 }

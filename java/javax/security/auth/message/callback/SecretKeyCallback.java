@@ -23,7 +23,6 @@ import javax.security.auth.callback.Callback;
  * A callback enabling an authentication module to request a secret key from the runtime, by supplying an alias.
  * Other request types may also be supported.
  *
- * @version $Rev$ $Date$
  */
 public class SecretKeyCallback implements Callback {
 

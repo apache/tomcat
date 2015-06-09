@@ -23,9 +23,6 @@ import javax.security.auth.message.AuthException;
 import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.ServerAuth;
 
-/**
- * @version $Rev$ $Date$
- */
 public interface ServerAuthModule extends ServerAuth {
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types

@@ -21,9 +21,6 @@ import java.util.Map;
 
 import javax.security.auth.AuthPermission;
 
-/**
- * @version $Rev$ $Date$
- */
 public abstract class AuthConfigFactory {
 
     public static final String DEFAULT_FACTORY_SECURITY_PROPERTY = "authconfigprovider.factory";

@@ -22,9 +22,6 @@ import javax.security.auth.Subject;
 import javax.security.auth.message.AuthException;
 
 
-/**
- * @version $Rev$ $Date$
- */
 public interface ClientAuthConfig extends AuthConfig {
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
