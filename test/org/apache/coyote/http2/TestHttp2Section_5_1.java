@@ -128,4 +128,31 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
 
     // TODO: Invalid frames for each of the remaining states
+
+    // Section 5.1.1
+
+    @Test
+    public void testClientSendEvenStream() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+
+        // HTTP2 upgrade
+        http2Connect();
+
+        // Part 1
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildSimpleRequestPart1(frameHeader, headersPayload, 4);
+        writeFrame(frameHeader, headersPayload);
+
+        // headers, body
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
+                        Error.PROTOCOL_ERROR.getCode() + "]-["));
+    }
+
+    // TODO Remaining 5.1.1 tests
+
+    // TODO 5.1.2 tests
 }
