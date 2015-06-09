@@ -16,7 +16,10 @@
  */
 package javax.security.auth.message.config;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Map;
 
 import javax.security.auth.AuthPermission;
@@ -24,19 +27,20 @@ import javax.security.auth.AuthPermission;
 public abstract class AuthConfigFactory {
 
     public static final String DEFAULT_FACTORY_SECURITY_PROPERTY = "authconfigprovider.factory";
-    private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL = "org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl";
+    private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL =
+            "org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl";
 
     private static AuthConfigFactory factory;
     private static ClassLoader contextClassLoader;
 
     static {
-        contextClassLoader = java.security.AccessController
-                .doPrivileged(new java.security.PrivilegedAction<ClassLoader>() {
-                    @Override
-                    public ClassLoader run() {
-                        return Thread.currentThread().getContextClassLoader();
-                    }
-                });
+        // TODO: This looks like a memory leak waiting to happen
+        contextClassLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+            @Override
+            public ClassLoader run() {
+                return Thread.currentThread().getContextClassLoader();
+            }
+        });
     }
 
     public static AuthConfigFactory getFactory() {
@@ -45,35 +49,35 @@ public abstract class AuthConfigFactory {
             sm.checkPermission(new AuthPermission("getAuthConfigFactory"));
         }
         if (factory == null) {
-            String className = java.security.AccessController
-                    .doPrivileged(new java.security.PrivilegedAction<String>() {
-                        @Override
-                        public String run() {
-                            return java.security.Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
-                        }
-                    });
+            String className = AccessController.doPrivileged(new PrivilegedAction<String>() {
+                @Override
+                public String run() {
+                    return java.security.Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
+                }
+            });
             if (className == null) {
                 className = DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL;
             }
             try {
                 final String finalClassName = className;
-                factory = java.security.AccessController
-                        .doPrivileged(new java.security.PrivilegedExceptionAction<AuthConfigFactory>() {
-                            @Override
-                            public AuthConfigFactory run() throws ClassNotFoundException, InstantiationException,
-                                    IllegalAccessException {
-                                // TODO Review this
-                                Class<?> clazz = Class.forName(finalClassName, true, contextClassLoader);
-                                return (AuthConfigFactory) clazz.newInstance();
-                            }
-                        });
+                factory = AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<AuthConfigFactory>() {
+                    @Override
+                    public AuthConfigFactory run() throws ClassNotFoundException,
+                            InstantiationException, IllegalAccessException {
+                        // TODO Review this
+                        Class<?> clazz = Class.forName(finalClassName, true, contextClassLoader);
+                        return (AuthConfigFactory) clazz.newInstance();
+                    }
+                });
             } catch (PrivilegedActionException e) {
                 Exception inner = e.getException();
                 if (inner instanceof InstantiationException) {
                     throw (SecurityException) new SecurityException("AuthConfigFactory error:"
                             + inner.getCause().getMessage()).initCause(inner.getCause());
                 } else {
-                    throw (SecurityException) new SecurityException("AuthConfigFactory error: " + inner).initCause(inner);
+                    throw (SecurityException) new SecurityException(
+                            "AuthConfigFactory error: " + inner).initCause(inner);
                 }
             }
         }
@@ -92,9 +96,11 @@ public abstract class AuthConfigFactory {
     public AuthConfigFactory() {
     }
 
-    public abstract String[] detachListener(RegistrationListener listener, String layer, String appContext);
+    public abstract String[] detachListener(RegistrationListener listener, String layer,
+            String appContext);
 
-    public abstract AuthConfigProvider getConfigProvider(String layer, String appContext, RegistrationListener listener);
+    public abstract AuthConfigProvider getConfigProvider(String layer, String appContext,
+            RegistrationListener listener);
 
     public abstract RegistrationContext getRegistrationContext(String registrationID);
 
@@ -102,10 +108,12 @@ public abstract class AuthConfigFactory {
 
     public abstract void refresh();
 
-    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer, String appContext, String description);
+    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer,
+            String appContext, String description);
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    public abstract String registerConfigProvider(String className, Map properties, String layer, String appContext, String description);
+    public abstract String registerConfigProvider(String className, Map properties, String layer,
+            String appContext, String description);
 
     public abstract boolean removeRegistration(String registrationID);
 
@@ -118,7 +126,5 @@ public abstract class AuthConfigFactory {
         String getMessageLayer();
 
         boolean isPersistent();
-
     }
-
 }
