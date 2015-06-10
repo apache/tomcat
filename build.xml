@@ -48,6 +48,8 @@
   <property name="jsp.revision" value="FR" />
   <property name="el.revision" value="FR" />
   <property name="websocket.revision" value="FR" />
+  <!-- MR B but this was first 1.1 release so use FR -->
+  <property name="jaspic.revision" value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -91,6 +93,7 @@
   <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
   <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
   <property name="websocket-api.jar" value="${tomcat.build}/lib/websocket-api.jar"/>
+  <property name="jaspic-api.jar" value="${tomcat.build}/lib/jaspic-api.jar"/>
   <property name="tomcat-websocket.jar" value="${tomcat.build}/lib/tomcat-websocket.jar"/>
   <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
   <property name="catalina-tribes.jar" value="${tomcat.build}/lib/catalina-tribes.jar"/>
@@ -116,6 +119,7 @@
   <property name="jsp-api-src.jar" value="${tomcat.src.jars}/jsp-api-src.jar"/>
   <property name="el-api-src.jar" value="${tomcat.src.jars}/el-api-src.jar"/>
   <property name="websocket-api-src.jar" value="${tomcat.src.jars}/websocket-api-src.jar"/>
+  <property name="jaspic-api-src.jar" value="${tomcat.src.jars}/jaspic-api-src.jar"/>
   <property name="tomcat-websocket-src.jar" value="${tomcat.src.jars}/tomcat-websocket-src.jar"/>
   <property name="catalina-src.jar" value="${tomcat.src.jars}/catalina-src.jar"/>
   <property name="catalina-tribes-src.jar" value="${tomcat.src.jars}/catalina-tribes-src.jar"/>
@@ -318,6 +322,10 @@
     <include name="javax/websocket/**" />
   </patternset>
 
+  <patternset id="files.jaspic-api">
+    <include name="javax/security/auth/message/**" />
+  </patternset>
+
   <patternset id="files.tomcat-websocket">
     <include name="org/apache/tomcat/websocket/**" />
   </patternset>
@@ -434,6 +442,7 @@
     <patternset refid="files.bootstrap" />
     <patternset refid="files.catalina" />
     <patternset refid="files.servlet-api" />
+    <patternset refid="files.jaspic-api" />
     <patternset refid="files.tomcat-api" />
     <!-- These pattern sets conflict so include files directly
       <patternset refid="files.tomcat-coyote" />
@@ -675,6 +684,7 @@
     <filter token="jsp.revision" value="${jsp.revision}"/>
     <filter token="el.revision" value="${el.revision}"/>
     <filter token="websocket.revision" value="${websocket.revision}"/>
+    <filter token="jaspic.revision" value="${jaspic.revision}"/>
 
     <mkdir dir="${tomcat.manifests}" />
     <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes"
@@ -717,6 +727,12 @@
       filesDir="${tomcat.classes}"
       filesId="files.websocket-api"
       manifest="${tomcat.manifests}/websocket-api.jar.manifest" />
+
+    <!-- JASPIC 1.1 Implementation JAR File -->
+    <jarIt jarfile="${jaspic-api.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.jaspic-api"
+      manifest="${tomcat.manifests}/jaspic-api.jar.manifest" />
 
     <!-- WebSocket 1.1 implementation JAR File -->
     <jarIt jarfile="${tomcat-websocket.jar}"
@@ -1993,6 +2009,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="jsp-api.jar"/>
         <include name="jasper.jar"/>
         <include name="jasper-el.jar"/>
+        <include name="jaspic-api.jar"/>
         <include name="servlet-api.jar"/>
         <include name="websocket-api.jar"/>
         <include name="tomcat-websocket.jar"/>
@@ -2617,6 +2634,14 @@ skip.installer property in build.properties" />
     <jarIt jarfile="${tomcat-websocket-src.jar}"
       filesDir="java"
       filesId="files.tomcat-websocket" />
+
+    <!-- JASPIC 1.1 Implementation JAR File -->
+    <jarIt jarfile="${jaspic-api-src.jar}"
+      filesDir="java"
+      filesId="files.jaspic-api"
+      manifest="${tomcat.manifests}/jaspic-api.jar.manifest"
+      notice="${tomcat.manifests}/jaspic-api.jar.notice"
+      license="${tomcat.manifests}/jaspic-api.jar.license" />
 
     <!-- Bootstrap JAR File -->
     <jarIt jarfile="${bootstrap-src.jar}"
