@@ -26,21 +26,26 @@ import java.util.Map;
 
 public abstract class AuthConfigFactory {
 
-    public static final java.lang.String DEFAULT_FACTORY_SECURITY_PROPERTY = "authconfigprovider.factory";
-    public static final java.lang.String GET_FACTORY_PERMISSION_NAME = "getProperty.authconfigprovider.factory";
-    public static final java.lang.String SET_FACTORY_PERMISSION_NAME = "setProperty.authconfigprovider.factory";
-    public static final java.lang.String PROVIDER_REGISTRATION_PERMISSION_NAME = "setProperty.authconfigfactory.provider";
+    public static final String DEFAULT_FACTORY_SECURITY_PROPERTY =
+            "authconfigprovider.factory";
+    public static final String GET_FACTORY_PERMISSION_NAME =
+            "getProperty.authconfigprovider.factory";
+    public static final String SET_FACTORY_PERMISSION_NAME =
+            "setProperty.authconfigprovider.factory";
+    public static final String PROVIDER_REGISTRATION_PERMISSION_NAME =
+            "setProperty.authconfigfactory.provider";
 
-    public static final SecurityPermission getFactorySecurityPermission = new SecurityPermission(
-            GET_FACTORY_PERMISSION_NAME);
+    public static final SecurityPermission getFactorySecurityPermission =
+            new SecurityPermission(GET_FACTORY_PERMISSION_NAME);
 
-    public static final SecurityPermission setFactorySecurityPermission = new SecurityPermission(
-            SET_FACTORY_PERMISSION_NAME);
+    public static final SecurityPermission setFactorySecurityPermission =
+            new SecurityPermission(SET_FACTORY_PERMISSION_NAME);
 
-    public static final SecurityPermission providerRegistrationSecurityPermission = new SecurityPermission(
-            PROVIDER_REGISTRATION_PERMISSION_NAME);
+    public static final SecurityPermission providerRegistrationSecurityPermission =
+            new SecurityPermission(PROVIDER_REGISTRATION_PERMISSION_NAME);
 
-    private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL = "org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl";
+    private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL =
+            "org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl";
 
     private static AuthConfigFactory factory;
     private static ClassLoader contextClassLoader;
