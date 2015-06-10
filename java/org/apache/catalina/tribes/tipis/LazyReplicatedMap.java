@@ -175,6 +175,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 backup = tmpBackup;
             }catch ( ChannelException x ) {
                 log.error(sm.getString("lazyReplicatedMap.unableReplicate.backup", key, next, x.getMessage()), x);
+                continue;
             }
             try {
                 //publish the data out to all nodes
