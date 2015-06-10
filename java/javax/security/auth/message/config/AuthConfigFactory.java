@@ -17,18 +17,30 @@
 package javax.security.auth.message.config;
 
 import java.security.AccessController;
+import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.security.SecurityPermission;
 import java.util.Map;
-
-import javax.security.auth.AuthPermission;
 
 public abstract class AuthConfigFactory {
 
-    public static final String DEFAULT_FACTORY_SECURITY_PROPERTY = "authconfigprovider.factory";
-    private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL =
-            "org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl";
+    public static final java.lang.String DEFAULT_FACTORY_SECURITY_PROPERTY = "authconfigprovider.factory";
+    public static final java.lang.String GET_FACTORY_PERMISSION_NAME = "getProperty.authconfigprovider.factory";
+    public static final java.lang.String SET_FACTORY_PERMISSION_NAME = "setProperty.authconfigprovider.factory";
+    public static final java.lang.String PROVIDER_REGISTRATION_PERMISSION_NAME = "setProperty.authconfigfactory.provider";
+
+    public static final SecurityPermission getFactorySecurityPermission = new SecurityPermission(
+            GET_FACTORY_PERMISSION_NAME);
+
+    public static final SecurityPermission setFactorySecurityPermission = new SecurityPermission(
+            SET_FACTORY_PERMISSION_NAME);
+
+    public static final SecurityPermission providerRegistrationSecurityPermission = new SecurityPermission(
+            PROVIDER_REGISTRATION_PERMISSION_NAME);
+
+    private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL = "org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl";
 
     private static AuthConfigFactory factory;
     private static ClassLoader contextClassLoader;
@@ -47,10 +59,7 @@ public abstract class AuthConfigFactory {
     }
 
     public static synchronized AuthConfigFactory getFactory() {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new AuthPermission("getAuthConfigFactory"));
-        }
+        checkPermission(getFactorySecurityPermission);
         if (factory == null) {
             String className = AccessController.doPrivileged(new PrivilegedAction<String>() {
                 @Override
@@ -88,10 +97,7 @@ public abstract class AuthConfigFactory {
     }
 
     public static synchronized void setFactory(AuthConfigFactory factory) {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new AuthPermission("setAuthConfigFactory"));
-        }
+        checkPermission(setFactorySecurityPermission);
         AuthConfigFactory.factory = factory;
     }
 
@@ -115,6 +121,13 @@ public abstract class AuthConfigFactory {
     public abstract RegistrationContext getRegistrationContext(String registrationID);
 
     public abstract void refresh();
+
+    private static void checkPermission(Permission permission) {
+        SecurityManager securityManager = System.getSecurityManager();
+        if (securityManager != null) {
+            securityManager.checkPermission(permission);
+        }
+    }
 
     public static interface RegistrationContext {
 
