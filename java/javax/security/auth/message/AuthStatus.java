@@ -18,11 +18,11 @@ package javax.security.auth.message;
 
 public class AuthStatus {
 
-    public static final AuthStatus FAILURE = new AuthStatus("FAILURE");
-    public static final AuthStatus SEND_CONTINUE = new AuthStatus("SEND_CONTINUE");
-    public static final AuthStatus SEND_FAILURE = new AuthStatus("SEND_FAILURE");
-    public static final AuthStatus SEND_SUCCESS = new AuthStatus("SEND_SUCCESS");
     public static final AuthStatus SUCCESS = new AuthStatus("SUCCESS");
+    public static final AuthStatus FAILURE = new AuthStatus("FAILURE");
+    public static final AuthStatus SEND_SUCCESS = new AuthStatus("SEND_SUCCESS");
+    public static final AuthStatus SEND_FAILURE = new AuthStatus("SEND_FAILURE");
+    public static final AuthStatus SEND_CONTINUE = new AuthStatus("SEND_CONTINUE");
 
     private final String name;
 
