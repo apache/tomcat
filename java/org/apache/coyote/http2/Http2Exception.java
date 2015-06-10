@@ -20,16 +20,16 @@ public abstract class Http2Exception extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private final Error error;
+    private final Http2Error error;
 
 
-    public Http2Exception(String msg, Error error) {
+    public Http2Exception(String msg, Http2Error error) {
         super(msg);
         this.error = error;
     }
 
 
-    public Error getError() {
+    public Http2Error getError() {
         return error;
     }
 }

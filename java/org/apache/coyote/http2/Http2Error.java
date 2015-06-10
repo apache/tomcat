@@ -16,7 +16,7 @@
  */
 package org.apache.coyote.http2;
 
-public enum Error {
+public enum Http2Error {
 
     NO_ERROR            (0x00),
     PROTOCOL_ERROR      (0x01),
@@ -35,7 +35,7 @@ public enum Error {
 
     private final long code;
 
-    private Error(long code) {
+    private Http2Error(long code) {
         this.code = code;
     }
 

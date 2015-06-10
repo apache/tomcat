@@ -40,7 +40,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Error.PROTOCOL_ERROR.getCode() + "]-["));
+                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
@@ -54,7 +54,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Error.PROTOCOL_ERROR.getCode() + "]-["));
+                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
@@ -79,7 +79,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Error.STREAM_CLOSED.getCode() + "]-["));
+                        Http2Error.STREAM_CLOSED.getCode() + "]-["));
     }
 
 
@@ -102,14 +102,14 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // Send a rst
-        sendRst(3, Error.INTERNAL_ERROR.getCode());
+        sendRst(3, Http2Error.INTERNAL_ERROR.getCode());
 
         // Then try sending some data (which should fail)
         sendData(3, new byte[] {});
         parser.readFrame(true);
 
         Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("3-RST-[" + Error.STREAM_CLOSED.getCode() + "]"));
+                output.getTrace().startsWith("3-RST-[" + Http2Error.STREAM_CLOSED.getCode() + "]"));
     }
 
 
@@ -123,7 +123,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Error.STREAM_CLOSED.getCode() + "]-["));
+                        Http2Error.STREAM_CLOSED.getCode() + "]-["));
     }
 
 
@@ -149,7 +149,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Error.PROTOCOL_ERROR.getCode() + "]-["));
+                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
@@ -177,7 +177,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Error.PROTOCOL_ERROR.getCode() + "]-["));
+                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
 
     }
 

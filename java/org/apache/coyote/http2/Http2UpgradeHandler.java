@@ -632,7 +632,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         Stream result = streams.get(key);
         if (result == null && unknownIsError) {
             // Stream has been closed and removed from the map
-            throw new ConnectionError(sm.getString("upgradeHandler.stream.closed", key), Error.PROTOCOL_ERROR);
+            throw new ConnectionError(sm.getString("upgradeHandler.stream.closed", key), Http2Error.PROTOCOL_ERROR);
         }
         return result;
     }
@@ -643,12 +643,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         if (streamId %2 != 1) {
             throw new ConnectionError(
-                    sm.getString("upgradeHandler.stream.even", key), Error.PROTOCOL_ERROR);
+                    sm.getString("upgradeHandler.stream.even", key), Http2Error.PROTOCOL_ERROR);
         }
 
         if (streamId <= maxRemoteStreamId) {
             throw new ConnectionError(sm.getString("upgradeHandler.stream.old", key,
-                    Integer.valueOf(maxRemoteStreamId)), Error.PROTOCOL_ERROR);
+                    Integer.valueOf(maxRemoteStreamId)), Http2Error.PROTOCOL_ERROR);
         }
 
         Stream result = new Stream(key, this);

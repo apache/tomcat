@@ -62,7 +62,7 @@ public enum FrameType {
         // Is FrameType valid for the given stream?
         if (streamId == 0 && !streamZero || streamId != 0 && !streamNonZero) {
             throw new ConnectionError(sm.getString("frameType.checkStream", this),
-                    Error.PROTOCOL_ERROR);
+                    Http2Error.PROTOCOL_ERROR);
         }
 
         // Is the payload size valid for the given FrameType
@@ -70,11 +70,11 @@ public enum FrameType {
             if (payloadErrorFatal || streamId == 0) {
                 throw new ConnectionError(sm.getString("frameType.checkPayloadSize",
                         Integer.toString(payloadSize), this),
-                        Error.FRAME_SIZE_ERROR);
+                        Http2Error.FRAME_SIZE_ERROR);
             } else {
                 throw new StreamError(sm.getString("frameType.checkPayloadSize",
                         Integer.toString(payloadSize), this),
-                        Error.FRAME_SIZE_ERROR, streamId);
+                        Http2Error.FRAME_SIZE_ERROR, streamId);
             }
         }
     }
