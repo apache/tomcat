@@ -66,6 +66,13 @@ public class NioChannel implements ByteChannel {
 
 
     /**
+     * Free the channel memory
+     */
+    public void free() {
+        bufHandler.free();
+    }
+
+    /**
      * Returns true if the network buffer has been flushed out and is empty.
      *
      * @param block     Unused. May be used when overridden

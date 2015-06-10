@@ -1660,7 +1660,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                             // Close socket and pool
                             closeSocket(socket);
                             if (running && !paused) {
-                                nioChannels.push(socket.getSocket());
+                                if (!nioChannels.push(socket.getSocket())) {
+                                    socket.getSocket().free();
+                                }
                             }
                         } else if (state == Handler.SocketState.LONG) {
                             if (socket.isAsync()) {
@@ -1673,7 +1675,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     } else if (handshake == -1 ) {
                         closeSocket(socket);
                         if (running && !paused) {
-                            nioChannels.push(socket.getSocket());
+                            if (!nioChannels.push(socket.getSocket())) {
+                                socket.getSocket().free();
+                            }
                         }
                     }
                 } catch (VirtualMachineError vme) {

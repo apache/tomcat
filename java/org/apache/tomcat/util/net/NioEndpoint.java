@@ -1536,7 +1536,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                                     // We do NOT want to do this more than once - see BZ
                                     // 57340.
                                     if (running && !paused) {
-                                        nioChannels.push(socket);
+                                        if (!nioChannels.push(socket)) {
+                                            socket.free();
+                                        }
                                     }
                                     socket = null;
                                 }
@@ -1550,7 +1552,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                             socket.getPoller().cancelledKey(key);
                         }
                         if (running && !paused) {
-                            nioChannels.push(socket);
+                            if (!nioChannels.push(socket)) {
+                                socket.free();
+                            }
                         }
                         socket = null;
                         ka = null;

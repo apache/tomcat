@@ -55,6 +55,13 @@ public class Nio2Channel implements AsynchronousByteChannel {
         bufHandler.reset();
     }
 
+    /**
+     * Free the channel memory
+     */
+    public void free() {
+        bufHandler.free();
+    }
+
     public SocketWrapperBase<Nio2Channel> getSocket() {
         return socket;
     }

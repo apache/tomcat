@@ -51,6 +51,7 @@ import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
@@ -2569,6 +2570,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     return;
                 }
                 closed = true;
+                if (sslOutputBuffer != null) {
+                    ByteBufferUtils.cleanDirectBuffer(sslOutputBuffer);
+                }
                 ((AprEndpoint) getEndpoint()).getPoller().close(getSocket().longValue());
             }
         }

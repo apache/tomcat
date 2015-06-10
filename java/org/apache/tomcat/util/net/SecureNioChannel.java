@@ -93,6 +93,14 @@ public class SecureNioChannel extends NioChannel  {
         netInBuffer.clear();
     }
 
+    @Override
+    public void free() {
+        super.free();
+        if (endpoint.getSocketProperties().getDirectSslBuffer()) {
+            ByteBufferUtils.cleanDirectBuffer(netInBuffer);
+            ByteBufferUtils.cleanDirectBuffer(netOutBuffer);
+        }
+    }
 
 //===========================================================================================
 //                  NIO SSL METHODS
