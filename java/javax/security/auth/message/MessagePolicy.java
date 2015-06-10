@@ -30,6 +30,10 @@ public class MessagePolicy {
         this.mandatory = mandatory;
     }
 
+    public boolean isMandatory() {
+        return mandatory;
+    }
+
     public TargetPolicy[] getTargetPolicies() {
         if (targetPolicies.length == 0) {
             return null;
@@ -37,15 +41,11 @@ public class MessagePolicy {
         return targetPolicies;
     }
 
-    public boolean isMandatory() {
-        return mandatory;
-    }
-
     public static interface ProtectionPolicy {
 
+        static String AUTHENTICATE_SENDER = "#authenticateSender";
         static String AUTHENTICATE_CONTENT = "#authenticateContent";
         static String AUTHENTICATE_RECIPIENT = "#authenticateRecipient";
-        static String AUTHENTICATE_SENDER = "#authenticateSender";
 
         String getID();
     }
@@ -54,9 +54,9 @@ public class MessagePolicy {
 
         Object get(MessageInfo messageInfo);
 
-        void put(MessageInfo messageInfo, Object data);
-
         void remove(MessageInfo messageInfo);
+
+        void put(MessageInfo messageInfo, Object data);
     }
 
     public static class TargetPolicy {

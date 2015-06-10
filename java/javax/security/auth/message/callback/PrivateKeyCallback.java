@@ -43,17 +43,17 @@ public class PrivateKeyCallback implements Callback {
         return request;
     }
 
-    public Certificate[] getChain() {
-        return chain;
+    public void setKey(PrivateKey key, Certificate[] chain) {
+        this.key = key;
+        this.chain = chain;
     }
 
     public PrivateKey getKey() {
         return key;
     }
 
-    public void setKey(PrivateKey key, Certificate[] chain) {
-        this.key = key;
-        this.chain = chain;
+    public Certificate[] getChain() {
+        return chain;
     }
 
     public static interface Request {
@@ -75,7 +75,6 @@ public class PrivateKeyCallback implements Callback {
     public static class DigestRequest implements Request {
         private final byte[] digest;
         private final String algorithm;
-
 
         public DigestRequest(byte[] digest, String algorithm) {
             this.digest = digest;
