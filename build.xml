@@ -107,6 +107,8 @@
   <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
 
+  <property name="jaspic-api.jar" value="${tomcat.build}/lib/jaspic-api.jar"/>
+
   <!-- Standard Source JARs -->
   <property name="bootstrap-src.jar" value="${tomcat.src.jars}/bootstrap-src.jar"/>
   <property name="tomcat-juli-src.jar" value="${tomcat.src.jars}/tomcat-juli-src.jar"/>
@@ -131,6 +133,8 @@
 
   <property name="jasper-src.jar" value="${tomcat.src.jars}/jasper-src.jar"/>
   <property name="jasper-el-src.jar" value="${tomcat.src.jars}/jasper-el-src.jar"/>
+
+  <property name="jaspic-api-src.jar" value="${tomcat.src.jars}/jaspic-api-src.jar"/>
 
   <!-- Embedded JARs & source JARs -->
   <property name="tomcat-embed-core.jar" value="${tomcat.embed}/tomcat-embed-core.jar"/>
@@ -308,6 +312,10 @@
 
   <patternset id="files.jsp-api">
     <include name="javax/servlet/jsp/**" />
+  </patternset>
+
+  <patternset id="files.jaspic-api">
+    <include name="javax/security/auth/**" />
   </patternset>
 
   <patternset id="files.el-api">
@@ -699,6 +707,12 @@
       manifest="${tomcat.manifests}/servlet-api.jar.manifest"
       notice="${tomcat.manifests}/servlet-api.jar.notice"
       license="${tomcat.manifests}/servlet-api.jar.license" />
+
+    <!-- JASPIC 1.1 Implementation JAR File -->
+    <jarIt jarfile="${jaspic-api.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.jaspic-api"
+      manifest="${tomcat.manifests}/jaspic-api.jar.manifest" />
 
     <!-- JSP 2.3 Implementation JAR File -->
     <jarIt jarfile="${jsp-api.jar}"
