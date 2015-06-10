@@ -318,9 +318,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     if (thisWriteStream < 1) {
                         // Need to block until a WindowUpdate message is
                         // processed for this stream
-                        synchronized (this) {
+                        synchronized (Stream.this) {
                             try {
-                                wait();
+                                Stream.this.wait();
                             } catch (InterruptedException e) {
                                 // TODO: Possible shutdown?
                             }
@@ -335,9 +335,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     if (thisWrite < 1) {
                         // Need to block until a WindowUpdate message is
                         // processed for this connection
-                        synchronized (this) {
+                        synchronized (Stream.this) {
                             try {
-                                wait();
+                                Stream.this.wait();
                             } catch (InterruptedException e) {
                                 // TODO: Possible shutdown?
                             }
