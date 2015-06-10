@@ -22,10 +22,10 @@ import javax.security.auth.message.AuthException;
 public interface AuthConfigProvider {
 
     ClientAuthConfig getClientAuthConfig(String layer, String appContext, CallbackHandler handler)
-            throws AuthException, SecurityException;
+            throws AuthException;
 
     ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler)
-            throws AuthException, SecurityException;
+            throws AuthException;
 
     void refresh();
 }
