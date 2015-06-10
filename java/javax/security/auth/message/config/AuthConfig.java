@@ -24,7 +24,7 @@ public interface AuthConfig {
 
     String getAppContext();
 
-    String getAuthContextID(MessageInfo messageInfo) throws IllegalArgumentException;
+    String getAuthContextID(MessageInfo messageInfo);
 
     void refresh();
 
