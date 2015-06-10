@@ -114,10 +114,30 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    protected void sendLargeRequest(int streamId) throws IOException {
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildLargeRequest(frameHeader, headersPayload, streamId);
+        writeFrame(frameHeader, headersPayload);
+    }
+
+
     protected void buildSimpleRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
+        buildRequest(frameHeader, headersPayload, streamId, "/simple");
+    }
+
+
+    protected void buildLargeRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
+        buildRequest(frameHeader, headersPayload, streamId, "/large");
+    }
+
+
+    protected void buildRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId,
+            String url) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("GET");
-        headers.addValue(":path").setString("/any");
+        headers.addValue(":path").setString(url);
         headers.addValue(":authority").setString("localhost:" + getPort());
         hpackEncoder.encode(headers, headersPayload);
 
@@ -137,7 +157,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             int streamId) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("GET");
-        headers.addValue(":path").setString("/any");
+        headers.addValue(":path").setString("/simple");
         hpackEncoder.encode(headers, headersPayload);
 
         headersPayload.flip();
@@ -204,12 +224,17 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void enableHttp2() {
+        enableHttp2(200);
+    }
+
+    protected void enableHttp2(long maxConcurrentStreams) {
         Connector connector = getTomcatInstance().getConnector();
         Http2Protocol http2Protocol = new Http2Protocol();
         // Short timeouts for now. May need to increase these for CI systems.
         http2Protocol.setReadTimeout(2000);
         http2Protocol.setKeepAliveTimeout(5000);
         http2Protocol.setWriteTimeout(2000);
+        http2Protocol.setMaxConcurrentStreams(maxConcurrentStreams);
         connector.addUpgradeProtocol(http2Protocol);
     }
 
@@ -219,7 +244,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         Context ctxt = tomcat.addContext("", null);
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMapping("/*", "simple");
+        ctxt.addServletMapping("/simple", "simple");
+        Tomcat.addServlet(ctxt, "large", new LargeServlet());
+        ctxt.addServletMapping("/large", "large");
 
         tomcat.start();
     }
@@ -245,7 +272,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void doHttpUpgrade(String connection, String upgrade, String settings,
             boolean validate) throws IOException {
-        byte[] upgradeRequest = ("GET / HTTP/1.1\r\n" +
+        byte[] upgradeRequest = ("GET /simple HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
                 "Connection: "+ connection + "\r\n" +
                 "Upgrade: " + upgrade + "\r\n" +
@@ -603,6 +630,32 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             resp.setContentType("application/octet-stream");
 
             int count = 4 * 1024;
+            // Two bytes per entry
+            resp.setContentLengthLong(count * 2);
+
+            OutputStream os = resp.getOutputStream();
+            byte[] data = new byte[2];
+            for (int i = 0; i < count; i++) {
+                data[0] = (byte) (i & 0xFF);
+                data[1] = (byte) ((i >> 8) & 0xFF);
+                os.write(data);
+            }
+        }
+    }
+
+
+    private static class LargeServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // Generate content with a simple known format that will exceed the
+            // default flow control window for a stream.
+            resp.setContentType("application/octet-stream");
+
+            int count = 128 * 1024;
             // Two bytes per entry
             resp.setContentLengthLong(count * 2);
 
