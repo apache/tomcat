@@ -185,7 +185,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                     msg = new MapMessage(getMapContextName(), MapMessage.MSG_PROXY, false,
                                          (Serializable) key, null, null, channel.getLocalMember(false),backup);
                     if ( log.isTraceEnabled() ) 
-                    log.trace("Publishing proxy data:"+msg+" to: "+Arrays.toNameString(proxies));
+                        log.trace("Publishing proxy data:"+msg+" to: "+Arrays.toNameString(proxies));
                     getChannel().send(proxies, msg, getChannelSendOptions());
                 }
             }catch  ( ChannelException x ) {
