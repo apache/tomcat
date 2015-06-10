@@ -43,7 +43,6 @@ import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.MimeHeaders;
 
-
 /**
  * Tests for compliance with the <a href="https://tools.ietf.org/html/rfc7540">
  * HTTP/2 specification</a>.
@@ -408,6 +407,26 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         os.write(payload);
         os.flush();
     }
+
+
+    void sendPriority(int streamId, int streamDependencyId, int weight) throws IOException {
+        byte[] priorityFrame = new byte[14];
+        // length
+        ByteUtil.setThreeBytes(priorityFrame, 0, 5);
+        // type
+        priorityFrame[3] = FrameType.PRIORITY.getIdByte();
+        // No flags
+        // Stream ID
+        ByteUtil.set31Bits(priorityFrame, 5, streamId);
+
+        // Payload
+        ByteUtil.set31Bits(priorityFrame, 9, streamDependencyId);
+        ByteUtil.setOneBytes(priorityFrame, 13, weight);
+
+        os.write(priorityFrame);
+        os.flush();
+    }
+
 
     private static class TestInput implements Http2Parser.Input {
 
