@@ -167,7 +167,12 @@ class Http2Parser {
         if (hpackDecoder == null) {
             hpackDecoder = output.getHpackDecoder();
         }
-        hpackDecoder.setHeaderEmitter(output.headersStart(streamId));
+        try {
+            hpackDecoder.setHeaderEmitter(output.headersStart(streamId));
+        } catch (StreamException se) {
+            swallow(payloadSize);
+            throw se;
+        }
 
         int padLength = 0;
         boolean padding = Flags.hasPadding(flags);
