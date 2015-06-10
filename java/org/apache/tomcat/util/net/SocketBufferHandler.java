@@ -28,9 +28,11 @@ public class SocketBufferHandler {
     private volatile boolean writeBufferConfiguredForWrite = true;
     private volatile ByteBuffer writeBuffer;
 
+    private final boolean direct;
 
     public SocketBufferHandler(int readBufferSize, int writeBufferSize,
             boolean direct) {
+        this.direct = direct;
         if (direct) {
             readBuffer = ByteBuffer.allocateDirect(readBufferSize);
             writeBuffer = ByteBuffer.allocateDirect(writeBufferSize);
@@ -156,4 +158,12 @@ public class SocketBufferHandler {
         configureWriteBufferForWrite();
         writeBuffer = ByteBufferUtils.expand(writeBuffer, newSize);
     }
+
+    public void free() {
+        if (direct) {
+            ByteBufferUtils.cleanDirectBuffer(readBuffer);
+            ByteBufferUtils.cleanDirectBuffer(writeBuffer);
+        }
+    }
+
 }

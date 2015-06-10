@@ -122,6 +122,14 @@ public class SecureNio2Channel extends Nio2Channel  {
         closing = false;
     }
 
+    @Override
+    public void free() {
+        super.free();
+        if (endpoint.getSocketProperties().getDirectSslBuffer()) {
+            ByteBufferUtils.cleanDirectBuffer(netInBuffer);
+            ByteBufferUtils.cleanDirectBuffer(netOutBuffer);
+        }
+    }
 
     private class FutureFlush implements Future<Boolean> {
         private Future<Integer> integer;

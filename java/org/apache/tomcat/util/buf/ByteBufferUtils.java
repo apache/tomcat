@@ -16,9 +16,28 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
 public class ByteBufferUtils {
+
+    private static final Method cleanerMethod;
+    private static final Method cleanMethod;
+
+    static {
+        try {
+            ByteBuffer tempBuffer = ByteBuffer.allocateDirect(0);
+            cleanerMethod = tempBuffer.getClass().getMethod("cleaner");
+            cleanerMethod.setAccessible(true);
+            Object cleanerObject = cleanerMethod.invoke(tempBuffer);
+            cleanMethod = cleanerObject.getClass().getMethod("clean");
+            cleanMethod.invoke(cleanerObject);
+        } catch (IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
 
     private ByteBufferUtils() {
         // Hide the default constructor since this is a utility class.
@@ -56,8 +75,10 @@ public class ByteBufferUtils {
         }
 
         ByteBuffer out;
+        boolean direct = false;
         if (in.isDirect()) {
             out = ByteBuffer.allocateDirect(newSize);
+            direct = true;
         } else {
             out = ByteBuffer.allocate(newSize);
         }
@@ -66,6 +87,20 @@ public class ByteBufferUtils {
         in.flip();
         out.put(in);
 
+        if (direct) {
+            cleanDirectBuffer(in);
+        }
+
         return out;
     }
+
+    public static void cleanDirectBuffer(ByteBuffer buf) {
+        try {
+            cleanMethod.invoke(cleanerMethod.invoke(buf));
+        } catch (IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException | SecurityException e) {
+            // Ignore
+        }
+    }
+
 }
