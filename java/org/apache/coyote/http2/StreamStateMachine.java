@@ -131,9 +131,7 @@ public class StreamStateMachine {
 
 
     public synchronized void closeIfIdle() {
-        if (state == State.IDLE) {
-            state = State.CLOSED_FINAL;
-        }
+        stateChange(State.IDLE, State.CLOSED_FINAL);
     }
 
 
