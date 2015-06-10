@@ -1,0 +1,11 @@
+Manifest-version: 1.0
+X-Compile-Source-JDK: @source.jdk@
+X-Compile-Target-JDK: @target.jdk@
+
+Name: javax/security/auth/message
+Specification-Title: Java Authentication SPI for Containers
+Specification-Version: 1.1
+Specification-Vendor: Sun Microsystems, Inc.
+Implementation-Title: javax.security.auth.message
+Implementation-Version: 1.1.@jaspic.revision@
+Implementation-Vendor: Apache Software Foundation
