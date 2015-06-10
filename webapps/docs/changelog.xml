@@ -160,6 +160,11 @@
         states have been transferred correctly from existing map members.
         (kfujino)
       </fix>
+      <fix>
+        Do not set the nodes that failed to replication to the backup nodes.
+        Ensure that the nodes that the data has been successfully replicated are
+        set to the backup node. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
