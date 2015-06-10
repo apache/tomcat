@@ -61,6 +61,11 @@ public class ByteUtil {
     }
 
 
+    public static void setOneBytes(byte[] output, int firstByte, int value) {
+        output[firstByte] = (byte) (value & 0xFF);
+    }
+
+
     public static void setTwoBytes(byte[] output, int firstByte, int value) {
         output[firstByte] = (byte) ((value & 0xFF00) >> 8);
         output[firstByte + 1] = (byte) (value & 0xFF);
