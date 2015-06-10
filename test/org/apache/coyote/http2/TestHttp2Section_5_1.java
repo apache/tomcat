@@ -204,5 +204,44 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
                         Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
-    // TODO 5.1.2 tests
+
+
+    @Test
+    public void testExceedMaxActiveStreams() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+
+        // http2Connect() - modified
+        enableHttp2(1);
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        sendLargeRequest(3);
+
+        sendSimpleRequest(5);
+
+        // 1 * headers
+        // 64k of body (8 * 8k)
+        // 1 * error (could be in any order)
+        for (int i = 0; i < 9; i++) {
+            parser.readFrame(true);
+        }
+        parser.readFrame(true);
+
+        // Release the remaining body
+        sendWindowUpdate(0, (1 << 31) - 1);
+        sendWindowUpdate(3, (1 << 31) - 1);
+
+        // 192k of body (24 * 8k)
+        // 1 * error (could be in any order)
+        for (int i = 0; i < 24; i++) {
+            parser.readFrame(true);
+        }
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().contains("5-RST-[" +
+                        Http2Error.REFUSED_STREAM.getCode() + "]"));
+    }
 }
