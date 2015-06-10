@@ -29,6 +29,8 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class Http2Protocol implements UpgradeProtocol {
 
+    private static final long DEFAULT_MAX_CONCURRENT_STREAMS = 200;
+
     private static final String HTTP_UPGRADE_NAME = "h2c";
     private static final String ALPN_NAME = "h2";
     private static final byte[] ALPN_IDENTIFIER = ALPN_NAME.getBytes(StandardCharsets.UTF_8);
@@ -37,6 +39,7 @@ public class Http2Protocol implements UpgradeProtocol {
     private long readTimeout = 10000;
     private long keepAliveTimeout = 30000;
     private long writeTimeout = 10000;
+    private long maxConcurrentStreams = DEFAULT_MAX_CONCURRENT_STREAMS;
 
     @Override
     public String getHttpUpgradeName(boolean isSecure) {
@@ -73,6 +76,7 @@ public class Http2Protocol implements UpgradeProtocol {
         result.setReadTimeout(getReadTimeout());
         result.setKeepAliveTimeout(getKeepAliveTimeout());
         result.setWriteTimeout(getWriteTimeout());
+        result.setMaxConcurrentStreams(getMaxConcurrentStreams());
 
         return result;
     }
@@ -127,5 +131,15 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public void setWriteTimeout(long writeTimeout) {
         this.writeTimeout = writeTimeout;
+    }
+
+
+    public long getMaxConcurrentStreams() {
+        return maxConcurrentStreams;
+    }
+
+
+    public void setMaxConcurrentStreams(long maxConcurrentStreams) {
+        this.maxConcurrentStreams = maxConcurrentStreams;
     }
 }

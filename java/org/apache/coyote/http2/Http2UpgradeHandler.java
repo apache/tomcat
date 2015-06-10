@@ -465,7 +465,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             if (stream.getOutputBuffer().isFinished()) {
                 header[4] = FLAG_END_OF_STREAM;
                 stream.sentEndOfStream();
-            }
+                if (!stream.isActive()) {
+                    activeRemoteStreamCount--;
+                }
+             }
             ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
             socketWrapper.write(true, header, 0, header.length);
             socketWrapper.write(true, data.array(), data.arrayOffset() + data.position(),
@@ -723,6 +726,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
+    public void setMaxConcurrentStreams(long maxConcurrentStreams) {
+        localSettings.setMaxConcurrentStreams(maxConcurrentStreams);
+    }
+
+
     // ----------------------------------------------- Http2Parser.Input methods
 
     @Override
@@ -776,10 +784,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void receiveEndOfStream(int streamId) throws ConnectionException {
         Stream stream = getStream(streamId, true);
-        if (stream.isActive()) {
+        stream.receivedEndOfStream();
+        if (!stream.isActive()) {
             activeRemoteStreamCount--;
         }
-        stream.receivedEndOfStream();
     }
 
 
