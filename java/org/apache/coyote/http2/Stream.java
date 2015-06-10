@@ -38,11 +38,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private volatile int weight = Constants.DEFAULT_WEIGHT;
 
     private final Http2UpgradeHandler handler;
+    private final StreamStateMachine state;
+    // TODO: Only create these objects if needed and null them when finished
     private final Request coyoteRequest;
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer;
     private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
-    private final StreamStateMachine state;
 
 
     public Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -257,6 +258,16 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
     void sendRst() {
         state.sendReset();
+    }
+
+
+    boolean isActive() {
+        return state.isActive();
+    }
+
+
+    void closeIfIdle() {
+        state.closeIfIdle();
     }
 
 

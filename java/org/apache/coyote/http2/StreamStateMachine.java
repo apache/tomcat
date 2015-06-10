@@ -130,6 +130,13 @@ public class StreamStateMachine {
     }
 
 
+    public synchronized void closeIfIdle() {
+        if (state == State.IDLE) {
+            state = State.CLOSED_FINAL;
+        }
+    }
+
+
     private enum State {
         IDLE               (false, true,  Http2Error.PROTOCOL_ERROR, FrameType.HEADERS,
                                                                      FrameType.PRIORITY),
