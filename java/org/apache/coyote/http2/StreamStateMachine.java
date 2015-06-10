@@ -108,11 +108,11 @@ public class StreamStateMachine {
         // state of this stream.
         if (!isFrameTypePermitted(frameType)) {
             if (state.connectionErrorForInvalidFrame) {
-                throw new ConnectionError(sm.getString("streamStateMachine.invalidFrame",
+                throw new ConnectionException(sm.getString("streamStateMachine.invalidFrame",
                         stream.getConnectionId(), stream.getIdentifier(), state, frameType),
                         state.errorCodeForInvalidFrame);
             } else {
-                throw new StreamError(sm.getString("streamStateMachine.invalidFrame",
+                throw new StreamException(sm.getString("streamStateMachine.invalidFrame",
                         stream.getConnectionId(), stream.getIdentifier(), state, frameType),
                         state.errorCodeForInvalidFrame, stream.getIdentifier().intValue());
             }

@@ -16,19 +16,14 @@
  */
 package org.apache.coyote.http2;
 
-public class StreamError extends Http2Exception {
+/**
+ * Thrown when an HTTP/2 connection error occurs.
+ */
+public class ConnectionException extends Http2Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private final int streamId;
-
-    public StreamError(String msg, Http2Error error, int streamId) {
+    public ConnectionException(String msg, Http2Error error) {
         super(msg, error);
-        this.streamId = streamId;
-    }
-
-
-    public int getStreamId() {
-        return streamId;
     }
 }
