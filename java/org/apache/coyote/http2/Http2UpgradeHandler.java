@@ -119,7 +119,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private final Map<Integer,Stream> streams = new HashMap<>();
     private volatile int activeRemoteStreamCount = 0;
     private volatile int maxRemoteStreamId = 0;
-    private volatile int maxActiveRemoteStreamId = 0;
+    // Start at -1 so the 'add 2' logic in closeIdleStreams() works
+    private volatile int maxActiveRemoteStreamId = -1;
 
     // Tracking for when the connection is blocked (windowSize < 1)
     private final Object backLogLock = new Object();
@@ -141,6 +142,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             Stream stream = new Stream(key, this, coyoteRequest);
             streams.put(key, stream);
             maxRemoteStreamId = 1;
+            maxActiveRemoteStreamId = 1;
             activeRemoteStreamCount = 1;
         }
     }
@@ -803,7 +805,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private void closeIdleStreams(int newMaxActiveRemoteStreamId) throws Http2Exception {
         for (int i = maxActiveRemoteStreamId + 2; i < newMaxActiveRemoteStreamId; i += 2) {
-            Stream stream = getStream(newMaxActiveRemoteStreamId, false);
+            Stream stream = getStream(i, false);
             if (stream != null) {
                 stream.closeIfIdle();
             }

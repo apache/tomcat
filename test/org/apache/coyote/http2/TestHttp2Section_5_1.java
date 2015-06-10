@@ -178,11 +178,31 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         Assert.assertTrue(output.getTrace(),
                 output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
                         Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
-
     }
 
 
-    // TODO Remaining 5.1.1 tests
+    @Test
+    public void testImplicitClose() throws Exception {
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+        http2Connect();
 
+        sendPriority(3, 0, 16);
+        sendPriority(5, 0, 16);
+
+        sendSimpleRequest(5);
+        readSimpleResponse();
+        Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
+        output.clearTrace();
+
+        // Should trigger an error since stream 3 should have been implicitly
+        // closed.
+        sendSimpleRequest(3);
+
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
+                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+    }
     // TODO 5.1.2 tests
 }
