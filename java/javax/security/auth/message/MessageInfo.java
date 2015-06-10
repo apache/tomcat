@@ -20,9 +20,6 @@ import java.util.Map;
 
 public interface MessageInfo {
 
-    @SuppressWarnings("rawtypes") // JASPIC API uses raw types
-    Map getMap();
-
     Object getRequestMessage();
 
     Object getResponseMessage();
@@ -30,4 +27,7 @@ public interface MessageInfo {
     void setRequestMessage(Object request);
 
     void setResponseMessage(Object response);
+
+    @SuppressWarnings("rawtypes") // JASPIC API uses raw types
+    Map getMap();
 }

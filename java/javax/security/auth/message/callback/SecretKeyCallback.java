@@ -36,12 +36,12 @@ public class SecretKeyCallback implements Callback {
         return request;
     }
 
-    public SecretKey getKey() {
-        return key;
-    }
-
     public void setKey(SecretKey key) {
         this.key = key;
+    }
+
+    public SecretKey getKey() {
+        return key;
     }
 
     public static interface Request {

@@ -28,11 +28,11 @@ public class TrustStoreCallback implements Callback {
 
     private KeyStore trustStore;
 
-    public KeyStore getTrustStore() {
-        return trustStore;
-    }
-
     public void setTrustStore(KeyStore trustStore) {
         this.trustStore = trustStore;
+    }
+
+    public KeyStore getTrustStore() {
+        return trustStore;
     }
 }

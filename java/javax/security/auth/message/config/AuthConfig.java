@@ -20,13 +20,13 @@ import javax.security.auth.message.MessageInfo;
 
 public interface AuthConfig {
 
+    String getMessageLayer();
+
     String getAppContext();
 
     String getAuthContextID(MessageInfo messageInfo) throws IllegalArgumentException;
 
-    String getMessageLayer();
+    void refresh();
 
     boolean isProtected();
-
-    void refresh();
 }

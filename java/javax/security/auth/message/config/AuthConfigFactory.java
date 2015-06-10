@@ -43,7 +43,10 @@ public abstract class AuthConfigFactory {
         });
     }
 
-    public static AuthConfigFactory getFactory() {
+    public AuthConfigFactory() {
+    }
+
+    public static synchronized AuthConfigFactory getFactory() {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new AuthPermission("getAuthConfigFactory"));
@@ -84,7 +87,7 @@ public abstract class AuthConfigFactory {
         return factory;
     }
 
-    public static void setFactory(AuthConfigFactory factory) {
+    public static synchronized void setFactory(AuthConfigFactory factory) {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
             sm.checkPermission(new AuthPermission("setAuthConfigFactory"));
@@ -92,38 +95,34 @@ public abstract class AuthConfigFactory {
         AuthConfigFactory.factory = factory;
     }
 
-
-    public AuthConfigFactory() {
-    }
-
-    public abstract String[] detachListener(RegistrationListener listener, String layer,
-            String appContext);
-
     public abstract AuthConfigProvider getConfigProvider(String layer, String appContext,
             RegistrationListener listener);
-
-    public abstract RegistrationContext getRegistrationContext(String registrationID);
-
-    public abstract String[] getRegistrationIDs(AuthConfigProvider provider);
-
-    public abstract void refresh();
-
-    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer,
-            String appContext, String description);
 
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
     public abstract String registerConfigProvider(String className, Map properties, String layer,
             String appContext, String description);
 
+    public abstract String registerConfigProvider(AuthConfigProvider provider, String layer,
+            String appContext, String description);
+
     public abstract boolean removeRegistration(String registrationID);
 
+    public abstract String[] detachListener(RegistrationListener listener, String layer,
+            String appContext);
+
+    public abstract String[] getRegistrationIDs(AuthConfigProvider provider);
+
+    public abstract RegistrationContext getRegistrationContext(String registrationID);
+
+    public abstract void refresh();
+
     public static interface RegistrationContext {
+
+        String getMessageLayer();
 
         String getAppContext();
 
         String getDescription();
-
-        String getMessageLayer();
 
         boolean isPersistent();
     }
