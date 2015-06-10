@@ -22,7 +22,7 @@ public class StreamError extends Http2Exception {
 
     private final int streamId;
 
-    public StreamError(String msg, Error error, int streamId) {
+    public StreamError(String msg, Http2Error error, int streamId) {
         super(msg, error);
         this.streamId = streamId;
     }

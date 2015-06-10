@@ -20,7 +20,7 @@ public class ConnectionError extends Http2Exception {
 
     private static final long serialVersionUID = 1L;
 
-    public ConnectionError(String msg, Error error) {
+    public ConnectionError(String msg, Http2Error error) {
         super(msg, error);
     }
 }

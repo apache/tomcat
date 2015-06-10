@@ -82,7 +82,7 @@ public class ConnectionSettings {
         // Need to put a sensible limit on this. Start with 16k (default is 4k)
         if (headerTableSize > (16 * 1024)) {
             throw new ConnectionError(sm.getString("connectionSettings.headerTableSizeLimit",
-                    Long.toString(headerTableSize)), Error.PROTOCOL_ERROR);
+                    Long.toString(headerTableSize)), Http2Error.PROTOCOL_ERROR);
         }
         this.headerTableSize = (int) headerTableSize;
     }
@@ -96,7 +96,7 @@ public class ConnectionSettings {
         // will never be negative
         if (enablePush > 1) {
             throw new ConnectionError(sm.getString("connectionSettings.enablePushInvalid",
-                    Long.toString(enablePush)), Error.PROTOCOL_ERROR);
+                    Long.toString(enablePush)), Http2Error.PROTOCOL_ERROR);
         }
         this.enablePush = (enablePush  == 1);
     }
@@ -117,7 +117,7 @@ public class ConnectionSettings {
         if (initialWindowSize > MAX_WINDOW_SIZE) {
             throw new ConnectionError(sm.getString("connectionSettings.windowSizeTooBig",
                     Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE)),
-                    Error.PROTOCOL_ERROR);
+                    Http2Error.PROTOCOL_ERROR);
         }
         this.initialWindowSize = (int) initialWindowSize;
     }
@@ -130,7 +130,7 @@ public class ConnectionSettings {
         if (maxFrameSize < MIN_MAX_FRAME_SIZE || maxFrameSize > MAX_MAX_FRAME_SIZE) {
             throw new ConnectionError(sm.getString("connectionSettings.maxFrameSizeInvalid",
                     Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
-                    Integer.toString(MAX_MAX_FRAME_SIZE)), Error.PROTOCOL_ERROR);
+                    Integer.toString(MAX_MAX_FRAME_SIZE)), Http2Error.PROTOCOL_ERROR);
         }
         this.maxFrameSize = (int) maxFrameSize;
     }
