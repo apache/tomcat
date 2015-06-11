@@ -1532,6 +1532,8 @@ public class AjpProcessor extends AbstractProcessor {
                 left = left - read;
                 start = start + read;
             }
+        } else if (read == -1) {
+            throw new EOFException();
         }
 
         return read > 0;
