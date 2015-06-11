@@ -32,8 +32,6 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
     @Test
     public void testHeaderDecodingError() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 
@@ -59,8 +57,6 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
     @Test
     public void testHeaderContinuationContiguous() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 
@@ -85,8 +81,6 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
     @Test
     public void testHeaderContinuationNonContiguous() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 

@@ -38,8 +38,6 @@ public class TestHttp2Section_4_1 extends Http2TestBase {
 
     @Test
     public void testUnknownFrameType() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         http2Connect();
         os.write(UNKNOWN_FRAME);
         os.flush();
@@ -54,8 +52,6 @@ public class TestHttp2Section_4_1 extends Http2TestBase {
 
     @Test
     public void testReservedBitIgnored() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 

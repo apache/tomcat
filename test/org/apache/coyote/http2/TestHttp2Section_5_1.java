@@ -64,7 +64,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void halfClosedRemoteInvalidFrame() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
         http2Connect();
 
         // This half-closes the stream since it includes the end of stream flag
@@ -85,8 +84,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void testClosedInvalidFrame01() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 
@@ -133,8 +130,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void testClientSendEvenStream() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 
@@ -155,8 +150,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void testClientSendOldStream() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         http2Connect();
         sendSimpleRequest(5);
         readSimpleResponse();
@@ -183,7 +176,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void testImplicitClose() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
         http2Connect();
 
         sendPriority(3, 0, 16);
@@ -208,8 +200,6 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void testExceedMaxActiveStreams() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // http2Connect() - modified
         enableHttp2(1);
         configureAndStartWebApplication();

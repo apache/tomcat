@@ -263,6 +263,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         input = new TestInput(is);
         output = new TestOutput();
         parser = new Http2Parser("-1", input, output);
+        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
     }
 
 
