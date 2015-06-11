@@ -76,7 +76,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         }
         case CLOSE: {
             // Tell the output buffer there will be no more data
-            stream.getOutputBuffer().finished();
+            stream.getOutputBuffer().close();
             // Then flush it
             action(ActionCode.CLIENT_FLUSH, null);
             break;

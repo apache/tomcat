@@ -456,6 +456,24 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    void sendSetting(int settingId, long value) throws IOException {
+        byte[] settingFrame = new byte[15];
+        // length
+        ByteUtil.setThreeBytes(settingFrame, 0, 6);
+        // type
+        settingFrame[3] = FrameType.SETTINGS.getIdByte();
+        // No flags
+        // Stream 0
+
+        // Payload
+        ByteUtil.setTwoBytes(settingFrame, 9, settingId);
+        ByteUtil.setFourBytes(settingFrame, 11, value);
+
+        os.write(settingFrame);
+        os.flush();
+    }
+
+
     private static class TestInput implements Http2Parser.Input {
 
         private final InputStream is;

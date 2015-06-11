@@ -275,11 +275,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
         private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
         private volatile long written = 0;
-        private volatile boolean finished = false;
+        private volatile boolean closed = false;
 
         @Override
         public int doWrite(ByteChunk chunk) throws IOException {
-            if (finished) {
+            if (closed) {
                 // TODO i18n
                 throw new IllegalStateException();
             }
@@ -293,7 +293,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 if (len > 0 && !buffer.hasRemaining()) {
                     // Only flush if we have more data to write and the buffer
                     // is full
-                    flush();
+                    flush(true);
                 }
             }
             written += offset;
@@ -301,6 +301,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
         public void flush() throws IOException {
+            flush(false);
+        }
+
+        private void flush(boolean writeInProgress) throws IOException {
             if (!coyoteResponse.isCommitted()) {
                 coyoteResponse.sendHeaders();
             }
@@ -348,7 +352,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 decrementWindowSize(thisWrite);
 
                 // Do the write
-                handler.writeBody(Stream.this, buffer, thisWrite);
+                handler.writeBody(Stream.this, buffer, thisWrite,
+                        !writeInProgress && closed && left == thisWrite);
                 left -= thisWrite;
                 buffer.position(buffer.position() + thisWrite);
             }
@@ -360,12 +365,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             return written;
         }
 
-        public void finished() {
-            finished = true;
+        public void close() {
+            closed = true;
         }
 
-        public boolean isFinished() {
-            return finished;
+        public boolean isClosed() {
+            return closed;
         }
 
         /**
@@ -373,7 +378,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          *         response has no body.
          */
         public boolean hasNoBody() {
-            return ((written == 0) && finished);
+            return ((written == 0) && closed);
         }
     }
 
