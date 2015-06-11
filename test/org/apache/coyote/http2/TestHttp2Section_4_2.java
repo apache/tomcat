@@ -30,8 +30,6 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
     @Test
     public void testFrameSizeLimitsTooBig() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 
@@ -67,8 +65,6 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
     @Test
     public void testFrameTypeLimitsTooBig() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 
@@ -97,8 +93,6 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
     @Test
     public void testFrameTypeLimitsTooSmall() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 
@@ -126,8 +120,6 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
     @Test
     public void testFrameTypeLimitsStream() throws Exception {
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
-
         // HTTP2 upgrade
         http2Connect();
 
