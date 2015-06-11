@@ -730,7 +730,7 @@ public class Http11InputBuffer implements InputBuffer {
         if (nRead > 0) {
             lastValid = pos + nRead;
             return true;
-        } else if (nRead < 0) {
+        } else if (nRead == -1) {
             throw new EOFException(sm.getString("iib.eof.error"));
         } else {
             return false;
