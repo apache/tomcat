@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http11;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -729,9 +730,12 @@ public class Http11InputBuffer implements InputBuffer {
         if (nRead > 0) {
             lastValid = pos + nRead;
             return true;
+        } else if (nRead < 0) {
+            throw new EOFException(sm.getString("iib.eof.error"));
+        } else {
+            return false;
         }
 
-        return false;
     }
 
 
