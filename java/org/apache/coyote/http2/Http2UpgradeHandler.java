@@ -453,7 +453,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    void writeBody(Stream stream, ByteBuffer data, int len) throws IOException {
+    void writeBody(Stream stream, ByteBuffer data, int len, boolean finished) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdentifier(),
                     Integer.toString(data.remaining())));
@@ -462,7 +462,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             byte[] header = new byte[9];
             ByteUtil.setThreeBytes(header, 0, len);
             header[3] = FrameType.DATA.getIdByte();
-            if (stream.getOutputBuffer().isFinished()) {
+            if (finished) {
                 header[4] = FLAG_END_OF_STREAM;
                 stream.sentEndOfStream();
                 if (!stream.isActive()) {
