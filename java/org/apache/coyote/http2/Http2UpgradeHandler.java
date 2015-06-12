@@ -563,7 +563,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             while (leftToAllocate > 0) {
                 leftToAllocate = allocate(this, leftToAllocate);
             }
-            allocate(this, increment);
             for (Entry<AbstractStream,int[]> entry : backLogStreams.entrySet()) {
                 int allocation = entry.getValue()[1];
                 if (allocation > 0) {
@@ -578,6 +577,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     private int allocate(AbstractStream stream, int allocation) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.allocate.debug", getConnectionId(),
+                    stream.getIdentifier(), Integer.toString(allocation)));
+        }
         // Allocate to the specified stream
         int[] value = backLogStreams.get(stream);
         if (value[0] >= allocation) {
@@ -592,6 +595,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         value[1] = value[0];
         value[0] = 0;
         leftToAllocate -= value[1];
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.allocate.left",
+                    getConnectionId(), stream.getIdentifier(), Integer.toString(leftToAllocate)));
+        }
 
         // Recipients are children of the current stream that are in the
         // backlog.
@@ -608,6 +616,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
             int totalWeight = 0;
             for (AbstractStream recipient : recipients) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.allocate.recipient",
+                            getConnectionId(), stream.getIdentifier(), recipient.getIdentifier(),
+                            Integer.toString(recipient.getWeight())));
+                }
                 totalWeight += recipient.getWeight();
             }
 
@@ -616,10 +629,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             Iterator<AbstractStream> iter = recipients.iterator();
             while (iter.hasNext()) {
                 AbstractStream recipient = iter.next();
-                // +1 is to avoid rounding issues triggering an infinite loop.
-                // Will cause a very slight over allocation but HTTP/2 should
-                // cope with that.
-                int share = 1 + leftToAllocate * recipient.getWeight() / totalWeight;
+                int share = leftToAllocate * recipient.getWeight() / totalWeight;
+                if (share == 0) {
+                    // This is to avoid rounding issues triggering an infinite
+                    // loop. It will cause a very slight over allocation but
+                    // HTTP/2 should cope with that.
+                    share = 1;
+                }
                 int remainder = allocate(recipient, share);
                 // Remove recipients that receive their full allocation so that
                 // they are excluded from the next allocation round.
