@@ -2581,7 +2581,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         @Override
         protected void doWriteInternal(boolean block) throws IOException {
             if (closed) {
-                throw new IOException(sm.getString("apr.closed", getSocket()));
+                throw new IOException(sm.getString("socket.apr.closed", getSocket()));
             }
 
             Lock readLock = getBlockingStatusReadLock();
