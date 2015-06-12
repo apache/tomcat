@@ -540,7 +540,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     protected void incrementWindowSize(int increment) throws Http2Exception {
         synchronized (backLogLock) {
-            if (getWindowSize() < 1) {
+            long windowSize = getWindowSize();
+            if (windowSize < 1 && windowSize + increment > 0) {
                 releaseBackLog(increment);
             }
             super.incrementWindowSize(increment);
