@@ -456,7 +456,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     void writeBody(Stream stream, ByteBuffer data, int len, boolean finished) throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdentifier(),
-                    Integer.toString(data.remaining())));
+                    Integer.toString(len)));
         }
         synchronized (socketWrapper) {
             byte[] header = new byte[9];
@@ -628,6 +628,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // Use an Iterator so fully allocated children/recipients can be
             // removed.
             Iterator<AbstractStream> iter = recipients.iterator();
+            int allocated = 0;
             while (iter.hasNext()) {
                 AbstractStream recipient = iter.next();
                 int share = leftToAllocate * recipient.getWeight() / totalWeight;
@@ -643,8 +644,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 if (remainder > 0) {
                     iter.remove();
                 }
-                leftToAllocate -= (share - remainder);
+                allocated += (share - remainder);
             }
+            leftToAllocate -= allocated;
         }
 
         return 0;
