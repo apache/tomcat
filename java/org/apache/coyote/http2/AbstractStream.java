@@ -19,10 +19,17 @@ package org.apache.coyote.http2;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Used to managed prioritisation.
  */
 abstract class AbstractStream {
+
+    private static final Log log = LogFactory.getLog(AbstractStream.class);
+    private static final StringManager sm = StringManager.getManager(AbstractStream.class);
 
     private final Integer identifier;
 
@@ -109,10 +116,14 @@ abstract class AbstractStream {
     protected void incrementWindowSize(int increment) throws Http2Exception {
         synchronized (windowSizeLock) {
             // Overflow protection
-            if (Long.MAX_VALUE - increment > windowSize) {
+            if (Long.MAX_VALUE - increment < windowSize) {
                 windowSize = Long.MAX_VALUE;
             } else {
                 windowSize += increment;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(),
+                        getIdentifier(), Integer.toString(increment), Long.toString(windowSize)));
             }
         }
     }
@@ -124,6 +135,10 @@ abstract class AbstractStream {
         // decrements are permitted
         synchronized (windowSizeLock) {
             windowSize -= decrement;
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(),
+                        getIdentifier(), Integer.toString(decrement), Long.toString(windowSize)));
+            }
         }
     }
 
