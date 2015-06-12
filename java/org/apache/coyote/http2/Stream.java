@@ -134,7 +134,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    private int reserveWindowSize(int reservation) {
+    private int checkWindowSize(int reservation) {
         long windowSize = getWindowSize();
         if (reservation > windowSize) {
             return (int) windowSize;
@@ -318,7 +318,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             while (left > 0) {
                 // Flow control for the Stream
                 do {
-                    thisWriteStream = reserveWindowSize(left);
+                    thisWriteStream = checkWindowSize(left);
                     if (thisWriteStream < 1) {
                         // Need to block until a WindowUpdate message is
                         // processed for this stream
@@ -349,6 +349,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     }
                 } while (thisWrite < 1);
 
+                // Stream.checkWindowSize() doesn't reduce the flow control
+                // window (reserveWindowSize() does) so the Stream's window
+                // needs to be reduced here.
                 decrementWindowSize(thisWrite);
 
                 // Do the write
