@@ -520,8 +520,12 @@
     description="Uses Checkstyle tool to perform style check for the source code">
     <!-- Required so we can cache checkstyle results -->
     <mkdir dir="${tomcat.output}/res/checkstyle"/>
+    <available property="checkstyletask.properties" resource="checkstyletask.properties"
+       classpath="${checkstyle.jar}" value="checkstyletask.properties"/>
+    <available property="checkstyletask.properties" resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"
+       classpath="${checkstyle.jar}" value="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties"/>
 
-    <taskdef resource="checkstyletask.properties"
+    <taskdef resource="${checkstyletask.properties}"
              classpath="${checkstyle.jar}" />
     <checkstyle config="res/checkstyle/checkstyle.xml">
       <fileset dir="." >
