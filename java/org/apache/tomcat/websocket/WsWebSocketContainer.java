@@ -83,7 +83,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private final Object asynchronousChannelGroupLock = new Object();
 
     private final Log log = LogFactory.getLog(WsWebSocketContainer.class);
-    private final Map<Class<?>, Set<WsSession>> endpointSessionMap =
+    private final Map<Endpoint, Set<WsSession>> endpointSessionMap =
             new HashMap<>();
     private final Map<WsSession,WsSession> sessions = new ConcurrentHashMap<>();
     private final Object endPointSessionMapLock = new Object();
@@ -370,8 +370,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     protected void registerSession(Endpoint endpoint, WsSession wsSession) {
 
-        Class<?> endpointClazz = endpoint.getClass();
-
         if (!wsSession.isOpen()) {
             // The session was closed during onOpen. No need to register it.
             return;
@@ -380,10 +378,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             if (endpointSessionMap.size() == 0) {
                 BackgroundProcessManager.getInstance().register(this);
             }
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpointClazz);
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
             if (wsSessions == null) {
                 wsSessions = new HashSet<>();
-                endpointSessionMap.put(endpointClazz, wsSessions);
+                endpointSessionMap.put(endpoint, wsSessions);
             }
             wsSessions.add(wsSession);
         }
@@ -411,7 +409,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    Set<Session> getOpenSessions(Class<?> endpoint) {
+    Set<Session> getOpenSessions(Endpoint endpoint) {
         HashSet<Session> result = new HashSet<>();
         synchronized (endPointSessionMapLock) {
             Set<WsSession> sessions = endpointSessionMap.get(endpoint);
