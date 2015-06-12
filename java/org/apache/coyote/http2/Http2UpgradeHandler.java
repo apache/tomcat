@@ -530,7 +530,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             } else {
                 result = toWrite;
             }
-            decrementWindowSize(-result);
+            decrementWindowSize(result);
         }
         return result;
     }
