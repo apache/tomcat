@@ -391,14 +391,12 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     protected void unregisterSession(Endpoint endpoint, WsSession wsSession) {
 
-        Class<?> endpointClazz = endpoint.getClass();
-
         synchronized (endPointSessionMapLock) {
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpointClazz);
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
             if (wsSessions != null) {
                 wsSessions.remove(wsSession);
                 if (wsSessions.size() == 0) {
-                    endpointSessionMap.remove(endpointClazz);
+                    endpointSessionMap.remove(endpoint);
                 }
             }
             if (endpointSessionMap.size() == 0) {
