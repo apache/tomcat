@@ -18,7 +18,6 @@ package org.apache.coyote.http2;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Used to managed prioritisation.
@@ -29,7 +28,8 @@ abstract class AbstractStream {
 
     private volatile AbstractStream parentStream = null;
     private final Set<AbstractStream> childStreams = new HashSet<>();
-    private AtomicLong windowSize = new AtomicLong(ConnectionSettings.DEFAULT_WINDOW_SIZE);
+    private long windowSize = ConnectionSettings.DEFAULT_WINDOW_SIZE;
+    private final Object windowSizeLock = new Object();
 
     public Integer getIdentifier() {
         return identifier;
@@ -89,12 +89,16 @@ abstract class AbstractStream {
 
 
     protected void setWindowSize(long windowSize) {
-        this.windowSize.set(windowSize);
+        synchronized (windowSizeLock) {
+            this.windowSize = windowSize;
+        }
     }
 
 
     protected long getWindowSize() {
-        return windowSize.get();
+        synchronized (windowSizeLock) {
+            return windowSize;
+        }
     }
 
 
@@ -103,12 +107,24 @@ abstract class AbstractStream {
      * @throws Http2Exception
      */
     protected void incrementWindowSize(int increment) throws Http2Exception {
-        windowSize.addAndGet(increment);
+        synchronized (windowSizeLock) {
+            // Overflow protection
+            if (Long.MAX_VALUE - increment > windowSize) {
+                windowSize = Long.MAX_VALUE;
+            } else {
+                windowSize += increment;
+            }
+        }
     }
 
 
     protected void decrementWindowSize(int decrement) {
-        windowSize.addAndGet(-decrement);
+        // No need for overflow protection here. Decrement can never be larger
+        // the Integer.MAX_VALUE and once windowSize does negative no further
+        // decrements are permitted
+        synchronized (windowSizeLock) {
+            windowSize -= decrement;
+        }
     }
 
 
