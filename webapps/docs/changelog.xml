@@ -406,7 +406,9 @@
       </add>
       <fix>
         <bug>55988</bug>: Add support for Java 8 JSSE server-preferred TLS
-        cipher suite ordering. This feature requires Java 8.
+        cipher suite ordering. This feature requires Java 8
+        and is controlled by <code>useServerCipherSuitesOrder</code>
+        attribute on an HTTP connector.
         Based upon patches provided by Ognjen Blagojevic. (schultz)
       </fix>
       <add>
