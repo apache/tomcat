@@ -61,8 +61,16 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         sendPriority(19, 17,  3);
         sendPriority(21, 17, 11);
 
-        // Send a simple request on each stream
+        // First, process a request on stream 17. This should consume both
+        // stream 17's window and the connection window.
         sendSimpleRequest(17);
+        // 17-headers, 17-1k-body
+        parser.readFrame(true);
+        parser.readFrame(true);
+        output.clearTrace();
+
+        // Send additional requests. Connection window is empty so only headers
+        // will be returned.
         sendSimpleRequest(19);
         sendSimpleRequest(21);
 
@@ -72,16 +80,13 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         sendWindowUpdate(21, 16*1024);
 
         // Read some frames
-        // 17-headers, 17-1k-body, 19-headers, 21-headers
-
-        for (int i = 0; i < 4; i++) {
-            parser.readFrame(true);
-        }
+        // 19-headers, 21-headers
+        parser.readFrame(true);
+        parser.readFrame(true);
         output.clearTrace();
 
-        // Stream 17 should have used up its own 1k window and the connection 1k
-        // window. At this point 17 is blocked because the stream window is zero
-        // small and 19 & 21 are blocked because the connection window is zero.
+        // At this point 17 is blocked because the stream window is zero and
+        // 19 & 21 are blocked because the connection window is zero.
 
         // This should release a single byte from each of 19 and 21 (the update
         // is allocated by weight and then rounded up).
