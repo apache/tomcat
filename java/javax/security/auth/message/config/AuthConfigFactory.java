@@ -46,7 +46,7 @@ public abstract class AuthConfigFactory {
             new SecurityPermission(PROVIDER_REGISTRATION_PERMISSION_NAME);
 
     private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL =
-            "org.apache.geronimo.components.jaspi.AuthConfigFactoryImpl";
+            "org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl";
 
     private static AuthConfigFactory factory;
     private static ClassLoader contextClassLoader;
