@@ -115,8 +115,8 @@ public class WsWebSocketContainer
     private final Object asynchronousChannelGroupLock = new Object();
 
     private final Log log = LogFactory.getLog(WsWebSocketContainer.class);
-    private final Map<Class<?>, Set<WsSession>> endpointSessionMap =
-            new HashMap<Class<?>, Set<WsSession>>();
+    private final Map<Endpoint, Set<WsSession>> endpointSessionMap =
+            new HashMap<Endpoint, Set<WsSession>>();
     private final Map<WsSession,WsSession> sessions = new ConcurrentHashMap<WsSession, WsSession>();
     private final Object endPointSessionMapLock = new Object();
 
@@ -424,8 +424,6 @@ public class WsWebSocketContainer
 
     protected void registerSession(Endpoint endpoint, WsSession wsSession) {
 
-        Class<?> endpointClazz = endpoint.getClass();
-
         if (!wsSession.isOpen()) {
             // The session was closed during onOpen. No need to register it.
             return;
@@ -434,10 +432,10 @@ public class WsWebSocketContainer
             if (endpointSessionMap.size() == 0) {
                 BackgroundProcessManager.getInstance().register(this);
             }
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpointClazz);
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
             if (wsSessions == null) {
                 wsSessions = new HashSet<WsSession>();
-                endpointSessionMap.put(endpointClazz, wsSessions);
+                endpointSessionMap.put(endpoint, wsSessions);
             }
             wsSessions.add(wsSession);
         }
@@ -447,14 +445,12 @@ public class WsWebSocketContainer
 
     protected void unregisterSession(Endpoint endpoint, WsSession wsSession) {
 
-        Class<?> endpointClazz = endpoint.getClass();
-
         synchronized (endPointSessionMapLock) {
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpointClazz);
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
             if (wsSessions != null) {
                 wsSessions.remove(wsSession);
                 if (wsSessions.size() == 0) {
-                    endpointSessionMap.remove(endpointClazz);
+                    endpointSessionMap.remove(endpoint);
                 }
             }
             if (endpointSessionMap.size() == 0) {
@@ -465,7 +461,7 @@ public class WsWebSocketContainer
     }
 
 
-    Set<Session> getOpenSessions(Class<?> endpoint) {
+    Set<Session> getOpenSessions(Endpoint endpoint) {
         HashSet<Session> result = new HashSet<Session>();
         synchronized (endPointSessionMapLock) {
             Set<WsSession> sessions = endpointSessionMap.get(endpoint);

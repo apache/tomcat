@@ -143,6 +143,11 @@
         <code>javax.websocket.server.ServerEndpointConfig</code> as they vary
         between different requests. (violetagg)
       </fix>
+      <fix>
+        <bug>57974</bug>: Session.getOpenSessions should return all sessions
+        associated with a given endpoint instance, rather than all sessions
+        from the endpoint class. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
