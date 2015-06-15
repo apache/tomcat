@@ -64,12 +64,9 @@ source distribution, do the following:
     into which you installed the JDK release.
 
 
-(2) Install Apache Ant version 1.9.3 or later on your computer.
+(2) Install Apache Ant version 1.9.5 or later on your computer.
 
-    Note: Ant 1.9.4 has a regression and cannot be used for Tomcat's
-    release build (Ant bug 56641).
-
- 1. If Apache Ant version 1.9.3 or later is already installed on your
+ 1. If Apache Ant version 1.9.5 or later is already installed on your
     computer, skip to (3).
 
  2. Download a binary distribution of Ant from:

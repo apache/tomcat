@@ -41,6 +41,12 @@ test.haltonfailure=false
 # Activate AccessLog during testing
 test.accesslog=false
 
+# Number of parallel threads to use for testing. The recommended value is one
+# thread per core.
+# Note: Cobertura code coverage currently requires this to be set to 1. Setting
+#       a value above one will disable code coverage if enabled.
+test.threads=1
+
 # Note the Cobertura code coverage tool is GPLv2 licensed
 test.cobertura=false
 
