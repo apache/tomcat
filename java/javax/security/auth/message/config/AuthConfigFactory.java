@@ -21,6 +21,7 @@ import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.security.Security;
 import java.security.SecurityPermission;
 import java.util.Map;
 
@@ -66,24 +67,15 @@ public abstract class AuthConfigFactory {
     public static synchronized AuthConfigFactory getFactory() {
         checkPermission(getFactorySecurityPermission);
         if (factory == null) {
-            String className = AccessController.doPrivileged(new PrivilegedAction<String>() {
-                @Override
-                public String run() {
-                    return java.security.Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
-                }
-            });
-            if (className == null) {
-                className = DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL;
-            }
+            final String className = getFactoryClassName();
             try {
-                final String finalClassName = className;
                 factory = AccessController.doPrivileged(
                         new PrivilegedExceptionAction<AuthConfigFactory>() {
                     @Override
                     public AuthConfigFactory run() throws ClassNotFoundException,
                             InstantiationException, IllegalAccessException {
                         // TODO Review this
-                        Class<?> clazz = Class.forName(finalClassName, true, contextClassLoader);
+                        Class<?> clazz = Class.forName(className, true, contextClassLoader);
                         return (AuthConfigFactory) clazz.newInstance();
                     }
                 });
@@ -132,6 +124,21 @@ public abstract class AuthConfigFactory {
         if (securityManager != null) {
             securityManager.checkPermission(permission);
         }
+    }
+
+    private static String getFactoryClassName() {
+        String className = AccessController.doPrivileged(new PrivilegedAction<String>() {
+            @Override
+            public String run() {
+                return Security.getProperty(DEFAULT_FACTORY_SECURITY_PROPERTY);
+            }
+        });
+
+        if (className != null) {
+            return className;
+        }
+
+        return DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL;
     }
 
     public static interface RegistrationContext {
