@@ -16,6 +16,9 @@
  */
 package org.apache.catalina.authenticator.jaspic;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.message.config.AuthConfigFactory;
@@ -24,47 +27,145 @@ import javax.security.auth.message.config.RegistrationListener;
 
 public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
+    private Map<String, ConfigProviderInfo> configProviders = new HashMap<>();
+
+
     @Override
     public AuthConfigProvider getConfigProvider(String layer, String appContext,
             RegistrationListener listener) {
-        return null;
+
+        String registrationKey = getRegistrationKey(layer, appContext);
+
+        ConfigProviderInfo provider = configProviders.get(registrationKey);
+        if (provider == null) {
+            provider = configProviders.get(getRegistrationKey(null, appContext));
+        }
+        if (provider == null) {
+            provider = configProviders.get(getRegistrationKey(layer, null));
+        }
+        if (provider == null) {
+            provider = configProviders.get(getRegistrationKey(null, null));
+        }
+        if (provider == null) {
+            return null;
+        }
+
+        if (listener != null) {
+            provider.addListener(listener);
+        }
+
+        return provider.getAuthConfigProvider();
     }
+
 
     @Override
     @SuppressWarnings("rawtypes") // JASPIC API uses raw types
     public String registerConfigProvider(String className, Map properties, String layer,
             String appContext, String description) {
-        return null;
+        throw new IllegalStateException("Not implemented yet!");
     }
+
 
     @Override
     public String registerConfigProvider(AuthConfigProvider provider, String layer,
             String appContext, String description) {
-        return null;
+
+        String registrationId = getRegistrationKey(layer, appContext);
+        ConfigProviderInfo providerInfo =
+                new ConfigProviderInfo(provider, true, layer, appContext, description);
+        configProviders.put(registrationId, providerInfo);
+        return registrationId;
     }
+
 
     @Override
     public boolean removeRegistration(String registrationID) {
-        return false;
+        return configProviders.remove(registrationID) != null;
     }
+
 
     @Override
     public String[] detachListener(RegistrationListener listener, String layer, String appContext) {
         return null;
     }
 
+
     @Override
     public String[] getRegistrationIDs(AuthConfigProvider provider) {
         return null;
     }
 
+
     @Override
     public RegistrationContext getRegistrationContext(String registrationID) {
-        return null;
+        return configProviders.get(registrationID);
     }
+
 
     @Override
     public void refresh() {
 
+    }
+
+
+    private String getRegistrationKey(String layer, String appContext) {
+        return layer + "/" + appContext;
+    }
+
+
+    private static class ConfigProviderInfo implements AuthConfigFactory.RegistrationContext {
+        private final AuthConfigProvider authConfigProvider;
+        private String appContext;
+        private String description;
+        private String messageLayer;
+        private final boolean persistent;
+        private final List<RegistrationListener> listeners = new ArrayList<>();
+
+        private ConfigProviderInfo(AuthConfigProvider authConfigProvider, boolean persistent,
+                String layer, String appContext, String description) {
+            this.authConfigProvider = authConfigProvider;
+            this.persistent = persistent;
+            this.messageLayer = layer;
+            this.appContext = appContext;
+            this.description = description;
+        }
+
+        private ConfigProviderInfo(AuthConfigProvider authConfigProvider,
+                List<RegistrationListener> listeners, boolean persistent) {
+            this.authConfigProvider = authConfigProvider;
+            this.persistent = persistent;
+        }
+
+        public AuthConfigProvider getAuthConfigProvider() {
+            return authConfigProvider;
+        }
+
+        public List<RegistrationListener> getListeners() {
+            return listeners;
+        }
+
+        public void addListener(RegistrationListener listener) {
+            listeners.add(listener);
+        }
+
+        @Override
+        public String getAppContext() {
+            return appContext;
+        }
+
+        @Override
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public String getMessageLayer() {
+            return messageLayer;
+        }
+
+        @Override
+        public boolean isPersistent() {
+            return persistent;
+        }
     }
 }
