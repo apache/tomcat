@@ -66,30 +66,33 @@ public abstract class AuthConfigFactory {
 
     public static synchronized AuthConfigFactory getFactory() {
         checkPermission(getFactorySecurityPermission);
-        if (factory == null) {
-            final String className = getFactoryClassName();
-            try {
-                factory = AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<AuthConfigFactory>() {
-                    @Override
-                    public AuthConfigFactory run() throws ClassNotFoundException,
-                            InstantiationException, IllegalAccessException {
-                        // TODO Review this
-                        Class<?> clazz = Class.forName(className, true, contextClassLoader);
-                        return (AuthConfigFactory) clazz.newInstance();
-                    }
-                });
-            } catch (PrivilegedActionException e) {
-                Exception inner = e.getException();
-                if (inner instanceof InstantiationException) {
-                    throw (SecurityException) new SecurityException("AuthConfigFactory error:"
-                            + inner.getCause().getMessage()).initCause(inner.getCause());
-                } else {
-                    throw (SecurityException) new SecurityException(
-                            "AuthConfigFactory error: " + inner).initCause(inner);
+        if (factory != null) {
+            return factory;
+        }
+
+        final String className = getFactoryClassName();
+        try {
+            factory = AccessController.doPrivileged(
+                    new PrivilegedExceptionAction<AuthConfigFactory>() {
+                @Override
+                public AuthConfigFactory run() throws ClassNotFoundException,
+                        InstantiationException, IllegalAccessException {
+                    // TODO Review this
+                    Class<?> clazz = Class.forName(className, true, contextClassLoader);
+                    return (AuthConfigFactory) clazz.newInstance();
                 }
+            });
+        } catch (PrivilegedActionException e) {
+            Exception inner = e.getException();
+            if (inner instanceof InstantiationException) {
+                throw (SecurityException) new SecurityException("AuthConfigFactory error:" +
+                        inner.getCause().getMessage()).initCause(inner.getCause());
+            } else {
+                throw (SecurityException) new SecurityException(
+                        "AuthConfigFactory error: " + inner).initCause(inner);
             }
         }
+
         return factory;
     }
 
