@@ -17,8 +17,12 @@
 package org.apache.catalina.startup;
 
 import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.LogManager;
 
 import static org.junit.Assert.fail;
 
@@ -27,6 +31,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
+import org.apache.juli.ClassLoaderLogManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -97,10 +102,12 @@ public abstract class LoggingBaseTest {
     @Before
     public void setUp() throws Exception {
         // Create catalina.base directory
-        tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
-        if (!tempDir.mkdirs() && !tempDir.isDirectory()) {
-            fail("Unable to create temporary directory for test");
+        File tempBase = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
+        if (!tempBase.mkdirs() && !tempBase.isDirectory()) {
+            fail("Unable to create base temporary directory for tests");
         }
+        Path tempBasePath = FileSystems.getDefault().getPath(tempBase.getAbsolutePath());
+        tempDir = Files.createTempDirectory(tempBasePath, "test").toFile();
 
         System.setProperty("catalina.base", tempDir.getAbsolutePath());
 
@@ -121,5 +128,13 @@ public abstract class LoggingBaseTest {
             ExpandWar.delete(file);
         }
         deleteOnTearDown.clear();
+
+        LogManager logManager = LogManager.getLogManager();
+        if (logManager instanceof ClassLoaderLogManager) {
+            ((ClassLoaderLogManager) logManager).shutdown();
+        } else {
+            logManager.reset();
+        }
+        ExpandWar.deleteDir(tempDir);
     }
 }
