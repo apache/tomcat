@@ -91,6 +91,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsecrtion name="Other">
+    <changelog>
+      <add>
+        Support the use of the <code>threads</code> attribute on Ant&apos;s
+        junit task. Note that using this with a value of greater than one will
+        disbale Cobertura code coverage. (markt)
+      </add>
+    </changelog>
+  </subsecrtion>
 </section>
 </body>
 </document>
