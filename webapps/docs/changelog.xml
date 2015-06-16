@@ -98,6 +98,11 @@
         <bug>57977</bug>: Correctly bind and unbind the web application class
         loader during execution of the PersistentValve. (markt)
       </fix>
+      <fix>
+        <bug>58023</bug>: Fix potentially execessive memory usage due to
+        unnecessary caching of JAR manifests in the web application class
+        loader. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

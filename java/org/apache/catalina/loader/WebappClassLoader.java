@@ -151,15 +151,17 @@ public class WebappClassLoader
 
         protected String name;
         protected String path;
+        protected boolean manifestRequired;
 
-        PrivilegedFindResourceByName(String name, String path) {
+        PrivilegedFindResourceByName(String name, String path, boolean manifestRequired) {
             this.name = name;
             this.path = path;
+            this.manifestRequired = manifestRequired;
         }
 
         @Override
         public ResourceEntry run() {
-            return findResourceInternal(name, path);
+            return findResourceInternal(name, path, manifestRequired);
         }
 
     }
@@ -1288,10 +1290,10 @@ public class WebappClassLoader
             if (entry == null) {
                 if (securityManager != null) {
                     PrivilegedAction<ResourceEntry> dp =
-                        new PrivilegedFindResourceByName(name, name);
+                        new PrivilegedFindResourceByName(name, name, false);
                     entry = AccessController.doPrivileged(dp);
                 } else {
-                    entry = findResourceInternal(name, name);
+                    entry = findResourceInternal(name, name, false);
                 }
             }
             if (entry != null) {
@@ -2886,10 +2888,10 @@ public class WebappClassLoader
 
         if (securityManager != null) {
             PrivilegedAction<ResourceEntry> dp =
-                new PrivilegedFindResourceByName(name, classPath);
+                new PrivilegedFindResourceByName(name, classPath, true);
             entry = AccessController.doPrivileged(dp);
         } else {
-            entry = findResourceInternal(name, classPath);
+            entry = findResourceInternal(name, classPath, true);
         }
 
         if (entry == null)
@@ -2997,7 +2999,8 @@ public class WebappClassLoader
      *
      * @return the loaded resource, or null if the resource isn't found
      */
-    protected ResourceEntry findResourceInternal(String name, String path) {
+    protected ResourceEntry findResourceInternal(String name, String path,
+            boolean manifestRequired) {
 
         if (!started) {
             log.info(sm.getString("webappClassLoader.stopped", name));
@@ -3132,7 +3135,9 @@ public class WebappClassLoader
                         }
                         contentLength = (int) jarEntry.getSize();
                         try {
-                            entry.manifest = jarFiles[i].getManifest();
+                            if (manifestRequired) {
+                                entry.manifest = jarFiles[i].getManifest();
+                            }
                             binaryStream = jarFiles[i].getInputStream(jarEntry);
                         } catch (IOException e) {
                             return null;
