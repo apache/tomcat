@@ -581,7 +581,6 @@ public final class Response {
         // the container will call listener.onWritePossible() once data can be
         // written.
         if (isReady()) {
-            action(ActionCode.DISPATCH_WRITE, null);
             synchronized (nonBlockingStateLock) {
                 // Ensure we don't get multiple write registrations if
                 // ServletOutputStream.isReady() returns false during a call to
@@ -591,6 +590,11 @@ public final class Response {
                 // container tries to trigger onWritePossible, nothing will
                 // happen
                 fireListener = true;
+            }
+            action(ActionCode.DISPATCH_WRITE, null);
+            if (!ContainerThreadMarker.isContainerThread()) {
+                // Not on a container thread so need to execute the dispatch
+                action(ActionCode.DISPATCH_EXECUTE, null);
             }
         }
     }
