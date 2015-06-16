@@ -146,8 +146,7 @@
     <attribute name="recoverySleepTime" required="false">
       <p>
       When <code>recoveryEnabled==true</code> this value indicates how long time (in milliseconds)
-      the system will sleep in between recovery attempts, until we either recovered successfully or we have reached the
-      recoveryCounter limit.
+      the system will sleep in between recovery attempts, until it recovers successfully.
       The default is <code>5000</code> (5 seconds). <br/>
       </p>
     </attribute>
