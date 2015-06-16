@@ -231,6 +231,11 @@ class Http2Parser {
         int parentStreamId = ByteUtil.get31Bits(payload, 0);
         int weight = ByteUtil.getOneByte(payload, 4) + 1;
 
+        if (streamId == parentStreamId) {
+            throw new StreamException(sm.getString("http2Parser.processFramePriority.invalidParent",
+                    connectionId, Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR, streamId);
+        }
+
         output.reprioritise(streamId, parentStreamId, exclusive, weight);
     }
 
