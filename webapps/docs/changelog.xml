@@ -166,6 +166,10 @@
         <bug>57282</bug>: Update request processing sequence diagrams. Updated
         diagrams provided by Stephen Chen. (markt)
       </fix>
+      <fix>
+        <bug>57971</bug>: Correct the documentation for the cluster
+        configuration setting <code>recoverySleepTime</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
