@@ -2696,7 +2696,7 @@ public class Request
                                 // Should not be possible
                             }
                         }
-                        if (maxPostSize > 0) {
+                        if (maxPostSize >= 0) {
                             // Have to calculate equivalent size. Not completely
                             // accurate but close enough.
                             if (charset == null) {
@@ -3008,7 +3008,7 @@ public class Request
 
             if (len > 0) {
                 int maxPostSize = connector.getMaxPostSize();
-                if ((maxPostSize > 0) && (len > maxPostSize)) {
+                if ((maxPostSize >= 0) && (len > maxPostSize)) {
                     Context context = getContext();
                     if (context != null && context.getLogger().isDebugEnabled()) {
                         context.getLogger().debug(
@@ -3100,7 +3100,7 @@ public class Request
         int len = 0;
         while (len > -1) {
             len = getStream().read(buffer, 0, CACHED_POST_LEN);
-            if (connector.getMaxPostSize() > 0 &&
+            if (connector.getMaxPostSize() >= 0 &&
                     (body.getLength() + len) > connector.getMaxPostSize()) {
                 // Too much data
                 checkSwallowInput();
