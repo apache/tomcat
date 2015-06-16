@@ -260,6 +260,10 @@ public class InputBuffer extends Reader
         // is not required.
         if (!coyoteRequest.isFinished() && isReady()) {
             coyoteRequest.action(ActionCode.DISPATCH_READ, null);
+            if (!ContainerThreadMarker.isContainerThread()) {
+                // Not on a container thread so need to execute the dispatch
+                coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
+            }
         }
     }
 
