@@ -121,6 +121,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private volatile int maxRemoteStreamId = 0;
     // Start at -1 so the 'add 2' logic in closeIdleStreams() works
     private volatile int maxActiveRemoteStreamId = -1;
+    private volatile int maxProcessedStreamId;
 
     // Tracking for when the connection is blocked (windowSize < 1)
     private final Object backLogLock = new Object();
@@ -144,6 +145,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             maxRemoteStreamId = 1;
             maxActiveRemoteStreamId = 1;
             activeRemoteStreamCount = 1;
+            maxProcessedStreamId = 1;
         }
     }
 
@@ -378,8 +380,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private void closeConnection(Http2Exception ce) {
         // Write a GOAWAY frame.
         byte[] fixedPayload = new byte[8];
-        // TODO needs to be correct value
-        ByteUtil.set31Bits(fixedPayload, 0, (2 << 31) - 1);
+        ByteUtil.set31Bits(fixedPayload, 0, maxProcessedStreamId);
         ByteUtil.setFourBytes(fixedPayload, 4, ce.getError().getCode());
         byte[] debugMessage = ce.getMessage().getBytes(StandardCharsets.UTF_8);
         byte[] payloadLength = new byte[3];
@@ -859,6 +860,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void headersEnd(int streamId) throws ConnectionException {
+        setMaxProcessedStream(streamId);
         Stream stream = getStream(streamId, true);
         // Process this stream on a container thread
         StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
@@ -866,6 +868,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
     }
 
+
+    private void setMaxProcessedStream(int streamId) {
+        if (maxProcessedStreamId < streamId) {
+            maxProcessedStreamId = streamId;
+        }
+    }
 
 
     @Override

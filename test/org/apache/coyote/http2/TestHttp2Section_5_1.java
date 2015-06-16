@@ -38,9 +38,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         parser.readFrame(true);
 
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
@@ -52,9 +51,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         parser.readFrame(true);
 
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
@@ -76,9 +74,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendData(3, new byte[] {});
         parser.readFrame(true);
 
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Http2Error.STREAM_CLOSED.getCode() + "]-["));
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                "0-Goaway-[3]-[" + Http2Error.STREAM_CLOSED.getCode() + "]-["));
     }
 
 
@@ -118,9 +115,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendData(1, new byte[] {});
         parser.readFrame(true);
 
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Http2Error.STREAM_CLOSED.getCode() + "]-["));
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                "0-Goaway-[1]-[" + Http2Error.STREAM_CLOSED.getCode() + "]-["));
     }
 
 
@@ -142,9 +138,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // headers
         parser.readFrame(true);
 
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
@@ -168,9 +163,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // headers
         parser.readFrame(true);
 
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                "0-Goaway-[5]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
@@ -192,9 +186,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         parser.readFrame(true);
 
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("0-Goaway-[2147483647]-[" +
-                        Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                "0-Goaway-[5]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
 
 
