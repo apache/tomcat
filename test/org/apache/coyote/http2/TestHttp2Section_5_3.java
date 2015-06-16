@@ -31,6 +31,20 @@ import org.junit.Test;
  */
 public class TestHttp2Section_5_3 extends Http2TestBase {
 
+    // Section 5.3.1
+
+    @Test
+    public void testStreamDependsOnSelf() throws Exception {
+        http2Connect();
+
+        sendPriority(3,  3,  15);
+
+        parser.readFrame(true);
+
+        Assert.assertEquals("3-RST-[1]",  output.getTrace());
+    }
+
+
     // Section 5.3.2
 
     @Test
