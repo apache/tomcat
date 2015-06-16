@@ -122,7 +122,7 @@
     <attribute name="maxPostSize" required="false">
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
-      setting this attribute to a value less than or equal to 0.
+      setting this attribute to a value less than zero.
       If not specified, this attribute is set to 2097152 (2 megabytes).</p>
     </attribute>
 
