@@ -60,6 +60,16 @@
 <section name="Tomcat 7.0.63 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>57938</bug>: Correctly handle empty form fields when a form is
+        submitted as <code>multipart/form-data</code>, the
+        <code>maxPostSize</code> attribute of the Connector has been set to a
+        negative value and the Context has been configured with a value of
+        <code>true</code> for <code>allowCasualMultipartParsing</code>. The
+        meaning of the value zero for the <code>maxPostSize</code> has also been
+        changed to mean a limit of zero rather than no limit to align it with
+        <code>maxSavePostSize</code> and to be more intuitive. (markt)
+      </fix>
       <add>
         <bug>54618</bug>: Add a new <code>HttpHeaderSecurityFilter</code> that
         adds the <code>Strict-Transport-Security</code>,
