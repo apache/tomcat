@@ -18,6 +18,7 @@ package org.apache.catalina.tribes.tipis;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -153,7 +154,14 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
             Member[] realFaultyMembers = faulty.toArray(new Member[faulty.size()]);
             if (realFaultyMembers.length != 0) {
                 backup = excludeFromSet(realFaultyMembers, backup);
-                if (backup.length == 0) throw e;
+                if (backup.length == 0) {
+                    throw e;
+                } else {
+                    if (log.isWarnEnabled()) {
+                        log.warn(sm.getString("replicatedMap.unableReplicate.completely", key,
+                                Arrays.toString(backup), Arrays.toString(realFaultyMembers)), e);
+                    }
+                }
             }
         }
         return backup;
