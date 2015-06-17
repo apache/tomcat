@@ -422,7 +422,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
             // Ensure that only one thread accesses inBuffer at a time
             synchronized (inBuffer) {
-                while (inBuffer.position() == 0 && !state.isFrameTypePermitted(FrameType.DATA)) {
+                while (inBuffer.position() == 0 && state.isFrameTypePermitted(FrameType.DATA)) {
                     // Need to block until some data is written
                     try {
                         inBuffer.wait();
@@ -437,7 +437,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     written = inBuffer.remaining();
                     inBuffer.get(outBuffer, 0, written);
                     inBuffer.clear();
-                } else if (state.isFrameTypePermitted(FrameType.DATA)) {
+                } else if (!state.isFrameTypePermitted(FrameType.DATA)) {
                     return -1;
                 } else {
                     // TODO Should never happen
