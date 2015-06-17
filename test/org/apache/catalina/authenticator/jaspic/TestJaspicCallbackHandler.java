@@ -30,9 +30,11 @@ import org.junit.Test;
 import org.apache.catalina.realm.GenericPrincipal;
 
 public class TestJaspicCallbackHandler {
+
     private static final String USER = "user";
 
     private JaspicCallbackHandler jaspicCallbackHandler = new JaspicCallbackHandler(null);
+
 
     @Test
     public void shouldConvertCallbackToTomcatPrincipal() throws Exception {
@@ -52,6 +54,7 @@ public class TestJaspicCallbackHandler {
         assertArrayEquals(groups, principal.getRoles());
     }
 
+
     @Test(expected = IllegalStateException.class)
     public void shouldHandleUnknowCallback() throws Exception {
         // given
@@ -64,5 +67,4 @@ public class TestJaspicCallbackHandler {
         // then
         fail("Should throw exception");
     }
-
 }
