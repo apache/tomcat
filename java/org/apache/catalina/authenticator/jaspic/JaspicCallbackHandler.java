@@ -30,8 +30,10 @@ import javax.security.auth.message.callback.PasswordValidationCallback;
 
 import org.apache.catalina.Realm;
 import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.tomcat.util.res.StringManager;
 
 public class JaspicCallbackHandler implements CallbackHandler {
+    protected static final StringManager sm = StringManager.getManager(JaspicCallbackHandler.class);
 
     private Realm realm;
 
@@ -61,7 +63,7 @@ public class JaspicCallbackHandler implements CallbackHandler {
         } else if (callback instanceof PasswordValidationCallback) {
             handlePasswordValidationCallback((PasswordValidationCallback) callback);
         } else {
-            throw new IllegalStateException("Unknown callback!");
+            throw new IllegalStateException(sm.getString("authenticator.jaspic.unknownCallback", callback.getClass()));
         }
     }
 
