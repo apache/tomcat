@@ -281,12 +281,12 @@ class Http2Parser {
 
     private void readPingFrame(int flags) throws IOException {
         if (Flags.isAck(flags)) {
+            output.pingAck();
+        } else {
             // Read the payload
             byte[] payload = new byte[8];
             input.fill(true, payload);
             output.pingReceive(payload);
-        } else {
-            output.pingAck();
         }
     }
 
