@@ -189,6 +189,11 @@
         Ensure that the nodes that the data has been successfully replicated are
         set to the backup node. (kfujino)
       </fix>
+      <fix>
+        When failed to replication, rather than all member is handled as a
+        failed member, exclude the failure members from backup members.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
