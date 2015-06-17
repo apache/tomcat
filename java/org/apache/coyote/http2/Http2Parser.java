@@ -387,7 +387,6 @@ class Http2Parser {
     private void readUnknownFrame(int streamId, FrameType frameType, int flags, int payloadSize)
             throws IOException {
         output.swallow(streamId, frameType, flags, payloadSize);
-        swallow(payloadSize);
     }
 
 
