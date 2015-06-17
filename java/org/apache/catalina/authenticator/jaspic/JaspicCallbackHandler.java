@@ -63,7 +63,8 @@ public class JaspicCallbackHandler implements CallbackHandler {
         } else if (callback instanceof PasswordValidationCallback) {
             handlePasswordValidationCallback((PasswordValidationCallback) callback);
         } else {
-            throw new IllegalStateException(sm.getString("authenticator.jaspic.unknownCallback", callback.getClass()));
+            throw new IllegalStateException(
+                    sm.getString("authenticator.jaspic.unknownCallback", callback.getClass()));
         }
     }
 
