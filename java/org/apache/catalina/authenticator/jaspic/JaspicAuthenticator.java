@@ -34,10 +34,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.connector.Request;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+/**
+ * Security valve which implements JASPIC authentication
+ * @author Fjodor Vershinin
+ *
+ */
 public class JaspicAuthenticator extends AuthenticatorBase {
 
     private static final Log log = LogFactory.getLog(JaspicAuthenticator.class);
@@ -45,35 +49,44 @@ public class JaspicAuthenticator extends AuthenticatorBase {
     private static final String AUTH_TYPE = "JASPIC";
     private static final String MESSAGE_LAYER = "HttpServlet";
 
-    private JaspicCallbackHandler callbackHandler;
     private Subject serviceSubject;
 
     @SuppressWarnings("rawtypes")
     private Map authProperties = null;
 
-
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         super.startInternal();
-        callbackHandler = new JaspicCallbackHandler(container.getRealm());
         serviceSubject = new Subject();
     }
-
 
     @Override
     public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
         MessageInfo messageInfo = new MessageInfoImpl(request, response, true);
+        JaspicCallbackHandler callbackHandler = getJaspicCallbackHandler();
+
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
-        String appContext = request.getLocalName() + " " + request.getContextPath();
+        String appContext = getAppContextId(request);
 
-        AuthConfigProvider configProvider =
-                factory.getConfigProvider(MESSAGE_LAYER, appContext, null);
-        ServerAuthConfig authConfig = getAuthConfig(appContext, configProvider);
-        String authContextId = authConfig.getAuthContextID(messageInfo);
+        AuthConfigProvider configProvider = factory.getConfigProvider(MESSAGE_LAYER, appContext,
+                null);
+        if (configProvider == null) {
+            handleUnauthorizedRequest(response, null);
+            return false;
+        }
 
-        ServerAuthContext authContext = null;
-        authContext = getAuthContext(authConfig, authContextId, authProperties, authContext);
-        AuthStatus authStatus = validateRequest(messageInfo, authContext);
+        AuthStatus authStatus;
+        try {
+            ServerAuthConfig authConfig = configProvider.getServerAuthConfig(MESSAGE_LAYER,
+                    appContext, callbackHandler);
+            String messageAuthContextId = authConfig.getAuthContextID(messageInfo);
+            ServerAuthContext authContext = authConfig.getAuthContext(messageAuthContextId,
+                    serviceSubject, authProperties);
+            authStatus = authContext.validateRequest(messageInfo, new Subject(), serviceSubject);
+        } catch (AuthException e) {
+            handleUnauthorizedRequest(response, e);
+            return false;
+        }
 
         if (authStatus == AuthStatus.SUCCESS) {
             Principal principal = callbackHandler.getPrincipal();
@@ -82,52 +95,33 @@ public class JaspicAuthenticator extends AuthenticatorBase {
             }
             return true;
         }
-
         return false;
     }
-
-
-    private AuthStatus validateRequest(MessageInfo messageInfo, ServerAuthContext authContext) {
-        Subject clientSubject = new Subject();
-        try {
-            return authContext.validateRequest(messageInfo, clientSubject, serviceSubject);
-        } catch (AuthException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-
-    @SuppressWarnings("rawtypes")
-    private ServerAuthContext getAuthContext(ServerAuthConfig authConfig, String authContextId,
-            Map authProperties, ServerAuthContext authContext) {
-        try {
-            return authConfig.getAuthContext(authContextId, serviceSubject, authProperties);
-        } catch (AuthException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
 
     @Override
     public void login(String userName, String password, Request request) throws ServletException {
         throw new IllegalStateException("not implemented yet!");
     }
 
-
     @Override
     public void logout(Request request) {
         throw new IllegalStateException("not implemented yet!");
     }
 
-
-    private ServerAuthConfig getAuthConfig(String appContext, AuthConfigProvider configProvider) {
-        try {
-            return configProvider.getServerAuthConfig(MESSAGE_LAYER, appContext, callbackHandler);
-        } catch (AuthException e) {
-            throw new IllegalStateException(e);
-        }
+    private void handleUnauthorizedRequest(HttpServletResponse response, AuthException e)
+            throws IOException {
+        log.error(sm.getString("authenticator.unauthorized"), e);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                sm.getString("authenticator.unauthorized"));
     }
 
+    private String getAppContextId(Request request) {
+        return request.getServletContext().getVirtualServerName() + " " + request.getContextPath();
+    }
+
+    private JaspicCallbackHandler getJaspicCallbackHandler() {
+        return new JaspicCallbackHandler(container.getRealm());
+    }
 
     @Override
     protected String getAuthMethod() {
