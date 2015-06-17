@@ -47,7 +47,7 @@ public class TestHttp2Section_5_2 extends Http2TestBase {
         output.clearTrace();
 
         // Headers + 8k response
-        sendSimpleRequest(3);
+        sendSimpleGetRequest(3);
 
         // Headers
         parser.readFrame(true);

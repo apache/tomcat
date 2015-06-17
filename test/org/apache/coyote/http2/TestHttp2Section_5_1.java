@@ -65,8 +65,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         http2Connect();
 
         // This half-closes the stream since it includes the end of stream flag
-        sendSimpleRequest(3);
-        readSimpleResponse();
+        sendSimpleGetRequest(3);
+        readSimpleGetResponse();
         Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
         output.clearTrace();
 
@@ -87,7 +87,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Build the simple request
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleRequest(frameHeader, headersPayload, 3);
+        buildSimpleGetRequest(frameHeader, headersPayload, 3);
 
         // Remove the end of stream and end of headers flags
         frameHeader[4] = 0;
@@ -132,7 +132,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Part 1
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleRequestPart1(frameHeader, headersPayload, 4);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 4);
         writeFrame(frameHeader, headersPayload);
 
         // headers
@@ -146,8 +146,8 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
     @Test
     public void testClientSendOldStream() throws Exception {
         http2Connect();
-        sendSimpleRequest(5);
-        readSimpleResponse();
+        sendSimpleGetRequest(5);
+        readSimpleGetResponse();
         Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
         output.clearTrace();
 
@@ -155,7 +155,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Build the simple request on an old stream
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleRequest(frameHeader, headersPayload, 3);
+        buildSimpleGetRequest(frameHeader, headersPayload, 3);
 
         os.write(frameHeader);
         os.flush();
@@ -175,14 +175,14 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendPriority(3, 0, 16);
         sendPriority(5, 0, 16);
 
-        sendSimpleRequest(5);
-        readSimpleResponse();
+        sendSimpleGetRequest(5);
+        readSimpleGetResponse();
         Assert.assertEquals(getSimpleResponseTrace(5), output.getTrace());
         output.clearTrace();
 
         // Should trigger an error since stream 3 should have been implicitly
         // closed.
-        sendSimpleRequest(3);
+        sendSimpleGetRequest(3);
 
         parser.readFrame(true);
 
@@ -201,9 +201,9 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         sendClientPreface();
         validateHttp2InitialResponse();
 
-        sendLargeRequest(3);
+        sendLargeGetRequest(3);
 
-        sendSimpleRequest(5);
+        sendSimpleGetRequest(5);
 
         // Default connection window size is 64k - 1. Initial request will have
         // used 8k (56k -1).

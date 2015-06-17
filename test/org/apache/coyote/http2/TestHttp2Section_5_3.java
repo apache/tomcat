@@ -57,8 +57,8 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         // Use up 56k of the connection window
         for (int i = 3; i < 17; i += 2) {
-            sendSimpleRequest(i);
-            readSimpleResponse();
+            sendSimpleGetRequest(i);
+            readSimpleGetResponse();
         }
 
         // Set the default window size to 1024 bytes
@@ -77,7 +77,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         // First, process a request on stream 17. This should consume both
         // stream 17's window and the connection window.
-        sendSimpleRequest(17);
+        sendSimpleGetRequest(17);
         // 17-headers, 17-1k-body
         parser.readFrame(true);
         parser.readFrame(true);
@@ -85,8 +85,8 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         // Send additional requests. Connection window is empty so only headers
         // will be returned.
-        sendSimpleRequest(19);
-        sendSimpleRequest(21);
+        sendSimpleGetRequest(19);
+        sendSimpleGetRequest(21);
 
         // Open up the flow control windows for stream 19 & 21 to more than the
         // size of a simple request (8k)

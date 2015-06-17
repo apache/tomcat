@@ -85,7 +85,7 @@ public class TestHttp2Section_5_5 extends Http2TestBase {
         // Part 1
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleRequestPart1(frameHeader, headersPayload, 3);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
         writeFrame(frameHeader, headersPayload);
 
         os.write(UNKNOWN_FRAME);

@@ -38,7 +38,7 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
         // Build the simple request
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleRequest(frameHeader, headersPayload, 3);
+        buildSimpleGetRequest(frameHeader, headersPayload, 3);
 
         // Try and corrupt the headerPayload
         headersPayload.put(0, (byte) (headersPayload.get(0) + 128));
@@ -62,12 +62,12 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
         // Part 1
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleRequestPart1(frameHeader, headersPayload, 3);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
         writeFrame(frameHeader, headersPayload);
 
         // Part 2
         headersPayload.clear();
-        buildSimpleRequestPart2(frameHeader, headersPayload, 3);
+        buildSimpleGetRequestPart2(frameHeader, headersPayload, 3);
         writeFrame(frameHeader, headersPayload);
 
         // headers, body
@@ -86,7 +86,7 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
         // Part 1
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleRequestPart1(frameHeader, headersPayload, 3);
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, 3);
         writeFrame(frameHeader, headersPayload);
 
         sendPing();
