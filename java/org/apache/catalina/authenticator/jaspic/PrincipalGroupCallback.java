@@ -28,21 +28,22 @@ import org.apache.catalina.realm.GenericPrincipal;
 
 /**
  * This class merges two principal callbacks into one tomcat's
- * {@link GenericPrincipal}
- * @author Fjodor Vershinin
- *
+ * {@link GenericPrincipal}.
  */
 public class PrincipalGroupCallback {
     private CallerPrincipalCallback callerPrincipalCallback;
     private GroupPrincipalCallback groupPrincipalCallback;
 
+
     public void setCallerPrincipalCallback(CallerPrincipalCallback callerPrincipalCallback) {
         this.callerPrincipalCallback = callerPrincipalCallback;
     }
 
+
     public void setCallerPrincipalCallback(GroupPrincipalCallback groupPrincipalCallback) {
         this.groupPrincipalCallback = groupPrincipalCallback;
     }
+
 
     /**
      * Get tomcat's principal, which contains user principal and roles
@@ -56,6 +57,7 @@ public class PrincipalGroupCallback {
         return new GenericPrincipal(getUserName(), null, getRoles(), userPrincipal);
     }
 
+
     private Principal getUserPrincipal() {
         if (callerPrincipalCallback == null) {
             return null;
@@ -63,12 +65,14 @@ public class PrincipalGroupCallback {
         return callerPrincipalCallback.getPrincipal();
     }
 
+
     private List<String> getRoles() {
         if (groupPrincipalCallback == null) {
             return Collections.emptyList();
         }
         return Arrays.asList(groupPrincipalCallback.getGroups());
     }
+
 
     private String getUserName() {
         String name = null;
@@ -80,6 +84,7 @@ public class PrincipalGroupCallback {
         }
         return getUserPrincipalName();
     }
+
 
     private String getUserPrincipalName() {
         Principal principal = getUserPrincipal();
