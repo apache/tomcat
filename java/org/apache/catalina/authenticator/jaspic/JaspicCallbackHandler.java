@@ -32,9 +32,7 @@ import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Callback handler which converts callbacks to realm
- * @author Fjodor Vershinin
- *
+ * Callback handler which converts callbacks to realm.
  */
 public class JaspicCallbackHandler implements CallbackHandler {
     protected static final StringManager sm = StringManager.getManager(JaspicCallbackHandler.class);
@@ -43,9 +41,11 @@ public class JaspicCallbackHandler implements CallbackHandler {
 
     private PrincipalGroupCallback principalGroupCallback = new PrincipalGroupCallback();
 
+
     public JaspicCallbackHandler(Realm realm) {
         this.realm = realm;
     }
+
 
     @Override
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -57,12 +57,13 @@ public class JaspicCallbackHandler implements CallbackHandler {
         }
     }
 
+
     public GenericPrincipal getPrincipal() {
         return principalGroupCallback.getPrincipal();
     }
 
-    private void handleCallback(Callback callback) {
 
+    private void handleCallback(Callback callback) {
         if (callback instanceof CallerPrincipalCallback) {
             principalGroupCallback.setCallerPrincipalCallback((CallerPrincipalCallback) callback);
         } else if (callback instanceof GroupPrincipalCallback) {
@@ -74,6 +75,7 @@ public class JaspicCallbackHandler implements CallbackHandler {
                     sm.getString("authenticator.jaspic.unknownCallback", callback.getClass()));
         }
     }
+
 
     private void handlePasswordValidationCallback(
             PasswordValidationCallback passwordValidationCallback) {

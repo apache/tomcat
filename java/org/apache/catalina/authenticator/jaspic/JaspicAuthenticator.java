@@ -38,9 +38,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Security valve which implements JASPIC authentication
- * @author Fjodor Vershinin
- *
+ * Security valve which implements JASPIC authentication.
  */
 public class JaspicAuthenticator extends AuthenticatorBase {
 
@@ -54,11 +52,13 @@ public class JaspicAuthenticator extends AuthenticatorBase {
     @SuppressWarnings("rawtypes")
     private Map authProperties = null;
 
+
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         super.startInternal();
         serviceSubject = new Subject();
     }
+
 
     @Override
     public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
@@ -98,30 +98,37 @@ public class JaspicAuthenticator extends AuthenticatorBase {
         return false;
     }
 
+
     @Override
     public void login(String userName, String password, Request request) throws ServletException {
         throw new IllegalStateException("not implemented yet!");
     }
+
 
     @Override
     public void logout(Request request) {
         throw new IllegalStateException("not implemented yet!");
     }
 
+
     private void handleUnauthorizedRequest(HttpServletResponse response, AuthException e)
             throws IOException {
-        log.error(sm.getString("authenticator.unauthorized"), e);
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                sm.getString("authenticator.unauthorized"));
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("authenticator.jaspic.unauthorized"), e);
+        }
     }
+
 
     private String getAppContextId(Request request) {
         return request.getServletContext().getVirtualServerName() + " " + request.getContextPath();
     }
 
+
     private JaspicCallbackHandler getJaspicCallbackHandler() {
         return new JaspicCallbackHandler(container.getRealm());
     }
+
 
     @Override
     protected String getAuthMethod() {
