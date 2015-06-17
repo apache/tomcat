@@ -21,27 +21,36 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.security.auth.callback.Callback;
 import javax.security.auth.message.callback.CallerPrincipalCallback;
 import javax.security.auth.message.callback.GroupPrincipalCallback;
 
 import org.apache.catalina.realm.GenericPrincipal;
 
+/**
+ * This class merges two principal callbacks into one tomcat's
+ * {@link GenericPrincipal}
+ * @author Fjodor Vershinin
+ *
+ */
 public class PrincipalGroupCallback {
     private CallerPrincipalCallback callerPrincipalCallback;
     private GroupPrincipalCallback groupPrincipalCallback;
 
-    public void addCallback(Callback callback) {
-        if (callback instanceof CallerPrincipalCallback) {
-            callerPrincipalCallback = (CallerPrincipalCallback) callback;
-        }
-        if (callback instanceof GroupPrincipalCallback) {
-            groupPrincipalCallback = (GroupPrincipalCallback) callback;
-        }
+    public void setCallerPrincipalCallback(CallerPrincipalCallback callerPrincipalCallback) {
+        this.callerPrincipalCallback = callerPrincipalCallback;
     }
 
-    public Principal getPrincipal() {
-        if (callerPrincipalCallback != null) {
+    public void setCallerPrincipalCallback(GroupPrincipalCallback groupPrincipalCallback) {
+        this.groupPrincipalCallback = groupPrincipalCallback;
+    }
+
+    /**
+     * Get tomcat's principal, which contains user principal and roles
+     * @return {@link GenericPrincipal}
+     */
+    public GenericPrincipal getPrincipal() {
+        if (callerPrincipalCallback == null) {
+            return null;
         }
         Principal userPrincipal = getUserPrincipal();
         return new GenericPrincipal(getUserName(), null, getRoles(), userPrincipal);
