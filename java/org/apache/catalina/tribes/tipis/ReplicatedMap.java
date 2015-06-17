@@ -17,12 +17,15 @@
 package org.apache.catalina.tribes.tipis;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelException.FaultyMember;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -131,12 +134,28 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 
         if (backup == null || backup.length == 0) return null;
 
-        //publish the data out to all nodes
-        MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_COPY, false,
-                                        (Serializable) key, (Serializable) value, null,channel.getLocalMember(false), backup);
+        try {
+            
+            //publish the data out to all nodes
+            MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_COPY, false,
+                    (Serializable) key, (Serializable) value, null,channel.getLocalMember(false), backup);
 
-        getChannel().send(getMapMembers(), msg, getChannelSendOptions());
-
+            getChannel().send(getMapMembers(), msg, getChannelSendOptions());
+        } catch (ChannelException e) {
+            FaultyMember[] faultyMembers = e.getFaultyMembers();
+            if (faultyMembers.length == 0) throw e;
+            ArrayList<Member> faulty = new ArrayList<>();
+            for (FaultyMember faultyMember : faultyMembers) {
+                if (!(faultyMember.getCause() instanceof RemoteProcessException)) {
+                    faulty.add(faultyMember.getMember());
+                }
+            }
+            Member[] realFaultyMembers = faulty.toArray(new Member[faulty.size()]);
+            if (realFaultyMembers.length != 0) {
+                backup = excludeFromSet(realFaultyMembers, backup);
+                if (backup.length == 0) throw e;
+            }
+        }
         return backup;
     }
 
