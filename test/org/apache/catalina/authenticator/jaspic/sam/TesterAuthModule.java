@@ -34,11 +34,12 @@ import javax.security.auth.message.module.ServerAuthModule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class TestAuthModule implements ServerAuthModule {
+public class TesterAuthModule implements ServerAuthModule {
 
     private CallbackHandler handler;
     private Class<?>[] supportedMessageTypes = new Class[] { HttpServletRequest.class,
             HttpServletResponse.class };
+
 
     @Override
     @SuppressWarnings("rawtypes")
@@ -46,6 +47,7 @@ public class TestAuthModule implements ServerAuthModule {
             CallbackHandler handler, Map options) throws AuthException {
         this.handler = handler;
     }
+
 
     @Override
     public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
@@ -63,6 +65,7 @@ public class TestAuthModule implements ServerAuthModule {
         return AuthStatus.SUCCESS;
     }
 
+
     private Callback[] getAuthenticationCallbacks(Subject clientSubject, HttpServletRequest request) {
         Callback[] callbacks;
 
@@ -76,20 +79,22 @@ public class TestAuthModule implements ServerAuthModule {
         return callbacks;
     }
 
+
     @Override
     public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
             throws AuthException {
         return AuthStatus.SEND_SUCCESS;
     }
 
+
     @Override
     public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
 
     }
 
+
     @Override
     public Class<?>[] getSupportedMessageTypes() {
         return supportedMessageTypes;
     }
-
 }

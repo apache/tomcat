@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.authenticator.jaspic.sam.TestAuthConfigProvider;
+import org.apache.catalina.authenticator.jaspic.sam.TesterAuthConfigProvider;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -45,6 +45,7 @@ public class TestJaspicAuthenticator extends TomcatBaseTest {
     private static final String ROLE = "group";
     private Context context;
 
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
@@ -53,8 +54,8 @@ public class TestJaspicAuthenticator extends TomcatBaseTest {
         this.context = tomcat.addContext(CONTEXT_PATH, null);
 
         // Add protected servlet
-        Tomcat.addServlet(context, "TesterServlet3", new TesterServlet());
-        context.addServletMapping(URI_PROTECTED, "TesterServlet3");
+        Tomcat.addServlet(context, "TesterServlet", new TesterServlet());
+        context.addServletMapping(URI_PROTECTED, "TesterServlet");
         SecurityCollection collection = new SecurityCollection();
         collection.addPattern(URI_PROTECTED);
 
@@ -70,10 +71,11 @@ public class TestJaspicAuthenticator extends TomcatBaseTest {
         context.getPipeline().addValve(new JaspicAuthenticator());
 
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
-        factory.registerConfigProvider(new TestAuthConfigProvider(), "HttpServlet", null,
+        factory.registerConfigProvider(new TesterAuthConfigProvider(), "HttpServlet", null,
                 "Description");
         getTomcatInstance().start();
     }
+
 
     @Test
     public void shouldAuthenticateUsingRegistredJaspicProvider() throws Exception {
@@ -89,6 +91,7 @@ public class TestJaspicAuthenticator extends TomcatBaseTest {
         assertEquals("OK", byteChunk.toString());
     }
 
+
     @Test
     public void shouldFailAuthenticationUsingRegistredJaspicProvider() throws Exception {
         // given
@@ -102,8 +105,8 @@ public class TestJaspicAuthenticator extends TomcatBaseTest {
         assertEquals(HttpServletResponse.SC_FORBIDDEN, result);
     }
 
+
     private String getUrl() throws MalformedURLException {
         return new URL("http", "localhost", getPort(), CONTEXT_PATH).toString();
     }
-
 }

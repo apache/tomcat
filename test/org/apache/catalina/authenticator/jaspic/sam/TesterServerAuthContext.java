@@ -16,55 +16,44 @@
  */
 package org.apache.catalina.authenticator.jaspic.sam;
 
-import java.util.Map;
+import java.util.Collections;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.message.AuthException;
+import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
-import javax.security.auth.message.config.ServerAuthConfig;
 import javax.security.auth.message.config.ServerAuthContext;
 import javax.security.auth.message.module.ServerAuthModule;
 
-public class TestAuthConfig implements ServerAuthConfig {
-    private CallbackHandler callbackHandler;
-    private ServerAuthModule authModule;
+public class TesterServerAuthContext implements ServerAuthContext {
 
-    public TestAuthConfig(CallbackHandler callbackHandler, ServerAuthModule authModule) {
-        this.callbackHandler = callbackHandler;
+    private final ServerAuthModule authModule;
+
+
+    public TesterServerAuthContext(CallbackHandler handler, ServerAuthModule authModule)
+            throws AuthException {
         this.authModule = authModule;
+        authModule.initialize(null, null, handler, Collections.emptyMap());
     }
+
 
     @Override
-    public String getMessageLayer() {
-        return "HttpServlet";
+    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
+            Subject serviceSubject) throws AuthException {
+        return authModule.validateRequest(messageInfo, clientSubject, serviceSubject);
     }
+
 
     @Override
-    public String getAppContext() {
-        return null;
+    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
+            throws AuthException {
+        return authModule.secureResponse(messageInfo, serviceSubject);
     }
+
 
     @Override
-    public String getAuthContextID(MessageInfo messageInfo) {
-        return null;
+    public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
+        authModule.cleanSubject(messageInfo, subject);
     }
-
-    @Override
-    public void refresh() {
-
-    }
-
-    @Override
-    public boolean isProtected() {
-        return false;
-    }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject,
-            Map properties) throws AuthException {
-        return new TestServerAuthContext(callbackHandler, authModule);
-    }
-
 }

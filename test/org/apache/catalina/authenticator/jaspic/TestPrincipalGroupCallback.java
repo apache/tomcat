@@ -34,6 +34,7 @@ public class TestPrincipalGroupCallback {
 
     private static final String USER_NAME = "user";
 
+
     @Test
     public void shouldAddUserPrincipal() throws Exception {
         // given
@@ -50,6 +51,7 @@ public class TestPrincipalGroupCallback {
         assertEquals(userPrincipal, principal.getUserPrincipal());
     }
 
+
     @Test
     public void shouldCreatePrincipalWithUsername() throws Exception {
         // given
@@ -63,6 +65,7 @@ public class TestPrincipalGroupCallback {
         // then
         assertEquals(USER_NAME, principal.getName());
     }
+
 
     @Test
     public void shouldAddGroupsToPrincipal() throws Exception {
@@ -84,6 +87,7 @@ public class TestPrincipalGroupCallback {
         assertArrayEquals(principal.getRoles(), groups);
     }
 
+
     @Test
     public void shouldReturnNullIfNoCallbackDefined() throws Exception {
         // given
@@ -95,6 +99,7 @@ public class TestPrincipalGroupCallback {
         // then
         assertNull(principal);
     }
+
 
     private static class UserPrincipal implements Principal {
         private String name;

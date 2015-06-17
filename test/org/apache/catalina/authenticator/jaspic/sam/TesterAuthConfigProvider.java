@@ -22,7 +22,7 @@ import javax.security.auth.message.config.AuthConfigProvider;
 import javax.security.auth.message.config.ClientAuthConfig;
 import javax.security.auth.message.config.ServerAuthConfig;
 
-public class TestAuthConfigProvider implements AuthConfigProvider {
+public class TesterAuthConfigProvider implements AuthConfigProvider {
 
     @Override
     public ClientAuthConfig getClientAuthConfig(String layer, String appContext,
@@ -30,11 +30,13 @@ public class TestAuthConfigProvider implements AuthConfigProvider {
         return null;
     }
 
+
     @Override
     public ServerAuthConfig getServerAuthConfig(String layer, String appContext,
             CallbackHandler handler) throws AuthException {
-        return new TestAuthConfig(handler, new TestAuthModule());
+        return new TesterAuthConfig(handler, new TesterAuthModule());
     }
+
 
     @Override
     public void refresh() {
