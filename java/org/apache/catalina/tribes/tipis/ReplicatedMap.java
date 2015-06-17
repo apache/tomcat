@@ -136,7 +136,6 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         if (backup == null || backup.length == 0) return null;
 
         try {
-            
             //publish the data out to all nodes
             MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_COPY, false,
                     (Serializable) key, (Serializable) value, null,channel.getLocalMember(false), backup);
