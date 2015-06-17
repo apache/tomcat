@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,6 +39,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.IOTools;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
@@ -105,35 +108,35 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void sendSimpleRequest(int streamId) throws IOException {
+    protected void sendSimpleGetRequest(int streamId) throws IOException {
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
-        buildSimpleRequest(frameHeader, headersPayload, streamId);
+        buildSimpleGetRequest(frameHeader, headersPayload, streamId);
         writeFrame(frameHeader, headersPayload);
     }
 
 
-    protected void sendLargeRequest(int streamId) throws IOException {
+    protected void sendLargeGetRequest(int streamId) throws IOException {
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
-        buildLargeRequest(frameHeader, headersPayload, streamId);
+        buildLargeGetRequest(frameHeader, headersPayload, streamId);
         writeFrame(frameHeader, headersPayload);
     }
 
 
-    protected void buildSimpleRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
-        buildRequest(frameHeader, headersPayload, streamId, "/simple");
+    protected void buildSimpleGetRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
+        buildGetRequest(frameHeader, headersPayload, streamId, "/simple");
     }
 
 
-    protected void buildLargeRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
-        buildRequest(frameHeader, headersPayload, streamId, "/large");
+    protected void buildLargeGetRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
+        buildGetRequest(frameHeader, headersPayload, streamId, "/large");
     }
 
 
-    protected void buildRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId,
+    protected void buildGetRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId,
             String url) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("GET");
@@ -153,7 +156,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void buildSimpleRequestPart1(byte[] frameHeader, ByteBuffer headersPayload,
+    protected void buildSimpleGetRequestPart1(byte[] frameHeader, ByteBuffer headersPayload,
             int streamId) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("GET");
@@ -172,7 +175,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void buildSimpleRequestPart2(byte[] frameHeader, ByteBuffer headersPayload,
+    protected void buildSimpleGetRequestPart2(byte[] frameHeader, ByteBuffer headersPayload,
             int streamId) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":authority").setString("localhost:" + getPort());
@@ -190,6 +193,51 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    protected void sendSimplePostRequest(int streamId) throws IOException {
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(128);
+
+        buildPostRequest(headersFrameHeader, headersPayload,
+                dataFrameHeader, dataPayload, streamId);
+        writeFrame(headersFrameHeader, headersPayload);
+        writeFrame(dataFrameHeader, dataPayload);
+    }
+
+
+    protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
+            byte[] dataFrameHeader, ByteBuffer dataPayload, int streamId) {
+        MimeHeaders headers = new MimeHeaders();
+        headers.addValue(":method").setString("POST");
+        headers.addValue(":path").setString("/simple");
+        headers.addValue(":authority").setString("localhost:" + getPort());
+        hpackEncoder.encode(headers, headersPayload);
+
+        headersPayload.flip();
+
+        ByteUtil.setThreeBytes(headersFrameHeader, 0, headersPayload.limit());
+        // Header frame is type 0x01
+        headersFrameHeader[3] = 0x01;
+        // Flags. end of headers (0x04)
+        headersFrameHeader[4] = 0x04;
+        // Stream id
+        ByteUtil.set31Bits(headersFrameHeader, 5, streamId);
+
+        // Data
+        while (dataPayload.hasRemaining()) {
+            dataPayload.put((byte) 'x');
+        }
+        dataPayload.flip();
+
+        // Size
+        ByteUtil.setThreeBytes(dataFrameHeader, 0, dataPayload.limit());
+        // Data is type 0
+        // End of stream
+        dataFrameHeader[4] = 0x01;
+        ByteUtil.set31Bits(dataFrameHeader, 5, streamId);
+    }
+
     protected void writeFrame(byte[] header, ByteBuffer payload)
             throws IOException {
         os.write(header);
@@ -198,7 +246,19 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void readSimpleResponse() throws Http2Exception, IOException {
+    protected void readSimpleGetResponse() throws Http2Exception, IOException {
+        // Headers
+        parser.readFrame(true);
+        // Body
+        parser.readFrame(true);
+    }
+
+
+    protected void readSimplePostResponse() throws Http2Exception, IOException {
+        // Connection window update after reading request body
+        parser.readFrame(true);
+        // Stream window update after reading request body
+        parser.readFrame(true);
         // Headers
         parser.readFrame(true);
         // Body
@@ -659,6 +719,21 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 data[1] = (byte) ((i >> 8) & 0xFF);
                 os.write(data);
             }
+        }
+
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // Do not do this at home. The unconstrained buffer is a DoS risk.
+
+            // Have to read into a buffer because clients typically do not start
+            // to read the response until the request is fully written.
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            IOTools.flow(req.getInputStream(), baos);
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            IOTools.flow(bais, resp.getOutputStream());
         }
     }
 
