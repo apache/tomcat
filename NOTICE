@@ -4,6 +4,12 @@ Copyright 1999-2015 The Apache Software Foundation
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
+This software contains code derived from netty-native
+developed by the Netty project
+(http://netty.io, https://github.com/netty/netty-tcnative/)
+and from finagle-native developed at Twitter
+(https://github.com/twitter/finagle).
+
 The Windows Installer is built with the Nullsoft
 Scriptable Install System (NSIS), which is
 open source software.  The original software and
@@ -14,6 +20,13 @@ Java compilation software for JSP pages is provided by the Eclipse
 JDT Core Batch Compiler component, which is open source software.
 The original software and related information is available at
 http://www.eclipse.org/jdt/core/.
+
+For portions of the Tomcat JNI OpenSSL API and the OpenSSL JSSE integration
+The org.apache.tomcat.jni and the org.apache.tomcat.net.openssl packages
+are derivative work originating from the Netty project and the finagle-native
+project developed at Twitter
+* Copyright 2014 The Netty Project
+* Copyright 2014 Twitter
 
 The original XML Schemas for Java EE Deployment Descriptors:
  - javaee_5.xsd
