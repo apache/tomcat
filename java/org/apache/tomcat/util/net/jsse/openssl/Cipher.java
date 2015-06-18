@@ -25,6 +25,7 @@ import java.util.Set;
 /**
  * All the standard cipher suites for SSL/TSL.
  *
+ * @see <a href="https://github.com/openssl/openssl/blob/master/ssl/s3_lib.c">OpenSSL</a>
  * @see <a href="http://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4"
  *      >The cipher suite registry</a>
  * @see <a href="https://www.thesprawl.org/research/tls-and-ssl-cipher-suites/"
@@ -182,7 +183,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168,
             "SSL_RSA_WITH_3DES_EDE_CBC_SHA"
     ),
@@ -228,7 +229,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168,
             "SSL_DH_DSS_WITH_3DES_EDE_CBC_SHA"
     ),
@@ -273,7 +274,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168,
             "SSL_DH_RSA_WITH_3DES_EDE_CBC_SHA"
     ),
@@ -319,7 +320,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168,
             "SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA"
     ),
@@ -364,7 +365,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168,
             "SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA"
     ),
@@ -439,7 +440,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168,
             "SSL_DH_anon_WITH_3DES_EDE_CBC_SHA"
     ),
