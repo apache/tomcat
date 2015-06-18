@@ -92,5 +92,29 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         Assert.assertTrue(trace, trace.startsWith("0-Goaway-[3]-[1]-["));
     }
 
+
+    @Test
+    public void testDataFrameOnStreamZero() throws Exception {
+        http2Connect();
+
+        byte[] dataFrame = new byte[10];
+
+        // Header
+        // length
+        ByteUtil.setThreeBytes(dataFrame, 0, 1);
+        // type (0 for data)
+        // flags (0)
+        // stream (0)
+        // payload (0)
+
+        os.write(dataFrame);
+        os.flush();
+
+        parser.readFrame(true);
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.startsWith("0-Goaway-[1]-[1]-["));
+    }
+
     // TODO: Remainder if section 6.1 tests
 }
