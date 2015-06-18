@@ -116,5 +116,32 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         Assert.assertTrue(trace, trace.startsWith("0-Goaway-[1]-[1]-["));
     }
 
+
+    @Test
+    public void testDataFrameTooMuchPadding() throws Exception {
+        http2Connect();
+
+        byte[] dataFrame = new byte[10];
+
+        // Header
+        // length
+        ByteUtil.setThreeBytes(dataFrame, 0, 1);
+        // type 0 (data)
+        // flags 8 (padded)
+        dataFrame[4] = 0x08;
+        // stream 3
+        ByteUtil.set31Bits(dataFrame, 5, 3);
+        // payload (pad length of 1)
+        dataFrame[9] = 1;
+
+        os.write(dataFrame);
+        os.flush();
+
+        parser.readFrame(true);
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.startsWith("0-Goaway-[1]-[1]-["));
+    }
+
     // TODO: Remainder if section 6.1 tests
 }
