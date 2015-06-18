@@ -143,5 +143,23 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         Assert.assertTrue(trace, trace.startsWith("0-Goaway-[1]-[1]-["));
     }
 
-    // TODO: Remainder if section 6.1 tests
+
+    @Test
+    public void testDataFrameWithZeroLengthPadding() throws Exception {
+        http2Connect();
+
+        byte[] padding = new byte[0];
+
+        sendSimplePostRequest(3, padding);
+        // Since padding is zero length, response looks like there is none.
+        readSimplePostResponse(false);
+
+        Assert.assertEquals("0-WindowSize-[127]\n"
+                + "3-WindowSize-[127]\n"
+                + "3-HeadersStart\n"
+                + "3-Header-[:status]-[200]\n"
+                + "3-HeadersEnd\n"
+                + "3-Body-127\n"
+                + "3-EndOfStream\n", output.getTrace());
+    }
 }
