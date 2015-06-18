@@ -445,6 +445,7 @@ public enum Cipher {
             "SSL_DH_anon_WITH_3DES_EDE_CBC_SHA"
     ),
     /* Fortezza ciphersuite from SSL 3.0 spec */
+    // Cipher 1C
     SSL_FORTEZZA_DMS_WITH_NULL_SHA(
             "FZA-NULL-SHA",
             KeyExchange.FZA,
@@ -458,6 +459,7 @@ public enum Cipher {
             0,
             0
     ),
+    // Cipher 1D
     SSL_FORTEZZA_DMS_WITH_FORTEZZA_CBC_SHA(
             "FZA-FZA-CBC-SHA",
             KeyExchange.FZA,
@@ -471,6 +473,7 @@ public enum Cipher {
             0,
             0
     ),
+    // Cipher 1E - duplicate
     SSL_FORTEZZA_DMS_WITH_RC4_128_SHA(
             "FZA-RC4-SHA",
             KeyExchange.FZA,
@@ -485,7 +488,7 @@ public enum Cipher {
             128
     ),
     /* The Kerberos ciphers*/
-    // Cipher 1E
+    // Cipher 1E - duplicate
     /*TLS_KRB5_WITH_DES_CBC_SHA(
             "KRB5-DES-CBC-SHA",
             KeyExchange.KRB5,
