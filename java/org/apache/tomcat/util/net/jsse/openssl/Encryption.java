@@ -18,5 +18,19 @@
 package org.apache.tomcat.util.net.jsse.openssl;
 
 enum Encryption {
-    AES256GCM, AES256, AES128GCM, AES128, CAMELLIA256, CAMELLIA128, TRIPLE_DES, DES, IDEA, eGOST2814789CNT, SEED, FZA, RC4, RC2, eNULL;
+    AES256GCM,
+    AES256,
+    AES128GCM,
+    AES128,
+    CAMELLIA256,
+    CAMELLIA128,
+    TRIPLE_DES,
+    DES,
+    IDEA,
+    eGOST2814789CNT,
+    SEED,
+    FZA,
+    RC4,
+    RC2,
+    eNULL;
 }

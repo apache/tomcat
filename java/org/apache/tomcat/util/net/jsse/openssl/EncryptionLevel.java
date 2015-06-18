@@ -18,5 +18,11 @@
 package org.apache.tomcat.util.net.jsse.openssl;
 
 enum EncryptionLevel {
-    STRONG_NONE, EXP40, EXP56, LOW, MEDIUM, HIGH, FIPS;
+    STRONG_NONE,
+    EXP40,
+    EXP56,
+    LOW,
+    MEDIUM,
+    HIGH,
+    FIPS;
 }
