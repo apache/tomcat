@@ -812,6 +812,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
+    public void swallowedPadding(int streamId, int paddingLength) throws
+            ConnectionException, IOException {
+        Stream stream = getStream(streamId, true);
+        // +1 is for the payload byte used to define the padding length
+        writeWindowUpdate(stream, paddingLength + 1);
+    }
+
+
+    @Override
     public HeaderEmitter headersStart(int streamId) throws Http2Exception {
         Stream stream = getStream(streamId, false);
         if (stream == null) {
@@ -942,7 +951,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void swallow(int streamId, FrameType frameType, int flags, int size) throws IOException {
-        swallow(size);
+    public void swallowed(int streamId, FrameType frameType, int flags, int size)
+            throws IOException {
+        // NO-OP.
     }
 }

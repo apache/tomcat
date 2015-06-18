@@ -193,21 +193,21 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void sendSimplePostRequest(int streamId) throws IOException {
+    protected void sendSimplePostRequest(int streamId, byte[] padding) throws IOException {
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
         byte[] dataFrameHeader = new byte[9];
         ByteBuffer dataPayload = ByteBuffer.allocate(128);
 
         buildPostRequest(headersFrameHeader, headersPayload,
-                dataFrameHeader, dataPayload, streamId);
+                dataFrameHeader, dataPayload, padding, streamId);
         writeFrame(headersFrameHeader, headersPayload);
         writeFrame(dataFrameHeader, dataPayload);
     }
 
 
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
-            byte[] dataFrameHeader, ByteBuffer dataPayload, int streamId) {
+            byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding, int streamId) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("POST");
         headers.addValue(":path").setString("/simple");
@@ -225,16 +225,30 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ByteUtil.set31Bits(headersFrameHeader, 5, streamId);
 
         // Data
+        if (padding != null) {
+            dataPayload.put((byte) (padding.length & 0xFF));
+            dataPayload.limit(dataPayload.capacity() - padding.length);
+        }
+
         while (dataPayload.hasRemaining()) {
             dataPayload.put((byte) 'x');
         }
+        if (padding != null && padding.length > 0) {
+            dataPayload.limit(dataPayload.capacity());
+            dataPayload.put(padding);
+        }
+
         dataPayload.flip();
 
         // Size
         ByteUtil.setThreeBytes(dataFrameHeader, 0, dataPayload.limit());
         // Data is type 0
-        // End of stream
-        dataFrameHeader[4] = 0x01;
+        // Flags: End of stream 1, Padding 8
+        if (padding == null) {
+            dataFrameHeader[4] = 0x01;
+        } else {
+            dataFrameHeader[4] = 0x09;
+        }
         ByteUtil.set31Bits(dataFrameHeader, 5, streamId);
     }
 
@@ -254,7 +268,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void readSimplePostResponse() throws Http2Exception, IOException {
+    protected void readSimplePostResponse(boolean padding) throws Http2Exception, IOException {
+        if (padding) {
+            // Window updates for padding
+            parser.readFrame(true);
+            parser.readFrame(true);
+        }
         // Connection window update after reading request body
         parser.readFrame(true);
         // Stream window update after reading request body
@@ -675,7 +694,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void swallow(int streamId, FrameType frameType, int flags, int size) {
+        public void swallowed(int streamId, FrameType frameType, int flags, int size) {
             trace.append(streamId);
             trace.append(",");
             trace.append(frameType);
@@ -684,6 +703,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             trace.append(",");
             trace.append(size);
             trace.append("\n");
+        }
+
+
+        @Override
+        public void swallowedPadding(int streamId, int paddingLength) {
+            trace.append(streamId);
+            trace.append("-SwallowedPadding-[");
+            trace.append(paddingLength);
+            trace.append("]\n");
         }
 
 
