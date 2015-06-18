@@ -324,12 +324,16 @@ public interface Context extends Container {
 
     /**
      * Return the alternate Deployment Descriptor name.
+     *
+     * @return the name
      */
     public String getAltDDName();
 
 
     /**
      * Set an alternate Deployment Descriptor name.
+     *
+     * @param altDDName The new name
      */
     public void setAltDDName(String altDDName) ;
 
