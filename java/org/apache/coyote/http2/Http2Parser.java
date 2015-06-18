@@ -141,6 +141,13 @@ class Http2Parser {
             byte[] b = new byte[1];
             input.fill(true, b);
             padLength = b[0] & 0xFF;
+
+            if (padLength >= payloadSize) {
+                throw new ConnectionException(
+                        sm.getString("http2Parser.processFrameData.tooMuchPadding", connectionId,
+                                Integer.toString(streamId), Integer.toString(padLength),
+                                Integer.toString(payloadSize)), Http2Error.PROTOCOL_ERROR);
+            }
             // +1 is for the padding length byte we just read above
             dataLength = payloadSize - (padLength + 1);
         } else {
