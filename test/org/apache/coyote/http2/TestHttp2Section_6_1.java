@@ -72,5 +72,25 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
                 + "3-EndOfStream\n", trace);
     }
 
+
+    @Test
+    public void testDataFrameWithNonZeroPadding() throws Exception {
+        http2Connect();
+
+        byte[] padding = new byte[8];
+        padding[4] = 0x01;
+
+        sendSimplePostRequest(3, padding);
+        parser.readFrame(true);
+        // May see Window updates depending on timing
+        while (output.getTrace().contains("WindowSize")) {
+            output.clearTrace();
+            parser.readFrame(true);
+        }
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.startsWith("0-Goaway-[3]-[1]-["));
+    }
+
     // TODO: Remainder if section 6.1 tests
 }

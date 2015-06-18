@@ -86,7 +86,7 @@ class Http2Parser {
         try {
             validateFrame(expected, frameType, streamId, flags, payloadSize);
         } catch (StreamException se) {
-            swallow(streamId, payloadSize);
+            swallow(streamId, payloadSize, false);
             throw se;
         }
 
@@ -160,7 +160,7 @@ class Http2Parser {
 
         ByteBuffer dest = output.getInputByteBuffer(streamId, dataLength);
         if (dest == null) {
-            swallow(streamId, dataLength);
+            swallow(streamId, dataLength, false);
             if (endOfStream) {
                 output.receiveEndOfStream(streamId);
             }
@@ -174,7 +174,7 @@ class Http2Parser {
             }
         }
         if (padLength > 0) {
-            swallow(streamId, padLength);
+            swallow(streamId, padLength, true);
             output.swallowedPadding(streamId, padLength);
         }
     }
@@ -189,7 +189,7 @@ class Http2Parser {
         try {
             hpackDecoder.setHeaderEmitter(output.headersStart(streamId));
         } catch (StreamException se) {
-            swallow(streamId, payloadSize);
+            swallow(streamId, payloadSize, false);
             throw se;
         }
 
@@ -224,7 +224,7 @@ class Http2Parser {
 
         readHeaderBlock(payloadSize, endOfHeaders);
 
-        swallow(streamId, padLength);
+        swallow(streamId, padLength, true);
 
         if (endOfHeaders) {
             output.headersEnd(streamId);
@@ -405,12 +405,18 @@ class Http2Parser {
 
     private void readUnknownFrame(int streamId, FrameType frameType, int flags, int payloadSize)
             throws IOException {
-        swallow(streamId, payloadSize);
+        try {
+            swallow(streamId, payloadSize, false);
+        } catch (ConnectionException e) {
+            // Will never happen because swallow() is called with mustBeZero set
+            // to false
+        }
         output.swallowed(streamId, frameType, flags, payloadSize);
     }
 
 
-    private void swallow(int streamId, int len) throws IOException {
+    private void swallow(int streamId, int len, boolean mustBeZero)
+            throws IOException, ConnectionException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("http2Parser.swallow.debug", connectionId,
                     Integer.toString(streamId), Integer.toString(len)));
@@ -423,6 +429,17 @@ class Http2Parser {
         while (read < len) {
             int thisTime = Math.min(buffer.length, len - read);
             input.fill(true, buffer, 0, thisTime);
+            if (mustBeZero) {
+                // Validate the padding is zero since receiving non-zero padding
+                // is a strong indication of either a faulty client or a server
+                // side bug.
+                for (int i = 0; i < thisTime; i++) {
+                    if (buffer[i] != 0) {
+                        throw new ConnectionException(sm.getString("http2Parser.nonZeroPadding",
+                                connectionId, Integer.toString(streamId)), Http2Error.PROTOCOL_ERROR);
+                    }
+                }
+            }
             read += thisTime;
         }
     }
