@@ -317,24 +317,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void swallow(int len) throws IOException {
-        if (len == 0) {
-            return;
-        }
-        int read = 0;
-        byte[] buffer = new byte[1024];
-        while (read < len) {
-            int toRead = Math.min(buffer.length, len - read);
-            int thisTime = socketWrapper.read(true, buffer, 0, toRead);
-            if (thisTime == -1) {
-                throw new IOException(
-                        sm.getString("upgradeHandler.swallow.eos", Integer.valueOf(len)));
-            }
-            read += thisTime;
-        }
-    }
-
-
     ConnectionSettings getRemoteSettings() {
         return remoteSettings;
     }
