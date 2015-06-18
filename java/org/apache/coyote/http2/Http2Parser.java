@@ -86,7 +86,7 @@ class Http2Parser {
         try {
             validateFrame(expected, frameType, streamId, flags, payloadSize);
         } catch (StreamException se) {
-            swallow(payloadSize);
+            swallow(streamId, payloadSize);
             throw se;
         }
 
@@ -136,28 +136,47 @@ class Http2Parser {
 
         boolean endOfStream = Flags.isEndOfStream(flags);
 
+        int dataLength;
         if (Flags.hasPadding(flags)) {
             byte[] b = new byte[1];
             input.fill(true, b);
             padLength = b[0] & 0xFF;
+            // +1 is for the padding length byte we just read above
+            dataLength = payloadSize - (padLength + 1);
+        } else {
+            dataLength = payloadSize;
         }
 
-        ByteBuffer dest = output.getInputByteBuffer(streamId, payloadSize);
+        if (log.isDebugEnabled()) {
+            String padding;
+            if (Flags.hasPadding(flags)) {
+                padding = Integer.toString(padLength);
+            } else {
+                padding = "none";
+            }
+            log.debug(sm.getString("http2Parser.processFrameData.lengths", connectionId,
+                    Integer.toString(streamId), Integer.toString(dataLength), padding));
+        }
+
+        ByteBuffer dest = output.getInputByteBuffer(streamId, dataLength);
         if (dest == null) {
-            swallow(payloadSize);
+            swallow(streamId, dataLength);
             if (endOfStream) {
                 output.receiveEndOfStream(streamId);
             }
         } else {
             synchronized (dest) {
-                input.fill(true, dest, payloadSize);
+                input.fill(true, dest, dataLength);
                 if (endOfStream) {
                     output.receiveEndOfStream(streamId);
                 }
                 dest.notifyAll();
             }
         }
-        swallow(padLength);
+        if (padLength > 0) {
+            swallow(streamId, padLength);
+            output.swallowedPadding(streamId, padLength);
+        }
     }
 
 
@@ -170,7 +189,7 @@ class Http2Parser {
         try {
             hpackDecoder.setHeaderEmitter(output.headersStart(streamId));
         } catch (StreamException se) {
-            swallow(payloadSize);
+            swallow(streamId, payloadSize);
             throw se;
         }
 
@@ -205,7 +224,7 @@ class Http2Parser {
 
         readHeaderBlock(payloadSize, endOfHeaders);
 
-        swallow(padLength);
+        swallow(streamId, padLength);
 
         if (endOfHeaders) {
             output.headersEnd(streamId);
@@ -386,11 +405,16 @@ class Http2Parser {
 
     private void readUnknownFrame(int streamId, FrameType frameType, int flags, int payloadSize)
             throws IOException {
-        output.swallow(streamId, frameType, flags, payloadSize);
+        swallow(streamId, payloadSize);
+        output.swallowed(streamId, frameType, flags, payloadSize);
     }
 
 
-    private void swallow(int len) throws IOException {
+    private void swallow(int streamId, int len) throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.swallow.debug", connectionId,
+                    Integer.toString(streamId), Integer.toString(len)));
+        }
         if (len == 0) {
             return;
         }
@@ -527,6 +551,7 @@ class Http2Parser {
         // Data frames
         ByteBuffer getInputByteBuffer(int streamId, int payloadSize) throws Http2Exception;
         void receiveEndOfStream(int streamId) throws ConnectionException;
+        void swallowedPadding(int streamId, int paddingLength) throws ConnectionException, IOException;
 
         // Header frames
         HeaderEmitter headersStart(int streamId) throws Http2Exception;
@@ -554,6 +579,6 @@ class Http2Parser {
         void incrementWindowSize(int streamId, int increment) throws Http2Exception;
 
         // Testing
-        void swallow(int streamId, FrameType frameType, int flags, int size) throws IOException;
+        void swallowed(int streamId, FrameType frameType, int flags, int size) throws IOException;
     }
 }
