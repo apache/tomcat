@@ -82,6 +82,11 @@
         has been significant changes to the SSL configuration in server.xml to
         support this. (markt)
       </add>
+      <add>
+        Add SSL engine backed by OpenSSL, based on code contributed by Numa de
+        Montmollin and derived from code developed by Twitter and Netty.
+        (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
