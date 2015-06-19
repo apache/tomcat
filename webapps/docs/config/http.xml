@@ -1018,13 +1018,6 @@
 
   <attributes>
 
-    <attribute name="certificateChainFile" required="false">
-      <p>OpenSSL only.</p>
-      <p>Name of the file that contains concatenated certifcates for the
-      certificate authorities which form the certifcate chain for the server
-      certificate. The format is PEM-encoded.</p>
-    </attribute>
-
     <attribute name="certificateFile" required="true">
       <p>OpenSSL only.</p>
       <p>Name of the file that contains the server certificate. The format is

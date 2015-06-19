@@ -88,7 +88,6 @@ public class SSLHostConfig {
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
     // OpenSSL
-    private String certificateChainFile;
     private String certificateFile;
     private String certificateKeyFile;
     private String certificateRevocationListPath;
@@ -475,17 +474,6 @@ public class SSLHostConfig {
 
 
     // ------------------------------- OpenSSL specific configuration properties
-
-    public void setCertificateChainFile(String certificateChainFile) {
-        setProperty("certificateChainFile", Type.OPENSSL);
-        this.certificateChainFile = certificateChainFile;
-    }
-
-
-    public String getCertificateChainFile() {
-        return certificateChainFile;
-    }
-
 
     public void setCertificateFile(String certificateFile) {
         setProperty("certificateFile", Type.OPENSSL);
