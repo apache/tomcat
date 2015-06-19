@@ -629,7 +629,7 @@ public class OpenSSLCipherConfigurationParser {
         return result;
     }
 
-    static LinkedHashSet<Cipher> parse(String expression) {
+    public static LinkedHashSet<Cipher> parse(String expression) {
         if (!initialized) {
             init();
         }
@@ -676,7 +676,7 @@ public class OpenSSLCipherConfigurationParser {
         return defaultSort(ciphers);
     }
 
-    static List<String> convertForJSSE(Collection<Cipher> ciphers) {
+    public static List<String> convertForJSSE(Collection<Cipher> ciphers) {
         List<String> result = new ArrayList<>(ciphers.size());
         for (Cipher cipher : ciphers) {
             result.addAll(cipher.getJsseNames());

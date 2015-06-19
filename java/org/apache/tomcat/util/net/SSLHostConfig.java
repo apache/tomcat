@@ -19,6 +19,8 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +29,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.jsse.openssl.Cipher;
 import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -75,6 +78,8 @@ public class SSLHostConfig {
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
     private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
+    private LinkedHashSet<Cipher> cipherList = null;
+    private List<String> jsseCipherNames = null;
     private boolean honorCipherOrder = true;
     private Set<String> protocols = new HashSet<>();
     // JSSE
@@ -250,11 +255,30 @@ public class SSLHostConfig {
         } else {
             this.ciphers = ciphersList;
         }
+        this.cipherList = null;
+        this.jsseCipherNames = null;
+
     }
 
 
     public String getCiphers() {
         return ciphers;
+    }
+
+
+    public LinkedHashSet<Cipher> getCipherList() {
+        if (cipherList == null) {
+            cipherList = OpenSSLCipherConfigurationParser.parse(ciphers);
+        }
+        return cipherList;
+    }
+
+
+    public List<String> getJsseCipherNames() {
+        if (jsseCipherNames == null) {
+            jsseCipherNames = OpenSSLCipherConfigurationParser.convertForJSSE(getCipherList());
+        }
+        return jsseCipherNames;
     }
 
 

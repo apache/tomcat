@@ -58,7 +58,6 @@ import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtil;
-import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -142,17 +141,14 @@ public class JSSESocketFactory implements SSLUtil {
 
     @Override
     public String[] getEnableableCiphers(SSLContext context) {
-        String requestedCiphersStr = sslHostConfig.getCiphers();
-
-        List<String> requestedCiphers =
-                OpenSSLCipherConfigurationParser.parseExpression(requestedCiphersStr);
+        List<String> requestedCiphers = sslHostConfig.getJsseCipherNames();
 
         List<String> ciphers = new ArrayList<>(requestedCiphers);
         ciphers.retainAll(Arrays.asList(context.getSupportedSSLParameters().getCipherSuites()));
 
         if (ciphers.isEmpty()) {
             log.warn(sm.getString("jsse.requested_ciphers_not_supported",
-                    requestedCiphersStr));
+                    sslHostConfig.getCiphers()));
         }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("jsse.enableable_ciphers", ciphers));

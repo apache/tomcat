@@ -17,7 +17,7 @@
 
 package org.apache.tomcat.util.net.jsse.openssl;
 
-enum Authentication {
+public enum Authentication {
     RSA /* RSA auth */,
     DSS /* DSS auth */,
     aNULL /* no auth (i.e. use ADH or AECDH) */,
