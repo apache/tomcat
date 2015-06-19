@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.WritePendingException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +38,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.TLSClientHelloExtractor.ExtractorResult;
+import org.apache.tomcat.util.net.jsse.openssl.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -330,9 +332,11 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
 
         String hostName = null;
+        List<Cipher> clientRequestedCiphers = null;
         switch (extractor.getResult()) {
         case COMPLETE:
             hostName = extractor.getSNIValue();
+            clientRequestedCiphers = extractor.getClientRequestedCiphers();
             break;
         case NOT_PRESENT:
             // NO-OP
@@ -353,7 +357,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             log.debug(sm.getString("channel.nio.ssl.sniHostName", hostName));
         }
 
-        sslEngine = endpoint.createSSLEngine(hostName);
+        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers);
 
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.
