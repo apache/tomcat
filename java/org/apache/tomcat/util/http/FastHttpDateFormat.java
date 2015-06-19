@@ -145,6 +145,9 @@ public final class FastHttpDateFormat {
         if (cachedDate != null) {
             return cachedDate.longValue();
         }
+        if (threadLocalformats == null) {
+            throw new IllegalArgumentException();
+        }
 
         Long date = null;
         if (threadLocalformats != null) {
