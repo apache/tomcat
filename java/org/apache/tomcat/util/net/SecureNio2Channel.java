@@ -36,7 +36,7 @@ import javax.net.ssl.SSLException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
-import org.apache.tomcat.util.net.TLSClientHelloExtractor.SNIResult;
+import org.apache.tomcat.util.net.TLSClientHelloExtractor.ExtractorResult;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -316,7 +316,7 @@ public class SecureNio2Channel extends Nio2Channel  {
 
         TLSClientHelloExtractor extractor = new TLSClientHelloExtractor(netInBuffer);
 
-        while (extractor.getResult() == SNIResult.UNDERFLOW &&
+        while (extractor.getResult() == ExtractorResult.UNDERFLOW &&
                 netInBuffer.capacity() < endpoint.getSniParseLimit()) {
             // extractor needed more data to process but netInBuffer was full so
             // expand the buffer and read some more data.
@@ -331,7 +331,7 @@ public class SecureNio2Channel extends Nio2Channel  {
 
         String hostName = null;
         switch (extractor.getResult()) {
-        case FOUND:
+        case COMPLETE:
             hostName = extractor.getSNIValue();
             break;
         case NOT_PRESENT:

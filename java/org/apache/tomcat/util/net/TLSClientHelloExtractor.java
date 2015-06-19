@@ -31,7 +31,7 @@ public class TLSClientHelloExtractor {
     private static final Log log = LogFactory.getLog(TLSClientHelloExtractor.class);
     private static final StringManager sm = StringManager.getManager(TLSClientHelloExtractor.class);
 
-    private final SNIResult result;
+    private final ExtractorResult result;
     private final String sniValue;
 
     private static final int TLS_RECORD_HEADER_LEN = 5;
@@ -53,7 +53,7 @@ public class TLSClientHelloExtractor {
         // the buffer state can be restored at the end of this method.
         int pos = netInBuffer.position();
         int limit = netInBuffer.limit();
-        SNIResult result = SNIResult.NOT_PRESENT;
+        ExtractorResult result = ExtractorResult.NOT_PRESENT;
         String sniValue = null;
         try {
             // Switch to read mode.
@@ -109,7 +109,7 @@ public class TLSClientHelloExtractor {
                 sniValue = readSniExtension(netInBuffer);
             }
             if (sniValue != null) {
-                result = SNIResult.FOUND;
+                result = ExtractorResult.COMPLETE;
             }
         } finally {
             this.result = result;
@@ -121,13 +121,13 @@ public class TLSClientHelloExtractor {
     }
 
 
-    public SNIResult getResult() {
+    public ExtractorResult getResult() {
         return result;
     }
 
 
     public String getSNIValue() {
-        if (result == SNIResult.FOUND) {
+        if (result == ExtractorResult.COMPLETE) {
             return sniValue;
         } else {
             throw new IllegalStateException();
@@ -135,13 +135,13 @@ public class TLSClientHelloExtractor {
     }
 
 
-    private static SNIResult handleIncompleteRead(ByteBuffer bb) {
+    private static ExtractorResult handleIncompleteRead(ByteBuffer bb) {
         if (bb.limit() == bb.capacity()) {
             // Buffer not big enough
-            return SNIResult.UNDERFLOW;
+            return ExtractorResult.UNDERFLOW;
         } else {
             // Need to read more data into buffer
-            return SNIResult.NEED_READ;
+            return ExtractorResult.NEED_READ;
         }
     }
 
@@ -221,8 +221,8 @@ public class TLSClientHelloExtractor {
     }
 
 
-    public static enum SNIResult {
-        FOUND,
+    public static enum ExtractorResult {
+        COMPLETE,
         NOT_PRESENT,
         UNDERFLOW,
         NEED_READ
