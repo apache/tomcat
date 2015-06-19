@@ -551,10 +551,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         log.warn(sm.getString("endpoint.alpn.fail", negotiableProtocols));
                     }
                 }
-                sslHostConfig.setSslContext(Long.valueOf(ctx));
+                sslHostConfig.setOpenSslContext(Long.valueOf(ctx));
             }
             SSLHostConfig defaultSSLHostConfig = sslHostConfigs.get(getDefaultSSLHostConfigName());
-            Long defaultSSLContext = (Long) defaultSSLHostConfig.getSslContext();
+            Long defaultSSLContext = (Long) defaultSSLHostConfig.getOpenSslContext();
             sslContext = defaultSSLContext.longValue();
             SSLContext.registerDefault(defaultSSLContext, this);
         }
@@ -564,7 +564,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     @Override
     public long getSslContext(String sniHostName) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
-        Long ctx = (Long) sslHostConfig.getSslContext();
+        Long ctx = (Long) sslHostConfig.getOpenSslContext();
         if (ctx != null) {
             return ctx.longValue();
         }
@@ -743,7 +743,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             Long ctx = Long.valueOf(sslContext);
             SSLContext.unregisterDefault(ctx);
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                sslHostConfig.setSslContext(null);
+                sslHostConfig.setOpenSslContext(null);
             }
             sslContext = 0;
         }

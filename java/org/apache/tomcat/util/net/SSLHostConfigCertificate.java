@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.net;
 
+import org.apache.tomcat.util.net.AbstractJsseEndpoint.SSLContextWrapper;
+
 
 public class SSLHostConfigCertificate {
 
@@ -25,6 +27,11 @@ public class SSLHostConfigCertificate {
             System.getProperty("javax.net.ssl.keyStoreProvider");
     static final String DEFAULT_KEYSTORE_TYPE =
             System.getProperty("javax.net.ssl.keyStoreType", "JKS");
+
+    // OpenSSL can handle multiple certs in a single config so the reference to
+    // the context is at the virtual host level. JSSE can't so the reference is
+    // held here on the certificate.
+    private SSLContextWrapper sslContextWrapper;
 
     // Common
     private final SSLHostConfig sslHostConfig;
@@ -49,9 +56,19 @@ public class SSLHostConfigCertificate {
     }
 
 
+    public SSLContextWrapper getSslContextWrapper() {
+        return sslContextWrapper;
+    }
+
+
+    public void setSslContextWrapper(SSLContextWrapper sslContextWrapper) {
+        this.sslContextWrapper = sslContextWrapper;
+    }
+
+
     // Common
 
-    public Type getType() {
+        public Type getType() {
         return type;
     }
 

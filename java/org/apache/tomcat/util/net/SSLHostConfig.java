@@ -59,7 +59,10 @@ public class SSLHostConfig {
 
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
-    private Object sslContext;
+    // OpenSSL can handle multiple certs in a single config so the reference to
+    // the context is here at the virtual host level. JSSE can't so the
+    // reference is held on the certificate.
+    private Long openSslContext;
 
     // Configuration properties
 
@@ -99,13 +102,13 @@ public class SSLHostConfig {
     }
 
 
-    public Object getSslContext() {
-        return sslContext;
+    public Object getOpenSslContext() {
+        return openSslContext;
     }
 
 
-    public void setSslContext(Object sslContext) {
-        this.sslContext = sslContext;
+    public void setOpenSslContext(Long openSslContext) {
+        this.openSslContext = openSslContext;
     }
 
 
