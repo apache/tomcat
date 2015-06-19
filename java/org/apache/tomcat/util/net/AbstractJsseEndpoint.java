@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -85,7 +86,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
                         sslUtil.configureSessionContext(sessionContext);
                     }
                     SSLContextWrapper sslContextWrapper = new SSLContextWrapper(sslContext, sslUtil);
-                    sslHostConfig.setSslContext(sslContextWrapper);
+                    certificate.setSslContextWrapper(sslContextWrapper);
                 }
             }
         }
@@ -94,7 +95,10 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
-        SSLContextWrapper sslContextWrapper = (SSLContextWrapper) sslHostConfig.getSslContext();
+
+        SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers);
+
+        SSLContextWrapper sslContextWrapper = certificate.getSslContextWrapper();
         if (sslContextWrapper == null) {
             throw new IllegalStateException(
                     sm.getString("endpoint.jsse.noSslContext", sniHostName));
@@ -127,15 +131,35 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     }
 
 
+    private SSLHostConfigCertificate selectCertificate(
+            SSLHostConfig sslHostConfig, List<Cipher> clientRequestedCiphers) {
+
+        Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
+        if (certificates.size() == 1) {
+            return certificates.iterator().next();
+        }
+
+        // TODO:
+        // Need to select correct certificate based on the ciphers requested by
+        // the client, the ciphers configured for the server and which is
+        // configured to define the preference order
+
+        // For now, just return the first certificate
+        return certificates.iterator().next();
+    }
+
+
     @Override
     public void unbind() throws Exception {
         for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-            sslHostConfig.setSslContext(null);
+            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+                certificate.setSslContextWrapper(null);
+            }
         }
     }
 
 
-    private static class SSLContextWrapper {
+    static class SSLContextWrapper {
 
         private final SSLContext sslContext;
         private final String[] enabledCiphers;
