@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net.jsse;
 
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtil;
 
 public class TesterBug50640SslImpl extends JSSEImplementation {
@@ -26,11 +27,11 @@ public class TesterBug50640SslImpl extends JSSEImplementation {
 
 
     @Override
-    public SSLUtil getSSLUtil(SSLHostConfig sslHostConfig) {
+    public SSLUtil getSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
         if (sslHostConfig.getProtocols().size() == 1 &&
                 sslHostConfig.getProtocols().contains(PROPERTY_VALUE)) {
             sslHostConfig.setProtocols("TLSv1,TLSv1.1,TLSv1.2");
-            return super.getSSLUtil(sslHostConfig);
+            return super.getSSLUtil(sslHostConfig, certificate);
         } else {
             return null;
         }

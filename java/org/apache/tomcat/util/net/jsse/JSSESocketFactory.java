@@ -56,6 +56,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
@@ -78,12 +79,14 @@ public class JSSESocketFactory implements SSLUtil {
     private static final StringManager sm = StringManager.getManager(JSSESocketFactory.class);
 
     private final SSLHostConfig sslHostConfig;
+    private final SSLHostConfigCertificate certificate;
 
     private final String[] defaultServerProtocols;
 
 
-    public JSSESocketFactory (SSLHostConfig sslHostConfig) {
+    public JSSESocketFactory (SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
         this.sslHostConfig = sslHostConfig;
+        this.certificate = certificate;
 
         SSLContext context;
         try {
@@ -266,7 +269,7 @@ public class JSSESocketFactory implements SSLUtil {
         String keystorePass = sslHostConfig.getCertificateKeystorePassword();
         String keyAlias = sslHostConfig.getCertificateKeyAlias();
         String algorithm = sslHostConfig.getKeyManagerAlgorithm();
-        String keyPass = sslHostConfig.getCertificateKeyPassword();
+        String keyPass = certificate.getCertificateKeyPassword();
         // This has to be here as it can't be moved to SSLHostConfig since the
         // defaults vary between JSSE and OpenSSL.
         if (keyPass == null) {

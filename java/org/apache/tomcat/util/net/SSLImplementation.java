@@ -71,5 +71,6 @@ public abstract class SSLImplementation {
 
     public abstract SSLSupport getSSLSupport(SSLSession session);
 
-    public abstract SSLUtil getSSLUtil(SSLHostConfig sslHostConfig);
+    public abstract SSLUtil getSSLUtil(SSLHostConfig sslHostConfig,
+            SSLHostConfigCertificate certificate);
 }

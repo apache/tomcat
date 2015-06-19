@@ -74,17 +74,19 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                SSLUtil sslUtil = sslImplementation.getSSLUtil(sslHostConfig);
+                for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+                    SSLUtil sslUtil = sslImplementation.getSSLUtil(sslHostConfig, certificate);
 
-                SSLContext sslContext = sslUtil.createSSLContext();
-                sslContext.init(sslUtil.getKeyManagers(), sslUtil.getTrustManagers(), null);
+                    SSLContext sslContext = sslUtil.createSSLContext();
+                    sslContext.init(sslUtil.getKeyManagers(), sslUtil.getTrustManagers(), null);
 
-                SSLSessionContext sessionContext = sslContext.getServerSessionContext();
-                if (sessionContext != null) {
-                    sslUtil.configureSessionContext(sessionContext);
+                    SSLSessionContext sessionContext = sslContext.getServerSessionContext();
+                    if (sessionContext != null) {
+                        sslUtil.configureSessionContext(sessionContext);
+                    }
+                    SSLContextWrapper sslContextWrapper = new SSLContextWrapper(sslContext, sslUtil);
+                    sslHostConfig.setSslContext(sslContextWrapper);
                 }
-                SSLContextWrapper sslContextWrapper = new SSLContextWrapper(sslContext, sslUtil);
-                sslHostConfig.setSslContext(sslContextWrapper);
             }
         }
     }
