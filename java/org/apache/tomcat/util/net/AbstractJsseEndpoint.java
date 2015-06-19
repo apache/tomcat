@@ -16,11 +16,14 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.List;
+
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSessionContext;
 
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
+import org.apache.tomcat.util.net.jsse.openssl.Cipher;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
@@ -87,7 +90,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     }
 
 
-    protected SSLEngine createSSLEngine(String sniHostName) {
+    protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
         SSLContextWrapper sslContextWrapper = (SSLContextWrapper) sslHostConfig.getSslContext();
         if (sslContextWrapper == null) {
