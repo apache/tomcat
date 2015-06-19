@@ -49,16 +49,6 @@ public final class FastHttpDateFormat {
             new SimpleDateFormat(RFC1123_DATE, Locale.US);
 
 
-    /**
-     * The set of SimpleDateFormat formats to use in getDateHeader().
-     */
-    private static final SimpleDateFormat formats[] = {
-        new SimpleDateFormat(RFC1123_DATE, Locale.US),
-        new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
-        new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
-    };
-
-
     private static final TimeZone gmtZone = TimeZone.getTimeZone("GMT");
 
 
@@ -66,13 +56,7 @@ public final class FastHttpDateFormat {
      * GMT timezone - all HTTP dates are on GMT
      */
     static {
-
         format.setTimeZone(gmtZone);
-
-        formats[0].setTimeZone(gmtZone);
-        formats[1].setTimeZone(gmtZone);
-        formats[2].setTimeZone(gmtZone);
-
     }
 
 
@@ -165,9 +149,6 @@ public final class FastHttpDateFormat {
         Long date = null;
         if (threadLocalformats != null) {
             date = internalParseDate(value, threadLocalformats);
-            updateParseCache(value, date);
-        } else {
-            date = internalParseDate(value, formats);
             updateParseCache(value, date);
         }
         if (date == null) {
