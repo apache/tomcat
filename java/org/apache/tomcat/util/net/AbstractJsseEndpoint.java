@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -132,19 +135,36 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
 
     private SSLHostConfigCertificate selectCertificate(
-            SSLHostConfig sslHostConfig, List<Cipher> clientRequestedCiphers) {
+            SSLHostConfig sslHostConfig, List<Cipher> clientCiphers) {
 
         Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
         if (certificates.size() == 1) {
             return certificates.iterator().next();
         }
 
-        // TODO:
-        // Need to select correct certificate based on the ciphers requested by
-        // the client, the ciphers configured for the server and which is
-        // configured to define the preference order
+        LinkedHashSet<Cipher> serverCiphers = sslHostConfig.getCipherList();
 
-        // For now, just return the first certificate
+        List<Cipher> candidateCiphers = new ArrayList<>();
+        if (sslHostConfig.getHonorCipherOrder()) {
+            candidateCiphers.addAll(serverCiphers);
+            candidateCiphers.retainAll(clientCiphers);
+        } else {
+            candidateCiphers.addAll(clientCiphers);
+            candidateCiphers.retainAll(serverCiphers);
+        }
+
+        Iterator<Cipher> candidateIter = candidateCiphers.iterator();
+        while (candidateIter.hasNext()) {
+            Cipher candidate = candidateIter.next();
+            for (SSLHostConfigCertificate certificate : certificates) {
+                if (certificate.getType().isCompatibleWith(candidate.getAu())) {
+                    return certificate;
+                }
+            }
+        }
+
+        // No matches. Just return the first certificate. The handshake will
+        // then fail due to no matching ciphers.
         return certificates.iterator().next();
     }
 

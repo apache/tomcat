@@ -16,7 +16,11 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.tomcat.util.net.AbstractJsseEndpoint.SSLContextWrapper;
+import org.apache.tomcat.util.net.jsse.openssl.Authentication;
 
 
 public class SSLHostConfigCertificate {
@@ -174,9 +178,25 @@ public class SSLHostConfigCertificate {
     // Nested types
 
     public static enum Type {
+
         UNDEFINED,
-        RSA,
-        DSA,
-        ECC
+        RSA(Authentication.RSA),
+        DSA(Authentication.DSS),
+        ECC(Authentication.ECDH, Authentication.ECDSA);
+
+        private final Set<Authentication> compatibleAuthentications;
+
+        private Type(Authentication... authentications) {
+            compatibleAuthentications = new HashSet<>();
+            if (authentications != null) {
+                for (Authentication authentication : authentications) {
+                    compatibleAuthentications.add(authentication);
+                }
+            }
+        }
+
+        public boolean isCompatibleWith(Authentication au) {
+            return compatibleAuthentications.contains(au);
+        }
     }
 }
