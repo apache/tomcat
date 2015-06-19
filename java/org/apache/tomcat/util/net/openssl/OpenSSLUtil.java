@@ -24,22 +24,25 @@ import javax.net.ssl.TrustManager;
 
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtil;
 
 public class OpenSSLUtil implements SSLUtil {
 
     private final SSLHostConfig sslHostConfig;
+    private final SSLHostConfigCertificate certificate;
 
     private String[] enabledProtocols = null;
     private String[] enabledCiphers = null;
 
-    public OpenSSLUtil(SSLHostConfig sslHostConfig) {
+    public OpenSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
         this.sslHostConfig = sslHostConfig;
+        this.certificate = certificate;
     }
 
     @Override
     public SSLContext createSSLContext() throws Exception {
-        return new OpenSSLContext(sslHostConfig);
+        return new OpenSSLContext(sslHostConfig, certificate);
     }
 
     @Override

@@ -63,8 +63,11 @@ public class SSLHostConfig {
 
     // Configuration properties
 
+    // Nested
+    private SSLHostConfigCertificate defaultCertificate = null;
+    private Set<SSLHostConfigCertificate> certificates = new HashSet<>(4);
+
     // Common
-    private String certificateKeyPassword = null;
     private String certificateRevocationListFile;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
@@ -146,15 +149,56 @@ public class SSLHostConfig {
     }
 
 
-    // ----------------------------------------- Common configuration properties
+    // ------------------------------------------- Nested configuration elements
 
-    public void setCertificateKeyPassword(String certificateKeyPassword) {
-        this.certificateKeyPassword = certificateKeyPassword;
+    private void registerDefaultCertificate() {
+        if (defaultCertificate == null) {
+            defaultCertificate =
+                    new SSLHostConfigCertificate(SSLHostConfigCertificate.Type.UNDEFINED);
+            certificates.add(defaultCertificate);
+        }
     }
 
 
-    public String getCertificateKeyPassword() {
-        return certificateKeyPassword;
+    public void addCertificate(SSLHostConfigCertificate certificate) {
+        // Need to make sure that if there is more than one certificate, none of
+        // them have a type of undefined.
+        if (certificates.size() == 0) {
+            certificates.add(certificate);
+            return;
+        }
+
+        if (certificates.size() == 1 &&
+                certificates.iterator().next().getType() == SSLHostConfigCertificate.Type.UNDEFINED ||
+                        certificate.getType() == SSLHostConfigCertificate.Type.UNDEFINED) {
+            // Invalid config
+        }
+
+        certificates.add(certificate);
+    }
+
+
+    public Set<SSLHostConfigCertificate> getCertificates() {
+        return getCertificates(false);
+    }
+
+
+    public Set<SSLHostConfigCertificate> getCertificates(boolean createDefaultIfEmpty) {
+        if (certificates.size() == 0 && createDefaultIfEmpty) {
+            registerDefaultCertificate();
+        }
+        return certificates;
+    }
+
+
+    // ----------------------------------------- Common configuration properties
+
+    // TODO: All of these SSL setters can be removed once it is no longer
+    // necessary to support the old configuration attributes (Tomcat 10?).
+
+    public void setCertificateKeyPassword(String certificateKeyPassword) {
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateKeyPassword(certificateKeyPassword);
     }
 
 

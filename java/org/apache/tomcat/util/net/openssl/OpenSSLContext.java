@@ -55,6 +55,7 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -69,6 +70,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private static final String defaultProtocol = "TLS";
 
     private final SSLHostConfig sslHostConfig;
+    private final SSLHostConfigCertificate certificate;
     private OpenSSLServerSessionContext sessionContext;
 
     private List<String> ciphers = new ArrayList<>();
@@ -105,8 +107,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    public OpenSSLContext(SSLHostConfig sslHostConfig) throws SSLException {
+    public OpenSSLContext(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate)
+            throws SSLException {
         this.sslHostConfig = sslHostConfig;
+        this.certificate = certificate;
         aprPool = Pool.create(0);
         boolean success = false;
         try {
@@ -305,7 +309,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setCertificate(ctx,
                     SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateFile()),
                     SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateKeyFile()),
-                    sslHostConfig.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
+                    certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
             // Support Client Certificates
             SSLContext.setCACertificate(ctx,
                     SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
