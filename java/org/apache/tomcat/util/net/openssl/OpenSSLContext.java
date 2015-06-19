@@ -179,7 +179,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
      * {@code OpenSSLKeyManager}
      * @param tms
      * @param sr Is not used for this implementation.
-     * @throws SSLException
      */
     @Override
     public synchronized void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) {

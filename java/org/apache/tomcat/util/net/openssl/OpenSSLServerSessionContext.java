@@ -21,7 +21,8 @@ import org.apache.tomcat.jni.SSLContext;
 
 
 /**
- * {@link OpenSslSessionContext} implementation which offers extra methods which are only useful for the server-side.
+ * {@link OpenSSLSessionContext} implementation which offers extra methods which
+ * are only useful for the server-side.
  */
 public final class OpenSSLServerSessionContext extends OpenSSLSessionContext {
     OpenSSLServerSessionContext(long context) {
