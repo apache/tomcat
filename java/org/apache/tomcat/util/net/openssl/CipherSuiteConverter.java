@@ -176,7 +176,7 @@ public final class CipherSuiteConverter {
 
         // Cache the reverse mapping after stripping the protocol prefix (TLS_ or SSL_)
         final String javaCipherSuiteSuffix = javaCipherSuite.substring(4);
-        Map<String, String> p2j = new HashMap<String, String>(4);
+        Map<String, String> p2j = new HashMap<>(4);
         p2j.put("", javaCipherSuiteSuffix);
         p2j.put("SSL", "SSL_" + javaCipherSuiteSuffix);
         p2j.put("TLS", "TLS_" + javaCipherSuiteSuffix);
@@ -300,7 +300,7 @@ public final class CipherSuiteConverter {
         final String javaCipherSuiteTls = "TLS_" + javaCipherSuiteSuffix;
 
         // Cache the mapping.
-        final Map<String, String> p2j = new HashMap<String, String>(4);
+        final Map<String, String> p2j = new HashMap<>(4);
         p2j.put("", javaCipherSuiteSuffix);
         p2j.put("SSL", javaCipherSuiteSsl);
         p2j.put("TLS", javaCipherSuiteTls);

@@ -71,7 +71,7 @@ public final class OpenSSLEngine extends SSLEngine {
     private static final Set<String> AVAILABLE_CIPHER_SUITES;
 
     static {
-        final Set<String> availableCipherSuites = new LinkedHashSet<String>(128);
+        final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
         final long aprPool = Pool.create(0);
         try {
             final long sslCtx = SSLContext.make(aprPool, SSL.SSL_PROTOCOL_ALL, SSL.SSL_MODE_SERVER);
@@ -124,7 +124,8 @@ public final class OpenSSLEngine extends SSLEngine {
         Constants.SSL_PROTO_TLSv1_1,
         Constants.SSL_PROTO_TLSv1_2
     };
-    private static final Set<String> SUPPORTED_PROTOCOLS_SET = new HashSet<String>(Arrays.asList(SUPPORTED_PROTOCOLS));
+    private static final Set<String> SUPPORTED_PROTOCOLS_SET =
+            new HashSet<>(Arrays.asList(SUPPORTED_PROTOCOLS));
 
     // Header (5) + Data (2^14) + Compression (1024) + Encryption (1024) + MAC (20) + Padding (256)
     static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
@@ -155,7 +156,6 @@ public final class OpenSSLEngine extends SSLEngine {
     private int accepted;
     private boolean handshakeFinished;
     private boolean receivedShutdown;
-    @SuppressWarnings("UnusedDeclaration")
     private volatile int destroyed;
 
     // Use an invalid cipherSuite until the handshake is completed
@@ -176,7 +176,6 @@ public final class OpenSSLEngine extends SSLEngine {
     private final String fallbackApplicationProtocol;
     private final OpenSSLSessionContext sessionContext;
 
-    @SuppressWarnings("unused")
     private volatile SSLSession session;
 
     /**
@@ -257,7 +256,8 @@ public final class OpenSSLEngine extends SSLEngine {
             }
         }
 
-        throw new IllegalStateException(sm.getString("engine.writeToSSLFailed", sslWrote));
+        throw new IllegalStateException(
+                sm.getString("engine.writeToSSLFailed", Integer.toString(sslWrote)));
     }
 
     /**
@@ -386,7 +386,9 @@ public final class OpenSSLEngine extends SSLEngine {
         }
 
         if (offset >= srcs.length || offset + length > srcs.length) {
-            throw new IndexOutOfBoundsException(sm.getString("engine.invalidBufferArray", offset, length, srcs.length));
+            throw new IndexOutOfBoundsException(sm.getString("engine.invalidBufferArray",
+                    Integer.toString(offset), Integer.toString(length),
+                    Integer.toString(srcs.length)));
         }
 
         if (dst.isReadOnly()) {
@@ -491,7 +493,9 @@ public final class OpenSSLEngine extends SSLEngine {
             throw new IllegalArgumentException(sm.getString("engine.nullBuffer"));
         }
         if (offset >= dsts.length || offset + length > dsts.length) {
-            throw new IndexOutOfBoundsException(sm.getString("engine.invalidBufferArray", offset, length, dsts.length));
+            throw new IndexOutOfBoundsException(sm.getString("engine.invalidBufferArray",
+                    Integer.toString(offset), Integer.toString(length),
+                    Integer.toString(dsts.length)));
         }
 
         int capacity = 0;
@@ -554,7 +558,8 @@ public final class OpenSSLEngine extends SSLEngine {
                 if (error != SSL.SSL_ERROR_NONE) {
                     String err = SSL.getErrorString(error);
                     if (logger.isDebugEnabled()) {
-                        logger.debug(sm.getString("engine.readFromSSLFailed", error, lastPrimingReadResult, err));
+                        logger.debug(sm.getString("engine.readFromSSLFailed", Long.toString(error),
+                                Integer.toString(lastPrimingReadResult), err));
                     }
                     // There was an internal error -- shutdown
                     shutdown();
@@ -741,7 +746,7 @@ public final class OpenSSLEngine extends SSLEngine {
 
     @Override
     public String[] getEnabledProtocols() {
-        List<String> enabled = new ArrayList<String>();
+        List<String> enabled = new ArrayList<>();
         // Seems like there is no way to explict disable SSLv2Hello in openssl so it is always enabled
         enabled.add(Constants.SSL_PROTO_SSLv2Hello);
         int opts = SSL.getOptions(ssl);
@@ -915,7 +920,7 @@ public final class OpenSSLEngine extends SSLEngine {
                     Map<String, Object> values = this.values;
                     if (values == null) {
                         // Use size of 2 to keep the memory overhead small
-                        values = this.values = new HashMap<String, Object>(2);
+                        values = this.values = new HashMap<>(2);
                     }
                     Object old = values.put(name, value);
                     if (value instanceof SSLSessionBindingListener) {
@@ -1303,7 +1308,6 @@ public final class OpenSSLEngine extends SSLEngine {
     }
 
     @Override
-    @SuppressWarnings("FinalizeDeclaration")
     protected void finalize() throws Throwable {
         super.finalize();
         // Call shutdown as the user may have created the OpenSslEngine and not used it at all.
