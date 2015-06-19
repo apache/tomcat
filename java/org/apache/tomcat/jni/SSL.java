@@ -398,43 +398,38 @@ public final class SSL {
     public static native int getError(long ssl, int ret);
 
     /**
-     * BIO_ctrl_pending
+     * BIO_ctrl_pending.
      * @param bio BIO pointer (BIO *)
-     * @return
      */
     public static native int pendingWrittenBytesInBIO(long bio);
 
     /**
-     * SSL_pending
+     * SSL_pending.
      * @param ssl SSL pointer (SSL *)
-     * @return
      */
     public static native int pendingReadableBytesInSSL(long ssl);
 
     /**
-     * BIO_write
+     * BIO_write.
      * @param bio
      * @param wbuf
      * @param wlen
-     * @return
      */
     public static native int writeToBIO(long bio, long wbuf, int wlen);
 
     /**
-     * BIO_read
+     * BIO_read.
      * @param bio
      * @param rbuf
      * @param rlen
-     * @return
      */
     public static native int readFromBIO(long bio, long rbuf, int rlen);
 
     /**
-     * SSL_write
+     * SSL_write.
      * @param ssl the SSL instance (SSL *)
      * @param wbuf
      * @param wlen
-     * @return
      */
     public static native int writeToSSL(long ssl, long wbuf, int wlen);
 
@@ -443,14 +438,12 @@ public final class SSL {
      * @param ssl the SSL instance (SSL *)
      * @param rbuf
      * @param rlen
-     * @return
      */
     public static native int readFromSSL(long ssl, long rbuf, int rlen);
 
     /**
      * SSL_get_shutdown
      * @param ssl the SSL instance (SSL *)
-     * @return
      */
     public static native int getShutdown(long ssl);
 
@@ -495,27 +488,24 @@ public final class SSL {
     /**
      * SSL_shutdown
      * @param ssl the SSL instance (SSL *)
-     * @return
      */
     public static native int shutdownSSL(long ssl);
 
     /**
-     * Get the error number representing the last error OpenSSL encountered on this thread.
-     * @return
+     * Get the error number representing the last error OpenSSL encountered on
+     * this thread.
      */
     public static native int getLastErrorNumber();
 
     /**
-     * SSL_get_cipher
+     * SSL_get_cipher.
      * @param ssl the SSL instance (SSL *)
-     * @return
      */
     public static native String getCipherForSSL(long ssl);
 
     /**
      * SSL_get_version
      * @param ssl the SSL instance (SSL *)
-     * @return
      */
     public static native String getVersion(long ssl);
 
@@ -526,16 +516,14 @@ public final class SSL {
     public static native int doHandshake(long ssl);
 
     /**
-     * SSL_in_init
+     * SSL_in_init.
      * @param SSL
-     * @return
      */
     public static native int isInInit(long SSL);
 
     /**
      * SSL_get0_next_proto_negotiated
      * @param ssl the SSL instance (SSL *)
-     * @return
      */
     public static native String getNextProtoNegotiated(long ssl);
 
@@ -546,7 +534,6 @@ public final class SSL {
     /**
      * SSL_get0_alpn_selected
      * @param ssl the SSL instance (SSL *)
-     * @return
      */
     public static native String getAlpnSelected(long ssl);
 
