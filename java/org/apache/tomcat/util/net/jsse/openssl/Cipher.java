@@ -37,6 +37,8 @@ import java.util.Set;
  *      >Mapping of OpenSSL cipher suites names to registry names</a>
  * @see <a href="https://github.com/ssllabs/sslhaf/blob/0.1.x/suites.csv"
  *      >SSL Labs tool - list of ciphers</a>
+ * @see <a href="http://hg.openjdk.java.net/jdk9/jdk9/jdk/file/e30cd0d37abf/src/java.base/share/classes/sun/security/ssl/CipherSuite.java"
+ *      >OpenJDK source code</a>
  */
 public enum Cipher {
     /* The RSA ciphers */
