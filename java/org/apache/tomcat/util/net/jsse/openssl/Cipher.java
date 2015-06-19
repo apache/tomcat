@@ -25,7 +25,8 @@ import java.util.Set;
 /**
  * All the standard cipher suites for SSL/TSL.
  *
- * @see <a href="https://github.com/openssl/openssl/blob/master/ssl/s3_lib.c">OpenSSL</a>
+ * @see <a href="https://github.com/openssl/openssl/blob/master/ssl/s3_lib.c"
+ *      >OpenSSL cipher definitions</a>
  * @see <a href="http://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4"
  *      >The cipher suite registry</a>
  * @see <a href="https://www.thesprawl.org/research/tls-and-ssl-cipher-suites/"
@@ -34,6 +35,8 @@ import java.util.Set;
  *      >Oracle standard names for cipher suites</a>
  * @see <a href="https://www.openssl.org/docs/apps/ciphers.html"
  *      >Mapping of OpenSSL cipher suites names to registry names</a>
+ * @see <a href="https://github.com/ssllabs/sslhaf/blob/0.1.x/suites.csv"
+ *      >SSL Labs tool - list of ciphers</a>
  */
 public enum Cipher {
     /* The RSA ciphers */
@@ -513,7 +516,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168
     ),
     // Cipher 20
@@ -569,7 +572,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             false,
-            168,
+            112,
             168
     ),
     // Cipher 24
@@ -1231,6 +1234,7 @@ public enum Cipher {
     ),
     /* GOST Ciphersuites */
     /*
+    // Cipher 80
     TLS_GOSTR341094_WITH_28147_CNT_IMIT(
             "GOST94-GOST89-GOST89",
             KeyExchange.GOST,
@@ -1244,6 +1248,7 @@ public enum Cipher {
             256,
             256
     ),
+    // Cipher 81
     TLS_GOSTR341001_WITH_28147_CNT_IMIT(
             "GOST2001-GOST89-GOST89",
             KeyExchange.GOST,
@@ -1257,6 +1262,7 @@ public enum Cipher {
             256,
             256
     ),
+    // Cipher 82
     TLS_GOSTR341094_WITH_NULL_GOSTR3411(
             "GOST94-NULL-GOST94",
             KeyExchange.GOST,
@@ -1270,6 +1276,7 @@ public enum Cipher {
             0,
             0
     ),
+    // Cipher 83
     TLS_GOSTR341001_WITH_NULL_GOSTR3411(
             "GOST2001-NULL-GOST94",
             KeyExchange.GOST,
@@ -1394,7 +1401,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168
     ),
     // Cipher 8C
@@ -1888,7 +1895,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168
     ),
     // Cipher C004
@@ -1958,7 +1965,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168
     ),
     // Cipher C009
@@ -2028,7 +2035,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168
     ),
     // Cipher C00E
@@ -2098,7 +2105,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168
     ),
     // Cipher C013
@@ -2168,7 +2175,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             true,
-            168,
+            112,
             168
     ),
     // Cipher C018
@@ -2211,7 +2218,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             false,
-            168,
+            112,
             168
     ),
     // Cipher C01B
@@ -2225,7 +2232,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             false,
-            168,
+            112,
             168
     ),
     // Cipher C01C
@@ -2239,7 +2246,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             false,
-            168,
+            112,
             168
     ),
     // Cipher C01D
@@ -2832,7 +2839,7 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             false,
-            168,
+            112,
             168,
             "SSL_CK_DES_192_EDE3_CBC_WITH_MD5"
     );
