@@ -1535,12 +1535,6 @@
       <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
-    <attribute name="SSLCertificateChainFile" required="false">
-      <p>This is an alias for the <code>certificateChainFile</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
-    </attribute>
-
     <attribute name="SSLCertificateFile" required="true">
       <p>This is an alias for the <code>certificateFile</code> attribute of the
       default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
