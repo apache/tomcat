@@ -38,6 +38,10 @@ public class SSLHostConfigCertificate {
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;
     private String certificateKeystoreType = DEFAULT_KEYSTORE_TYPE;
 
+    // OpenSSL
+    private String certificateFile;
+    private String certificateKeyFile;
+
 
     public SSLHostConfigCertificate(SSLHostConfig sslHostConfig, Type type) {
         this.sslHostConfig = sslHostConfig;
@@ -126,6 +130,29 @@ public class SSLHostConfigCertificate {
 
     // OpenSSL
 
+    public void setCertificateFile(String certificateFile) {
+        sslHostConfig.setProperty(
+                "Certificate.certificateFile", SSLHostConfig.Type.OPENSSL);
+        this.certificateFile = certificateFile;
+    }
+
+
+    public String getCertificateFile() {
+        return certificateFile;
+    }
+
+
+    public void setCertificateKeyFile(String certificateKeyFile) {
+        sslHostConfig.setProperty(
+                "Certificate.certificateKeyFile", SSLHostConfig.Type.OPENSSL);
+        this.certificateKeyFile = certificateKeyFile;
+    }
+
+
+    public String getCertificateKeyFile() {
+        return certificateKeyFile;
+    }
+
 
     // Nested types
 
@@ -133,7 +160,6 @@ public class SSLHostConfigCertificate {
         UNDEFINED,
         RSA,
         DSA,
-        EC,
-        DH
+        ECC
     }
 }

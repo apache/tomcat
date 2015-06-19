@@ -86,8 +86,6 @@ public class SSLHostConfig {
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
     // OpenSSL
-    private String certificateFile;
-    private String certificateKeyFile;
     private String certificateRevocationListPath;
     private String caCertificateFile;
     private String caCertificatePath;
@@ -496,25 +494,18 @@ public class SSLHostConfig {
 
     // ------------------------------- OpenSSL specific configuration properties
 
+    // TODO: These certificate setters can be removed once it is no longer
+    // necessary to support the old configuration attributes (Tomcat 10?).
+
     public void setCertificateFile(String certificateFile) {
-        setProperty("certificateFile", Type.OPENSSL);
-        this.certificateFile = certificateFile;
-    }
-
-
-    public String getCertificateFile() {
-        return certificateFile;
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateFile(certificateFile);
     }
 
 
     public void setCertificateKeyFile(String certificateKeyFile) {
-        setProperty("certificateKeyFile", Type.OPENSSL);
-        this.certificateKeyFile = certificateKeyFile;
-    }
-
-
-    public String getCertificateKeyFile() {
-        return certificateKeyFile;
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateKeyFile(certificateKeyFile);
     }
 
 

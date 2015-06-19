@@ -48,8 +48,8 @@ public class OpenSSLUtil implements SSLUtil {
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
         KeyManager[] managers = {
-                new OpenSSLKeyManager(SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateFile()),
-                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateKeyFile()))
+                new OpenSSLKeyManager(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
+                        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()))
                 };
         return managers;
     }

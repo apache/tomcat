@@ -114,7 +114,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         aprPool = Pool.create(0);
         boolean success = false;
         try {
-            if (SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateFile()) == null) {
+            if (SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()) == null) {
                 // This is required
                 throw new Exception(netSm.getString("endpoint.apr.noSslCertFile"));
             }
@@ -307,8 +307,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setCipherSuite(ctx, ciphers);
             // Load Server key and certificate
             SSLContext.setCertificate(ctx,
-                    SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateFile()),
-                    SSLHostConfig.adjustRelativePath(sslHostConfig.getCertificateKeyFile()),
+                    SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
+                    SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
                     certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
             // Support Client Certificates
             SSLContext.setCACertificate(ctx,
