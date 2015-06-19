@@ -452,7 +452,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     @Override
-    @SuppressWarnings("FinalizeDeclaration")
     protected final void finalize() throws Throwable {
         super.finalize();
         synchronized (OpenSSLContext.class) {
