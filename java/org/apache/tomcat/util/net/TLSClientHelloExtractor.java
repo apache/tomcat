@@ -26,10 +26,10 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * This class extracts the SNI host name from a TLS client-hello message.
  */
-public class SNIExtractor {
+public class TLSClientHelloExtractor {
 
-    private static final Log log = LogFactory.getLog(SNIExtractor.class);
-    private static final StringManager sm = StringManager.getManager(SNIExtractor.class);
+    private static final Log log = LogFactory.getLog(TLSClientHelloExtractor.class);
+    private static final StringManager sm = StringManager.getManager(TLSClientHelloExtractor.class);
 
     private final SNIResult result;
     private final String sniValue;
@@ -45,7 +45,7 @@ public class SNIExtractor {
      *
      * @param netInBuffer The buffer containing the TLS data to process
      */
-    public SNIExtractor(ByteBuffer netInBuffer) {
+    public TLSClientHelloExtractor(ByteBuffer netInBuffer) {
         // TODO: Detect use of http on a secure connection and provide a simple
         //       error page.
 
