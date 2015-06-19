@@ -262,18 +262,18 @@ public class JSSESocketFactory implements SSLUtil {
 
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
-        String keystoreType = sslHostConfig.getCertificateKeystoreType();
-        String keystoreProvider = sslHostConfig.getCertificateKeystoreProvider();
+        String keystoreType = certificate.getCertificateKeystoreType();
+        String keystoreProvider = certificate.getCertificateKeystoreProvider();
         String keystoreFile = SSLHostConfig.adjustRelativePath(
-                sslHostConfig.getCertificateKeystoreFile());
-        String keystorePass = sslHostConfig.getCertificateKeystorePassword();
-        String keyAlias = sslHostConfig.getCertificateKeyAlias();
+                certificate.getCertificateKeystoreFile());
+        String keystorePass = certificate.getCertificateKeystorePassword();
+        String keyAlias = certificate.getCertificateKeyAlias();
         String algorithm = sslHostConfig.getKeyManagerAlgorithm();
         String keyPass = certificate.getCertificateKeyPassword();
         // This has to be here as it can't be moved to SSLHostConfig since the
         // defaults vary between JSSE and OpenSSL.
         if (keyPass == null) {
-            keyPass = sslHostConfig.getCertificateKeystorePassword();
+            keyPass = certificate.getCertificateKeystorePassword();
         }
 
         KeyManager[] kms = null;
