@@ -18,9 +18,12 @@ package org.apache.tomcat.util.net;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.jsse.openssl.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -32,6 +35,7 @@ public class TLSClientHelloExtractor {
     private static final StringManager sm = StringManager.getManager(TLSClientHelloExtractor.class);
 
     private final ExtractorResult result;
+    private final List<Cipher> clientRequestedCiphers;
     private final String sniValue;
 
     private static final int TLS_RECORD_HEADER_LEN = 5;
@@ -54,6 +58,7 @@ public class TLSClientHelloExtractor {
         int pos = netInBuffer.position();
         int limit = netInBuffer.limit();
         ExtractorResult result = ExtractorResult.NOT_PRESENT;
+        List<Cipher> clientRequestedCiphers = null;
         String sniValue = null;
         try {
             // Switch to read mode.
@@ -92,8 +97,16 @@ public class TLSClientHelloExtractor {
             skipBytes(netInBuffer, 32);
             // Session ID (single byte for length)
             skipBytes(netInBuffer, (netInBuffer.get() & 0xFF));
-            // Cipher Suites (2 bytes for length)
-            skipBytes(netInBuffer, (netInBuffer.getChar()));
+
+            // Cipher Suites
+            // (2 bytes for length, each cipher ID is 2 bytes)
+            int cipherCount = netInBuffer.getChar() / 2;
+            clientRequestedCiphers = new ArrayList<>(cipherCount);
+            for (int i = 0; i < cipherCount; i++) {
+                int cipherId = netInBuffer.getChar();
+                clientRequestedCiphers.add(Cipher.valueOf(cipherId));
+            }
+
             // Compression methods (single byte for length)
             skipBytes(netInBuffer, (netInBuffer.get() & 0xFF));
 
@@ -113,6 +126,7 @@ public class TLSClientHelloExtractor {
             }
         } finally {
             this.result = result;
+            this.clientRequestedCiphers = clientRequestedCiphers;
             this.sniValue = sniValue;
             // Whatever happens, return the buffer to its original state
             netInBuffer.limit(limit);
@@ -129,6 +143,15 @@ public class TLSClientHelloExtractor {
     public String getSNIValue() {
         if (result == ExtractorResult.COMPLETE) {
             return sniValue;
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+
+    public List<Cipher> getClientRequestedCiphers() {
+        if (result == ExtractorResult.COMPLETE) {
+            return clientRequestedCiphers;
         } else {
             throw new IllegalStateException();
         }
