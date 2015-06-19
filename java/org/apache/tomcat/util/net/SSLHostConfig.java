@@ -75,11 +75,6 @@ public class SSLHostConfig {
     private boolean honorCipherOrder = true;
     private Set<String> protocols = new HashSet<>();
     // JSSE
-    private String certificateKeyAlias;
-    private String certificateKeystorePassword = "changeit";
-    private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
-    private String certificateKeystoreProvider = System.getProperty("javax.net.ssl.keyStoreProvider");
-    private String certificateKeystoreType = System.getProperty("javax.net.ssl.keyStoreType");
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     private int sessionCacheSize = 0;
     private int sessionTimeout = 86400;
@@ -103,10 +98,6 @@ public class SSLHostConfig {
     public SSLHostConfig() {
         // Set defaults that can't be (easily) set when defining the fields.
         setProtocols(Constants.SSL_PROTO_ALL);
-        // Configure fall-back defaults if system property is not set.
-        if (certificateKeystoreType == null) {
-            certificateKeystoreType = "JKS";
-        }
     }
 
 
@@ -132,7 +123,7 @@ public class SSLHostConfig {
     }
 
 
-    private void setProperty(String name, Type configType) {
+    void setProperty(String name, Type configType) {
         if (this.configType == null) {
             Set<String> properties = configuredProperties.get(configType);
             if (properties == null) {
@@ -153,8 +144,8 @@ public class SSLHostConfig {
 
     private void registerDefaultCertificate() {
         if (defaultCertificate == null) {
-            defaultCertificate =
-                    new SSLHostConfigCertificate(SSLHostConfigCertificate.Type.UNDEFINED);
+            defaultCertificate = new SSLHostConfigCertificate(
+                    this, SSLHostConfigCertificate.Type.UNDEFINED);
             certificates.add(defaultCertificate);
         }
     }
@@ -193,7 +184,7 @@ public class SSLHostConfig {
 
     // ----------------------------------------- Common configuration properties
 
-    // TODO: All of these SSL setters can be removed once it is no longer
+    // TODO: This certificate setter can be removed once it is no longer
     // necessary to support the old configuration attributes (Tomcat 10?).
 
     public void setCertificateKeyPassword(String certificateKeyPassword) {
@@ -344,58 +335,36 @@ public class SSLHostConfig {
 
     // ---------------------------------- JSSE specific configuration properties
 
+    // TODO: These certificate setters can be removed once it is no longer
+    // necessary to support the old configuration attributes (Tomcat 10?).
+
     public void setCertificateKeyAlias(String certificateKeyAlias) {
-        setProperty("certificateKeyAlias", Type.JSSE);
-        this.certificateKeyAlias = certificateKeyAlias;
-    }
-
-
-    public String getCertificateKeyAlias() {
-        return certificateKeyAlias;
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateKeyAlias(certificateKeyAlias);
     }
 
 
     public void setCertificateKeystoreFile(String certificateKeystoreFile) {
-        setProperty("certificateKeystoreFile", Type.JSSE);
-        this.certificateKeystoreFile = certificateKeystoreFile;
-    }
-
-
-    public String getCertificateKeystoreFile() {
-        return certificateKeystoreFile;
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateKeystoreFile(certificateKeystoreFile);
     }
 
 
     public void setCertificateKeystorePassword(String certificateKeystorePassword) {
-        setProperty("certificateKeystorePassword", Type.JSSE);
-        this.certificateKeystorePassword = certificateKeystorePassword;
-    }
-
-
-    public String getCertificateKeystorePassword() {
-        return certificateKeystorePassword;
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateKeystorePassword(certificateKeystorePassword);
     }
 
 
     public void setCertificateKeystoreProvider(String certificateKeystoreProvider) {
-        setProperty("certificateKeystoreProvider", Type.JSSE);
-        this.certificateKeystoreProvider = certificateKeystoreProvider;
-    }
-
-
-    public String getCertificateKeystoreProvider() {
-        return certificateKeystoreProvider;
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateKeystoreProvider(certificateKeystoreProvider);
     }
 
 
     public void setCertificateKeystoreType(String certificateKeystoreType) {
-        setProperty("certificateKeystoreType", Type.JSSE);
-        this.certificateKeystoreType = certificateKeystoreType;
-    }
-
-
-    public String getCertificateKeystoreType() {
-        return certificateKeystoreType;
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateKeystoreType(certificateKeystoreType);
     }
 
 
@@ -495,7 +464,11 @@ public class SSLHostConfig {
 
     public String getTruststoreProvider() {
         if (truststoreProvider == null) {
-            return getCertificateKeystoreProvider();
+            if (defaultCertificate == null) {
+                return SSLHostConfigCertificate.DEFAULT_KEYSTORE_PROVIDER;
+            } else {
+                return defaultCertificate.getCertificateKeystoreProvider();
+            }
         } else {
             return truststoreProvider;
         }
@@ -510,7 +483,11 @@ public class SSLHostConfig {
 
     public String getTruststoreType() {
         if (truststoreType == null) {
-            return getCertificateKeystoreType();
+            if (defaultCertificate == null) {
+                return SSLHostConfigCertificate.DEFAULT_KEYSTORE_TYPE;
+            } else {
+                return defaultCertificate.getCertificateKeystoreType();
+            }
         } else {
             return truststoreType;
         }
