@@ -17,6 +17,9 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -66,6 +69,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
      * Flag to enable disable logging of failed queries
      */
     protected boolean logFailed = true;
+
+    /**
+     * Sort QueryStats by last invocation time
+     */
+    protected final Comparator<QueryStats> queryStatsComparator = new QueryStatsComparator();
 
     /**
      * Returns the query stats for a given pool
@@ -186,15 +194,18 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     /**
-     * TODO - implement a better algorithm
+     * Sort QueryStats by last invocation time
      * @param queries
      */
     protected void removeOldest(ConcurrentHashMap<String,QueryStats> queries) {
-        Iterator<String> it = queries.keySet().iterator();
-        while (queries.size()>maxQueries && it.hasNext()) {
-            String sql = it.next();
-            it.remove();
+        ArrayList<QueryStats> list = new ArrayList<>(queries.values());
+        Collections.sort(list, queryStatsComparator);
+        int removeIndex = 0;
+        while (queries.size() > maxQueries) {
+            String sql = list.get(removeIndex).getQuery();
+            queries.remove(sql);
             if (log.isDebugEnabled()) log.debug("Removing slow query, capacity reached:"+sql);
+            removeIndex++;
         }
     }
 
@@ -444,5 +455,19 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
     }
 
+    private static class QueryStatsComparator implements Comparator<QueryStats> {
+
+        @Override
+        public int compare(QueryStats stats1, QueryStats stats2) {
+            long result = stats1.lastInvocation - stats2.lastInvocation;
+            if (result > 0) {
+                return 1;
+            } else if (result == 0) {
+                return 0;
+            } else {
+                return -1;
+            }
+        }
+    }
 
 }
