@@ -182,7 +182,7 @@ public class SSLHostConfigCertificate {
         UNDEFINED,
         RSA(Authentication.RSA),
         DSA(Authentication.DSS),
-        ECC(Authentication.ECDH, Authentication.ECDSA);
+        EC(Authentication.ECDH, Authentication.ECDSA);
 
         private final Set<Authentication> compatibleAuthentications;
 
