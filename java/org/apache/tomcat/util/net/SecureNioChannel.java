@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.Collections;
 import java.util.List;
 
 import javax.net.ssl.SSLEngine;
@@ -274,10 +275,9 @@ public class SecureNioChannel extends NioChannel  {
         switch (extractor.getResult()) {
         case COMPLETE:
             hostName = extractor.getSNIValue();
-            clientRequestedCiphers = extractor.getClientRequestedCiphers();
-            break;
+            //$FALL-THROUGH$ to set the client requested ciphers
         case NOT_PRESENT:
-            // NO-OP
+            clientRequestedCiphers = extractor.getClientRequestedCiphers();
             break;
         case NEED_READ:
             return SelectionKey.OP_READ;
@@ -287,6 +287,7 @@ public class SecureNioChannel extends NioChannel  {
                 log.debug(sm.getString("channel.nio.ssl.sniDefault"));
             }
             hostName = endpoint.getDefaultSSLHostConfigName();
+            clientRequestedCiphers = Collections.emptyList();
             break;
         }
 

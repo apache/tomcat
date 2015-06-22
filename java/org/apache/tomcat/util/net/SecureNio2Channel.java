@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.WritePendingException;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -336,10 +337,9 @@ public class SecureNio2Channel extends Nio2Channel  {
         switch (extractor.getResult()) {
         case COMPLETE:
             hostName = extractor.getSNIValue();
-            clientRequestedCiphers = extractor.getClientRequestedCiphers();
-            break;
+            //$FALL-THROUGH$ to set the client requested ciphers
         case NOT_PRESENT:
-            // NO-OP
+            clientRequestedCiphers = extractor.getClientRequestedCiphers();
             break;
         case NEED_READ:
             sc.read(netInBuffer, socket, handshakeReadCompletionHandler);
@@ -350,6 +350,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 log.debug(sm.getString("channel.nio.ssl.sniDefault"));
             }
             hostName = endpoint.getDefaultSSLHostConfigName();
+            clientRequestedCiphers = Collections.emptyList();
             break;
         }
 

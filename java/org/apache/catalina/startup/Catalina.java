@@ -340,8 +340,15 @@ public class Catalina {
                                  "org.apache.tomcat.util.net.SSLHostConfig");
         digester.addSetProperties("Server/Service/Connector/SSLHostConfig");
         digester.addSetNext("Server/Service/Connector/SSLHostConfig",
-                            "addSslHostConfig",
-                            "org.apache.tomcat.util.net.SSLHostConfig");
+                "addSslHostConfig",
+                "org.apache.tomcat.util.net.SSLHostConfig");
+
+        digester.addRule("Server/Service/Connector/SSLHostConfig/Certificate",
+                         new CertificateCreateRule());
+        digester.addSetProperties("Server/Service/Connector/SSLHostConfig/Certificate");
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig/Certificate",
+                            "addCertificate",
+                            "org.apache.tomcat.util.net.SSLHostConfigCertificate");
 
         digester.addObjectCreate("Server/Service/Connector/Listener",
                                  null, // MUST be specified in the element
