@@ -58,7 +58,7 @@ public class TLSClientHelloExtractor {
         int pos = netInBuffer.position();
         int limit = netInBuffer.limit();
         ExtractorResult result = ExtractorResult.NOT_PRESENT;
-        List<Cipher> clientRequestedCiphers = null;
+        List<Cipher> clientRequestedCiphers = new ArrayList<>();
         String sniValue = null;
         try {
             // Switch to read mode.
@@ -101,7 +101,6 @@ public class TLSClientHelloExtractor {
             // Cipher Suites
             // (2 bytes for length, each cipher ID is 2 bytes)
             int cipherCount = netInBuffer.getChar() / 2;
-            clientRequestedCiphers = new ArrayList<>(cipherCount);
             for (int i = 0; i < cipherCount; i++) {
                 int cipherId = netInBuffer.getChar();
                 clientRequestedCiphers.add(Cipher.valueOf(cipherId));
@@ -150,7 +149,7 @@ public class TLSClientHelloExtractor {
 
 
     public List<Cipher> getClientRequestedCiphers() {
-        if (result == ExtractorResult.COMPLETE) {
+        if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientRequestedCiphers;
         } else {
             throw new IllegalStateException();
