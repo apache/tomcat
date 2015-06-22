@@ -123,6 +123,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         handshakeComplete = false;
         closed = false;
         closing = false;
+        netInBuffer.clear();
     }
 
     @Override
