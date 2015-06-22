@@ -17,7 +17,9 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -59,6 +61,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
     protected int  maxQueries= 1000; //don't store more than this amount of queries
 
     /**
+     * Sort QueryStats by last invocation time
+     */
+    protected final Comparator<QueryStats> queryStatsComparator = new QueryStatsComparator();
+
+    /**
      * Returns the query stats for a given pool
      * @param poolname - the name of the pool we want to retrieve stats for
      * @return a hash map containing statistics for 0 to maxQueries
@@ -90,6 +97,16 @@ public class SlowQueryReport extends AbstractQueryReport  {
             if (log.isWarnEnabled()) {
                 log.warn("Failed Query Report SQL="+sql+"; time="+delta+" ms;");
             }
+        }
+        return sql;
+    }
+
+    @Override
+    protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
+        String sql = super.reportQuery(query, args, name, start, delta);
+        if (this.maxQueries > 0 ) {
+            QueryStats qs = this.getQueryStats(sql);
+            qs.add(delta, start);
         }
         return sql;
     }
@@ -177,15 +194,18 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     /**
-     * TODO - implement a better algorithm
+     * Sort QueryStats by last invocation time
      * @param queries
      */
     protected void removeOldest(ConcurrentHashMap<String,QueryStats> queries) {
-        Iterator<String> it = queries.keySet().iterator();
-        while (queries.size()>maxQueries && it.hasNext()) {
-            String sql = it.next();
-            it.remove();
+        ArrayList<QueryStats> list = new ArrayList<QueryStats>(queries.values());
+        Collections.sort(list, queryStatsComparator);
+        int removeIndex = 0;
+        while (queries.size() > maxQueries) {
+            String sql = list.get(removeIndex).getQuery();
+            queries.remove(sql);
             if (log.isDebugEnabled()) log.debug("Removing slow query, capacity reached:"+sql);
+            removeIndex++;
         }
     }
 
@@ -416,5 +436,22 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
     }
 
+    private static class QueryStatsComparator implements Comparator<QueryStats> {
+
+        @Override
+        public int compare(QueryStats stats1, QueryStats stats2) {
+            if (stats1.lastInvocation == 0) return 1;
+            if (stats2.lastInvocation == 0) return -1;
+
+            long result = stats1.lastInvocation - stats2.lastInvocation;
+            if (result > 0) {
+                return 1;
+            } else if (result == 0) {
+                return 0;
+            } else {
+                return -1;
+            }
+        }
+    }
 
 }

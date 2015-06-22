@@ -196,6 +196,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Refactoring of the <code>removeOldest</code> method in
+        <code>SlowQueryReport</code> to behave as expected. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
