@@ -36,7 +36,8 @@ public final class SSL {
 
     public static final int SSL_AIDX_RSA     = 0;
     public static final int SSL_AIDX_DSA     = 1;
-    public static final int SSL_AIDX_MAX     = 2;
+    public static final int SSL_AIDX_ECC     = 3;
+    public static final int SSL_AIDX_MAX     = 4;
     /*
      * Define IDs for the temporary RSA keys and DH params
      */
