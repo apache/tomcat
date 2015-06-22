@@ -111,6 +111,16 @@ public class SlowQueryReport extends AbstractQueryReport  {
     }
 
     @Override
+    protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
+        String sql = super.reportQuery(query, args, name, start, delta);
+        if (this.maxQueries > 0 ) {
+            QueryStats qs = this.getQueryStats(sql);
+            qs.add(delta, start);
+        }
+        return sql;
+    }
+
+    @Override
     protected String reportSlowQuery(String query, Object[] args, String name, long start, long delta) {
         String sql = super.reportSlowQuery(query, args, name, start, delta);
         if (this.maxQueries > 0 ) {
