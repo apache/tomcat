@@ -31,11 +31,14 @@ import javax.security.auth.message.module.ServerAuthModule;
 
 import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
 import org.apache.catalina.authenticator.jaspic.provider.modules.TomcatAuthModule;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class contains references to different JASPIC modules.
  */
 public class TomcatServerAuthContext implements ServerAuthContext {
+
+    protected static final StringManager sm = StringManager.getManager(TomcatServerAuthContext.class);
 
     private Map<String, ServerAuthModule> serverAuthModules = new HashMap<>();
 
@@ -85,7 +88,8 @@ public class TomcatServerAuthContext implements ServerAuthContext {
         String authenticationType = (String) properties.get(MessageInfoImpl.AUTH_METHOD);
         ServerAuthModule module = serverAuthModules.get(authenticationType);
         if (module == null) {
-            throw new AuthException("Unknown auth module");// TODO message i18n
+            throw new AuthException(sm.getString("authenticator.jaspic.unknownAuthType",
+                    authenticationType));
         }
         return module;
     }
