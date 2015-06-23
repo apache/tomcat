@@ -38,7 +38,7 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
         // Build the simple request
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleGetRequest(frameHeader, headersPayload, 3);
+        buildSimpleGetRequest(frameHeader, headersPayload, null, 3);
 
         // Try and corrupt the headerPayload
         headersPayload.put(0, (byte) (headersPayload.get(0) + 128));

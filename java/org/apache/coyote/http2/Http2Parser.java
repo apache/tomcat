@@ -225,6 +225,7 @@ class Http2Parser {
             }
 
             payloadSize -= optionalLen;
+            payloadSize -= padLength;
         }
 
         boolean endOfHeaders = Flags.isEndOfHeaders(flags);

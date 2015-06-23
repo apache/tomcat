@@ -31,7 +31,7 @@ import org.junit.Test;
 public class TestHttp2Section_6_2 extends Http2TestBase {
 
     @Test
-    public void testHeaderOnStreamZero() throws Exception {
+    public void testHeaderFrameOnStreamZero() throws Exception {
         // HTTP2 upgrade
         http2Connect();
 
@@ -47,4 +47,23 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
         Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
                 "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
     }
+
+
+    @Test
+    public void testHeaderFrameWithPadding() throws Exception {
+        http2Connect();
+
+        byte[] padding= new byte[8];
+
+        sendSimpleGetRequest(3, padding);
+        readSimpleGetResponse();
+        Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
+        output.clearTrace();
+    }
+
+    // with non-zero padding
+
+    // too much padding
+
+    // zero length padding
 }

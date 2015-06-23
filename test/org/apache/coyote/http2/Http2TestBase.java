@@ -109,10 +109,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void sendSimpleGetRequest(int streamId) throws IOException {
+        sendSimpleGetRequest(streamId, null);
+    }
+
+
+    protected void sendSimpleGetRequest(int streamId, byte[] padding) throws IOException {
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
-        buildSimpleGetRequest(frameHeader, headersPayload, streamId);
+        buildSimpleGetRequest(frameHeader, headersPayload, padding, streamId);
         writeFrame(frameHeader, headersPayload);
     }
 
@@ -126,24 +131,30 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected void buildSimpleGetRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
-        buildGetRequest(frameHeader, headersPayload, streamId, "/simple");
+    protected void buildSimpleGetRequest(byte[] frameHeader, ByteBuffer headersPayload,
+            byte[] padding, int streamId) {
+        buildGetRequest(frameHeader, headersPayload, padding, streamId, "/simple");
     }
 
 
     protected void buildLargeGetRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
-        buildGetRequest(frameHeader, headersPayload, streamId, "/large");
+        buildGetRequest(frameHeader, headersPayload, null, streamId, "/large");
     }
 
 
-    protected void buildGetRequest(byte[] frameHeader, ByteBuffer headersPayload, int streamId,
-            String url) {
+    protected void buildGetRequest(byte[] frameHeader, ByteBuffer headersPayload, byte[] padding,
+            int streamId, String url) {
+        if (padding != null) {
+            headersPayload.put((byte) (0xFF & padding.length));
+        }
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("GET");
         headers.addValue(":path").setString(url);
         headers.addValue(":authority").setString("localhost:" + getPort());
         hpackEncoder.encode(headers, headersPayload);
-
+        if (padding != null) {
+            headersPayload.put(padding);
+        }
         headersPayload.flip();
 
         ByteUtil.setThreeBytes(frameHeader, 0, headersPayload.limit());
@@ -151,6 +162,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         frameHeader[3] = 0x01;
         // Flags. end of headers (0x04). end of stream (0x01)
         frameHeader[4] = 0x05;
+        if (padding != null) {
+            frameHeader[4] += 0x08;
+        }
         // Stream id
         ByteUtil.set31Bits(frameHeader, 5, streamId);
     }
