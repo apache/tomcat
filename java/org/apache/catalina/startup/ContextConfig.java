@@ -459,6 +459,7 @@ public class ContextConfig implements LifecycleListener {
     }
 
     private String getJaspicAppContext() {
+        // TODO: This might not be unique
         return context.getServletContext().getVirtualServerName() + " " + context.getPath();
     }
 
