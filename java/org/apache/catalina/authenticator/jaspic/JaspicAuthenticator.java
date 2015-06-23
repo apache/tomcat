@@ -65,6 +65,10 @@ public class JaspicAuthenticator extends AuthenticatorBase {
 
     @Override
     public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
+        if (checkForCachedAuthentication(request, response, true)) {
+            return true;
+        }
+
         MessageInfo messageInfo = new MessageInfoImpl(request, response, true, getAuthMethod());
 
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
