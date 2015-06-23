@@ -102,9 +102,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
             long now = System.currentTimeMillis();
             long delta = now - start;
             QueryStats qs = this.getQueryStats(sql);
-            qs.failure(delta, now);
-            if (isLogFailed() && log.isWarnEnabled()) {
-                log.warn("Failed Query Report SQL="+sql+"; time="+delta+" ms;");
+            if (qs != null) {
+                qs.failure(delta, now);
+                if (isLogFailed() && log.isWarnEnabled()) {
+                    log.warn("Failed Query Report SQL="+sql+"; time="+delta+" ms;");
+                }
             }
         }
         return sql;
@@ -115,7 +117,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
         String sql = super.reportQuery(query, args, name, start, delta);
         if (this.maxQueries > 0 ) {
             QueryStats qs = this.getQueryStats(sql);
-            qs.add(delta, start);
+            if (qs != null) qs.add(delta, start);
         }
         return sql;
     }
@@ -125,9 +127,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
         String sql = super.reportSlowQuery(query, args, name, start, delta);
         if (this.maxQueries > 0 ) {
             QueryStats qs = this.getQueryStats(sql);
-            qs.add(delta, start);
-            if (isLogSlow() && log.isWarnEnabled()) {
-                log.warn("Slow Query Report SQL="+sql+"; time="+delta+" ms;");
+            if (qs != null) {
+                qs.add(delta, start);
+                if (isLogSlow() && log.isWarnEnabled()) {
+                    log.warn("Slow Query Report SQL="+sql+"; time="+delta+" ms;");
+                }
             }
         }
         return sql;
@@ -145,13 +149,13 @@ public class SlowQueryReport extends AbstractQueryReport  {
     @Override
     public void prepareStatement(String sql, long time) {
         QueryStats qs = getQueryStats(sql);
-        qs.prepare(time);
+        if (qs != null) qs.prepare(time);
     }
 
     @Override
     public void prepareCall(String sql, long time) {
         QueryStats qs = getQueryStats(sql);
-        qs.prepare(time);
+        if (qs != null) qs.prepare(time);
     }
 
     /**
@@ -186,7 +190,10 @@ public class SlowQueryReport extends AbstractQueryReport  {
     protected QueryStats getQueryStats(String sql) {
         if (sql==null) sql = "";
         ConcurrentHashMap<String,QueryStats> queries = SlowQueryReport.this.queries;
-        if (queries==null) return null;
+        if (queries==null) {
+            if (log.isWarnEnabled()) log.warn("Connection has already been closed or abandoned");
+            return null;
+        }
         QueryStats qs = queries.get(sql);
         if (qs == null) {
             qs = new QueryStats(sql);
