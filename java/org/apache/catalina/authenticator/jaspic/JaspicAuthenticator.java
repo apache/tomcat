@@ -23,7 +23,6 @@ import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
-import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.config.AuthConfigFactory;
 import javax.security.auth.message.config.AuthConfigProvider;
 import javax.security.auth.message.config.ServerAuthConfig;
@@ -69,7 +68,8 @@ public class JaspicAuthenticator extends AuthenticatorBase {
             return true;
         }
 
-        MessageInfo messageInfo = new MessageInfoImpl(request, response, true, getAuthMethod());
+        MessageInfoImpl messageInfo = new MessageInfoImpl(request, response, true, getAuthMethod());
+        messageInfo.setRealmName(getRealmName(context));
 
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
         String appContext = getAppContextId(request);

@@ -45,11 +45,11 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
     }
 
 
+    @SuppressWarnings("unchecked")
     protected static String getRealmName(MessageInfo messageInfo) {
         if (messageInfo == null) {
             return REALM_NAME;
         }
-        // TODO get realm name from message
-        return REALM_NAME;
+        return (String) messageInfo.getMap().getOrDefault(MessageInfoImpl.REALM_NAME, REALM_NAME);
     }
 }
