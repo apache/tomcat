@@ -17,7 +17,7 @@
 package org.apache.catalina.authenticator.jaspic;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.security.Principal;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -80,9 +80,14 @@ public class JaspicCallbackHandler implements CallbackHandler {
     private void handlePasswordValidationCallback(
             PasswordValidationCallback passwordValidationCallback) {
         Subject subject = passwordValidationCallback.getSubject();
+        String username = passwordValidationCallback.getUsername();
+        String password = new String(passwordValidationCallback.getPassword());
 
-        passwordValidationCallback.setResult(true);
-        subject.getPrincipals().add(
-                new GenericPrincipal("user", "password", Collections.singletonList("user")));
+        Principal principal = realm.authenticate(username, password);
+        passwordValidationCallback.setResult(principal != null);
+
+        if (principal != null) {
+            subject.getPrivateCredentials().add(principal);
+        }
     }
 }
