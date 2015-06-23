@@ -30,6 +30,7 @@ import javax.security.auth.message.config.ServerAuthContext;
 
 import org.apache.catalina.Realm;
 import org.apache.catalina.authenticator.jaspic.provider.modules.BasicAuthModule;
+import org.apache.catalina.authenticator.jaspic.provider.modules.DigestAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.TomcatAuthModule;
 
 public class TomcatAuthConfig implements ServerAuthConfig {
@@ -94,6 +95,7 @@ public class TomcatAuthConfig implements ServerAuthConfig {
     private Collection<TomcatAuthModule> getModules() {
         List<TomcatAuthModule> modules = new ArrayList<>();
         modules.add(new BasicAuthModule());
+        modules.add(new DigestAuthModule(realm));
         return modules;
     }
 }
