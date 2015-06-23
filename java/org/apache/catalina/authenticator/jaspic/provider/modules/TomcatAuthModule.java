@@ -41,7 +41,7 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
 
     protected boolean isMandatory(MessageInfo messageInfo) {
         String mandatory = (String) messageInfo.getMap().get(MessageInfoImpl.IS_MANDATORY);
-        return Boolean.valueOf(mandatory).booleanValue();
+        return Boolean.parseBoolean(mandatory);
     }
 
 
