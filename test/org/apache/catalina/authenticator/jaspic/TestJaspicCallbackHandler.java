@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.authenticator.jaspic;
 
+import java.util.Set;
+
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.message.callback.CallerPrincipalCallback;
@@ -39,17 +41,20 @@ public class TestJaspicCallbackHandler {
     @Test
     public void shouldConvertCallbackToTomcatPrincipal() throws Exception {
         // given
-        CallerPrincipalCallback callerCallback = new CallerPrincipalCallback(new Subject(), USER);
+        Subject subject = new Subject();
+        CallerPrincipalCallback callerCallback = new CallerPrincipalCallback(subject, USER);
         String[] groups = new String[] { "group" };
 
-        GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(new Subject(), groups);
+        GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(subject, groups);
         Callback[] callbacks = new Callback[] { callerCallback, groupCallback };
 
         // when
         jaspicCallbackHandler.handle(callbacks);
-        GenericPrincipal principal = jaspicCallbackHandler.getPrincipal();
 
         // then
+        Set<GenericPrincipal> principals = callerCallback.getSubject().getPrivateCredentials(
+                GenericPrincipal.class);
+        GenericPrincipal principal = principals.iterator().next();
         assertEquals(USER, principal.getName());
         assertArrayEquals(groups, principal.getRoles());
     }

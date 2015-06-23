@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.security.auth.Subject;
 import javax.security.auth.message.callback.CallerPrincipalCallback;
 import javax.security.auth.message.callback.GroupPrincipalCallback;
 
@@ -39,11 +40,30 @@ public class PrincipalGroupCallback {
         this.callerPrincipalCallback = callerPrincipalCallback;
     }
 
-
-    public void setCallerPrincipalCallback(GroupPrincipalCallback groupPrincipalCallback) {
+    public void setGroupPrincipalCallback(GroupPrincipalCallback groupPrincipalCallback) {
         this.groupPrincipalCallback = groupPrincipalCallback;
     }
 
+    public void configureSubject() {
+        GenericPrincipal principal = getPrincipal();
+        if (principal == null) {
+            return;
+        }
+        Subject subject = getSubject();
+        if (subject != null) {
+            subject.getPrivateCredentials().add(principal);
+        }
+    }
+
+    private Subject getSubject() {
+        if (callerPrincipalCallback != null) {
+            return callerPrincipalCallback.getSubject();
+        }
+        if (groupPrincipalCallback != null) {
+            return callerPrincipalCallback.getSubject();
+        }
+        return null;
+    }
 
     /**
      * Get tomcat's principal, which contains user principal and roles

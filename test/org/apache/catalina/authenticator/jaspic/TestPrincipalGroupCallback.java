@@ -78,7 +78,7 @@ public class TestPrincipalGroupCallback {
 
         String[] groups = new String[] { "group1" };
         GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(subject, groups);
-        principalGroupCallback.setCallerPrincipalCallback(groupCallback);
+        principalGroupCallback.setGroupPrincipalCallback(groupCallback);
 
         // when
         GenericPrincipal principal = principalGroupCallback.getPrincipal();

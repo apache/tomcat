@@ -17,8 +17,8 @@
 package org.apache.catalina.authenticator.jaspic;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Map;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.message.AuthException;
@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.connector.Request;
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -52,18 +53,19 @@ public class JaspicAuthenticator extends AuthenticatorBase {
     @SuppressWarnings("rawtypes")
     private Map authProperties = null;
 
+    private JaspicCallbackHandler callbackHandler;
 
     @Override
     protected synchronized void startInternal() throws LifecycleException {
         super.startInternal();
         serviceSubject = new Subject();
+        callbackHandler = getJaspicCallbackHandler();
     }
 
 
     @Override
     public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
         MessageInfo messageInfo = new MessageInfoImpl(request, response, true);
-        JaspicCallbackHandler callbackHandler = getJaspicCallbackHandler();
 
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
         String appContext = getAppContextId(request);
@@ -76,26 +78,41 @@ public class JaspicAuthenticator extends AuthenticatorBase {
         }
 
         AuthStatus authStatus;
+        Subject subject = new Subject();
         try {
             ServerAuthConfig authConfig = configProvider.getServerAuthConfig(MESSAGE_LAYER,
                     appContext, callbackHandler);
             String messageAuthContextId = authConfig.getAuthContextID(messageInfo);
             ServerAuthContext authContext = authConfig.getAuthContext(messageAuthContextId,
                     serviceSubject, authProperties);
-            authStatus = authContext.validateRequest(messageInfo, new Subject(), serviceSubject);
+            authStatus = authContext.validateRequest(messageInfo, subject, serviceSubject);
         } catch (AuthException e) {
             handleUnauthorizedRequest(response, e);
             return false;
         }
 
         if (authStatus == AuthStatus.SUCCESS) {
-            Principal principal = callbackHandler.getPrincipal();
+            GenericPrincipal principal = getPrincipal(subject);
             if (principal != null) {
                 register(request, response, principal, AUTH_TYPE, null, null);
             }
             return true;
         }
         return false;
+    }
+
+
+    private GenericPrincipal getPrincipal(Subject subject) {
+        if (subject == null) {
+            return null;
+        }
+
+        Set<GenericPrincipal> principals = subject.getPrivateCredentials(GenericPrincipal.class);
+        if (principals.isEmpty()) {
+            return null;
+        }
+
+        return principals.iterator().next();
     }
 
 

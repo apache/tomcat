@@ -28,7 +28,6 @@ import javax.security.auth.message.callback.GroupPrincipalCallback;
 import javax.security.auth.message.callback.PasswordValidationCallback;
 
 import org.apache.catalina.Realm;
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -38,8 +37,6 @@ public class JaspicCallbackHandler implements CallbackHandler {
     protected static final StringManager sm = StringManager.getManager(JaspicCallbackHandler.class);
 
     private Realm realm;
-
-    private PrincipalGroupCallback principalGroupCallback = new PrincipalGroupCallback();
 
 
     public JaspicCallbackHandler(Realm realm) {
@@ -52,22 +49,19 @@ public class JaspicCallbackHandler implements CallbackHandler {
         if (callbacks == null) {
             return;
         }
+        PrincipalGroupCallback principalGroupCallback = new PrincipalGroupCallback();
         for (Callback callback : callbacks) {
-            handleCallback(callback);
+            handleCallback(callback, principalGroupCallback);
         }
+        principalGroupCallback.configureSubject();
     }
 
 
-    public GenericPrincipal getPrincipal() {
-        return principalGroupCallback.getPrincipal();
-    }
-
-
-    private void handleCallback(Callback callback) {
+    private void handleCallback(Callback callback, PrincipalGroupCallback principalGroupCallback) {
         if (callback instanceof CallerPrincipalCallback) {
             principalGroupCallback.setCallerPrincipalCallback((CallerPrincipalCallback) callback);
         } else if (callback instanceof GroupPrincipalCallback) {
-            principalGroupCallback.setCallerPrincipalCallback((GroupPrincipalCallback) callback);
+            principalGroupCallback.setGroupPrincipalCallback((GroupPrincipalCallback) callback);
         } else if (callback instanceof PasswordValidationCallback) {
             handlePasswordValidationCallback((PasswordValidationCallback) callback);
         } else {
