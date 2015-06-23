@@ -202,6 +202,12 @@
         Refactoring of the <code>removeOldest</code> method in
         <code>SlowQueryReport</code> to behave as expected. (kfujino)
       </fix>
+      <fix>
+        <bug>57783</bug>: Fix <code>NullPointerException</code> in
+        <code>SlowQueryReport</code>. To avoid this NPE, Refactor
+        <code>SlowQueryReport#removeOldest</code> and handle the abandoned
+        connection properly. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
