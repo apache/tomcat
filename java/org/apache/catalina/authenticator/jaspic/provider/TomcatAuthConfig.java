@@ -28,6 +28,7 @@ import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.config.ServerAuthConfig;
 import javax.security.auth.message.config.ServerAuthContext;
 
+import org.apache.catalina.Realm;
 import org.apache.catalina.authenticator.jaspic.provider.modules.TomcatAuthModule;
 
 public class TomcatAuthConfig implements ServerAuthConfig {
@@ -36,12 +37,15 @@ public class TomcatAuthConfig implements ServerAuthConfig {
     private String appContext;
     private CallbackHandler handler;
     private TomcatServerAuthContext tomcatServerAuthContext;
+    private Realm realm;
 
 
-    public TomcatAuthConfig(String layer, String appContext, CallbackHandler callbackHandler) {
+    public TomcatAuthConfig(String layer, String appContext, CallbackHandler callbackHandler,
+            Realm realm) {
         this.messageLayer = layer;
         this.appContext = appContext;
         this.handler = callbackHandler;
+        this.realm = realm;
     }
 
 
