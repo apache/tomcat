@@ -58,12 +58,62 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
         sendSimpleGetRequest(3, padding);
         readSimpleGetResponse();
         Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
-        output.clearTrace();
     }
 
-    // with non-zero padding
 
-    // too much padding
+    @Test
+    public void testHeaderFrameWithNonZeroPadding() throws Exception {
+        http2Connect();
 
-    // zero length padding
+        byte[] padding= new byte[8];
+        padding[4] = 1;
+
+        sendSimpleGetRequest(3, padding);
+
+        // Goaway
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+    }
+
+
+    @Test
+    public void testHeaderFrameTooMuchPadding() throws Exception {
+        http2Connect();
+
+        byte[] headerFrame = new byte[10];
+
+        // Header
+        // length
+        ByteUtil.setThreeBytes(headerFrame, 0, 1);
+        // type 1 (headers)
+        headerFrame[3] = 0x01;
+        // flags 8 (padded)
+        headerFrame[4] = 0x08;
+        // stream 3
+        ByteUtil.set31Bits(headerFrame, 5, 3);
+        // payload (pad length of 1)
+        headerFrame[9] = 1;
+
+        os.write(headerFrame);
+        os.flush();
+
+        parser.readFrame(true);
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.startsWith("0-Goaway-[1]-[1]-["));
+    }
+
+
+    @Test
+    public void testHeaderFrameWithZeroLengthPadding() throws Exception {
+        http2Connect();
+
+        byte[] padding= new byte[0];
+
+        sendSimpleGetRequest(3, padding);
+        readSimpleGetResponse();
+        Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
+    }
 }
