@@ -39,6 +39,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.security.auth.message.config.AuthConfigFactory;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
@@ -61,6 +62,8 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.authenticator.jaspic.JaspicAuthenticator;
+import org.apache.catalina.authenticator.jaspic.provider.TomcatAuthConfigProvider;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
@@ -388,6 +391,15 @@ public class ContextConfig implements LifecycleListener {
             authenticator = (Valve)
                 customAuthenticators.get(loginConfig.getAuthMethod());
         }
+
+        if (authenticator == null) {
+            String authMethod = loginConfig.getAuthMethod();
+            if (authMethod != null && authMethod.contains("JASPIC")) {
+                //TODO temporary workaround, Jaspic should be enabled by default
+                authenticator = configureDefaultJaspicAuthModules();
+            }
+        }
+
         if (authenticator == null) {
             if (authenticators == null) {
                 log.error(sm.getString("contextConfig.authenticatorResources"));
@@ -431,6 +443,18 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
         }
+    }
+
+
+    /**
+     * Configure and register default JASPIC modules
+     * @return
+     */
+    private JaspicAuthenticator configureDefaultJaspicAuthModules() {
+        AuthConfigFactory authConfigFactory = AuthConfigFactory.getFactory();
+        authConfigFactory.registerConfigProvider(new TomcatAuthConfigProvider(),
+                JaspicAuthenticator.MESSAGE_LAYER, null, "Tomcat Jaspic");
+        return new JaspicAuthenticator();
     }
 
 
