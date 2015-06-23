@@ -26,7 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.connector.Request;
 
 public class MessageInfoImpl implements MessageInfo {
-    private static final String IS_MANDATORY = "javax.security.auth.message.MessagePolicy.isMandatory";
+    public static final String IS_MANDATORY = "javax.security.auth.message.MessagePolicy.isMandatory";
+    public static final String AUTH_METHOD = "javax.servlet.http.authType";
 
     private final Map<String, Object> map = new HashMap<>();
     private HttpServletRequest request;
@@ -35,10 +36,12 @@ public class MessageInfoImpl implements MessageInfo {
     public MessageInfoImpl() {
     }
 
-    public MessageInfoImpl(Request request, HttpServletResponse response, boolean authMandatory) {
+    public MessageInfoImpl(Request request, HttpServletResponse response, boolean authMandatory,
+            String authMethod) {
         this.request = request;
         this.response = response;
         map.put(IS_MANDATORY, Boolean.toString(authMandatory));
+        map.put(AUTH_METHOD, authMethod);
     }
 
     @Override
