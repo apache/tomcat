@@ -144,7 +144,7 @@ class Http2Parser {
 
             if (padLength >= payloadSize) {
                 throw new ConnectionException(
-                        sm.getString("http2Parser.processFrameData.tooMuchPadding", connectionId,
+                        sm.getString("http2Parser.processFrame.tooMuchPadding", connectionId,
                                 Integer.toString(streamId), Integer.toString(padLength),
                                 Integer.toString(payloadSize)), Http2Error.PROTOCOL_ERROR);
             }
@@ -216,6 +216,12 @@ class Http2Parser {
             int optionalPos = 0;
             if (padding) {
                 padLength = ByteUtil.getOneByte(optional, optionalPos++);
+                if (padLength >= payloadSize) {
+                    throw new ConnectionException(
+                            sm.getString("http2Parser.processFrame.tooMuchPadding", connectionId,
+                                    Integer.toString(streamId), Integer.toString(padLength),
+                                    Integer.toString(payloadSize)), Http2Error.PROTOCOL_ERROR);
+                }
             }
             if (priority) {
                 boolean exclusive = ByteUtil.isBit7Set(optional[optionalPos]);
