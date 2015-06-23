@@ -58,7 +58,7 @@ public class TestHttp2Section_4_1 extends Http2TestBase {
         // Build the simple request
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleGetRequest(frameHeader, headersPayload, 3);
+        buildSimpleGetRequest(frameHeader, headersPayload, null, 3);
 
         // Tweak the header to set the reserved bit
         frameHeader[5] = (byte) (frameHeader[5] | 0x80);

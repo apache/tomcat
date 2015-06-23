@@ -87,7 +87,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Build the simple request
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleGetRequest(frameHeader, headersPayload, 3);
+        buildSimpleGetRequest(frameHeader, headersPayload, null, 3);
 
         // Remove the end of stream and end of headers flags
         frameHeader[4] = 0;
@@ -155,7 +155,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         // Build the simple request on an old stream
         byte[] frameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
-        buildSimpleGetRequest(frameHeader, headersPayload, 3);
+        buildSimpleGetRequest(frameHeader, headersPayload, null, 3);
 
         os.write(frameHeader);
         os.flush();
