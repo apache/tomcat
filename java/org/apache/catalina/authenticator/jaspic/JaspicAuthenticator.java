@@ -46,7 +46,7 @@ public class JaspicAuthenticator extends AuthenticatorBase {
     private static final Log log = LogFactory.getLog(JaspicAuthenticator.class);
 
     private static final String AUTH_TYPE = "JASPIC";
-    private static final String MESSAGE_LAYER = "HttpServlet";
+    public static final String MESSAGE_LAYER = "HttpServlet";
 
     private Subject serviceSubject;
 
@@ -65,7 +65,7 @@ public class JaspicAuthenticator extends AuthenticatorBase {
 
     @Override
     public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
-        MessageInfo messageInfo = new MessageInfoImpl(request, response, true);
+        MessageInfo messageInfo = new MessageInfoImpl(request, response, true, getAuthMethod());
 
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
         String appContext = getAppContextId(request);
@@ -149,6 +149,6 @@ public class JaspicAuthenticator extends AuthenticatorBase {
 
     @Override
     protected String getAuthMethod() {
-        return AUTH_TYPE;
+        return context.getLoginConfig().getAuthMethod();
     }
 }
