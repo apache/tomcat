@@ -117,7 +117,7 @@ public class ConnectionSettings {
         if (initialWindowSize > MAX_WINDOW_SIZE) {
             throw new ConnectionException(sm.getString("connectionSettings.windowSizeTooBig",
                     Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE)),
-                    Http2Error.PROTOCOL_ERROR);
+                    Http2Error.FLOW_CONTROL_ERROR);
         }
         this.initialWindowSize = (int) initialWindowSize;
     }
