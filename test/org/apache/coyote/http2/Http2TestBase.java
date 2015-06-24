@@ -543,18 +543,35 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    void sendSetting(int settingId, long value) throws IOException {
+    void sendSettings(int streamId, boolean ack, Setting... settings) throws IOException {
         byte[] settingFrame = new byte[15];
         // length
-        ByteUtil.setThreeBytes(settingFrame, 0, 6);
+
+        int settingsCount;
+        if (settings == null) {
+            settingsCount = 0;
+        } else {
+            settingsCount = settings.length;
+        }
+
+        ByteUtil.setThreeBytes(settingFrame, 0, 6 * settingsCount);
         // type
         settingFrame[3] = FrameType.SETTINGS.getIdByte();
-        // No flags
-        // Stream 0
+
+        if (ack) {
+            settingFrame[4] = 0x01;
+        }
+
+        // Stream
+        ByteUtil.set31Bits(settingFrame, 5, streamId);
 
         // Payload
-        ByteUtil.setTwoBytes(settingFrame, 9, settingId);
-        ByteUtil.setFourBytes(settingFrame, 11, value);
+        for (int i = 0; i < settingsCount; i++) {
+            // Stops IDE complaining about possible NPE
+            Assert.assertNotNull(settings);
+            ByteUtil.setTwoBytes(settingFrame, (i * 6) + 9, settings[i].getSetting());
+            ByteUtil.setFourBytes(settingFrame, (i * 6) + 11, settings[i].getValue());
+        }
 
         os.write(settingFrame);
         os.flush();
@@ -796,6 +813,25 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 data[1] = (byte) ((i >> 8) & 0xFF);
                 os.write(data);
             }
+        }
+    }
+
+
+    static class Setting {
+        private final int setting;
+        private final long value;
+
+        public Setting(int setting, long value) {
+            this.setting = setting;
+            this.value = value;
+        }
+
+        public int getSetting() {
+            return setting;
+        }
+
+        public long getValue() {
+            return value;
         }
     }
 }

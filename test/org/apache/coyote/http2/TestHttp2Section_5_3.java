@@ -62,7 +62,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         }
 
         // Set the default window size to 1024 bytes
-        sendSetting(4, 1024);
+        sendSettings(0, false, new Setting(4, 1024));
         // Wait for the ack
         parser.readFrame(true);
         output.clearTrace();
