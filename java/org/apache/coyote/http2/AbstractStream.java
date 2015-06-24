@@ -131,7 +131,7 @@ abstract class AbstractStream {
 
     protected void decrementWindowSize(int decrement) {
         // No need for overflow protection here. Decrement can never be larger
-        // the Integer.MAX_VALUE and once windowSize does negative no further
+        // the Integer.MAX_VALUE and once windowSize goes negative no further
         // decrements are permitted
         synchronized (windowSizeLock) {
             windowSize -= decrement;
