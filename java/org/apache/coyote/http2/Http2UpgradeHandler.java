@@ -811,7 +811,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         stream.checkState(FrameType.HEADERS);
         stream.receivedStartOfHeaders();
         closeIdleStreams(streamId);
-        if (localSettings.getMaxConcurrentStreams() <= activeRemoteStreamCount.incrementAndGet()) {
+        if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
             activeRemoteStreamCount.decrementAndGet();
             throw new StreamException(sm.getString("upgradeHandler.tooManyRemoteStreams",
                     Long.toString(localSettings.getMaxConcurrentStreams())),
