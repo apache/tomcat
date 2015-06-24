@@ -117,7 +117,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private long writeTimeout = 10000;
 
     private final Map<Integer,Stream> streams = new HashMap<>();
-    private volatile int activeRemoteStreamCount = 0;
+    private final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
     private volatile int maxRemoteStreamId = 0;
     // Start at -1 so the 'add 2' logic in closeIdleStreams() works
     private volatile int maxActiveRemoteStreamId = -1;
@@ -144,7 +144,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             streams.put(key, stream);
             maxRemoteStreamId = 1;
             maxActiveRemoteStreamId = 1;
-            activeRemoteStreamCount = 1;
+            activeRemoteStreamCount.set(1);
             maxProcessedStreamId = 1;
         }
     }
@@ -449,7 +449,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 header[4] = FLAG_END_OF_STREAM;
                 stream.sentEndOfStream();
                 if (!stream.isActive()) {
-                    activeRemoteStreamCount--;
+                    activeRemoteStreamCount.decrementAndGet();
                 }
              }
             ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
@@ -788,7 +788,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         Stream stream = getStream(streamId, true);
         stream.receivedEndOfStream();
         if (!stream.isActive()) {
-            activeRemoteStreamCount--;
+            activeRemoteStreamCount.decrementAndGet();
         }
     }
 
@@ -811,9 +811,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         stream.checkState(FrameType.HEADERS);
         stream.receivedStartOfHeaders();
         closeIdleStreams(streamId);
-        if (localSettings.getMaxConcurrentStreams() > activeRemoteStreamCount) {
-            activeRemoteStreamCount++;
-        } else {
+        if (localSettings.getMaxConcurrentStreams() > activeRemoteStreamCount.incrementAndGet()) {
+            activeRemoteStreamCount.decrementAndGet();
             throw new StreamException(sm.getString("upgradeHandler.tooManyRemoteStreams",
                     Long.toString(localSettings.getMaxConcurrentStreams())),
                     Http2Error.REFUSED_STREAM, streamId);
