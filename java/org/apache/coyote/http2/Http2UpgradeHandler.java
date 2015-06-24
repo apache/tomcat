@@ -495,8 +495,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 int[] value = backLogStreams.remove(stream);
                 if (value != null && value[1] > 0) {
                     result = value[1];
-                    value[0] = 0;
-                    value[1] = 1;
                 } else {
                     value = new int[] { toWrite, 0 };
                     backLogStreams.put(stream, value);
