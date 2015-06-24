@@ -87,8 +87,7 @@ public class TestHttp2Section_6_2 extends Http2TestBase {
         // Header
         // length
         ByteUtil.setThreeBytes(headerFrame, 0, 1);
-        // type 1 (headers)
-        headerFrame[3] = 0x01;
+        headerFrame[3] = FrameType.HEADERS.getIdByte();
         // flags 8 (padded)
         headerFrame[4] = 0x08;
         // stream 3
