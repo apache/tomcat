@@ -528,6 +528,10 @@ cannot use <code>$N</code> in the substitution string!
       in conjunction with the <strong>C</strong> (chain) flag, in order
       to apply more than one pattern before substitution occurs.</p>
 
+      <p>Unlike newer mod_rewrite versions, the Tomcat rewrite valve does
+      not automatically support absolute URLs (the specific redirect flag
+      must be used to be able to specify an absolute URLs, see below)
+      or direct file serving.</p>
 
       <p>Additionally you can set special <span
       id="rewriteflags">flags</span> for <em>Substitution</em> by
