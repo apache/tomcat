@@ -81,7 +81,7 @@
         Java 8 update 40 and later. The workaround should be safe for earlier
         Java versions but it can be disabled with the
         <code>applyJava8u40Fix</code> attribute of the SPNEGO authenticator if
-        necessary. (markt) 
+        necessary. (markt)
       </fix>
       <add>
         <bug>57154</bug>: Add support for web applications (Context elements)
@@ -102,6 +102,10 @@
         <bug>58023</bug>: Fix potentially execessive memory usage due to
         unnecessary caching of JAR manifests in the web application class
         loader. (markt)
+      </fix>
+      <fix>
+        <bug>57700</bug>: Ensure that Container event
+        <code>ADD_CHILD_EVENT</code> will be sent in all cases. (violetagg)
       </fix>
     </changelog>
   </subsection>
@@ -151,7 +155,7 @@
       </add>
       <add>
         Extend support for the <code>permessage-deflate</code> extension to the
-        client implementation. 
+        client implementation.
       </add>
       <fix>
         <bug>57969</bug>: Provide path parameters to POJO via per session
