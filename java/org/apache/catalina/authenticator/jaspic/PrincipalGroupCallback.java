@@ -60,7 +60,7 @@ public class PrincipalGroupCallback {
             return callerPrincipalCallback.getSubject();
         }
         if (groupPrincipalCallback != null) {
-            return callerPrincipalCallback.getSubject();
+            return groupPrincipalCallback.getSubject();
         }
         return null;
     }
