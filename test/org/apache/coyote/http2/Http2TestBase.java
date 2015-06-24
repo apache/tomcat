@@ -158,8 +158,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         headersPayload.flip();
 
         ByteUtil.setThreeBytes(frameHeader, 0, headersPayload.limit());
-        // Header frame is type 0x01
-        frameHeader[3] = 0x01;
+        frameHeader[3] = FrameType.HEADERS.getIdByte();
         // Flags. end of headers (0x04). end of stream (0x01)
         frameHeader[4] = 0x05;
         if (padding != null) {
@@ -180,8 +179,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         headersPayload.flip();
 
         ByteUtil.setThreeBytes(frameHeader, 0, headersPayload.limit());
-        // Header frame is type 0x01
-        frameHeader[3] = 0x01;
+        frameHeader[3] = FrameType.HEADERS.getIdByte();
         // Flags. end of stream (0x01)
         frameHeader[4] = 0x01;
         // Stream id
@@ -198,8 +196,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         headersPayload.flip();
 
         ByteUtil.setThreeBytes(frameHeader, 0, headersPayload.limit());
-        // Continuation frame is type 0x09
-        frameHeader[3] = 0x09;
+        frameHeader[3] = FrameType.CONTINUATION.getIdByte();
         // Flags. end of headers (0x04)
         frameHeader[4] = 0x04;
         // Stream id
@@ -231,8 +228,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         headersPayload.flip();
 
         ByteUtil.setThreeBytes(headersFrameHeader, 0, headersPayload.limit());
-        // Header frame is type 0x01
-        headersFrameHeader[3] = 0x01;
+        headersFrameHeader[3] = FrameType.HEADERS.getIdByte();
         // Flags. end of headers (0x04)
         headersFrameHeader[4] = 0x04;
         // Stream id
@@ -479,8 +475,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         byte[] rstFrame = new byte[13];
         // length is always 4
         rstFrame[2] = 0x04;
-        // type is always 3
-        rstFrame[3] = 0x03;
+        rstFrame[3] = FrameType.RST.getIdByte();
         // no flags
         // Stream ID
         ByteUtil.set31Bits(rstFrame, 5, streamId);
@@ -502,8 +497,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         byte[] updateFrame = new byte[13];
         // length is always 4
         updateFrame[2] = 0x04;
-        // type is always 8
-        updateFrame[3] = 0x08;
+        updateFrame[3] = FrameType.WINDOW_UPDATE.getIdByte();
         // no flags
         // Stream ID
         ByteUtil.set31Bits(updateFrame, 5, streamId);
