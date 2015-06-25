@@ -485,7 +485,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    int reserveWindowSize(Stream stream, int reservation) {
+    int reserveWindowSize(Stream stream, int reservation) throws IOException {
         // Need to be holding the stream lock so releaseBacklog() can't notify
         // this thread until after this thread enters wait()
         int allocation = 0;
@@ -521,8 +521,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     try {
                         stream.wait();
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        throw new IOException(e);
                     }
                 }
             } while (allocation == 0);
