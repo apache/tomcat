@@ -300,11 +300,14 @@ public final class CipherSuiteConverter {
         final String javaCipherSuiteTls = "TLS_" + javaCipherSuiteSuffix;
 
         // Cache the mapping.
-        final Map<String, String> p2j = new HashMap<>(4);
+        Map<String, String> p2j = new HashMap<>(4);
         p2j.put("", javaCipherSuiteSuffix);
         p2j.put("SSL", javaCipherSuiteSsl);
         p2j.put("TLS", javaCipherSuiteTls);
-        o2j.putIfAbsent(openSslCipherSuite, p2j);
+        Map<String, String> p2jCurrent = o2j.putIfAbsent(openSslCipherSuite, p2j);
+        if (p2jCurrent != null) {
+            p2j = p2jCurrent;
+        }
 
         // Cache the reverse mapping after adding the protocol prefix (TLS_ or SSL_)
         j2o.putIfAbsent(javaCipherSuiteTls, openSslCipherSuite);
