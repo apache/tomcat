@@ -316,6 +316,18 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Return value is never used -->
+    <Class name="org.apache.tomcat.dbcp.dbcp2.DelegatingConnection" />
+    <Method name="prepareStatement" />
+    <Bug pattern="NP_NONNULL_RETURN_VIOLATION" />
+  </Match>
+  <Match>
+    <!-- Pooled objects can't be null so this is OK -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.BaseGenericObjectPool$IdentityWrapper" />
+    <Method name="equals" />
+    <Bug pattern="NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT" />
+  </Match>
+  <Match>
     <!-- Increment is in sync block so it is safe. Volatile is used so reading
          thread sees latest value.  -->
     <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
