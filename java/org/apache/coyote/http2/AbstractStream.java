@@ -36,7 +36,6 @@ abstract class AbstractStream {
     private volatile AbstractStream parentStream = null;
     private final Set<AbstractStream> childStreams = new HashSet<>();
     private long windowSize = ConnectionSettings.DEFAULT_WINDOW_SIZE;
-    private final Object windowSizeLock = new Object();
 
     public Integer getIdentifier() {
         return identifier;
@@ -95,17 +94,13 @@ abstract class AbstractStream {
     }
 
 
-    protected void setWindowSize(long windowSize) {
-        synchronized (windowSizeLock) {
-            this.windowSize = windowSize;
-        }
+    protected synchronized void setWindowSize(long windowSize) {
+        this.windowSize = windowSize;
     }
 
 
-    protected long getWindowSize() {
-        synchronized (windowSizeLock) {
-            return windowSize;
-        }
+    protected synchronized long getWindowSize() {
+        return windowSize;
     }
 
 
@@ -113,32 +108,28 @@ abstract class AbstractStream {
      * @param increment
      * @throws Http2Exception
      */
-    protected void incrementWindowSize(int increment) throws Http2Exception {
-        synchronized (windowSizeLock) {
-            // Overflow protection
-            if (Long.MAX_VALUE - increment < windowSize) {
-                windowSize = Long.MAX_VALUE;
-            } else {
-                windowSize += increment;
-            }
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(),
-                        getIdentifier(), Integer.toString(increment), Long.toString(windowSize)));
-            }
+    protected synchronized void incrementWindowSize(int increment) throws Http2Exception {
+        // Overflow protection
+        if (Long.MAX_VALUE - increment < windowSize) {
+            windowSize = Long.MAX_VALUE;
+        } else {
+            windowSize += increment;
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(),
+                    getIdentifier(), Integer.toString(increment), Long.toString(windowSize)));
         }
     }
 
 
-    protected void decrementWindowSize(int decrement) {
+    protected synchronized void decrementWindowSize(int decrement) {
         // No need for overflow protection here. Decrement can never be larger
         // the Integer.MAX_VALUE and once windowSize goes negative no further
         // decrements are permitted
-        synchronized (windowSizeLock) {
-            windowSize -= decrement;
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(),
-                        getIdentifier(), Integer.toString(decrement), Long.toString(windowSize)));
-            }
+        windowSize -= decrement;
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("abstractStream.windowSizeDec", getConnectionId(),
+                    getIdentifier(), Integer.toString(decrement), Long.toString(windowSize)));
         }
     }
 

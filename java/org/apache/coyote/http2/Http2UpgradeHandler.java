@@ -124,7 +124,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private volatile int maxProcessedStreamId;
 
     // Tracking for when the connection is blocked (windowSize < 1)
-    private final Object backLogLock = new Object();
     private final Map<AbstractStream,int[]> backLogStreams = new ConcurrentHashMap<>();
     private long backLogSize = 0;
 
@@ -486,51 +485,64 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    int reserveWindowSize(Stream stream, int toWrite) {
-        int result;
-        synchronized (backLogLock) {
-            long windowSize = getWindowSize();
-            if (windowSize < 1 || backLogSize > 0) {
-                // Has this stream been granted an allocation
-                int[] value = backLogStreams.remove(stream);
-                if (value != null && value[1] > 0) {
-                    result = value[1];
-                } else {
-                    value = new int[] { toWrite, 0 };
-                    backLogStreams.put(stream, value);
-                    backLogSize += toWrite;
-                    // Add the parents as well
-                    AbstractStream parent = stream.getParentStream();
-                    while (parent != null && backLogStreams.putIfAbsent(parent, new int[2]) == null) {
-                        parent = parent.getParentStream();
+    int reserveWindowSize(Stream stream, int reservation) {
+        // Need to be holding the stream lock so releaseBacklog() can't notify
+        // this thread until after this thread enters wait()
+        int allocation = 0;
+        synchronized (stream) {
+            do {
+                synchronized (this) {
+                    long windowSize = getWindowSize();
+                    if (windowSize < 1 || backLogSize > 0) {
+                        // Has this stream been granted an allocation
+                        int[] value = backLogStreams.remove(stream);
+                        if (value != null && value[1] > 0) {
+                            allocation = value[1];
+                            decrementWindowSize(allocation);
+                        } else {
+                            value = new int[] { reservation, 0 };
+                            backLogStreams.put(stream, value);
+                            backLogSize += reservation;
+                            // Add the parents as well
+                            AbstractStream parent = stream.getParentStream();
+                            while (parent != null && backLogStreams.putIfAbsent(parent, new int[2]) == null) {
+                                parent = parent.getParentStream();
+                            }
+                        }
+                    } else if (windowSize < reservation) {
+                        allocation = (int) windowSize;
+                        decrementWindowSize(allocation);
+                    } else {
+                        allocation = reservation;
+                        decrementWindowSize(allocation);
                     }
-                    result = 0;
                 }
-            } else if (windowSize < toWrite) {
-                result = (int) windowSize;
-            } else {
-                result = toWrite;
-            }
-            decrementWindowSize(result);
+                if (allocation == 0) {
+                    try {
+                        stream.wait();
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            } while (allocation == 0);
         }
-        return result;
+        return allocation;
     }
 
 
 
     @Override
-    protected void incrementWindowSize(int increment) throws Http2Exception {
-        synchronized (backLogLock) {
-            long windowSize = getWindowSize();
-            if (windowSize < 1 && windowSize + increment > 0) {
-                releaseBackLog(increment);
-            }
-            super.incrementWindowSize(increment);
+    protected synchronized void incrementWindowSize(int increment) throws Http2Exception {
+        long windowSize = getWindowSize();
+        if (windowSize < 1 && windowSize + increment > 0) {
+            releaseBackLog(increment);
         }
+        super.incrementWindowSize(increment);
     }
 
 
-    private void releaseBackLog(int increment) {
+    private synchronized void releaseBackLog(int increment) {
         if (backLogSize < increment) {
             // Can clear the whole backlog
             for (AbstractStream stream : backLogStreams.keySet()) {
