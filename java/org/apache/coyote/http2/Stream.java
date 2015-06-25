@@ -119,28 +119,37 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
-    public void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
+    public synchronized void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
         // If this is zero then any thread that has been trying to write for
         // this stream will be waiting. Notify that thread it can continue. Use
         // notify all even though only one thread is waiting to be on the safe
         // side.
-        boolean notify = getWindowSize() == 0;
+        boolean notify = getWindowSize() < 1;
         super.incrementWindowSize(windowSizeIncrement);
-        if (notify) {
-            synchronized (this) {
-                notifyAll();
-            }
+        if (notify && getWindowSize() > 0) {
+            notifyAll();
         }
     }
 
 
-    private int checkWindowSize(int reservation) {
+    private synchronized int reserveWindowSize(int reservation) {
         long windowSize = getWindowSize();
-        if (reservation > windowSize) {
-            return (int) windowSize;
-        } else {
-            return reservation;
+        while (windowSize < 1) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+            }
+            windowSize = getWindowSize();
         }
+        int allocation;
+        if (windowSize < reservation) {
+            allocation = (int) windowSize;
+        } else {
+            allocation = reservation;
+        }
+        decrementWindowSize(allocation);
+        return allocation;
     }
 
 
@@ -277,8 +286,13 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         private volatile long written = 0;
         private volatile boolean closed = false;
 
+        /* The write methods are synchronized to ensure that only one thread at
+         * a time is able to access the buffer. Without this protection, a
+         * client that performed concurrent writes could corrupt the buffer.
+         */
+
         @Override
-        public int doWrite(ByteChunk chunk) throws IOException {
+        public synchronized int doWrite(ByteChunk chunk) throws IOException {
             if (closed) {
                 // TODO i18n
                 throw new IllegalStateException();
@@ -300,11 +314,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             return offset;
         }
 
-        public void flush() throws IOException {
+        public synchronized void flush() throws IOException {
             flush(false);
         }
 
-        private void flush(boolean writeInProgress) throws IOException {
+        private synchronized void flush(boolean writeInProgress) throws IOException {
             if (!coyoteResponse.isCommitted()) {
                 coyoteResponse.sendHeaders();
             }
@@ -314,51 +328,19 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             }
             buffer.flip();
             int left = buffer.remaining();
-            int thisWriteStream;
             while (left > 0) {
-                // Flow control for the Stream
-                do {
-                    thisWriteStream = checkWindowSize(left);
-                    if (thisWriteStream < 1) {
-                        // Need to block until a WindowUpdate message is
-                        // processed for this stream
-                        synchronized (Stream.this) {
-                            try {
-                                Stream.this.wait();
-                            } catch (InterruptedException e) {
-                                // TODO: Possible shutdown?
-                            }
-                        }
-                    }
-                } while (thisWriteStream < 1);
+                int streamReservation  = reserveWindowSize(left);
+                while (streamReservation > 0) {
+                    int connectionReservation =
+                                handler.reserveWindowSize(Stream.this, streamReservation);
+                    // Do the write
+                    handler.writeBody(Stream.this, buffer, connectionReservation,
+                            !writeInProgress && closed && left == connectionReservation);
+                    streamReservation -= connectionReservation;
+                    left -= connectionReservation;
+                    buffer.position(buffer.position() + connectionReservation);
 
-                // Flow control for the connection
-                int thisWrite;
-                do {
-                    thisWrite = handler.reserveWindowSize(Stream.this, thisWriteStream);
-                    if (thisWrite < 1) {
-                        // Need to block until a WindowUpdate message is
-                        // processed for this connection
-                        synchronized (Stream.this) {
-                            try {
-                                Stream.this.wait();
-                            } catch (InterruptedException e) {
-                                // TODO: Possible shutdown?
-                            }
-                        }
-                    }
-                } while (thisWrite < 1);
-
-                // Stream.checkWindowSize() doesn't reduce the flow control
-                // window (reserveWindowSize() does) so the Stream's window
-                // needs to be reduced here.
-                decrementWindowSize(thisWrite);
-
-                // Do the write
-                handler.writeBody(Stream.this, buffer, thisWrite,
-                        !writeInProgress && closed && left == thisWrite);
-                left -= thisWrite;
-                buffer.position(buffer.position() + thisWrite);
+                }
             }
             buffer.clear();
         }
