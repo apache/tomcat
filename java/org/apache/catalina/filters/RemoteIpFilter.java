@@ -858,8 +858,9 @@ public class RemoteIpFilter implements Filter {
             }
             
             HttpServletResponse xResponse;
-            if (!xRequest.getScheme().equals(request.getScheme()) ||
-                    xRequest.getServerPort() != request.getServerPort()) {
+            if (xRequest.getScheme() != null &&
+                    (!xRequest.getScheme().equals(request.getScheme()) ||
+                    xRequest.getServerPort() != request.getServerPort())) {
                 xResponse = new XForwardedResponse(response, xRequest.getScheme(), xRequest.getServerPort());
             } else {
                 xResponse = response;
