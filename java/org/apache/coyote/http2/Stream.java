@@ -132,13 +132,16 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    private synchronized int reserveWindowSize(int reservation) {
+    private synchronized int reserveWindowSize(int reservation) throws IOException {
         long windowSize = getWindowSize();
         while (windowSize < 1) {
             try {
                 wait();
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
+                // Possible shutdown / rst or similar. Use an IOException to
+                // signal to the client that further I/O isn't possible for this
+                // Stream.
+                throw new IOException(e);
             }
             windowSize = getWindowSize();
         }
@@ -294,8 +297,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         @Override
         public synchronized int doWrite(ByteChunk chunk) throws IOException {
             if (closed) {
-                // TODO i18n
-                throw new IllegalStateException();
+                throw new IllegalStateException(
+                        sm.getString("stream.closed", getConnectionId(), getIdentifier()));
             }
             int len = chunk.getLength();
             int offset = 0;
@@ -409,7 +412,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     try {
                         inBuffer.wait();
                     } catch (InterruptedException e) {
-                        // TODO: Possible shutdown?
+                        // Possible shutdown / rst or similar. Use an
+                        // IOException to signal to the client that further I/O
+                        // isn't possible for this Stream.
+                        throw new IOException(e);
                     }
                 }
 
@@ -422,7 +428,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 } else if (!state.isFrameTypePermitted(FrameType.DATA)) {
                     return -1;
                 } else {
-                    // TODO Should never happen
+                    // Should never happen
                     throw new IllegalStateException();
                 }
             }
