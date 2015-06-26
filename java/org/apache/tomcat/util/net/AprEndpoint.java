@@ -1607,8 +1607,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         }
 
         /**
-         * The background thread that listens for incoming TCP/IP connections
-         * and hands them off to an appropriate processor.
+         * The background thread that adds sockets to the Poller, checks the
+         * poller for triggered events and hands the associated socket off to an
+         * appropriate processor as events occur.
          */
         @Override
         public void run() {
