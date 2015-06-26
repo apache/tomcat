@@ -16,7 +16,7 @@
  */
 package org.apache.catalina.authenticator.jaspic.provider;
 
-import java.util.Collections;
+import java.util.Map;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
@@ -33,15 +33,16 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class TomcatServerAuthContext implements ServerAuthContext {
 
-    protected static final StringManager sm = StringManager.getManager(TomcatServerAuthContext.class);
+    protected static final StringManager sm = StringManager
+            .getManager(TomcatServerAuthContext.class);
 
     private ServerAuthModule module;
 
 
-    public TomcatServerAuthContext(CallbackHandler handler, ServerAuthModule module)
-            throws AuthException {
+    public TomcatServerAuthContext(CallbackHandler handler, ServerAuthModule module,
+            Map<String, String> options) throws AuthException {
         this.module = module;
-        this.module.initialize(null, null, handler, Collections.emptyMap());
+        this.module.initialize(null, null, handler, options);
     }
 
 

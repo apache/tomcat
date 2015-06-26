@@ -68,8 +68,7 @@ public class JaspicAuthenticator extends AuthenticatorBase {
             return true;
         }
 
-        MessageInfoImpl messageInfo = new MessageInfoImpl(request, response, true, getAuthMethod());
-        messageInfo.setRealmName(getRealmName(context));
+        MessageInfoImpl messageInfo = new MessageInfoImpl(request, response, true);
 
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
         String appContext = getAppContextId(request);

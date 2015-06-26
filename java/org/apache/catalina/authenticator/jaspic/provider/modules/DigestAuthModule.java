@@ -180,9 +180,9 @@ public class DigestAuthModule extends TomcatAuthModule {
     }
 
 
-    @SuppressWarnings("rawtypes")
     @Override
-    public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
+    @SuppressWarnings("rawtypes")
+    public void initializeModule(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
             CallbackHandler handler, Map options) throws AuthException {
         this.handler = handler;
         startInternal();
@@ -238,12 +238,12 @@ public class DigestAuthModule extends TomcatAuthModule {
         String authorization = request.getHeader(AUTHORIZATION_HEADER);
 
         DigestInfo digestInfo = new DigestInfo(getOpaque(), getNonceValidity(), getKey(), nonces,
-                isValidateUri());
+                isValidateUri(), getRealmName());
         if (authorization == null) {
 
             String nonce = generateNonce(request);
 
-            String authenticateHeader = getAuthenticateHeader(nonce, false, messageInfo);
+            String authenticateHeader = getAuthenticateHeader(nonce, false);
             return sendUnauthorizedError(response, authenticateHeader);
         }
 
@@ -251,7 +251,7 @@ public class DigestAuthModule extends TomcatAuthModule {
             return AuthStatus.SEND_FAILURE;
         }
 
-        if (digestInfo.validate(request, messageInfo)) {
+        if (digestInfo.validate(request)) {
             // TODO discuss a better way to get user roles
             principal = (GenericPrincipal) digestInfo.authenticate(realm);
         }
@@ -259,7 +259,7 @@ public class DigestAuthModule extends TomcatAuthModule {
         if (principal == null || digestInfo.isNonceStale()) {
             String nonce = generateNonce(request);
             boolean isNoncaneStale = principal != null && digestInfo.isNonceStale();
-            String authenticateHeader = getAuthenticateHeader(nonce, isNoncaneStale, messageInfo);
+            String authenticateHeader = getAuthenticateHeader(nonce, isNoncaneStale);
             return sendUnauthorizedError(response, authenticateHeader);
         }
 
@@ -389,10 +389,9 @@ public class DigestAuthModule extends TomcatAuthModule {
      * @param nonce nonce token
      * @return
      */
-    protected String getAuthenticateHeader(String nonce, boolean isNonceStale,
-            MessageInfo messageInfo) {
+    protected String getAuthenticateHeader(String nonce, boolean isNonceStale) {
 
-        String realmName = getRealmName(messageInfo);
+        String realmName = getRealmName();
 
         String template = "Digest realm=\"{0}\", qop=\"{1}\", nonce=\"{2}\", opaque=\"{3}\"";
         String authenticateHeader = MessageFormat.format(template, realmName, QOP, nonce,
@@ -425,13 +424,16 @@ public class DigestAuthModule extends TomcatAuthModule {
 
         private boolean nonceStale = false;
 
+        private String contextRealmName;
+
         public DigestInfo(String opaque, long nonceValidity, String key,
-                Map<String, NonceInfo> nonces, boolean validateUri) {
+                Map<String, NonceInfo> nonces, boolean validateUri, String contextRealmName) {
             this.opaque = opaque;
             this.nonceValidity = nonceValidity;
             this.key = key;
             this.nonces = nonces;
             this.validateUri = validateUri;
+            this.contextRealmName = contextRealmName;
         }
 
         public String getUsername() {
@@ -470,7 +472,7 @@ public class DigestAuthModule extends TomcatAuthModule {
             return true;
         }
 
-        public boolean validate(HttpServletRequest request, MessageInfo messageInfo) {
+        public boolean validate(HttpServletRequest request) {
             if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null)
                     || (response == null)) {
                 return false;
@@ -507,8 +509,7 @@ public class DigestAuthModule extends TomcatAuthModule {
             }
 
             // Validate the Realm name
-            String lcRealm = getRealmName(messageInfo);
-            if (!lcRealm.equals(realmName)) {
+            if (!contextRealmName.equals(realmName)) {
                 return false;
             }
 

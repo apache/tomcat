@@ -16,7 +16,13 @@
  */
 package org.apache.catalina.authenticator.jaspic.provider.modules;
 
+import java.util.Map;
+import java.util.Optional;
+
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.message.AuthException;
 import javax.security.auth.message.MessageInfo;
+import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.module.ServerAuthModule;
 
 import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
@@ -24,16 +30,20 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class TomcatAuthModule implements ServerAuthModule {
 
+    public static final String REALM_NAME = "javax.servlet.http.realmName";
+    public static final String DEFAULT_REALM_NAME = "Authentication required";
+
     protected static final String AUTH_HEADER_NAME = "WWW-Authenticate";
     protected static final String AUTHORIZATION_HEADER = "authorization";
-    /**
-     * Default authentication realm name.
-     */
-    protected static final String REALM_NAME = "Authentication required";
+
     /**
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(TomcatAuthModule.class);
+
+    protected String realmName;
+
+    protected CallbackHandler handler;
 
 
     protected boolean isMandatory(MessageInfo messageInfo) {
@@ -42,11 +52,23 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
     }
 
 
-    @SuppressWarnings("unchecked")
-    protected static String getRealmName(MessageInfo messageInfo) {
-        if (messageInfo == null) {
-            return REALM_NAME;
-        }
-        return (String) messageInfo.getMap().getOrDefault(MessageInfoImpl.REALM_NAME, REALM_NAME);
+     @SuppressWarnings("rawtypes")
+     @Override
+     public final void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
+             CallbackHandler handler, Map options) throws AuthException {
+         this.handler = handler;
+         this.realmName = (String) options.get(REALM_NAME);
+         initializeModule(requestPolicy, responsePolicy, handler, options);
     }
+
+
+    public String getRealmName() {
+        return Optional.of(realmName).orElse(DEFAULT_REALM_NAME);
+    }
+
+
+     @SuppressWarnings("rawtypes")
+     public abstract void initializeModule(MessagePolicy requestPolicy,
+             MessagePolicy responsePolicy, CallbackHandler handler, Map options)
+             throws AuthException;
 }

@@ -45,14 +45,10 @@ public class BasicAuthModule extends TomcatAuthModule {
     private Class<?>[] supportedMessageTypes = new Class[] { HttpServletRequest.class,
             HttpServletResponse.class };
 
-    private CallbackHandler handler;
-
-
     @SuppressWarnings("rawtypes")
     @Override
-    public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
+    public void initializeModule(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
             CallbackHandler handler, Map options) throws AuthException {
-        this.handler = handler;
     }
 
 
@@ -67,7 +63,7 @@ public class BasicAuthModule extends TomcatAuthModule {
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
         String authorization = request.getHeader(AUTHORIZATION_HEADER);
 
-        String realmName = getRealmName(messageInfo);
+        String realmName = getRealmName();
 
         if (authorization == null) {
             return sendUnauthorizedError(response, realmName);
