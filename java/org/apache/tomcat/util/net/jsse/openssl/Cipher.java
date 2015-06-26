@@ -1826,7 +1826,7 @@ public enum Cipher {
     // Cipher A9
     TLS_PSK_WITH_AES_256_GCM_SHA384(
             0x00A9,
-            "PSK-AES128-GCM-SHA384",
+            "PSK-AES256-GCM-SHA384",
             KeyExchange.PSK,
             Authentication.PSK,
             Encryption.AES256GCM,
