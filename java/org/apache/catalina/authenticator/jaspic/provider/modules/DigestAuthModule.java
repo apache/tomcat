@@ -238,16 +238,11 @@ public class DigestAuthModule extends TomcatAuthModule {
 
         DigestInfo digestInfo = new DigestInfo(getOpaque(), getNonceValidity(), getKey(), nonces,
                 isValidateUri(), getRealmName());
-        if (authorization == null) {
 
+        if (authorization == null || !digestInfo.parse(request, authorization)) {
             String nonce = generateNonce(request);
-
             String authenticateHeader = getAuthenticateHeader(nonce, false);
             return sendUnauthorizedError(response, authenticateHeader);
-        }
-
-        if (!digestInfo.parse(request, authorization)) {
-            return AuthStatus.SEND_FAILURE;
         }
 
         if (digestInfo.validate(request)) {
