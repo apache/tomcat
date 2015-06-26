@@ -1458,7 +1458,9 @@ public class ApplicationContext
     @Override
     public String getVirtualServerName() {
         // Constructor will fail if context or its parent is null
-        return ((Host) context.getParent()).getName();
+        Host host = (Host) context.getParent();
+        Engine engine = (Engine) host.getParent();
+        return engine.getName() + "/" + host.getName();
     }
 
 
