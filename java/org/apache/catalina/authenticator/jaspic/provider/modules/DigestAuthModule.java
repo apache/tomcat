@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Realm;
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -232,7 +231,7 @@ public class DigestAuthModule extends TomcatAuthModule {
     public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
             Subject serviceSubject) throws AuthException {
 
-        GenericPrincipal principal = null;
+        Principal principal = null;
         HttpServletRequest request = (HttpServletRequest) messageInfo.getRequestMessage();
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
         String authorization = request.getHeader(AUTHORIZATION_HEADER);
@@ -252,8 +251,7 @@ public class DigestAuthModule extends TomcatAuthModule {
         }
 
         if (digestInfo.validate(request)) {
-            // TODO discuss a better way to get user roles
-            principal = (GenericPrincipal) digestInfo.authenticate(realm);
+            principal = digestInfo.authenticate(realm);
         }
 
         if (principal == null || digestInfo.isNonceStale()) {
@@ -266,8 +264,8 @@ public class DigestAuthModule extends TomcatAuthModule {
         try {
             CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(clientSubject,
                     principal);
-            GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject,
-                    principal.getRoles());
+            String[] roles = realm.getRoles(principal);
+            GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject, roles);
             handler.handle(new Callback[] { principalCallback, groupCallback });
         } catch (IOException | UnsupportedCallbackException e) {
             throw new AuthException(e.getMessage());
