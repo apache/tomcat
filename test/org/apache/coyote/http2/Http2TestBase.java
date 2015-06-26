@@ -506,6 +506,30 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    void sendGoaway(int streamId, int lastStreamId, long errorCode, byte[] debug)
+            throws IOException {
+        byte[] goawayFrame = new byte[17];
+        int len = 8;
+        if (debug != null) {
+            len += debug.length;
+        }
+        ByteUtil.setThreeBytes(goawayFrame, 0, len);
+        // Type
+        goawayFrame[3] = FrameType.GOAWAY.getIdByte();
+        // No flags
+        // Stream
+        ByteUtil.set31Bits(goawayFrame, 5, streamId);
+        // Last stream
+        ByteUtil.set31Bits(goawayFrame, 9, lastStreamId);
+        ByteUtil.setFourBytes(goawayFrame, 13, errorCode);
+        os.write(goawayFrame);
+        if (debug != null && debug.length > 0) {
+            os.write(debug);
+        }
+        os.flush();
+    }
+
+
     void sendWindowUpdate(int streamId, int increment) throws IOException {
         byte[] updateFrame = new byte[13];
         // length is always 4
