@@ -404,8 +404,6 @@ public class TestCipher {
                     "EXP-RC2-CBC-MD5+SSLv2",
                     "EXP-RC4-MD5+SSLv2",
                     "IDEA-CBC-MD5+SSLv2",
-                    "PSK-AES128-GCM-SHA256+TLSv1.2",
-                    "PSK-AES256-GCM-SHA384+TLSv1.2",
                     "RC2-CBC-MD5+SSLv2",
                     "RC4-MD5+SSLv2")));
 
