@@ -16,9 +16,6 @@
  */
 package org.apache.catalina.authenticator.jaspic.provider;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -32,22 +29,27 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.authenticator.jaspic.provider.modules.BasicAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.DigestAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.TomcatAuthModule;
+import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.res.StringManager;
 
 public class TomcatAuthConfig implements ServerAuthConfig {
+    protected static final StringManager sm = StringManager.getManager(TomcatAuthConfig.class);
 
     private String messageLayer;
     private String appContext;
     private CallbackHandler handler;
     private TomcatServerAuthContext tomcatServerAuthContext;
     private Realm realm;
+    private LoginConfig loginConfig;
 
 
     public TomcatAuthConfig(String layer, String appContext, CallbackHandler callbackHandler,
-            Realm realm) {
+            Realm realm, LoginConfig loginConfig) {
         this.messageLayer = layer;
         this.appContext = appContext;
         this.handler = callbackHandler;
         this.realm = realm;
+        this.loginConfig = loginConfig;
     }
 
 
@@ -70,8 +72,8 @@ public class TomcatAuthConfig implements ServerAuthConfig {
 
 
     @Override
-    public void refresh() {
-
+    public synchronized void refresh() {
+        this.tomcatServerAuthContext = null;
     }
 
 
@@ -86,16 +88,34 @@ public class TomcatAuthConfig implements ServerAuthConfig {
     public synchronized ServerAuthContext getAuthContext(String authContextID,
             Subject serviceSubject, Map properties) throws AuthException {
         if (this.tomcatServerAuthContext == null) {
-            this.tomcatServerAuthContext = new TomcatServerAuthContext(handler, getModules());
+            this.tomcatServerAuthContext = new TomcatServerAuthContext(handler, getModule());
         }
         return tomcatServerAuthContext;
     }
 
 
-    private Collection<TomcatAuthModule> getModules() {
-        List<TomcatAuthModule> modules = new ArrayList<>();
-        modules.add(new BasicAuthModule());
-        modules.add(new DigestAuthModule(realm));
-        return modules;
+    private TomcatAuthModule getModule() throws AuthException {
+        String authMethod = getAuthMethod();
+        switch (authMethod) {
+        case "BASIC": {
+            return new BasicAuthModule();
+        }
+        case "DIGEST": {
+            return new DigestAuthModule(realm);
+        }
+        default: {
+            throw new AuthException(
+                    sm.getString("authenticator.jaspic.unknownAuthType", authMethod));
+        }
+        }
+    }
+
+
+    /**
+     * Temporary workaround to get authentication method
+     * @return
+     */
+    private String getAuthMethod() {
+        return loginConfig.getAuthMethod().replace("JASPIC-", "");
     }
 }

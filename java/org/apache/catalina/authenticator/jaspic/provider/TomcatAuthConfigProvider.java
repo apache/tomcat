@@ -25,21 +25,21 @@ import javax.security.auth.message.config.AuthConfigProvider;
 import javax.security.auth.message.config.ClientAuthConfig;
 import javax.security.auth.message.config.ServerAuthConfig;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.Realm;
+import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
 public class TomcatAuthConfigProvider implements AuthConfigProvider {
 
     private Map<String, String> providerProperties;
     private ServerAuthConfig serverAuthConfig;
     private Realm realm;
+    private LoginConfig loginConfig;
 
 
-    public TomcatAuthConfigProvider() {
-    }
-
-
-    public TomcatAuthConfigProvider(Realm realm) {
-        this.realm = realm;
+    public TomcatAuthConfigProvider(Context context) {
+        this.realm = context.getRealm();
+        this.loginConfig = context.getLoginConfig();
     }
 
 
@@ -62,7 +62,7 @@ public class TomcatAuthConfigProvider implements AuthConfigProvider {
     public synchronized ServerAuthConfig getServerAuthConfig(String layer, String appContext,
             CallbackHandler handler) throws AuthException {
         if (this.serverAuthConfig == null) {
-            this.serverAuthConfig = new TomcatAuthConfig(layer, appContext, handler, realm);
+            this.serverAuthConfig = new TomcatAuthConfig(layer, appContext, handler, realm, loginConfig);
         }
         return this.serverAuthConfig;
     }
