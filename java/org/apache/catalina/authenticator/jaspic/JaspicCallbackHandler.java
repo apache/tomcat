@@ -31,7 +31,9 @@ import org.apache.catalina.Realm;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Callback handler which converts callbacks to realm.
+ * Callback handler which uses callbacks to construct JAAS Subject, which
+ * contains {@link org.apache.catalina.realm.GenericPrincipal} in private
+ * credentials.
  */
 public class JaspicCallbackHandler implements CallbackHandler {
     protected static final StringManager sm = StringManager.getManager(JaspicCallbackHandler.class);
