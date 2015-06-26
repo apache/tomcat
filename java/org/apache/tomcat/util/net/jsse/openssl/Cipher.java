@@ -1808,8 +1808,38 @@ public enum Cipher {
             256,
             256
     ),
+    // Cipher A8
+    TLS_PSK_WITH_AES_128_GCM_SHA256(
+            0x00A8,
+            "PSK-AES128-GCM-SHA256",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.AES128GCM,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher A9
+    TLS_PSK_WITH_AES_256_GCM_SHA384(
+            0x00A9,
+            "PSK-AES128-GCM-SHA384",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.AES256GCM,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
 
-    /* PSK ciphers 0x00A8 to 0x00B9
+    /* PSK ciphers 0x00AA to 0x00B9
      * Unsupported by both Java and OpenSSL
      */
 
