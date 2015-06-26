@@ -452,7 +452,7 @@ public class ContextConfig implements LifecycleListener {
      */
     private JaspicAuthenticator configureDefaultJaspicAuthModules() {
         AuthConfigFactory authConfigFactory = AuthConfigFactory.getFactory();
-        TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(context.getRealm());
+        TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(context);
         authConfigFactory.registerConfigProvider(provider, JaspicAuthenticator.MESSAGE_LAYER,
                 getJaspicAppContext(), "Tomcat Jaspic");
         return new JaspicAuthenticator();
