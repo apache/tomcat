@@ -799,14 +799,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public void run() {
             // Loop until destroy() is called
             while (true) {
-                // Loop if endpoint is paused
-                while (paused && (!close) ) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
-                }
 
                 boolean hasEvents = false;
 
