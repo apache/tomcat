@@ -17,7 +17,7 @@
 
 Notes of things to consider for the next major Tomcat release (9.0.x)
 
- 1. Fix Java 8 Javadoc warnings. Currently ~2800.
+ 1. Fix Java 8 Javadoc warnings. Currently ~2650.
 
  2. DONE.
     Remove BIO AJP and HTTP connector.
@@ -25,7 +25,8 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
  3. DONE.
     Remove Comet support.
 
- 4. Refactor the connectors to minimise code duplication.
+ 4. DONE.
+    Refactor the connectors to minimise code duplication.
     - All implementation specific per connector code -> Endpoint
     - All implementation specific per connection code -> SocketWrapper
 
