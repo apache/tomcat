@@ -268,7 +268,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
                 }
                 close();
-                result = SocketState.CLOSED;
                 break;
             }
 
@@ -283,7 +282,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
                 }
                 close();
-                result = SocketState.CLOSED;
                 break;
             }
 
@@ -305,7 +303,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // For all of the above, including the unexpected values, close the
             // connection.
             close();
-            result = SocketState.CLOSED;
             break;
         }
 
