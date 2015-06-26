@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.authenticator.jaspic.provider;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -88,9 +89,17 @@ public class TomcatAuthConfig implements ServerAuthConfig {
     public synchronized ServerAuthContext getAuthContext(String authContextID,
             Subject serviceSubject, Map properties) throws AuthException {
         if (this.tomcatServerAuthContext == null) {
-            this.tomcatServerAuthContext = new TomcatServerAuthContext(handler, getModule());
+            this.tomcatServerAuthContext = new TomcatServerAuthContext(handler, getModule(),
+                    getOptions());
         }
         return tomcatServerAuthContext;
+    }
+
+
+    private Map<String, String> getOptions() {
+        Map<String, String> options = new HashMap<>();
+        options.put(TomcatAuthModule.REALM_NAME, getRealmName());
+        return options;
     }
 
 
@@ -108,6 +117,11 @@ public class TomcatAuthConfig implements ServerAuthConfig {
                     sm.getString("authenticator.jaspic.unknownAuthType", authMethod));
         }
         }
+    }
+
+
+    private String getRealmName() {
+        return loginConfig.getRealmName();
     }
 
 
