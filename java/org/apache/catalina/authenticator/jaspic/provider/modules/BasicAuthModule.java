@@ -48,12 +48,6 @@ public class BasicAuthModule extends TomcatAuthModule {
     private CallbackHandler handler;
 
 
-    @Override
-    public String getAuthenticationType() {
-        return "BASIC";
-    }
-
-
     @SuppressWarnings("rawtypes")
     @Override
     public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,

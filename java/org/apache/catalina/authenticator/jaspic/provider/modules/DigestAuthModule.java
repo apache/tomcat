@@ -180,12 +180,6 @@ public class DigestAuthModule extends TomcatAuthModule {
     }
 
 
-    @Override
-    public String getAuthenticationType() {
-        return "DIGEST";
-    }
-
-
     @SuppressWarnings("rawtypes")
     @Override
     public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,

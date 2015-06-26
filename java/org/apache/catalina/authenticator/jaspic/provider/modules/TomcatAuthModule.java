@@ -36,9 +36,6 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
     protected static final StringManager sm = StringManager.getManager(TomcatAuthModule.class);
 
 
-    public abstract String getAuthenticationType();
-
-
     protected boolean isMandatory(MessageInfo messageInfo) {
         String mandatory = (String) messageInfo.getMap().get(MessageInfoImpl.IS_MANDATORY);
         return Boolean.parseBoolean(mandatory);
