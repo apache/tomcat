@@ -76,4 +76,12 @@ public interface Processor {
      * @return leftover bytes
      */
     ByteBuffer getLeftoverInput();
+
+    /**
+     * Informs the processor that the underlying I/O layer has stopped accepting
+     * new connections. This is primarily intended to enable processors that
+     * use multiplexed connections to prevent further 'streams' being added to
+     * an existing multiplexed connection.
+     */
+    void pause();
 }

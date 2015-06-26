@@ -57,6 +57,12 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
     }
 
 
+    @Override
+    public void pause() {
+        internalHttpUpgradeHandler.pause();
+    }
+
+
     // --------------------------------------------------- AutoCloseable methods
 
     @Override

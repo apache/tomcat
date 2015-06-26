@@ -188,6 +188,12 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
 
     @Override
+    public void pause() {
+        // NO-OP
+    }
+
+
+    @Override
     public void destroy() {
         if (connection != null) {
             try {

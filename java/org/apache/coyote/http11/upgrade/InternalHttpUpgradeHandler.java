@@ -35,4 +35,6 @@ public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
     void setSocketWrapper(SocketWrapperBase<?> wrapper);
 
     void setSslSupport(SSLSupport sslSupport);
+
+    void pause();
 }

@@ -136,6 +136,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
+    public void pause() {
+        // NO-OP. Handled by the Http2UpgradeHandler
+    }
+
+
+    @Override
     public SocketState process(SocketWrapperBase<?> socket) throws IOException {
         // Should never happen
         throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));

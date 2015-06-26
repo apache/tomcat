@@ -888,6 +888,12 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
+    @Override
+    public void pause() {
+        // NOOP for AJP
+    }
+
+
     // ------------------------------------------------------ Protected Methods
 
     // Methods used by SocketInputBuffer

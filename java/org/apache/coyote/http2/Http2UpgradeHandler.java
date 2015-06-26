@@ -319,6 +319,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
+    public void pause() {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.pause.entry", connectionId));
+        }
+        // TODO: Stop accepting new streams
+    }
+
+
+    @Override
     public void destroy() {
         // NO-OP
     }
