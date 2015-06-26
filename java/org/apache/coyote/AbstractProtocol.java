@@ -945,6 +945,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 }
             }
         }
+
+        @Override
+        public final void pause() {
+            /*
+             * Inform all the processors associated with current connections
+             * that the endpoint is being paused. Most won't care. Those
+             * processing multiplexed streams may wish to take action. For
+             * example, HTTP/2 may wish to stop accepting new streams.
+             *
+             * Note that even if the endpoint is resumed, there is (currently)
+             * no API to inform the Processors of this.
+             */
+            for (Processor processor : connections.values()) {
+                processor.pause();
+            }
+        }
     }
 
     protected static class RecycledProcessors<P extends Processor, S>

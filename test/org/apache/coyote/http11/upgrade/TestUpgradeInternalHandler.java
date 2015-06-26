@@ -227,6 +227,11 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         }
 
         @Override
+        public void pause() {
+            // NO-OP
+        }
+
+        @Override
         public void destroy() {
             // NO-OP
         }

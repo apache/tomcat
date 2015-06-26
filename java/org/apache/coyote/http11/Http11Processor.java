@@ -1887,4 +1887,10 @@ public class Http11Processor extends AbstractProcessor {
         return inputBuffer.getLeftover();
     }
 
+
+    @Override
+    public void pause() {
+        // NOOP for HTTP
+    }
+
 }

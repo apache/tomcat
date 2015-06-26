@@ -126,4 +126,10 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     public final void setSslSupport(SSLSupport sslSupport) {
         // NO-OP
     }
+
+
+    @Override
+    public void pause() {
+        // NOOP for AJP
+    }
 }

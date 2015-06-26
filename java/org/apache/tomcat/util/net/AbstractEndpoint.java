@@ -94,6 +94,15 @@ public abstract class AbstractEndpoint<S> {
 
 
         /**
+         * Inform the handler that the endpoint has stopped accepting any new
+         * connections. Typically, the endpoint will be stopped shortly
+         * afterwards but it is possible that the endpoint will be resumed so
+         * the handler should not assume that a stop will follow.
+         */
+        public void pause();
+
+
+        /**
          * Recycle resources associated with the handler.
          */
         public void recycle();
@@ -877,6 +886,7 @@ public abstract class AbstractEndpoint<S> {
         if (running && !paused) {
             paused = true;
             unlockAccept();
+            getHandler().pause();
         }
     }
 
@@ -905,6 +915,8 @@ public abstract class AbstractEndpoint<S> {
         }
     }
 
+
+    protected abstract Handler<S> getHandler();
 
     protected abstract Log getLog();
 

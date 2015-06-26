@@ -104,6 +104,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
      */
     private Handler handler = null;
     public void setHandler(Handler handler ) { this.handler = handler; }
+    @Override
     public Handler getHandler() { return handler; }
 
 

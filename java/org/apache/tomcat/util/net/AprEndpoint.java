@@ -144,6 +144,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      */
     protected Handler<Long> handler = null;
     public void setHandler(Handler<Long> handler ) { this.handler = handler; }
+    @Override
     public Handler<Long> getHandler() { return handler; }
 
 
