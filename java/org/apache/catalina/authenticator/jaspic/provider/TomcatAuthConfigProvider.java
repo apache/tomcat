@@ -29,6 +29,10 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Realm;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
+/**
+ * Tomcat's context based JASPIC authentication provider. It returns authentication
+ * modules depending on context login-config setup.
+ */
 public class TomcatAuthConfigProvider implements AuthConfigProvider {
 
     private Map<String, String> providerProperties;

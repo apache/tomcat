@@ -28,7 +28,7 @@ import javax.security.auth.message.callback.GroupPrincipalCallback;
 import org.apache.catalina.realm.GenericPrincipal;
 
 /**
- * This class merges two principal callbacks into one tomcat's
+ * This class uses callbacks to construct JAAS Subject with
  * {@link GenericPrincipal}.
  */
 public class PrincipalGroupCallback {
@@ -44,6 +44,10 @@ public class PrincipalGroupCallback {
         this.groupPrincipalCallback = groupPrincipalCallback;
     }
 
+
+    /**
+     * Enrich JAAS subject with Tomcat's {@link GenericPrincipal}.
+     */
     public void configureSubject() {
         GenericPrincipal principal = getPrincipal();
         if (principal == null) {
@@ -66,7 +70,8 @@ public class PrincipalGroupCallback {
     }
 
     /**
-     * Get tomcat's principal, which contains user principal and roles
+     * Get tomcat's principal, which contains user principal and roles.
+     *
      * @return {@link GenericPrincipal}
      */
     public GenericPrincipal getPrincipal() {

@@ -40,6 +40,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.codec.binary.Base64;
 
+/**
+ * This class implements JASPIC based HTTP BASIC authentication.
+ */
 public class BasicAuthModule extends TomcatAuthModule {
 
     private Class<?>[] supportedMessageTypes = new Class[] { HttpServletRequest.class,
