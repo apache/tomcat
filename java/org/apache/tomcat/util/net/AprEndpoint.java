@@ -1620,14 +1620,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // Loop until we receive a shutdown command
             while (pollerRunning) {
 
-                // Loop if endpoint is paused
-                while (pollerRunning && paused) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
-                }
                 // Check timeouts if the poller is empty.
                 while (pollerRunning && connectionCount.get() < 1 &&
                         addList.size() < 1 && closeList.size() < 1) {
