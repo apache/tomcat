@@ -64,12 +64,48 @@ public class SSLValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(SSLValve.class);
 
+    private String sslClientCertHeader = "ssl_client_cert";
+    private String sslCipherHeader = "ssl_cipher";
+    private String sslSessionIdHeader = "ssl_session_id";
+    private String sslCipherUserKeySizeHeader = "ssl_cipher_usekeysize";
 
     //------------------------------------------------------ Constructor
     public SSLValve() {
         super(true);
     }
 
+
+    public String getSslClientCertHeader() {
+        return sslClientCertHeader;
+    }
+
+    public void setSslClientCertHeader(String sslClientCertHeader) {
+        this.sslClientCertHeader = sslClientCertHeader;
+    }
+
+    public String getSslCipherHeader() {
+        return sslCipherHeader;
+    }
+
+    public void setSslCipherHeader(String sslCipherHeader) {
+        this.sslCipherHeader = sslCipherHeader;
+    }
+
+    public String getSslSessionIdHeader() {
+        return sslSessionIdHeader;
+    }
+
+    public void setSslSessionIdHeader(String sslSessionIdHeader) {
+        this.sslSessionIdHeader = sslSessionIdHeader;
+    }
+
+    public String getSslCipherUserKeySizeHeader() {
+        return sslCipherUserKeySizeHeader;
+    }
+
+    public void setSslCipherUserKeySizeHeader(String sslCipherUserKeySizeHeader) {
+        this.sslCipherUserKeySizeHeader = sslCipherUserKeySizeHeader;
+    }
 
 
     public String mygetHeader(Request request, String header) {
@@ -88,7 +124,7 @@ public class SSLValve extends ValveBase {
         throws IOException, ServletException {
 
         /* mod_header converts the '\n' into ' ' so we have to rebuild the client certificate */
-        String strcert0 = mygetHeader(request, "ssl_client_cert");
+        String strcert0 = mygetHeader(request, sslClientCertHeader);
         if (strcert0 != null && strcert0.length()>28) {
             String strcert1 = strcert0.replace(' ', '\n');
             String strcert2 = strcert1.substring(28, strcert1.length()-26);
@@ -119,16 +155,16 @@ public class SSLValve extends ValveBase {
             }
             request.setAttribute(Globals.CERTIFICATES_ATTR, jsseCerts);
         }
-        strcert0 = mygetHeader(request, "ssl_cipher");
+        strcert0 = mygetHeader(request, sslCipherHeader);
         if (strcert0 != null) {
             request.setAttribute(Globals.CIPHER_SUITE_ATTR, strcert0);
         }
-        strcert0 = mygetHeader(request, "ssl_session_id");
+        strcert0 = mygetHeader(request, sslSessionIdHeader);
         if (strcert0 != null) {
             request.setAttribute(Globals.SSL_SESSION_ID_ATTR, strcert0);
             request.setAttribute(Globals.SSL_SESSION_ID_TOMCAT_ATTR, strcert0);
         }
-        strcert0 = mygetHeader(request, "ssl_cipher_usekeysize");
+        strcert0 = mygetHeader(request, sslCipherUserKeySizeHeader);
         if (strcert0 != null) {
             request.setAttribute(Globals.KEY_SIZE_ATTR,
                     Integer.valueOf(strcert0));

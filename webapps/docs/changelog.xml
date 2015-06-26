@@ -107,6 +107,9 @@
         <bug>57700</bug>: Ensure that Container event
         <code>ADD_CHILD_EVENT</code> will be sent in all cases. (violetagg)
       </fix>
+      <fix>
+        Add configuration fields for header names in SSLValve. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

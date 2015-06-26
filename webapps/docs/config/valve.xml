@@ -876,6 +876,30 @@
         </p>
       </attribute>
 
+      <attribute name="sslClientCertHeader" required="false">
+        <p>Allows setting a custom name for the ssl_client_cert header.
+        If not specified, the default of <code>ssl_client_cert</code> is
+        used.</p>
+      </attribute>
+
+      <attribute name="sslCipherHeader" required="false">
+        <p>Allows setting a custom name for the ssl_cipher header.
+        If not specified, the default of <code>ssl_cipher</code> is
+        used.</p>
+      </attribute>
+
+      <attribute name="sslSessionIdHeader" required="false">
+        <p>Allows setting a custom name for the ssl_session_id header.
+        If not specified, the default of <code>ssl_session_id</code> is
+        used.</p>
+      </attribute>
+
+      <attribute name="sslCipherUserKeySizeHeader" required="false">
+        <p>Allows setting a custom name for the ssl_cipher_usekeysize header.
+        If not specified, the default of <code>ssl_cipher_usekeysize</code> is
+        used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
