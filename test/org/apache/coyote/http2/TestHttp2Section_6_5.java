@@ -20,7 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 6.4 of
+ * Unit tests for Section 6.5 of
  * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
  * <br>
  * The order of tests in this class is aligned with the order of the

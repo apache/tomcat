@@ -57,10 +57,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
     static final String EMPTY_HTTP2_SETTINGS_HEADER;
 
-    private static final byte[] PING_FRAME = new byte[] {
-        0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
     static {
         byte[] empty = new byte[0];
         EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
@@ -488,7 +484,24 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     void sendPing() throws IOException {
-        os.write(PING_FRAME);
+        sendPing(0, false, new byte[8]);
+    }
+
+
+    void sendPing(int streamId, boolean ack, byte[] payload) throws IOException {
+        byte[] pingHeader = new byte[9];
+        // length
+        ByteUtil.setThreeBytes(pingHeader, 0, payload.length);
+        // Type
+        pingHeader[3] = FrameType.PING.getIdByte();
+        // Flags
+        if (ack) {
+            ByteUtil.setOneBytes(pingHeader, 4, 0x01);
+        }
+        // Stream
+        ByteUtil.set31Bits(pingHeader, 5, streamId);
+        os.write(pingHeader);
+        os.write(payload);
         os.flush();
     }
 
@@ -685,8 +698,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void pingReceive(byte[] payload) {
-            trace.append("0-Ping-[");
+        public void pingReceive(byte[] payload, boolean ack) {
+            trace.append("0-Ping-");
+            if (ack) {
+                trace.append("Ack-");
+            }
+            trace.append('[');
             boolean first = true;
             for (byte b : payload) {
                 if (first) {
@@ -697,12 +714,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 trace.append(b & 0xFF);
             }
             trace.append("]\n");
-        }
-
-
-        @Override
-        public void pingAck() {
-            trace.append("0-Ping-Ack\n");
         }
 
 
