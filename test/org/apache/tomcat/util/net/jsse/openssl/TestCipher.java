@@ -607,6 +607,7 @@ public class TestCipher {
                     "PSK-AES128-CBC-SHA+SSLv3",
                     "PSK-AES128-GCM-SHA256+TLSv1.2",
                     "PSK-AES256-CBC-SHA+SSLv3",
+                    "PSK-AES256-GCM-SHA384+TLSv1.2",
                     "PSK-RC4-SHA+SSLv3",
                     "RC2-CBC-MD5+SSLv2",
                     "RC4-MD5+SSLv2",
