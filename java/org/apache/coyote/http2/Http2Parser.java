@@ -313,14 +313,10 @@ class Http2Parser {
 
 
     private void readPingFrame(int flags) throws IOException {
-        if (Flags.isAck(flags)) {
-            output.pingAck();
-        } else {
-            // Read the payload
-            byte[] payload = new byte[8];
-            input.fill(true, payload);
-            output.pingReceive(payload);
-        }
+        // Read the payload
+        byte[] payload = new byte[8];
+        input.fill(true, payload);
+        output.pingReceive(payload, Flags.isAck(flags));
     }
 
 
@@ -600,8 +596,7 @@ class Http2Parser {
         void settingsEnd(boolean ack) throws IOException;
 
         // Ping frames
-        void pingReceive(byte[] payload) throws IOException;
-        void pingAck();
+        void pingReceive(byte[] payload, boolean ack) throws IOException;
 
         // Goaway
         void goaway(int lastStreamId, long errorCode, String debugData);

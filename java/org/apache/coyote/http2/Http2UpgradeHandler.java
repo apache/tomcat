@@ -903,19 +903,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void pingReceive(byte[] payload) throws IOException {
-        // Echo it back
-        synchronized (socketWrapper) {
-            socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
-            socketWrapper.write(true, payload, 0, payload.length);
-            socketWrapper.flush(true);
+    public void pingReceive(byte[] payload, boolean ack) throws IOException {
+        if (!ack) {
+            // Echo it back
+            synchronized (socketWrapper) {
+                socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
+                socketWrapper.write(true, payload, 0, payload.length);
+                socketWrapper.flush(true);
+            }
         }
-    }
-
-
-    @Override
-    public void pingAck() {
-        // TODO Auto-generated method stub
     }
 
 

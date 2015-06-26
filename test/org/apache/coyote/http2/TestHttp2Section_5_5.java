@@ -73,7 +73,7 @@ public class TestHttp2Section_5_5 extends Http2TestBase {
 
         parser.readFrame(true);
 
-        Assert.assertEquals("0-Ping-Ack\n", output.getTrace());
+        Assert.assertEquals("0-Ping-Ack-[0,0,0,0,0,0,0,0]\n", output.getTrace());
     }
 
 
