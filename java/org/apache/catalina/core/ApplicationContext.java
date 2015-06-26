@@ -57,7 +57,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
-import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
 import org.apache.catalina.WebResourceRoot;
@@ -1458,8 +1457,8 @@ public class ApplicationContext
     @Override
     public String getVirtualServerName() {
         // Constructor will fail if context or its parent is null
-        Host host = (Host) context.getParent();
-        Engine engine = (Engine) host.getParent();
+        Container host = context.getParent();
+        Container engine = host.getParent();
         return engine.getName() + "/" + host.getName();
     }
 
