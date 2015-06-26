@@ -84,6 +84,9 @@ public class JaspicAuthenticator extends AuthenticatorBase {
         AuthStatus authStatus;
         Subject subject = new Subject();
         try {
+            // TODO: A number of the method calls below are synchronised. For
+            //       something that may get called on every request that is a
+            //       potential bottleneck.
             ServerAuthConfig authConfig = configProvider.getServerAuthConfig(MESSAGE_LAYER,
                     appContext, callbackHandler);
             String messageAuthContextId = authConfig.getAuthContextID(messageInfo);
