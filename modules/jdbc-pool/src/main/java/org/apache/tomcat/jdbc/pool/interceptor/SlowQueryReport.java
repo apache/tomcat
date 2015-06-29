@@ -270,10 +270,10 @@ public class SlowQueryReport extends AbstractQueryReport  {
             setMaxQueries(Integer.parseInt(p2.getValue()));
         }
         if (p3!=null) {
-            setLogSlow(Boolean.getBoolean(p3.getValue()));
+            setLogSlow(Boolean.parseBoolean(p3.getValue()));
         }
         if (p4!=null) {
-            setLogFailed(Boolean.getBoolean(p4.getValue()));
+            setLogFailed(Boolean.parseBoolean(p4.getValue()));
         }
     }
 
