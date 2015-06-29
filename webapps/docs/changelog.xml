@@ -182,6 +182,10 @@
         <bug>57971</bug>: Correct the documentation for the cluster
         configuration setting <code>recoverySleepTime</code>. (markt)
       </fix>
+      <add>
+        <bug>57758</bug>: Add document of <code>testOnConnect</code> attribute
+        in jdbc-pool doc. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">

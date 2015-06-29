@@ -264,6 +264,15 @@
       </p>
     </attribute>
 
+    <attribute name="testOnConnect" required="false">
+      <p>(boolean) The indication of whether objects will be validated when a connection is first created.
+         If an object fails to validate, it will be throw <code>SQLException</code>.
+         NOTE - for a true value to have any effect, the <code>validationQuery</code> or <code>initSQL</code>
+         parameter must be set to a non-null string.
+         Default value is <code>false</code>
+      </p>
+    </attribute>
+
     <attribute name="testOnReturn" required="false">
       <p>(boolean) The indication of whether objects will be validated before being returned to the pool.
          NOTE - for a true value to have any effect, the <code>validationQuery</code> parameter must be set to a non-null string.
