@@ -186,6 +186,10 @@
         <bug>57758</bug>: Add document of <code>testOnConnect</code> attribute
         in jdbc-pool doc. (kfujino)
       </add>
+      <add>
+        Add description of <code>validatorClassName</code> attribute to testXXXX
+        attributes in jdbc-pool docs. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
