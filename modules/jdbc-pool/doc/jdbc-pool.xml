@@ -277,7 +277,8 @@
     <attribute name="testOnBorrow" required="false">
       <p>(boolean) The indication of whether objects will be validated before being borrowed from the pool.
          If the object fails to validate, it will be dropped from the pool, and we will attempt to borrow another.
-         NOTE - for a true value to have any effect, the <code>validationQuery</code> parameter must be set to a non-null string.
+         NOTE - for a true value to have any effect, the <code>validationQuery</code>
+         or <code>validatorClassName</code> parameter must be set to a non-null string.
          In order to have a more efficient validation, see <code>validationInterval</code>.
          Default value is <code>false</code>
       </p>
@@ -286,15 +287,16 @@
     <attribute name="testOnConnect" required="false">
       <p>(boolean) The indication of whether objects will be validated when a connection is first created.
          If an object fails to validate, it will be throw <code>SQLException</code>.
-         NOTE - for a true value to have any effect, the <code>validationQuery</code> or <code>initSQL</code>
-         parameter must be set to a non-null string.
+         NOTE - for a true value to have any effect, the <code>validationQuery</code>, <code>initSQL</code>
+         or <code>validatorClassName</code> parameter must be set to a non-null string.
          Default value is <code>false</code>
       </p>
     </attribute>
 
     <attribute name="testOnReturn" required="false">
       <p>(boolean) The indication of whether objects will be validated before being returned to the pool.
-         NOTE - for a true value to have any effect, the <code>validationQuery</code> parameter must be set to a non-null string.
+         NOTE - for a true value to have any effect, the <code>validationQuery</code>
+         or <code>validatorClassName</code> parameter must be set to a non-null string.
          The default value is <code>false</code>.
       </p>
     </attribute>
@@ -302,7 +304,8 @@
     <attribute name="testWhileIdle" required="false">
       <p>(boolean) The indication of whether objects will be validated by the idle object evictor (if any).
          If an object fails to validate, it will be dropped from the pool.
-         NOTE - for a true value to have any effect, the <code>validationQuery</code> parameter must be set to a non-null string.
+         NOTE - for a true value to have any effect, the <code>validationQuery</code>
+         or <code>validatorClassName</code> parameter must be set to a non-null string.
          The default value is <code>false</code> and this property has to be set in order for the
          pool cleaner/test thread is to run (also see <code>timeBetweenEvictionRunsMillis</code>)
       </p>
