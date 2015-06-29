@@ -345,7 +345,8 @@ public class Catalina {
 
         digester.addRule("Server/Service/Connector/SSLHostConfig/Certificate",
                          new CertificateCreateRule());
-        digester.addSetProperties("Server/Service/Connector/SSLHostConfig/Certificate");
+        digester.addRule("Server/Service/Connector/SSLHostConfig/Certificate",
+                         new SetAllPropertiesRule(new String[]{"type"}));
         digester.addSetNext("Server/Service/Connector/SSLHostConfig/Certificate",
                             "addCertificate",
                             "org.apache.tomcat.util.net.SSLHostConfigCertificate");
