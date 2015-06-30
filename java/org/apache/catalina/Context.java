@@ -348,6 +348,8 @@ public interface Context extends Container {
 
     /**
      * Return the deny-uncovered-http-methods flag for this web application.
+     *
+     * @return The current value of the flag
      */
     public boolean getDenyUncoveredHttpMethods();
 
