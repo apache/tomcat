@@ -72,7 +72,7 @@ public class SSLHostConfigCertificate {
 
     // Common
 
-        public Type getType() {
+    public Type getType() {
         return type;
     }
 
