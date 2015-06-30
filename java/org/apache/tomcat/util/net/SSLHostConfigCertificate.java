@@ -54,6 +54,10 @@ public class SSLHostConfigCertificate {
     private String certificateKeyFile;
 
 
+    public SSLHostConfigCertificate() {
+        this(null, Type.UNDEFINED);
+    }
+
     public SSLHostConfigCertificate(SSLHostConfig sslHostConfig, Type type) {
         this.sslHostConfig = sslHostConfig;
         this.type = type;

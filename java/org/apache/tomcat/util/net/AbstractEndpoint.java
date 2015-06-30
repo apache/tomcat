@@ -251,6 +251,9 @@ public abstract class AbstractEndpoint<S> {
         }
         sslHostConfig.setConfigType(getSslConfigType());
     }
+    public SSLHostConfig[] findSslHostConfigs() {
+        return sslHostConfigs.values().toArray(new SSLHostConfig[0]);
+    }
     protected abstract SSLHostConfig.Type getSslConfigType();
 
     protected SSLHostConfig getSSLHostConfig(String sniHostName) {
