@@ -858,9 +858,16 @@ public class Connector extends LifecycleMBeanBase  {
         protocolHandler.addSslHostConfig(sslHostConfig);
     }
 
+    public SSLHostConfig[] findSslHostConfigs() {
+        return protocolHandler.findSslHostConfigs();
+    }
+
 
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
         protocolHandler.addUpgradeProtocol(upgradeProtocol);
+    }
+    public UpgradeProtocol[] findUpgradeProtocols() {
+        return protocolHandler.findUpgradeProtocols();
     }
 
     // --------------------------------------------------------- Public Methods

@@ -136,8 +136,20 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
 
     @Override
+    public SSLHostConfig[] findSslHostConfigs() {
+        return new SSLHostConfig[0];
+    }
+
+
+    @Override
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
         getLog().warn(sm.getString("ajpprotocol.noUpgrade", upgradeProtocol.getClass().getName()));
+    }
+
+
+    @Override
+    public UpgradeProtocol[] findUpgradeProtocols() {
+        return new UpgradeProtocol[0];
     }
 
 

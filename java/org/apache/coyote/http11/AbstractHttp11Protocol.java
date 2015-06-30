@@ -297,6 +297,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
         upgradeProtocols.add(upgradeProtocol);
     }
+    @Override
+    public UpgradeProtocol[] findUpgradeProtocols() {
+        return upgradeProtocols.toArray(new UpgradeProtocol[0]);
+    }
 
     /**
      * The protocols that are available via internal Tomcat support for access
@@ -391,6 +395,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         getEndpoint().addSslHostConfig(sslHostConfig);
     }
 
+    @Override
+    public SSLHostConfig[] findSslHostConfigs() {
+        return getEndpoint().findSslHostConfigs();
+    }
 
     // ----------------------------------------------- HTTPS specific properties
     // -------------------------------------------- Handled via an SSLHostConfig
