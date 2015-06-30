@@ -186,8 +186,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     remoteSettings.set(id, value);
                 }
             } catch (Http2Exception | IOException ioe) {
-                // TODO i18n
-                throw new ProtocolException();
+                throw new ProtocolException(
+                        sm.getString("upgradeHandler.upgrade.fail", connectionId));
             }
         }
 
@@ -204,8 +204,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         try {
             parser.readConnectionPreface();
         } catch (Http2Exception e) {
-            // TODO i18n
-            throw new ProtocolException();
+            throw new ProtocolException(
+                    sm.getString("upgradeHandler.invalidPreface", connectionId));
         }
 
         if (webConnection != null) {
