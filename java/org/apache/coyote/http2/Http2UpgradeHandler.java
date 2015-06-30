@@ -95,6 +95,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] HTTP2_UPGRADE_ACK = ("HTTP/1.1 101 Switching Protocols\r\n" +
                 "Connection: Upgrade\r\nUpgrade: h2c\r\n\r\n").getBytes(StandardCharsets.ISO_8859_1);
 
+    private static final int STATE_NEW = 0;
+    private static final int STATE_CONNECTED = 1;
+    private static final int STATE_PAUSED = 2;
+    private static final int STATE_CLOSED =3;
+
     private final String connectionId;
 
     private final Adapter adapter;
@@ -103,7 +108,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private volatile Http2Parser parser;
 
-    private volatile boolean initialized = false;
+    // Simple state machine (sequence of states)
+
+    private AtomicInteger connectionState = new AtomicInteger(STATE_NEW);
 
     private final ConnectionSettings remoteSettings = new ConnectionSettings();
     private final ConnectionSettings localSettings = new ConnectionSettings();
@@ -155,9 +162,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.init", connectionId));
         }
 
+        if (!connectionState.compareAndSet(STATE_NEW, STATE_CONNECTED)) {
+            return;
+        }
+
         parser = new Http2Parser(connectionId, this, this);
 
-        initialized = true;
         Stream stream = null;
 
         socketWrapper.setReadTimeout(getReadTimeout());
@@ -235,10 +245,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.upgradeDispatch.entry", connectionId, status));
         }
 
-        if (!initialized) {
-            // WebConnection is not used so passing null here is fine
-            init(null);
-        }
+        // WebConnection is not used so passing null here is fine
+        // Might not be necessary. init() will handle that.
+        init(null);
 
         SocketState result = SocketState.CLOSED;
 
@@ -323,7 +332,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.pause.entry", connectionId));
         }
-        // TODO: Stop accepting new streams
+
+        connectionState.compareAndSet(STATE_CONNECTED, STATE_PAUSED);
     }
 
 
@@ -686,6 +696,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     private void close() {
+        connectionState.set(STATE_CLOSED);
         try {
             socketWrapper.close();
         } catch (IOException ioe) {
