@@ -539,13 +539,13 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public String getProtocol() {
 
-        if ("org.apache.coyote.http11.Http11NioProtocol".equals
-            (getProtocolHandlerClassName())
+        if (("org.apache.coyote.http11.Http11NioProtocol".equals
+            (getProtocolHandlerClassName()) && !AprLifecycleListener.isAprAvailable())
             || "org.apache.coyote.http11.Http11AprProtocol".equals
             (getProtocolHandlerClassName())) {
             return "HTTP/1.1";
-        } else if ("org.apache.coyote.ajp.AjpNioProtocol".equals
-                   (getProtocolHandlerClassName())
+        } else if (("org.apache.coyote.ajp.AjpNioProtocol".equals
+                   (getProtocolHandlerClassName()) && !AprLifecycleListener.isAprAvailable())
                    || "org.apache.coyote.ajp.AjpAprProtocol".equals
                    (getProtocolHandlerClassName())) {
             return "AJP/1.3";
