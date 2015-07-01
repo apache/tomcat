@@ -193,7 +193,7 @@
         tag="CredentialHandler"
         standard="false"
         default="false"
-        children="false"
+        children="true"
         tagClass="org.apache.catalina.CredentialHandler"
         storeFactoryClass="org.apache.catalina.storeconfig.CredentialHandlerSF">
      </Description>
