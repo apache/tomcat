@@ -69,6 +69,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected Http2Parser parser;
     protected OutputStream os;
 
+    private long pingAckDelayMillis = 0;
+
+
+    protected void setPingAckDelayMillis(long delay) {
+        pingAckDelayMillis = delay;
+    }
 
     /**
      * Standard setup. Creates HTTP/2 connection via HTTP upgrade and ensures
@@ -95,9 +101,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         parser.readFrame(true);
         parser.readFrame(true);
         parser.readFrame(true);
+        parser.readFrame(true);
 
         Assert.assertEquals("0-Settings-End\n" +
                 "0-Settings-Ack\n" +
+                "0-Ping-[0,0,0,0,0,0,0,1]\n" +
                 getSimpleResponseTrace(1)
                 , output.getTrace());
         output.clearTrace();
@@ -489,6 +497,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     void sendPing(int streamId, boolean ack, byte[] payload) throws IOException {
+        if (ack && pingAckDelayMillis > 0) {
+            try {
+                Thread.sleep(pingAckDelayMillis);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
         byte[] pingHeader = new byte[9];
         // length
         ByteUtil.setThreeBytes(pingHeader, 0, payload.length);
@@ -643,7 +658,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    static class TestOutput implements Output, HeaderEmitter {
+    class TestOutput implements Output, HeaderEmitter {
 
         private StringBuffer trace = new StringBuffer();
         private String lastStreamId = "0";
@@ -722,10 +737,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void pingReceive(byte[] payload, boolean ack) {
+        public void pingReceive(byte[] payload, boolean ack) throws IOException {
             trace.append("0-Ping-");
             if (ack) {
                 trace.append("Ack-");
+            } else {
+                sendPing(0, true, payload);
             }
             trace.append('[');
             boolean first = true;
