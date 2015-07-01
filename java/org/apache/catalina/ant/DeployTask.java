@@ -140,7 +140,7 @@ public class DeployTask extends AbstractCatalinaCommandTask {
         String contentType = null;
         int contentLength = -1;
         if (war != null) {
-            if (war.startsWith("file:")) {
+            if (!war.startsWith("file:")) {
                 try {
                     URL url = new URL(war);
                     URLConnection conn = url.openConnection();

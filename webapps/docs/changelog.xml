@@ -58,6 +58,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.64 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>58086</bug>: Ensure that WAR URLs are handled properly when using
+        ANT for web application deployment. Based on a patch provided by Lukasz
+        Jader. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.63 (violetagg)">
   <subsection name="Catalina">
@@ -101,7 +110,7 @@
         loader during execution of the PersistentValve. (markt)
       </fix>
       <fix>
-        <bug>58023</bug>: Fix potentially execessive memory usage due to
+        <bug>58023</bug>: Fix potentially excessive memory usage due to
         unnecessary caching of JAR manifests in the web application class
         loader. (markt)
       </fix>
