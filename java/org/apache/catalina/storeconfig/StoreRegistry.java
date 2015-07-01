@@ -22,6 +22,7 @@ import java.util.Map;
 
 import javax.naming.directory.DirContext;
 
+import org.apache.catalina.CredentialHandler;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
@@ -39,6 +40,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.transport.DataSender;
+import org.apache.coyote.UpgradeProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -63,7 +65,8 @@ public class StoreRegistry {
             Manager.class, DirContext.class, LifecycleListener.class,
             Valve.class, ClusterListener.class, MessageListener.class,
             DataSender.class, ChannelInterceptor.class, Member.class,
-            WebResourceRoot.class, WebResourceSet.class };
+            WebResourceRoot.class, WebResourceSet.class,
+            CredentialHandler.class, UpgradeProtocol.class };
 
     /**
      * @return Returns the name.

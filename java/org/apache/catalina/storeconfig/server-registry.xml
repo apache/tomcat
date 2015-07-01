@@ -106,7 +106,7 @@
      <Description
         tag="UpgradeProtocol"
         standard="false"
-        default="true"
+        default="false"
         tagClass="org.apache.coyote.UpgradeProtocol"
         children="false"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
