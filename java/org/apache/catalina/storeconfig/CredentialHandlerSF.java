@@ -59,23 +59,23 @@ public class CredentialHandlerSF extends StoreFactoryBase {
     }
 
     /**
-     * Store the specified Realm properties and child (Realm)
+     * Store the specified CredentialHandler properties and child (CredentialHandler)
      *
      * @param aWriter
      *            PrintWriter to which we are storing
      * @param indent
      *            Number of spaces to indent this element
-     * @param aRealm
-     *            Realm whose properties are being stored
+     * @param aCredentialHandler
+     *            CredentialHandler whose properties are being stored
      *
      * @exception Exception
      *                if an exception occurs while storing
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aRealm,
+    public void storeChildren(PrintWriter aWriter, int indent, Object aCredentialHandler,
             StoreDescription parentDesc) throws Exception {
-        if (aRealm instanceof NestedCredentialHandler) {
-            NestedCredentialHandler nestedCredentialHandler = (NestedCredentialHandler) aRealm;
+        if (aCredentialHandler instanceof NestedCredentialHandler) {
+            NestedCredentialHandler nestedCredentialHandler = (NestedCredentialHandler) aCredentialHandler;
 
             // Store nested <CredentialHandler> element
             CredentialHandler[] credentialHandlers = nestedCredentialHandler.getCredentialHandlers();
