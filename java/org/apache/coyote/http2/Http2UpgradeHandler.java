@@ -25,9 +25,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.http.WebConnection;
 
@@ -84,6 +87,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final int FLAG_END_OF_STREAM = 1;
     private static final int FLAG_END_OF_HEADERS = 4;
 
+    private static final byte[] PING = { 0x00, 0x00, 0x08, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00};
     private static final byte[] PING_ACK = { 0x00, 0x00, 0x08, 0x06, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
     private static final byte[] SETTINGS_EMPTY = { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -95,10 +99,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] HTTP2_UPGRADE_ACK = ("HTTP/1.1 101 Switching Protocols\r\n" +
                 "Connection: Upgrade\r\nUpgrade: h2c\r\n\r\n").getBytes(StandardCharsets.ISO_8859_1);
 
-    private static final int STATE_NEW = 0;
-    private static final int STATE_CONNECTED = 1;
-    private static final int STATE_PAUSED = 2;
-    private static final int STATE_CLOSED =3;
+    private static final HeaderSink HEADER_SINK = new HeaderSink();
 
     private final String connectionId;
 
@@ -109,8 +110,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private volatile Http2Parser parser;
 
     // Simple state machine (sequence of states)
-
-    private AtomicInteger connectionState = new AtomicInteger(STATE_NEW);
+    private AtomicReference<ConnectionState> connectionState =
+            new AtomicReference<>(ConnectionState.NEW);
+    private volatile long pausedNanoTime = Long.MAX_VALUE;
 
     private final ConnectionSettings remoteSettings = new ConnectionSettings();
     private final ConnectionSettings localSettings = new ConnectionSettings();
@@ -129,6 +131,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     // Start at -1 so the 'add 2' logic in closeIdleStreams() works
     private volatile int maxActiveRemoteStreamId = -1;
     private volatile int maxProcessedStreamId;
+    private final PingManager pingManager = new PingManager();
 
     // Tracking for when the connection is blocked (windowSize < 1)
     private final Map<AbstractStream,int[]> backLogStreams = new ConcurrentHashMap<>();
@@ -162,7 +165,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.init", connectionId));
         }
 
-        if (!connectionState.compareAndSet(STATE_NEW, STATE_CONNECTED)) {
+        if (!connectionState.compareAndSet(ConnectionState.NEW, ConnectionState.CONNECTED)) {
             return;
         }
 
@@ -218,6 +221,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     sm.getString("upgradeHandler.invalidPreface", connectionId));
         }
 
+        // Send a ping to get an idea of round trip time as early as possible
+        try {
+            pingManager.sendPing(true);
+        } catch (IOException ioe) {
+            throw new ProtocolException(sm.getString("upgradeHandler.pingFailed"), ioe);
+        }
+
         if (webConnection != null) {
             // Process the initial request on a container thread
             StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
@@ -249,70 +259,69 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         // Might not be necessary. init() will handle that.
         init(null);
 
+
         SocketState result = SocketState.CLOSED;
 
-        switch(status) {
-        case OPEN_READ:
-            try {
-                while (true) {
-                    try {
-                        if (!parser.readFrame(false)) {
-                            break;
+        try {
+            pingManager.sendPing(false);
+
+            checkPauseState();
+
+            switch(status) {
+            case OPEN_READ:
+                try {
+
+                    while (true) {
+                        try {
+                            if (!parser.readFrame(false)) {
+                                break;
+                            }
+                        } catch (StreamException se) {
+                            // Stream errors are not fatal to the connection so
+                            // continue reading frames
+                            closeStream(se);
                         }
-                    } catch (StreamException se) {
-                        // Stream errors are not fatal to the connection so
-                        // continue reading frames
-                        closeStream(se);
                     }
+                } catch (Http2Exception ce) {
+                    // Really ConnectionError
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("upgradeHandler.connectionError"), ce);
+                    }
+                    closeConnection(ce);
+                    break;
                 }
-            } catch (Http2Exception ce) {
-                // Really ConnectionError
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.connectionError"), ce);
-                }
-                closeConnection(ce);
-                break;
-            } catch (IOException ioe) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
-                }
-                close();
-                break;
-            }
 
-            result = SocketState.UPGRADED;
-            break;
+                result = SocketState.UPGRADED;
+                break;
 
-        case OPEN_WRITE:
-            try {
+                case OPEN_WRITE:
                 processWrites();
-            } catch (IOException ioe) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
-                }
+
+                result = SocketState.UPGRADED;
+                break;
+
+            case ASYNC_READ_ERROR:
+            case ASYNC_WRITE_ERROR:
+            case CLOSE_NOW:
+                // This should never happen and will be fatal for this connection.
+                // Add the exception to trace how this point was reached.
+                log.error(sm.getString("upgradeHandler.unexpectedStatus", status),
+                        new IllegalStateException());
+                //$FALL-THROUGH$
+            case DISCONNECT:
+            case ERROR:
+            case TIMEOUT:
+            case STOP:
+                // For all of the above, including the unexpected values, close the
+                // connection.
                 close();
                 break;
             }
-
-            result = SocketState.UPGRADED;
-            break;
-
-        case ASYNC_READ_ERROR:
-        case ASYNC_WRITE_ERROR:
-        case CLOSE_NOW:
-            // This should never happen and will be fatal for this connection.
-            // Add the exception to trace how this point was reached.
-            log.error(sm.getString("upgradeHandler.unexpectedStatus", status),
-                    new IllegalStateException());
-            //$FALL-THROUGH$
-        case DISCONNECT:
-        case ERROR:
-        case TIMEOUT:
-        case STOP:
-            // For all of the above, including the unexpected values, close the
-            // connection.
+        } catch (IOException ioe) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
+            }
             close();
-            break;
         }
 
         if (log.isDebugEnabled()) {
@@ -333,13 +342,59 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.pause.entry", connectionId));
         }
 
-        connectionState.compareAndSet(STATE_CONNECTED, STATE_PAUSED);
+        if (connectionState.compareAndSet(ConnectionState.CONNECTED, ConnectionState.PAUSING)) {
+            pausedNanoTime = System.nanoTime();
+
+            // Write a GOAWAY frame.
+            byte[] fixedPayload = new byte[8];
+            ByteUtil.set31Bits(fixedPayload, 0, (1 << 31) - 1);
+            ByteUtil.setFourBytes(fixedPayload, 4, Http2Error.NO_ERROR.getCode());
+            byte[] payloadLength = new byte[3];
+            ByteUtil.setThreeBytes(payloadLength, 0, 8);
+
+            try {
+                synchronized (socketWrapper) {
+                    socketWrapper.write(true, payloadLength, 0, payloadLength.length);
+                    socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
+                    socketWrapper.write(true, fixedPayload, 0, 8);
+                    socketWrapper.flush(true);
+                }
+            } catch (IOException ioe) {
+                // This is fatal for the connection. Ignore it here. There will be
+                // further attempts at I/O in upgradeDispatch() and it can better
+                // handle the IO errors.
+            }
+        }
     }
 
 
     @Override
     public void destroy() {
         // NO-OP
+    }
+
+
+    private void checkPauseState() throws IOException {
+        if (connectionState.get() == ConnectionState.PAUSING) {
+            if (pausedNanoTime + pingManager.getRoundTripTimeNano() < System.nanoTime()) {
+                connectionState.compareAndSet(ConnectionState.PAUSING, ConnectionState.PAUSED);
+
+                // Write a GOAWAY frame.
+                byte[] fixedPayload = new byte[8];
+                ByteUtil.set31Bits(fixedPayload, 0, maxProcessedStreamId);
+                ByteUtil.setFourBytes(fixedPayload, 4, Http2Error.NO_ERROR.getCode());
+                byte[] payloadLength = new byte[3];
+                ByteUtil.setThreeBytes(payloadLength, 0, 8);
+
+                synchronized (socketWrapper) {
+                    socketWrapper.write(true, payloadLength, 0, payloadLength.length);
+                    socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
+                    socketWrapper.write(true, fixedPayload, 0, 8);
+                    socketWrapper.flush(true);
+                }
+
+            }
+        }
     }
 
 
@@ -661,7 +716,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private Stream getStream(int streamId, boolean unknownIsError) throws ConnectionException{
+    private Stream getStream(int streamId, boolean unknownIsError) throws ConnectionException {
         Integer key = Integer.valueOf(streamId);
         Stream result = streams.get(key);
         if (result == null && unknownIsError) {
@@ -696,7 +751,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     private void close() {
-        connectionState.set(STATE_CLOSED);
+        connectionState.set(ConnectionState.CLOSED);
         try {
             socketWrapper.close();
         } catch (IOException ioe) {
@@ -811,10 +866,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void receiveEndOfStream(int streamId) throws ConnectionException {
-        Stream stream = getStream(streamId, true);
-        stream.receivedEndOfStream();
-        if (!stream.isActive()) {
-            activeRemoteStreamCount.decrementAndGet();
+        Stream stream = getStream(streamId, connectionState.get().isNewStreamAllowed());
+        if (stream != null) {
+            stream.receivedEndOfStream();
+            if (!stream.isActive()) {
+                activeRemoteStreamCount.decrementAndGet();
+            }
         }
     }
 
@@ -830,20 +887,29 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public HeaderEmitter headersStart(int streamId) throws Http2Exception {
-        Stream stream = getStream(streamId, false);
-        if (stream == null) {
-            stream = createRemoteStream(streamId);
+        if (connectionState.get().isNewStreamAllowed()) {
+            Stream stream = getStream(streamId, false);
+            if (stream == null) {
+                stream = createRemoteStream(streamId);
+            }
+            stream.checkState(FrameType.HEADERS);
+            stream.receivedStartOfHeaders();
+            closeIdleStreams(streamId);
+            if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
+                activeRemoteStreamCount.decrementAndGet();
+                throw new StreamException(sm.getString("upgradeHandler.tooManyRemoteStreams",
+                        Long.toString(localSettings.getMaxConcurrentStreams())),
+                        Http2Error.REFUSED_STREAM, streamId);
+            }
+            return stream;
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.noNewStreams",
+                        connectionId, Integer.toString(streamId)));
+            }
+            // Stateless so a static can be used to save on GC
+            return HEADER_SINK;
         }
-        stream.checkState(FrameType.HEADERS);
-        stream.receivedStartOfHeaders();
-        closeIdleStreams(streamId);
-        if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
-            activeRemoteStreamCount.decrementAndGet();
-            throw new StreamException(sm.getString("upgradeHandler.tooManyRemoteStreams",
-                    Long.toString(localSettings.getMaxConcurrentStreams())),
-                    Http2Error.REFUSED_STREAM, streamId);
-        }
-        return stream;
     }
 
 
@@ -877,11 +943,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void headersEnd(int streamId) throws ConnectionException {
         setMaxProcessedStream(streamId);
-        Stream stream = getStream(streamId, true);
-        // Process this stream on a container thread
-        StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
-        streamProcessor.setSslSupport(sslSupport);
-        socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
+        Stream stream = getStream(streamId, connectionState.get().isNewStreamAllowed());
+        if (stream != null) {
+            // Process this stream on a container thread
+            StreamProcessor streamProcessor = new StreamProcessor(stream, adapter, socketWrapper);
+            streamProcessor.setSslSupport(sslSupport);
+            socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
+        }
     }
 
 
@@ -921,14 +989,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void pingReceive(byte[] payload, boolean ack) throws IOException {
-        if (!ack) {
-            // Echo it back
-            synchronized (socketWrapper) {
-                socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
-                socketWrapper.write(true, payload, 0, payload.length);
-                socketWrapper.flush(true);
-            }
-        }
+        pingManager.receivePing(payload, ack);
     }
 
 
@@ -958,4 +1019,115 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             throws IOException {
         // NO-OP.
     }
+
+
+    private class PingManager {
+
+        // 10 seconds
+        private final long pingIntervalNano = 10000000000L;
+
+        private int sequence = 0;
+        private long lastPingNanoTime = Long.MIN_VALUE;
+
+        private Queue<PingRecord> inflightPings = new ConcurrentLinkedQueue<>();
+        private Queue<Long> roundTripTimes = new ConcurrentLinkedQueue<>();
+
+        /**
+         * Check to see if a ping was sent recently and, if not, send one.
+         *
+         * @throws IOException If an I/O issue prevents the ping from being sent
+         */
+        public void sendPing(boolean force) throws IOException {
+            long now = System.nanoTime();
+            if (force || now - lastPingNanoTime > pingIntervalNano) {
+                lastPingNanoTime = now;
+                byte[] payload = new byte[8];
+                synchronized (socketWrapper) {
+                    int sentSequence = ++sequence;
+                    PingRecord pingRecord = new PingRecord(sentSequence, now);
+                    inflightPings.add(pingRecord);
+                    ByteUtil.set31Bits(payload, 4, sentSequence);
+                    socketWrapper.write(true, PING, 0, PING.length);
+                    socketWrapper.write(true, payload, 0, payload.length);
+                    socketWrapper.flush(true);
+                }
+            }
+        }
+
+        public void receivePing(byte[] payload, boolean ack) throws IOException {
+            if (ack) {
+                // Extract the sequence from the payload
+                int receivedSequence = ByteUtil.get31Bits(payload, 4);
+                PingRecord pingRecord = inflightPings.poll();
+                while (pingRecord != null && pingRecord.getSequence() < receivedSequence) {
+                    pingRecord = inflightPings.poll();
+                }
+                if (pingRecord == null) {
+                    // Unexpected ACK. Log it.
+                } else {
+                    long roundTripTime = System.nanoTime() - pingRecord.getSentNanoTime();
+                    roundTripTimes.add(Long.valueOf(roundTripTime));
+                    while (roundTripTimes.size() > 3) {
+                        roundTripTimes.poll();
+                    }
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("pingManager.roundTripTime",
+                                connectionId, Long.valueOf(roundTripTime)));
+                    }
+                }
+
+            } else {
+                // Client originated ping. Echo it back.
+                synchronized (socketWrapper) {
+                    socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
+                    socketWrapper.write(true, payload, 0, payload.length);
+                    socketWrapper.flush(true);
+                }
+            }
+        }
+
+        public long getRoundTripTimeNano() {
+            return (long) roundTripTimes.stream().mapToLong(x -> x.longValue()).average().orElse(0);
+        }
+    }
+
+
+    private static class PingRecord {
+
+        private final int sequence;
+        private final long sentNanoTime;
+
+        public PingRecord(int sequence, long sentNanoTime) {
+            this.sequence = sequence;
+            this.sentNanoTime = sentNanoTime;
+        }
+
+        public int getSequence() {
+            return sequence;
+        }
+
+        public long getSentNanoTime() {
+            return sentNanoTime;
+        }
+    }
+
+
+    private enum ConnectionState {
+
+        NEW(true),
+        CONNECTED(true),
+        PAUSING(true),
+        PAUSED(false),
+        CLOSED(false);
+
+        private final boolean newStreamsAllowed;
+
+        private ConnectionState(boolean newStreamsAllowed) {
+            this.newStreamsAllowed = newStreamsAllowed;
+        }
+
+        public boolean isNewStreamAllowed() {
+            return newStreamsAllowed;
+        }
+     }
 }
