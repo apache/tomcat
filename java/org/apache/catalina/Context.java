@@ -364,6 +364,8 @@ public interface Context extends Container {
 
     /**
      * Return the display name of this web application.
+     *
+     * @return The display name
      */
     public String getDisplayName();
 
