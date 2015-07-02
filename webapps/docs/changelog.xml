@@ -72,6 +72,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>57943</bug>: Prevent the same socket being added to the cache
+        twice. Patch based on analysis by Ian Luo / Sun Qi. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.63 (violetagg)">
   <subsection name="Catalina">

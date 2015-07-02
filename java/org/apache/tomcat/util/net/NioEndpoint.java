@@ -1755,34 +1755,15 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     if (state == SocketState.CLOSED) {
                         // Close socket and pool
                         try {
-                            if (ka!=null) ka.setComet(false);
-                            if (socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false) != null) {
-                                // SocketWrapper (attachment) was removed from the
-                                // key - recycle both. This can only happen once
-                                // per attempted closure so it is used to determine
-                                // whether or not to return socket and ka to
-                                // their respective caches. We do NOT want to do
-                                // this more than once - see BZ 57340.
-                                if (running && !paused) {
-                                    nioChannels.offer(socket);
-                                }
-                                socket = null;
-                                if (running && !paused && ka != null) {
-                                    keyCache.offer(ka);
-                                }
-                            }
+                            close(ka, socket, key, SocketStatus.ERROR);
+                            socket = null;
                             ka = null;
                         } catch ( Exception x ) {
                             log.error("",x);
                         }
                     }
                 } else if (handshake == -1 ) {
-                    if (key != null) {
-                        socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
-                    }
-                    nioChannels.offer(socket);
-                    socket = null;
-                    if ( ka!=null ) keyCache.offer(ka);
+                    close(ka, socket, key, SocketStatus.DISCONNECT);
                     ka = null;
                 } else {
                     ka.getPoller().add(socket, handshake);
@@ -1819,6 +1800,31 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 if (running && !paused) {
                     processorCache.offer(this);
                 }
+            }
+        }
+
+        private void close(KeyAttachment ka, NioChannel socket, SelectionKey key,
+                SocketStatus socketStatus) {
+            try {
+                if (ka != null) {
+                    ka.setComet(false);
+                }
+                if (socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false) != null) {
+                    // SocketWrapper (attachment) was removed from the
+                    // key - recycle both. This can only happen once
+                    // per attempted closure so it is used to determine
+                    // whether or not to return socket and ka to
+                    // their respective caches. We do NOT want to do
+                    // this more than once - see BZ 57340 / 57943.
+                    if (running && !paused) {
+                        nioChannels.offer(socket);
+                    }
+                    if (running && !paused && ka != null) {
+                        keyCache.offer(ka);
+                    }
+                }
+            } catch ( Exception x ) {
+                log.error("",x);
             }
         }
     }
