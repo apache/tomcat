@@ -84,7 +84,7 @@ public class FileResourceSet extends AbstractFileResourceSet {
             if (f == null) {
                 return new EmptyResource(root, path);
             }
-            return new FileResource(root, path, f, isReadOnly());
+            return new FileResource(root, path, f, isReadOnly(), null);
         }
 
         if (path.charAt(path.length() - 1) != '/') {

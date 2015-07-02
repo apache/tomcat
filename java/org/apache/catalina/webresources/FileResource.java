@@ -43,9 +43,10 @@ public class FileResource extends AbstractResource {
     private final File resource;
     private final String name;
     private final boolean readOnly;
+    private final Manifest manifest;
 
     public FileResource(WebResourceRoot root, String webAppPath,
-            File resource, boolean readOnly) {
+            File resource, boolean readOnly, Manifest manifest) {
         super(root,webAppPath);
         this.resource = resource;
 
@@ -67,6 +68,7 @@ public class FileResource extends AbstractResource {
         }
 
         this.readOnly = readOnly;
+        this.manifest = manifest;
     }
 
     @Override
@@ -218,7 +220,7 @@ public class FileResource extends AbstractResource {
 
     @Override
     public Manifest getManifest() {
-        return null;
+        return manifest;
     }
 
     @Override
