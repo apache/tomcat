@@ -1035,6 +1035,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         /**
          * Check to see if a ping was sent recently and, if not, send one.
          *
+         * @param force Send a ping, even if one was sent recently
+         *
          * @throws IOException If an I/O issue prevents the ping from being sent
          */
         public void sendPing(boolean force) throws IOException {
