@@ -1521,36 +1521,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                             state = handler.process(ka, status);
                         }
                         if (state == SocketState.CLOSED) {
-                            // Close socket and pool
-                            try {
-                                if (socket.getPoller().cancelledKey(key) != null) {
-                                    // SocketWrapper (attachment) was removed from the
-                                    // key - recycle the key. This can only happen once
-                                    // per attempted closure so it is used to determine
-                                    // whether or not to return the key to the cache.
-                                    // We do NOT want to do this more than once - see BZ
-                                    // 57340.
-                                    if (running && !paused) {
-                                        if (!nioChannels.push(socket)) {
-                                            socket.free();
-                                        }
-                                    }
-                                    socket = null;
-                                }
-                                ka = null;
-                            } catch (Exception x) {
-                                log.error("",x);
-                            }
+                            close(socket, key);
+                            socket = null;
+                            ka = null;
                         }
                     } else if (handshake == -1 ) {
-                        if (key != null) {
-                            socket.getPoller().cancelledKey(key);
-                        }
-                        if (running && !paused) {
-                            if (!nioChannels.push(socket)) {
-                                socket.free();
-                            }
-                        }
+                        close(socket, key);
                         socket = null;
                         ka = null;
                     } else {
@@ -1575,6 +1551,26 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         processorCache.push(this);
                     }
                 }
+            }
+        }
+
+        private void close(NioChannel socket, SelectionKey key) {
+            try {
+                if (socket.getPoller().cancelledKey(key) != null) {
+                    // SocketWrapper (attachment) was removed from the
+                    // key - recycle the key. This can only happen once
+                    // per attempted closure so it is used to determine
+                    // whether or not to return the key to the cache.
+                    // We do NOT want to do this more than once - see BZ
+                    // 57340 / 57943.
+                    if (running && !paused) {
+                        if (!nioChannels.push(socket)) {
+                            socket.free();
+                        }
+                    }
+                }
+            } catch (Exception x) {
+                log.error("",x);
             }
         }
     }
