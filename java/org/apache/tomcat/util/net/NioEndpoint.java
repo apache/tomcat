@@ -1522,29 +1522,21 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         }
                         if (state == SocketState.CLOSED) {
                             close(socket, key);
-                            socket = null;
-                            ka = null;
                         }
                     } else if (handshake == -1 ) {
                         close(socket, key);
-                        socket = null;
-                        ka = null;
                     } else {
                         ka.getPoller().add(socket,handshake);
                     }
                 } catch (CancelledKeyException cx) {
-                    if (socket != null) {
-                        socket.getPoller().cancelledKey(key);
-                    }
+                    socket.getPoller().cancelledKey(key);
                 } catch (VirtualMachineError vme) {
                     ExceptionUtils.handleThrowable(vme);
                 } catch (Throwable t) {
                     log.error("", t);
-                    if (socket != null) {
-                        socket.getPoller().cancelledKey(key);
-                    }
+                    socket.getPoller().cancelledKey(key);
                 } finally {
-                    socket = null;
+                    ka = null;
                     status = null;
                     //return to cache
                     if (running && !paused) {
