@@ -5168,7 +5168,7 @@ public class StandardContext extends ContainerBase
                 }
             }
             // Register the cache in JMX
-            if (isCachingAllowed()) {
+            if (isCachingAllowed() && proxyDirContext.getCache() != null) {
                 String contextName = getName();
                 if (!contextName.startsWith("/")) {
                     contextName = "/" + contextName;

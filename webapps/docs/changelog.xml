@@ -65,6 +65,11 @@
         ANT for web application deployment. Based on a patch provided by Lukasz
         Jader. (violetagg)
       </fix>
+      <fix>
+        <bug>58094</bug>: Fix cosmetic error log when using non standard
+        non cacheable resources, like with the empty resources used in some
+        tests. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
