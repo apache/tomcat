@@ -1756,20 +1756,17 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                         // Close socket and pool
                         try {
                             close(ka, socket, key, SocketStatus.ERROR);
-                            socket = null;
-                            ka = null;
                         } catch ( Exception x ) {
                             log.error("",x);
                         }
                     }
                 } else if (handshake == -1 ) {
                     close(ka, socket, key, SocketStatus.DISCONNECT);
-                    ka = null;
                 } else {
                     ka.getPoller().add(socket, handshake);
                 }
-            }catch(CancelledKeyException cx) {
-                socket.getPoller().cancelledKey(key,null,false);
+            } catch (CancelledKeyException cx) {
+                socket.getPoller().cancelledKey(key, null, false);
             } catch (OutOfMemoryError oom) {
                 try {
                     oomParachuteData = null;
@@ -1809,7 +1806,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 if (ka != null) {
                     ka.setComet(false);
                 }
-                if (socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false) != null) {
+                if (socket.getPoller().cancelledKey(key, socketStatus, false) != null) {
                     // SocketWrapper (attachment) was removed from the
                     // key - recycle both. This can only happen once
                     // per attempted closure so it is used to determine
