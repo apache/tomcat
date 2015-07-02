@@ -76,7 +76,6 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
  * <li><b>%s</b> - HTTP status code of the response
  * <li><b>%S</b> - User session ID
  * <li><b>%t</b> - Date and time, in Common Log Format format
- * <li><b>%t{format}</b> - Date and time, in any format supported by SimpleDateFormat
  * <li><b>%u</b> - Remote user that was authenticated
  * <li><b>%U</b> - Requested URL path
  * <li><b>%v</b> - Local server name
@@ -873,7 +872,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * write date and time, in configurable format (default CLF) - %t or %t{format}
+     * write date and time, in configurable format (default CLF) - %t or %{format}t
      */
     protected class DateAndTimeElement implements AccessLogElement {
 
