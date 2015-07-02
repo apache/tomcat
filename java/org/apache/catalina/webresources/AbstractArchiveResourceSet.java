@@ -37,20 +37,11 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     private final HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
     private URL baseUrl;
     private String baseUrlString;
-    private Manifest manifest;
 
     private JarFile archive = null;
     private final Object archiveLock = new Object();
     private long archiveUseCount = 0;
 
-
-    protected final void setManifest(Manifest manifest) {
-        this.manifest = manifest;
-    }
-
-    protected final Manifest getManifest() {
-        return manifest;
-    }
 
     protected final void setBaseUrl(URL baseUrl) {
         this.baseUrl = baseUrl;
@@ -250,7 +241,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 if (jarEntry == null) {
                     return new EmptyResource(root, path);
                 } else {
-                    return createArchiveResource(jarEntry, path, manifest);
+                    return createArchiveResource(jarEntry, path, getManifest());
                 }
             }
         } else {
