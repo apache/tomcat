@@ -107,7 +107,7 @@ public class FormAuthModule extends TomcatAuthModule {
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
 
         // Have we authenticated this user before but have caching disabled?
-        if (!isCache()) {
+        if (!isCache()) { //TODO Ask is it required? May be principal must be always cached
             Session session = request.getSessionInternal(true);
             if (log.isDebugEnabled()) {
                 log.debug("Checking for reauthenticate in session " + session);
@@ -118,21 +118,18 @@ public class FormAuthModule extends TomcatAuthModule {
                 if (log.isDebugEnabled()) {
                     log.debug("Reauthenticating username '" + username + "'");
                 }
-                PasswordValidationCallback passwordCallback = new PasswordValidationCallback(
-                        clientSubject, username, password.toCharArray());
-                handler.handle(new Callback[] { passwordCallback });
-
-                if (!passwordCallback.getResult()) {
+                Principal principal = realm.authenticate(username, password);
+                if (principal == null) {
                     forwardToErrorPage(request, response);
+                    return AuthStatus.FAILURE;
                 }
-                Principal principal = getPrincipal(passwordCallback);
-                if (principal != null) {
-                    session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
-                    if (!isMatchingSavedRequest(request)) {
-                        handlePrincipalCallbacks(clientSubject, principal);
-                        return AuthStatus.SUCCESS;
-                    }
+
+                session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
+                if (!isMatchingSavedRequest(request)) {
+                    handlePrincipalCallbacks(clientSubject, principal);
+                    return AuthStatus.SUCCESS;
                 }
+
                 if (log.isDebugEnabled()) {
                     log.debug("Reauthentication failed, proceed normally");
                 }
@@ -146,14 +143,7 @@ public class FormAuthModule extends TomcatAuthModule {
             return submitSavedRequest(clientSubject, request, response);
         }
 
-        String contextPath = request.getContextPath();
-        String requestURI = request.getDecodedRequestURI();
-
-        // Is this the action request from the login page?
-        boolean loginAction = requestURI.startsWith(contextPath)
-                && requestURI.endsWith(Constants.FORM_ACTION);
-
-        if (!loginAction) {
+        if (!isLoginActionRequest(request)) {
             return handleNoLoginAction(request, response);
         }
 
@@ -597,10 +587,11 @@ public class FormAuthModule extends TomcatAuthModule {
         SavedRequest saved = new SavedRequest();
         Cookie cookies[] = request.getCookies();
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                saved.addCookie(cookies[i]);
+            for (Cookie cookie : cookies) {
+                saved.addCookie(cookie);
             }
         }
+
         Enumeration<String> names = request.getHeaderNames();
         while (names.hasMoreElements()) {
             String name = names.nextElement();
@@ -666,4 +657,12 @@ public class FormAuthModule extends TomcatAuthModule {
         return (sb.toString());
 
     }
+
+
+    private boolean isLoginActionRequest(Request request) {
+        String contextPath = request.getContextPath();
+        String requestURI = request.getDecodedRequestURI();
+        return requestURI.startsWith(contextPath) && requestURI.endsWith(Constants.FORM_ACTION);
+    }
+
 }
