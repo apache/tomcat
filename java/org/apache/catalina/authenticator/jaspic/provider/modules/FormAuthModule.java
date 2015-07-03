@@ -70,6 +70,8 @@ public class FormAuthModule extends TomcatAuthModule {
     private Realm realm;
     private LoginConfig loginConfig;
 
+    private boolean changeSessionIdOnAuthenication = true;
+
 
     public FormAuthModule(Context context) {
         super(context);
@@ -392,7 +394,7 @@ public class FormAuthModule extends TomcatAuthModule {
 
 
     private boolean getChangeSessionIdOnAuthentication() {
-        return true;        // FIXME
+        return changeSessionIdOnAuthenication ;
     }
 
 
