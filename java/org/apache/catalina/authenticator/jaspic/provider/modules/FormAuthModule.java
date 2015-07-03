@@ -182,27 +182,54 @@ public class FormAuthModule extends TomcatAuthModule {
         boolean loginAction = requestURI.startsWith(contextPath)
                 && requestURI.endsWith(Constants.FORM_ACTION);
 
-        // No -- Save this request and redirect to the form login page
         if (!loginAction) {
-            session = request.getSessionInternal(true);
-            if (log.isDebugEnabled()) {
-                log.debug("Save request in session '" + session.getIdInternal() + "'");
-            }
-            try {
-                saveRequest(request, session);
-            } catch (IOException ioe) {
-                log.debug("Request body too big to save during authentication");
-                response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                        sm.getString("authenticator.requestBodyTooBig"));
-                return AuthStatus.FAILURE;
-            }
-            forwardToLoginPage(request, response);
-            return AuthStatus.SEND_CONTINUE;
+            return handleNoLoginAction(request, response);
         }
 
-        // Yes -- Acknowledge the request, validate the specified
-        // credentials
-        // and redirect to the error page if they are not correct
+        return handleLoginAction(request, response);
+    }
+
+
+    /**
+     * Save this request and redirect to the form login page
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    private AuthStatus handleNoLoginAction(Request request, HttpServletResponse response)
+            throws IOException {
+        Session session = request.getSessionInternal(true);
+        if (log.isDebugEnabled()) {
+            log.debug("Save request in session '" + session.getIdInternal() + "'");
+        }
+        try {
+            saveRequest(request, session);
+        } catch (IOException ioe) {
+            log.debug("Request body too big to save during authentication");
+            response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                    sm.getString("authenticator.requestBodyTooBig"));
+            return AuthStatus.FAILURE;
+        }
+
+        forwardToLoginPage(request, response);
+        return AuthStatus.SEND_CONTINUE;
+    }
+
+
+    /**
+     * Acknowledge the request, validate the specified and redirect to the error
+     * page if they are not correct
+     *
+     * @param request
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    private AuthStatus handleLoginAction(Request request, HttpServletResponse response)
+            throws IOException {
+
         request.getResponse().sendAcknowledgement();
 
         // TODO fix character encoding
@@ -215,7 +242,7 @@ public class FormAuthModule extends TomcatAuthModule {
         if (log.isDebugEnabled()) {
             log.debug("Authenticating username '" + username + "'");
         }
-        principal = realm.authenticate(username, password);
+        Principal principal = realm.authenticate(username, password);
         if (principal == null) {
             forwardToErrorPage(request, response);
             return AuthStatus.FAILURE;
@@ -225,9 +252,7 @@ public class FormAuthModule extends TomcatAuthModule {
             log.debug("Authentication of '" + username + "' was successful");
         }
 
-        if (session == null) {
-            session = request.getSessionInternal(false);
-        }
+        Session session = request.getSessionInternal(false);
         if (session == null) {
             handleSessionExpired(request, response);
             return AuthStatus.FAILURE;
