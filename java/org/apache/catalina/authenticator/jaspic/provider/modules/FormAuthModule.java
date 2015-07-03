@@ -68,6 +68,7 @@ public class FormAuthModule extends TomcatAuthModule {
             HttpServletResponse.class };
 
     private String landingPage;
+    private String characterEncoding;
 
     private Realm realm;
     private LoginConfig loginConfig;
@@ -222,10 +223,9 @@ public class FormAuthModule extends TomcatAuthModule {
 
         request.getResponse().sendAcknowledgement();
 
-        // TODO fix character encoding
-        // if (characterEncoding != null) {
-        // request.setCharacterEncoding(characterEncoding);
-        // }
+        if (characterEncoding != null) {
+            request.setCharacterEncoding(characterEncoding);
+        }
 
         String username = request.getParameter(Constants.FORM_USERNAME);
         String password = request.getParameter(Constants.FORM_PASSWORD);
