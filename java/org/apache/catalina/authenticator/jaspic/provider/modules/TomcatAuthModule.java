@@ -66,7 +66,7 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
 
 
     public String getRealmName() {
-        return Optional.of(realmName).orElse(DEFAULT_REALM_NAME);
+        return Optional.ofNullable(realmName).orElse(DEFAULT_REALM_NAME);
     }
 
 
