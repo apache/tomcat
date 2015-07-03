@@ -242,11 +242,11 @@ public class FormAuthModule extends TomcatAuthModule {
 
         // Redirect the user to the original request URI (which will cause
         // the original request to be restored)
-        requestURI = savedRequestURL(session);
+        String savedRequestUrl = savedRequestURL(session);
         if (log.isDebugEnabled()) {
-            log.debug("Redirecting to original '" + requestURI + "'");
+            log.debug("Redirecting to original '" + savedRequestUrl + "'");
         }
-        if (requestURI == null) {
+        if (savedRequestUrl == null) {
             if (landingPage == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST,
                         sm.getString("authenticator.formlogin"));
@@ -267,7 +267,7 @@ public class FormAuthModule extends TomcatAuthModule {
             // to
             // use.
             Response internalResponse = request.getResponse();
-            String location = response.encodeRedirectURL(requestURI);
+            String location = response.encodeRedirectURL(savedRequestUrl);
             if ("HTTP/1.1".equals(request.getProtocol())) {
                 internalResponse.sendRedirect(location, HttpServletResponse.SC_SEE_OTHER);
             } else {
