@@ -51,6 +51,8 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
 
     protected Context context;
 
+    protected boolean cachePrincipalsInSession = true;
+
 
     public TomcatAuthModule(Context context) {
         this.context = context;

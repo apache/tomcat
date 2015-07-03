@@ -107,7 +107,7 @@ public class FormAuthModule extends TomcatAuthModule {
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
 
         // Have we authenticated this user before but have caching disabled?
-        if (!isCache()) { //TODO Ask is it required? May be principal must be always cached
+        if (!cachePrincipalsInSession) {
             Session session = request.getSessionInternal(true);
             if (log.isDebugEnabled()) {
                 log.debug("Checking for reauthenticate in session " + session);
@@ -125,14 +125,12 @@ public class FormAuthModule extends TomcatAuthModule {
                 }
 
                 session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
-                if (!isMatchingSavedRequest(request)) {
-                    handlePrincipalCallbacks(clientSubject, principal);
-                    return AuthStatus.SUCCESS;
+                if (isMatchingSavedRequest(request)) {
+                    return submitSavedRequest(clientSubject, request, response);
                 }
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Reauthentication failed, proceed normally");
-                }
+                handlePrincipalCallbacks(clientSubject, principal);
+                return AuthStatus.SUCCESS;
             }
         }
 
@@ -163,7 +161,7 @@ public class FormAuthModule extends TomcatAuthModule {
         // If we're caching principals we no longer need getPrincipal the
         // username
         // and password in the session, so remove them
-        if (isCache()) {
+        if (cachePrincipalsInSession) {
             session.removeNote(Constants.SESS_USERNAME_NOTE);
             session.removeNote(Constants.SESS_PASSWORD_NOTE);
         }
@@ -321,11 +319,6 @@ public class FormAuthModule extends TomcatAuthModule {
         GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject, context
                 .getRealm().getRoles(principal));
         handler.handle(new Callback[] { principalCallback, groupCallback });
-    }
-
-
-    private boolean isCache() {
-        return true;
     }
 
 
