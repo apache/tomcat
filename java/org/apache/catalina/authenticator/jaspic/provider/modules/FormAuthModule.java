@@ -204,11 +204,12 @@ public class FormAuthModule extends TomcatAuthModule {
         // credentials
         // and redirect to the error page if they are not correct
         request.getResponse().sendAcknowledgement();
-        Realm realm = context.getRealm();
+
         // TODO fix character encoding
         // if (characterEncoding != null) {
         // request.setCharacterEncoding(characterEncoding);
         // }
+
         String username = request.getParameter(Constants.FORM_USERNAME);
         String password = request.getParameter(Constants.FORM_PASSWORD);
         if (log.isDebugEnabled()) {
@@ -228,25 +229,7 @@ public class FormAuthModule extends TomcatAuthModule {
             session = request.getSessionInternal(false);
         }
         if (session == null) {
-            // if (containerLog.isDebugEnabled()) {
-            // containerLog.debug
-            // ("User took so long to log on the session expired");
-            // }
-            if (landingPage == null) {
-                response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,
-                        sm.getString("authenticator.sessionExpired"));
-            } else {
-                // Make the authenticator think the user originally
-                // requested
-                // the landing page
-                String uri = request.getContextPath() + landingPage;
-                SavedRequest saved = new SavedRequest();
-                saved.setMethod("GET");
-                saved.setRequestURI(uri);
-                saved.setDecodedRequestURI(uri);
-                request.getSessionInternal(true).setNote(Constants.FORM_REQUEST_NOTE, saved);
-                response.sendRedirect(response.encodeRedirectURL(uri));
-            }
+            handleSessionExpired(request, response);
             return AuthStatus.FAILURE;
         }
 
@@ -292,6 +275,25 @@ public class FormAuthModule extends TomcatAuthModule {
             }
         }
         return AuthStatus.FAILURE;
+    }
+
+
+    private void handleSessionExpired(Request request, HttpServletResponse response)
+            throws IOException {
+        if (landingPage == null) {
+            response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,
+                    sm.getString("authenticator.sessionExpired"));
+            return;
+        }
+        // Make the authenticator think the user originally
+        // requested
+        // the landing page
+        String uri = request.getContextPath() + landingPage;
+        SavedRequest saved = new SavedRequest();
+        saved.setMethod("GET");
+        saved.setRequestURI(uri);
+        saved.setDecodedRequestURI(uri);
+        request.getSessionInternal(true).setNote(Constants.FORM_REQUEST_NOTE, saved);
     }
 
 
