@@ -105,13 +105,10 @@ public class FormAuthModule extends TomcatAuthModule {
             UnsupportedCallbackException {
         Request request = (Request) messageInfo.getRequestMessage();
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
-        // References to objects we will need later
-        Session session = null;
-        Principal principal = null;
 
         // Have we authenticated this user before but have caching disabled?
         if (!isCache()) {
-            session = request.getSessionInternal(true);
+            Session session = request.getSessionInternal(true);
             if (log.isDebugEnabled()) {
                 log.debug("Checking for reauthenticate in session " + session);
             }
@@ -128,10 +125,10 @@ public class FormAuthModule extends TomcatAuthModule {
                 if (!passwordCallback.getResult()) {
                     forwardToErrorPage(request, response);
                 }
-                principal = getPrincipal(passwordCallback);
+                Principal principal = getPrincipal(passwordCallback);
                 if (principal != null) {
                     session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
-                    if (!matchRequest(request)) {
+                    if (!isMatchingSavedRequest(request)) {
                         handlePrincipalCallbacks(clientSubject, principal);
                         return AuthStatus.SUCCESS;
                     }
@@ -145,36 +142,10 @@ public class FormAuthModule extends TomcatAuthModule {
         // Is this the re-submit of the original request URI after
         // successful
         // authentication? If so, forward the *original* request instead.
-        if (matchRequest(request)) {
-            session = request.getSessionInternal(true);
-            if (log.isDebugEnabled()) {
-                log.debug("Restore request from session '" + session.getIdInternal() + "'");
-            }
-            principal = (Principal) session.getNote(Constants.FORM_PRINCIPAL_NOTE);
-            handlePrincipalCallbacks(clientSubject, principal);
-
-            // If we're caching principals we no longer needgetPrincipal the
-            // username
-            // and password in the session, so remove them
-            if (isCache()) {
-                session.removeNote(Constants.SESS_USERNAME_NOTE);
-                session.removeNote(Constants.SESS_PASSWORD_NOTE);
-            }
-            if (restoreRequest(request, session)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Proceed to restored request");
-                }
-                return AuthStatus.SUCCESS;
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Restore of original request failed");
-                }
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                return AuthStatus.FAILURE;
-            }
+        if (isMatchingSavedRequest(request)) {
+            return submitSavedRequest(clientSubject, request, response);
         }
 
-        // Acquire references to objects we will need to evaluate
         String contextPath = request.getContextPath();
         String requestURI = request.getDecodedRequestURI();
 
@@ -187,6 +158,37 @@ public class FormAuthModule extends TomcatAuthModule {
         }
 
         return handleLoginAction(request, response);
+    }
+
+
+    private AuthStatus submitSavedRequest(Subject clientSubject, Request request,
+            HttpServletResponse response) throws IOException, UnsupportedCallbackException {
+        Session session = request.getSessionInternal(true);
+        if (log.isDebugEnabled()) {
+            log.debug("Restore request from session '" + session.getIdInternal() + "'");
+        }
+        Principal principal = (Principal) session.getNote(Constants.FORM_PRINCIPAL_NOTE);
+        handlePrincipalCallbacks(clientSubject, principal);
+
+        // If we're caching principals we no longer need getPrincipal the
+        // username
+        // and password in the session, so remove them
+        if (isCache()) {
+            session.removeNote(Constants.SESS_USERNAME_NOTE);
+            session.removeNote(Constants.SESS_PASSWORD_NOTE);
+        }
+        if (restoreRequest(request, session)) {
+            if (log.isDebugEnabled()) {
+                log.debug("Proceed to restored request");
+            }
+            return AuthStatus.SUCCESS;
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Restore of original request failed");
+            }
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return AuthStatus.FAILURE;
+        }
     }
 
 
@@ -467,7 +469,7 @@ public class FormAuthModule extends TomcatAuthModule {
      *
      * @param request The request to be verified
      */
-    protected boolean matchRequest(Request request) {
+    protected boolean isMatchingSavedRequest(Request request) {
         // Has a session been created?
         Session session = request.getSessionInternal(false);
         if (session == null) {
