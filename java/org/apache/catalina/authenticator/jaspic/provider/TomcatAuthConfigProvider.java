@@ -26,24 +26,20 @@ import javax.security.auth.message.config.ClientAuthConfig;
 import javax.security.auth.message.config.ServerAuthConfig;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Realm;
-import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
 /**
- * Tomcat's context based JASPIC authentication provider. It returns authentication
- * modules depending on context login-config setup.
+ * Tomcat's context based JASPIC authentication provider. It returns
+ * authentication modules depending on context login-config setup.
  */
 public class TomcatAuthConfigProvider implements AuthConfigProvider {
 
     private Map<String, String> providerProperties;
     private ServerAuthConfig serverAuthConfig;
-    private Realm realm;
-    private LoginConfig loginConfig;
+    private Context context;
 
 
     public TomcatAuthConfigProvider(Context context) {
-        this.realm = context.getRealm();
-        this.loginConfig = context.getLoginConfig();
+        this.context = context;
     }
 
 
@@ -66,7 +62,7 @@ public class TomcatAuthConfigProvider implements AuthConfigProvider {
     public synchronized ServerAuthConfig getServerAuthConfig(String layer, String appContext,
             CallbackHandler handler) throws AuthException {
         if (this.serverAuthConfig == null) {
-            this.serverAuthConfig = new TomcatAuthConfig(layer, appContext, handler, realm, loginConfig);
+            this.serverAuthConfig = new TomcatAuthConfig(layer, appContext, handler, context);
         }
         return this.serverAuthConfig;
     }

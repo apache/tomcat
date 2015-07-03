@@ -25,6 +25,7 @@ import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.module.ServerAuthModule;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -48,6 +49,13 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
 
     protected CallbackHandler handler;
 
+    protected Context context;
+
+
+    public TomcatAuthModule(Context context) {
+        this.context = context;
+    }
+
 
     protected boolean isMandatory(MessageInfo messageInfo) {
         String mandatory = (String) messageInfo.getMap().get(MessageInfoImpl.IS_MANDATORY);
@@ -55,13 +63,13 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
     }
 
 
-     @SuppressWarnings("rawtypes")
-     @Override
-     public final void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-             CallbackHandler handler, Map options) throws AuthException {
-         this.handler = handler;
-         this.realmName = (String) options.get(REALM_NAME);
-         initializeModule(requestPolicy, responsePolicy, handler, options);
+    @SuppressWarnings("rawtypes")
+    @Override
+    public final void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
+            CallbackHandler handler, Map options) throws AuthException {
+        this.handler = handler;
+        this.realmName = (String) options.get(REALM_NAME);
+        initializeModule(requestPolicy, responsePolicy, handler, options);
     }
 
 
