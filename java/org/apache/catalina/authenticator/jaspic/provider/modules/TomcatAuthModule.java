@@ -16,13 +16,20 @@
  */
 package org.apache.catalina.authenticator.jaspic.provider.modules;
 
+import java.io.IOException;
+import java.security.Principal;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
+import javax.security.auth.message.callback.CallerPrincipalCallback;
+import javax.security.auth.message.callback.GroupPrincipalCallback;
 import javax.security.auth.message.module.ServerAuthModule;
 
 import org.apache.catalina.Context;
@@ -94,4 +101,22 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
     public abstract void initializeModule(MessagePolicy requestPolicy,
             MessagePolicy responsePolicy, CallbackHandler handler, Map options)
             throws AuthException;
+
+
+    /**
+     * Convert Tomcat's principal to JAAS subject using JASPIC callbacks
+     *
+     * @param clientSubject
+     * @param principal
+     * @throws IOException
+     * @throws UnsupportedCallbackException
+     */
+    protected void handlePrincipalCallbacks(Subject clientSubject, Principal principal)
+            throws IOException, UnsupportedCallbackException {
+        CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(clientSubject,
+                principal);
+        String[] roles = context.getRealm().getRoles(principal);
+        GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject, roles);
+        handler.handle(new Callback[] { principalCallback, groupCallback });
+    }
 }

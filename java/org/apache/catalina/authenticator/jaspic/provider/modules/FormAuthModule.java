@@ -25,15 +25,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
-import javax.security.auth.message.callback.CallerPrincipalCallback;
-import javax.security.auth.message.callback.GroupPrincipalCallback;
 import javax.security.auth.message.callback.PasswordValidationCallback;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.Cookie;
@@ -309,16 +306,6 @@ public class FormAuthModule extends TomcatAuthModule {
         saved.setRequestURI(uri);
         saved.setDecodedRequestURI(uri);
         request.getSessionInternal(true).setNote(Constants.FORM_REQUEST_NOTE, saved);
-    }
-
-
-    private void handlePrincipalCallbacks(Subject clientSubject, Principal principal)
-            throws IOException, UnsupportedCallbackException {
-        CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(clientSubject,
-                principal);
-        GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject, context
-                .getRealm().getRoles(principal));
-        handler.handle(new Callback[] { principalCallback, groupCallback });
     }
 
 

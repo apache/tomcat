@@ -29,8 +29,6 @@ import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
-import javax.security.auth.message.callback.CallerPrincipalCallback;
-import javax.security.auth.message.callback.GroupPrincipalCallback;
 import javax.security.auth.message.callback.PasswordValidationCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -91,14 +89,7 @@ public class BasicAuthModule extends TomcatAuthModule {
             if (!passwordCallback.getResult()) {
                 sendUnauthorizedError(response, realmName);
             }
-
-            GenericPrincipal principal = getPrincipal(passwordCallback);
-
-            CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(clientSubject,
-                    principal);
-            GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject,
-                    principal.getRoles());
-            handler.handle(new Callback[] { principalCallback, groupCallback });
+            handlePrincipalCallbacks(clientSubject, getPrincipal(passwordCallback));
             return AuthStatus.SUCCESS;
 
         } catch (Exception e) {

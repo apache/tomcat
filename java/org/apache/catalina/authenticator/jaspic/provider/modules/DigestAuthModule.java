@@ -25,15 +25,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
-import javax.security.auth.message.callback.CallerPrincipalCallback;
-import javax.security.auth.message.callback.GroupPrincipalCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -259,11 +256,7 @@ public class DigestAuthModule extends TomcatAuthModule {
         }
 
         try {
-            CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(clientSubject,
-                    principal);
-            String[] roles = realm.getRoles(principal);
-            GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject, roles);
-            handler.handle(new Callback[] { principalCallback, groupCallback });
+            handlePrincipalCallbacks(clientSubject, principal);
         } catch (IOException | UnsupportedCallbackException e) {
             throw new AuthException(e.getMessage());
         }
