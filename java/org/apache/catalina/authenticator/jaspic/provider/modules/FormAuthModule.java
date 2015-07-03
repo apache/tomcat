@@ -132,11 +132,7 @@ public class FormAuthModule extends TomcatAuthModule {
                 if (principal != null) {
                     session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
                     if (!matchRequest(request)) {
-                        CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(
-                                clientSubject, principal);
-                        GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(
-                                clientSubject, context.getRealm().getRoles(principal));
-                        handler.handle(new Callback[] { principalCallback, groupCallback });
+                        handlePrincipalCallbacks(clientSubject, principal);
                         return AuthStatus.SUCCESS;
                     }
                 }
@@ -155,11 +151,7 @@ public class FormAuthModule extends TomcatAuthModule {
                 log.debug("Restore request from session '" + session.getIdInternal() + "'");
             }
             principal = (Principal) session.getNote(Constants.FORM_PRINCIPAL_NOTE);
-            CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(clientSubject,
-                    principal);
-            GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject,
-                    realm.getRoles(principal));
-            handler.handle(new Callback[] { principalCallback, groupCallback });
+            handlePrincipalCallbacks(clientSubject, principal);
 
             // If we're caching principals we no longer needgetPrincipal the
             // username
@@ -189,7 +181,6 @@ public class FormAuthModule extends TomcatAuthModule {
         // Is this the action request from the login page?
         boolean loginAction = requestURI.startsWith(contextPath)
                 && requestURI.endsWith(Constants.FORM_ACTION);
-
 
         // No -- Save this request and redirect to the form login page
         if (!loginAction) {
@@ -304,6 +295,16 @@ public class FormAuthModule extends TomcatAuthModule {
     }
 
 
+    private void handlePrincipalCallbacks(Subject clientSubject, Principal principal)
+            throws IOException, UnsupportedCallbackException {
+        CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(clientSubject,
+                principal);
+        GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject, context
+                .getRealm().getRoles(principal));
+        handler.handle(new Callback[] { principalCallback, groupCallback });
+    }
+
+
     private boolean isCache() {
         return true;
     }
@@ -343,7 +344,8 @@ public class FormAuthModule extends TomcatAuthModule {
      *             to {@link HttpServletResponse#sendError(int, String)} throws
      *             an {@link IOException}
      */
-    protected void forwardToLoginPage(Request request, HttpServletResponse response) throws IOException {
+    protected void forwardToLoginPage(Request request, HttpServletResponse response)
+            throws IOException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("formAuthenticator.forwardLogin", request.getRequestURI(),
