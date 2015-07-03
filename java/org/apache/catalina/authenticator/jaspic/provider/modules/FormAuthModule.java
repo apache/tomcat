@@ -69,9 +69,14 @@ public class FormAuthModule extends TomcatAuthModule {
 
     private String landingPage;
 
+    private Realm realm;
+    private LoginConfig loginConfig;
+
 
     public FormAuthModule(Context context) {
         super(context);
+        this.realm = context.getRealm();
+        this.loginConfig = context.getLoginConfig();
     }
 
 
@@ -121,7 +126,7 @@ public class FormAuthModule extends TomcatAuthModule {
                 handler.handle(new Callback[] { passwordCallback });
 
                 if (!passwordCallback.getResult()) {
-                    forwardToErrorPage(request, response, context.getLoginConfig());
+                    forwardToErrorPage(request, response);
                 }
                 principal = getPrincipal(passwordCallback);
                 if (principal != null) {
@@ -153,7 +158,7 @@ public class FormAuthModule extends TomcatAuthModule {
             CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(clientSubject,
                     principal);
             GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject,
-                    context.getRealm().getRoles(principal));
+                    realm.getRoles(principal));
             handler.handle(new Callback[] { principalCallback, groupCallback });
 
             // If we're caching principals we no longer needgetPrincipal the
@@ -185,7 +190,6 @@ public class FormAuthModule extends TomcatAuthModule {
         boolean loginAction = requestURI.startsWith(contextPath)
                 && requestURI.endsWith(Constants.FORM_ACTION);
 
-        LoginConfig config = context.getLoginConfig();
 
         // No -- Save this request and redirect to the form login page
         if (!loginAction) {
@@ -201,7 +205,7 @@ public class FormAuthModule extends TomcatAuthModule {
                         sm.getString("authenticator.requestBodyTooBig"));
                 return AuthStatus.FAILURE;
             }
-            forwardToLoginPage(request, response, config);
+            forwardToLoginPage(request, response);
             return AuthStatus.SEND_CONTINUE;
         }
 
@@ -221,7 +225,7 @@ public class FormAuthModule extends TomcatAuthModule {
         }
         principal = realm.authenticate(username, password);
         if (principal == null) {
-            forwardToErrorPage(request, response, config);
+            forwardToErrorPage(request, response);
             return AuthStatus.FAILURE;
         }
 
@@ -335,21 +339,18 @@ public class FormAuthModule extends TomcatAuthModule {
      *
      * @param request Request we are processing
      * @param response Response we are populating
-     * @param config Login configuration describing how authentication should be
-     *            performed
      * @throws IOException If the forward to the login page fails and the call
      *             to {@link HttpServletResponse#sendError(int, String)} throws
      *             an {@link IOException}
      */
-    protected void forwardToLoginPage(Request request, HttpServletResponse response,
-            LoginConfig config) throws IOException {
+    protected void forwardToLoginPage(Request request, HttpServletResponse response) throws IOException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("formAuthenticator.forwardLogin", request.getRequestURI(),
-                    request.getMethod(), config.getLoginPage(), context.getName()));
+                    request.getMethod(), loginConfig.getLoginPage(), context.getName()));
         }
 
-        String loginPage = config.getLoginPage();
+        String loginPage = loginConfig.getLoginPage();
         if (loginPage == null || loginPage.length() == 0) {
             String msg = sm.getString("formAuthenticator.noLoginPage", context.getName());
             log.warn(msg);
@@ -398,17 +399,15 @@ public class FormAuthModule extends TomcatAuthModule {
      * Called to forward to the error page
      *
      * @param request Request we are processing
-     * @param response Response we are populating
-     * @param config Login configuration describing how authentication should be
-     *            performed
-     * @throws IOException If the forward to the error page fails and the call
-     *             to {@link HttpServletResponse#sendError(int, String)} throws
-     *             an {@link IOException}
+     * @param response Response we are populating @throws IOException If the
+     *            forward to the error page fails and the call to
+     *            {@link HttpServletResponse#sendError(int, String)} throws an
+     *            {@link IOException}
      */
-    protected void forwardToErrorPage(Request request, HttpServletResponse response,
-            LoginConfig config) throws IOException {
+    protected void forwardToErrorPage(Request request, HttpServletResponse response)
+            throws IOException {
 
-        String errorPage = config.getErrorPage();
+        String errorPage = loginConfig.getErrorPage();
         if (errorPage == null || errorPage.length() == 0) {
             String msg = sm.getString("formAuthenticator.noErrorPage", context.getName());
             log.warn(msg);
@@ -417,7 +416,7 @@ public class FormAuthModule extends TomcatAuthModule {
         }
 
         RequestDispatcher disp = context.getServletContext().getRequestDispatcher(
-                config.getErrorPage());
+                loginConfig.getErrorPage());
         try {
             if (context.fireRequestInitEvent(request)) {
                 disp.forward(request.getRequest(), response);
