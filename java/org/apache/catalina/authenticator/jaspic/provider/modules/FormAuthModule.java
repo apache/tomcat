@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
@@ -89,213 +90,217 @@ public class FormAuthModule extends TomcatAuthModule {
             return AuthStatus.SUCCESS;
         }
         try {
-
-            Request request = (Request) messageInfo.getRequestMessage();
-            HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
-            // References to objects we will need later
-            Session session = null;
-            Principal principal = null;
-
-            // Have we authenticated this user before but have caching disabled?
-            if (!isCache()) {
-                session = request.getSessionInternal(true);
-                if (log.isDebugEnabled()) {
-                    log.debug("Checking for reauthenticate in session " + session);
-                }
-                String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
-                String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
-                if ((username != null) && (password != null)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Reauthenticating username '" + username + "'");
-                    }
-                    PasswordValidationCallback passwordCallback = new PasswordValidationCallback(
-                            clientSubject, username, password.toCharArray());
-                    handler.handle(new Callback[] { passwordCallback });
-
-                    if (!passwordCallback.getResult()) {
-                        forwardToErrorPage(request, response, context.getLoginConfig());
-                    }
-                    principal = getPrincipal(passwordCallback);
-                    if (principal != null) {
-                        session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
-                        if (!matchRequest(request)) {
-                            CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(
-                                    clientSubject, principal);
-                            GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(
-                                    clientSubject, context.getRealm().getRoles(principal));
-                            handler.handle(new Callback[] { principalCallback, groupCallback });
-                            return AuthStatus.SUCCESS;
-                        }
-                    }
-                    if (log.isDebugEnabled()) {
-                        log.debug("Reauthentication failed, proceed normally");
-                    }
-                }
-            }
-
-            // Is this the re-submit of the original request URI after
-            // successful
-            // authentication? If so, forward the *original* request instead.
-            if (matchRequest(request)) {
-                session = request.getSessionInternal(true);
-                if (log.isDebugEnabled()) {
-                    log.debug("Restore request from session '" + session.getIdInternal() + "'");
-                }
-                principal = (Principal) session.getNote(Constants.FORM_PRINCIPAL_NOTE);
-                CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(
-                        clientSubject, principal);
-                GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject,
-                        context.getRealm().getRoles(principal));
-                handler.handle(new Callback[] { principalCallback, groupCallback });
-
-                // If we're caching principals we no longer needgetPrincipal the
-                // username
-                // and password in the session, so remove them
-                if (isCache()) {
-                    session.removeNote(Constants.SESS_USERNAME_NOTE);
-                    session.removeNote(Constants.SESS_PASSWORD_NOTE);
-                }
-                if (restoreRequest(request, session)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Proceed to restored request");
-                    }
-                    return AuthStatus.SUCCESS;
-                } else {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Restore of original request failed");
-                    }
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    return AuthStatus.FAILURE;
-                }
-            }
-
-            // Acquire references to objects we will need to evaluate
-            MessageBytes uriMB = MessageBytes.newInstance();
-            CharChunk uriCC = uriMB.getCharChunk();
-            uriCC.setLimit(-1);
-            String contextPath = request.getContextPath();
-            String requestURI = request.getDecodedRequestURI();
-
-            // Is this the action request from the login page?
-            boolean loginAction = requestURI.startsWith(contextPath)
-                    && requestURI.endsWith(Constants.FORM_ACTION);
-
-            LoginConfig config = context.getLoginConfig();
-
-            // No -- Save this request and redirect to the form login page
-            if (!loginAction) {
-                session = request.getSessionInternal(true);
-                if (log.isDebugEnabled()) {
-                    log.debug("Save request in session '" + session.getIdInternal() + "'");
-                }
-                try {
-                    saveRequest(request, session);
-                } catch (IOException ioe) {
-                    log.debug("Request body too big to save during authentication");
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                            sm.getString("authenticator.requestBodyTooBig"));
-                    return AuthStatus.FAILURE;
-                }
-                forwardToLoginPage(request, response, config);
-                return AuthStatus.SEND_CONTINUE;
-            }
-
-            // Yes -- Acknowledge the request, validate the specified
-            // credentials
-            // and redirect to the error page if they are not correct
-            request.getResponse().sendAcknowledgement();
-            Realm realm = context.getRealm();
-            // TODO fix character encoding
-            // if (characterEncoding != null) {
-            // request.setCharacterEncoding(characterEncoding);
-            // }
-            String username = request.getParameter(Constants.FORM_USERNAME);
-            String password = request.getParameter(Constants.FORM_PASSWORD);
-            if (log.isDebugEnabled()) {
-                log.debug("Authenticating username '" + username + "'");
-            }
-            principal = realm.authenticate(username, password);
-            if (principal == null) {
-                forwardToErrorPage(request, response, config);
-                return AuthStatus.FAILURE;
-            }
-
-            if (log.isDebugEnabled()) {
-                log.debug("Authentication of '" + username + "' was successful");
-            }
-
-            if (session == null) {
-                session = request.getSessionInternal(false);
-            }
-            if (session == null) {
-                // if (containerLog.isDebugEnabled()) {
-                // containerLog.debug
-                // ("User took so long to log on the session expired");
-                // }
-                if (landingPage == null) {
-                    response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,
-                            sm.getString("authenticator.sessionExpired"));
-                } else {
-                    // Make the authenticator think the user originally
-                    // requested
-                    // the landing page
-                    String uri = request.getContextPath() + landingPage;
-                    SavedRequest saved = new SavedRequest();
-                    saved.setMethod("GET");
-                    saved.setRequestURI(uri);
-                    saved.setDecodedRequestURI(uri);
-                    request.getSessionInternal(true).setNote(Constants.FORM_REQUEST_NOTE, saved);
-                    response.sendRedirect(response.encodeRedirectURL(uri));
-                }
-                return AuthStatus.FAILURE;
-            }
-
-            // Save the authenticated Principal in our session
-            session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
-
-            // Save the username and password as well
-            session.setNote(Constants.SESS_USERNAME_NOTE, username);
-            session.setNote(Constants.SESS_PASSWORD_NOTE, password);
-
-            // Redirect the user to the original request URI (which will cause
-            // the original request to be restored)
-            requestURI = savedRequestURL(session);
-            if (log.isDebugEnabled()) {
-                log.debug("Redirecting to original '" + requestURI + "'");
-            }
-            if (requestURI == null) {
-                if (landingPage == null) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                            sm.getString("authenticator.formlogin"));
-                } else {
-                    // Make the authenticator think the user originally
-                    // requested
-                    // the landing page
-                    String uri = request.getContextPath() + landingPage;
-                    SavedRequest saved = new SavedRequest();
-                    saved.setMethod("GET");
-                    saved.setRequestURI(uri);
-                    saved.setDecodedRequestURI(uri);
-                    session.setNote(Constants.FORM_REQUEST_NOTE, saved);
-                    response.sendRedirect(response.encodeRedirectURL(uri));
-                }
-            } else {
-                // Until the Servlet API allows specifying the type of redirect
-                // to
-                // use.
-                Response internalResponse = request.getResponse();
-                String location = response.encodeRedirectURL(requestURI);
-                if ("HTTP/1.1".equals(request.getProtocol())) {
-                    internalResponse.sendRedirect(location, HttpServletResponse.SC_SEE_OTHER);
-                } else {
-                    internalResponse.sendRedirect(location, HttpServletResponse.SC_FOUND);
-                }
-            }
-            return AuthStatus.FAILURE;
+            return validate(messageInfo, clientSubject);
         } catch (Exception e) {
             throw new AuthException(e.getMessage());
         }
+    }
 
+
+    private AuthStatus validate(MessageInfo messageInfo, Subject clientSubject) throws IOException,
+            UnsupportedCallbackException {
+        Request request = (Request) messageInfo.getRequestMessage();
+        HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
+        // References to objects we will need later
+        Session session = null;
+        Principal principal = null;
+
+        // Have we authenticated this user before but have caching disabled?
+        if (!isCache()) {
+            session = request.getSessionInternal(true);
+            if (log.isDebugEnabled()) {
+                log.debug("Checking for reauthenticate in session " + session);
+            }
+            String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
+            String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
+            if ((username != null) && (password != null)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Reauthenticating username '" + username + "'");
+                }
+                PasswordValidationCallback passwordCallback = new PasswordValidationCallback(
+                        clientSubject, username, password.toCharArray());
+                handler.handle(new Callback[] { passwordCallback });
+
+                if (!passwordCallback.getResult()) {
+                    forwardToErrorPage(request, response, context.getLoginConfig());
+                }
+                principal = getPrincipal(passwordCallback);
+                if (principal != null) {
+                    session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
+                    if (!matchRequest(request)) {
+                        CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(
+                                clientSubject, principal);
+                        GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(
+                                clientSubject, context.getRealm().getRoles(principal));
+                        handler.handle(new Callback[] { principalCallback, groupCallback });
+                        return AuthStatus.SUCCESS;
+                    }
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug("Reauthentication failed, proceed normally");
+                }
+            }
+        }
+
+        // Is this the re-submit of the original request URI after
+        // successful
+        // authentication? If so, forward the *original* request instead.
+        if (matchRequest(request)) {
+            session = request.getSessionInternal(true);
+            if (log.isDebugEnabled()) {
+                log.debug("Restore request from session '" + session.getIdInternal() + "'");
+            }
+            principal = (Principal) session.getNote(Constants.FORM_PRINCIPAL_NOTE);
+            CallerPrincipalCallback principalCallback = new CallerPrincipalCallback(clientSubject,
+                    principal);
+            GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject,
+                    context.getRealm().getRoles(principal));
+            handler.handle(new Callback[] { principalCallback, groupCallback });
+
+            // If we're caching principals we no longer needgetPrincipal the
+            // username
+            // and password in the session, so remove them
+            if (isCache()) {
+                session.removeNote(Constants.SESS_USERNAME_NOTE);
+                session.removeNote(Constants.SESS_PASSWORD_NOTE);
+            }
+            if (restoreRequest(request, session)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Proceed to restored request");
+                }
+                return AuthStatus.SUCCESS;
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Restore of original request failed");
+                }
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return AuthStatus.FAILURE;
+            }
+        }
+
+        // Acquire references to objects we will need to evaluate
+        MessageBytes uriMB = MessageBytes.newInstance();
+        CharChunk uriCC = uriMB.getCharChunk();
+        uriCC.setLimit(-1);
+        String contextPath = request.getContextPath();
+        String requestURI = request.getDecodedRequestURI();
+
+        // Is this the action request from the login page?
+        boolean loginAction = requestURI.startsWith(contextPath)
+                && requestURI.endsWith(Constants.FORM_ACTION);
+
+        LoginConfig config = context.getLoginConfig();
+
+        // No -- Save this request and redirect to the form login page
+        if (!loginAction) {
+            session = request.getSessionInternal(true);
+            if (log.isDebugEnabled()) {
+                log.debug("Save request in session '" + session.getIdInternal() + "'");
+            }
+            try {
+                saveRequest(request, session);
+            } catch (IOException ioe) {
+                log.debug("Request body too big to save during authentication");
+                response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                        sm.getString("authenticator.requestBodyTooBig"));
+                return AuthStatus.FAILURE;
+            }
+            forwardToLoginPage(request, response, config);
+            return AuthStatus.SEND_CONTINUE;
+        }
+
+        // Yes -- Acknowledge the request, validate the specified
+        // credentials
+        // and redirect to the error page if they are not correct
+        request.getResponse().sendAcknowledgement();
+        Realm realm = context.getRealm();
+        // TODO fix character encoding
+        // if (characterEncoding != null) {
+        // request.setCharacterEncoding(characterEncoding);
+        // }
+        String username = request.getParameter(Constants.FORM_USERNAME);
+        String password = request.getParameter(Constants.FORM_PASSWORD);
+        if (log.isDebugEnabled()) {
+            log.debug("Authenticating username '" + username + "'");
+        }
+        principal = realm.authenticate(username, password);
+        if (principal == null) {
+            forwardToErrorPage(request, response, config);
+            return AuthStatus.FAILURE;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug("Authentication of '" + username + "' was successful");
+        }
+
+        if (session == null) {
+            session = request.getSessionInternal(false);
+        }
+        if (session == null) {
+            // if (containerLog.isDebugEnabled()) {
+            // containerLog.debug
+            // ("User took so long to log on the session expired");
+            // }
+            if (landingPage == null) {
+                response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT,
+                        sm.getString("authenticator.sessionExpired"));
+            } else {
+                // Make the authenticator think the user originally
+                // requested
+                // the landing page
+                String uri = request.getContextPath() + landingPage;
+                SavedRequest saved = new SavedRequest();
+                saved.setMethod("GET");
+                saved.setRequestURI(uri);
+                saved.setDecodedRequestURI(uri);
+                request.getSessionInternal(true).setNote(Constants.FORM_REQUEST_NOTE, saved);
+                response.sendRedirect(response.encodeRedirectURL(uri));
+            }
+            return AuthStatus.FAILURE;
+        }
+
+        // Save the authenticated Principal in our session
+        session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
+
+        // Save the username and password as well
+        session.setNote(Constants.SESS_USERNAME_NOTE, username);
+        session.setNote(Constants.SESS_PASSWORD_NOTE, password);
+
+        // Redirect the user to the original request URI (which will cause
+        // the original request to be restored)
+        requestURI = savedRequestURL(session);
+        if (log.isDebugEnabled()) {
+            log.debug("Redirecting to original '" + requestURI + "'");
+        }
+        if (requestURI == null) {
+            if (landingPage == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        sm.getString("authenticator.formlogin"));
+            } else {
+                // Make the authenticator think the user originally
+                // requested
+                // the landing page
+                String uri = request.getContextPath() + landingPage;
+                SavedRequest saved = new SavedRequest();
+                saved.setMethod("GET");
+                saved.setRequestURI(uri);
+                saved.setDecodedRequestURI(uri);
+                session.setNote(Constants.FORM_REQUEST_NOTE, saved);
+                response.sendRedirect(response.encodeRedirectURL(uri));
+            }
+        } else {
+            // Until the Servlet API allows specifying the type of redirect
+            // to
+            // use.
+            Response internalResponse = request.getResponse();
+            String location = response.encodeRedirectURL(requestURI);
+            if ("HTTP/1.1".equals(request.getProtocol())) {
+                internalResponse.sendRedirect(location, HttpServletResponse.SC_SEE_OTHER);
+            } else {
+                internalResponse.sendRedirect(location, HttpServletResponse.SC_FOUND);
+            }
+        }
+        return AuthStatus.FAILURE;
     }
 
 
