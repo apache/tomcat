@@ -106,32 +106,8 @@ public class FormAuthModule extends TomcatAuthModule {
         Request request = (Request) messageInfo.getRequestMessage();
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
 
-        // Have we authenticated this user before but have caching disabled?
-        if (!cachePrincipalsInSession) {
-            Session session = request.getSessionInternal(true);
-            if (log.isDebugEnabled()) {
-                log.debug("Checking for reauthenticate in session " + session);
-            }
-            String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
-            String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
-            if ((username != null) && (password != null)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Reauthenticating username '" + username + "'");
-                }
-                Principal principal = realm.authenticate(username, password);
-                if (principal == null) {
-                    forwardToErrorPage(request, response);
-                    return AuthStatus.FAILURE;
-                }
-
-                session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
-                if (isMatchingSavedRequest(request)) {
-                    return submitSavedRequest(clientSubject, request, response);
-                }
-
-                handlePrincipalCallbacks(clientSubject, principal);
-                return AuthStatus.SUCCESS;
-            }
+        if (!cachePrincipalsInSession && isUserAuthenicatedBefore(request)) {
+            return handleSavedCredentials(clientSubject, request, response);
         }
 
         // Is this the re-submit of the original request URI after
@@ -146,6 +122,43 @@ public class FormAuthModule extends TomcatAuthModule {
         }
 
         return handleLoginAction(request, response);
+    }
+
+
+    private AuthStatus handleSavedCredentials(Subject clientSubject, Request request,
+            HttpServletResponse response) throws IOException, UnsupportedCallbackException {
+        Session session = request.getSessionInternal(true);
+        if (log.isDebugEnabled()) {
+            log.debug("Checking for reauthenticate in session " + session);
+        }
+
+        String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
+        String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
+        if (log.isDebugEnabled()) {
+            log.debug("Reauthenticating username '" + username + "'");
+        }
+
+        Principal principal = realm.authenticate(username, password);
+        if (principal == null) {
+            forwardToErrorPage(request, response);
+            return AuthStatus.FAILURE;
+        }
+
+        session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
+        if (isMatchingSavedRequest(request)) {
+            return submitSavedRequest(clientSubject, request, response);
+        }
+
+        handlePrincipalCallbacks(clientSubject, principal);
+        return AuthStatus.SUCCESS;
+    }
+
+
+    private boolean isUserAuthenicatedBefore(Request request) {
+        Session session = request.getSessionInternal(true);
+        String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
+        String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
+        return username != null && password != null;
     }
 
 
