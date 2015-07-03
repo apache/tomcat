@@ -29,6 +29,7 @@ import javax.security.auth.message.config.ServerAuthContext;
 import org.apache.catalina.Realm;
 import org.apache.catalina.authenticator.jaspic.provider.modules.BasicAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.DigestAuthModule;
+import org.apache.catalina.authenticator.jaspic.provider.modules.FormAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.TomcatAuthModule;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.res.StringManager;
@@ -111,6 +112,9 @@ public class TomcatAuthConfig implements ServerAuthConfig {
         }
         case "DIGEST": {
             return new DigestAuthModule(realm);
+        }
+        case "FORM": {
+            return new FormAuthModule();
         }
         default: {
             throw new AuthException(
