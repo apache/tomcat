@@ -37,6 +37,7 @@ import javax.security.auth.message.callback.GroupPrincipalCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.Realm;
 import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.juli.logging.Log;
@@ -109,8 +110,9 @@ public class DigestAuthModule extends TomcatAuthModule {
 
     // ------------------------------------------------------------- Properties
 
-    public DigestAuthModule(Realm realm) {
-        this.realm = realm;
+    public DigestAuthModule(Context context) {
+        super(context);
+        this.realm = context.getRealm();
     }
 
 

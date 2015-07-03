@@ -35,6 +35,7 @@ import javax.security.auth.message.callback.PasswordValidationCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -47,6 +48,12 @@ public class BasicAuthModule extends TomcatAuthModule {
 
     private Class<?>[] supportedMessageTypes = new Class[] { HttpServletRequest.class,
             HttpServletResponse.class };
+
+
+    public BasicAuthModule(Context context) {
+        super(context);
+    }
+
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -114,8 +121,8 @@ public class BasicAuthModule extends TomcatAuthModule {
 
 
     private GenericPrincipal getPrincipal(PasswordValidationCallback passwordCallback) {
-        Iterator<Object> credentials =
-                passwordCallback.getSubject().getPrivateCredentials().iterator();
+        Iterator<Object> credentials = passwordCallback.getSubject().getPrivateCredentials()
+                .iterator();
         return (GenericPrincipal) credentials.next();
     }
 
@@ -147,7 +154,6 @@ public class BasicAuthModule extends TomcatAuthModule {
         return supportedMessageTypes;
     }
 
-
     /**
      * Parser for an HTTP Authorization header for BASIC authentication as per
      * RFC 2617 section 2, and the Base64 encoded credentials as per RFC 2045
@@ -167,14 +173,15 @@ public class BasicAuthModule extends TomcatAuthModule {
         private String username = null;
         private String password = null;
 
+
         /**
          * Parse the HTTP Authorization header for BASIC authentication as per
          * RFC 2617 section 2, and the Base64 encoded credentials as per RFC
          * 2045 section 6.8.
          *
          * @param input The header value to parse in-place
-         * @throws IllegalArgumentException If the header does not conform to RFC
-         *             2617
+         * @throws IllegalArgumentException If the header does not conform to
+         *             RFC 2617
          */
         public BasicCredentials(ByteChunk input) throws IllegalArgumentException {
             authorization = input;
@@ -183,6 +190,7 @@ public class BasicAuthModule extends TomcatAuthModule {
             byte[] decoded = parseBase64();
             parseCredentials(decoded);
         }
+
 
         /**
          * Trivial accessor.
@@ -194,6 +202,7 @@ public class BasicAuthModule extends TomcatAuthModule {
             return username;
         }
 
+
         /**
          * Trivial accessor.
          *
@@ -203,6 +212,7 @@ public class BasicAuthModule extends TomcatAuthModule {
         public String getPassword() {
             return password;
         }
+
 
         /*
          * The authorization method string is case-insensitive and must have at
@@ -218,6 +228,7 @@ public class BasicAuthModule extends TomcatAuthModule {
                 throw new IllegalArgumentException("Authorization header method is not \"Basic\"");
             }
         }
+
 
         /*
          * Decode the base64-user-pass token, which RFC 2617 states can be
@@ -235,6 +246,7 @@ public class BasicAuthModule extends TomcatAuthModule {
             }
             return decoded;
         }
+
 
         /*
          * Extract the mandatory username token and separate it from the

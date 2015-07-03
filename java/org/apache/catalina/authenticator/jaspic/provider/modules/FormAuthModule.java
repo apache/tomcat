@@ -27,6 +27,7 @@ import javax.security.auth.message.MessagePolicy;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Context;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -42,12 +43,8 @@ public class FormAuthModule extends TomcatAuthModule {
     private String landingPage;
 
 
-    public FormAuthModule() {
-    }
-
-
-    public FormAuthModule(String landingPage) {
-        this.landingPage = landingPage;
+    public FormAuthModule(Context context) {
+        super(context);
     }
 
 
