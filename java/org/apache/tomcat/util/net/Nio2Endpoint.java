@@ -522,11 +522,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     if (running && !paused) {
                         // Hand this socket off to an appropriate processor
                         if (!setSocketOptions(socket)) {
-                            countDownConnection();
                             closeSocket(socket);
                         }
                     } else {
-                        countDownConnection();
                         // Close socket right away
                         closeSocket(socket);
                     }
