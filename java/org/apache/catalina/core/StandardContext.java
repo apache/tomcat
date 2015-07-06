@@ -88,7 +88,6 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
-import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
@@ -1987,19 +1986,6 @@ public class StandardContext extends ContainerBase
 
     public void setJ2EEServer(String j2EEServer) {
         this.j2EEServer = j2EEServer;
-    }
-
-
-    /**
-     * Set the Loader with which this Context is associated.
-     *
-     * @param loader The newly associated loader
-     */
-    @Override
-    public synchronized void setLoader(Loader loader) {
-
-        super.setLoader(loader);
-
     }
 
 
