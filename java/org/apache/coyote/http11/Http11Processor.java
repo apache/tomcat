@@ -290,6 +290,10 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Set compression level.
+     *
+     * @param compression One of <code>on</code>, <code>force</code>,
+     *                    <code>off</code> or the minimum compression size in
+     *                    bytes which implies <code>on</code>
      */
     public void setCompression(String compression) {
         if (compression.equals("on")) {
@@ -312,6 +316,9 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Set Minimum size to trigger compression.
+     *
+     * @param compressionMinSize The minimum content length required for
+     *                           compression in bytes
      */
     public void setCompressionMinSize(int compressionMinSize) {
         this.compressionMinSize = compressionMinSize;
@@ -320,9 +327,11 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Set no compression user agent pattern. Regular expression as supported
-     * by {@link Pattern}.
+     * by {@link Pattern}. e.g.: <code>gorilla|desesplorer|tigrus</code>.
      *
-     * ie: "gorilla|desesplorer|tigrus"
+     * @param noCompressionUserAgents The regular expression for user agent
+     *                                strings for which compression should not
+     *                                be applied
      */
     public void setNoCompressionUserAgents(String noCompressionUserAgents) {
         if (noCompressionUserAgents == null || noCompressionUserAgents.length() == 0) {
