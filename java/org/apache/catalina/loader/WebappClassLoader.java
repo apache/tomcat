@@ -530,6 +530,10 @@ public class WebappClassLoader
      */
     private String contextName = "unknown";
 
+    /**
+     * Code base to use for classes loaded from WEB-INF/classes.
+     */
+    private URL webInfClassesCodeBase = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -1890,6 +1894,17 @@ public class WebappClassLoader
             needConvert = true;
         }
 
+        for (int i = 0; i < repositories.length; i++) {
+            if (repositories[i].equals("/WEB-INF/classes/")) {
+                try {
+                    webInfClassesCodeBase = files[i].toURI().toURL();
+                } catch (MalformedURLException e) {
+                    // Ignore - leave it as null
+                }
+                break;
+            }
+        }
+        
     }
 
 
@@ -1942,6 +1957,7 @@ public class WebappClassLoader
         paths = null;
         hasExternalRepositories = false;
         parent = null;
+        webInfClassesCodeBase = null;
 
         permissionList.clear();
         loaderPC.clear();
@@ -2986,7 +3002,13 @@ public class WebappClassLoader
         ResourceEntry entry = new ResourceEntry();
         try {
             entry.source = getURI(new File(file, path));
-            entry.codeBase = entry.source;
+            String sourceString = entry.source.toString();
+            if (sourceString.startsWith(webInfClassesCodeBase.toString()) &&
+                    sourceString.endsWith(".class")) {
+                entry.codeBase = webInfClassesCodeBase;
+            } else {
+                entry.codeBase = entry.source;
+            }
         } catch (MalformedURLException e) {
             return null;
         }

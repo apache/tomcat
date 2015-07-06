@@ -70,6 +70,10 @@
         non cacheable resources, like with the empty resources used in some
         tests. (remm)
       </fix>
+      <fix>
+        <bug>58096</bug>: Classes loaded from <code>/WEB-INF/classes/</code>
+        should use that directory as their code base. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
