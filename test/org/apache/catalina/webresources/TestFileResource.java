@@ -29,7 +29,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestFileResource extends TomcatBaseTest {
 
     @Test
-    public void doIt() throws Exception {
+    public void testGetCodePath() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk out = new ByteChunk();
