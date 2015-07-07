@@ -557,7 +557,7 @@ public final class CGIServlet extends HttpServlet {
 
 
     /**
-     * Provides CGI Gateway service
+     * Provides CGI Gateway service.
      *
      * @param  req   HttpServletRequest passed in by servlet container
      * @param  res   HttpServletResponse passed in by servlet container
@@ -576,7 +576,7 @@ public final class CGIServlet extends HttpServlet {
                                           cgiEnv.getEnvironment(),
                                           cgiEnv.getWorkingDirectory(),
                                           cgiEnv.getParameters());
-            // REMIND: how does this interact with Servlet API 2.3's Filters?!
+
             if ("POST".equals(req.getMethod())) {
                 cgi.setInput(req.getInputStream());
             }
