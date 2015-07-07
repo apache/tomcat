@@ -84,6 +84,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>58110</bug>: Like scriptlet sections, declaration sections of JSP
+        pages have a one-to-one mapping of lines to the generated .java file.
+        Use this information to provide more accurate error messages if a
+        compilation error occurs in a declaration section. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.63 (violetagg)" rtext="released 2015-07-06">
   <subsection name="Catalina">
