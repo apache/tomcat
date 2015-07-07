@@ -42,7 +42,12 @@
   <!-- parameters (default values are in square brackets):                  -->
   <!--                                                                      -->
   <!--   debug               Debugging detail level for messages logged     -->
-  <!--                       by this servlet.  [0]                          -->
+  <!--                       by this servlet. Useful values range from 0    -->
+  <!--                       to 5 where 0 means no logging and 5 means      -->
+  <!--                       maximum logging. Values of 10 or more mean     -->
+  <!--                       maximum logging plus debug info added to the   -->
+  <!--                       HTTP response. Note that any value of 10 or    -->
+  <!--                       more has the same effect. [0]                  -->
   <!--                                                                      -->
   <!--   fileEncoding        Encoding to be used to read static resources   -->
   <!--                       [platform default]                             -->

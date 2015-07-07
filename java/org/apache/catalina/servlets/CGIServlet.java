@@ -239,7 +239,12 @@ public final class CGIServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    /** the debugging detail level for this servlet. */
+    /**
+     * The debugging detail level for this servlet. Useful values range from 0
+     * to 5 where 0 means no logging and 5 means maximum logging. Values of 10
+     * or more mean maximum logging plus debug info added to the HTTP response.
+     * Note that any value of 10 or more has the same effect.
+     */
     private int debug = 0;
 
     /**
