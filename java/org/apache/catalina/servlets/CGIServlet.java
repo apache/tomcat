@@ -538,20 +538,18 @@ public final class CGIServlet extends HttpServlet {
 
 
     /**
-     * Provides CGI Gateway service -- delegates to <code>doGet</code>
+     * Provides CGI Gateway service -- delegates to
+     * {@link #doGet(HttpServletRequest, HttpServletResponse)}.
      *
      * @param  req   HttpServletRequest passed in by servlet container
      * @param  res   HttpServletResponse passed in by servlet container
      *
      * @exception  ServletException  if a servlet-specific exception occurs
      * @exception  IOException  if a read/write exception occurs
-     *
-     * @see javax.servlet.http.HttpServlet
-     *
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
         doGet(req, res);
     }
 
