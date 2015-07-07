@@ -576,7 +576,6 @@ public final class CGIServlet extends HttpServlet {
                                           cgiEnv.getEnvironment(),
                                           cgiEnv.getWorkingDirectory(),
                                           cgiEnv.getParameters());
-            // If POST, we need to cgi.setInput
             // REMIND: how does this interact with Servlet API 2.3's Filters?!
             if ("POST".equals(req.getMethod())) {
                 cgi.setInput(req.getInputStream());
