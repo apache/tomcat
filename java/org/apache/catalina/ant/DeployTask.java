@@ -153,7 +153,9 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     throw new BuildException(e);
                 }
             } else {
-                try (FileInputStream fsInput = new FileInputStream(war)) {
+                FileInputStream fsInput = null;
+                try {
+                    fsInput = new FileInputStream(war);
                     long size = fsInput.getChannel().size();
 
                     if (size > Integer.MAX_VALUE)
@@ -165,6 +167,13 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     stream = new BufferedInputStream(fsInput, 1024);
 
                 } catch (IOException e) {
+                    if (fsInput != null) {
+                        try {
+                            fsInput.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                    }
                     throw new BuildException(e);
                 }
             }
