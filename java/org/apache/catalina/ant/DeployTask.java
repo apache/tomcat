@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
 
@@ -38,6 +39,7 @@ import org.apache.tools.ant.BuildException;
  * @since 4.1
  */
 public class DeployTask extends AbstractCatalinaCommandTask {
+    private static final Pattern PROTOCOL_PATTERN = Pattern.compile("\\w{3,5}\\:");
 
 
     // ------------------------------------------------------------- Properties
@@ -140,7 +142,7 @@ public class DeployTask extends AbstractCatalinaCommandTask {
         String contentType = null;
         int contentLength = -1;
         if (war != null) {
-            if (!war.startsWith("file:")) {
+            if (PROTOCOL_PATTERN.matcher(war).lookingAt()) {
                 try {
                     URL url = new URL(war);
                     URLConnection conn = url.openConnection();
@@ -151,8 +153,9 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     throw new BuildException(e);
                 }
             } else {
+                FileInputStream fsInput = null;
                 try {
-                    FileInputStream fsInput = new FileInputStream(war);
+                    fsInput = new FileInputStream(war);
                     long size = fsInput.getChannel().size();
 
                     if (size > Integer.MAX_VALUE)
@@ -164,6 +167,13 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     stream = new BufferedInputStream(fsInput, 1024);
 
                 } catch (IOException e) {
+                    if (fsInput != null) {
+                        try {
+                            fsInput.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                    }
                     throw new BuildException(e);
                 }
             }

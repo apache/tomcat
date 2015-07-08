@@ -62,8 +62,7 @@
     <changelog>
       <fix>
         <bug>58086</bug>: Ensure that WAR URLs are handled properly when using
-        ANT for web application deployment. Based on a patch provided by Lukasz
-        Jader. (violetagg)
+        ANT for web application deployment. (violetagg)
       </fix>
       <fix>
         <bug>58094</bug>: Fix cosmetic error log when using non standard
