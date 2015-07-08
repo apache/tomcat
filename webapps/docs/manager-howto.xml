@@ -1147,7 +1147,8 @@ commands, you must perform the following setup operations:</p>
     You must use version <strong>1.4</strong> or later.</li>
 <li>Install the Ant distribution in a convenient directory (called
     ANT_HOME in the remainder of these instructions).</li>
-<li>Copy the file <code>server/lib/catalina-ant.jar</code> from your Tomcat
+<li>Copy the files <code>server/lib/catalina-ant.jar</code> and
+    <code>server/lib/tomcat-util.jar</code> from your Tomcat
     installation into Ant's library directory (<code>$ANT_HOME/lib</code>).
     </li>
 <li>Add the <code>$ANT_HOME/bin</code> directory to your <code>PATH</code>
