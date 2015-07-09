@@ -50,18 +50,15 @@ public class TestDeployTask extends TomcatBaseTest {
         setDefaults(deployTask);
 
         testExecute(deployTask, "file:./test/deployment/context.war");
-        testExecute(deployTask, "file:.\\test\\deployment\\context.war");
         testExecute(deployTask, new File("test/deployment/context.war").toURI().toString());
         testExecute(deployTask, new File("test/deployment/context.war").getAbsolutePath());
         testExecute(deployTask, "jar:" + new File("test/deployment/context.jar").toURI().toString() + "!/context.war");
         testExecute(deployTask, "file:./test/deployment/dir with spaces/context.war");
-        testExecute(deployTask, "file:.\\test\\deployment\\dir with spaces\\context.war");
         testExecute(deployTask, new File("test/deployment/dir with spaces/context.war").toURI().toString());
         testExecute(deployTask, new File("test/deployment/dir with spaces/context.war").getAbsolutePath());
         testExecute(deployTask, "jar:" + new File("test/deployment/dir with spaces/context.jar").toURI().toString()
                 + "!/context.war");
         testExecute(deployTask, "file:./test/deployment/dir%20with%20spaces/context.war");
-        testExecute(deployTask, "file:.\\test\\deployment\\dir%20with%20spaces\\context.war");
     }
 
     @Test(expected = BuildException.class)
