@@ -731,9 +731,14 @@ public class FarmWarDeployer extends ClusterListener
                     return false;
                 }
             }
-            java.io.FileInputStream is = new java.io.FileInputStream(from);
-            java.io.FileOutputStream os = new java.io.FileOutputStream(to,
-                    false);
+        } catch (IOException e) {
+            log.error(sm.getString("farmWarDeployer.fileCopyFail",
+                    from, to), e);
+            return false;
+        }
+
+        try (java.io.FileInputStream is = new java.io.FileInputStream(from);
+                java.io.FileOutputStream os = new java.io.FileOutputStream(to, false);) {
             byte[] buf = new byte[4096];
             while (true) {
                 int len = is.read(buf);
@@ -741,8 +746,6 @@ public class FarmWarDeployer extends ClusterListener
                     break;
                 os.write(buf, 0, len);
             }
-            is.close();
-            os.close();
         } catch (IOException e) {
             log.error(sm.getString("farmWarDeployer.fileCopyFail",
                     from, to), e);
