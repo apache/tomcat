@@ -198,7 +198,11 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                 sb.append("&tag=");
                 sb.append(URLEncoder.encode(tag, getCharset()));
             }
+
+            execute(sb.toString(), stream, contentType, contentLength);
         } catch (UnsupportedEncodingException e) {
+            throw new BuildException("Invalid 'charset' attribute: " + getCharset());
+        } finally {
             if (stream != null) {
                 try {
                     stream.close();
@@ -206,10 +210,7 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     // Ignore
                 }
             }
-            throw new BuildException("Invalid 'charset' attribute: " + getCharset());
         }
-
-        execute(sb.toString(), stream, contentType, contentLength);
 
     }
 
