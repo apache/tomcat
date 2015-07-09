@@ -19,6 +19,7 @@ package org.apache.catalina.ant;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.catalina.Globals;
@@ -90,10 +91,10 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
         // SecurityManager assume that untrusted applications may be deployed.
         Digester digester = DigesterFactory.newDigester(
                 true, true, null, Globals.IS_SECURITY_ENABLED);
+        InputStream stream = null;
         try {
             file = file.getCanonicalFile();
-            InputStream stream = 
-                new BufferedInputStream(new FileInputStream(file));
+            stream = new BufferedInputStream(new FileInputStream(file));
             InputSource is =
                 new InputSource(file.toURI().toURL().toExternalForm());
             is.setByteStream(stream);
@@ -106,6 +107,13 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
                 handleErrorOutput("Validation failure: " + e);
             }
         } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                 // Ignore
+                }
+            }
             Thread.currentThread().setContextClassLoader(oldCL);
             closeRedirector();
         }

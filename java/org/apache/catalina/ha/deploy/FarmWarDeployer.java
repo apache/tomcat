@@ -785,6 +785,8 @@ public class FarmWarDeployer extends ClusterListener
      * @return true, copy successful
      */
     protected boolean copy(File from, File to) {
+        java.io.FileInputStream is = null;
+        java.io.FileOutputStream os = null;
         try {
             if (!to.exists()) {
                 if (!to.createNewFile()) {
@@ -792,9 +794,8 @@ public class FarmWarDeployer extends ClusterListener
                     return false;
                 }
             }
-            java.io.FileInputStream is = new java.io.FileInputStream(from);
-            java.io.FileOutputStream os = new java.io.FileOutputStream(to,
-                    false);
+            is = new java.io.FileInputStream(from);
+            os = new java.io.FileOutputStream(to, false);
             byte[] buf = new byte[4096];
             while (true) {
                 int len = is.read(buf);
@@ -802,12 +803,29 @@ public class FarmWarDeployer extends ClusterListener
                     break;
                 os.write(buf, 0, len);
             }
-            is.close();
-            os.close();
         } catch (IOException e) {
             log.error(sm.getString("farmWarDeployer.fileCopyFail",
                     from, to), e);
             return false;
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    log.debug(sm.getString(
+                            "farmWarDeployer.streamCannotBeClosed",
+                            "InputStream", from), e);
+                }
+            }
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    log.debug(sm.getString(
+                            "farmWarDeployer.streamCannotBeClosed",
+                            "OutputStream", to), e);
+                }
+            }
         }
         return true;
     }

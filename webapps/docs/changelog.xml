@@ -73,6 +73,10 @@
         <bug>58096</bug>: Classes loaded from <code>/WEB-INF/classes/</code>
         should use that directory as their code base. (markt)
       </fix>
+      <fix>
+        Fix possible resource leaks by closing streams properly.
+        Issues reported by Coverity Scan. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
