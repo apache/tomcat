@@ -199,6 +199,13 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                 sb.append(URLEncoder.encode(tag, getCharset()));
             }
         } catch (UnsupportedEncodingException e) {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+            }
             throw new BuildException("Invalid 'charset' attribute: " + getCharset());
         }
 
