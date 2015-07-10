@@ -95,6 +95,11 @@
         Use this information to provide more accurate error messages if a
         compilation error occurs in a declaration section. (markt)
       </fix>
+      <fix>
+        <bug>58119</bug>: When tags are compiled they must be placed in the
+        org/apache/jsp/tag/web directory. Correct a regression in the fix for
+        52725. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>

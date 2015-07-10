@@ -740,7 +740,7 @@ public class JspUtil {
 
         index = path.indexOf(WEB_INF_TAGS);
         if (index != -1) {
-            className = Constants.TAG_FILE_PACKAGE_NAME + ".web";
+            className = Constants.TAG_FILE_PACKAGE_NAME + ".web.";
             begin = index + WEB_INF_TAGS.length();
         } else {
             index = path.indexOf(META_INF_TAGS);
