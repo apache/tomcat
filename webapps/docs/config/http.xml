@@ -317,7 +317,10 @@
     <attribute name="compressableMimeType" required="false">
       <p>The value is a comma separated list of MIME types for which HTTP
       compression may be used.
-      The default value is <code>text/html,text/xml,text/plain,text/css</code>.
+      The default value is
+      <code>
+      text/html,text/xml,text/plain,text/css,text/javascript,application/javascript
+      </code>.
       </p>
     </attribute>
 

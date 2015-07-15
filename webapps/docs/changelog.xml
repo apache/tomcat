@@ -85,6 +85,10 @@
         <bug>57943</bug>: Prevent the same socket being added to the cache
         twice. Patch based on analysis by Ian Luo / Sun Qi. (markt)
       </fix>
+      <fix>
+        Add <code>text/javascript,application/javascript</code> to the default
+        list of compressable MIME types. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
