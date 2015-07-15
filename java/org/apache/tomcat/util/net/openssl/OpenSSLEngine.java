@@ -51,6 +51,7 @@ import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.Constants;
+import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -58,7 +59,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <a href="https://www.openssl.org/docs/crypto/BIO_s_bio.html#EXAMPLE">OpenSSL
  * BIO abstractions</a>.
  */
-public final class OpenSSLEngine extends SSLEngine {
+public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolInfo {
 
     private static final Log logger = LogFactory.getLog(OpenSSLEngine.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLEngine.class);
@@ -175,6 +176,9 @@ public final class OpenSSLEngine extends SSLEngine {
     private final boolean clientMode;
     private final String fallbackApplicationProtocol;
     private final OpenSSLSessionContext sessionContext;
+    private final boolean alpn;
+
+    private String selectedProtocol = null;
 
     private volatile SSLSession session;
 
@@ -190,7 +194,7 @@ public final class OpenSSLEngine extends SSLEngine {
      * {@link SSLEngine} belongs to.
      */
     OpenSSLEngine(long sslCtx, String fallbackApplicationProtocol,
-            boolean clientMode, OpenSSLSessionContext sessionContext) {
+            boolean clientMode, OpenSSLSessionContext sessionContext, boolean alpn) {
         if (sslCtx == 0) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
@@ -199,6 +203,12 @@ public final class OpenSSLEngine extends SSLEngine {
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
+        this.alpn = alpn;
+    }
+
+    @Override
+    public String getNegotiatedProtocol() {
+        return selectedProtocol;
     }
 
     /**
@@ -1152,8 +1162,11 @@ public final class OpenSSLEngine extends SSLEngine {
                 throw new SSLException(err);
             }
         } else {
+            if (alpn) {
+                selectedProtocol = SSL.getAlpnSelected(ssl);
+            }
             // if SSL_do_handshake returns > 0 it means the handshake was finished. This means we can update
-            // handshakeFinished directly and so eliminate uncessary calls to SSL.isInInit(...)
+            // handshakeFinished directly and so eliminate unnecessary calls to SSL.isInInit(...)
             handshakeFinished = true;
         }
     }
@@ -1182,6 +1195,9 @@ public final class OpenSSLEngine extends SSLEngine {
             // No pending data to be sent to the peer
             // Check to see if we have finished handshaking
             if (SSL.isInInit(ssl) == 0) {
+                if (alpn) {
+                    selectedProtocol = SSL.getAlpnSelected(ssl);
+                }
                 handshakeFinished = true;
                 return SSLEngineResult.HandshakeStatus.FINISHED;
             }
