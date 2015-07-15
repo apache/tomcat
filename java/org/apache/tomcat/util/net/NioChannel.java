@@ -42,6 +42,7 @@ public class NioChannel implements ByteChannel {
     protected static ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
     protected SocketChannel sc = null;
+    protected SocketWrapperBase<NioChannel> socket = null;
 
     protected final SocketBufferHandler bufHandler;
 
@@ -64,6 +65,10 @@ public class NioChannel implements ByteChannel {
         this.sendFile = false;
     }
 
+
+    void setSocketWrapper(SocketWrapperBase<NioChannel> socket) {
+        this.socket = socket;
+    }
 
     /**
      * Free the channel memory
