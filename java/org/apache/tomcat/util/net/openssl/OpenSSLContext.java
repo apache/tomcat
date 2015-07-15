@@ -449,7 +449,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     @Override
     public SSLEngine createSSLEngine() {
-        return new OpenSSLEngine(ctx, defaultProtocol, false, sessionContext);
+        return new OpenSSLEngine(ctx, defaultProtocol, false, sessionContext,
+                (negotiableProtocols != null && negotiableProtocols.size() > 0));
     }
 
     @Override

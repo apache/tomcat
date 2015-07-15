@@ -60,4 +60,11 @@ public interface SSLUtil {
      */
     public String[] getEnableableProtocols(SSLContext context);
 
+    public interface ProtocolInfo {
+        /**
+         * ALPN information.
+         * @return the protocol selected using ALPN
+         */
+        public String getNegotiatedProtocol();
+    }
 }

@@ -575,6 +575,9 @@ public abstract class AbstractEndpoint<S> {
     public void addNegotiatedProtocol(String negotiableProtocol) {
         negotiableProtocols.add(negotiableProtocol);
     }
+    public boolean hasNegotiableProtocols() {
+        return (negotiableProtocols.size() > 0);
+    }
 
     /**
      * Attributes provide a way for configuration to be passed to sub-components
