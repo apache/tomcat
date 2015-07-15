@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net.openssl;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -69,9 +70,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static final String defaultProtocol = "TLS";
 
+    // http/1.1 with preceding length
+    private static final byte[] ALPN_DEFAULT =
+            new byte[] { 0x08, 0x68, 0x74, 0x74, 0x70, 0x2f, 0x31, 0x2e, 0x31 };
+
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private OpenSSLServerSessionContext sessionContext;
+
+    private final List<String> negotiableProtocols;
 
     private List<String> ciphers = new ArrayList<>();
 
@@ -107,7 +114,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    public OpenSSLContext(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate)
+    public OpenSSLContext(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate, List<String> negotiableProtocols)
             throws SSLException {
         this.sslHostConfig = sslHostConfig;
         this.certificate = certificate;
@@ -159,6 +166,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 throw new Exception(
                         netSm.getString("endpoint.apr.failSslContextMake"), e);
             }
+
+            this.negotiableProtocols = negotiableProtocols;
+
             success = true;
         } catch(Exception e) {
             throw new SSLException(sm.getString("openssl.errorSSLCtxInit"), e);
@@ -167,6 +177,38 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 destroyPools();
             }
         }
+    }
+
+    private byte[] buildAlpnConfig(List<String> protocols) {
+        /*
+         * The expected format is zero or more of the following:
+         * - Single byte for size
+         * - Sequence of size bytes for the identifier
+         */
+        byte[][] protocolsBytes = new byte[protocols.size()][];
+        int i = 0;
+        int size = 0;
+        for (String protocol : protocols) {
+            protocolsBytes[i] = protocol.getBytes(StandardCharsets.UTF_8);
+            size += protocolsBytes[i].length;
+            // And one byte to store the size
+            size++;
+            i++;
+        }
+
+        size += ALPN_DEFAULT.length;
+
+        byte[] result = new byte[size];
+        int pos = 0;
+        for (byte[] protocolBytes : protocolsBytes) {
+            result[pos++] = (byte) (0xff & protocolBytes.length);
+            System.arraycopy(protocolBytes, 0, result, pos, protocolBytes.length);
+            pos += protocolBytes.length;
+        }
+
+        System.arraycopy(ALPN_DEFAULT, 0, result, pos, ALPN_DEFAULT.length);
+
+        return result;
     }
 
     private void destroyPools() {
@@ -358,6 +400,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setNpnProtos(ctx, protos, SSL.SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL);
 
             sessionContext = new OpenSSLServerSessionContext(ctx);
+
+            if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
+                byte[] protocols = buildAlpnConfig(negotiableProtocols);
+                if (SSLContext.setALPN(ctx, protocols, protocols.length) != 0) {
+                    log.warn(netSm.getString("endpoint.alpn.fail", negotiableProtocols));
+                }
+            }
+
+            sslHostConfig.setOpenSslContext(Long.valueOf(ctx));
             initialized = true;
         } catch (Exception e) {
             log.warn(sm.getString("openssl.errorSSLCtxInit"), e);

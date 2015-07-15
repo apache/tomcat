@@ -89,7 +89,7 @@ public class JSSESocketFactory implements SSLUtil {
 
         SSLContext context;
         try {
-            context = createSSLContext();
+            context = createSSLContext(null);
             context.init(null,  null,  null);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             // This is fatal for the connector so throw an exception to prevent
@@ -251,7 +251,7 @@ public class JSSESocketFactory implements SSLUtil {
 
 
     @Override
-    public SSLContext createSSLContext() throws NoSuchAlgorithmException {
+    public SSLContext createSSLContext(List<String> negotiableProtocols) throws NoSuchAlgorithmException {
         return new JSSESSLContext(sslHostConfig.getSslProtocol());
     }
 

@@ -16,13 +16,15 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.List;
+
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 
 public interface SSLUtil {
 
-    public SSLContext createSSLContext() throws Exception;
+    public SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception;
 
     public KeyManager[] getKeyManagers() throws Exception;
 
