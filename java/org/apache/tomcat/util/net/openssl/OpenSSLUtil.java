@@ -41,8 +41,8 @@ public class OpenSSLUtil implements SSLUtil {
     }
 
     @Override
-    public SSLContext createSSLContext() throws Exception {
-        return new OpenSSLContext(sslHostConfig, certificate);
+    public SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception {
+        return new OpenSSLContext(sslHostConfig, certificate, negotiableProtocols);
     }
 
     @Override

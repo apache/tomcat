@@ -81,7 +81,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
                 for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
                     SSLUtil sslUtil = sslImplementation.getSSLUtil(sslHostConfig, certificate);
 
-                    SSLContext sslContext = sslUtil.createSSLContext();
+                    SSLContext sslContext = sslUtil.createSSLContext(negotiableProtocols);
                     sslContext.init(sslUtil.getKeyManagers(), sslUtil.getTrustManagers(), null);
 
                     SSLSessionContext sessionContext = sslContext.getServerSessionContext();
