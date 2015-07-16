@@ -194,8 +194,8 @@ public class StoreLoader {
             String configUrl = getConfigUrl();
             if (configUrl != null) {
                 is = (new URL(configUrl)).openStream();
-                if (log.isInfoEnabled())
-                    log.info("Find registry server-registry.xml from system property at url "
+                if (log.isDebugEnabled())
+                    log.debug("Find registry server-registry.xml from system property at url "
                             + configUrl);
                 registryResource = new URL(configUrl);
             }
