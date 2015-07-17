@@ -60,6 +60,10 @@
 <section name="Tomcat 7.0.64 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>55317</bug>: Facilitate weaving by allowing ClassFileTransformer to
+        be added to WebppClassLoader. Patch by Nick Williams. (markt)
+      </add>
       <fix>
         <bug>58086</bug>: Ensure that WAR URLs are handled properly when using
         ANT for web application deployment. (violetagg)
