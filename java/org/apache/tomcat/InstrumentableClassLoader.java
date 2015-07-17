@@ -33,7 +33,7 @@ import java.lang.instrument.ClassFileTransformer;
  * {@code WebappClassLoaderBase} are protected by the default security
  * manager if one is in use.
  *
- * @since 8.0, 7.0.44
+ * @since 8.0, 7.0.64
  */
 public interface InstrumentableClassLoader {
 
@@ -53,7 +53,7 @@ public interface InstrumentableClassLoader {
      * It will no longer be able to instrument the byte code of any classes
      * loaded by the class loader after the invocation of this method.
      * However, any classes already instrumented by this transformer before
-     * this method call will remain in their instramented state.
+     * this method call will remain in their instrumented state.
      *
      * @param transformer The transformer to remove
      */
