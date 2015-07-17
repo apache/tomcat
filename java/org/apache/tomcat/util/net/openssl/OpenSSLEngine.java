@@ -1164,6 +1164,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         } else {
             if (alpn) {
                 selectedProtocol = SSL.getAlpnSelected(ssl);
+                if (selectedProtocol == null) {
+                    selectedProtocol = SSL.getNextProtoNegotiated(ssl);
+                }
             }
             // if SSL_do_handshake returns > 0 it means the handshake was finished. This means we can update
             // handshakeFinished directly and so eliminate unnecessary calls to SSL.isInInit(...)
@@ -1197,6 +1200,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (SSL.isInInit(ssl) == 0) {
                 if (alpn) {
                     selectedProtocol = SSL.getAlpnSelected(ssl);
+                    if (selectedProtocol == null) {
+                        selectedProtocol = SSL.getNextProtoNegotiated(ssl);
+                    }
                 }
                 handshakeFinished = true;
                 return SSLEngineResult.HandshakeStatus.FINISHED;
