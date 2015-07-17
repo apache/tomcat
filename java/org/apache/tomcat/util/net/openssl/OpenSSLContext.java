@@ -396,10 +396,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                 });
             }
-            String[] protos = new OpenSSLProtocols(enabledProtocol).getProtocols();
-            SSLContext.setNpnProtos(ctx, protos, SSL.SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL);
-
-            sessionContext = new OpenSSLServerSessionContext(ctx);
 
             if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
                 byte[] protocols = buildAlpnConfig(negotiableProtocols);
@@ -408,6 +404,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
 
+            sessionContext = new OpenSSLServerSessionContext(ctx);
             sslHostConfig.setOpenSslContext(Long.valueOf(ctx));
             initialized = true;
         } catch (Exception e) {
