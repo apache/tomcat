@@ -24,7 +24,6 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -77,11 +76,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     // -------------------------------------------------------------- Constants
 
     private static final Log log = LogFactory.getLog(AprEndpoint.class);
-
-    // http/1.1 with preceding length
-    private static final byte[] ALPN_DEFAULT =
-            new byte[] { 0x08, 0x68, 0x74, 0x74, 0x70, 0x2f, 0x31, 0x2e, 0x31 };
-
 
     // ----------------------------------------------------------------- Fields
 
@@ -547,10 +541,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
 
                 if (negotiableProtocols.size() > 0) {
-                    byte[] protocols = buildAlpnConfig(negotiableProtocols);
-                    if (SSLContext.setALPN(ctx, protocols, protocols.length) != 0) {
-                        log.warn(sm.getString("endpoint.alpn.fail", negotiableProtocols));
-                    }
+                    ArrayList<String> protocols = new ArrayList<>();
+                    protocols.addAll(negotiableProtocols);
+                    protocols.add("http/1.1");
+                    String[] protocolsArray = protocols.toArray(new String[0]);
+                    SSLContext.setAlpnProtos(ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
                 }
                 sslHostConfig.setOpenSslContext(Long.valueOf(ctx));
             }
@@ -571,39 +566,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         }
         // Default
         return 0;
-    }
-
-
-    private byte[] buildAlpnConfig(List<String> protocols) {
-        /*
-         * The expected format is zero or more of the following:
-         * - Single byte for size
-         * - Sequence of size bytes for the identifier
-         */
-        byte[][] protocolsBytes = new byte[protocols.size()][];
-        int i = 0;
-        int size = 0;
-        for (String protocol : protocols) {
-            protocolsBytes[i] = protocol.getBytes(StandardCharsets.UTF_8);
-            size += protocolsBytes[i].length;
-            // And one byte to store the size
-            size++;
-            i++;
-        }
-
-        size += ALPN_DEFAULT.length;
-
-        byte[] result = new byte[size];
-        int pos = 0;
-        for (byte[] protocolBytes : protocolsBytes) {
-            result[pos++] = (byte) (0xff & protocolBytes.length);
-            System.arraycopy(protocolBytes, 0, result, pos, protocolBytes.length);
-            pos += protocolBytes.length;
-        }
-
-        System.arraycopy(ALPN_DEFAULT, 0, result, pos, ALPN_DEFAULT.length);
-
-        return result;
     }
 
 
