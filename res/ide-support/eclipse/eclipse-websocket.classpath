@@ -17,7 +17,7 @@
 -->
 <classpath>
     <classpathentry including="org/apache/tomcat/websocket/" kind="src" path="java"/>
-    <classpathentry including="org/apache/catalina/websocket/|org/apache/tomcat/websocket/" kind="src" path="test"/>
+    <classpathentry excluding="deployment/|webapp*/" including="org/apache/catalina/websocket/|org/apache/tomcat/websocket/" kind="src" path="test"/>
     <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
     <classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
     <classpathentry combineaccessrules="false" kind="src" path="/tomcat-7.0.x"/>

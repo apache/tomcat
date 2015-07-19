@@ -110,6 +110,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Update sample Eclipse IDE configuration to exclude test/webapp* and
+        similar paths from compiler sourcepath. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.63 (violetagg)" rtext="released 2015-07-06">
   <subsection name="Catalina">
