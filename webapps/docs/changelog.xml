@@ -62,11 +62,11 @@
     <changelog>
       <add>
         <bug>55317</bug>: Facilitate weaving by allowing ClassFileTransformer to
-        be added to WebppClassLoader. Patch by Nick Williams. (markt)
+        be added to WebappClassLoader. Patch by Nick Williams. (markt)
       </add>
       <fix>
         <bug>58086</bug>: Ensure that WAR URLs are handled properly when using
-        ANT for web application deployment. (violetagg)
+        Apache Ant for web application deployment. (violetagg)
       </fix>
       <fix>
         <bug>58094</bug>: Fix cosmetic error log when using non standard
@@ -290,7 +290,7 @@
         the post 1.3.1 fixes. (markt)
       </update>
       <update>
-        Update package renamed Apache Commons Codes to r1682326. No functional
+        Update package renamed Apache Commons Codec to r1682326. No functional
         changes. Javadoc only. (markt)
       </update>
     </changelog>
