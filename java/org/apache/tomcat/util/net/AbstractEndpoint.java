@@ -952,7 +952,7 @@ public abstract class AbstractEndpoint<S> {
         if (latch!=null) {
             long result = latch.countDown();
             if (result<0) {
-                getLog().warn("Incorrect connection count, multiple socket.close called on the same socket." );
+                getLog().warn(sm.getString("endpoint.warn.incorrectConnectionCount"));
             }
             return result;
         } else return -1;
