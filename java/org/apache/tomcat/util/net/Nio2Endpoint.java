@@ -430,26 +430,30 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         }
         try {
             handler.release(socket);
-            try {
-                if (socket.getSocket() != null) {
-                    socket.getSocket().close(true);
-                }
-            } catch (Exception e){
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString(
-                            "endpoint.debug.socketCloseFail"), e);
+        } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
+            if (log.isDebugEnabled()) log.error("",e);
+        }
+        try {
+            if (socket.getSocket() != null) {
+                synchronized (socket.getSocket()) {
+                    if (socket.getSocket() != null && socket.getSocket().isOpen()) {
+                        countDownConnection();
+                        socket.getSocket().close(true);
+                    }
                 }
             }
+        } catch (Throwable e) {
+            ExceptionUtils.handleThrowable(e);
+            if (log.isDebugEnabled()) log.error("",e);
+        }
+        try {
             Nio2SocketWrapper nio2Socket = (Nio2SocketWrapper) socket;
-            try {
-                if (nio2Socket.getSendfileData() != null
-                        && nio2Socket.getSendfileData().fchannel != null
-                        && nio2Socket.getSendfileData().fchannel.isOpen()) {
-                    nio2Socket.getSendfileData().fchannel.close();
-                }
-            } catch (Exception ignore) {
+            if (nio2Socket.getSendfileData() != null
+                    && nio2Socket.getSendfileData().fchannel != null
+                    && nio2Socket.getSendfileData().fchannel.isOpen()) {
+                nio2Socket.getSendfileData().fchannel.close();
             }
-            countDownConnection();
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             if (log.isDebugEnabled()) log.error("",e);
@@ -523,12 +527,24 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         // Hand this socket off to an appropriate processor
                         if (!setSocketOptions(socket)) {
                             countDownConnection();
-                            closeSocket(socket);
-                        }
+                            try {
+                                socket.close();
+                            } catch (IOException ioe) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug("", ioe);
+                                }
+                            }
+                       }
                     } else {
                         countDownConnection();
                         // Close socket right away
-                        closeSocket(socket);
+                        try {
+                            socket.close();
+                        } catch (IOException ioe) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("", ioe);
+                            }
+                        }
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -538,17 +554,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             state = AcceptorState.ENDED;
         }
 
-    }
-
-
-    private void closeSocket(AsynchronousSocketChannel socket) {
-        try {
-            socket.close();
-        } catch (IOException ioe) {
-            if (log.isDebugEnabled()) {
-                log.debug("", ioe);
-            }
-        }
     }
 
 
