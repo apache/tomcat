@@ -195,6 +195,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             // NIO2 does not allow any form of IO concurrency
             acceptorThreadCount = 1;
         }
+        // Disable maxConnections feature, mostly designed for APR rather than NIO2, and has issues (BZ58103)
+        if (getMaxConnections() != -1) {
+            setMaxConnections(-1);
+        }
 
         // Initialize SSL if needed
         initialiseSsl();
