@@ -110,6 +110,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct the incorrect document of <code>QueryTimeoutInterceptor</code>.
+        The setting value is not in milliseconds but in seconds. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

@@ -649,8 +649,9 @@
     </p>
     <attributes>
       <attribute name="queryTimeout" required="true">
-        <p>(int as String) The number of seconds to set for the query timeout
-           The default value is <code>1000</code> milliseconds.
+        <p>(int as String) The number of seconds to set for the query timeout.
+           A value less than or equal to zero will disable this feature.
+           The default value is <code>1</code> seconds.
         </p>
       </attribute>
     </attributes>
