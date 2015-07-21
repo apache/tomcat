@@ -28,12 +28,13 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
 public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor {
     private static Log log = LogFactory.getLog(QueryTimeoutInterceptor.class);
-    int timeout;
+    int timeout = 1;
 
     @Override
     public void setProperties(Map<String,InterceptorProperty> properties) {
         super.setProperties(properties);
-        timeout = properties.get("queryTimeout").getValueAsInt(-1);
+        InterceptorProperty p = properties.get("queryTimeout");
+        if (p!=null) timeout = p.getValueAsInt(timeout);
     }
 
     @Override
