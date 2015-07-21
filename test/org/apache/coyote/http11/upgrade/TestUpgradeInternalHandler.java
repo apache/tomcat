@@ -60,8 +60,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
     public void testUpgradeInternal() throws Exception {
         Assume.assumeTrue(
                 "Only supported on NIO 2",
-                getTomcatInstance().getConnector().getProtocol()
-                        .equals("org.apache.coyote.http11.Http11Nio2Protocol"));
+                getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Nio2"));
 
         UpgradeConnection uc = doUpgrade(EchoAsync.class);
         PrintWriter pw = new PrintWriter(uc.getWriter());
