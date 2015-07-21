@@ -338,7 +338,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
      * Process the specified connection.
      */
     protected boolean setSocketOptions(AsynchronousSocketChannel socket) {
-        // Process the connection
         try {
             socketProperties.setProperties(socket);
             Nio2Channel channel = nioChannels.pop();
