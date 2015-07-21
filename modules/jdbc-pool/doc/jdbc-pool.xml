@@ -703,7 +703,7 @@
       </attribute>
       <attribute name="logFailed" required="false">
         <p>(boolean as String) Set to <code>true</code> if you wish to log failed queries.
-            The default value is <code>true</code>.
+            The default value is <code>false</code>.
         </p>
       </attribute>
     </attributes>

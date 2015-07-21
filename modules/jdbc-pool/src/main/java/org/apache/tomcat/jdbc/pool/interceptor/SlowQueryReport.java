@@ -67,7 +67,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     /**
      * Flag to enable disable logging of failed queries
      */
-    protected boolean logFailed = true;
+    protected boolean logFailed = false;
 
     /**
      * Sort QueryStats by last invocation time
