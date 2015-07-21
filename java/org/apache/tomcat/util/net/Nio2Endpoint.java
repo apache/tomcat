@@ -341,7 +341,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         // Process the connection
         try {
             socketProperties.setProperties(socket);
-
             Nio2Channel channel = nioChannels.pop();
             if (channel == null) {
                 SocketBufferHandler bufhandler = new SocketBufferHandler(
@@ -363,18 +362,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             socketWrapper.setReadTimeout(getSoTimeout());
             socketWrapper.setWriteTimeout(getSoTimeout());
             // Continue processing on another thread
-            processSocket(socketWrapper, SocketStatus.OPEN_READ, true);
+            return processSocket0(socketWrapper, SocketStatus.OPEN_READ, true);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            try {
-                log.error("",t);
-            } catch (Throwable tt) {
-                ExceptionUtils.handleThrowable(t);
-            }
-            // Tell to close the socket
-            return false;
+            log.error("",t);
         }
-        return true;
+        // Tell to close the socket
+        return false;
     }
 
 
