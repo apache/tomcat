@@ -131,6 +131,11 @@
         <code>ignoreExceptionOnPreLoad</code> attribute do not allow a change
         via JMX. (kfujino)
       </fix>
+      <fix>
+        If the <code>timeBetweenEvictionRunsMillis</code> attribute is changed
+        via jmx, it should restart the pool cleaner because this attribute
+        affects the execution interval of the pool cleaner. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

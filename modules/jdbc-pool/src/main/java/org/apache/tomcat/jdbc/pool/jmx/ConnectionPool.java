@@ -634,8 +634,14 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         getPoolProperties().setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
         //make sure pool cleaner starts/stops when it should
-        if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
-        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
+        if (!wasEnabled && shouldBeEnabled) {
+            pool.initializePoolCleaner(getPoolProperties());
+        } else if (wasEnabled) {
+            pool.terminatePoolCleaner();
+            if (shouldBeEnabled) {
+                pool.initializePoolCleaner(getPoolProperties());
+            }
+        }
     }
 
 
