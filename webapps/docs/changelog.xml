@@ -126,6 +126,11 @@
       <fix>
         Add support for stopping the pool cleaner via JMX. (kfujino)
       </fix>
+      <fix>
+        The <code>fairness</code> attribute and
+        <code>ignoreExceptionOnPreLoad</code> attribute do not allow a change
+        via JMX. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -489,7 +489,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     @Override
     public void setFairQueue(boolean fairQueue) {
-        getPoolProperties().setFairQueue(fairQueue);
+        // noop - this pool is already running
+        throw new UnsupportedOperationException();
     }
 
 
@@ -856,7 +857,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      */
     @Override
     public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
-        getPoolProperties().setIgnoreExceptionOnPreLoad(ignoreExceptionOnPreLoad);
+        // noop - this pool is already running
+        throw new UnsupportedOperationException();
     }
 
     /**
