@@ -123,6 +123,9 @@
       <fix>
         Fix potential NPE in <code>QueryTimeoutInterceptor</code>. (kfujino)
       </fix>
+      <fix>
+        Add support for stopping the pool cleaner via JMX. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
