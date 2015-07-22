@@ -551,8 +551,9 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
-        //make sure pool cleaner starts when it should
+        //make sure pool cleaner starts/stops when it should
         if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
+        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
     }
 
 
@@ -579,8 +580,9 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setRemoveAbandoned(removeAbandoned);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
-        //make sure pool cleaner starts when it should
+        //make sure pool cleaner starts/stops when it should
         if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
+        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
     }
 
 
@@ -589,8 +591,9 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setRemoveAbandonedTimeout(removeAbandonedTimeout);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
-        //make sure pool cleaner starts when it should
+        //make sure pool cleaner starts/stops when it should
         if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
+        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
     }
 
 
@@ -617,8 +620,9 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setTestWhileIdle(testWhileIdle);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
-        //make sure pool cleaner starts when it should
+        //make sure pool cleaner starts/stops when it should
         if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
+        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
     }
 
 
@@ -627,8 +631,9 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         boolean wasEnabled = getPoolProperties().isPoolSweeperEnabled();
         getPoolProperties().setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
         boolean shouldBeEnabled = getPoolProperties().isPoolSweeperEnabled();
-        //make sure pool cleaner starts when it should
+        //make sure pool cleaner starts/stops when it should
         if (!wasEnabled && shouldBeEnabled) pool.initializePoolCleaner(getPoolProperties());
+        else if (wasEnabled && !shouldBeEnabled) pool.terminatePoolCleaner();
     }
 
 
