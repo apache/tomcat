@@ -512,6 +512,13 @@ public class ConnectionPool {
         } //end if
     }
 
+    public void terminatePoolCleaner() {
+        if (poolCleaner!= null) {
+            poolCleaner.stopRunning();
+            poolCleaner = null;
+        }
+    }
+
 
 //===============================================================================
 //         CONNECTION POOLING IMPL LOGIC
