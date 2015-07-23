@@ -136,6 +136,11 @@
         via jmx, it should restart the pool cleaner because this attribute
         affects the execution interval of the pool cleaner. (kfujino)
       </fix>
+      <fix>
+        Eliminate the dependence on <code>maxActive</code> of busy queues and
+        idle queue in order to enable the expansion of the pool size via JMX.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

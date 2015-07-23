@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -441,7 +440,7 @@ public class ConnectionPool {
         }
 
         //make space for 10 extra in case we flow over a bit
-        busy = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
+        busy = new LinkedBlockingQueue<PooledConnection>();
         //busy = new FairBlockingQueue<PooledConnection>();
         //make space for 10 extra in case we flow over a bit
         if (properties.isFairQueue()) {
@@ -450,7 +449,7 @@ public class ConnectionPool {
             //idle = new LinkedTransferQueue<PooledConnection>();
             //idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
         } else {
-            idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
+            idle = new LinkedBlockingQueue<PooledConnection>();
         }
 
         initializePoolCleaner(properties);
