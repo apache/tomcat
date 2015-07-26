@@ -121,9 +121,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private HpackEncoder hpackEncoder;
 
     // All timeouts in milliseconds
-    private long readTimeout = 10000;
-    private long keepAliveTimeout = 30000;
-    private long writeTimeout = 10000;
+    private long readTimeout = Http2Protocol.DEFAULT_READ_TIMEOUT;
+    private long keepAliveTimeout = Http2Protocol.DEFAULT_KEEP_ALIVE_TIMEOUT;
+    private long writeTimeout = Http2Protocol.DEFAULT_WRITE_TIMEOUT;
 
     private final Map<Integer,Stream> streams = new HashMap<>();
     private final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
@@ -205,6 +205,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         // Send the initial settings frame
+        // TODO: Need to send non-default settings values
         try {
             socketWrapper.write(true, SETTINGS_EMPTY, 0, SETTINGS_EMPTY.length);
             socketWrapper.flush(true);
@@ -809,8 +810,25 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
+    /*
+     * This only has an effect if called before the connection is established
+     */
     public void setMaxConcurrentStreams(long maxConcurrentStreams) {
         localSettings.setMaxConcurrentStreams(maxConcurrentStreams);
+    }
+
+
+    /*
+     * This only has an effect if called before the connection is established
+     */
+    public void setInitialWindowSize(int initialWindowSize) {
+        try {
+            localSettings.setInitialWindowSize(initialWindowSize);
+        } catch (ConnectionException e) {
+            // Illegal setting. Ignore it but log a warning.
+            log.warn(sm.getString("upgradeHandler.initialWindowSize.invalid",
+                    connectionId, Integer.toString(initialWindowSize)));
+        }
     }
 
 
