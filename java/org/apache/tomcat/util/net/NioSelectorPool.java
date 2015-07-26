@@ -71,7 +71,6 @@ public class NioSelectorPool {
         return  SHARED_SELECTOR;
     }
 
-    @SuppressWarnings("resource") // s is closed in put()
     public Selector get() throws IOException{
         if ( SHARED ) {
             return getSharedSelector();
