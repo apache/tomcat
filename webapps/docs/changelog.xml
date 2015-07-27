@@ -81,6 +81,11 @@
         Fix possible resource leaks by closing streams properly.
         Issues reported by Coverity Scan. (violetagg)
       </fix>
+      <fix>
+        <bug>58179</bug>: Fix a thread safety issues that could mean concurrent
+        threads setting the same attribute on a <code>ServletContext</code>
+        could both see <code>null</code> as the old value. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
