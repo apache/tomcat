@@ -63,6 +63,7 @@ Unnecessary code
    ([x] on all additional check boxes)
    except the following:
 
+   - Value of exception parameter is...   - I
    - Unnecessary else                     - I
 
 Generic types
