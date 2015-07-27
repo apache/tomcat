@@ -781,17 +781,13 @@ public class ApplicationContext
             return;
         }
 
-        Object oldValue = null;
-        boolean replaced = false;
-
         // Add or replace the specified attribute
         // Check for read only attribute
         if (readOnlyAttributes.containsKey(name))
             return;
-        oldValue = attributes.get(name);
-        if (oldValue != null)
-            replaced = true;
-        attributes.put(name, value);
+
+        Object oldValue = attributes.put(name, value);
+        boolean replaced = oldValue != null;
 
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
