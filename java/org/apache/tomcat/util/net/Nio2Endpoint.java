@@ -96,8 +96,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     private SynchronizedStack<Nio2Channel> nioChannels;
 
 
-    // ------------------------------------------------------------- Properties
+    public Nio2Endpoint() {
+        // Override the defaults for NIO2
+        // Disable maxConnections by default for NIO2 (see BZ58103)
+        setMaxConnections(-1);
+    }
 
+
+    // ------------------------------------------------------------- Properties
 
     /**
      * Handling of accepted sockets.
@@ -194,10 +200,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         if (acceptorThreadCount != 1) {
             // NIO2 does not allow any form of IO concurrency
             acceptorThreadCount = 1;
-        }
-        // Disable maxConnections feature, mostly designed for APR rather than NIO2, and has issues (BZ58103)
-        if (getMaxConnections() != -1) {
-            setMaxConnections(-1);
         }
 
         // Initialize SSL if needed
