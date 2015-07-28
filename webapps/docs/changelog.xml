@@ -127,6 +127,10 @@
         Correct the incorrect document of <code>QueryTimeoutInterceptor</code>.
         The setting value is not in milliseconds but in seconds. (kfujino)
       </fix>
+      <fix>
+        <bug>58112</bug>: Update the documentation for using the Catalina tasks
+        in an Apache Ant build file. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
