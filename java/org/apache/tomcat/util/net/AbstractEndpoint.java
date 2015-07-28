@@ -993,6 +993,9 @@ public abstract class AbstractEndpoint<S> {
 
     protected final Set<SocketWrapperBase<S>> waitingRequests = Collections
             .newSetFromMap(new ConcurrentHashMap<SocketWrapperBase<S>, Boolean>());
+    public void removeWaitingRequest(SocketWrapperBase<S> socketWrapper) {
+        waitingRequests.remove(socketWrapper);
+    }
 
     /**
      * The async timeout thread.
