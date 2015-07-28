@@ -98,6 +98,12 @@
         Add <code>text/javascript,application/javascript</code> to the default
         list of compressable MIME types. (violetagg)
       </fix>
+      <fix>
+        <bug>58103</bug>: When pipelining requests, and the previous request was
+        an async request, ensure that the socket is removed from the waiting
+        requests so that the async timeout thread doesn't process it during the
+        next request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

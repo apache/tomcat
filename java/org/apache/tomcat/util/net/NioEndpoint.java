@@ -771,6 +771,13 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         return true;
     }
 
+    
+    @Override
+    public void removeWaitingRequest(SocketWrapper<NioChannel> socketWrapper) {
+        // NO-OP
+    }
+    
+
     @Override
     protected Log getLog() {
         return log;

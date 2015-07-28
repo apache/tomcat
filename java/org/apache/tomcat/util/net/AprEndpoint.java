@@ -112,7 +112,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
 
     protected ConcurrentLinkedQueue<SocketWrapper<Long>> waitingRequests =
         new ConcurrentLinkedQueue<SocketWrapper<Long>>();
-
+    @Override
+    public void removeWaitingRequest(SocketWrapper<Long> socketWrapper) {
+        waitingRequests.remove(socketWrapper);
+    }
+    
+    
     private final Map<Long,AprSocketWrapper> connections =
             new ConcurrentHashMap<Long, AprSocketWrapper>();
 
@@ -1013,6 +1018,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
         }
     }
 
+    
     @Override
     protected Log getLog() {
         return log;

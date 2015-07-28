@@ -628,6 +628,8 @@ public abstract class AbstractEndpoint<S> {
     public abstract void processSocketAsync(SocketWrapper<S> socketWrapper,
             SocketStatus socketStatus);
 
+    public abstract void removeWaitingRequest(SocketWrapper<S> socketWrapper);
+
 
     // ------------------------------------------------------- Lifecycle methods
 
@@ -957,6 +959,7 @@ public abstract class AbstractEndpoint<S> {
                     new String[sslEnabledProtocols.size()]);
         }
     }
+
 
     /**
      * Configures SSLEngine to honor cipher suites ordering based upon

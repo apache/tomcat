@@ -602,6 +602,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         state = processor.asyncDispatch(status);
                     } else if (state == SocketState.ASYNC_END) {
                         state = processor.asyncDispatch(status);
+                        // release() won't get called so in case this request
+                        // takes a long time to process remove the socket from
+                        // the waiting requests now else the async timeout will
+                        // fire
+                        getProtocol().endpoint.removeWaitingRequest(wrapper);
                         if (state == SocketState.OPEN) {
                             // There may be pipe-lined data to read. If the data
                             // isn't processed now, execution will exit this

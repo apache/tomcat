@@ -598,6 +598,12 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
 
     protected ConcurrentLinkedQueue<SocketWrapper<Socket>> waitingRequests =
         new ConcurrentLinkedQueue<SocketWrapper<Socket>>();
+    @Override
+    public void removeWaitingRequest(SocketWrapper<Socket> socketWrapper) {
+        waitingRequests.remove(socketWrapper);
+    }
+    
+    
 
     @Override
     protected Log getLog() {
