@@ -82,6 +82,11 @@
         Issues reported by Coverity Scan. (violetagg)
       </fix>
       <fix>
+        <bug>58116</bug>: Fix a regression in the fix for <bug>57281</bug> that
+        broke Comet support when running under a security manager. Based on a
+        patch provided by Johno Crawford. (markt)
+      </fix>
+      <fix>
         <bug>58179</bug>: Fix a thread safety issues that could mean concurrent
         threads setting the same attribute on a <code>ServletContext</code>
         could both see <code>null</code> as the old value. (markt)
