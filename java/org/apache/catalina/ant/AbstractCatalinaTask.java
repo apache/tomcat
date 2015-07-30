@@ -185,7 +185,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      * @exception BuildException if an error occurs
      */
     public void execute(String command, InputStream istream,
-                        String contentType, int contentLength)
+                        String contentType, long contentLength)
         throws BuildException {
 
         URLConnection conn = null;
