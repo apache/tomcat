@@ -1228,8 +1228,25 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             //       the webapp from overriding Java SE classes. This implements
             //       SRV.10.7.2
             String resourceName = binaryNameToPath(name, false);
+
             ClassLoader javaseLoader = getJavaseClassLoader();
-            if (javaseLoader.getResource(resourceName) != null) {
+            boolean tryLoadingFromJavaseLoader;
+            try {
+                // Use getResource as it won't trigger an expensive
+                // ClassNotFoundException if the resource is not available from
+                // the Java SE class loader. However (see
+                // https://bz.apache.org/bugzilla/show_bug.cgi?id=58125 for
+                // details) when running under a security manager in rare cases
+                // this call may trigger a ClassCircularityError.
+                tryLoadingFromJavaseLoader = (javaseLoader.getResource(resourceName) != null);
+            } catch (ClassCircularityError cce) {
+                // The getResource() trick won't work for this class. We have to
+                // try loading it directly and accept that we might get a
+                // ClassNotFoundException.
+                tryLoadingFromJavaseLoader = true;
+            }
+
+            if (tryLoadingFromJavaseLoader) {
                 try {
                     clazz = javaseLoader.loadClass(name);
                     if (clazz != null) {
