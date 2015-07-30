@@ -140,13 +140,13 @@ public class DeployTask extends AbstractCatalinaCommandTask {
         // Building an input stream on the WAR to upload, if any
         BufferedInputStream stream = null;
         String contentType = null;
-        int contentLength = -1;
+        long contentLength = -1;
         if (war != null) {
             if (PROTOCOL_PATTERN.matcher(war).lookingAt()) {
                 try {
                     URL url = new URL(war);
                     URLConnection conn = url.openConnection();
-                    contentLength = conn.getContentLength();
+                    contentLength = conn.getContentLengthLong();
                     stream = new BufferedInputStream
                         (conn.getInputStream(), 1024);
                 } catch (IOException e) {
@@ -156,16 +156,8 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                 FileInputStream fsInput = null;
                 try {
                     fsInput = new FileInputStream(war);
-                    long size = fsInput.getChannel().size();
-
-                    if (size > Integer.MAX_VALUE)
-                        throw new UnsupportedOperationException(
-                                "DeployTask does not support WAR files " +
-                                "greater than 2 Gb");
-                    contentLength = (int) size;
-
+                    contentLength = fsInput.getChannel().size();
                     stream = new BufferedInputStream(fsInput, 1024);
-
                 } catch (IOException e) {
                     if (fsInput != null) {
                         try {
