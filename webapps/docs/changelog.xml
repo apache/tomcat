@@ -91,6 +91,12 @@
         threads setting the same attribute on a <code>ServletContext</code>
         could both see <code>null</code> as the old value. (markt)
       </fix>
+      <fix>
+        <bug>58192</bug>: Correct a regression in the previous fix for
+        <bug>58023</bug>. Ensure that classes are associated with their manifest
+        even if the class file is frist read (and cached) without the manifest.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

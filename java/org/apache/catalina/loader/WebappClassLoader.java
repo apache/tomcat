@@ -150,6 +150,8 @@ public class WebappClassLoader extends URLClassLoader
 
     private static final String CLASS_FILE_SUFFIX = ".class";
 
+    private static final Manifest MANIFEST_UNKNOWN = new Manifest();
+    
     static {
         JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
@@ -3162,9 +3164,34 @@ public class WebappClassLoader extends URLClassLoader
         if ((name == null) || (path == null))
             return null;
 
+        JarEntry jarEntry = null;
+
         ResourceEntry entry = resourceEntries.get(name);
-        if (entry != null)
+        if (entry != null) {
+            if (manifestRequired && entry.manifest == MANIFEST_UNKNOWN) {
+                // This resource was added to the cache when a request was made
+                // for the resource that did not need the manifest. Now the
+                // manifest is required, the cache entry needs to be updated.
+                synchronized (jarFiles) {
+                    if (openJARs()) {
+                        for (int i = 0; i < jarFiles.length; i++) {
+
+                            jarEntry = jarFiles[i].getJarEntry(path);
+
+                            if (jarEntry != null) {
+                                try {
+                                    entry.manifest = jarFiles[i].getManifest();
+                                } catch (IOException ioe) {
+                                    // Ignore
+                                }
+                                break;
+                            }
+                         }
+                     }
+                }
+            }
             return entry;
+        }
 
         int contentLength = -1;
         InputStream binaryStream = null;
@@ -3261,8 +3288,6 @@ public class WebappClassLoader extends URLClassLoader
         if ((entry == null) && (notFoundResources.containsKey(name)))
             return null;
 
-        JarEntry jarEntry = null;
-
         synchronized (jarFiles) {
 
             try {
@@ -3289,6 +3314,8 @@ public class WebappClassLoader extends URLClassLoader
                         try {
                             if (manifestRequired) {
                                 entry.manifest = jarFiles[i].getManifest();
+                            } else {
+                                entry.manifest = MANIFEST_UNKNOWN;
                             }
                             binaryStream = jarFiles[i].getInputStream(jarEntry);
                         } catch (IOException e) {
