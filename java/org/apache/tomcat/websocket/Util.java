@@ -86,7 +86,7 @@ public class Util {
 
     static CloseCode getCloseCode(int code) {
         if (code > 2999 && code < 5000) {
-            return CloseCodes.NORMAL_CLOSURE;
+            return CloseCodes.getCloseCode(code);
         }
         switch (code) {
             case 1000:
