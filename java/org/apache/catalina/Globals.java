@@ -288,6 +288,13 @@ public final class Globals {
 
 
     /**
+     * The reason that the parameter parsing failed.
+     */
+    public static final String PARAMETER_PARSE_FAILED_REASON_ATTR =
+            "org.apache.catalina.parameter_parse_failed_reason";
+
+
+    /**
      * The master flag which controls strict servlet specification
      * compliance.
      */

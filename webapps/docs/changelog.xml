@@ -65,6 +65,11 @@
         be added to WebappClassLoader. Patch by Nick Williams. (markt)
       </add>
       <fix>
+        <bug>58031</bug>: Make the (first) reason parameter parsing failed
+        available as a request attribute and then use it to provide a better 
+        status code via the FailedRequstFilter (if configured). (markt)
+      </fix>
+      <fix>
         <bug>58086</bug>: Ensure that WAR URLs are handled properly when using
         Apache Ant for web application deployment. (violetagg)
       </fix>
