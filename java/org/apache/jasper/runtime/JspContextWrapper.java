@@ -23,9 +23,13 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.el.ELContext;
+import javax.el.ELResolver;
+import javax.el.FunctionMapper;
+import javax.el.VariableMapper;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -489,26 +493,75 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         return alias;
     }
 
-    //private ELContextImpl elContext;
-
     @Override
     public ELContext getELContext() {
-        // instead decorate!!!
-        
         if (elContext == null) {
-            elContext = rootJspCtxt.getELContext();
+            elContext = new ELContextWrapper(rootJspCtxt.getELContext(), this);
         }
         return elContext;
-        
-        /*
-        if (this.elContext != null) {
-            JspFactory jspFact = JspFactory.getDefaultFactory();
-            ServletContext servletContext = this.getServletContext();
-            JspApplicationContextImpl jspCtx = (JspApplicationContextImpl) jspFact
-                    .getJspApplicationContext(servletContext);
-            this.elContext = jspCtx.createELContext(this);
+    }
+
+
+    static class ELContextWrapper extends ELContext {
+
+        private final ELContext wrapped;
+        private final PageContext pageContext;
+
+        private ELContextWrapper(ELContext wrapped, PageContext pageContext) {
+            this.wrapped = wrapped;
+            this.pageContext = pageContext;
         }
-        return this.elContext;
-        */
+
+        ELContext getWrappedELContext() {
+            return wrapped;
+        }
+
+        @Override
+        public void setPropertyResolved(boolean resolved) {
+            wrapped.setPropertyResolved(resolved);
+        }
+
+        @Override
+        public boolean isPropertyResolved() {
+            return wrapped.isPropertyResolved();
+        }
+
+        @Override
+        public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
+            wrapped.putContext(key, contextObject);
+        }
+
+        @Override
+        public Object getContext(@SuppressWarnings("rawtypes") Class key) {
+            if (key == JspContext.class) {
+                return pageContext;
+            }
+            return wrapped.getContext(key);
+        }
+
+        @Override
+        public Locale getLocale() {
+            return wrapped.getLocale();
+        }
+
+        @Override
+        public void setLocale(Locale locale) {
+            wrapped.setLocale(locale);
+        }
+
+        @Override
+        public ELResolver getELResolver() {
+            return wrapped.getELResolver();
+        }
+
+        @Override
+        public FunctionMapper getFunctionMapper() {
+            return wrapped.getFunctionMapper();
+        }
+
+        @Override
+        public VariableMapper getVariableMapper() {
+            return wrapped.getVariableMapper();
+        }
     }
 }

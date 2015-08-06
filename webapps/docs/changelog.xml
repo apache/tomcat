@@ -135,6 +135,11 @@
         org/apache/jsp/tag/web directory. Correct a regression in the fix for
         52725. (violetagg)
       </fix>
+      <fix>
+        <bug>58178</bug>: Expressions in a tag file should use the tag
+        file&apos;s <code>PageContext</code> rather than that of the containing
+        page. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

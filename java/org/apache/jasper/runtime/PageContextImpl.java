@@ -54,6 +54,7 @@ import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.el.ELContextImpl;
 import org.apache.jasper.el.ExpressionEvaluatorImpl;
 import org.apache.jasper.el.VariableResolverImpl;
+import org.apache.jasper.runtime.JspContextWrapper.ELContextWrapper;
 import org.apache.jasper.security.SecurityUtil;
 
 /**
@@ -937,8 +938,14 @@ public class PageContextImpl extends PageContext {
             final ProtectedFunctionMapper functionMap, final boolean escape)
             throws ELException {
         final ExpressionFactory exprFactory = jspf.getJspApplicationContext(pageContext.getServletContext()).getExpressionFactory();
-        ELContextImpl ctx = (ELContextImpl) pageContext.getELContext();
-        ctx.setFunctionMapper(functionMap);
+        ELContext ctx = pageContext.getELContext();
+        ELContextImpl ctxImpl;
+        if (ctx instanceof ELContextWrapper) {
+            ctxImpl = (ELContextImpl) ((ELContextWrapper) ctx).getWrappedELContext();
+        } else {
+            ctxImpl = (ELContextImpl) ctx;
+        }
+        ctxImpl.setFunctionMapper(functionMap);
         ValueExpression ve = exprFactory.createValueExpression(ctx, expression, expectedType);
         return ve.getValue(ctx);
     }

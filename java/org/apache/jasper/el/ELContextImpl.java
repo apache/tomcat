@@ -39,7 +39,7 @@ import org.apache.jasper.Constants;
  * 
  * @author Jacob Hookom
  */
-public final class ELContextImpl extends ELContext {
+public class ELContextImpl extends ELContext {
 
     private static final FunctionMapper NullFunctionMapper = new FunctionMapper() {
         @Override
