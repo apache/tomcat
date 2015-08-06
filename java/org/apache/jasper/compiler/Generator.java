@@ -3631,13 +3631,14 @@ class Generator {
         out.printin("public final class ");
         out.println(className);
         out.printil("    extends javax.servlet.jsp.tagext.SimpleTagSupport");
-        out.printin("    implements org.apache.jasper.runtime.JspSourceDependent");
+        out.printin("    implements org.apache.jasper.runtime.JspSourceDependent,");
+        out.println();
+        out.printin("                 org.apache.jasper.runtime.JspSourceImports");
         if (tagInfo.hasDynamicAttributes()) {
             out.println(",");
             out.printin("               javax.servlet.jsp.tagext.DynamicAttributes");
         }
         out.println(" {");
-        out.println();
         out.pushIndent();
 
         /*
@@ -3906,9 +3907,9 @@ class Generator {
             out.println(");");
         }
         if (aliasSeen) {
-            out.printil("this.jspContext = new org.apache.jasper.runtime.JspContextWrapper(ctx, _jspx_nested, _jspx_at_begin, _jspx_at_end, aliasMap);");
+            out.printil("this.jspContext = new org.apache.jasper.runtime.JspContextWrapper(this, ctx, _jspx_nested, _jspx_at_begin, _jspx_at_end, aliasMap);");
         } else {
-            out.printil("this.jspContext = new org.apache.jasper.runtime.JspContextWrapper(ctx, _jspx_nested, _jspx_at_begin, _jspx_at_end, null);");
+            out.printil("this.jspContext = new org.apache.jasper.runtime.JspContextWrapper(this, ctx, _jspx_nested, _jspx_at_begin, _jspx_at_end, null);");
         }
         out.popIndent();
         out.printil("}");
