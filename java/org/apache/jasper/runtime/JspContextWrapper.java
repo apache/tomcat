@@ -23,9 +23,16 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.el.ELContext;
+import javax.el.ELResolver;
+import javax.el.EvaluationListener;
+import javax.el.FunctionMapper;
+import javax.el.ImportHandler;
+import javax.el.VariableMapper;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -492,26 +499,135 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
         return alias;
     }
 
-    //private ELContextImpl elContext;
-
     @Override
     public ELContext getELContext() {
-        // instead decorate!!!
-
         if (elContext == null) {
-            elContext = rootJspCtxt.getELContext();
+            elContext = new ELContextWrapper(rootJspCtxt.getELContext(), this);
         }
         return elContext;
+    }
 
-        /*
-        if (this.elContext != null) {
-            JspFactory jspFact = JspFactory.getDefaultFactory();
-            ServletContext servletContext = this.getServletContext();
-            JspApplicationContextImpl jspCtx = (JspApplicationContextImpl) jspFact
-                    .getJspApplicationContext(servletContext);
-            this.elContext = jspCtx.createELContext(this);
+
+    static class ELContextWrapper extends ELContext {
+
+        private final ELContext wrapped;
+        private final PageContext pageContext;
+
+        private ELContextWrapper(ELContext wrapped, PageContext pageContext) {
+            this.wrapped = wrapped;
+            this.pageContext = pageContext;
         }
-        return this.elContext;
-        */
+
+        ELContext getWrappedELContext() {
+            return wrapped;
+        }
+
+        @Override
+        public void setPropertyResolved(boolean resolved) {
+            wrapped.setPropertyResolved(resolved);
+        }
+
+        @Override
+        public void setPropertyResolved(Object base, Object property) {
+            wrapped.setPropertyResolved(base, property);
+        }
+
+        @Override
+        public boolean isPropertyResolved() {
+            return wrapped.isPropertyResolved();
+        }
+
+        @Override
+        public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
+            wrapped.putContext(key, contextObject);
+        }
+
+        @Override
+        public Object getContext(@SuppressWarnings("rawtypes") Class key) {
+            if (key == JspContext.class) {
+                return pageContext;
+            }
+            return wrapped.getContext(key);
+        }
+
+        @Override
+        public ImportHandler getImportHandler() {
+            return wrapped.getImportHandler();
+        }
+
+        @Override
+        public Locale getLocale() {
+            return wrapped.getLocale();
+        }
+
+        @Override
+        public void setLocale(Locale locale) {
+            wrapped.setLocale(locale);
+        }
+
+        @Override
+        public void addEvaluationListener(EvaluationListener listener) {
+            wrapped.addEvaluationListener(listener);
+        }
+
+        @Override
+        public List<EvaluationListener> getEvaluationListeners() {
+            return wrapped.getEvaluationListeners();
+        }
+
+        @Override
+        public void notifyBeforeEvaluation(String expression) {
+            wrapped.notifyBeforeEvaluation(expression);
+        }
+
+        @Override
+        public void notifyAfterEvaluation(String expression) {
+            wrapped.notifyAfterEvaluation(expression);
+        }
+
+        @Override
+        public void notifyPropertyResolved(Object base, Object property) {
+            wrapped.notifyPropertyResolved(base, property);
+        }
+
+        @Override
+        public boolean isLambdaArgument(String name) {
+            return wrapped.isLambdaArgument(name);
+        }
+
+        @Override
+        public Object getLambdaArgument(String name) {
+            return wrapped.getLambdaArgument(name);
+        }
+
+        @Override
+        public void enterLambdaScope(Map<String, Object> arguments) {
+            wrapped.enterLambdaScope(arguments);
+        }
+
+        @Override
+        public void exitLambdaScope() {
+            wrapped.exitLambdaScope();
+        }
+
+        @Override
+        public Object convertToType(Object obj, Class<?> type) {
+            return wrapped.convertToType(obj, type);
+        }
+
+        @Override
+        public ELResolver getELResolver() {
+            return wrapped.getELResolver();
+        }
+
+        @Override
+        public FunctionMapper getFunctionMapper() {
+            return wrapped.getFunctionMapper();
+        }
+
+        @Override
+        public VariableMapper getVariableMapper() {
+            return wrapped.getVariableMapper();
+        }
     }
 }
