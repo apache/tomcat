@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
@@ -47,6 +48,7 @@ import javax.servlet.jsp.el.ELException;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
 import javax.servlet.jsp.tagext.BodyContent;
+import javax.servlet.jsp.tagext.JspTag;
 import javax.servlet.jsp.tagext.VariableInfo;
 
 import org.apache.jasper.compiler.Localizer;
@@ -65,6 +67,8 @@ import org.apache.jasper.compiler.Localizer;
  */
 @SuppressWarnings("deprecation") // Have to support old JSP EL API
 public class JspContextWrapper extends PageContext implements VariableResolver {
+
+    private final JspTag jspTag;
 
     // Invoking JSP context
     private final PageContext invokingJspCtxt;
@@ -90,9 +94,10 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
     private final PageContext rootJspCtxt;
 
-    public JspContextWrapper(JspContext jspContext,
+    public JspContextWrapper(JspTag jspTag, JspContext jspContext,
             ArrayList<String> nestedVars, ArrayList<String> atBeginVars,
             ArrayList<String> atEndVars, Map<String,String> aliases) {
+        this.jspTag = jspTag;
         this.invokingJspCtxt = (PageContext) jspContext;
         if (jspContext instanceof JspContextWrapper) {
             rootJspCtxt = ((JspContextWrapper)jspContext).rootJspCtxt;
@@ -502,7 +507,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     @Override
     public ELContext getELContext() {
         if (elContext == null) {
-            elContext = new ELContextWrapper(rootJspCtxt.getELContext(), this);
+            elContext = new ELContextWrapper(rootJspCtxt.getELContext(), jspTag, this);
         }
         return elContext;
     }
@@ -511,10 +516,13 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     static class ELContextWrapper extends ELContext {
 
         private final ELContext wrapped;
+        private final JspTag jspTag;
         private final PageContext pageContext;
+        private ImportHandler importHandler;
 
-        private ELContextWrapper(ELContext wrapped, PageContext pageContext) {
+        private ELContextWrapper(ELContext wrapped, JspTag jspTag, PageContext pageContext) {
             this.wrapped = wrapped;
+            this.jspTag = jspTag;
             this.pageContext = pageContext;
         }
 
@@ -552,7 +560,25 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
         @Override
         public ImportHandler getImportHandler() {
-            return wrapped.getImportHandler();
+            if (importHandler == null) {
+                importHandler = new ImportHandler();
+                if (jspTag instanceof JspSourceImports) {
+                    Set<String> packageImports = ((JspSourceImports) jspTag).getPackageImports();
+                    if (packageImports != null) {
+                        for (String packageImport : packageImports) {
+                            importHandler.importPackage(packageImport);
+                        }
+                    }
+                    Set<String> classImports = ((JspSourceImports) jspTag).getClassImports();
+                    if (classImports != null) {
+                        for (String classImport : classImports) {
+                            importHandler.importClass(classImport);
+                        }
+                    }
+                }
+
+            }
+            return importHandler;
         }
 
         @Override
