@@ -53,7 +53,11 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         sendSimpleGetRequest(5);
 
         parser.readFrame(true);
+        // Debugging Gump failure
+        System.err.println(output.getTrace());
         parser.readFrame(true);
+        // Debugging Gump failure
+        System.err.println(output.getTrace());
 
         Assert.assertEquals(getSimpleResponseTrace(3),  output.getTrace());
         output.clearTrace();
