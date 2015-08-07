@@ -1872,10 +1872,246 @@ public enum Cipher {
             256,
             256
     ),
-
-    /* PSK ciphers 0x00AA to 0x00B9
-     * Unsupported by both Java and OpenSSL
-     */
+    // Cipher AA
+    TLS_DHE_PSK_WITH_AES_128_GCM_SHA256(
+            0x00AA,
+            "DHE-PSK-AES128-GCM-SHA256",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.AES128GCM,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher AB
+    TLS_DHE_PSK_WITH_AES_256_GCM_SHA384(
+            0x00AB,
+            "DHE-PSK-AES256-GCM-SHA384",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.AES256GCM,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    // Cipher AC
+    TLS_RSA_PSK_WITH_AES_128_GCM_SHA256(
+            0x00AC,
+            "RSA-PSK-AES128-GCM-SHA256",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.AES128GCM,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher AD
+    TLS_RSA_PSK_WITH_AES_256_GCM_SHA384(
+            0x00AD,
+            "RSA-PSK-AES256-GCM-SHA384",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.AES256GCM,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    // Cipher AE
+    TLS_PSK_WITH_AES_128_CBC_SHA256    (
+            0x00AE,
+            "PSK-AES128-CBC-SHA256",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.AES128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher AF
+    TLS_PSK_WITH_AES_256_CBC_SHA384    (
+            0x00AF,
+            "PSK-AES256-CBC-SHA384",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.AES256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    // Cipher B0
+    TLS_PSK_WITH_NULL_SHA256           (
+            0x00B0,
+            "PSK-NULL-SHA256",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.eNULL,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            0,
+            0
+    ),
+    // Cipher B1
+    TLS_PSK_WITH_NULL_SHA384           (
+            0x00B1,
+            "PSK-NULL-SHA384",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.eNULL,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            0,
+            0
+    ),
+    // Cipher B2
+    TLS_DHE_PSK_WITH_AES_128_CBC_SHA256(
+            0x00B2,
+            "DHE-PSK-AES128-CBC-SHA256",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.AES128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher B3
+    TLS_DHE_PSK_WITH_AES_256_CBC_SHA384(
+            0x00B3,
+            "DHE-PSK-AES256-CBC-SHA384",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.AES256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    // Cipher B4
+    TLS_DHE_PSK_WITH_NULL_SHA256       (
+            0x00B4,
+            "DHE-PSK-NULL-SHA256",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.eNULL,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            0,
+            0
+    ),
+    // Cipher B5
+    TLS_DHE_PSK_WITH_NULL_SHA384       (
+            0x00B5,
+            "DHE-PSK-NULL-SHA384",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.eNULL,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            0,
+            0
+    ),
+    // Cipher B6
+    TLS_RSA_PSK_WITH_AES_128_CBC_SHA256(
+            0x00B6,
+            "RSA-PSK-AES128-CBC-SHA256",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.AES128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher B7
+    TLS_RSA_PSK_WITH_AES_256_CBC_SHA384(
+            0x00B7,
+            "RSA-PSK-AES256-CBC-SHA384",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.AES256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    // Cipher B8
+    TLS_RSA_PSK_WITH_NULL_SHA256       (
+            0x00B8,
+            "RSA-PSK-NULL-SHA256",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.eNULL,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.STRONG_NONE,
+            true,
+            0,
+            0
+    ),
+    // Cipher B9
+    TLS_RSA_PSK_WITH_NULL_SHA384       (
+            0x00B9,
+            "RSA-PSK-NULL-SHA384",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.eNULL,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.STRONG_NONE,
+            true,
+            0,
+            0
+    ),
 
     // Cipher BA
     TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256(
