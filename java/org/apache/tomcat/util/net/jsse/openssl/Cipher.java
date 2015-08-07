@@ -732,8 +732,6 @@ public enum Cipher {
     ),*/
 
     /* PSK cipher suites from RFC 4785 */
-    // Unsupported by Java
-
     // Cipher 2C
     TLS_PSK_WITH_NULL_SHA(
             0x002c,
