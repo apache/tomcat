@@ -392,8 +392,21 @@ public class TestCipher {
      */
     private static Set<String> OPENSSL_UNMAPPED_ORACLE =
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+                    "ADH-DES-CBC-SHA+SSLv3",
+                    "ADH-DES-CBC3-SHA+SSLv3",
+                    "ADH-RC4-MD5+SSLv3",
                     "DES-CBC-MD5+SSLv2",
+                    "DES-CBC-SHA+SSLv3",
                     "DES-CBC3-MD5+SSLv2",
+                    "DES-CBC3-SHA+SSLv3",
+                    "DH-DSS-DES-CBC-SHA+SSLv3",
+                    "DH-DSS-DES-CBC3-SHA+SSLv3",
+                    "DH-RSA-DES-CBC-SHA+SSLv3",
+                    "DH-RSA-DES-CBC3-SHA+SSLv3",
+                    "DHE-DSS-DES-CBC-SHA+SSLv3",
+                    "DHE-DSS-DES-CBC3-SHA+SSLv3",
+                    "DHE-RSA-DES-CBC-SHA+SSLv3",
+                    "DHE-RSA-DES-CBC3-SHA+SSLv3",
                     "ECDH-ECDSA-CAMELLIA128-SHA256+TLSv1.2",
                     "ECDH-ECDSA-CAMELLIA256-SHA384+TLSv1.2",
                     "ECDH-RSA-CAMELLIA128-SHA256+TLSv1.2",
@@ -402,11 +415,22 @@ public class TestCipher {
                     "ECDHE-ECDSA-CAMELLIA256-SHA384+TLSv1.2",
                     "ECDHE-RSA-CAMELLIA128-SHA256+TLSv1.2",
                     "ECDHE-RSA-CAMELLIA256-SHA384+TLSv1.2",
+                    "EXP-ADH-DES-CBC-SHA+SSLv3",
+                    "EXP-ADH-RC4-MD5+SSLv3",
+                    "EXP-DES-CBC-SHA+SSLv3",
+                    "EXP-DHE-DSS-DES-CBC-SHA+SSLv3",
+                    "EXP-DHE-RSA-DES-CBC-SHA+SSLv3",
                     "EXP-RC2-CBC-MD5+SSLv2",
+                    "EXP-RC2-CBC-MD5+SSLv3",
                     "EXP-RC4-MD5+SSLv2",
+                    "EXP-RC4-MD5+SSLv3",
                     "IDEA-CBC-MD5+SSLv2",
+                    "NULL-MD5+SSLv3",
+                    "NULL-SHA+SSLv3",
                     "RC2-CBC-MD5+SSLv2",
-                    "RC4-MD5+SSLv2")));
+                    "RC4-MD5+SSLv2",
+                    "RC4-MD5+SSLv3",
+                    "RC4-SHA+SSLv3")));
 
 
     /**
