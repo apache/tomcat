@@ -731,17 +731,53 @@ public enum Cipher {
             128
     ),*/
 
-    /* PSK cipher suites from RFC 4785
-     * Unsupported by both Java and OpenSSL.
+    /* PSK cipher suites from RFC 4785 */
+    // Unsupported by Java
+
     // Cipher 2C
-    TLS_PSK_WITH_NULL_SHA
+    TLS_PSK_WITH_NULL_SHA(
+            0x002c,
+            "PSK-NULL-SHA",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.eNULL,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.STRONG_NONE,
+            true,
+            0,
+            0),
 
     // Cipher 2D
-    TLS_DHE_PSK_WITH_NULL_SHA
+    TLS_DHE_PSK_WITH_NULL_SHA(
+            0x002d,
+            "DHE-PSK-NULL-SHA",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.eNULL,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.STRONG_NONE,
+            true,
+            0,
+            0),
 
     // Cipher 2E
-    TLS_RSA_PSK_WITH_NULL_SHA
-    */
+    TLS_RSA_PSK_WITH_NULL_SHA(
+            0x002e,
+            "RSA-PSK-NULL-SHA",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.eNULL,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.STRONG_NONE,
+            true,
+            0,
+            0),
 
     /* New AES ciphersuites */
     // Cipher 2F
