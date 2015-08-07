@@ -100,6 +100,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
     private static final String PROP_REMOVEABANDONEDONMAINTENANCE = "removeAbandonedOnMaintenance";
     private static final String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
     private static final String PROP_LOGABANDONED = "logAbandoned";
+    private static final String PROP_ABANDONEDUSAGETRACKING = "abandonedUsageTracking";
     private static final String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
     private static final String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
     private static final String PROP_CONNECTIONPROPERTIES = "connectionProperties";
@@ -166,6 +167,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
         PROP_REMOVEABANDONEDONMAINTENANCE,
         PROP_REMOVEABANDONEDTIMEOUT,
         PROP_LOGABANDONED,
+        PROP_ABANDONEDUSAGETRACKING,
         PROP_POOLPREPAREDSTATEMENTS,
         PROP_MAXOPENPREPAREDSTATEMENTS,
         PROP_CONNECTIONPROPERTIES,
@@ -514,6 +516,11 @@ public class BasicDataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_LOGABANDONED);
         if (value != null) {
             dataSource.setLogAbandoned(Boolean.valueOf(value).booleanValue());
+        }
+        
+        value = properties.getProperty(PROP_ABANDONEDUSAGETRACKING);
+        if (value != null) {
+            dataSource.setAbandonedUsageTracking(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_POOLPREPAREDSTATEMENTS);

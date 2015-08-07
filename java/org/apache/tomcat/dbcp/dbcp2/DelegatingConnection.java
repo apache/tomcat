@@ -230,9 +230,13 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
         try {
             passivate();
         } finally {
-            try {
-                _conn.close();
-            } finally {
+            if (_conn != null) {
+                try {
+                    _conn.close();
+                } finally {
+                    _closed = true;
+                }
+            } else {
                 _closed = true;
             }
         }
