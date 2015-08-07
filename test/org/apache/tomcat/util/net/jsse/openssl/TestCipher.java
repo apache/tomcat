@@ -111,7 +111,7 @@ public class TestCipher {
             if (openSSLAlias.contains("RC2-MD5")) {
                 continue;
             }
-            // As of OpenSSL 1.1.0, SSLv2 ciphers are not suported so exclude
+            // As of OpenSSL 1.1.0, SSLv2 ciphers are not supported so exclude
             // them from the expected list
             if (cipher.getProtocol().equals(Protocol.SSLv2)) {
                 continue;
@@ -393,6 +393,7 @@ public class TestCipher {
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                     "DES-CBC-MD5+SSLv2",
                     "DES-CBC3-MD5+SSLv2",
+                    "DHE-PSK-NULL-SHA+SSLv3",
                     "ECDH-ECDSA-CAMELLIA128-SHA256+TLSv1.2",
                     "ECDH-ECDSA-CAMELLIA256-SHA384+TLSv1.2",
                     "ECDH-RSA-CAMELLIA128-SHA256+TLSv1.2",
@@ -404,8 +405,10 @@ public class TestCipher {
                     "EXP-RC2-CBC-MD5+SSLv2",
                     "EXP-RC4-MD5+SSLv2",
                     "IDEA-CBC-MD5+SSLv2",
+                    "PSK-NULL-SHA+SSLv3",
                     "RC2-CBC-MD5+SSLv2",
-                    "RC4-MD5+SSLv2")));
+                    "RC4-MD5+SSLv2",
+                    "RSA-PSK-NULL-SHA+SSLv3")));
 
 
     /**
@@ -584,6 +587,7 @@ public class TestCipher {
                     "DHE-DSS-CAMELLIA256-SHA+SSLv3",
                     "DHE-DSS-CAMELLIA256-SHA256+TLSv1.2",
                     "DHE-DSS-SEED-SHA+SSLv3",
+                    "DHE-PSK-NULL-SHA+SSLv3",
                     "DHE-RSA-CAMELLIA128-SHA+SSLv3",
                     "DHE-RSA-CAMELLIA128-SHA256+TLSv1.2",
                     "DHE-RSA-CAMELLIA256-SHA+SSLv3",
@@ -608,9 +612,11 @@ public class TestCipher {
                     "PSK-AES128-GCM-SHA256+TLSv1.2",
                     "PSK-AES256-CBC-SHA+SSLv3",
                     "PSK-AES256-GCM-SHA384+TLSv1.2",
+                    "PSK-NULL-SHA+SSLv3",
                     "PSK-RC4-SHA+SSLv3",
                     "RC2-CBC-MD5+SSLv2",
                     "RC4-MD5+SSLv2",
+                    "RSA-PSK-NULL-SHA+SSLv3",
                     "SEED-SHA+SSLv3",
                     "SRP-AES-128-CBC-SHA+SSLv3",
                     "SRP-AES-256-CBC-SHA+SSLv3",
