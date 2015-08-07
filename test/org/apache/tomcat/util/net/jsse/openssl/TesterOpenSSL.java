@@ -36,6 +36,7 @@ public class TesterOpenSSL {
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                     // The following ciphers are not implemented in an OpenSSL
                     // version
+                    Cipher.SSL2_DES_64_CBC_WITH_MD5,
                     Cipher.SSL_CK_RC2_128_CBC_WITH_MD5,
                     // The following are not implemented in 1.1.x onwards. They
                     // are implemented in 1.0.x and earlier
