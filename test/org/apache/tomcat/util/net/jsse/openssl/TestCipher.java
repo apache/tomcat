@@ -43,30 +43,31 @@ public class TestCipher {
     public void testAllOpenSSLCiphersMapped() throws Exception {
         Set<String> openSSLCipherSuites = TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL");
 
+        StringBuilder errors = new StringBuilder();
+
         for (String openSSLCipherSuite : openSSLCipherSuites) {
             List<String> jsseCipherSuites =
                     OpenSSLCipherConfigurationParser.parseExpression(openSSLCipherSuite);
 
             for (JsseImpl jsseImpl : JSSE_IMPLS) {
-                boolean found = false;
                 for (String jsseCipherSuite : jsseCipherSuites) {
                     if (jsseImpl.getStandardNames().contains(jsseCipherSuite)) {
-                        found = true;
-                        Assert.assertFalse("Mapping found in " + jsseImpl.getVendor() +
+                        if (jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
+                            errors.append("Mapping found in " + jsseImpl.getVendor() +
                                 "'s JSSE implementation for " + openSSLCipherSuite +
-                                " when none was expected",
-                                jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite));
-                        break;
+                                " when none was expected\n");
+                        }
+                    } else {
+                        if (!jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
+                            errors.append("No mapping found in " + jsseImpl.getVendor() +
+                                    "'s JSSE implementation for " + openSSLCipherSuite +
+                                    " when one was expected\n");
+                        }
                     }
-                }
-                if (!found) {
-                    Assert.assertTrue("No mapping found in " + jsseImpl.getVendor() +
-                            "'s JSSE implementation for " + openSSLCipherSuite +
-                            " when one was expected",
-                            jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite));
                 }
             }
         }
+        Assert.assertTrue(errors.toString(), errors.length() == 0);
     }
 
 
@@ -584,7 +585,10 @@ public class TestCipher {
                     "DHE-DSS-CAMELLIA256-SHA+SSLv3",
                     "DHE-DSS-CAMELLIA256-SHA256+TLSv1.2",
                     "DHE-DSS-SEED-SHA+SSLv3",
+                    "DHE-PSK-AES128-CBC-SHA+SSLv3",
+                    "DHE-PSK-AES256-GCM-SHA384+TLSv1.2",
                     "DHE-PSK-NULL-SHA+SSLv3",
+                    "DHE-PSK-NULL-SHA384+SSLv3",
                     "DHE-RSA-CAMELLIA128-SHA+SSLv3",
                     "DHE-RSA-CAMELLIA128-SHA256+TLSv1.2",
                     "DHE-RSA-CAMELLIA256-SHA+SSLv3",
