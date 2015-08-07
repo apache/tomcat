@@ -179,7 +179,7 @@ class PooledConnectionImpl implements PooledConnection,
         if (logicalConnection != null && !logicalConnection.isClosed()) {
             // should notify pool of error so the pooled connection can
             // be removed !FIXME!
-            throw new SQLException("PooledConnection was reused, without"
+            throw new SQLException("PooledConnection was reused, without "
                     + "its previous Connection being closed.");
         }
 
