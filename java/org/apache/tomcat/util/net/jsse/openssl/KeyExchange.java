@@ -29,5 +29,8 @@ enum KeyExchange {
     ECDHr /* SSL_kECDHr - ECDH cert, RSA CA cert */,
     ECDHe /* SSL_eECDHe - ECDH cert, ECDSA CA cert */,
     GOST  /* SSL_kGOST  - GOST key exchange */,
-    SRP   /* SSL_kSRP   - SRP */;
+    SRP   /* SSL_kSRP   - SRP */,
+    RSAPSK,
+    ECDHEPSK,
+    DHEPSK;
 }
