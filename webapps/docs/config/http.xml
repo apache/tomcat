@@ -933,7 +933,7 @@
   <strong>SSLHostConfig</strong> element which can be used to define one of
   these configurations. Any number of <strong>SSLHostConfig</strong> may be
   nested in a <strong>Connector</strong>. Tomcat 9 also adds support for
-  mutliple cerificates to be associated with a single
+  multiple certificates to be associated with a single
   <strong>SSLHostConfig</strong>. Each SSL certificate is therefore configured
   in a <strong>Certificate</strong> element with in an
   <strong>SSLHostConfig</strong>. For further information, see the SSL Support
@@ -1175,7 +1175,7 @@
 
     <attribute name="sslProtocol" required="false">
       <p>JSSE only.</p>
-      <p>The the SSL protocol(s) to use (a single value may enable multiple
+      <p>The SSL protocol(s) to use (a single value may enable multiple
       protocols - see the JVM documentation for details). If not specified, the
       default is <code>TLS</code>. The permitted values may be obtained from the
       JVM documentation for the allowed values for algorithm when creating an
@@ -1270,7 +1270,7 @@
       order in which keys are read from the keystore is implementation
       dependent. It may not be the case that keys are read from the keystore in
       the same order as they were added. If more than one key is present in the
-      kesytore it is strongly recommended that a keyAlias is configured to
+      keystore it is strongly recommended that a keyAlias is configured to
       ensure that the correct key is used.</p>
     </attribute>
 
@@ -1330,7 +1330,7 @@
     </attribute>
 
     <attribute name="type" required="false">
-      <p>The type of certificate. This is used to idenitfy the ciphers that are
+      <p>The type of certificate. This is used to identify the ciphers that are
       compatible with the certificate. It must be one of <code>UNDEFINED</code>,
       <code>RSA</code>, <code>DSS</code> or <code>EC</code>. If only one
       <strong>Certificate</strong> is nested within a <code>SSLHostConfig</code>
@@ -1357,7 +1357,7 @@
       requested server name. The message needs to be buffered so it can then be
       passed to the JSSE implementation for normal TLS processing. In theory,
       this first message could be very large although in practise it is
-      typically a few hundered bytes. This attribute sets the maximum message
+      typically a few hundred bytes. This attribute sets the maximum message
       size that Tomcat will buffer. If a message exceeds this size, the
       connection will be configured as if no server name was indicated by the
       client. If not specified a default of <code>65536</code> (64k) will be
@@ -1384,7 +1384,7 @@
   <subsection name="SSL Support - Connector - NIO and NIO2 (deprecated)">
 
   <p>The following NIO and NIO2 SSL configuration attributes have been
-  depreacted in favour of the default
+  deprecated in favour of the default
   <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.
   </p>
 
