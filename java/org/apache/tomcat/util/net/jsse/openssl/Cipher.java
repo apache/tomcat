@@ -3170,8 +3170,68 @@ public enum Cipher {
             256,
             256
     ),
+    // Cipher C033
+    TLS_ECDHE_PSK_WITH_RC4_128_SHA(
+            0xC033,
+            "ECDHE-PSK-RC4-SHA",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.RC4,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.MEDIUM,
+            false,
+            128,
+            128
+    ),
+    // Cipher C034
+    TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA(
+            0xC034,
+            "ECDHE-PSK-3DES-EDE-CBC-SHA",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.TRIPLE_DES,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            112,
+            168
+    ),
+    // Cipher C035
+    TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA(
+            0xC035,
+            "ECDHE-PSK-AES128-CBC-SHA",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.AES128,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher C036
+    TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA(
+            0xC036,
+            "ECDHE-PSK-AES256-CBC-SHA",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.AES256,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
 
-    /* PSK ciphers 0xC033 to 0xC03B
+    /* PSK ciphers 0xC037 to 0xC03B
      * Unsupported by both Java and OpenSSL
      */
 
