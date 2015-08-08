@@ -1565,11 +1565,126 @@ public enum Cipher {
             256,
             256
     ),
-
-    /* PSK ciphers 0x008E to 0x0095
-     * Unsupported by both Java and OpenSSL
-     */
-
+    // Cipher 8E
+    TLS_DHE_PSK_WITH_RC4_128_SHA(
+            0x008E,
+            "DHE-PSK-RC4-SHA",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.RC4,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.MEDIUM,
+            false,
+            128,
+            128
+    ),
+    // Cipher 8F
+    TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA(
+            0x008F,
+            "DHE-PSK-3DES-EDE-CBC-SHA",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.TRIPLE_DES,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            112,
+            168
+    ),
+    // Cipher 90
+    TLS_DHE_PSK_WITH_AES_128_CBC_SHA(
+            0x0090,
+            "DHE-PSK-AES128-CBC-SHA",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.AES128,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher 91
+    TLS_DHE_PSK_WITH_AES_256_CBC_SHA(
+            0x0091,
+            "DHE-PSK-AES256-CBC-SHA",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.AES256,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    // Cipher 92
+    TLS_RSA_PSK_WITH_RC4_128_SHA(
+            0x0092,
+            "RSA-PSK-RC4-SHA",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.RC4,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.MEDIUM,
+            false,
+            128,
+            128
+    ),
+    // Cipher 93
+    TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA(
+            0x0093,
+            "RSA-PSK-3DES-EDE-CBC-SHA",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.TRIPLE_DES,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            112,
+            168
+    ),
+    // Cipher 94
+    TLS_RSA_PSK_WITH_AES_128_CBC_SHA(
+            0x0094,
+            "RSA-PSK-AES128-CBC-SHA",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.AES128,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    // Cipher 95
+    TLS_RSA_PSK_WITH_AES_256_CBC_SHA(
+            0x0095,
+            "RSA-PSK-AES256-CBC-SHA",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.AES256,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
     /* SEED ciphersuites from RFC4162 */
     // Cipher 96
     TLS_RSA_WITH_SEED_CBC_SHA(
