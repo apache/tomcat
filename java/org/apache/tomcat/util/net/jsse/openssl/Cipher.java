@@ -3426,6 +3426,127 @@ public enum Cipher {
             256
     ),
 
+    // Cipher C094
+    TLS_PSK_WITH_CAMELLIA_128_CBC_SHA256(
+            0xC094,
+            "PSK-CAMELLIA128-SHA256",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher C095
+    TLS_PSK_WITH_CAMELLIA_256_CBC_SHA384(
+            0xC095,
+            "PSK-CAMELLIA256-SHA384",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.CAMELLIA256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256
+    ),
+    // Cipher C096
+    TLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256(
+            0xC096,
+            "DHE-PSK-CAMELLIA128-SHA256",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher C097
+    TLS_DHE_PSK_WITH_CAMELLIA_256_CBC_SHA384(
+            0xC097,
+            "DHE-PSK-CAMELLIA256-SHA384",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.CAMELLIA256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256
+    ),
+    // Cipher C098
+    TLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256(
+            0xC098,
+            "RSA-PSK-CAMELLIA128-SHA256",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher C099
+    TLS_RSA_PSK_WITH_CAMELLIA_256_CBC_SHA384(
+            0xC099,
+            "RSA-PSK-CAMELLIA256-SHA384",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.CAMELLIA256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256
+    ),
+    // Cipher C09A
+    TLS_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256(
+            0xC09A,
+            "ECDHE-PSK-CAMELLIA128-SHA256",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.CAMELLIA128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128
+    ),
+    // Cipher C09B
+    TLS_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384(
+            0xC09B,
+            "ECDHE-PSK-CAMELLIA256-SHA384",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.CAMELLIA256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256
+    ),
+
     // Cipher 0x010080 (SSLv2)
     // RC4_128_WITH_MD5
     SSL_CK_RC4_128_WITH_MD5(
