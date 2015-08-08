@@ -396,12 +396,8 @@ public class TestCipher {
             Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
                     "DES-CBC-MD5+SSLv2",
                     "DES-CBC3-MD5+SSLv2",
-                    "DHE-PSK-3DES-EDE-CBC-SHA+SSLv3",
-                    "DHE-PSK-AES128-CBC-SHA+SSLv3",
-                    "DHE-PSK-AES256-CBC-SHA+SSLv3",
                     "DHE-PSK-CAMELLIA128-SHA256+SSLv3",
                     "DHE-PSK-CAMELLIA256-SHA384+SSLv3",
-                    "DHE-PSK-RC4-SHA+SSLv3",
                     "ECDH-ECDSA-CAMELLIA128-SHA256+TLSv1.2",
                     "ECDH-ECDSA-CAMELLIA256-SHA384+TLSv1.2",
                     "ECDH-RSA-CAMELLIA128-SHA256+TLSv1.2",
@@ -428,12 +424,8 @@ public class TestCipher {
                     "PSK-CAMELLIA256-SHA384+SSLv3",
                     "RC2-CBC-MD5+SSLv2",
                     "RC4-MD5+SSLv2",
-                    "RSA-PSK-3DES-EDE-CBC-SHA+SSLv3",
-                    "RSA-PSK-AES128-CBC-SHA+SSLv3",
-                    "RSA-PSK-AES256-CBC-SHA+SSLv3",
                     "RSA-PSK-CAMELLIA128-SHA256+SSLv3",
-                    "RSA-PSK-CAMELLIA256-SHA384+SSLv3",
-                    "RSA-PSK-RC4-SHA+SSLv3")));
+                    "RSA-PSK-CAMELLIA256-SHA384+SSLv3")));
 
 
     /**
