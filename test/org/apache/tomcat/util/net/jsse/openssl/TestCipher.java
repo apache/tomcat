@@ -50,20 +50,22 @@ public class TestCipher {
                     OpenSSLCipherConfigurationParser.parseExpression(openSSLCipherSuite);
 
             for (JsseImpl jsseImpl : JSSE_IMPLS) {
+                boolean found = false;
                 for (String jsseCipherSuite : jsseCipherSuites) {
                     if (jsseImpl.getStandardNames().contains(jsseCipherSuite)) {
-                        if (jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
+                        found = true;
+                        if (!jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
                             errors.append("Mapping found in " + jsseImpl.getVendor() +
                                 "'s JSSE implementation for " + openSSLCipherSuite +
                                 " when none was expected\n");
                         }
-                    } else {
-                        if (!jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
-                            errors.append("No mapping found in " + jsseImpl.getVendor() +
-                                    "'s JSSE implementation for " + openSSLCipherSuite +
-                                    " when one was expected\n");
-                        }
+                        break;
                     }
+                }
+                if (!found && jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
+                    errors.append("No mapping found in " + jsseImpl.getVendor() +
+                            "'s JSSE implementation for " + openSSLCipherSuite +
+                            " when one was expected");
                 }
             }
         }
