@@ -1026,7 +1026,7 @@
       order in which keys are read from the keystore is implementation
       dependent. It may not be the case that keys are read from the keystore in
       the same order as they were added. If more than one key is present in the
-      kesytore it is strongly recommended that a keyAlias is configured to
+      keystore it is strongly recommended that a keyAlias is configured to
       ensure that the correct key is used.</p>
     </attribute>
 
@@ -1099,7 +1099,7 @@
     </attribute>
 
     <attribute name="sslProtocol" required="false">
-      <p>The the SSL protocol(s) to use (a single value may enable multiple
+      <p>The SSL protocol(s) to use (a single value may enable multiple
       protocols - see the JVM documentation for details). If not specified, the
       default is <code>TLS</code>. The permitted values may be obtained from the
       JVM documentation for the allowed values for algorithm when creating an
