@@ -54,7 +54,7 @@ public class TestCipher {
                 for (String jsseCipherSuite : jsseCipherSuites) {
                     if (jsseImpl.getStandardNames().contains(jsseCipherSuite)) {
                         found = true;
-                        if (!jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
+                        if (jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
                             errors.append("Mapping found in " + jsseImpl.getVendor() +
                                 "'s JSSE implementation for " + openSSLCipherSuite +
                                 " when none was expected\n");
@@ -62,10 +62,10 @@ public class TestCipher {
                         break;
                     }
                 }
-                if (!found && jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
+                if (!found && !jsseImpl.getOpenSslUnmapped().contains(openSSLCipherSuite)) {
                     errors.append("No mapping found in " + jsseImpl.getVendor() +
                             "'s JSSE implementation for " + openSSLCipherSuite +
-                            " when one was expected");
+                            " when one was expected\n");
                 }
             }
         }
