@@ -3231,9 +3231,76 @@ public enum Cipher {
             256
     ),
 
-    /* PSK ciphers 0xC037 to 0xC03B
-     * Unsupported by both Java and OpenSSL
-     */
+    TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256(
+            0xC037,
+            "ECDHE-PSK-AES128-CBC-SHA256",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.AES128,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128
+    ),
+    TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384(
+            0xC038,
+            "ECDHE-PSK-AES256-CBC-SHA384",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.AES256,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256
+    ),
+    TLS_ECDHE_PSK_WITH_NULL_SHA(
+            0xC039,
+            "ECDHE-PSK-NULL-SHA",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.eNULL,
+            MessageDigest.SHA1,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.STRONG_NONE,
+            true,
+            0,
+            0
+    ),
+    TLS_ECDHE_PSK_WITH_NULL_SHA256(
+            0xC03A,
+            "ECDHE-PSK-NULL-SHA256",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.eNULL,
+            MessageDigest.SHA256,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.STRONG_NONE,
+            true,
+            0,
+            0
+    ),
+    TLS_ECDHE_PSK_WITH_NULL_SHA384(
+            0xC03B,
+            "ECDHE-PSK-NULL-SHA384",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.eNULL,
+            MessageDigest.SHA384,
+            Protocol.TLSv1,
+            false,
+            EncryptionLevel.STRONG_NONE,
+            true,
+            0,
+            0
+    ),
 
     /* ARIA ciphers 0xC03C to 0xC071
      * Unsupported by both Java and OpenSSL
