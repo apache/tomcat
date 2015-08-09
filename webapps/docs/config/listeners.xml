@@ -192,7 +192,7 @@
 
       <attribute name="driverManagerProtection" required="false">
         <p>The first use of <code>java.sql.DriverManager</code> will trigger the
-        loading of JDBC Driver in the the current class loader. The web
+        loading of JDBC Driver in the current class loader. The web
         application level memory leak protection can take care of this in most
         cases but triggering the loading here has fewer side-effects. The
         default is <code>true</code>.</p>
@@ -501,7 +501,7 @@
 
       <attribute name="useLocalPorts" required="false">
         <p>Should any clients using these ports be forced to use local ports to
-        connect to the the JMX/RMI server. This is useful when tunnelling
+        connect to the JMX/RMI server. This is useful when tunnelling
         connections over SSH or similar. Defaults to <code>false</code>.</p>
       </attribute>
 
