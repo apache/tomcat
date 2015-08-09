@@ -361,7 +361,7 @@
     implements many of the same file handling attributes.  The main
     difference to the standard <code>AccessLogValve</code> is that
     <code>ExtendedAccessLogValve</code> creates log files which
-    conform to the the Working Draft for the
+    conform to the Working Draft for the
     <a href="http://www.w3.org/TR/WD-logfile.html">Extended Log File Format</a>
     defined by the W3C.</p>
 

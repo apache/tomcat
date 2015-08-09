@@ -198,7 +198,7 @@
     message basis. Meaning, that your messages are not delivered based on some static configuration
     that remains fixed after the message framework has been started.<br/>
     To give you an example of how powerful this feature is, I'll try to illustrate it with a simple example.
-    Imagine you need to send 10 different messages, you could send the the following way:
+    Imagine you need to send 10 different messages, you could send them the following way:
     <source>
       Message_1 - asynchronous and fast, no guarantee required, fire and forget
       Message_2 - all-or-nothing, either all receivers get it, or none.

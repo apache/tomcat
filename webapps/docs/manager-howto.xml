@@ -781,7 +781,7 @@ error message.  Possible causes for problems include:</p>
 <p><strong><span style="color: red;">WARNING</span> - This command will delete any web
 application artifacts that exist within <code>appBase</code> directory
 (typically "webapps") for this virtual host</strong>.
-This will delete the the application .WAR, if present,
+This will delete the application .WAR, if present,
 the application directory resulting either from a deploy in unpacked form
 or from .WAR expansion as well as the XML Context definition from
 <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> directory.
