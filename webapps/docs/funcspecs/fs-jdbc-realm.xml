@@ -252,7 +252,7 @@
 
 <section name="Testable Assertions">
 
-  <p>In addition the the assertions implied by the functionality requirements
+  <p>In addition to the assertions implied by the functionality requirements
   listed above, the following additional assertions shall be tested to
   validate the behavior of <code>JDBCRealm</code>:</p>
   <ul>

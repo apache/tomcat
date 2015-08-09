@@ -628,7 +628,7 @@
         <p>If <code>true</code> and an <code>sun.net.www.http.HttpClient</code>
         keep-alive timer thread has been started by this web application and is
         still running, Tomcat will change the context class loader for that
-        thread from the web application class loader to the the parent of the web
+        thread from the web application class loader to the parent of the web
         application class loader to prevent a memory leak. Note that the
         keep-alive timer thread will stop on its own once the keep-alives all
         expire however, on a busy system that might not happen for some time. If
