@@ -1493,7 +1493,7 @@
         <p>Some clients (not most browsers) expect the server to cache the
         authenticated user information for a connection and do not resend the
         credentials with every request. Tomcat will not do this unless an HTTP
-        session is available. A session will be availble if either the
+        session is available. A session will be available if either the
         application creates one or if <code>alwaysUseSession</code> is enabled
         for this Authenticator.</p>
         <p>As an alternative to creating a session, this attribute may be used
