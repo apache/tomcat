@@ -467,7 +467,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(kGOST, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.GOST)));
         addListAlias(GOST94, filterByMessageDigest(allCiphers, Collections.singleton(MessageDigest.GOST94)));
         addListAlias(GOST89MAC, filterByMessageDigest(allCiphers, Collections.singleton(MessageDigest.GOST89MAC)));
-        addListAlias(PSK, filter(allCiphers, null, Collections.singleton(KeyExchange.PSK), Collections.singleton(Authentication.PSK), null, null, null));
+        addListAlias(PSK, filter(allCiphers, null, new HashSet<>(Arrays.asList(KeyExchange.PSK, KeyExchange.RSAPSK, KeyExchange.DHEPSK, KeyExchange.ECDHEPSK)), Collections.singleton(Authentication.PSK), null, null, null));
         addListAlias(KRB5, filter(allCiphers, null, Collections.singleton(KeyExchange.KRB5), Collections.singleton(Authentication.KRB5), null, null, null));
         addListAlias(aSRP, filterByAuthentication(allCiphers, Collections.singleton(Authentication.SRP)));
         addListAlias(kSRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
