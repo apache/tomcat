@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import org.apache.catalina.connector.Connector;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,8 +35,22 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
     public void testGoawayIgnoreNewStreams() throws Exception {
         setPingAckDelayMillis(PNG_ACK_DELAY_MS);
 
-        // HTTP2 upgrade
-        http2Connect();
+        // HTTP2 upgrade - need longer timeouts for this test
+        Connector connector = getTomcatInstance().getConnector();
+        Http2Protocol http2Protocol = new Http2Protocol();
+        // Short timeouts for now. May need to increase these for CI systems.
+        http2Protocol.setReadTimeout(5000);
+        http2Protocol.setKeepAliveTimeout(10000);
+        http2Protocol.setWriteTimeout(5000);
+        http2Protocol.setMaxConcurrentStreams(200);
+        connector.addUpgradeProtocol(http2Protocol);
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        Thread.sleep(PNG_ACK_DELAY_MS + 200);
 
         getTomcatInstance().getConnector().pause();
 
