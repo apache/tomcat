@@ -1257,9 +1257,10 @@ public enum Cipher {
             null
     ),
     /* Experimental (and now expired) TLSv1 versions of SSLv3 ciphers.
-     * Unsupported by Java and OpenSSL.
+     * Unsupported by Java and OpenSSL. */
     // Cipher 60
     TLS_RSA_EXPORT1024_WITH_RC4_56_MD5(
+            0x0060,
             "EXP1024-RC4-MD5",
             KeyExchange.RSA,
             Authentication.RSA,
@@ -1276,6 +1277,7 @@ public enum Cipher {
     ),
     // Cipher 61
     TLS_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5(
+            0x0061,
             "EXP1024-RC2-CBC-MD5",
             KeyExchange.RSA,
             Authentication.RSA,
@@ -1292,6 +1294,7 @@ public enum Cipher {
     ),
     // Cipher 62
     TLS_RSA_EXPORT1024_WITH_DES_CBC_SHA(
+            0x0062,
             "EXP1024-DES-CBC-SHA",
             KeyExchange.RSA,
             Authentication.RSA,
@@ -1308,6 +1311,7 @@ public enum Cipher {
     ),
     // Cipher 63
     TLS_DHE_DSS_EXPORT1024_WITH_DES_CBC_SHA(
+            0x0063,
             "EXP1024-DHE-DSS-DES-CBC-SHA",
             KeyExchange.EDH,
             Authentication.DSS,
@@ -1324,6 +1328,7 @@ public enum Cipher {
     ),
     // Cipher 64
     TLS_RSA_EXPORT1024_WITH_RC4_56_SHA(
+            0x0064,
             "EXP1024-RC4-SHA",
             KeyExchange.RSA,
             Authentication.RSA,
@@ -1340,6 +1345,7 @@ public enum Cipher {
     ),
     // Cipher 65
     TLS_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA(
+            0x0065,
             "EXP1024-DHE-DSS-RC4-SHA",
             KeyExchange.EDH,
             Authentication.DSS,
@@ -1356,6 +1362,7 @@ public enum Cipher {
     ),
     // Cipher 66
     TLS_DHE_DSS_WITH_RC4_128_SHA(
+            0x0066,
             "DHE-DSS-RC4-SHA",
             KeyExchange.EDH,
             Authentication.DSS,
@@ -1369,7 +1376,8 @@ public enum Cipher {
             128,
             new String[] {"SSL_DHE_DSS_WITH_RC4_128_SHA"},
             null
-    ),*/
+    ),
+
     /* TLS v1.2 ciphersuites */
     // Cipher 67
     TLS_DHE_RSA_WITH_AES_128_CBC_SHA256(
