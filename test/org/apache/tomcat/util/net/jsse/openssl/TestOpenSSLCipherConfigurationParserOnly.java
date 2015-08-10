@@ -66,4 +66,14 @@ public class TestOpenSSLCipherConfigurationParserOnly {
         Assert.assertEquals(expected.toString(), result.toString());
     }
 
+    @Test
+    public void testRename01() throws Exception {
+        // EDH -> DHE
+        LinkedHashSet<Cipher> result =
+                OpenSSLCipherConfigurationParser.parse("EXP-EDH-DSS-DES-CBC-SHA");
+        LinkedHashSet<Cipher> expected = new LinkedHashSet<>();
+        expected.add(Cipher.TLS_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA);
+
+        Assert.assertEquals(expected, result);
+    }
 }
