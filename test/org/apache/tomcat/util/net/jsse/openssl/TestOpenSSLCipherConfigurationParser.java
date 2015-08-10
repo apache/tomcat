@@ -26,13 +26,17 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testDEFAULT() throws Exception {
-        testSpecification("DEFAULT");
+        // EXPORT was removed from DEFAULT in 1.1.0 but we prefer the old
+        // behaviour
+        testSpecification("DEFAULT:!EXPORT");
     }
 
 
     @Test
     public void testCOMPLEMENTOFDEFAULT() throws Exception {
-        testSpecification("COMPLEMENTOFDEFAULT");
+        // EXPORT was removed from DEFAULT in 1.1.0 but we prefer the old
+        // behaviour
+        testSpecification("COMPLEMENTOFDEFAULT:EXPORT");
     }
 
 
