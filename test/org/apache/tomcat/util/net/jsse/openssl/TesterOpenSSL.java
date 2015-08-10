@@ -68,7 +68,7 @@ public class TesterOpenSSL {
         //      1.0.0 - TODO
         //      1.0.1 - TODO
         //      1.0.2 - Done
-        //      1.1.0 - TODO
+        //      1.1.0 - Done
 
         // These were removed in 0.9.8 (or earlier) so won't be available in any
         // supported version.
