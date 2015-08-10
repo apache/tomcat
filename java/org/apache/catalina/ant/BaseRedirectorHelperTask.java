@@ -108,8 +108,10 @@ public abstract class BaseRedirectorHelperTask extends Task {
     }
 
     /**
-     * Returns the value of the failOnError
-     * property.
+     * Returns the value of the failOnError property.
+     *
+     * @return <code>true</code> if the task should will if an error occurs,
+     *         otherwise <code>false</code>
      */
     public boolean isFailOnError() {
       return failOnError;
