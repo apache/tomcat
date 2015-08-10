@@ -42,7 +42,7 @@ public class TesterFirehoseServer {
     public static final int MESSAGE_COUNT = 100000;
     public static final String MESSAGE;
     public static final int MESSAGE_SIZE = 1024;
-    public static final int WAIT_TIME_MILLIS = 60000;
+    public static final int WAIT_TIME_MILLIS = 120000;
     public static final int SEND_TIME_OUT_MILLIS = 5000;
 
     static {
