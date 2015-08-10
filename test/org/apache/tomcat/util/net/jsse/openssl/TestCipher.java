@@ -23,16 +23,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 
 public class TestCipher {
-
-    @Before
-    public void checkVersion() {
-        Assume.assumeTrue(TesterOpenSSL.IS_EXPECTED_VERSION);
-    }
 
     /*
      * Checks that every cipher suite returned by OpenSSL is mapped to at least
@@ -83,43 +76,10 @@ public class TestCipher {
         Set<String> availableCipherSuites = TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL");
         Set<String> expectedCipherSuites = new HashSet<>();
         for (Cipher cipher : Cipher.values()) {
-            String openSSLAlias = cipher.getOpenSSLAlias();
-            // OpenSSL does not implement any FORTEZZA algorithms so exclude
-            // them from the expected list
-            if (openSSLAlias.contains("FZA")) {
+            if (TesterOpenSSL.OPENSSL_UNIMPLEMENTED_CIPHERS.contains(cipher)) {
                 continue;
             }
-            // GOST algorithms are not enabled by default and no JSSE
-            // implementation supports them so exclude them from the expected
-            // list
-            if (openSSLAlias.contains("GOST")) {
-                continue;
-            }
-            // OpenSSL does not enable the experimental EXP1024 and
-            // DHE-DSS-RC4-SHA cipher suites unless the source is explicitly
-            // patched so exclude them from the expected list
-            if (openSSLAlias.contains("EXP1024")) {
-                continue;
-            }
-            if (openSSLAlias.contains("DHE-DSS-RC4-SHA")) {
-                continue;
-            }
-            // OpenSSL removed (broken) support for EXP-DH-RSA-DES-CBC-SHA
-            // and EXP-DH-DSS-DES-CBC-SHA on 2015-05-23.
-            if (openSSLAlias.contains("EXP-DH-")) {
-                continue;
-            }
-            // RC2-MD5 is not referenced in the OpenSSL source so exclude it
-            // from the expected list
-            if (openSSLAlias.contains("RC2-MD5")) {
-                continue;
-            }
-            // As of OpenSSL 1.1.0, SSLv2 ciphers are not supported so exclude
-            // them from the expected list
-            if (cipher.getProtocol().equals(Protocol.SSLv2)) {
-                continue;
-            }
-            expectedCipherSuites.add(openSSLAlias + "+" +
+            expectedCipherSuites.add(cipher.getOpenSSLAlias() + "+" +
                     cipher.getProtocol().getOpenSSLName());
         }
 

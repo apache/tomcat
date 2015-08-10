@@ -4021,7 +4021,7 @@ public enum Cipher {
     // RC2_128_CBC_WITH_MD5
     SSL_CK_RC2_128_CBC_WITH_MD5(
             -1,
-            "RC2-MD5",
+            "RC2-CBC-MD5",
             KeyExchange.RSA,
             Authentication.RSA,
             Encryption.RC2,
