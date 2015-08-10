@@ -75,20 +75,21 @@ public class TestLimitLatch {
 
     @Test
     public void testTenWait() throws Exception {
+        final int pauseTime = 2000;
         LimitLatch latch = new LimitLatch(10);
         assertFalse("No threads should be waiting", latch.hasQueuedThreads());
         Thread[] testThread = new TestThread[30];
         for (int i = 0; i < 30; i++) {
-            testThread[i] = new TestThread(latch, 1000);
+            testThread[i] = new TestThread(latch, pauseTime);
             testThread[i].start();
         }
-        Thread.sleep(50);
+        Thread.sleep(pauseTime / 2);
         assertEquals("20 threads should be waiting", 20,
                 latch.getQueuedThreads().size());
-        Thread.sleep(1000);
+        Thread.sleep(pauseTime);
         assertEquals("10 threads should be waiting", 10,
                 latch.getQueuedThreads().size());
-        Thread.sleep(1000);
+        Thread.sleep(pauseTime);
         assertFalse("No threads should be waiting", latch.hasQueuedThreads());
     }
 
