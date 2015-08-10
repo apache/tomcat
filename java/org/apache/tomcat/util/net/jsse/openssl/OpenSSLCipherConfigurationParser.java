@@ -374,6 +374,17 @@ public class OpenSSLCipherConfigurationParser {
             }
             aliases.put(cipher.name(), Collections.singletonList(cipher));
 
+            for (String openSSlAltName : cipher.getOpenSSLAltNames()) {
+                if (aliases.containsKey(openSSlAltName)) {
+                    aliases.get(openSSlAltName).add(cipher);
+                } else {
+                    List<Cipher> list = new ArrayList<>();
+                    list.add(cipher);
+                    aliases.put(openSSlAltName, list);
+                }
+
+            }
+
             jsseToOpenSSL.put(cipher.name(), cipher.getOpenSSLAlias());
             Set<String> jsseNames = cipher.getJsseNames();
             for (String jsseName : jsseNames) {
