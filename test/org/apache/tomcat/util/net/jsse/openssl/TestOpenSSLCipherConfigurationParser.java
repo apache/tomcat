@@ -19,18 +19,10 @@ package org.apache.tomcat.util.net.jsse.openssl;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class TestOpenSSLCipherConfigurationParser {
-
-    @Before
-    public void checkVersion() {
-        Assume.assumeTrue(TesterOpenSSL.IS_EXPECTED_VERSION);
-    }
-
 
     @Test
     public void testDEFAULT() throws Exception {
