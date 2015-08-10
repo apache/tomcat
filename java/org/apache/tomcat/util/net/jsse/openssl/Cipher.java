@@ -1257,7 +1257,8 @@ public enum Cipher {
             null
     ),
     /* Experimental (and now expired) TLSv1 versions of SSLv3 ciphers.
-     * Unsupported by Java and OpenSSL. */
+     * Unsupported by Java and OpenSSL 1.1.x onwards. Some earlier OpenSSL
+     * versions do support these. */
     // Cipher 60
     TLS_RSA_EXPORT1024_WITH_RC4_56_MD5(
             0x0060,
