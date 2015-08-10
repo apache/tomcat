@@ -517,7 +517,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
         if (value != null) {
             dataSource.setLogAbandoned(Boolean.valueOf(value).booleanValue());
         }
-        
+
         value = properties.getProperty(PROP_ABANDONEDUSAGETRACKING);
         if (value != null) {
             dataSource.setAbandonedUsageTracking(Boolean.valueOf(value).booleanValue());

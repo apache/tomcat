@@ -185,7 +185,7 @@ class KeyedCPDSConnectionFactory
                 valid = false;
             } finally {
                 Utils.closeQuietly(conn);
-                validatingSet.remove(pconn); 
+                validatingSet.remove(pconn);
             }
         } else {
             Statement stmt = null;
