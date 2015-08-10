@@ -16,9 +16,10 @@
  */
 package org.apache.coyote.http2;
 
-import org.apache.catalina.connector.Connector;
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.catalina.connector.Connector;
 
 /**
  * Unit tests for Section 6.8 of
