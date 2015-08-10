@@ -2087,7 +2087,7 @@ public enum Cipher {
             MessageDigest.SHA256,
             Protocol.TLSv1,
             false,
-            EncryptionLevel.HIGH,
+            EncryptionLevel.STRONG_NONE,
             true,
             0,
             0
@@ -2102,7 +2102,7 @@ public enum Cipher {
             MessageDigest.SHA384,
             Protocol.TLSv1,
             false,
-            EncryptionLevel.HIGH,
+            EncryptionLevel.STRONG_NONE,
             true,
             0,
             0
@@ -2147,7 +2147,7 @@ public enum Cipher {
             MessageDigest.SHA256,
             Protocol.TLSv1,
             false,
-            EncryptionLevel.HIGH,
+            EncryptionLevel.STRONG_NONE,
             true,
             0,
             0
@@ -2162,7 +2162,7 @@ public enum Cipher {
             MessageDigest.SHA384,
             Protocol.TLSv1,
             false,
-            EncryptionLevel.HIGH,
+            EncryptionLevel.STRONG_NONE,
             true,
             0,
             0
