@@ -46,6 +46,7 @@ public class TesterOpenSSL {
                     Cipher.SSL2_DES_192_EDE3_CBC_WITH_MD5,
                     Cipher.SSL2_IDEA_128_CBC_WITH_MD5,
                     Cipher.SSL2_RC4_128_EXPORT40_WITH_MD5,
+                    Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_MD5,
                     Cipher.TLS_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5,
                     Cipher.TLS_RSA_EXPORT1024_WITH_DES_CBC_SHA,
                     Cipher.TLS_DHE_DSS_EXPORT1024_WITH_DES_CBC_SHA,
