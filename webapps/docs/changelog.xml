@@ -102,6 +102,12 @@
         even if the class file is frist read (and cached) without the manifest.
         (markt) 
       </fix>
+      <fix>
+        Fix thread safety issue in the <code>AsyncContext</code> implementation
+        that meant a sequence of <code>start();dispatch();</code> calls using
+        non-container threads could result in a previous dispatch interfering
+        with a subsequent start. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
