@@ -63,10 +63,10 @@ public class TesterOpenSSL {
         // Note: The following lists are intended to be aligned with the most
         //       recent release of each OpenSSL release branch
 
-        // TODO Validate this for all OpenSSL versions
+        // TODO Validate this for all current OpenSSL versions
         //      0.9.8 - TODO
         //      1.0.0 - TODO
-        //      1.0.1 - TODO
+        //      1.0.1 - Done
         //      1.0.2 - Done
         //      1.1.0 - Done
 
@@ -127,6 +127,31 @@ public class TesterOpenSSL {
         if (VERSION < 10002) {
             // These were implemented in 1.0.2 so won't be available in any
             // earlier version
+            unimplemented.add(Cipher.TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA256);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_CBC_SHA256);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_DES_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_DSS_WITH_SEED_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA256);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_CBC_SHA256);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_DES_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_RSA_WITH_SEED_CBC_SHA);
+
         } else {
             // These were removed in 1.0.2 so won't be available from that
             // version onwards.
