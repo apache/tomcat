@@ -102,6 +102,8 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * Whether to fail (with a BuildException) if
      * ManagerServlet returns an error.  The default behavior is
      * to do so.
+     *
+     * @param fail The new value of failonerror
      */
     public void setFailonerror(boolean fail) {
         failOnError = fail;
