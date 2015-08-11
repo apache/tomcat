@@ -183,11 +183,8 @@
   <property name="test.jvmarg.egd" value="" />
 
   <!-- Location of OpenSSL binary (file name, not directory) -->
+  <!-- The OpenSSL tests cases be disabled by specifing an invalid path here -->
   <property name="test.openssl.path" value="" />
-
-  <!-- Accepted version of OpenSSL. The output of "openssl version"
-       must start with "OpenSSL " plus value of this property. -->
-  <property name="test.openssl.version" value="1.1.0" />
 
   <!-- Include .gitignore in src distributions. -->
   <!-- .git and .gitignore are in defaultexcludes since Ant 1.8.2 -->
