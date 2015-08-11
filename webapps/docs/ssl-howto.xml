@@ -286,7 +286,7 @@ JSSE implementation.
 </p>
 
 <p>
-As configuration attributes for SSL support significally differ between
+As configuration attributes for SSL support significantly differ between
 APR vs. JSSE implementations, it is <strong>recommended</strong> to
 avoid auto-selection of implementation. It is done by specifying a classname
 in the <b>protocol</b> attribute of the <a href="config/http.html">Connector</a>.</p>
@@ -502,7 +502,7 @@ SSL communications, and what to do about them.</p>
     <p>If you are using the APR/native connector,
     it will determine the strength of ephemeral DH keys from the key size of
     your RSA certificate. For example a 2048 bit RSA key will result in
-    using a 2048 bit primefor the DH keys. Unfortunately Java 6 only supports
+    using a 2048 bit prime for the DH keys. Unfortunately Java 6 only supports
     768 bit and Java 7 only supports 1024 bit. So if your certificate has a
     stronger key, old Java clients might produce such handshake failures.
     As a mitigation you can either try to force them to use another cipher by

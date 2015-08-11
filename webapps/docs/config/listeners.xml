@@ -398,7 +398,7 @@
       </attribute>
 
       <attribute name="homeBase" required="false">
-        <p>The base directory containing user home directories.This is effective
+        <p>The base directory containing user home directories. This is effective
         only when <code>org.apache.catalina.startup.HomesUserDatabase</code> is
         used.</p>
       </attribute>

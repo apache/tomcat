@@ -368,9 +368,9 @@ should be completed:</p>
         Using interceptors, logic can be broken into more manageable pieces of code. The interceptors configured above are:<br/>
         TcpFailureDetector - verifies crashed members through TCP, if multicast packets get dropped, this interceptor protects against false positives,
         ie the node marked as crashed even though it still is alive and running.<br/>
-        MessageDispatch15Interceptor - dispatches messages to a thread (thread pool) to send message asynchrously.<br/>
+        MessageDispatch15Interceptor - dispatches messages to a thread (thread pool) to send message asynchronously.<br/>
         ThroughputInterceptor - prints out simple stats on message traffic.<br/>
-        Please note that the order of interceptors is important. the way they are defined in server.xml is the way they are represented in the
+        Please note that the order of interceptors is important. The way they are defined in server.xml is the way they are represented in the
         channel stack. Think of it as a linked list, with the head being the first most interceptor and the tail the last.
         <br/>For more info, Please visit the <a href="config/cluster-interceptor.html">reference documentation</a>
     </p>
@@ -474,7 +474,7 @@ should be completed:</p>
 <li><code>TomcatA</code> The session <code>S2</code> expires due to inactivity.</li>
 </ol>
 
-<p>Ok, now that we have a good sequence, we will take you through exactly what happens in the session repliction code</p>
+<p>Ok, now that we have a good sequence, we will take you through exactly what happens in the session replication code</p>
 
 <ol>
 <li><b><code>TomcatA</code> starts up</b>
@@ -506,7 +506,7 @@ should be completed:</p>
         The request coming in to TomcatA is treated exactly the same way as without session replication.
         The action happens when the request is completed, the <code>ReplicationValve</code> will intercept
         the request before the response is returned to the user.
-        At this point it finds that the session has been modified, and it uses TCP to replicata the
+        At this point it finds that the session has been modified, and it uses TCP to replicate the
         session to TomcatB. Once the serialized data has been handed off to the operating systems TCP logic,
         the request returns to the user, back through the valve pipeline.
         For each request the entire session is replicated, this allows code that modifies attributes

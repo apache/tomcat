@@ -83,7 +83,7 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
     that is provided to each web application.</li>
 <li><a href="jndi-datasource-examples-howto.html">
     <strong>JDBC DataSource</strong></a>
-    - Configuring a JNDI DataSoure with a DB connection pool.
+    - Configuring a JNDI DataSource with a DB connection pool.
     Examples for many popular databases.</li>
 <li><a href="class-loader-howto.html"><strong>Classloading</strong></a>
     - Information about class loading in Apache Tomcat, including where to place
