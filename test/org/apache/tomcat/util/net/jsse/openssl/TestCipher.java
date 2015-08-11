@@ -23,16 +23,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 
 public class TestCipher {
-
-    @Before
-    public void checkVersion() {
-        Assume.assumeTrue(TesterOpenSSL.TESTS_ENABLED);
-    }
 
     /*
      * Checks that every cipher suite returned by OpenSSL is mapped to at least

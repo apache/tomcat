@@ -29,10 +29,6 @@ import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 public class TesterOpenSSL {
 
-    // These tests can be disabled (e.g. on CI systems with old OpenSSL versions
-    // by specifying an invalid path to the openssl binary).
-    public static boolean TESTS_ENABLED;
-
     public static final int VERSION;
 
     public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS;
@@ -62,9 +58,7 @@ public class TesterOpenSSL {
             VERSION = -1;
         }
 
-        TESTS_ENABLED = (VERSION != -1);
-
-        HashSet<Cipher> unimplemented = new HashSet<>();
+         HashSet<Cipher> unimplemented = new HashSet<>();
 
         // These have been removed from all supported versions.
         unimplemented.add(Cipher.TLS_DHE_DSS_WITH_RC4_128_SHA);
