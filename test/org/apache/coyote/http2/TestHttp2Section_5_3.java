@@ -118,7 +118,12 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         parser.readFrame(true);
         // Debugging Gump failure
         System.err.println(output.getTrace());
-        parser.readFrame(true);
+        // Temp try block to help gump log
+        try {
+            parser.readFrame(true);
+        } catch (Throwable t) {
+            Assert.fail(t.getMessage());
+        }
         // Debugging Gump failure
         System.err.println(output.getTrace());
 
