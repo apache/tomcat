@@ -174,7 +174,7 @@ Returns the list of all the defined variables.
 </li>
 <li>
 <strong>set</strong> - <code>&lt;!--#set var="foo" value="Bar" --&gt;</code>
-is used to assign a value to a user-defind variable.
+is used to assign a value to a user-defined variable.
 </li>
 <li>
 <strong>if elif endif else</strong> - Used to create conditional sections. For example:

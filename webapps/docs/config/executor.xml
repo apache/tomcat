@@ -37,7 +37,7 @@
 
   <p>The <strong>Executor</strong> represents a thread pool that can be shared
      between components in Tomcat. Historically there has been a thread pool per
-     connector created but this allows you to share a thread pool, between (primarly) connector
+     connector created but this allows you to share a thread pool, between (primarily) connector
      but also other components when those get configured to support executors</p>
 
 
