@@ -353,8 +353,8 @@ without debug info <code>debug=&quot;off&quot;</code>.
 <p>
 When you don't want to stop the jsp generation at first jsp syntax error, use
 <code>failOnError=&quot;false&quot;</code>and with
-<code>showSuccess=&quot;true&quot;</code> all successfull <i>jsp to java</i>
-generation are printed out. Sometimes it is very helpfull, when you cleanup the
+<code>showSuccess=&quot;true&quot;</code> all successful <i>jsp to java</i>
+generation are printed out. Sometimes it is very helpful, when you cleanup the
 generate java source files at <code>${webapp.path}/WEB-INF/src</code>
 and the compile jsp servlet classes at
 <code>${webapp.path}/WEB-INF/classes/org/apache/jsp</code>.

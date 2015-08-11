@@ -704,7 +704,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     <p>There are a number of HTTP headers that can be added to the response to
     improve the security of the connection. This filter provides a mechanism for
     adding those headers. Note that security related headers with more complex
-    requirements, like CORS, are implemted as separate Filters.</p>
+    requirements, like CORS, are implemented as separate Filters.</p>
 
   </subsection>
 

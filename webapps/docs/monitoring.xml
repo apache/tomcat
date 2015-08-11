@@ -388,7 +388,7 @@ List of Attributes<br/>
 
   <tr>
     <td>delimiter</td>
-    <td>Split result with delimiter (java.util.StringTokenizier)
+    <td>Split result with delimiter (java.util.StringTokenizer)
         and use resultproperty as prefix to store tokens.
     </td>
     <td></td>
@@ -576,7 +576,7 @@ List of Attributes<br/>
 
   <tr>
     <td>delimiter</td>
-    <td>Split result with delimiter (java.util.StringTokenizier)
+    <td>Split result with delimiter (java.util.StringTokenizer)
         and use resultproperty as prefix to store tokens.
     </td>
     <td></td>
@@ -687,7 +687,7 @@ List of Attributes<br/>
   </tr>
 
   <tr>
-    <td>attributebinduing</td>
+    <td>attributebinding</td>
     <td>bind ALL MBean attributes in addition to <em>name</em>
     </td>
     <td><code>false</code></td>
@@ -695,7 +695,7 @@ List of Attributes<br/>
 
   <tr>
     <td>delimiter</td>
-    <td>Split result with delimiter (java.util.StringTokenizier)
+    <td>Split result with delimiter (java.util.StringTokenizer)
         and use resultproperty as prefix to store tokens.
     </td>
     <td></td>

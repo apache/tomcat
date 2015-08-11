@@ -483,7 +483,7 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
         documentation</a> for details.</p>
         <p>This <code>tomcat-juli.jar</code> differs from the default one. It
         contains the full Apache Commons Logging implementation and thus is
-        able to discover the presense of log4j and configure itself.</p>
+        able to discover the presence of log4j and configure itself.</p>
         </li>
 
         <li><p>If you want to configure Tomcat to use log4j globally:</p>

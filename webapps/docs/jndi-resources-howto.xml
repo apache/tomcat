@@ -692,7 +692,7 @@ Transport.send(message);]]></source>
     Resource reference to a factory for java.sql.Connection
     instances that may be used for talking to a particular
     database that is configured in the <Context>
-    configurartion for the web application.
+    configuration for the web application.
   </description>
   <res-ref-name>
     jdbc/EmployeeDB
@@ -799,7 +799,7 @@ conn.close();]]></source>
         returned to the pool. Default: false</li>
     </ul>
     <p>The optional evictor thread is responsible for shrinking the pool
-    by removing any conections which are idle for a long time. The evictor
+    by removing any connections which are idle for a long time. The evictor
     does not respect <code>minIdle</code>. Note that you do not need to
     activate the evictor thread if you only want the pool to shrink according
     to the configured <code>maxIdle</code> property.</p>
@@ -810,7 +810,7 @@ conn.close();]]></source>
         milliseconds between consecutive runs of the evictor.
         Default: -1 (disabled)</li>
     <li><strong>numTestsPerEvictionRun</strong> - The number of connections
-        that will be checked for idleness by the evitor during each
+        that will be checked for idleness by the evictor during each
         run of the evictor. Default: 3</li>
     <li><strong>minEvictableIdleTimeMillis</strong> - The idle time in
         milliseconds after which a connection can be removed from the pool
@@ -888,7 +888,7 @@ conn.close();]]></source>
   <h4>1.  Write A Resource Factory Class</h4>
 
   <p>You must write a class that implements the JNDI service provider
-  <code>javax.naming.spi.ObjectFactory</code> inteface.  Every time your
+  <code>javax.naming.spi.ObjectFactory</code> interface.  Every time your
   web application calls <code>lookup()</code> on a context entry that is
   bound to this factory (assuming that the factory is configured with
   <code>singleton=&quot;false&quot;</code>), the

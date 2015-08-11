@@ -529,7 +529,7 @@
   <subsection name="Single Sign On">
 
     <p>In many environments, but particularly in portal environments, it
-    is desireable to have a user challenged to authenticate themselves only
+    is desirable to have a user challenged to authenticate themselves only
     once over a set of web applications deployed on a particular virtual
     host.  This can be accomplished by nesting an element like this inside
     the Host element for this virtual host:</p>

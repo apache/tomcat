@@ -285,7 +285,7 @@ JSSE implementation.
 </p>
 
 <p>
-As configuration attributes for SSL support significally differ between
+As configuration attributes for SSL support significantly differ between
 APR vs. JSSE implementations, it is <strong>recommended</strong> to
 avoid auto-selection of implementation. It is done by specifying a classname
 in the <b>protocol</b> attribute of the <a href="config/http.html">Connector</a>.</p>

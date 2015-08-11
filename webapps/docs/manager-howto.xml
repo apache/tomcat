@@ -697,7 +697,7 @@ Default maximum session inactive interval 30 minutes
 3 - <4 minutes: 1 sessions
 >0 minutes: 2 sessions were expired]]></source>
 
-<p>Actually <code>/sessions</code> and <code>/expire</code> are synonims for
+<p>Actually <code>/sessions</code> and <code>/expire</code> are synonyms for
 the same command. The difference is in the presence of <code>idle</code>
 parameter.</p>
 
@@ -1010,7 +1010,7 @@ on each of deployed web applications will be available.</p>
       </li>
     </ul>
     <p>
-    You'll need to experiment with this to really understand its capabilites.
+    You'll need to experiment with this to really understand its capabilities
     If you provide no <code>qry</code> parameter, then all of the MBeans will
     be displayed. We really recommend looking at the tomcat source code and
     understand the JMX spec to get a better understanding of all the queries

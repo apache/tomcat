@@ -1048,7 +1048,7 @@ When developing your LoginModule, note that JAASRealm's built-in <code>CallbackH
 only recognizes the <code>NameCallback</code> and <code>PasswordCallback</code> at present.
           </li>
           <li>Although not specified in JAAS, you should create
-seperate classes to distinguish between users and roles, extending <code>javax.security.Principal</code>,
+separate classes to distinguish between users and roles, extending <code>javax.security.Principal</code>,
 so that Tomcat can tell which Principals returned from your login
 module are users and which are roles (see <code>org.apache.catalina.realm.JAASRealm</code>).
 Regardless, the first Principal returned is <em>always</em> treated as the user Principal.
