@@ -120,7 +120,10 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testkDHE() throws Exception {
-        testSpecification("kDHE");
+        // This alias was introduced in 1.0.2
+        if (TesterOpenSSL.VERSION >= 10002) {
+            testSpecification("kDHE");
+        }
     }
 
 
@@ -132,7 +135,10 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testDHE() throws Exception {
-        testSpecification("DHE");
+        // This alias was introduced in 1.0.2
+        if (TesterOpenSSL.VERSION >= 10002) {
+            testSpecification("DHE");
+        }
     }
 
 
