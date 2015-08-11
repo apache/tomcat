@@ -57,6 +57,8 @@ public abstract class AbstractCatalinaCommandTask extends
      *
      * @param command Command to be executed
      *
+     * @return The generated query string
+     *
      * @exception BuildException if an error occurs
      */
     public StringBuilder createQueryString(String command) throws BuildException {
