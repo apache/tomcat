@@ -29,14 +29,19 @@ import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 public class TesterOpenSSL {
 
+    // These tests can be disabled (e.g. on CI systems with old OpenSSL versions
+    // by specifying an invalid path to the openssl binary).
+    public static boolean TESTS_ENABLED;
+
     public static final int VERSION;
 
     public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS;
 
     static {
-        // Note: The tests are configured for the OpenSSL 1.1.0 development
-        //       branch. Running with a different version is likely to trigger
-        //       failures.
+        // Note: The following lists are intended to be aligned with the most
+        //       recent release of each OpenSSL release branch. Running the unit
+        //       tests with earlier releases is likely to result in failures.
+
         String versionString = null;
         try {
             versionString = executeOpenSSLCommand("version");
@@ -54,14 +59,12 @@ public class TesterOpenSSL {
         } else if (versionString.startsWith("OpenSSL 0.9.8")) {
             VERSION =   908;
         } else {
-            // Unknown OpenSSL version
-            throw new IllegalStateException("Unknown OpenSSL version " + versionString);
+            VERSION = -1;
         }
 
-        HashSet<Cipher> unimplemented = new HashSet<>();
+        TESTS_ENABLED = (VERSION != -1);
 
-        // Note: The following lists are intended to be aligned with the most
-        //       recent release of each OpenSSL release branch
+        HashSet<Cipher> unimplemented = new HashSet<>();
 
         // These have been removed from all supported versions.
         unimplemented.add(Cipher.TLS_DHE_DSS_WITH_RC4_128_SHA);
