@@ -331,7 +331,8 @@
       <code>ServletContext.getResource()</code> or
       <code>ServletContext.getResourceAsStream()</code> must start with
       &quot;/&quot;. If <code>false</code>, code like
-      <code>getResource("myfolder/myresource.txt")</code> will work.</p>
+      <code>getResource("myfolder/myresource.txt")</code> will work as Tomcat
+      will prepend &quot;/&quot; to the provided path.</p>
       <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
       <code>true</code>, the default of this setting will be <code>true</code>,
       else the default value will be <code>false</code>.</p>
