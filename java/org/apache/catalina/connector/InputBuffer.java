@@ -315,16 +315,10 @@ public class InputBuffer extends Reader
     /**
      * Reads new bytes in the byte chunk.
      *
-     * @param cbuf Byte buffer to be written to the response
-     * @param off Offset
-     * @param len Length
-     *
      * @throws IOException An underlying IOException occurred
      */
     @Override
-    public int realReadBytes(byte cbuf[], int off, int len)
-            throws IOException {
-
+    public int realReadBytes() throws IOException {
         if (closed) {
             return -1;
         }
@@ -339,13 +333,10 @@ public class InputBuffer extends Reader
         int result = coyoteRequest.doRead(bb);
 
         return result;
-
     }
 
 
-    public int readByte()
-        throws IOException {
-
+    public int readByte() throws IOException {
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
@@ -354,9 +345,7 @@ public class InputBuffer extends Reader
     }
 
 
-    public int read(byte[] b, int off, int len)
-        throws IOException {
-
+    public int read(byte[] b, int off, int len) throws IOException {
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
@@ -375,8 +364,7 @@ public class InputBuffer extends Reader
      * mark is lost.
      */
     @Override
-    public void realWriteChars(char c[], int off, int len)
-        throws IOException {
+    public void realWriteChars(char c[], int off, int len) throws IOException {
         markPos = -1;
         cb.setOffset(0);
         cb.setEnd(0);
@@ -389,9 +377,7 @@ public class InputBuffer extends Reader
 
 
     @Override
-    public int realReadChars(char cbuf[], int off, int len)
-        throws IOException {
-
+    public int realReadChars() throws IOException {
         if (!gotEnc) {
             setConverter();
         }
@@ -399,7 +385,7 @@ public class InputBuffer extends Reader
         boolean eof = false;
 
         if (bb.getLength() <= 0) {
-            int nRead = realReadBytes(bb.getBytes(), 0, bb.getBytes().length);
+            int nRead = realReadBytes();
             if (nRead < 0) {
                 eof = true;
             }
@@ -467,10 +453,7 @@ public class InputBuffer extends Reader
 
 
     @Override
-    public long skip(long n)
-        throws IOException {
-
-
+    public long skip(long n) throws IOException {
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
@@ -487,28 +470,18 @@ public class InputBuffer extends Reader
             } else {
                 nRead += cb.getLength();
                 cb.setOffset(cb.getEnd());
-                int toRead = 0;
-                if (cb.getChars().length < (n - nRead)) {
-                    toRead = cb.getChars().length;
-                } else {
-                    toRead = (int) (n - nRead);
-                }
-                int nb = realReadChars(cb.getChars(), 0, toRead);
+                int nb = realReadChars();
                 if (nb < 0) {
                     break;
                 }
             }
         }
-
         return nRead;
-
     }
 
 
     @Override
-    public boolean ready()
-        throws IOException {
-
+    public boolean ready() throws IOException {
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }

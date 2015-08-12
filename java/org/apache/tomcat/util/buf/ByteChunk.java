@@ -75,12 +75,13 @@ public final class ByteChunk implements Cloneable, Serializable {
      */
     public static interface ByteInputChannel {
         /**
-         * Read new bytes ( usually the internal conversion buffer ).
-         * The implementation is allowed to ignore the parameters,
-         * and mutate the chunk if it wishes to implement its own buffering.
+         * Read new bytes.
+         *
+         * @return The number of bytes read
+         *
+         * @throws IOException If an I/O occurs while reading the bytes
          */
-        public int realReadBytes(byte cbuf[], int off, int len)
-            throws IOException;
+        public int realReadBytes() throws IOException;
     }
 
     /** Same as java.nio.channel.WrittableByteChannel.
@@ -353,59 +354,51 @@ public final class ByteChunk implements Cloneable, Serializable {
 
     // -------------------- Removing data from the buffer --------------------
 
-    public int substract()
-        throws IOException {
-
+    public int substract() throws IOException {
         if ((end - start) == 0) {
             if (in == null) {
                 return -1;
             }
-            int n = in.realReadBytes( buff, 0, buff.length );
+            int n = in.realReadBytes();
             if (n < 0) {
                 return -1;
             }
         }
-
         return (buff[start++] & 0xFF);
-
     }
 
-    public byte substractB()
-        throws IOException {
 
-        if ((end - start) == 0) {
-            if (in == null)
-                return -1;
-            int n = in.realReadBytes( buff, 0, buff.length );
-            if (n < 0)
-                return -1;
-        }
-
-        return (buff[start++]);
-
-    }
-
-    public int substract( byte src[], int off, int len )
-        throws IOException {
-
+    public byte substractB() throws IOException {
         if ((end - start) == 0) {
             if (in == null) {
                 return -1;
             }
-            int n = in.realReadBytes( buff, 0, buff.length );
+            int n = in.realReadBytes();
             if (n < 0) {
                 return -1;
             }
         }
+        return buff[start++];
+    }
 
+
+    public int substract(byte dest[], int off, int len ) throws IOException {
+        if ((end - start) == 0) {
+            if (in == null) {
+                return -1;
+            }
+            int n = in.realReadBytes();
+            if (n < 0) {
+                return -1;
+            }
+        }
         int n = len;
         if (len > getLength()) {
             n = getLength();
         }
-        System.arraycopy(buff, start, src, off, n);
+        System.arraycopy(buff, start, dest, off, n);
         start += n;
         return n;
-
     }
 
 

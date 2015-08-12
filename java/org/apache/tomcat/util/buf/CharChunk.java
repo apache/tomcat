@@ -37,12 +37,13 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     // Input interface, used when the buffer is emptied.
     public static interface CharInputChannel {
         /**
-         * Read new bytes ( usually the internal conversion buffer ).
-         * The implementation is allowed to ignore the parameters,
-         * and mutate the chunk if it wishes to implement its own buffering.
+         * Read new characters.
+         *
+         * @return The number of characters read
+         *
+         * @throws IOException If an I/O error occurs reading the characters
          */
-        public int realReadChars(char cbuf[], int off, int len)
-            throws IOException;
+        public int realReadChars() throws IOException;
     }
     /**
      *  When we need more space we'll either
@@ -341,31 +342,25 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     // -------------------- Removing data from the buffer --------------------
 
-    public int substract()
-        throws IOException {
-
+    public int substract() throws IOException {
         if ((end - start) == 0) {
             if (in == null) {
                 return -1;
             }
-            int n = in.realReadChars(buff, end, buff.length - end);
+            int n = in.realReadChars();
             if (n < 0) {
                 return -1;
             }
         }
-
         return (buff[start++]);
-
     }
 
-    public int substract( char src[], int off, int len )
-        throws IOException {
-
+    public int substract(char dest[], int off, int len) throws IOException {
         if ((end - start) == 0) {
             if (in == null) {
                 return -1;
             }
-            int n = in.realReadChars( buff, end, buff.length - end);
+            int n = in.realReadChars();
             if (n < 0) {
                 return -1;
             }
@@ -375,16 +370,13 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         if (len > getLength()) {
             n = getLength();
         }
-        System.arraycopy(buff, start, src, off, n);
+        System.arraycopy(buff, start, dest, off, n);
         start += n;
         return n;
-
     }
 
 
-    public void flushBuffer()
-        throws IOException
-    {
+    public void flushBuffer() throws IOException {
         //assert out!=null
         if( out==null ) {
             throw new IOException( "Buffer overflow, no sink " + limit + " " +
