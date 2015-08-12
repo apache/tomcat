@@ -1723,9 +1723,7 @@ public class Http11Processor extends AbstractProcessor {
             }
         } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
             try {
-                if (inputBuffer.available() > 0) {
-                    asyncStateMachine.asyncOperation();
-                }
+                asyncStateMachine.asyncOperation();
             } catch (IllegalStateException x) {
                 // ISE - Request/Response not in correct state for async read
                 if (log.isDebugEnabled()) {
