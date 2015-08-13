@@ -79,7 +79,9 @@ public class TestWsServerContainer extends TomcatBaseTest {
         SimpleClient client = new SimpleClient();
         URI uri = new URI("ws://localhost:" + getPort() + "/echoBasic");
 
-        try (Session session = wsContainer.connectToServer(client, uri);) {
+        Session session = null;
+        try {
+            session = wsContainer.connectToServer(client, uri);
             CountDownLatch latch = new CountDownLatch(1);
             BasicText handler = new BasicText(latch);
             session.addMessageHandler(handler);
@@ -92,6 +94,10 @@ public class TestWsServerContainer extends TomcatBaseTest {
             Assert.assertEquals(1, messages.size());
             for (String message : messages) {
                 Assert.assertEquals("echoBasic", message);
+            }
+        } finally {
+            if (session != null) {
+                session.close();
             }
         }
     }
