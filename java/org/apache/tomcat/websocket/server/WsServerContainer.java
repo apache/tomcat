@@ -181,6 +181,13 @@ public class WsServerContainer extends WsWebSocketContainer
         }
         String path = sec.getPath();
 
+        // Add method mapping to user properties
+        PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(),
+                sec.getDecoders(), path);
+        sec.getUserProperties().put(
+                PojoEndpointServer.POJO_METHOD_MAPPING_KEY,
+                methodMapping);
+
         UriTemplate uriTemplate = new UriTemplate(path);
         if (uriTemplate.hasParameters()) {
             Integer key = Integer.valueOf(uriTemplate.getSegmentCount());
@@ -238,10 +245,6 @@ public class WsServerContainer extends WsWebSocketContainer
         // Validate encoders
         validateEncoders(annotation.encoders());
 
-        // Method mapping
-        PojoMethodMapping methodMapping = new PojoMethodMapping(pojo,
-                annotation.decoders(), path);
-
         // ServerEndpointConfig
         ServerEndpointConfig sec;
         Class<? extends Configurator> configuratorClazz =
@@ -268,9 +271,6 @@ public class WsServerContainer extends WsWebSocketContainer
                 subprotocols(Arrays.asList(annotation.subprotocols())).
                 configurator(configurator).
                 build();
-        sec.getUserProperties().put(
-                PojoEndpointServer.POJO_METHOD_MAPPING_KEY,
-                methodMapping);
 
         addEndpoint(sec);
     }

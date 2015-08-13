@@ -99,7 +99,7 @@
       <fix>
         <bug>58192</bug>: Correct a regression in the previous fix for
         <bug>58023</bug>. Ensure that classes are associated with their manifest
-        even if the class file is frist read (and cached) without the manifest.
+        even if the class file is first read (and cached) without the manifest.
         (markt) 
       </fix>
       <fix>
@@ -153,6 +153,12 @@
       <fix>
         <bug>58166</bug>: Allow applications to send close codes in the range
         3000-4999 inclusive. (markt)
+      </fix>
+      <fix>
+        <bug>58232</bug>: Avoid possible NPE when adding endpoints
+        programmatically to the
+        <code>javax.websocket.server.ServerContainer</code>.
+        Based on a patch provided by bastian.(violetagg)
       </fix>
     </changelog>
   </subsection>

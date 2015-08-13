@@ -71,7 +71,7 @@ public class PojoMethodMapping {
 
 
     public PojoMethodMapping(Class<?> clazzPojo,
-            Class<? extends Decoder>[] decoderClazzes, String wsPath)
+            List<Class<? extends Decoder>> decoderClazzes, String wsPath)
                     throws DeploymentException {
 
         this.wsPath = wsPath;
