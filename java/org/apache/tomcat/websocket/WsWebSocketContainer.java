@@ -108,7 +108,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                             pojo.getClass().getName()));
         }
 
-        Endpoint ep = new PojoEndpointClient(pojo, annotation.decoders());
+        Endpoint ep = new PojoEndpointClient(pojo, Arrays.asList(annotation.decoders()));
 
         Class<? extends ClientEndpointConfig.Configurator> configuratorClazz =
                 annotation.configurator();
