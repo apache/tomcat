@@ -257,6 +257,11 @@ public class PojoMethodMapping {
     }
 
 
+    public boolean hasMessageHandlers() {
+        return !onMessage.isEmpty();
+    }
+
+
     public Set<MessageHandler> getMessageHandlers(Object pojo,
             Map<String,String> pathParameters, Session session,
             EndpointConfig config) {

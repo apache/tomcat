@@ -184,9 +184,12 @@ public class WsServerContainer extends WsWebSocketContainer
         // Add method mapping to user properties
         PojoMethodMapping methodMapping = new PojoMethodMapping(sec.getEndpointClass(),
                 sec.getDecoders(), path);
-        sec.getUserProperties().put(
-                PojoEndpointServer.POJO_METHOD_MAPPING_KEY,
-                methodMapping);
+        if (methodMapping.getOnClose() != null || methodMapping.getOnOpen() != null
+                || methodMapping.getOnError() != null || methodMapping.hasMessageHandlers()) {
+            sec.getUserProperties().put(
+                    PojoEndpointServer.POJO_METHOD_MAPPING_KEY,
+                    methodMapping);
+        }
 
         UriTemplate uriTemplate = new UriTemplate(path);
         if (uriTemplate.hasParameters()) {
