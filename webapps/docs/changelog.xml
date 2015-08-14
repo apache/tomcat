@@ -126,6 +126,11 @@
         requests so that the async timeout thread doesn't process it during the
         next request. (markt)
       </fix>
+      <fix>
+        Fix a concurrency issue that meant that a change in socket timeout (e.g.
+        when switching to asynchronous I/O) did not always take effect
+        immediately. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
