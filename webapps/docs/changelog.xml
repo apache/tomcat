@@ -131,6 +131,11 @@
         when switching to asynchronous I/O) did not always take effect
         immediately. (markt)
       </fix>
+      <fix>
+        In the AJP and HTTP NIO connectors, ensure that the socket timeout is
+        correctly set before adding the socket back to the poller for read.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

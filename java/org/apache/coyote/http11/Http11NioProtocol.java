@@ -218,6 +218,10 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
             processor.recycle(isSocketClosing);
             recycledProcessors.offer(processor);
             if (addToPoller) {
+                // The only time this method is called with addToPoller == true
+                // is when the socket is in keep-alive so set the appropriate
+                // timeout.
+                socket.setTimeout(getProtocol().getKeepAliveTimeout());
                 socket.getSocket().getPoller().add(socket.getSocket());
             }
         }
