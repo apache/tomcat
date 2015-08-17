@@ -143,6 +143,10 @@
         with multiple attempts to process the same event for the same socket.
         (markt)
       </fix>
+      <fix>
+        Correct a coupe of edge cases in <code>RequestUtil.normalize()</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
