@@ -45,10 +45,12 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * TIMING_OUT    - The async request has timed out and is waiting for a call
  *                 to complete(). If that isn't made, the error state will
  *                 entered.
- * MUST_DISPATCH - dispatch() has been called before the request in which
- *                 ServletRequest.startAsync() has finished. As soon as that
- *                 request finishes, the dispatch() will be processed.
- * DISPATCHING   - The dispatch is being processed.
+ * MUST_DISPATCH - dispatch() has been called from a container thread. The
+ *                 dispatch will be processed once processing control returns to
+ *                 the container.
+ * DISPATCHING   - dispatch() has been called from a non-container thread. The
+ *                 dispatch will be processed as soon as a container thread is
+ *                 available.
  * ERROR         - Something went wrong.
  *
  * |----------------->--------------|
@@ -72,18 +74,18 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * |          |       |               |                 |             |     /-----------|         
  * |          |       ^               |dispatch()       |             |    /                      
  * |          |       |               |                 |             |   /                       
- * |          |       |              \|/                /            \|/ /                        
- * |          |       |         MUST_DISPATCH          /           STARTED
- * |          |       |           |                   /            /|  
- * |          |       |           |postProcess()     /            / |   
- * ^          ^       |           |                 /  dispatch()/  |    
- * |          |       |           |                /            /   |    
- * |          |       |           |   |---------- / -----------/    |auto
- * |          |       |           |   |          /                  |   
- * |          |       |           |   |   |-----/                   |   
- * |          |       | auto     \|/ \|/ \|/                       \|/  
- * |          |       |---<------DISPATCHING<-----------------TIMING_OUT
- * |          |                               dispatch()        |   |
+ * |          |       |              \|/                |            \|/ /                        
+ * |          |       |----<----MUST_DISPATCH----<------|          STARTED
+ * |          |       |   auto              \                      /|  
+ * |          |       |                      \                    / |   
+ * ^          ^       ^                       \        dispatch()/  |    
+ * |          |       |                        \                /   |    
+ * |          |       |               |-------- \ -------------/    |auto
+ * |          |       |               |          \                  |   
+ * |          |       |               |           \                 |   
+ * |          |       | auto         \|/           \               \|/  
+ * |          |       |---<------DISPATCHING        \---------TIMING_OUT
+ * |          |                                   dispatch()    |   |
  * |          |                                                 |   |
  * |          |-------<----------------------------------<------|   |
  * |                              complete()                        |  
@@ -278,11 +280,19 @@ public class AsyncStateMachine<S> {
     public synchronized boolean asyncDispatch() {
         pauseNonContainerThread();
         boolean doDispatch = false;
-        if (state == AsyncState.STARTING) {
-            state = AsyncState.MUST_DISPATCH;
-        } else if (state == AsyncState.STARTED ||
+        if (state == AsyncState.STARTING ||
                 state == AsyncState.TIMING_OUT ||
                 state == AsyncState.ERROR) {
+            // In these three cases processing is on a container thread so no
+            // need to transfer processing to a new container thread
+            state = AsyncState.MUST_DISPATCH;
+        } else if (state == AsyncState.STARTED) {
+            // A dispatch is always required.
+            // If on a non-container thread, need to get back onto a container
+            // thread to complete the processing.
+            // If on a container thread the current request/response are not the
+            // request/response associated with the AsyncContext so need a new
+            // container thread to process the different request/response.
             state = AsyncState.DISPATCHING;
             doDispatch = true;
         } else {
@@ -295,7 +305,8 @@ public class AsyncStateMachine<S> {
     
     
     public synchronized void asyncDispatched() {
-        if (state == AsyncState.DISPATCHING) {
+        if (state == AsyncState.DISPATCHING ||
+                state == AsyncState.MUST_DISPATCH) {
             state = AsyncState.DISPATCHED;
         } else {
             throw new IllegalStateException(

@@ -136,6 +136,13 @@
         correctly set before adding the socket back to the poller for read.
         (markt)
       </fix>
+      <fix>
+        <bug>58157</bug>: Ensure that the handling of async timeouts does not
+        result in an unnecessary dispatch to a container thread that could
+        result in the current socket being added to the Poller multiple times
+        with multiple attempts to process the same event for the same socket.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
