@@ -44,7 +44,7 @@ class Http2Parser {
     private volatile int headersCurrentStream = -1;
     private volatile boolean headersEndStream = false;
 
-    private volatile int maxPayloadSize = ConnectionSettings.DEFAULT_MAX_FRAME_SIZE;
+    private volatile int maxPayloadSize = ConnectionSettingsRemote.DEFAULT_MAX_FRAME_SIZE;
 
 
     Http2Parser(String connectionId, Input input, Output output) {

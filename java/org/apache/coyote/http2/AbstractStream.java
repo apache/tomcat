@@ -35,7 +35,7 @@ abstract class AbstractStream {
 
     private volatile AbstractStream parentStream = null;
     private final Set<AbstractStream> childStreams = new HashSet<>();
-    private long windowSize = ConnectionSettings.DEFAULT_INITIAL_WINDOW_SIZE;
+    private long windowSize = ConnectionSettingsRemote.DEFAULT_INITIAL_WINDOW_SIZE;
 
     public Integer getIdentifier() {
         return identifier;

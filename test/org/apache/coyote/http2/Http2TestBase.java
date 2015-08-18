@@ -356,7 +356,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         input = new TestInput(is);
         output = new TestOutput();
         parser = new Http2Parser("-1", input, output);
-        hpackEncoder = new HpackEncoder(ConnectionSettings.DEFAULT_HEADER_TABLE_SIZE);
+        hpackEncoder = new HpackEncoder(ConnectionSettingsRemote.DEFAULT_HEADER_TABLE_SIZE);
     }
 
 
@@ -662,7 +662,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         private StringBuffer trace = new StringBuffer();
         private String lastStreamId = "0";
-        private ConnectionSettings remoteSettings = new ConnectionSettings();
+        private ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote();
 
 
         @Override
