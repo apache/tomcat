@@ -166,7 +166,10 @@ public final class Room {
 
     /**
      * Creates a Player from the given Client and adds it to this room.
+     *
      * @param client the client
+     *
+     * @return The newly created player
      */
     public Player createAndAddPlayer(Client client) {
         if (players.size() >= MAX_PLAYER_COUNT) {
