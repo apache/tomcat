@@ -752,7 +752,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="antiClickJackingOption" required="false">
-        <p>What value should be used for the ant click-jacking header? Must be
+        <p>What value should be used for the anticlick-jacking header? Must be
         one of <code>DENY</code>, <code>SAMEORIGIN</code>,
         <code>ALLOW-FROM </code> (case-insensitive). If not specified, the
         default value of <code>DENY</code> will be used.</p>
