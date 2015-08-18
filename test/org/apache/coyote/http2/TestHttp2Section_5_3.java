@@ -16,10 +16,11 @@
  */
 package org.apache.coyote.http2;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Unit tests for Section 5.3 of
