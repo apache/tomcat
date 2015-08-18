@@ -729,17 +729,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void settingsEnd(boolean ack) {
+        public void settingsEnd(boolean ack) throws IOException {
             if (ack) {
                 trace.append("0-Settings-Ack\n");
             } else {
                 trace.append("0-Settings-End\n");
-                try {
-                    sendSettings(0,  true);
-                } catch (IOException ioe) {
-                    // Convert to uncaught exception
-                    throw new IllegalStateException(ioe);
-                }
+                sendSettings(0,  true);
             }
         }
 
