@@ -168,12 +168,22 @@ class Http2Parser {
         ByteBuffer dest = output.getInputByteBuffer(streamId, dataLength);
         if (dest == null) {
             swallow(streamId, dataLength, false);
+            // Process padding before sending any notifications in case padding
+            // is invalid.
+            if (padLength > 0) {
+                swallow(streamId, padLength, true);
+            }
             if (endOfStream) {
                 output.receiveEndOfStream(streamId);
             }
         } else {
             synchronized (dest) {
                 input.fill(true, dest, dataLength);
+                // Process padding before sending any notifications in case
+                // padding is invalid.
+                if (padLength > 0) {
+                    swallow(streamId, padLength, true);
+                }
                 if (endOfStream) {
                     output.receiveEndOfStream(streamId);
                 }
@@ -181,7 +191,6 @@ class Http2Parser {
             }
         }
         if (padLength > 0) {
-            swallow(streamId, padLength, true);
             output.swallowedPadding(streamId, padLength);
         }
     }
