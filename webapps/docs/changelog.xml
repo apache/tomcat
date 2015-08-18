@@ -197,6 +197,10 @@
         Improve the Javadoc for some of the APR socket read functions that have
         inconsistent behaviour for return values. (markt)
       </fix>
+      <add>
+        <bug>58255</bug>: Document the Semaphore valve. Patch provided by
+        Kyohei Nakamura. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
