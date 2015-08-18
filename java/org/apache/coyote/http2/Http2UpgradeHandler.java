@@ -114,8 +114,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             new AtomicReference<>(ConnectionState.NEW);
     private volatile long pausedNanoTime = Long.MAX_VALUE;
 
-    private final ConnectionSettings remoteSettings = new ConnectionSettings();
-    private final ConnectionSettings localSettings = new ConnectionSettings();
+    private final ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote();
+    private final ConnectionSettingsRemote localSettings = new ConnectionSettingsRemote();
 
     private HpackDecoder hpackDecoder;
     private HpackEncoder hpackEncoder;
@@ -332,7 +332,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    ConnectionSettings getRemoteSettings() {
+    ConnectionSettingsRemote getRemoteSettings() {
         return remoteSettings;
     }
 

@@ -20,13 +20,13 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-public class ConnectionSettings {
+public class ConnectionSettingsRemote {
 
-    private final Log log = LogFactory.getLog(ConnectionSettings.class);
-    private final StringManager sm = StringManager.getManager(ConnectionSettings.class);
+    private final Log log = LogFactory.getLog(ConnectionSettingsRemote.class);
+    private final StringManager sm = StringManager.getManager(ConnectionSettingsRemote.class);
 
     public static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
-    private static final long UNLIMITED = ((long)1 << 32); // Use the maximum possible
+    static final long UNLIMITED = ((long)1 << 32); // Use the maximum possible
     private static final int MAX_WINDOW_SIZE = (1 << 31) - 1;
 
     private static final int MIN_MAX_FRAME_SIZE = 1 << 14;
