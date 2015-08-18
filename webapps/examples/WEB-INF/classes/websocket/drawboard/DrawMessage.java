@@ -37,7 +37,6 @@ public final class DrawMessage {
     private byte colorR, colorG, colorB, colorA;
     private double thickness;
     private double x1, y1, x2, y2;
-    private boolean lastInChain;
 
     /**
      * The type.
@@ -108,23 +107,10 @@ public final class DrawMessage {
         this.y2 = y2;
     }
 
-    /**
-     * Specifies if this DrawMessage is the last one in a chain
-     * (e.g. a chain of brush paths).<br>
-     * Currently it is unused.
-     */
-    public boolean isLastInChain() {
-        return lastInChain;
-    }
-    public void setLastInChain(boolean lastInChain) {
-        this.lastInChain = lastInChain;
-    }
-
-
 
     public DrawMessage(int type, byte colorR, byte colorG, byte colorB,
             byte colorA, double thickness, double x1, double x2, double y1,
-            double y2, boolean lastInChain) {
+            double y2) {
 
         this.type = type;
         this.colorR = colorR;
@@ -136,7 +122,6 @@ public final class DrawMessage {
         this.x2 = x2;
         this.y1 = y1;
         this.y2 = y2;
-        this.lastInChain = lastInChain;
     }
 
 
@@ -203,8 +188,7 @@ public final class DrawMessage {
 
         return type + "," + (colorR & 0xFF) + "," + (colorG & 0xFF) + ","
                 + (colorB & 0xFF) + "," + (colorA & 0xFF) + "," + thickness
-                + "," + x1 + "," + y1 + "," + x2 + "," + y2 + ","
-                + (lastInChain ? "1" : "0");
+                + "," + x1 + "," + y1 + "," + x2 + "," + y2;
     }
 
     public static DrawMessage parseFromString(String str)
@@ -214,7 +198,6 @@ public final class DrawMessage {
         byte[] colors = new byte[4];
         double thickness;
         double[] coords = new double[4];
-        boolean last;
 
         try {
             String[] elements = str.split(",");
@@ -238,15 +221,13 @@ public final class DrawMessage {
                             + coords[i]);
             }
 
-            last = !"0".equals(elements[10]);
-
         } catch (RuntimeException ex) {
             throw new ParseException(ex);
         }
 
         DrawMessage m = new DrawMessage(type, colors[0], colors[1],
                 colors[2], colors[3], thickness, coords[0], coords[2],
-                coords[1], coords[3], last);
+                coords[1], coords[3]);
 
         return m;
     }
