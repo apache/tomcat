@@ -35,7 +35,7 @@
 <section name="Introduction">
 
   <p>The <strong>SessionIdGenerator</strong> element represents the <em>session
-  id generator</em> that will be used to create create session ids used by
+  id generator</em> that will be used to create session ids used by
   web application HTTP sessions.</p>
 
   <p>A SessionIdGenerator element MAY be nested inside a

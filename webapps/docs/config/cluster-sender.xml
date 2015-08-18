@@ -60,7 +60,7 @@
 
 <section name="Nested Elements">
  <p>
-   The nested element <code>&lt;Transport&gt;</code> is is not required, by encouraged, as this is where
+   The nested element <code>&lt;Transport&gt;</code> is not required, but encouraged, as this is where
    you would set all the socket options for the outgoing messages. Please see its attributes below.
    There are two implementations, in a similar manner to the <a href="cluster-receiver.html">receiver</a>, one is non-blocking
    based and the other is built using blocking IO. <br/>
