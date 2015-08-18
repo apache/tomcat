@@ -42,6 +42,8 @@ public class CompressionServletResponseWrapper
     /**
      * Calls the parent constructor which creates a ServletResponse adaptor
      * wrapping the given response object.
+     *
+     * @param response The response object to be wrapped.
      */
     public CompressionServletResponseWrapper(HttpServletResponse response) {
         super(response);
