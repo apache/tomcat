@@ -104,7 +104,9 @@ public class CompressionServletResponseWrapper
 
 
     /**
-     * Set threshold number
+     * Set threshold number.
+     *
+     * @param threshold The new compression threshold
      */
     public void setCompressionThreshold(int threshold) {
         if (debug > 1) {
