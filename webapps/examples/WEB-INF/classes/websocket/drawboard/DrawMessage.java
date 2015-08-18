@@ -40,11 +40,9 @@ public final class DrawMessage {
     private boolean lastInChain;
 
     /**
-     * The type.<br>
-     * 1: Brush<br>
-     * 2: Line<br>
-     * 3: Rectangle<br>
-     * 4: Ellipse
+     * The type.
+     *
+     * @return 1: Brush<br>2: Line<br>3: Rectangle<br>4: Ellipse
      */
     public int getType() {
         return type;
