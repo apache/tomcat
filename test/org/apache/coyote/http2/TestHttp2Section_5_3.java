@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,6 +32,8 @@ import org.junit.Test;
  * found in {@link TestAbstractStream}.
  */
 public class TestHttp2Section_5_3 extends Http2TestBase {
+
+    Log log = LogFactory.getLog(TestHttp2Section_5_3.class);
 
     // Section 5.3.1
 
@@ -66,7 +70,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // Wait for the ack
         parser.readFrame(true);
         // Debugging Gump failure
-        System.out.println(output.getTrace());
+        log.info(output.getTrace());
         output.clearTrace();
 
         // At this point the connection window should be 1k and any new stream
@@ -83,10 +87,10 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // 17-headers, 17-1k-body
         parser.readFrame(true);
         // Debugging Gump failure
-        System.out.println(output.getTrace());
+        log.info(output.getTrace());
         parser.readFrame(true);
         // Debugging Gump failure
-        System.out.println(output.getTrace());
+        log.info(output.getTrace());
         output.clearTrace();
 
         // Send additional requests. Connection window is empty so only headers
@@ -103,10 +107,10 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // 19-headers, 21-headers
         parser.readFrame(true);
         // Debugging Gump failure
-        System.out.println(output.getTrace());
+        log.info(output.getTrace());
         parser.readFrame(true);
         // Debugging Gump failure
-        System.out.println(output.getTrace());
+        log.info(output.getTrace());
         output.clearTrace();
 
         // At this point 17 is blocked because the stream window is zero and
@@ -117,7 +121,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         sendWindowUpdate(0, 1);
         parser.readFrame(true);
         // Debugging Gump failure
-        System.out.println(output.getTrace());
+        log.info(output.getTrace());
 
         // This frame is not always written
         int count = 0;
@@ -130,7 +134,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         }
 
         // Debugging Gump failure
-        System.out.println(output.getTrace());
+        log.info(output.getTrace());
 
         String trace = output.getTrace();
         Assert.assertTrue(trace, trace.contains("19-Body-1"));
@@ -144,10 +148,10 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         sendWindowUpdate(0, 1024);
         parser.readFrame(true);
         // Debugging Gump failure
-        System.out.println(output.getTrace());
+        log.info(output.getTrace());
         parser.readFrame(true);
         // Debugging Gump failure
-        System.out.println(output.getTrace());
+        log.info(output.getTrace());
 
         trace = output.getTrace();
         Assert.assertTrue(trace, trace.contains("19-Body-256"));
@@ -162,7 +166,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         for (int i = 0; i < 3; i++) {
             parser.readFrame(true);
             // Debugging Gump failure
-            System.out.println(output.getTrace());
+            log.info(output.getTrace());
         }
     }
 }
