@@ -27,7 +27,9 @@ import java.util.logging.LogManager;
 import static org.junit.Assert.fail;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
@@ -99,6 +101,16 @@ public abstract class LoggingBaseTest {
         deleteOnTearDown.add(file);
     }
 
+    @BeforeClass
+    public void setUpPerTestClass() throws Exception {
+        // Configure logging
+        System.setProperty("java.util.logging.manager",
+                "org.apache.juli.ClassLoaderLogManager");
+        System.setProperty("java.util.logging.config.file", new File(
+                getBuildDirectory(), "conf/logging.properties").toString());
+
+    }
+
     @Before
     public void setUp() throws Exception {
         // Create catalina.base directory
@@ -111,13 +123,6 @@ public abstract class LoggingBaseTest {
 
         System.setProperty("catalina.base", tempDir.getAbsolutePath());
 
-        // Configure logging
-        System.setProperty("java.util.logging.manager",
-                "org.apache.juli.ClassLoaderLogManager");
-        System.setProperty("java.util.logging.config.file", new File(
-                getBuildDirectory(), "conf/logging.properties").toString());
-
-        // Get log instance after logging has been configured
         log = LogFactory.getLog(getClass());
         log.info("Starting test case [" + testName.getMethodName() + "]");
     }
@@ -129,12 +134,16 @@ public abstract class LoggingBaseTest {
         }
         deleteOnTearDown.clear();
 
+        ExpandWar.deleteDir(tempDir);
+    }
+
+    @AfterClass
+    public void tearDownPerTestClass() throws Exception {
         LogManager logManager = LogManager.getLogManager();
         if (logManager instanceof ClassLoaderLogManager) {
             ((ClassLoaderLogManager) logManager).shutdown();
         } else {
             logManager.reset();
         }
-        ExpandWar.deleteDir(tempDir);
     }
 }
