@@ -37,8 +37,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
     // Section 5.3.1
 
-    //@Test Disable as other test is failing and logging only works for first
-    //      test
+    @Test
     public void testStreamDependsOnSelf() throws Exception {
         http2Connect();
 
