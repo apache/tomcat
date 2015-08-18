@@ -69,7 +69,7 @@ public abstract class LoggingBaseTest {
      * is used to access resources that are part of default Tomcat deployment.
      * E.g. the examples webapp.
      */
-    public File getBuildDirectory() {
+    public static File getBuildDirectory() {
         return new File(System.getProperty("tomcat.test.tomcatbuild",
                 "output/build"));
     }
@@ -102,7 +102,7 @@ public abstract class LoggingBaseTest {
     }
 
     @BeforeClass
-    public void setUpPerTestClass() throws Exception {
+    public static void setUpPerTestClass() throws Exception {
         // Configure logging
         System.setProperty("java.util.logging.manager",
                 "org.apache.juli.ClassLoaderLogManager");
@@ -138,7 +138,7 @@ public abstract class LoggingBaseTest {
     }
 
     @AfterClass
-    public void tearDownPerTestClass() throws Exception {
+    public static void tearDownPerTestClass() throws Exception {
         LogManager logManager = LogManager.getLogManager();
         if (logManager instanceof ClassLoaderLogManager) {
             ((ClassLoaderLogManager) logManager).shutdown();
