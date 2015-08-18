@@ -343,8 +343,7 @@ For example:
 
 It is possible to further limit such run to a number of selected test
 methods by adding "test.entry.methods" property. The property specifies a
-comma-separated list of test case methods. (This feature requires
-Apache Ant 1.8.2 or later).
+comma-separated list of test case methods.
 
 For example:
 
