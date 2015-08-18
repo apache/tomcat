@@ -124,7 +124,7 @@ identity is important, a Certificate is typically purchased from a well-known
 <em>Certificate Authority</em> (CA) such as VeriSign or Thawte.  Such
 certificates can be electronically verified -- in effect, the Certificate
 Authority will vouch for the authenticity of the certificates that it grants,
-so you can believe that that Certificate is valid if you trust the Certificate
+so you can believe that the Certificate is valid if you trust the Certificate
 Authority that granted it.</p>
 
 <p>In many cases, however, authentication is not really a concern.  An
