@@ -92,9 +92,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void validateHttp2InitialResponse() throws Exception {
         // - 101 response acts as acknowledgement of the HTTP2-Settings header
-        // Need to read 4 frames
+        // Need to read 5 frames
         // - settings (server settings - must be first)
         // - settings ack (for the settings frame in the client preface)
+        // - ping
         // - headers (for response)
         // - data (for response body)
         parser.readFrame(true);
@@ -103,7 +104,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         parser.readFrame(true);
         parser.readFrame(true);
 
-        Assert.assertEquals("0-Settings-End\n" +
+        Assert.assertEquals("0-Settings-[3]-[200]\n" +
+                "0-Settings-End\n" +
                 "0-Settings-Ack\n" +
                 "0-Ping-[0,0,0,0,0,0,0,1]\n" +
                 getSimpleResponseTrace(1)
@@ -596,15 +598,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     void sendSettings(int streamId, boolean ack, Setting... settings) throws IOException {
-        byte[] settingFrame = new byte[15];
         // length
-
         int settingsCount;
         if (settings == null) {
             settingsCount = 0;
         } else {
             settingsCount = settings.length;
         }
+
+        byte[] settingFrame = new byte[9 + 6 * settingsCount];
 
         ByteUtil.setThreeBytes(settingFrame, 0, 6 * settingsCount);
         // type
@@ -732,6 +734,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 trace.append("0-Settings-Ack\n");
             } else {
                 trace.append("0-Settings-End\n");
+                try {
+                    sendSettings(0,  true);
+                } catch (IOException ioe) {
+                    // Convert to uncaught exception
+                    throw new IllegalStateException(ioe);
+                }
             }
         }
 
