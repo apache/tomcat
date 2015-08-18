@@ -118,12 +118,17 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         parser.readFrame(true);
         // Debugging Gump failure
         System.err.println(output.getTrace());
-        // Temp try block to help gump log
-        try {
-            parser.readFrame(true);
-        } catch (Throwable t) {
-            Assert.fail(t.getMessage());
+
+        // This frame is not always written
+        int count = 0;
+        while (!parser.readFrame(false) && count < 10) {
+            Thread.sleep(100);
+            count++;
         }
+        if (count == 10) {
+            Assert.fail("Second 1 byte body frame not received");
+        }
+
         // Debugging Gump failure
         System.err.println(output.getTrace());
 
