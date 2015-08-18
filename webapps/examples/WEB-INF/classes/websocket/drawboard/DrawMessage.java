@@ -127,7 +127,8 @@ public final class DrawMessage {
 
     /**
      * Draws this DrawMessage onto the given Graphics2D.
-     * @param g
+     *
+     * @param g The target for the DrawMessage
      */
     public void draw(Graphics2D g) {
 
