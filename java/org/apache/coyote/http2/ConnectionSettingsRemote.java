@@ -20,6 +20,10 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Represents the remote connection settings: i.e. the settings the server must
+ * use when communicating with the client.
+ */
 public class ConnectionSettingsRemote {
 
     private final Log log = LogFactory.getLog(ConnectionSettingsRemote.class);

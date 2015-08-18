@@ -199,7 +199,21 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         openClientConnection();
         doHttpUpgrade();
         sendClientPreface();
-        validateHttp2InitialResponse();
+
+        // validateHttp2InitialResponse() - modified
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+
+        Assert.assertEquals("0-Settings-[3]-[1]\n" +
+                "0-Settings-End\n" +
+                "0-Settings-Ack\n" +
+                "0-Ping-[0,0,0,0,0,0,0,1]\n" +
+                getSimpleResponseTrace(1)
+                , output.getTrace());
+        output.clearTrace();
 
         sendLargeGetRequest(3);
 

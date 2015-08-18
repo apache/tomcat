@@ -115,7 +115,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private volatile long pausedNanoTime = Long.MAX_VALUE;
 
     private final ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote();
-    private final ConnectionSettingsRemote localSettings = new ConnectionSettingsRemote();
+    private final ConnectionSettingsLocal localSettings = new ConnectionSettingsLocal();
 
     private HpackDecoder hpackDecoder;
     private HpackEncoder hpackEncoder;
@@ -205,9 +205,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         // Send the initial settings frame
-        // TODO: Need to send non-default settings values
         try {
-            socketWrapper.write(true, SETTINGS_EMPTY, 0, SETTINGS_EMPTY.length);
+            byte[] settings = localSettings.getSettingsFrameForPending();
+            socketWrapper.write(true, settings, 0, settings.length);
             socketWrapper.flush(true);
         } catch (IOException ioe) {
             throw new IllegalStateException(sm.getString("upgradeHandler.sendPrefaceFail"), ioe);
@@ -810,25 +810,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    /*
-     * This only has an effect if called before the connection is established
-     */
     public void setMaxConcurrentStreams(long maxConcurrentStreams) {
         localSettings.setMaxConcurrentStreams(maxConcurrentStreams);
     }
 
 
-    /*
-     * This only has an effect if called before the connection is established
-     */
     public void setInitialWindowSize(int initialWindowSize) {
-        try {
-            localSettings.setInitialWindowSize(initialWindowSize);
-        } catch (ConnectionException e) {
-            // Illegal setting. Ignore it but log a warning.
-            log.warn(sm.getString("upgradeHandler.initialWindowSize.invalid",
-                    connectionId, Integer.toString(initialWindowSize)));
-        }
+        localSettings.setInitialWindowSize(initialWindowSize);
     }
 
 
@@ -995,7 +983,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void settingsEnd(boolean ack) throws IOException {
         if (ack) {
-            // TODO Process ACK
+            localSettings.ack();
         } else {
             synchronized (socketWrapper) {
                 socketWrapper.write(true, SETTINGS_ACK, 0, SETTINGS_ACK.length);
