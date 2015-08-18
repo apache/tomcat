@@ -30,7 +30,7 @@ public enum FrameType {
     PUSH_PROMISE  (5,   false,  true, (x) -> x >= 4,      true),
     PING          (6,    true, false, (x) -> x == 8,     false),
     GOAWAY        (7,    true, false, (x) -> x >= 8,     false),
-    WINDOW_UPDATE (8,    true,  true, (x) -> x == 4,     false),
+    WINDOW_UPDATE (8,    true,  true, (x) -> x == 4,      true),
     CONTINUATION  (9,   false,  true, null,               true),
     UNKNOWN       (256,  true,  true, null,              false);
 
