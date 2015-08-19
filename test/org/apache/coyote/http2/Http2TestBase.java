@@ -226,6 +226,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void sendSimplePostRequest(int streamId, byte[] padding) throws IOException {
+        sendSimplePostRequest(streamId, padding, true);
+    }
+
+
+    protected void sendSimplePostRequest(int streamId, byte[] padding, boolean writeBody)
+            throws IOException {
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
         byte[] dataFrameHeader = new byte[9];
@@ -234,7 +240,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         buildPostRequest(headersFrameHeader, headersPayload,
                 dataFrameHeader, dataPayload, padding, streamId);
         writeFrame(headersFrameHeader, headersPayload);
-        writeFrame(dataFrameHeader, dataPayload);
+        if (writeBody) {
+            writeFrame(dataFrameHeader, dataPayload);
+        }
     }
 
 

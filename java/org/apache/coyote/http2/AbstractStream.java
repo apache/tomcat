@@ -109,15 +109,25 @@ abstract class AbstractStream {
      * @throws Http2Exception
      */
     protected synchronized void incrementWindowSize(int increment) throws Http2Exception {
-        // Overflow protection
-        if (Long.MAX_VALUE - increment < windowSize) {
-            windowSize = Long.MAX_VALUE;
-        } else {
-            windowSize += increment;
-        }
+        // No need for overflow protection here.
+        // Increment can't be more than Integer.MAX_VALUE and once windowSize
+        // goes beyond 2^31-1 an error is triggered.
+        windowSize += increment;
+
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("abstractStream.windowSizeInc", getConnectionId(),
                     getIdentifier(), Integer.toString(increment), Long.toString(windowSize)));
+        }
+
+        if (windowSize > ConnectionSettingsRemote.MAX_WINDOW_SIZE) {
+            String msg = sm.getString("abstractStream.windowSizeTooBig", getConnectionId(), identifier,
+                    Integer.toString(increment), Long.toString(windowSize));
+            if (identifier.intValue() == 0) {
+                throw new ConnectionException(msg, Http2Error.FLOW_CONTROL_ERROR);
+            } else {
+                throw new StreamException(
+                        msg, Http2Error.FLOW_CONTROL_ERROR, identifier.intValue());
+            }
         }
     }
 

@@ -45,8 +45,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
     public void testZeroWindowUpdateStream() throws Exception {
         http2Connect();
 
-        sendPriority(3,  0,  15);
-
+        sendSimplePostRequest(3,  null,  false);
         sendWindowUpdate(3, 0);
 
         parser.readFrame(true);
@@ -122,6 +121,37 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         sendWindowUpdate(0,  1024);
 
         Assert.assertEquals(getEmptyResponseTrace(17), output.getTrace());
+    }
+
+
+    @Test
+    public void testWindowSizeTooLargeStream() throws Exception {
+        http2Connect();
+
+        // Set up stream 3
+        sendSimplePostRequest(3,  null,  false);
+
+        // Super size the flow control window.
+        sendWindowUpdate(3, (1 << 31) - 1);
+
+        parser.readFrame(true);
+
+        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]",
+                output.getTrace());
+    }
+
+
+    @Test
+    public void testWindowSizeTooLargeConnection() throws Exception {
+        http2Connect();
+
+        // Super size the flow control window.
+        sendWindowUpdate(0, (1 << 31) - 1);
+
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                "0-Goaway-[1]-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]-["));
     }
 
 
