@@ -267,7 +267,7 @@
                     this.id = id;
                 }
 
-                function Path(type, color, thickness, x1, y1, x2, y2, lastInChain) {
+                function Path(type, color, thickness, x1, y1, x2, y2) {
                     this.type = type;
                     this.color = color;
                     this.thickness = thickness;
@@ -275,7 +275,6 @@
                     this.y1 = y1;
                     this.x2 = x2;
                     this.y2 = y2;
-                    this.lastInChain = lastInChain;
 
                     function ellipse(ctx, x, y, w, h) {
                         /* Drawing a ellipse cannot be done directly in a
@@ -495,8 +494,7 @@
                                                     parseFloat(elements[7]),
                                                     parseFloat(elements[8]),
                                                     parseFloat(elements[9]),
-                                                    parseFloat(elements[10]),
-                                                    elements[11] != "0");
+                                                    parseFloat(elements[10]));
 
                                             // Draw the path onto the last canvas.
                                             path.draw(canvasServerImageCtx);
@@ -613,7 +611,7 @@
                                         availableColors[currentColorIndex],
                                         availableThicknesses[currentThicknessIndex],
                                         currentMouseX, currentMouseY, mouseX,
-                                        mouseY, false);
+                                        mouseY);
                                 // Draw it on the background canvas.
                                 path.draw(canvasBackgroundCtx);
 
@@ -658,19 +656,24 @@
                                 var mouseY = e.pageY - canvasDisplay.offsetTop;
                                 var drawType = availableDrawTypes[currentDrawTypeIndex];
 
-                                var path = new Path(drawType.id, availableColors[currentColorIndex],
-                                        availableThicknesses[currentThicknessIndex],
-                                        currentMouseX, currentMouseY, mouseX,
-                                        mouseY, true);
-                                // Draw it on the background canvas.
-                                path.draw(canvasBackgroundCtx);
+                                // If we are drawing a continuous path and the previous mouse coordinates are the same as
+                                // the new ones, there is no need to construct a new draw message as we don't need to
+                                // "terminate" a path as every path element contains both the start and the end point.
+                                if (!(drawType.continuous && mouseX == currentMouseX && mouseY == currentMouseY)) {
+                                    var path = new Path(drawType.id, availableColors[currentColorIndex],
+                                            availableThicknesses[currentThicknessIndex],
+                                            currentMouseX, currentMouseY, mouseX,
+                                            mouseY);
+                                    // Draw it on the background canvas.
+                                    path.draw(canvasBackgroundCtx);
 
-                                // Send it to the sever.
-                                pushPath(path);
+                                    // Send it to the sever.
+                                    pushPath(path);
 
-                                // Refresh old coordinates
-                                currentMouseX = mouseX;
-                                currentMouseY = mouseY;
+                                    // Refresh old coordinates
+                                    currentMouseX = mouseX;
+                                    currentMouseY = mouseY;
+                                }
 
                                 refreshDisplayCanvas();
                             }
@@ -807,8 +810,7 @@
                             + path.color[2] + ","
                             + Math.round(path.color[3] * 255.0) + ","
                             + path.thickness + "," + path.x1 + ","
-                            + path.y1 + "," + path.x2 + "," + path.y2 + ","
-                            + (path.lastInChain ? "1" : "0");
+                            + path.y1 + "," + path.x2 + "," + path.y2;
 
                     socket.send("1" + message);
                 }
