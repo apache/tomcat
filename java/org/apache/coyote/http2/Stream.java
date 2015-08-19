@@ -259,6 +259,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void sentEndOfStream() {
+        outputBuffer.endOfStreamSent = true;
         state.sentEndOfStream();
     }
 
@@ -288,6 +289,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
         private volatile long written = 0;
         private volatile boolean closed = false;
+        private volatile boolean endOfStreamSent = false;
 
         /* The write methods are synchronized to ensure that only one thread at
          * a time is able to access the buffer. Without this protection, a
@@ -331,6 +333,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 coyoteResponse.sendHeaders();
             }
             if (buffer.position() == 0) {
+                if (closed && !endOfStreamSent) {
+                    // Handling this special case here is simpler than trying
+                    // to modify the following code to handle it.
+                    handler.writeBody(Stream.this, buffer, 0, true);
+                }
                 // Buffer is empty. Nothing to do.
                 return;
             }
