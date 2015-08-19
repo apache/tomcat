@@ -97,8 +97,6 @@ public final class Request {
 
     private final MimeHeaders headers = new MimeHeaders();
 
-    private final MessageBytes instanceId = MessageBytes.newInstance();
-
     /**
      * Notes.
      */
@@ -178,18 +176,6 @@ public final class Request {
 
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * Get the instance id (or JVM route). Currently Ajp is sending it with each
-     * request. In future this should be fixed, and sent only once ( or
-     * 'negotiated' at config time so both tomcat and apache share the same name.
-     *
-     * @return the instance id
-     */
-    public MessageBytes instanceId() {
-        return instanceId;
-    }
-
 
     public MimeHeaders getMimeHeaders() {
         return headers;
@@ -548,7 +534,6 @@ public final class Request {
 
         schemeMB.recycle();
 
-        instanceId.recycle();
         remoteUser.recycle();
         remoteUserNeedsAuthorization = false;
         authType.recycle();

@@ -1193,7 +1193,8 @@ public class AjpProcessor extends AbstractProcessor {
                 break;
 
             case Constants.SC_A_JVM_ROUTE :
-                requestHeaderMessage.getBytes(request.instanceId());
+                requestHeaderMessage.getBytes(tmpMB);
+                // nothing
                 break;
 
             case Constants.SC_A_SSL_CERT :
