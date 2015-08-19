@@ -114,6 +114,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    protected void sendEmptyGetRequest(int streamId) throws IOException {
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildEmptyGetRequest(frameHeader, headersPayload, null, streamId);
+        writeFrame(frameHeader, headersPayload);
+    }
+
+
     protected void sendSimpleGetRequest(int streamId) throws IOException {
         sendSimpleGetRequest(streamId, null);
     }
@@ -134,6 +143,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         buildLargeGetRequest(frameHeader, headersPayload, streamId);
         writeFrame(frameHeader, headersPayload);
+    }
+
+
+    protected void buildEmptyGetRequest(byte[] frameHeader, ByteBuffer headersPayload,
+            byte[] padding, int streamId) {
+        buildGetRequest(frameHeader, headersPayload, padding, streamId, "/empty");
     }
 
 
@@ -301,7 +316,17 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    protected String getEmptyResponseTrace(int streamId) {
+        return getSingleResponseBodyFrameTrace(streamId, 0);
+    }
+
+
     protected String getSimpleResponseTrace(int streamId) {
+        return getSingleResponseBodyFrameTrace(streamId, 8192);
+    }
+
+
+    private String getSingleResponseBodyFrameTrace(int streamId, int bodySize) {
         StringBuilder result = new StringBuilder();
         result.append(streamId);
         result.append("-HeadersStart\n");
@@ -310,7 +335,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         result.append(streamId);
         result.append("-HeadersEnd\n");
         result.append(streamId);
-        result.append("-Body-8192\n");
+        result.append("-Body-");
+        result.append(bodySize);
+        result.append("\n");
         result.append(streamId);
         result.append("-EndOfStream\n");
 
@@ -338,6 +365,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         Context ctxt = tomcat.addContext("", null);
+        Tomcat.addServlet(ctxt, "empty", new EmptyServlet());
+        ctxt.addServletMapping("/empty", "empty");
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMapping("/simple", "simple");
         Tomcat.addServlet(ctxt, "large", new LargeServlet());
@@ -802,6 +831,20 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         public String getTrace() {
             return trace.toString();
+        }
+    }
+
+
+    private static class EmptyServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // Generate an empty response
+            resp.setContentLength(0);
+            resp.flushBuffer();
         }
     }
 

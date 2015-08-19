@@ -94,5 +94,36 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
                 "0-Goaway-[1]-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]-["));
     }
 
+
+    @Test
+    public void testEmptyDataFrameWithNoAvailableFlowControl() throws Exception {
+        http2Connect();
+
+        // Default connection window size is 64k - 1. Initial request will have
+        // used 8k (56k -1).
+
+        // Use up the remaining connection window. These requests require 56k
+        // but there is only 56k - 1 available.
+        for (int i = 3; i < 17; i += 2) {
+            sendSimpleGetRequest(i);
+            readSimpleGetResponse();
+        }
+        output.clearTrace();
+
+        // It should be possible to send a request that generates an empty
+        // response at this point
+        sendEmptyGetRequest(17);
+        // Headers
+        parser.readFrame(true);
+        // Body
+        parser.readFrame(true);
+
+        // Release Stream 15 which is waiting for a single byte.
+        sendWindowUpdate(0,  1024);
+
+        Assert.assertEquals(getEmptyResponseTrace(17), output.getTrace());
+    }
+
+
     // TODO: Remaining 6.9 tests
 }
