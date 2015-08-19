@@ -322,6 +322,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
         private synchronized void flush(boolean writeInProgress) throws IOException {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("stream.outputBuffer.flush.debug", getConnectionId(), getIdentifier(),
+                        Integer.toString(buffer.position()), Boolean.toString(writeInProgress),
+                        Boolean.toString(closed)));
+            }
             if (!coyoteResponse.isCommitted()) {
                 coyoteResponse.sendHeaders();
             }
@@ -342,7 +347,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     streamReservation -= connectionReservation;
                     left -= connectionReservation;
                     buffer.position(buffer.position() + connectionReservation);
-
                 }
             }
             buffer.clear();
