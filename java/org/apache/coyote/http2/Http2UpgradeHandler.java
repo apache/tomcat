@@ -592,7 +592,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     try {
                         stream.wait();
                     } catch (InterruptedException e) {
-                        throw new IOException(e);
+                        throw new IOException(sm.getString(
+                                "upgradeHandler.windowSizeReservationInterrupted", connectionId,
+                                stream.getIdentifier(), Integer.toString(reservation)), e);
                     }
                 }
             } while (allocation == 0);
