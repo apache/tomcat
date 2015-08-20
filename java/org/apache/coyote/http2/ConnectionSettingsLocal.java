@@ -67,14 +67,14 @@ public class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgum
     }
 
 
-    synchronized void ack() {
+    synchronized boolean ack() {
         if (sendInProgress) {
             sendInProgress = false;
             current.putAll(pending);
             pending.clear();
+            return true;
         } else {
-            // Unexpected ACK. Log it?
-            // TODO
+            return false;
         }
     }
 
