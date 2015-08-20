@@ -24,7 +24,7 @@ import org.apache.tomcat.util.res.StringManager;
  * Represents the remote connection settings: i.e. the settings the server must
  * use when communicating with the client.
  */
-public class ConnectionSettingsRemote {
+public class ConnectionSettingsRemote extends ConnectionSettingsBase {
 
     private final Log log = LogFactory.getLog(ConnectionSettingsRemote.class);
     private final StringManager sm = StringManager.getManager(ConnectionSettingsRemote.class);

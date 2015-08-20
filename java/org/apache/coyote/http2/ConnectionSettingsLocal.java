@@ -31,7 +31,7 @@ import java.util.Map;
  * client will respond (almost certainly by closing the connection) as defined
  * in the HTTP/2 specification.
  */
-public class ConnectionSettingsLocal {
+public class ConnectionSettingsLocal extends ConnectionSettingsBase {
 
     private static final Integer KEY_HEADER_TABLE_SIZE = Integer.valueOf(1);
     private static final Integer KEY_ENABLE_PUSH = Integer.valueOf(2);
