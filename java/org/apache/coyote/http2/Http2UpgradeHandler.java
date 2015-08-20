@@ -983,7 +983,22 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public void setting(Setting setting, long value) throws ConnectionException {
-        remoteSettings.set(setting, value);
+        // Special handling required
+        if (setting == Setting.INITIAL_WINDOW_SIZE) {
+            long oldValue = remoteSettings.getInitialWindowSize();
+            // Do this first in case new value is invalid
+            remoteSettings.set(setting, value);
+            int diff = (int) (value - oldValue);
+            for (Stream stream : streams.values()) {
+                try {
+                    stream.incrementWindowSize(diff);
+                } catch (Http2Exception e) {
+                    // Should never happen since the diff should always be valid
+                }
+            }
+        } else {
+            remoteSettings.set(setting, value);
+        }
     }
 
 

@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.nio.ByteBuffer;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -152,6 +154,90 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
 
         Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
                 "0-Goaway-[1]-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]-["));
+    }
+
+
+    @Test
+    public void testWindowSizeAndSettingsFrame() throws Exception {
+        http2Connect();
+
+        // Set up a POST request that echoes the body back
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(8 * 1024);
+
+        buildPostRequest(headersFrameHeader, headersPayload,
+                dataFrameHeader, dataPayload, null, 3);
+
+        // Write the headers
+        writeFrame(headersFrameHeader, headersPayload);
+
+        // Now use a settings frame to reduce the size of the flow control
+        // window.
+        sendSettings(0, false, new SettingValue(4, 4 * 1024));
+        // Ack
+        parser.readFrame(true);
+        Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
+        output.clearTrace();
+
+        // Write the body
+        writeFrame(dataFrameHeader, dataPayload);
+
+        // Window size updates after reading POST body
+        parser.readFrame(true);
+        parser.readFrame(true);
+        Assert.assertEquals(
+                "0-WindowSize-[8192]\n" +
+                "3-WindowSize-[8192]\n",
+                output.getTrace());
+        output.clearTrace();
+
+        // Read stream 3 headers and first part of body
+        parser.readFrame(true);
+        parser.readFrame(true);
+        Assert.assertEquals(
+                "3-HeadersStart\n" +
+                "3-Header-[:status]-[200]\n" +
+                "3-HeadersEnd\n" +
+                "3-Body-4096\n", output.getTrace());
+                output.clearTrace();
+
+        // Do a POST that won't be affected by the above limit
+        sendSimplePostRequest(5, null);
+        // Window size updates after reading POST body
+        parser.readFrame(true);
+        parser.readFrame(true);
+        Assert.assertEquals(
+                "0-WindowSize-[128]\n" +
+                "5-WindowSize-[128]\n",
+                output.getTrace());
+        output.clearTrace();
+        // Headers + body
+        parser.readFrame(true);
+        parser.readFrame(true);
+        Assert.assertEquals(
+                "5-HeadersStart\n" +
+                "5-Header-[:status]-[200]\n" +
+                "5-HeadersEnd\n" +
+                "5-Body-128\n" +
+                "5-EndOfStream\n", output.getTrace());
+                output.clearTrace();
+
+        // Now use a settings frame to restore the size of the flow control
+        // window.
+        sendSettings(0, false, new SettingValue(4, 64 * 1024 - 1));
+        // Ack
+        parser.readFrame(true);
+        Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
+        output.clearTrace();
+
+        // Stream remainder of stream 3 body
+        parser.readFrame(true);
+        Assert.assertEquals(
+                "3-Body-4096\n" +
+                "3-EndOfStream\n", output.getTrace());
+                output.clearTrace();
     }
     // TODO: Remaining 6.9 tests
 }
