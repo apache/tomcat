@@ -992,8 +992,17 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             for (Stream stream : streams.values()) {
                 try {
                     stream.incrementWindowSize(diff);
-                } catch (Http2Exception e) {
-                    // Should never happen since the diff should always be valid
+                } catch (Http2Exception h2e) {
+                    try {
+                        closeStream(new StreamException(sm.getString(
+                                "upgradeHandler.windowSizeTooBig", connectionId,
+                                stream.getIdentifier()),
+                                h2e.getError(), stream.getIdentifier().intValue()));
+                    } catch (IOException ioe) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("upgradeHandler.socketCloseFailed"), ioe);
+                        }
+                    }
                 }
             }
         } else {

@@ -255,5 +255,24 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
                 "3-EndOfStream\n", output.getTrace());
                 output.clearTrace();
     }
-    // TODO: Remaining 6.9 tests
+
+
+    @Test
+    public void testWindowSizeTooLargeViaSettings() throws Exception {
+        http2Connect();
+
+        // Set up stream 3
+        sendSimplePostRequest(3,  null,  false);
+
+        // Increase the flow control window but keep it under the limit
+        sendWindowUpdate(3, 1 << 30);
+
+        // Now increase beyond the limit via a settings frame
+        sendSettings(0, false, new SettingValue(4,  1 << 30));
+        // Ack
+        parser.readFrame(true);
+        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]",
+                output.getTrace());
+
+    }
 }
