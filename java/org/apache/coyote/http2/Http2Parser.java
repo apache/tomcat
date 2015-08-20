@@ -44,8 +44,6 @@ class Http2Parser {
     private volatile int headersCurrentStream = -1;
     private volatile boolean headersEndStream = false;
 
-    private volatile int maxPayloadSize = ConnectionSettingsRemote.DEFAULT_MAX_FRAME_SIZE;
-
 
     Http2Parser(String connectionId, Input input, Output output) {
         this.connectionId = connectionId;
@@ -308,7 +306,7 @@ class Http2Parser {
                 input.fill(true, setting);
                 int id = ByteUtil.getTwoBytes(setting, 0);
                 long value = ByteUtil.getFourBytes(setting, 2);
-                output.setting(id, value);
+                output.setting(Setting.valueOf(id), value);
             }
         }
         output.settingsEnd(ack);
@@ -486,9 +484,10 @@ class Http2Parser {
                     expected, frameType), Http2Error.PROTOCOL_ERROR, streamId);
         }
 
-        if (payloadSize > maxPayloadSize) {
+        int maxFrameSize = input.getMaxFrameSize();
+        if (payloadSize > maxFrameSize) {
             throw new ConnectionException(sm.getString("http2Parser.payloadTooBig",
-                    Integer.toString(payloadSize), Integer.toString(maxPayloadSize)),
+                    Integer.toString(payloadSize), Integer.toString(maxFrameSize)),
                     Http2Error.FRAME_SIZE_ERROR);
         }
 
@@ -573,6 +572,8 @@ class Http2Parser {
             }
             return result;
         }
+
+        int getMaxFrameSize();
     }
 
 
@@ -601,7 +602,7 @@ class Http2Parser {
         void reset(int streamId, long errorCode) throws Http2Exception;
 
         // Settings frames
-        void setting(int identifier, long value) throws ConnectionException;
+        void setting(Setting setting, long value) throws ConnectionException;
         void settingsEnd(boolean ack) throws IOException;
 
         // Ping frames

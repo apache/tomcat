@@ -395,7 +395,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         input = new TestInput(is);
         output = new TestOutput();
         parser = new Http2Parser("-1", input, output);
-        hpackEncoder = new HpackEncoder(ConnectionSettingsRemote.DEFAULT_HEADER_TABLE_SIZE);
+        hpackEncoder = new HpackEncoder(ConnectionSettingsBase.DEFAULT_HEADER_TABLE_SIZE);
     }
 
 
@@ -634,7 +634,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    void sendSettings(int streamId, boolean ack, Setting... settings) throws IOException {
+    void sendSettings(int streamId, boolean ack, SettingValue... settings) throws IOException {
         // length
         int settingsCount;
         if (settings == null) {
@@ -693,6 +693,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 len -= read;
             }
             return true;
+        }
+
+
+        @Override
+        public int getMaxFrameSize() {
+            // Hard-coded to use the default
+            return ConnectionSettingsBase.DEFAULT_MAX_FRAME_SIZE;
         }
     }
 
@@ -759,9 +766,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void setting(int identifier, long value) throws ConnectionException {
-            trace.append("0-Settings-[" + identifier + "]-[" + value + "]\n");
-            remoteSettings.set(identifier, value);
+        public void setting(Setting setting, long value) throws ConnectionException {
+            trace.append("0-Settings-[" + setting + "]-[" + value + "]\n");
+            remoteSettings.set(setting, value);
         }
 
 
@@ -923,11 +930,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    static class Setting {
+    static class SettingValue {
         private final int setting;
         private final long value;
 
-        public Setting(int setting, long value) {
+        public SettingValue(int setting, long value) {
             this.setting = setting;
             this.value = value;
         }

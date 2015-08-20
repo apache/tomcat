@@ -35,7 +35,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
         // Overly large settings
         // Settings have to be a multiple of six
-        int settingsCount = (ConnectionSettingsRemote.DEFAULT_MAX_FRAME_SIZE / 6) + 1;
+        int settingsCount = (ConnectionSettingsBase.DEFAULT_MAX_FRAME_SIZE / 6) + 1;
         int size = settingsCount * 6;
         byte[] settings = new byte[size + 9];
         // Header

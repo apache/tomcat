@@ -153,7 +153,5 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
                 "0-Goaway-[1]-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]-["));
     }
-
-
     // TODO: Remaining 6.9 tests
 }
