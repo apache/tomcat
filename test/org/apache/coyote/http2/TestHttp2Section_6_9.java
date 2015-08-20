@@ -203,6 +203,22 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
                 "3-Body-4096\n", output.getTrace());
                 output.clearTrace();
 
+        // Now use a settings frame to further reduce the size of the flow
+        // control window. This should make the stream 3 window negative
+        sendSettings(0, false, new SettingValue(4, 2 * 1024));
+        // Ack
+        parser.readFrame(true);
+        Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
+        output.clearTrace();
+
+        // Now use a settings frame to increase the size of the flow control
+        // window. The stream 3 window should still be negative
+        sendSettings(0, false, new SettingValue(4, 3 * 1024));
+        // Ack
+        parser.readFrame(true);
+        Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
+        output.clearTrace();
+
         // Do a POST that won't be affected by the above limit
         sendSimplePostRequest(5, null);
         // Window size updates after reading POST body
