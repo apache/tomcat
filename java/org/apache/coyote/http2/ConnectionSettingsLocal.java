@@ -36,7 +36,7 @@ public class ConnectionSettingsLocal {
     private static final Integer KEY_HEADER_TABLE_SIZE = Integer.valueOf(1);
     private static final Integer KEY_ENABLE_PUSH = Integer.valueOf(2);
     private static final Integer KEY_MAX_CONCURRENT_STREAMS = Integer.valueOf(3);
-    private static final Integer KEY_INITAIL_WINDOW_SIZE = Integer.valueOf(4);
+    private static final Integer KEY_INITIAL_WINDOW_SIZE = Integer.valueOf(4);
     private static final Integer KEY_MAX_FRAME_SIZE = Integer.valueOf(5);
     private static final Integer KEY_MAX_HEADER_LIST_SIZE = Integer.valueOf(6);
 
@@ -63,7 +63,7 @@ public class ConnectionSettingsLocal {
         current.put(KEY_HEADER_TABLE_SIZE,      DEFAULT_HEADER_TABLE_SIZE);
         current.put(KEY_ENABLE_PUSH,            DEFAULT_ENABLE_PUSH);
         current.put(KEY_MAX_CONCURRENT_STREAMS, DEFAULT_MAX_CONCURRENT_STREAMS);
-        current.put(KEY_INITAIL_WINDOW_SIZE,    DEFAULT_INITIAL_WINDOW_SIZE);
+        current.put(KEY_INITIAL_WINDOW_SIZE,    DEFAULT_INITIAL_WINDOW_SIZE);
         current.put(KEY_MAX_FRAME_SIZE,         DEFAULT_MAX_FRAME_SIZE);
         current.put(KEY_MAX_HEADER_LIST_SIZE,   DEFAULT_MAX_HEADER_LIST_SIZE);
     }
@@ -189,10 +189,10 @@ public class ConnectionSettingsLocal {
 
 
     public int getInitialWindowSize() {
-        return getMaxInt(KEY_INITAIL_WINDOW_SIZE);
+        return getMaxInt(KEY_INITIAL_WINDOW_SIZE);
     }
     public void setInitialWindowSize(long initialWindowSize) {
-        set(KEY_INITAIL_WINDOW_SIZE, initialWindowSize);
+        set(KEY_INITIAL_WINDOW_SIZE, initialWindowSize);
     }
 
 
