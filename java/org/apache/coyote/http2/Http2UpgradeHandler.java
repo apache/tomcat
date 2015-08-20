@@ -1014,7 +1014,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void settingsEnd(boolean ack) throws IOException {
         if (ack) {
-            localSettings.ack();
+            if (!localSettings.ack()) {
+                // Ack was unexpected
+                log.warn(sm.getString(
+                        "upgradeHandler.unexpectedAck", connectionId, getIdentifier()));
+            }
         } else {
             synchronized (socketWrapper) {
                 socketWrapper.write(true, SETTINGS_ACK, 0, SETTINGS_ACK.length);
