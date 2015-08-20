@@ -195,7 +195,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 for (int i = 0; i < settings.length % 6; i++) {
                     int id = ByteUtil.getTwoBytes(settings, i * 6);
                     long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
-                    remoteSettings.set(id, value);
+                    remoteSettings.set(Setting.valueOf(id), value);
                 }
             } catch (Http2Exception | IOException ioe) {
                 throw new ProtocolException(
@@ -812,12 +812,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     public void setMaxConcurrentStreams(long maxConcurrentStreams) {
-        localSettings.setMaxConcurrentStreams(maxConcurrentStreams);
+        localSettings.set(Setting.MAX_CONCURRENT_STREAMS, maxConcurrentStreams);
     }
 
 
     public void setInitialWindowSize(int initialWindowSize) {
-        localSettings.setInitialWindowSize(initialWindowSize);
+        localSettings.set(Setting.INITIAL_WINDOW_SIZE, initialWindowSize);
     }
 
 
@@ -849,6 +849,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         return true;
+    }
+
+
+    @Override
+    public int getMaxFrameSize() {
+        return localSettings.getMaxFrameSize();
     }
 
 
@@ -976,8 +982,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public void setting(int identifier, long value) throws ConnectionException {
-        remoteSettings.set(identifier, value);
+    public void setting(Setting setting, long value) throws ConnectionException {
+        remoteSettings.set(setting, value);
     }
 
 

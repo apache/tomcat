@@ -35,7 +35,7 @@ abstract class AbstractStream {
 
     private volatile AbstractStream parentStream = null;
     private final Set<AbstractStream> childStreams = new HashSet<>();
-    private long windowSize = ConnectionSettingsRemote.DEFAULT_INITIAL_WINDOW_SIZE;
+    private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
     public Integer getIdentifier() {
         return identifier;
@@ -119,7 +119,7 @@ abstract class AbstractStream {
                     getIdentifier(), Integer.toString(increment), Long.toString(windowSize)));
         }
 
-        if (windowSize > ConnectionSettingsRemote.MAX_WINDOW_SIZE) {
+        if (windowSize > ConnectionSettingsBase.MAX_WINDOW_SIZE) {
             String msg = sm.getString("abstractStream.windowSizeTooBig", getConnectionId(), identifier,
                     Integer.toString(increment), Long.toString(windowSize));
             if (identifier.intValue() == 0) {
