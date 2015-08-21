@@ -174,8 +174,6 @@ public class StreamStateMachine {
                                                                      FrameType.RST,
                                                                      FrameType.PUSH_PROMISE,
                                                                      FrameType.WINDOW_UPDATE),
-        // TODO: This state may end up being removed and replaced by the stream
-        //       being removed from the map in the upgrade handler.
         CLOSED_FINAL       (false, true,  Http2Error.PROTOCOL_ERROR, FrameType.PRIORITY);
 
         private final boolean active;
