@@ -169,9 +169,17 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             break;
         }
         case ":path": {
-            coyoteRequest.requestURI().setString(value);
-            // TODO: This is almost certainly wrong and needs to be decoded
-            coyoteRequest.decodedURI().setString(value);
+            int queryStart = value.indexOf('?');
+            if (queryStart == -1) {
+                coyoteRequest.requestURI().setString(value);
+                coyoteRequest.decodedURI().setString(coyoteRequest.getURLDecoder().convert(value, false));
+            } else {
+                String uri = value.substring(0, queryStart);
+                String query = value.substring(queryStart + 1);
+                coyoteRequest.requestURI().setString(uri);
+                coyoteRequest.decodedURI().setString(coyoteRequest.getURLDecoder().convert(uri, false));
+                coyoteRequest.queryString().setString(coyoteRequest.getURLDecoder().convert(query, true));
+            }
             break;
         }
         case ":authority": {
