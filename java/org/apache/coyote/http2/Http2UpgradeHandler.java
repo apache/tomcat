@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -131,7 +132,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private volatile int maxActiveRemoteStreamId = -1;
     private volatile int maxProcessedStreamId;
     private final PingManager pingManager = new PingManager();
-
+    private volatile int newStreamsSinceLastPrune = 0;
     // Tracking for when the connection is blocked (windowSize < 1)
     private final Map<AbstractStream,int[]> backLogStreams = new ConcurrentHashMap<>();
     private long backLogSize = 0;
@@ -743,7 +744,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     Integer.valueOf(maxRemoteStreamId)), Http2Error.PROTOCOL_ERROR);
         }
 
-        // TODO Implement periodic pruning of closed streams
+        pruneClosedStreams();
 
         Stream result = new Stream(key, this);
         streams.put(key, result);
@@ -758,6 +759,77 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             socketWrapper.close();
         } catch (IOException ioe) {
             log.debug(sm.getString("upgradeHandler.socketCloseFailed"), ioe);
+        }
+    }
+
+
+    private void pruneClosedStreams() {
+        // Only prune every 10 new streams
+        if (newStreamsSinceLastPrune < 9) {
+            newStreamsSinceLastPrune++;
+            return;
+        }
+        // Reset counter
+        newStreamsSinceLastPrune = 0;
+
+        // RFC 7540, 5.3.4 endpoints should maintain state for at least the
+        // maximum number of concurrent streams
+        long max = localSettings.getMaxConcurrentStreams();
+        // Allow an additional 10% for closed streams that are used in the
+        // priority tree
+        max = max + max / 10;
+        if (max > Integer.MAX_VALUE) {
+            max = Integer.MAX_VALUE;
+        }
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.pruneStart", connectionId,
+                    Long.toString(max), Integer.toString(streams.size())));
+        }
+
+        int toClose = (int) max  - streams.size();
+        if (toClose < 1) {
+            return;
+        }
+
+        // Need to try and close some streams.
+        // Use this Set to keep track of streams that might be part of the
+        // priority tree. Only remove these if we absolutely have to.
+        TreeSet<Integer> additionalCandidates = new TreeSet<>();
+
+        Iterator<Entry<Integer,Stream>> entryIter = streams.entrySet().iterator();
+        while (entryIter.hasNext() && toClose > 0) {
+            Entry<Integer,Stream> entry = entryIter.next();
+            Stream stream = entry.getValue();
+            // Never remove active streams or streams with children
+            if (stream.isActive() || stream.getChildStreams().size() > 0) {
+                continue;
+            }
+            if (stream.isClosedFinal()) {
+                // This stream went from IDLE to CLOSED and is likely to have
+                // been created by the client as part of the priority tree. Keep
+                // it if possible.
+                additionalCandidates.add(entry.getKey());
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.pruned", connectionId, entry.getKey()));
+                }
+                entryIter.remove();
+                toClose--;
+            }
+        }
+
+        while (toClose > 0 && additionalCandidates.size() > 0) {
+            Integer pruned = additionalCandidates.pollLast();
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.prunedPriority", connectionId, pruned));
+            }
+            toClose++;
+        }
+
+        if (toClose > 0) {
+            log.warn(sm.getString("upgradeHandler.pruneIncomplete", connectionId,
+                    Integer.toString(toClose)));
         }
     }
 
