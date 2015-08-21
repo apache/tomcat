@@ -168,6 +168,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             coyoteRequest.method().setString(value);
             break;
         }
+        case ":scheme": {
+            coyoteRequest.scheme().setString(value);
+            break;
+        }
         case ":path": {
             int queryStart = value.indexOf('?');
             if (queryStart == -1) {
