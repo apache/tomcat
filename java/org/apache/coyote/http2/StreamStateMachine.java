@@ -130,6 +130,10 @@ public class StreamStateMachine {
     }
 
 
+    public synchronized boolean isClosedFinal() {
+        return state == State.CLOSED_FINAL;
+    }
+
     public synchronized void closeIfIdle() {
         stateChange(State.IDLE, State.CLOSED_FINAL);
     }

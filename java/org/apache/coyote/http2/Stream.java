@@ -279,6 +279,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    boolean isClosedFinal() {
+        return state.isClosedFinal();
+    }
+
+
     void closeIfIdle() {
         state.closeIfIdle();
     }
