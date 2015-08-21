@@ -39,7 +39,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
     private final Http2UpgradeHandler handler;
     private final StreamStateMachine state;
-    // TODO: Only create these objects if needed and null them when finished
+    // TODO: null these when finished to reduce memory used by closed stream
     private final Request coyoteRequest;
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer;
