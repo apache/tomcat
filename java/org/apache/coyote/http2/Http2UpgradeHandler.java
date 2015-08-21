@@ -775,6 +775,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         // RFC 7540, 5.3.4 endpoints should maintain state for at least the
         // maximum number of concurrent streams
         long max = localSettings.getMaxConcurrentStreams();
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.pruneStart", connectionId,
+                    Long.toString(max), Integer.toString(streams.size())));
+        }
+
         // Allow an additional 10% for closed streams that are used in the
         // priority tree
         max = max + max / 10;
@@ -782,12 +788,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             max = Integer.MAX_VALUE;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.pruneStart", connectionId,
-                    Long.toString(max), Integer.toString(streams.size())));
-        }
-
-        int toClose = (int) max  - streams.size();
+        int toClose = streams.size() - (int) max;
         if (toClose < 1) {
             return;
         }
