@@ -1011,8 +1011,8 @@
 
   <p>As of Tomcat 9, the majority of the SSL configuration attributes in the
   <strong>Connector</strong> are deprecated. If specified, they will be used to
-  configure a <strong>SSLHostConfig</strong> and <strong>Certificate</strong>for
-  the <code>sslDefaultHost</code>. Note that if an explicit
+  configure a <strong>SSLHostConfig</strong> and <strong>Certificate</strong>
+  for the <code>sslDefaultHost</code>. Note that if an explicit
   <strong>SSLHostConfig</strong> element also exists for the
   <code>sslDefaultHost</code> then that will be treated as a configuration
   error. It is expected that Tomcat 10 will drop support for the SSL
@@ -1089,7 +1089,7 @@
       used.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
       <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5</code> will be used.</p>
-      <p>Note that, by default, the order in which ciphers are defined is not
+      <p>Note that, by default, the order in which ciphers are defined is
       treated as an order of preference. See <code>honorCipherOrder</code>.</p>
     </attribute>
 
