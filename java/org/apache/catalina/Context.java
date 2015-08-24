@@ -379,7 +379,9 @@ public interface Context extends Container {
 
 
     /**
-     * Return the distributable flag for this web application.
+     * Get the distributable flag for this web application.
+     *
+     * @return The value of the distributable flag for this web application.
      */
     public boolean getDistributable();
 
