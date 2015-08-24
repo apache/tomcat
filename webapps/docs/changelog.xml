@@ -69,10 +69,6 @@
         Refactor HTTP upgrade and AJP implementations to reduce duplication.
         (markt)
       </scode>
-      <fix>
-        <bug>55988</bug>: Add support for Java 8 JSSE server-preferred TLS
-        cipher suite ordering. Patch provided by Ognjen Blagojevic. (schultz)
-      </fix>
       <add>
         Add support for HPACK header encoding and decoding, contributed
         by Stuart Douglas. (remm)
@@ -83,9 +79,9 @@
         support this. (markt)
       </add>
       <add>
-        Add SSL engine backed by OpenSSL, based on code contributed by Numa de
-        Montmollin and derived from code developed by Twitter and Netty.
-        (remm)
+        Add SSL engine for JSSE backed by OpenSSL. Includes ALPN support.
+        Based on code contributed by Numa de Montmollin and derived from code
+        developed by Twitter and Netty. (remm)
       </add>
     </changelog>
   </subsection>
