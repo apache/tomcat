@@ -63,7 +63,7 @@
     <li>Multicast port is 45564 (the port and the address together determine cluster membership.</li>
     <li>The IP broadcasted is <code>java.net.InetAddress.getLocalHost().getHostAddress()</code> (make sure you don't broadcast 127.0.0.1, this is a common error)</li>
     <li>The TCP port listening for replication messages is the first available server socket in range <code>4000-4100</code></li>
-    <li>Two listeners are configured <code>ClusterSessionListener</code></li>
+    <li>Listener is configured <code>ClusterSessionListener</code></li>
     <li>Two interceptors are configured <code>TcpFailureDetector</code> and <code>MessageDispatch15Interceptor</code></li>
   </ol>
   <p>
@@ -119,7 +119,7 @@ should be completed:</p>
   <li>All your session attributes must implement <code>java.io.Serializable</code></li>
   <li>Uncomment the <code>Cluster</code> element in server.xml</li>
   <li>If you have defined custom cluster valves, make sure you have the <code>ReplicationValve</code>  defined as well under the Cluster element in server.xml</li>
-  <li>If your Tomcat instances are running on the same machine, make sure the <code>tcpListenPort</code>
+  <li>If your Tomcat instances are running on the same machine, make sure the <code>Receiver.port</code>
       attribute is unique for each instance, in most cases Tomcat is smart enough to resolve this on it's own by autodetecting available ports in the range 4000-4100</li>
   <li>Make sure your <code>web.xml</code> has the
       <code>&lt;distributable/&gt;</code> element</li>
