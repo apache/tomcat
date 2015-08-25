@@ -532,12 +532,16 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     @Override
     public void setMaxActive(int maxActive) {
         getPoolProperties().setMaxActive(maxActive);
+        //make sure the pool is properly configured
+        pool.checkPoolConfiguration(getPoolProperties());
     }
 
 
     @Override
     public void setMaxIdle(int maxIdle) {
         getPoolProperties().setMaxIdle(maxIdle);
+        //make sure the pool is properly configured
+        pool.checkPoolConfiguration(getPoolProperties());
 
     }
 
@@ -562,6 +566,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     @Override
     public void setMinIdle(int minIdle) {
         getPoolProperties().setMinIdle(minIdle);
+        //make sure the pool is properly configured
+        pool.checkPoolConfiguration(getPoolProperties());
     }
 
 

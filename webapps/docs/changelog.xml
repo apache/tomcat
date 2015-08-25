@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.65 (violetagg)">
+    <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Make sure the pool has been properly configured when attributes that
+        related to the pool size are changed via JMX. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.64 (violetagg)">
   <subsection name="Catalina">
