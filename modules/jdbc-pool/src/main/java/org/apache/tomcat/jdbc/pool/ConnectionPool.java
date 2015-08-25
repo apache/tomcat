@@ -416,26 +416,7 @@ public class ConnectionPool {
         poolProperties = properties;
 
         //make sure the pool is properly configured
-        if (properties.getMaxActive()<1) {
-            log.warn("maxActive is smaller than 1, setting maxActive to: "+PoolProperties.DEFAULT_MAX_ACTIVE);
-            properties.setMaxActive(PoolProperties.DEFAULT_MAX_ACTIVE);
-        }
-        if (properties.getMaxActive()<properties.getInitialSize()) {
-            log.warn("initialSize is larger than maxActive, setting initialSize to: "+properties.getMaxActive());
-            properties.setInitialSize(properties.getMaxActive());
-        }
-        if (properties.getMinIdle()>properties.getMaxActive()) {
-            log.warn("minIdle is larger than maxActive, setting minIdle to: "+properties.getMaxActive());
-            properties.setMinIdle(properties.getMaxActive());
-        }
-        if (properties.getMaxIdle()>properties.getMaxActive()) {
-            log.warn("maxIdle is larger than maxActive, setting maxIdle to: "+properties.getMaxActive());
-            properties.setMaxIdle(properties.getMaxActive());
-        }
-        if (properties.getMaxIdle()<properties.getMinIdle()) {
-            log.warn("maxIdle is smaller than minIdle, setting maxIdle to: "+properties.getMinIdle());
-            properties.setMaxIdle(properties.getMinIdle());
-        }
+        checkPoolConfiguration(properties);
 
         //make space for 10 extra in case we flow over a bit
         busy = new LinkedBlockingQueue<>();
@@ -502,6 +483,29 @@ public class ConnectionPool {
         closed = false;
     }
 
+    public void checkPoolConfiguration(PoolConfiguration properties) {
+        //make sure the pool is properly configured
+        if (properties.getMaxActive()<1) {
+            log.warn("maxActive is smaller than 1, setting maxActive to: "+PoolProperties.DEFAULT_MAX_ACTIVE);
+            properties.setMaxActive(PoolProperties.DEFAULT_MAX_ACTIVE);
+        }
+        if (properties.getMaxActive()<properties.getInitialSize()) {
+            log.warn("initialSize is larger than maxActive, setting initialSize to: "+properties.getMaxActive());
+            properties.setInitialSize(properties.getMaxActive());
+        }
+        if (properties.getMinIdle()>properties.getMaxActive()) {
+            log.warn("minIdle is larger than maxActive, setting minIdle to: "+properties.getMaxActive());
+            properties.setMinIdle(properties.getMaxActive());
+        }
+        if (properties.getMaxIdle()>properties.getMaxActive()) {
+            log.warn("maxIdle is larger than maxActive, setting maxIdle to: "+properties.getMaxActive());
+            properties.setMaxIdle(properties.getMaxActive());
+        }
+        if (properties.getMaxIdle()<properties.getMinIdle()) {
+            log.warn("maxIdle is smaller than minIdle, setting maxIdle to: "+properties.getMinIdle());
+            properties.setMaxIdle(properties.getMinIdle());
+        }
+    }
 
     public void initializePoolCleaner(PoolConfiguration properties) {
         //if the evictor thread is supposed to run, start it now
