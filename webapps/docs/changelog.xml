@@ -65,6 +65,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <add>
+        Add support for configurations of <code>ChannelListener</code> and
+        <code>MembershipListener</code> in server.xml. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
