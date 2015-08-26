@@ -71,6 +71,10 @@
         Add support for configurations of <code>ChannelListener</code> and
         <code>MembershipListener</code> in server.xml. (kfujino)
       </add>
+      <fix>
+        Correct log messages in case of using <code>ReplicatedMap</code>.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

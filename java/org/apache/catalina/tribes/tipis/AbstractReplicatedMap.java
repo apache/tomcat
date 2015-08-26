@@ -510,11 +510,11 @@ public abstract class AbstractReplicatedMap<K,V>
                 }
             }
         } catch (ChannelException x) {
-            log.error("Unable to transfer LazyReplicatedMap state.", x);
+            log.error("Unable to transfer AbstractReplicatedMap state.", x);
         } catch (IOException x) {
-            log.error("Unable to transfer LazyReplicatedMap state.", x);
+            log.error("Unable to transfer AbstractReplicatedMap state.", x);
         } catch (ClassNotFoundException x) {
-            log.error("Unable to transfer LazyReplicatedMap state.", x);
+            log.error("Unable to transfer AbstractReplicatedMap state.", x);
         }
     }
 
@@ -906,7 +906,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 getChannel().send(getMapMembers(), msg, getChannelSendOptions());
             }
         } catch ( ChannelException x ) {
-            log.error("Unable to replicate out data for a LazyReplicatedMap.remove operation",x);
+            log.error("Unable to replicate out data for a AbstractReplicatedMap.remove operation",x);
         }
         return entry!=null?entry.getValue():null;
     }
@@ -970,7 +970,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 if ( getMapOwner()!=null ) getMapOwner().objectMadePrimay(key, entry.getValue());
 
             } catch (Exception x) {
-                log.error("Unable to replicate out data for a LazyReplicatedMap.get operation", x);
+                log.error("Unable to replicate out data for a AbstractReplicatedMap.get operation", x);
                 return null;
             }
         }
@@ -1036,7 +1036,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 entry.setBackupNodes(backup);
             }
         } catch (ChannelException x) {
-            log.error("Unable to replicate out data for a LazyReplicatedMap.put operation", x);
+            log.error("Unable to replicate out data for a AbstractReplicatedMap.put operation", x);
         }
         innerMap.put(key,entry);
         return old;
