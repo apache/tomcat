@@ -75,7 +75,6 @@ public class AsyncFileHandler extends FileHandler {
     public void close() {
         if (closed) return;
         closed = true;
-        // TODO Auto-generated method stub
         super.close();
     }
     
@@ -83,7 +82,6 @@ public class AsyncFileHandler extends FileHandler {
     protected void open() {
         if(!closed) return;
         closed = false;
-        // TODO Auto-generated method stub
         super.open();
     }
     
