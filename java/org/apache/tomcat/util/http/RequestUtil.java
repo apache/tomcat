@@ -31,7 +31,7 @@ public class RequestUtil {
      *
      * @param path Relative path to be normalized
      *
-     * @return The normalized path or <code>null</code> of the path cannot be
+     * @return The normalized path or <code>null</code> if the path cannot be
      *         normalized
      */
     public static String normalize(String path) {
@@ -48,7 +48,7 @@ public class RequestUtil {
      * @param path Relative path to be normalized
      * @param replaceBackSlash Should '\\' be replaced with '/'
      *
-     * @return The normalized path or <code>null</code> of the path cannot be
+     * @return The normalized path or <code>null</code> if the path cannot be
      *         normalized
      */
     public static String normalize(String path, boolean replaceBackSlash) {
