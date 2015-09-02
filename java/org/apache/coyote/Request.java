@@ -140,6 +140,7 @@ public final class Request {
 
     private final RequestInfo reqProcessorMX=new RequestInfo(this);
 
+    private boolean sendfile = true;
 
     protected volatile ReadListener listener;
 
@@ -422,6 +423,14 @@ public final class Request {
         this.available = available;
     }
 
+    public boolean getSendfile() {
+        return sendfile;
+    }
+
+    public void setSendfile(boolean sendfile) {
+        this.sendfile = sendfile;
+    }
+
     public boolean isFinished() {
         AtomicBoolean result = new AtomicBoolean(false);
         action(ActionCode.REQUEST_BODY_FULLY_READ, result);
@@ -522,6 +531,7 @@ public final class Request {
         localPort = -1;
         remotePort = -1;
         available = 0;
+        sendfile = true;
 
         serverCookies.recycle();
         parameters.recycle();

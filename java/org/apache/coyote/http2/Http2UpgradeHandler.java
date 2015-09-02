@@ -295,7 +295,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 result = SocketState.UPGRADED;
                 break;
 
-                case OPEN_WRITE:
+            case OPEN_WRITE:
                 processWrites();
 
                 result = SocketState.UPGRADED;
