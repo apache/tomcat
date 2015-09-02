@@ -568,7 +568,7 @@ public class OutputBuffer extends Writer
             enc = DEFAULT_ENCODING;
         }
 
-        Charset charset = B2CConverter.getCharset(enc);
+        final Charset charset = B2CConverter.getCharset(enc);
         conv = encoders.get(charset);
 
         if (conv == null) {
@@ -579,7 +579,7 @@ public class OutputBuffer extends Writer
 
                                 @Override
                                 public C2BConverter run() throws IOException{
-                                    return new C2BConverter(enc);
+                                    return new C2BConverter(charset);
                                 }
                             }
                     );
@@ -590,7 +590,7 @@ public class OutputBuffer extends Writer
                     }
                 }
             } else {
-                conv = new C2BConverter(enc);
+                conv = new C2BConverter(charset);
             }
 
             encoders.put(charset, conv);
