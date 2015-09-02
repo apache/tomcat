@@ -117,12 +117,6 @@ public class OutputBuffer extends Writer
 
 
     /**
-     * Encoder is set.
-     */
-    private boolean gotEnc = false;
-
-
-    /**
      * List of encoders.
      */
     protected final ConcurrentHashMap<String, C2BConverter> encoders = new ConcurrentHashMap<>();
@@ -238,11 +232,11 @@ public class OutputBuffer extends Writer
         suspended = false;
         doFlush = false;
 
-        if (conv!= null) {
+        if (conv != null) {
             conv.recycle();
+            conv = null;
         }
 
-        gotEnc = false;
         enc = null;
     }
 
@@ -555,13 +549,10 @@ public class OutputBuffer extends Writer
     }
 
 
-    public void checkConverter()
-        throws IOException {
-
-        if (!gotEnc) {
+    public void checkConverter() throws IOException {
+        if (conv == null) {
             setConverter();
         }
-
     }
 
 
@@ -572,7 +563,6 @@ public class OutputBuffer extends Writer
             enc = coyoteResponse.getCharacterEncoding();
         }
 
-        gotEnc = true;
         if (enc == null) {
             enc = DEFAULT_ENCODING;
         }
@@ -641,7 +631,7 @@ public class OutputBuffer extends Writer
         bytesWritten = 0;
         charsWritten = 0;
         if (resetWriterStreamFlags) {
-            gotEnc = false;
+            conv = null;
             enc = null;
         }
         initial = true;
