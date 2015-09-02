@@ -3310,7 +3310,7 @@ public class Request
                     public Object get(Request request, String name) {
                         return Boolean.valueOf(
                                 request.getConnector().getProtocolHandler(
-                                        ).isSendfileSupported());
+                                        ).isSendfileSupported() && request.getCoyoteRequest().getSendfile());
                     }
                     @Override
                     public void set(Request request, String name, Object value) {

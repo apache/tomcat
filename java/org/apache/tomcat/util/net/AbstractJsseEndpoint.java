@@ -97,11 +97,6 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
                     certificate.setSslContextWrapper(sslContextWrapper);
                 }
             }
-            // For now, sendfile is not supported with SSL
-            if (getUseSendfile()) {
-                    super.setUseSendfile(false);
-                    log.warn(sm.getString("endpoint.noSendfileWithSSL"));
-                }
 
         }
     }

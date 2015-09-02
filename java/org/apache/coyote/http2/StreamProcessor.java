@@ -54,6 +54,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     public void run() {
         try {
+            // No sendfile for HTTP/2
+            request.setSendfile(false);
             adapter.service(request, response);
             // Ensure the response is complete
             response.action(ActionCode.CLOSE, null);
