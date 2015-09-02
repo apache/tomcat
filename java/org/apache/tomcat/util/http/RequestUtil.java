@@ -67,14 +67,6 @@ public class RequestUtil {
         if (!normalized.startsWith("/"))
             normalized = "/" + normalized;
 
-        if (normalized.equals("/.")) {
-            return "/";
-        }
-
-        if (normalized.equals("/..")) {
-            return null;  // Trying to go outside our context
-        }
-
         // Resolve occurrences of "//" in the normalized path
         while (true) {
             int index = normalized.indexOf("//");
@@ -104,6 +96,14 @@ public class RequestUtil {
             }
             int index2 = normalized.lastIndexOf('/', index - 1);
             normalized = normalized.substring(0, index2) + normalized.substring(index + 3);
+        }
+
+        if (normalized.equals("/.")) {
+            return "/";
+        }
+
+        if (normalized.equals("/..")) {
+            return null;  // Trying to go outside our context
         }
 
         // Return the normalized path that we have completed

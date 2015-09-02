@@ -66,6 +66,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct some edge cases in <code>RequestUtil.normalize()</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
@@ -181,7 +188,7 @@
         (markt)
       </fix>
       <fix>
-        Correct a coupe of edge cases in <code>RequestUtil.normalize()</code>.
+        Correct a couple of edge cases in <code>RequestUtil.normalize()</code>.
         (markt)
       </fix>
     </changelog>
