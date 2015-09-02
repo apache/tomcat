@@ -21,7 +21,7 @@ import java.io.Writer;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
@@ -125,7 +125,7 @@ public class OutputBuffer extends Writer
     /**
      * List of encoders.
      */
-    protected final HashMap<String, C2BConverter> encoders = new HashMap<>();
+    protected final ConcurrentHashMap<String, C2BConverter> encoders = new ConcurrentHashMap<>();
 
 
     /**
