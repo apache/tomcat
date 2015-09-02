@@ -87,6 +87,36 @@ public class TestRequestUtil {
         doTestNormalize("..", null);
     }
 
+    @Test
+    public void testNormalize14() {
+        doTestNormalize("//..", null);
+    }
+
+    @Test
+    public void testNormalize15() {
+        doTestNormalize("//../", null);
+    }
+
+    @Test
+    public void testNormalize16() {
+        doTestNormalize("/./..", null);
+    }
+
+    @Test
+    public void testNormalize17() {
+        doTestNormalize("/./../", null);
+    }
+
+    @Test
+    public void testNormalize18() {
+        doTestNormalize("/a/../..", null);
+    }
+
+    @Test
+    public void testNormalize19() {
+        doTestNormalize("/a/../../", null);
+    }
+
     private void doTestNormalize(String input, String expected) {
         assertEquals(expected,RequestUtil.normalize(input));
     }
