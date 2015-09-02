@@ -26,11 +26,16 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSessionContext;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
 import org.apache.tomcat.util.net.jsse.openssl.Cipher;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
+
+    private static final Log log = LogFactory.getLog(AbstractJsseEndpoint.class);
 
     private String sslImplementationName = null;
     private int sniParseLimit = 64 * 1024;
@@ -92,6 +97,12 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
                     certificate.setSslContextWrapper(sslContextWrapper);
                 }
             }
+            // For now, sendfile is not supported with SSL
+            if (getUseSendfile()) {
+                    super.setUseSendfile(false);
+                    log.warn(sm.getString("endpoint.noSendfileWithSSL"));
+                }
+
         }
     }
 
