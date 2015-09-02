@@ -19,6 +19,7 @@ package org.apache.tomcat.util.buf;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
@@ -37,8 +38,8 @@ public final class C2BConverter {
      */
     private final CharBuffer leftovers;
 
-    public C2BConverter(String encoding) throws IOException {
-        encoder = B2CConverter.getCharset(encoding).newEncoder();
+    public C2BConverter(Charset charset) {
+        encoder = charset.newEncoder();
         // FIXME: See if unmappable/malformed behavior configuration is needed
         //        in practice
         encoder.onUnmappableCharacter(CodingErrorAction.REPLACE)
