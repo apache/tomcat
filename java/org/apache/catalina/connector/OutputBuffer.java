@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Globals;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Response;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -119,7 +121,7 @@ public class OutputBuffer extends Writer
     /**
      * List of encoders.
      */
-    protected final ConcurrentHashMap<String, C2BConverter> encoders = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<Charset, C2BConverter> encoders = new ConcurrentHashMap<>();
 
 
     /**
@@ -556,8 +558,7 @@ public class OutputBuffer extends Writer
     }
 
 
-    protected void setConverter()
-        throws IOException {
+    protected void setConverter() throws IOException {
 
         if (coyoteResponse != null) {
             enc = coyoteResponse.getCharacterEncoding();
@@ -566,10 +567,13 @@ public class OutputBuffer extends Writer
         if (enc == null) {
             enc = DEFAULT_ENCODING;
         }
-        conv = encoders.get(enc);
+
+        Charset charset = B2CConverter.getCharset(enc);
+        conv = encoders.get(charset);
+
         if (conv == null) {
             if (Globals.IS_SECURITY_ENABLED){
-                try{
+                try {
                     conv = AccessController.doPrivileged(
                             new PrivilegedExceptionAction<C2BConverter>(){
 
@@ -577,10 +581,9 @@ public class OutputBuffer extends Writer
                                 public C2BConverter run() throws IOException{
                                     return new C2BConverter(enc);
                                 }
-
                             }
                     );
-                }catch(PrivilegedActionException ex){
+                } catch (PrivilegedActionException ex) {
                     Exception e = ex.getException();
                     if (e instanceof IOException) {
                         throw (IOException)e;
@@ -590,14 +593,12 @@ public class OutputBuffer extends Writer
                 conv = new C2BConverter(enc);
             }
 
-            encoders.put(enc, conv);
-
+            encoders.put(charset, conv);
         }
     }
 
 
     // --------------------  BufferedOutputStream compatibility
-
 
     public long getContentWritten() {
         return bytesWritten + charsWritten;
