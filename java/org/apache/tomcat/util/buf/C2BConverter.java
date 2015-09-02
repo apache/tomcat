@@ -40,8 +40,6 @@ public final class C2BConverter {
 
     public C2BConverter(Charset charset) {
         encoder = charset.newEncoder();
-        // FIXME: See if unmappable/malformed behavior configuration is needed
-        //        in practice
         encoder.onUnmappableCharacter(CodingErrorAction.REPLACE)
             .onMalformedInput(CodingErrorAction.REPLACE);
         char[] left = new char[4];
