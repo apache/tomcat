@@ -2448,8 +2448,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Set the current settings for this socket
                     setBlockingStatus(block);
                     if (block) {
+                        Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, 0);
                         Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
                     } else {
+                        Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, 1);
                         Socket.timeoutSet(getSocket().longValue(), 0);
                     }
                     // Downgrade the lock
@@ -2567,8 +2569,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 // Set the current settings for this socket
                 setBlockingStatus(block);
                 if (block) {
+                    Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, 0);
                     Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
                 } else {
+                    Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, 1);
                     Socket.timeoutSet(getSocket().longValue(), 0);
                 }
 
