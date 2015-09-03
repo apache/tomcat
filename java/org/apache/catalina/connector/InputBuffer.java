@@ -544,7 +544,7 @@ public class InputBuffer extends Reader
     }
 
 
-    protected void setConverter() throws IOException {
+    private void setConverter() throws IOException {
 
         if (coyoteRequest != null) {
             enc = coyoteRequest.getCharacterEncoding();
