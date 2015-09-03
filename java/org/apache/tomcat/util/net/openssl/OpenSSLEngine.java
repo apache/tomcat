@@ -239,7 +239,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (src.isDirect()) {
             final long addr = Buffer.address(src) + pos;
             sslWrote = SSL.writeToSSL(ssl, addr, len);
-            if (sslWrote > 0) {
+            if (sslWrote >= 0) {
                 src.position(pos + sslWrote);
                 return sslWrote;
             }
@@ -254,7 +254,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 src.limit(limit);
 
                 sslWrote = SSL.writeToSSL(ssl, addr, len);
-                if (sslWrote > 0) {
+                if (sslWrote >= 0) {
                     src.position(pos + sslWrote);
                     return sslWrote;
                 } else {
