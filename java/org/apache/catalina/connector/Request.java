@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.naming.NamingException;
@@ -194,7 +195,7 @@ public class Request
     /**
      * The attributes associated with this Request, keyed by attribute name.
      */
-    protected final HashMap<String, Object> attributes = new HashMap<>();
+    protected final ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<>();
 
 
     /**
