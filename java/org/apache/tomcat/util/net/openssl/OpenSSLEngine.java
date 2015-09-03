@@ -257,8 +257,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 if (sslWrote > 0) {
                     src.position(pos + sslWrote);
                     return sslWrote;
-                } else {
-                    src.position(pos);
                 }
             } finally {
                 buf.clear();
