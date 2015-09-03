@@ -572,28 +572,33 @@ public class OutputBuffer extends Writer
         conv = encoders.get(charset);
 
         if (conv == null) {
-            if (Globals.IS_SECURITY_ENABLED){
-                try {
-                    conv = AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<C2BConverter>(){
-
-                                @Override
-                                public C2BConverter run() throws IOException{
-                                    return new C2BConverter(charset);
-                                }
-                            }
-                    );
-                } catch (PrivilegedActionException ex) {
-                    Exception e = ex.getException();
-                    if (e instanceof IOException) {
-                        throw (IOException)e;
-                    }
-                }
-            } else {
-                conv = new C2BConverter(charset);
-            }
-
+            conv = createNewConverter(charset);
             encoders.put(charset, conv);
+        }
+    }
+
+
+    private static C2BConverter createNewConverter(Charset charset) throws IOException {
+        if (Globals.IS_SECURITY_ENABLED){
+            try {
+                return AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<C2BConverter>(){
+                            @Override
+                            public C2BConverter run() throws IOException{
+                                return new C2BConverter(charset);
+                            }
+                        }
+                );
+            } catch (PrivilegedActionException ex) {
+                Exception e = ex.getException();
+                if (e instanceof IOException) {
+                    throw (IOException) e;
+                } else {
+                    throw new IOException(ex);
+                }
+            }
+        } else {
+            return new C2BConverter(charset);
         }
     }
 
