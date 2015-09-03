@@ -308,7 +308,6 @@ public class CoyoteAdapter implements Adapter {
                 // Clear converters so that the minimum amount of memory
                 // is used by this processor
                 request.clearEncoders();
-                response.clearEncoders();
             }
         }
         return success;
@@ -409,7 +408,6 @@ public class CoyoteAdapter implements Adapter {
                 // Clear converters so that the minimum amount of memory
                 // is used by this processor
                 request.clearEncoders();
-                response.clearEncoders();
             }
         }
 

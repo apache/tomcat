@@ -287,16 +287,7 @@ public class Response
     }
 
 
-    /**
-     * Clear cached encoders (to save memory for async requests).
-     */
-    public void clearEncoders() {
-        outputBuffer.clearEncoders();
-    }
-
-
     // ------------------------------------------------------- Response Methods
-
 
     /**
      * Return the number of bytes the application has actually written to the
