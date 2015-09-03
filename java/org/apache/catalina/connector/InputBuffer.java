@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -98,7 +99,7 @@ public class InputBuffer extends Reader
     /**
      * List of encoders.
      */
-    protected final ConcurrentHashMap<String,B2CConverter> encoders = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<Charset,B2CConverter> encoders = new ConcurrentHashMap<>();
 
 
     /**
@@ -552,10 +553,13 @@ public class InputBuffer extends Reader
         if (enc == null) {
             enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
         }
-        conv = encoders.get(enc);
+
+        Charset charset = B2CConverter.getCharset(enc);
+        conv = encoders.get(charset);
+
         if (conv == null) {
             if (SecurityUtil.isPackageProtectionEnabled()){
-                try{
+                try {
                     conv = AccessController.doPrivileged(
                             new PrivilegedExceptionAction<B2CConverter>(){
 
@@ -563,10 +567,9 @@ public class InputBuffer extends Reader
                                 public B2CConverter run() throws IOException {
                                     return new B2CConverter(enc);
                                 }
-
                             }
                     );
-                }catch(PrivilegedActionException ex){
+                } catch (PrivilegedActionException ex) {
                     Exception e = ex.getException();
                     if (e instanceof IOException) {
                         throw (IOException)e;
@@ -575,9 +578,7 @@ public class InputBuffer extends Reader
             } else {
                 conv = new B2CConverter(enc);
             }
-            encoders.put(enc, conv);
+            encoders.put(charset, conv);
         }
-
     }
-
 }
