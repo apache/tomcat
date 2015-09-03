@@ -1077,7 +1077,7 @@ public class CoyoteAdapter implements Adapter {
             B2CConverter conv = request.getURIConverter();
             try {
                 if (conv == null) {
-                    conv = new B2CConverter(enc, true);
+                    conv = new B2CConverter(B2CConverter.getCharset(enc), true);
                     request.setURIConverter(conv);
                 } else {
                     conv.recycle();
