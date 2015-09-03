@@ -51,8 +51,6 @@ public class OutputBuffer extends Writer
 
     // -------------------------------------------------------------- Constants
 
-    public static final String DEFAULT_ENCODING =
-        org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
 
 
@@ -565,7 +563,7 @@ public class OutputBuffer extends Writer
         }
 
         if (enc == null) {
-            enc = DEFAULT_ENCODING;
+            enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
         }
 
         final Charset charset = B2CConverter.getCharset(enc);

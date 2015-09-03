@@ -54,9 +54,6 @@ public class InputBuffer extends Reader
 
     // -------------------------------------------------------------- Constants
 
-
-    public static final String DEFAULT_ENCODING =
-        org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
 
     // The buffer can be used for byte[] and char[] reading
@@ -65,8 +62,8 @@ public class InputBuffer extends Reader
     public final int CHAR_STATE = 1;
     public final int BYTE_STATE = 2;
 
-    // ----------------------------------------------------- Instance Variables
 
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * The byte buffer.
@@ -564,7 +561,7 @@ public class InputBuffer extends Reader
 
         gotEnc = true;
         if (enc == null) {
-            enc = DEFAULT_ENCODING;
+            enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
         }
         conv = encoders.get(enc);
         if (conv == null) {
