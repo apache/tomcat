@@ -565,7 +565,7 @@ public class InputBuffer extends Reader
 
                                 @Override
                                 public B2CConverter run() throws IOException {
-                                    return new B2CConverter(enc);
+                                    return new B2CConverter(charset);
                                 }
                             }
                     );
@@ -576,7 +576,7 @@ public class InputBuffer extends Reader
                     }
                 }
             } else {
-                conv = new B2CConverter(enc);
+                conv = new B2CConverter(charset);
             }
             encoders.put(charset, conv);
         }

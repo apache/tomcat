@@ -97,12 +97,11 @@ public class B2CConverter {
      */
     private final ByteBuffer leftovers;
 
-    public B2CConverter(String encoding) throws IOException {
-        this(encoding, false);
+    public B2CConverter(Charset charset) {
+        this(charset, false);
     }
 
-    public B2CConverter(String encoding, boolean replaceOnError)
-            throws IOException {
+    public B2CConverter(Charset charset, boolean replaceOnError) {
         byte[] left = new byte[LEFTOVER_SIZE];
         leftovers = ByteBuffer.wrap(left);
         CodingErrorAction action;
@@ -111,7 +110,6 @@ public class B2CConverter {
         } else {
             action = CodingErrorAction.REPORT;
         }
-        Charset charset = getCharset(encoding);
         // Special case. Use the Apache Harmony based UTF-8 decoder because it
         // - a) rejects invalid sequences that the JVM decoder does not
         // - b) fails faster for some invalid sequences
