@@ -568,12 +568,12 @@ public class OutputBuffer extends Writer
         conv = stack.pop();
 
         if (conv == null) {
-            conv = createNewConverter(charset);
+            conv = createConverter(charset);
         }
     }
 
 
-    private static C2BConverter createNewConverter(Charset charset) throws IOException {
+    private static C2BConverter createConverter(Charset charset) throws IOException {
         if (Globals.IS_SECURITY_ENABLED){
             try {
                 return AccessController.doPrivileged(
