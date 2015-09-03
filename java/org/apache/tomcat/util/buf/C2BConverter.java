@@ -124,4 +124,7 @@ public final class C2BConverter {
         }
     }
 
+    public Charset getCharset() {
+        return encoder.charset();
+    }
 }

@@ -34,6 +34,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -49,9 +50,13 @@ public class OutputBuffer extends Writer
 
     private static final StringManager sm = StringManager.getManager(OutputBuffer.class);
 
-    // -------------------------------------------------------------- Constants
-
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
+
+    /**
+     * Encoder cache.
+     */
+    private static final ConcurrentHashMap<Charset, SynchronizedStack<C2BConverter>> encoders =
+            new ConcurrentHashMap<>();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -114,12 +119,6 @@ public class OutputBuffer extends Writer
      * Encoding to use.
      */
     private String enc;
-
-
-    /**
-     * List of encoders.
-     */
-    protected final ConcurrentHashMap<Charset, C2BConverter> encoders = new ConcurrentHashMap<>();
 
 
     /**
@@ -234,18 +233,11 @@ public class OutputBuffer extends Writer
 
         if (conv != null) {
             conv.recycle();
+            encoders.get(conv.getCharset()).push(conv);
             conv = null;
         }
 
         enc = null;
-    }
-
-
-    /**
-     * Clear cached encoders (to save memory for async requests).
-     */
-    public void clearEncoders() {
-        encoders.clear();
     }
 
 
@@ -567,11 +559,16 @@ public class OutputBuffer extends Writer
         }
 
         final Charset charset = B2CConverter.getCharset(enc);
-        conv = encoders.get(charset);
+        SynchronizedStack<C2BConverter> stack = encoders.get(charset);
+        if (stack == null) {
+            stack = new SynchronizedStack<>();
+            encoders.putIfAbsent(charset, stack);
+            stack = encoders.get(charset);
+        }
+        conv = stack.pop();
 
         if (conv == null) {
             conv = createNewConverter(charset);
-            encoders.put(charset, conv);
         }
     }
 
@@ -635,6 +632,10 @@ public class OutputBuffer extends Writer
         bytesWritten = 0;
         charsWritten = 0;
         if (resetWriterStreamFlags) {
+            if (conv != null) {
+                conv.recycle();
+                encoders.get(conv.getCharset()).push(conv);
+            }
             conv = null;
             enc = null;
         }
