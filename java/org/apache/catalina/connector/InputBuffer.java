@@ -106,7 +106,8 @@ public class InputBuffer extends Reader
     /**
      * List of encoders.
      */
-    protected final ConcurrentHashMap<String,B2CConverter> encoders = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String,B2CConverter> encoders =
+            new ConcurrentHashMap<String, B2CConverter>();
 
 
     /**
