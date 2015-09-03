@@ -64,6 +64,10 @@
         <bug>58313</bug>: Fix concurrent access of encoders map when clearing
         encoders prior to switch to async. (markt)
       </fix>
+      <fix>
+        <bug>58320</bug>: Fix concurrent access of request attributes which is
+        possible during asynchronous processing. (markt)
+      </fix> 
     </changelog>
   </subsection>
   <subsection name="Coyote">
