@@ -558,27 +558,35 @@ public class InputBuffer extends Reader
         conv = encoders.get(charset);
 
         if (conv == null) {
-            if (SecurityUtil.isPackageProtectionEnabled()){
-                try {
-                    conv = AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<B2CConverter>(){
-
-                                @Override
-                                public B2CConverter run() throws IOException {
-                                    return new B2CConverter(charset);
-                                }
-                            }
-                    );
-                } catch (PrivilegedActionException ex) {
-                    Exception e = ex.getException();
-                    if (e instanceof IOException) {
-                        throw (IOException)e;
-                    }
-                }
-            } else {
-                conv = new B2CConverter(charset);
-            }
+            conv = createConverter(charset);
             encoders.put(charset, conv);
         }
+    }
+
+
+    private static B2CConverter createConverter(Charset charset) throws IOException {
+        if (SecurityUtil.isPackageProtectionEnabled()){
+            try {
+                return AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<B2CConverter>(){
+
+                            @Override
+                            public B2CConverter run() throws IOException {
+                                return new B2CConverter(charset);
+                            }
+                        }
+                );
+            } catch (PrivilegedActionException ex) {
+                Exception e = ex.getException();
+                if (e instanceof IOException) {
+                    throw (IOException) e;
+                } else {
+                    throw new IOException(e);
+                }
+            }
+        } else {
+            return new B2CConverter(charset);
+        }
+
     }
 }
