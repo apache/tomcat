@@ -17,8 +17,8 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletException;
 
@@ -36,7 +36,7 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
     // Timing tests need an error margin to prevent failures.
     private static final long ERROR_MARGIN = RELAX_TIMING ? 1000 : 100;
 
-    private final List<Entry> entries = new ArrayList<>();
+    private final Queue<Entry> entries = new ConcurrentLinkedQueue<>();
 
     public TesterAccessLogValve() {
         // Async requests are supported
@@ -86,8 +86,7 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
             entriesLog.append(System.lineSeparator());
         }
         assertEquals(entriesLog.toString(), count, entries.size());
-        for (int j = 0; j < count; j++) {
-            Entry entry = entries.get(j);
+        for (Entry entry : entries) {
             assertEquals(status, entry.getStatus());
             assertTrue(entry.toString() + " duration is not >= " + (minTime - ERROR_MARGIN),
                     entry.getTime() >= minTime - ERROR_MARGIN);
