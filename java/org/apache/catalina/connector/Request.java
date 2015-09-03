@@ -517,13 +517,6 @@ public class Request
         pathParameters.clear();
     }
 
-    /**
-     * Clear cached encoders (to save memory for async requests).
-     */
-    public void clearEncoders() {
-        inputBuffer.clearEncoders();
-    }
-
 
     // -------------------------------------------------------- Request Methods
 

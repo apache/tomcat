@@ -33,6 +33,7 @@ import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -52,9 +53,6 @@ public class InputBuffer extends Reader
      */
     protected static final StringManager sm = StringManager.getManager(InputBuffer.class);
 
-
-    // -------------------------------------------------------------- Constants
-
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
 
     // The buffer can be used for byte[] and char[] reading
@@ -62,6 +60,13 @@ public class InputBuffer extends Reader
     public final int INITIAL_STATE = 0;
     public final int CHAR_STATE = 1;
     public final int BYTE_STATE = 2;
+
+
+    /**
+     * Encoder cache.
+     */
+    private static final ConcurrentHashMap<Charset,SynchronizedStack<B2CConverter>> encoders =
+            new ConcurrentHashMap<>();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -94,12 +99,6 @@ public class InputBuffer extends Reader
      * Encoding to use.
      */
     private String enc;
-
-
-    /**
-     * List of encoders.
-     */
-    protected final ConcurrentHashMap<Charset,B2CConverter> encoders = new ConcurrentHashMap<>();
 
 
     /**
@@ -197,18 +196,11 @@ public class InputBuffer extends Reader
 
         if (conv != null) {
             conv.recycle();
+            encoders.get(conv.getCharset()).push(conv);
             conv = null;
         }
 
         enc = null;
-    }
-
-
-    /**
-     * Clear cached encoders (to save memory for async requests).
-     */
-    public void clearEncoders() {
-        encoders.clear();
     }
 
 
@@ -370,9 +362,7 @@ public class InputBuffer extends Reader
 
     @Override
     public int realReadChars() throws IOException {
-        if (conv == null) {
-            setConverter();
-        }
+        checkConverter();
 
         boolean eof = false;
 
@@ -545,7 +535,6 @@ public class InputBuffer extends Reader
 
 
     private void setConverter() throws IOException {
-
         if (coyoteRequest != null) {
             enc = coyoteRequest.getCharacterEncoding();
         }
@@ -555,11 +544,16 @@ public class InputBuffer extends Reader
         }
 
         Charset charset = B2CConverter.getCharset(enc);
-        conv = encoders.get(charset);
+        SynchronizedStack<B2CConverter> stack = encoders.get(charset);
+        if (stack == null) {
+            stack = new SynchronizedStack<>();
+            encoders.putIfAbsent(charset, stack);
+            stack = encoders.get(charset);
+        }
+        conv = stack.pop();
 
         if (conv == null) {
             conv = createConverter(charset);
-            encoders.put(charset, conv);
         }
     }
 

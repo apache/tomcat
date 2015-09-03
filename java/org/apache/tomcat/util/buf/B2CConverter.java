@@ -198,4 +198,9 @@ public class B2CConverter {
             }
         }
     }
+
+
+    public Charset getCharset() {
+        return decoder.charset();
+    }
 }
