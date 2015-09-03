@@ -304,10 +304,6 @@ public class CoyoteAdapter implements Adapter {
             if (!success || !request.isAsync()) {
                 request.recycle();
                 response.recycle();
-            } else {
-                // Clear converters so that the minimum amount of memory
-                // is used by this processor
-                request.clearEncoders();
             }
         }
         return success;
@@ -404,13 +400,8 @@ public class CoyoteAdapter implements Adapter {
             if (!async || error.get()) {
                 request.recycle();
                 response.recycle();
-            } else {
-                // Clear converters so that the minimum amount of memory
-                // is used by this processor
-                request.clearEncoders();
             }
         }
-
     }
 
 
