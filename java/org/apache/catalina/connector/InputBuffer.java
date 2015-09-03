@@ -96,12 +96,6 @@ public class InputBuffer extends Reader
 
 
     /**
-     * Encoder is set.
-     */
-    private boolean gotEnc = false;
-
-
-    /**
      * List of encoders.
      */
     protected final ConcurrentHashMap<String,B2CConverter> encoders = new ConcurrentHashMap<>();
@@ -202,9 +196,9 @@ public class InputBuffer extends Reader
 
         if (conv != null) {
             conv.recycle();
+            conv = null;
         }
 
-        gotEnc = false;
         enc = null;
     }
 
@@ -375,7 +369,7 @@ public class InputBuffer extends Reader
 
     @Override
     public int realReadChars() throws IOException {
-        if (!gotEnc) {
+        if (conv == null) {
             setConverter();
         }
 
@@ -542,24 +536,19 @@ public class InputBuffer extends Reader
     }
 
 
-    public void checkConverter()
-        throws IOException {
-
-        if (!gotEnc) {
+    public void checkConverter() throws IOException {
+        if (conv == null) {
             setConverter();
         }
-
     }
 
 
-    protected void setConverter()
-        throws IOException {
+    protected void setConverter() throws IOException {
 
         if (coyoteRequest != null) {
             enc = coyoteRequest.getCharacterEncoding();
         }
 
-        gotEnc = true;
         if (enc == null) {
             enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
         }
