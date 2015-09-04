@@ -33,6 +33,7 @@ public class JreCompat {
     private static final JreCompat instance;
     private static StringManager sm =
             StringManager.getManager(JreCompat.class.getPackage().getName());
+    private static final boolean jre7Available;
     private static final boolean jre8Available;
     
     
@@ -42,12 +43,15 @@ public class JreCompat {
         // Look for the highest supported JVM first
         if (Jre8Compat.isSupported()) {
             instance = new Jre8Compat();
+            jre7Available = true;
             jre8Available = true;
         } else if (Jre7Compat.isSupported()) {
             instance = new Jre7Compat();
+            jre7Available = true;
             jre8Available = false;
         } else {
             instance = new JreCompat();
+            jre7Available = false;
             jre8Available = false;
         }
     }
@@ -58,7 +62,12 @@ public class JreCompat {
     }
     
     
-    // Java 7 methods
+    // Java 6 implementation of Java 7 methods
+    
+    public static boolean isJre7Available() {
+        return jre7Available;
+    }
+    
     
     public Locale forLanguageTag(String languageTag) {
         // Extract the language and country for this entry
@@ -101,7 +110,7 @@ public class JreCompat {
     }
    
     
-    // Java 8 methods
+    // Java 6 implementation of Java 8 methods
     
     public static boolean isJre8Available() {
         return jre8Available;
