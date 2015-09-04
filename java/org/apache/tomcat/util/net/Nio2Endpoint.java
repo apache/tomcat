@@ -949,7 +949,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 if (log.isDebugEnabled()) {
                     log.debug("Socket: [" + this + "], Read: [" + nRead + "]");
                 }
-                return nRead;
+                return (nRead > len) ? len : nRead;
             }
         }
 
