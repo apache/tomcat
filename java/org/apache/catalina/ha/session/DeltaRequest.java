@@ -96,7 +96,6 @@ public class DeltaRequest implements Externalizable {
     }
 
     /**
-     * convert principal at SerializablePrincipal for backup nodes.
      * Only support principals from type {@link GenericPrincipal GenericPrincipal}
      * @param p Session principal
      * @see GenericPrincipal
