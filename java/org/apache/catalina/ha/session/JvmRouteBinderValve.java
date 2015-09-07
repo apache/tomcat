@@ -257,7 +257,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     }
 
     /**
-     * get Cluster DeltaManager
+     * get ClusterManager
      * 
      * @param request current request
      * @return manager or null
