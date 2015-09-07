@@ -75,6 +75,14 @@
       <fix>
         Correct some edge cases in <code>RequestUtil.normalize()</code>. (markt)
       </fix>
+      <fix>
+        <bug>58275</bug>: The IBM JREs accept cipher suite names starting with
+        <code>TLS_</code> or <code>SSL_</code> but when listing the supported
+        cipher suites only the <code>SSL_</code> version is reported. This can
+        break Tomcat&apos;s check that at least one requested cipher suite is
+        supported. Tomcat now includes a work-around so either form of the
+        cipher suite name can be used when running on an IBM JRE. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
