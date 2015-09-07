@@ -85,6 +85,10 @@
         <code>ClusterSessionListener</code> is never used in
         <code>BackupManager</code>. (kfujino)
       </fix>
+      <fix>
+        Correct log messages in case of using <code>BackupManager</code>.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
