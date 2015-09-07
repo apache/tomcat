@@ -44,6 +44,7 @@ package org.apache.jasper.util;
  * and reinsert it in front or at the end in constant time.
  * So keeping the list sorted is very cheap.
  *
+ * @param <T> The type of elements in the queue
  */
 public class FastRemovalDequeue<T> {
 
@@ -56,7 +57,12 @@ public class FastRemovalDequeue<T> {
     /** Size of the queue */
     private int size;
 
-    /** Initialize empty queue. */
+    /**
+     * Initialize empty queue.
+     *
+     * @param maxSize The maximum size to which the queue will be allowed to
+     *                grow
+     */
     public FastRemovalDequeue(int maxSize) {
         if (maxSize <=1 ) {
             maxSize = 2;
@@ -143,7 +149,7 @@ public class FastRemovalDequeue<T> {
                 first.setPrevious(null);
             }
             size--;
-            element.setValid(false);
+            element.invalidate();
         }
         return content;
     }
@@ -165,14 +171,16 @@ public class FastRemovalDequeue<T> {
                 last.setNext(null);
             }
             size--;
-            element.setValid(false);
+            element.invalidate();
         }
         return content;
     }
 
     /**
      * Removes any element of the list and returns its content.
-     **/
+     *
+     * @param element The element to remove
+     */
     public synchronized void remove(final Entry element) {
         if (element == null || !element.getValid()) {
             return;
@@ -190,7 +198,7 @@ public class FastRemovalDequeue<T> {
             first = next;
         }
         size--;
-        element.setValid(false);
+        element.invalidate();
     }
 
     /**
@@ -272,8 +280,10 @@ public class FastRemovalDequeue<T> {
             return valid;
         }
 
-        private final void setValid(final boolean valid) {
-            this.valid = valid;
+        private final void invalidate() {
+            this.valid = false;
+            this.previous = null;
+            this.next = null;
         }
 
         public final T getContent() {
