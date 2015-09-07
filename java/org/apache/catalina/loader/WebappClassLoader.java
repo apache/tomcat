@@ -82,6 +82,7 @@ import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.compat.JreVendor;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -2974,7 +2975,7 @@ public class WebappClassLoader extends URLClassLoader
                     "webappClassLoader.clearReferencesResourceBundlesFail",
                     contextName), e);
         } catch (NoSuchFieldException e) {
-            if (Globals.IS_ORACLE_JVM) {
+            if (JreVendor.IS_ORACLE_JVM) {
                 log.error(sm.getString(
                         "webappClassLoader.clearReferencesResourceBundlesFail",
                         getContextName()), e);
