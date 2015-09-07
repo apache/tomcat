@@ -77,6 +77,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Fix a default clusterListeners in <code>SimpleTcpCluster</code>. The
+        optimal default value is different for each session manager.
+        <code>ClusterSessionListener</code> is never used in
+        <code>BackupManager</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

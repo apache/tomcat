@@ -700,8 +700,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     protected void checkDefaults() {
         if ( clusterListeners.size() == 0 ) {
-            addClusterListener(new JvmRouteSessionIDBinderListener()); 
-            addClusterListener(new ClusterSessionListener());
+            addClusterListener(new JvmRouteSessionIDBinderListener());
+            if (managerTemplate instanceof DeltaManager) {
+                addClusterListener(new ClusterSessionListener());
+            }
         }
         if ( valves.size() == 0 ) {
             addValve(new JvmRouteBinderValve());
