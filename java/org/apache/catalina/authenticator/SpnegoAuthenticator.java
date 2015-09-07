@@ -30,7 +30,6 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
@@ -39,6 +38,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.compat.JreVendor;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -210,7 +210,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             final GSSManager manager = GSSManager.getInstance();
             // IBM JDK only understands indefinite lifetime
             final int credentialLifetime;
-            if (Globals.IS_IBM_JVM) {
+            if (JreVendor.IS_IBM_JVM) {
                 credentialLifetime = GSSCredential.INDEFINITE_LIFETIME;
             } else {
                 credentialLifetime = GSSCredential.DEFAULT_LIFETIME;
