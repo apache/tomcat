@@ -1334,8 +1334,8 @@ public class HostConfig implements LifecycleListener {
             // missed. See Bug 57765.
             if ((resource.lastModified() != lastModified &&
                     (!host.getAutoDeploy() ||
-                            resource.lastModified() < currentTimeWithResolutionOffset) ||
-                            skipFileModificationResolutionCheck) ||
+                            resource.lastModified() < currentTimeWithResolutionOffset ||
+                            skipFileModificationResolutionCheck)) ||
                     update) {
                 if (!update) {
                     // Reload application
