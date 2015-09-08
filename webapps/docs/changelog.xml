@@ -60,6 +60,12 @@
 <section name="Tomcat 7.0.65 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>57681</bug>: Add a web application class loader implementation that
+        supports the parallel loading of web application classes. Use of this
+        feature requires a Java 7 or later JRE. Based on a patch by Huxing
+        Zhang. (markt)
+      </add>
       <fix>
         <bug>58187</bug>: Correct a regression in the fix for <bug>57765</bug>
         that meant that deployment of web applications deployed via the Manager

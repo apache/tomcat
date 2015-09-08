@@ -171,4 +171,48 @@
 
   </mbean>
 
+  <mbean         name="ParallelWebappClassLoader"
+          description="Classloader implementation which is specialized for handling web applications"
+               domain="Catalina"
+                group="Loader"
+                 type="org.apache.catalina.loader.ParallelWebappClassLoader">
+
+    <attribute   name="className"
+          description="Fully qualified class name of the managed object"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="contextName"
+          description="Name of the webapp context"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="delegate"
+          description="The 'follow standard delegation model' flag that will be used to configure our ClassLoader"
+                 type="boolean"/>
+
+    <attribute   name="antiJARLocking"
+          description="The antiJARLocking flag for this Loader"
+                 type="boolean"/>
+
+    <attribute   name="searchExternalFirst"
+          description="The searchExternalFirst flag for this Loader"
+                 type="boolean"/>
+
+    <attribute   name="stateName"
+          description="The name of the LifecycleState that this component is currently in"
+                 type="java.lang.String"
+                 writeable="false"/>
+
+    <attribute   name="URLs"
+          description="The URLs of this loader"
+                 type="[Ljava.net.URL;"/>
+
+    <attribute   name="jarPath"
+          description="The jarPath of this loader"
+             writeable="false" 
+                 type="java.lang.String"/>
+
+  </mbean>
+
 </mbeans-descriptors>

@@ -125,7 +125,11 @@
         implementation class to use.  If not specified, the default value is
         <code>org.apache.catalina.loader.WebappClassLoader</code>. Custom
         <strong>loaderClass</strong> implementations must extend
-        <code>org.apache.catalina.loader.WebappClassLoaderBase</code>.</p>
+        <code>org.apache.catalina.loader.WebappClassLoaderBase</code>.The
+        default <strong>loaderClass</strong> is not parallel capable. A parallel
+        capable <strong>loaderClass</strong> is available when running on a Java
+        7 or higher JRE and can be used by specifying
+        <code>org.apache.catalina.loader.ParallelWebappClassLoader</code>.</p>
       </attribute>
 
       <attribute name="searchExternalFirst" required="false">
