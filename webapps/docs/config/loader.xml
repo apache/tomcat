@@ -125,7 +125,7 @@
         implementation class to use.  If not specified, the default value is
         <code>org.apache.catalina.loader.WebappClassLoader</code>. Custom
         <strong>loaderClass</strong> implementations must extend
-        <code>org.apache.catalina.loader.WebappClassLoader</code>.</p>
+        <code>org.apache.catalina.loader.WebappClassLoaderBase</code>.</p>
       </attribute>
 
       <attribute name="searchExternalFirst" required="false">

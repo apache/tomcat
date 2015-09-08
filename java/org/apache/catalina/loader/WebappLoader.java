@@ -122,7 +122,7 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * The class loader being managed by this Loader component.
      */
-    private WebappClassLoader classLoader = null;
+    private WebappClassLoaderBase classLoader = null;
 
 
     /**
@@ -147,7 +147,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
     /**
      * The Java class name of the ClassLoader implementation to be used.
-     * This class should extend WebappClassLoader, otherwise, a different
+     * This class should extend WebappClassLoaderBase, otherwise, a different
      * loader implementation must be used.
      */
     private String loaderClass =
@@ -715,11 +715,11 @@ public class WebappLoader extends LifecycleMBeanBase
     /**
      * Create associated classLoader.
      */
-    private WebappClassLoader createClassLoader()
+    private WebappClassLoaderBase createClassLoader()
         throws Exception {
 
         Class<?> clazz = Class.forName(loaderClass);
-        WebappClassLoader classLoader = null;
+        WebappClassLoaderBase classLoader = null;
 
         if (parentClassLoader == null) {
             parentClassLoader = container.getParentClassLoader();
@@ -727,7 +727,7 @@ public class WebappLoader extends LifecycleMBeanBase
         Class<?>[] argTypes = { ClassLoader.class };
         Object[] args = { parentClassLoader };
         Constructor<?> constr = clazz.getConstructor(argTypes);
-        classLoader = (WebappClassLoader) constr.newInstance(args);
+        classLoader = (WebappClassLoaderBase) constr.newInstance(args);
 
         return classLoader;
 

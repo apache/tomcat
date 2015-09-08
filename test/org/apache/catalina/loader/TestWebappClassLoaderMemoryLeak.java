@@ -72,7 +72,7 @@ public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
 
     /*
      * Get the set of current threads as an array.
-     * Copied from WebappClassLoader
+     * Copied from WebappClassLoaderBase
      */
     private Thread[] getThreads() {
         // Get the current thread group
