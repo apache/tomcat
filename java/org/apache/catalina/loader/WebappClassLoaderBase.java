@@ -82,6 +82,7 @@ import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.compat.JreVendor;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -153,11 +154,37 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     private static final Manifest MANIFEST_UNKNOWN = new Manifest();
     
+    private static final Method GET_CLASSLOADING_LOCK_METHOD;
+    
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+
     static {
+        // Register this base class loader as parallel capable on Java 7+ JREs
+        Method getClassLoadingLockMethod = null;
+        try {
+            if (JreCompat.isJre7Available()) {
+                final Method registerParallel =
+                        ClassLoader.class.getDeclaredMethod("registerAsParallelCapable");
+                AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                    @Override
+                    public Void run() {
+                        registerParallel.setAccessible(true);
+                        return null;
+                    }
+                });
+                registerParallel.invoke(null);
+                getClassLoadingLockMethod = 
+                        ClassLoader.class.getDeclaredMethod("getClassLoadingLock", String.class);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        GET_CLASSLOADING_LOCK_METHOD = getClassLoadingLockMethod;
         JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
     }
 
+    
     protected class PrivilegedFindResourceByName
         implements PrivilegedAction<ResourceEntry> {
 
@@ -217,13 +244,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     protected static final String[] packageTriggers = {
     };
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     /**
@@ -1710,10 +1730,11 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      *
      * @exception ClassNotFoundException if the class was not found
      */
+    @SuppressWarnings("sync-override")
     @Override
     public Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 
-        synchronized (this) {
+        synchronized (getClassLoadingLockInternal(name)) {
             if (log.isDebugEnabled())
                 log.debug("loadClass(" + name + ", " + resolve + ")");
             Class<?> clazz = null;
@@ -1834,6 +1855,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
+    private Object getClassLoadingLockInternal(String className) {
+        if (JreCompat.isJre7Available() && GET_CLASSLOADING_LOCK_METHOD != null) {
+            try {
+                return GET_CLASSLOADING_LOCK_METHOD.invoke(this, className);
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+        return this;
+    }
+    
+    
     /**
      * Get the Permissions for a CodeSource.  If this instance
      * of WebappClassLoaderBase is for a web application context,
@@ -3023,7 +3056,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (clazz != null)
             return clazz;
 
-        synchronized (this) {
+        synchronized (getClassLoadingLockInternal(name)) {
             clazz = entry.loadedClass;
             if (clazz != null)
                 return clazz;
