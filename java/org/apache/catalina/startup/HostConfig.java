@@ -1227,10 +1227,10 @@ public class HostConfig implements LifecycleListener {
      * @deprecated Use {@link #checkResources(DeployedApplication, boolean)}.
      *             Will be removed in Tomcat 9.0.x
      */
-    //@Deprecated
-    //protected synchronized void checkResources(DeployedApplication app) {
-    //    checkResources(app, false);
-    //}
+    @Deprecated
+    protected synchronized void checkResources(DeployedApplication app) {
+        checkResources(app, false);
+    }
 
     /**
      * Check resources for redeployment and reloading.
