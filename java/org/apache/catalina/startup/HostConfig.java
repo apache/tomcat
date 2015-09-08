@@ -1224,17 +1224,6 @@ public class HostConfig implements LifecycleListener {
     /**
      * Check resources for redeployment and reloading.
      *
-     * @deprecated Use {@link #checkResources(DeployedApplication, boolean)}.
-     *             Will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    protected synchronized void checkResources(DeployedApplication app) {
-        checkResources(app, false);
-    }
-
-    /**
-     * Check resources for redeployment and reloading.
-     *
      * @param app   The web application to check
      * @param skipFileModificationResolutionCheck
      *              When checking files for modification should the check that
