@@ -14,13 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
 
-
 import java.io.File;
-import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -29,17 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
-import javax.management.ObjectName;
-
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.catalina.startup.ClassLoaderFactory.Repository;
 import org.apache.catalina.startup.ClassLoaderFactory.RepositoryType;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-
 
 /**
  * Bootstrap loader for Catalina.  This application constructs a class loader
@@ -53,7 +44,6 @@ import org.apache.juli.logging.LogFactory;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-
 public final class Bootstrap {
 
     private static final Log log = LogFactory.getLog(Bootstrap.class);
@@ -146,24 +136,7 @@ public final class Bootstrap {
             }
         }
 
-        ClassLoader classLoader = ClassLoaderFactory.createClassLoader
-            (repositories, parent);
-
-        // Retrieving MBean server
-        MBeanServer mBeanServer = null;
-        if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
-            mBeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
-        } else {
-            mBeanServer = ManagementFactory.getPlatformMBeanServer();
-        }
-
-        // Register the server classloader
-        ObjectName objectName =
-            new ObjectName("Catalina:type=ServerClassLoader,name=" + name);
-        mBeanServer.registerMBean(classLoader, objectName);
-
-        return classLoader;
-
+        return ClassLoaderFactory.createClassLoader(repositories, parent);
     }
 
     /**

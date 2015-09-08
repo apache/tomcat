@@ -22,6 +22,7 @@ package org.apache.catalina.startup;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.LinkedHashSet;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.apache.catalina.loader.StandardClassLoader;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -124,13 +124,13 @@ public final class ClassLoaderFactory {
         // Construct the class loader itself
         final URL[] array = set.toArray(new URL[set.size()]);
         return AccessController.doPrivileged(
-                new PrivilegedAction<StandardClassLoader>() {
+                new PrivilegedAction<URLClassLoader>() {
                     @Override
-                    public StandardClassLoader run() {
+                    public URLClassLoader run() {
                         if (parent == null)
-                            return new StandardClassLoader(array);
+                            return new URLClassLoader(array);
                         else
-                            return new StandardClassLoader(array, parent);
+                            return new URLClassLoader(array, parent);
                     }
                 });
     }
@@ -222,13 +222,13 @@ public final class ClassLoaderFactory {
             }
 
         return AccessController.doPrivileged(
-                new PrivilegedAction<StandardClassLoader>() {
+                new PrivilegedAction<URLClassLoader>() {
                     @Override
-                    public StandardClassLoader run() {
+                    public URLClassLoader run() {
                         if (parent == null)
-                            return new StandardClassLoader(array);
+                            return new URLClassLoader(array);
                         else
-                            return new StandardClassLoader(array, parent);
+                            return new URLClassLoader(array, parent);
                     }
                 });
     }

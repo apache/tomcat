@@ -318,7 +318,6 @@
     <include name="org/apache/catalina/startup/ClassLoaderFactory.*" />
     <include name="org/apache/catalina/startup/ClassLoaderFactory$*.*" />
     <include name="org/apache/catalina/startup/Tool.*" />
-    <include name="org/apache/catalina/loader/StandardClassLoader*.*" />
     <include name="org/apache/catalina/loader/Extension.*" />
     <include name="org/apache/catalina/loader/Reloader.*" />
     <include name="org/apache/catalina/security/SecurityClassLoad.*" />

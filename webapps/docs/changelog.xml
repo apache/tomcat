@@ -74,6 +74,12 @@
         <bug>58320</bug>: Fix concurrent access of request attributes which is
         possible during asynchronous processing. (markt)
       </fix> 
+      <scode>
+        In preparation for implementing enhancement <bug>57681</bug>, replace
+        the use of the <code>StandardClassLoader</code> with
+        <code>URLClassLoader</code>. This removes the server class loader from
+        JMX. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
