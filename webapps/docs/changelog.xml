@@ -61,6 +61,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>58187</bug>: Correct a regression in the fix for <bug>57765</bug>
+        that meant that deployment of web applications deployed via the Manager
+        application was delayed until the next execution of the automatic
+        deployment background process. (markt)
+      </fix>
+      <fix>
         <bug>58313</bug>: Fix concurrent access of encoders map when clearing
         encoders prior to switch to async. (markt)
       </fix>
