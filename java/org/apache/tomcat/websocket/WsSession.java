@@ -293,13 +293,13 @@ public class WsSession implements Session {
             removed = true;
         }
 
-        if (listener.equals(binaryMessageHandler) ||
+        if (wrapped.equals(binaryMessageHandler) ||
                 listener.equals(binaryMessageHandler)) {
             binaryMessageHandler = null;
             removed = true;
         }
 
-        if (listener.equals(pongMessageHandler) ||
+        if (wrapped.equals(pongMessageHandler) ||
                 listener.equals(pongMessageHandler)) {
             pongMessageHandler = null;
             removed = true;

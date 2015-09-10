@@ -127,6 +127,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>58342</bug>: Fix a copy and paste error that meant MessageHandler
+        removal could fail for binary and pong MessageHandlers. Patch provided
+        by DJ. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
