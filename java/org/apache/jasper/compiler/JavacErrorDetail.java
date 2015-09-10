@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jasper.JspCompilationContext;
+import org.apache.tomcat.util.scan.Jar;
 
 /**
  * Class providing details about a javac compilation error.
@@ -37,7 +38,7 @@ public class JavacErrorDetail {
 
     private final String javaFileName;
     private final int javaLineNum;
-    private final String jspFileName;
+    private String jspFileName;
     private int jspBeginLineNum;
     private final StringBuilder errMsg;
     private String jspExtract = null;
@@ -85,7 +86,17 @@ public class JavacErrorDetail {
         //       be modified (corrected) during the execution of this method
 
         if (jspBeginLineNum > 0 && ctxt != null) {
-            try (InputStream is = ctxt.getResourceAsStream(jspFileName)) {
+            InputStream is = null;
+            try {
+                Jar tagJar = ctxt.getTagFileJar();
+                if (tagJar != null) {
+                    // Strip leading '/'
+                    String entryName = jspFileName.substring(1);
+                    is = tagJar.getInputStream(entryName);
+                    this.jspFileName = tagJar.getURL(entryName);
+                } else {
+                    is = ctxt.getResourceAsStream(jspFileName);
+                }
                 // Read both files in, so we can inspect them
                 String[] jspLines = readFile(is);
 
@@ -131,6 +142,13 @@ public class JavacErrorDetail {
                 }
             } catch (IOException ioe) {
                 // Can't read files - ignore
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException ignore) {
+                        // Ignore
+                    }
+                }
             }
         }
         this.jspBeginLineNum = jspBeginLineNum;
