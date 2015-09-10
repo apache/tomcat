@@ -24,8 +24,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.JarFile;
 
 import org.apache.jasper.Constants;
+import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 
 /**
@@ -91,7 +93,17 @@ public class JavacErrorDetail {
             
             try {
                 // Read both files in, so we can inspect them
-                is = ctxt.getResourceAsStream(jspFileName);
+                JarFile jarFile = null;
+                JarResource tagJarResource = ctxt.getTagFileJarResource();
+                if (tagJarResource != null) {
+                    jarFile = tagJarResource.getJarFile();
+                }
+                try {
+                    is = JspUtil.getInputStream(jspFileName, jarFile, ctxt, null);
+                } catch (JasperException e) {
+                    // Ignore: Exception is never thrown.
+                }
+                
                 String[] jspLines = readFile(is);
     
                 fis = new FileInputStream(ctxt.getServletJavaFileName());

@@ -116,6 +116,10 @@
         <code>maxLoadedJsps</code> triggered a memory leak once the limit was
         reached. (markt)
       </fix>
+      <fix>
+        <bug>58340</bug>: Improve error reporting for tag files packaged in
+        JARs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
