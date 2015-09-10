@@ -642,7 +642,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             this.clientShouldUseHttp11 = clientShouldUseHttp11;
 
             Tomcat tomcat = getTomcatInstance();
-            File appDir = new File(getBuildDirectory(), "webapps/examples");
+            File appDir = new File(System.getProperty("tomcat.test.basedir"), "webapps/examples");
             Context ctx = tomcat.addWebapp(null, "/examples",
                     appDir.getAbsolutePath());
             setUseCookies(clientShouldUseCookies);
