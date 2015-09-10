@@ -86,6 +86,11 @@
         <code>URLClassLoader</code>. This removes the server class loader from
         JMX. (markt)
       </scode>
+      <fix>
+        <bug>58352</bug>: Always trigger a thread dump if Tomcat fails to stop
+        gracefully from <code>catalina.sh</code> even if using
+        <code>-force</code>. Patch provided by  Alexandre Garnier. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
