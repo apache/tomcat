@@ -199,6 +199,8 @@ class Parser implements TagConstants {
         if (qName == null)
             return false;
 
+        boolean ignoreEL = pageInfo.isELIgnored();
+
         // Determine prefix and local name components
         String localName = qName;
         String uri = "";
@@ -223,11 +225,14 @@ class Parser implements TagConstants {
             err.jspError(reader.mark(), "jsp.error.attribute.noquote");
 
         String watchString = "";
-        if (reader.matches("<%="))
+        if (reader.matches("<%=")) {
             watchString = "%>";
+            // Can't embed EL in a script expression
+            ignoreEL = true;
+        }
         watchString = watchString + quote;
 
-        String attrValue = parseAttributeValue(watchString);
+        String attrValue = parseAttributeValue(watchString, ignoreEL);
         attrs.addAttribute(uri, localName, qName, "CDATA", attrValue);
         return true;
     }
@@ -258,9 +263,9 @@ class Parser implements TagConstants {
      * RTAttributeValueDouble ::= ((QuotedChar - '"')* - ((QuotedChar-'"')'%>"')
      * ('%>"' | TRANSLATION_ERROR)
      */
-    private String parseAttributeValue(String watch) throws JasperException {
+    private String parseAttributeValue(String watch, boolean ignoreEL) throws JasperException {
         Mark start = reader.mark();
-        Mark stop = reader.skipUntilIgnoreEsc(watch);
+        Mark stop = reader.skipUntilIgnoreEsc(watch, ignoreEL);
         if (stop == null) {
             err.jspError(start, "jsp.error.attribute.unterminated", watch);
         }
@@ -1275,7 +1280,11 @@ class Parser implements TagConstants {
 
     /*
      * Parse for a template text string until '<' or "${" or "#{" is encountered,
-     * recognizing escape sequences "<\%", "\${", and "\#{".
+     * recognizing escape sequences "<\%", "\$", and "\#".
+     *
+     * Note: JSP uses '\$' as an escape for '$' and '\#' for '#' whereas EL uses
+     *       '\${' for '${' and '\#{' for '#{'. We are processing JSP template
+     *       test here so the JSP escapes apply.
      */
     private void parseTemplateText(Node parent) {
 
@@ -1304,13 +1313,7 @@ class Parser implements TagConstants {
             } else if (ch == '\\' && !pageInfo.isELIgnored()) {
                 int next = reader.peekChar(0);
                 if (next == '$' || next == '#') {
-                    if (reader.peekChar(1) == '{') {
-                        ttext.write(reader.nextChar());
-                        ttext.write(reader.nextChar());
-                    } else {
-                        ttext.write(ch);
-                        ttext.write(reader.nextChar());
-                    }
+                    ttext.write(reader.nextChar());
                 } else {
                     ttext.write(ch);
                 }
@@ -1362,10 +1365,7 @@ class Parser implements TagConstants {
                 } else if (ch == '\\') {
                     int next = reader.peekChar(0);
                     if (next == '$' || next =='#') {
-                        if (reader.peekChar(1) == '{') {
-                            ttext.write(reader.nextChar());
-                            ttext.write(reader.nextChar());
-                        }
+                        ttext.write(reader.nextChar());
                     } else {
                         ttext.write('\\');
                     }

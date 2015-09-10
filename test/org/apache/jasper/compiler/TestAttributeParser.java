@@ -127,19 +127,15 @@ public class TestAttributeParser {
         // list and looking at the spec to find some edge cases
 
         // '\' is only an escape character inside a StringLiteral
-        assertEquals("\\", evalAttr("${'\\\\\\\\'}", '\"'));
-        assertEquals("\\", evalAttr("${\"\\\\\\\\\"}", '\"'));
+        // Attribute escaping does not apply inside EL expressions
+        assertEquals("\\", evalAttr("${'\\\\'}", '\"'));
 
         // Can use ''' inside '"' when quoting with '"' and vice versa without
         // escaping
-        assertEquals("\\\"", evalAttr("${'\\\\\\\\\\\"'}", '\"'));
-        assertEquals("\"\\", evalAttr("${'\\\"\\\\\\\\'}", '\"'));
-        assertEquals("\\'", evalAttr("${'\\\\\\\\\\\\''}", '\"'));
-        assertEquals("'\\", evalAttr("${'\\\\'\\\\\\\\'}", '\"'));
-        assertEquals("\\'", evalAttr("${\\\"\\\\\\\\'\\\"}", '\"'));
-        assertEquals("'\\", evalAttr("${\\\"'\\\\\\\\\\\"}", '\"'));
-        assertEquals("\\\"", evalAttr("${\\\"\\\\\\\\\\\\\\\"\\\"}", '\"'));
-        assertEquals("\"\\", evalAttr("${\\\"\\\\\\\"\\\\\\\\\\\"}", '\"'));
+        assertEquals("\\\"", evalAttr("${'\\\\\"'}", '\"'));
+        assertEquals("\"\\", evalAttr("${'\\\"\\\\'}", '\"'));
+        assertEquals("\\'", evalAttr("${'\\\\\\''}", '\"'));
+        assertEquals("'\\", evalAttr("${'\\'\\\\'}", '\"'));
 
         // Quoting <% and %>
         assertEquals("hello <% world", evalAttr("hello <\\% world", '\"'));
@@ -156,9 +152,8 @@ public class TestAttributeParser {
         // expression that follows from being evaluated.
         //
         assertEquals("foo\\bar\\baz", evalAttr("${\'foo\'}\\\\${\'bar\'}\\\\${\'baz\'}", '\"'));
-        assertEquals("foo\\bar\\baz", evalAttr("${\'foo\'}\\\\${\\\"bar\\\"}\\\\${\'baz\'}", '\"'));
-        assertEquals("foo\\bar\\baz", evalAttr("${\\\"foo\\\"}\\\\${\'bar\'}\\\\${\\\"baz\\\"}", '\"'));
-        assertEquals("foo\\bar\\baz", evalAttr("${\"foo\"}\\\\${\\\'bar\\\'}\\\\${\"baz\"}", '\''));
+        assertEquals("foo\\bar\\baz", evalAttr("${\'foo\'}\\\\${\"bar\"}\\\\${\'baz\'}", '\"'));
+        assertEquals("foo\\bar\\baz", evalAttr("${\"foo\"}\\\\${\'bar\'}\\\\${\"baz\"}", '\"'));
     }
 
     @Test

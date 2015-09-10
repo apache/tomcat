@@ -21,21 +21,19 @@
     <p>00-${'hello world'}</p>
     <p>01-${'hello \'world'}</p>
     <p>02-${'hello "world'}</p>
-    <p>03-${"hello world"}</p>
-    <p>04-${"hello 'world"}</p>
-    <p>05-${"hello \"world"}</p>
+    <p>03-${'hello \"world'}</p>
+    <p>04-${"hello world"}</p>
+    <p>05-${"hello 'world"}</p>
+    <p>06-${"hello \'world"}</p>
+    <p>07-${"hello \"world"}</p>
 
-    <tags:echo echo="06-${'hello world'}" />
-    <tags:echo echo="07-${'hello \\\'world'}" />
-    <tags:echo echo="08-${'hello \"world'}" />
-    <tags:echo echo="09-${\"hello world\"}" />
-    <tags:echo echo="10-${\"hello 'world\"}" />
-    <tags:echo echo="11-${\"hello \\\"world\"}" />
-    <tags:echo echo='12-${\'hello world\'}' />
-    <tags:echo echo='13-${\'hello \\\'world\'}' />
-    <tags:echo echo='14-${\'hello "world\'}' />
-    <tags:echo echo='15-${"hello world"}' />
-    <tags:echo echo='16-${"hello \'world"}' />
-    <tags:echo echo='17-${"hello \\\"world"}' />
+    <tags:echo echo="08-${'hello world'}" />
+    <tags:echo echo="09-${'hello \'world'}" />
+    <tags:echo echo="10-${'hello "world'}" />
+    <tags:echo echo="11-${'hello \"world'}" />
+    <tags:echo echo='12-${"hello world"}' />
+    <tags:echo echo='13-${"hello 'world"}' />
+    <tags:echo echo='14-${"hello \'world"}' />
+    <tags:echo echo='15-${"hello \"world"}' />
   </body>
 </html>
