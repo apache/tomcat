@@ -71,9 +71,11 @@
   <property name="tomcat.release"        value="${tomcat.output}/release"/>
   <property name="tomcat.src.jars"       value="${tomcat.output}/src-jars"/>
   <property name="test.classes"          value="${tomcat.output}/testclasses"/>
+  <property name="test.run.classes"      value="${tomcat.output}/classes"/>
   <property name="test.temp"             value="${tomcat.output}/test-tmp"/>
-  <property name="test.reports"          value="${tomcat.build}/logs"/>
-  <property name="test.apr.loc"          value="${tomcat.build}/bin/native"/>
+  <property name="test.basedir"          value="${tomcat.build}"/>
+  <property name="test.reports"          value="${test.basedir}/logs"/>
+  <property name="test.apr.loc"          value="${test.basedir}/bin/native"/>
   <!-- base directory for jdbc-pool -->
   <property name="tomcat.jdbc.dir"       value="${basedir}/modules/jdbc-pool"/>
   <!-- build output directory for jdbc-pool -->
@@ -199,11 +201,11 @@
   </path>
 
   <path id="tomcat.classpath">
-    <pathelement location="${tomcat.classes}"/>
+    <pathelement path="${test.run.classes}"/>
   </path>
 
   <path id="tomcat.test.classpath">
-    <pathelement location="${tomcat.build}/webapps/examples/WEB-INF/classes"/>
+    <pathelement location="${test.basedir}/webapps/examples/WEB-INF/classes"/>
     <pathelement location="${test.classes}"/>
     <pathelement location="${junit.jar}"/>
     <pathelement location="${hamcrest.jar}"/>
@@ -1442,6 +1444,7 @@
         <classpath refid="tomcat.test.run.classpath" />
 
         <sysproperty key="tomcat.test.temp" value="${test.temp}" />
+        <sysproperty key="tomcat.test.basedir" value="${test.basedir}" />
         <sysproperty key="tomcat.test.tomcatbuild" value="${tomcat.build}" />
         <sysproperty key="tomcat.test.protocol" value="@{protocol}" />
         <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />

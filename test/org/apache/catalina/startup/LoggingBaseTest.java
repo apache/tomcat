@@ -106,8 +106,9 @@ public abstract class LoggingBaseTest {
         // Configure logging
         System.setProperty("java.util.logging.manager",
                 "org.apache.juli.ClassLoaderLogManager");
-        System.setProperty("java.util.logging.config.file", new File(
-                getBuildDirectory(), "conf/logging.properties").toString());
+        System.setProperty("java.util.logging.config.file",
+                new File(System.getProperty("tomcat.test.basedir"),
+                        "conf/logging.properties").toString());
 
     }
 
