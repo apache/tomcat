@@ -87,6 +87,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
      * Underlying socket.
      */
     private long socket;
+    private SocketWrapper wrapper;
 
 
     // --------------------------------------------------------- Public Methods
@@ -98,6 +99,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     @Override
     public void recycle() {
         socket = 0;
+        wrapper = null;
         super.recycle();
     }
 
@@ -545,6 +547,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     protected void init(SocketWrapper<Long> socketWrapper,
             AbstractEndpoint<Long> endpoint) throws IOException {
 
+        wrapper = socketWrapper;
         socket = socketWrapper.getSocket().longValue();
         Socket.setrbb(this.socket, bbuf);
     }
@@ -611,6 +614,14 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 } else if (nRead == 0) {
                     // APR_STATUS_IS_EOF, since native 1.1.22
                     return false;
+                } else if (-nRead == Status.APR_EGENERAL && wrapper.isSecure()) {
+                    // Not entirely sure why this is necessary. Testing to date has not
+                    // identified any issues with this but log it so it can be tracked
+                    // if it is suspected of causing issues in the future.
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("iib.apr.sslGeneralError",
+                                Long.valueOf(socket), wrapper));
+                    }
                 } else {
                     throw new IOException(sm.getString("iib.failedread"));
                 }
@@ -619,7 +630,6 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         }
 
         return (nRead > 0);
-
     }
 
 

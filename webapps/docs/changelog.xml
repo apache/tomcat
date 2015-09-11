@@ -106,6 +106,13 @@
         supported. Tomcat now includes a work-around so either form of the
         cipher suite name can be used when running on an IBM JRE. (markt)
       </fix>
+      <fix>
+        <bug>58357</bug>: For reasons not currently understood when the
+        APR/native connector is used with OpenSSL reads can return an error code
+        when there is no apparent error. This was work-around for HTTP upgrade
+        connections by treating this as <code>EAGAIN</code>. The same fix has
+        now been applied to the standard HTTP connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
