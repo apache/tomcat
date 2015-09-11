@@ -643,6 +643,10 @@ public abstract class SocketWrapperBase<E> {
          */
         INLINE,
         /**
+         * The operation completed inline but failed.
+         */
+        ERROR,
+        /**
          * The operation completed, but not inline.
          */
         DONE
