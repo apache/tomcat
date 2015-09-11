@@ -1015,7 +1015,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     if (complete) {
                         readPending.release();
                         state.state = currentState;
-                        if (completion) {
+                        if (completion && state.handler != null) {
                             state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
                         }
                     } else {
@@ -1038,8 +1038,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     // If already closed, don't call onError and close again
                     return;
                 }
-                state.state = Nio2Endpoint.isInline() ? CompletionState.INLINE : CompletionState.DONE;
-                state.handler.failed(ioe, state.attachment);
+                state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
+                if (state.handler != null) {
+                    state.handler.failed(ioe, state.attachment);
+                }
             }
         }
 
@@ -1068,7 +1070,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     if (complete) {
                         writePending.release();
                         state.state = currentState;
-                        if (completion) {
+                        if (completion && state.handler != null) {
                             state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
                         }
                     } else {
@@ -1087,8 +1089,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 }
                 Nio2SocketWrapper.this.setError(ioe);
                 writePending.release();
-                state.state = Nio2Endpoint.isInline() ? CompletionState.INLINE : CompletionState.DONE;
-                state.handler.failed(ioe, state.attachment);
+                state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
+                if (state.handler != null) {
+                    state.handler.failed(ioe, state.attachment);
+                }
             }
         }
 
