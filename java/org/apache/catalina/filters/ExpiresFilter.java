@@ -48,18 +48,19 @@ import org.apache.juli.logging.LogFactory;
  * <p>
  * ExpiresFilter is a Java Servlet API port of <a
  * href="http://httpd.apache.org/docs/2.2/mod/mod_expires.html">Apache
- * mod_expires</a> to add ' <tt>Expires</tt>' and '
- * <tt>Cache-Control: max-age=</tt>' headers to HTTP response according to its '
- * <tt>Content-Type</tt>'.
+ * mod_expires</a> to add '{@code Expires}' and
+ * '{@code Cache-Control: max-age=}' headers to HTTP response according to its
+ * '{@code Content-Type}'.
  * </p>
  *
  * <p>
- * Following documentation is inspired by <tt>mod_expires</tt> .
+ * Following documentation is inspired by <a
+ * href="http://httpd.apache.org/docs/2.2/mod/mod_expires.html">mod_expires</a>
  * </p>
  * <h1>Summary</h1>
  * <p>
- * This filter controls the setting of the <tt>Expires</tt> HTTP header and the
- * <tt>max-age</tt> directive of the <tt>Cache-Control</tt> HTTP header in
+ * This filter controls the setting of the {@code Expires} HTTP header and the
+ * {@code max-age} directive of the {@code Cache-Control} HTTP header in
  * server responses. The expiration date can set to be relative to either the
  * time the source file was last modified, or to the time of the client access.
  * </p>
@@ -71,73 +72,74 @@ import org.apache.juli.logging.LogFactory;
  * be obtained from the source.
  * </p>
  * <p>
- * To modify <tt>Cache-Control</tt> directives other than <tt>max-age</tt> (see
+ * To modify {@code Cache-Control} directives other than {@code max-age} (see
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9" >RFC
  * 2616 section 14.9</a>), you can use other servlet filters or <a
  * href="http://httpd.apache.org/docs/2.2/mod/mod_headers.html" >Apache Httpd
  * mod_headers</a> module.
  * </p>
- * <h1>Filter Configuration</h1><h2>Basic configuration to add &#x27;
- * <tt>Expires</tt>&#x27; and &#x27; <tt>Cache-Control: max-age=</tt>&#x27;
+ * <h1>Filter Configuration</h1><h2>Basic configuration to add
+ * '{@code Expires}' and '{@code Cache-Control: max-age=}'
  * headers to images, css and javascript</h2>
  *
- * <code>
- * &lt;web-app ...&gt;
+ * <pre>
+ * {@code
+ * <web-app ...>
  *    ...
- *    &lt;filter&gt;
- *       &lt;filter-name&gt;ExpiresFilter&lt;/filter-name&gt;
- *       &lt;filter-class&gt;org.apache.catalina.filters.ExpiresFilter&lt;/filter-class&gt;
- *       &lt;init-param&gt;
- *          &lt;param-name&gt;ExpiresByType image&lt;/param-name&gt;
- *          &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
- *       &lt;/init-param&gt;
- *       &lt;init-param&gt;
- *          &lt;param-name&gt;ExpiresByType text/css&lt;/param-name&gt;
- *          &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
- *       &lt;/init-param&gt;
- *       &lt;init-param&gt;
- *          &lt;param-name&gt;ExpiresByType application/javascript&lt;/param-name&gt;
- *          &lt;param-value&gt;access plus 10 minutes&lt;/param-value&gt;
- *       &lt;/init-param&gt;
- *    &lt;/filter&gt;
+ *    <filter>
+ *       <filter-name>ExpiresFilter</filter-name>
+ *       <filter-class>org.apache.catalina.filters.ExpiresFilter</filter-class>
+ *       <init-param>
+ *          <param-name>ExpiresByType image</param-name>
+ *          <param-value>access plus 10 minutes</param-value>
+ *       </init-param>
+ *       <init-param>
+ *          <param-name>ExpiresByType text/css</param-name>
+ *          <param-value>access plus 10 minutes</param-value>
+ *       </init-param>
+ *       <init-param>
+ *          <param-name>ExpiresByType application/javascript</param-name>
+ *          <param-value>access plus 10 minutes</param-value>
+ *       </init-param>
+ *    </filter>
  *    ...
- *    &lt;filter-mapping&gt;
- *       &lt;filter-name&gt;ExpiresFilter&lt;/filter-name&gt;
- *       &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
- *       &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- *    &lt;/filter-mapping&gt;
+ *    <filter-mapping>
+ *       <filter-name>ExpiresFilter</filter-name>
+ *       <url-pattern>/*</url-pattern>
+ *       <dispatcher>REQUEST</dispatcher>
+ *    </filter-mapping>
  *    ...
- * &lt;/web-app&gt;
- * </code>
+ * </web-app>
+ * }
+ * </pre>
  *
  * <h2>Configuration Parameters</h2>
  *
- * <h3>
- * <tt>ExpiresByType &lt;content-type&gt;</tt></h3>
+ * <h3>{@code ExpiresByType <content-type>}</h3>
  * <p>
- * This directive defines the value of the <tt>Expires</tt> header and the
- * <tt>max-age</tt> directive of the <tt>Cache-Control</tt> header generated for
- * documents of the specified type (<i>e.g.</i>, <tt>text/html</tt>). The second
+ * This directive defines the value of the {@code Expires} header and the
+ * {@code max-age} directive of the {@code Cache-Control} header generated for
+ * documents of the specified type (<i>e.g.</i>, {@code text/html}). The second
  * argument sets the number of seconds that will be added to a base time to
- * construct the expiration date. The <tt>Cache-Control: max-age</tt> is
+ * construct the expiration date. The {@code Cache-Control: max-age} is
  * calculated by subtracting the request time from the expiration date and
  * expressing the result in seconds.
  * </p>
  * <p>
  * The base time is either the last modification time of the file, or the time
  * of the client&#x27;s access to the document. Which should be used is
- * specified by the <tt>&lt;code&gt;</tt> field; <tt>M</tt> means that the
+ * specified by the {@code <code>} field; {@code M} means that the
  * file&#x27;s last modification time should be used as the base time, and
- * <tt>A</tt> means the client&#x27;s access time should be used. The duration
- * is expressed in seconds. <tt>A2592000</tt> stands for
- * <tt>access plus 30 days</tt> in alternate syntax.
+ * {@code A} means the client&#x27;s access time should be used. The duration
+ * is expressed in seconds. {@code A2592000} stands for
+ * {@code access plus 30 days} in alternate syntax.
  * </p>
  * <p>
- * The difference in effect is subtle. If <tt>M</tt> (<tt>modification</tt> in
+ * The difference in effect is subtle. If {@code M} ({@code modification} in
  * alternate syntax) is used, all current copies of the document in all caches
  * will expire at the same time, which can be good for something like a weekly
- * notice that&#x27;s always found at the same URL. If <tt>A</tt> (
- * <tt>access</tt> or <tt>now</tt> in alternate syntax) is used, the date of
+ * notice that&#x27;s always found at the same URL. If {@code A} (
+ * {@code access} or {@code now} in alternate syntax) is used, the date of
  * expiration is different for each client; this can be good for image files
  * that don&#x27;t change very often, particularly for a set of related
  * documents that all refer to the same images (<i>i.e.</i>, the images will be
@@ -147,206 +149,226 @@ import org.apache.juli.logging.LogFactory;
  * <strong>Example:</strong>
  * </p>
  *
- * <code>
- * &lt;init-param&gt;
- *    &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;&lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
- * &lt;/init-param&gt;
+ * <pre>
+ * {@code
+ * <init-param>
+ *    <param-name>ExpiresByType text/html</param-name>
+ *    <param-value>access plus 1 month 15 days 2 hours</param-value>
+ * </init-param>
  *
- * &lt;init-param&gt;
- *    &lt;!-- 2592000 seconds = 30 days --&gt;
- *    &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;&lt;param-value&gt;A2592000&lt;/param-value&gt;
- * &lt;/init-param&gt;
- * </code>
+ * <init-param>
+ *    <!-- 2592000 seconds = 30 days -->
+ *    <param-name>ExpiresByType image/gif</param-name>
+ *    <param-value>A2592000</param-value>
+ * </init-param>
+ * }
+ * </pre>
  * <p>
- * Note that this directive only has effect if <tt>ExpiresActive On</tt> has
+ * Note that this directive only has effect if {@code ExpiresActive On} has
  * been specified. It overrides, for the specified MIME type <i>only</i>, any
- * expiration date set by the <tt>ExpiresDefault</tt> directive.
+ * expiration date set by the {@code ExpiresDefault} directive.
  * </p>
  * <p>
  * You can also specify the expiration time calculation using an alternate
  * syntax, described earlier in this document.
  * </p>
  * <h3>
- * <tt>ExpiresExcludedResponseStatusCodes</tt></h3>
+ * {@code ExpiresExcludedResponseStatusCodes}</h3>
  * <p>
  * This directive defines the http response status codes for which the
- * <tt>ExpiresFilter</tt> will not generate expiration headers. By default, the
- * <tt>304</tt> status code (&quot;<tt>Not modified</tt>&quot;) is skipped. The
+ * {@code ExpiresFilter} will not generate expiration headers. By default, the
+ * {@code 304} status code (&quot;{@code Not modified}&quot;) is skipped. The
  * value is a comma separated list of http status codes.
  * </p>
  * <p>
- * This directive is useful to ease usage of <tt>ExpiresDefault</tt> directive.
- * Indeed, the behavior of <tt>304 Not modified</tt> (which does specify a
- * <tt>Content-Type</tt> header) combined with <tt>Expires</tt> and
- * <tt>Cache-Control:max-age=</tt> headers can be unnecessarily tricky to
+ * This directive is useful to ease usage of {@code ExpiresDefault} directive.
+ * Indeed, the behavior of {@code 304 Not modified} (which does specify a
+ * {@code Content-Type} header) combined with {@code Expires} and
+ * {@code Cache-Control:max-age=} headers can be unnecessarily tricky to
  * understand.
  * </p>
  * <p>
  * Configuration sample :
  * </p>
  *
- * <code>
- * &lt;init-param&gt;
- *    &lt;param-name&gt;ExpiresExcludedResponseStatusCodes&lt;/param-name&gt;&lt;param-value&gt;302, 500, 503&lt;/param-value&gt;
- * &lt;/init-param&gt;
- * </code>
+ * <pre>
+ * {@code
+ * <init-param>
+ *    <param-name>ExpiresExcludedResponseStatusCodes</param-name>
+ *    <param-value>302, 500, 503</param-value>
+ * </init-param>
+ * }
+ * </pre>
  *
  * <h3>ExpiresDefault</h3>
  * <p>
  * This directive sets the default algorithm for calculating the expiration time
  * for all documents in the affected realm. It can be overridden on a
- * type-by-type basis by the <tt>ExpiresByType</tt> directive. See the
+ * type-by-type basis by the {@code ExpiresByType} directive. See the
  * description of that directive for details about the syntax of the argument,
  * and the "alternate syntax" description as well.
  * </p>
  * <h1>Alternate Syntax</h1>
  * <p>
- * The <tt>ExpiresDefault</tt> and <tt>ExpiresByType</tt> directives can also be
+ * The {@code ExpiresDefault} and {@code ExpiresByType} directives can also be
  * defined in a more readable syntax of the form:
  * </p>
  *
- * <code>
- * &lt;init-param&gt;
- *    &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;&lt;param-value&gt;&lt;base&gt; [plus] {&lt;num&gt;   &lt;type&gt;}*&lt;/param-value&gt;
- * &lt;/init-param&gt;
+ * <pre>
+ * {@code
+ * <init-param>
+ *    <param-name>ExpiresDefault</param-name>
+ *    <param-value><base> [plus] {<num> <type>}*</param-value>
+ * </init-param>
  *
- * &lt;init-param&gt;
- *    &lt;param-name&gt;ExpiresByType type/encoding&lt;/param-name&gt;&lt;param-value&gt;&lt;base&gt; [plus]   {&lt;num&gt; &lt;type&gt;}*&lt;/param-value&gt;
- * &lt;/init-param&gt;
- * </code>
+ * <init-param>
+ *    <param-name>ExpiresByType type/encoding</param-name>
+ *    <param-value><base> [plus] {<num> <type>}*</param-value>
+ * </init-param>
+ * }
+ * </pre>
  * <p>
- * where <tt>&lt;base&gt;</tt> is one of:
+ * where {@code <base>} is one of:
  * </p>
  * <ul>
- * <li><tt>access</tt></li>
- * <li><tt>now</tt> (equivalent to &#x27;<tt>access</tt>&#x27;)</li>
- * <li><tt>modification</tt></li>
+ * <li>{@code access}</li>
+ * <li>{@code now} (equivalent to &#x27;{@code access}&#x27;)</li>
+ * <li>{@code modification}</li>
  * </ul>
  * <p>
- * The <tt>plus</tt> keyword is optional. <tt>&lt;num&gt;</tt> should be an
- * integer value (acceptable to <tt>Integer.parseInt()</tt>), and
- * <tt>&lt;type&gt;</tt> is one of:
+ * The {@code plus} keyword is optional. {@code <num>} should be an
+ * integer value (acceptable to {@code Integer.parseInt()}), and
+ * {@code <type>} is one of:
  * </p>
  * <ul>
- * <li><tt>years</tt></li>
- * <li><tt>months</tt></li>
- * <li><tt>weeks</tt></li>
- * <li><tt>days</tt></li>
- * <li><tt>hours</tt></li>
- * <li><tt>minutes</tt></li>
- * <li><tt>seconds</tt></li>
+ * <li>{@code years}</li>
+ * <li>{@code months}</li>
+ * <li>{@code weeks}</li>
+ * <li>{@code days}</li>
+ * <li>{@code hours}</li>
+ * <li>{@code minutes}</li>
+ * <li>{@code seconds}</li>
  * </ul>
  * <p>
  * For example, any of the following directives can be used to make documents
  * expire 1 month after being accessed, by default:
  * </p>
  *
- * <code>
- * &lt;init-param&gt;
- *    &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;&lt;param-value&gt;access plus 1 month&lt;/param-value&gt;
- * &lt;/init-param&gt;
+ * <pre>
+ * {@code
+ * <init-param>
+ *    <param-name>ExpiresDefault</param-name>
+ *    <param-value>access plus 1 month</param-value>
+ * </init-param>
  *
- * &lt;init-param&gt;
- *    &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;&lt;param-value&gt;access plus 4 weeks&lt;/param-value&gt;
- * &lt;/init-param&gt;
+ * <init-param>
+ *    <param-name>ExpiresDefault</param-name>
+ *    <param-value>access plus 4 weeks</param-value>
+ * </init-param>
  *
- * &lt;init-param&gt;
- *    &lt;param-name&gt;ExpiresDefault&lt;/param-name&gt;&lt;param-value&gt;access plus 30 days&lt;/param-value&gt;
- * &lt;/init-param&gt;
- * </code>
+ * <init-param>
+ *    <param-name>ExpiresDefault</param-name>
+ *    <param-value>access plus 30 days</param-value>
+ * </init-param>
+ * }
+ * </pre>
  * <p>
  * The expiry time can be fine-tuned by adding several &#x27;
- * <tt>&lt;num&gt; &lt;type&gt;</tt>&#x27; clauses:
+ * {@code <num> <type>}&#x27; clauses:
  * </p>
  *
- * <code>
- * &lt;init-param&gt;
- *    &lt;param-name&gt;ExpiresByType text/html&lt;/param-name&gt;&lt;param-value&gt;access plus 1 month 15   days 2 hours&lt;/param-value&gt;
- * &lt;/init-param&gt;
+ * <pre>
+ * {@code
+ * <init-param>
+ *    <param-name>ExpiresByType text/html</param-name>
+ *    <param-value>access plus 1 month 15 days 2 hours</param-value>
+ * </init-param>
  *
- * &lt;init-param&gt;
- *    &lt;param-name&gt;ExpiresByType image/gif&lt;/param-name&gt;&lt;param-value&gt;modification plus 5 hours 3   minutes&lt;/param-value&gt;
- * &lt;/init-param&gt;
- * </code>
+ * <init-param>
+ *    <param-name>ExpiresByType image/gif</param-name>
+ *    <param-value>modification plus 5 hours 3 minutes</param-value>
+ * </init-param>
+ * }
+ * </pre>
  * <p>
- * Note that if you use a modification date based setting, the <tt>Expires</tt>
+ * Note that if you use a modification date based setting, the {@code Expires}
  * header will <strong>not</strong> be added to content that does not come from
  * a file on disk. This is due to the fact that there is no modification time
  * for such content.
  * </p>
  * <h1>Expiration headers generation eligibility</h1>
  * <p>
- * A response is eligible to be enriched by <tt>ExpiresFilter</tt> if :
+ * A response is eligible to be enriched by {@code ExpiresFilter} if :
  * </p>
  * <ol>
- * <li>no expiration header is defined (<tt>Expires</tt> header or the
- * <tt>max-age</tt> directive of the <tt>Cache-Control</tt> header),</li>
+ * <li>no expiration header is defined ({@code Expires} header or the
+ * {@code max-age} directive of the {@code Cache-Control} header),</li>
  * <li>the response status code is not excluded by the directive
- * <tt>ExpiresExcludedResponseStatusCodes</tt>,</li>
- * <li>the <tt>Content-Type</tt> of the response matches one of the types
- * defined the in <tt>ExpiresByType</tt> directives or the
- * <tt>ExpiresDefault</tt> directive is defined.</li>
+ * {@code ExpiresExcludedResponseStatusCodes},</li>
+ * <li>the {@code Content-Type} of the response matches one of the types
+ * defined the in {@code ExpiresByType} directives or the
+ * {@code ExpiresDefault} directive is defined.</li>
  * </ol>
  * <p>
  * Note :
  * </p>
  * <ul>
- * <li>If <tt>Cache-Control</tt> header contains other directives than
- * <tt>max-age</tt>, they are concatenated with the <tt>max-age</tt> directive
- * that is added by the <tt>ExpiresFilter</tt>.</li>
+ * <li>If {@code Cache-Control} header contains other directives than
+ * {@code max-age}, they are concatenated with the {@code max-age} directive
+ * that is added by the {@code ExpiresFilter}.</li>
  * </ul>
  * <h1>Expiration configuration selection</h1>
  * <p>
  * The expiration configuration if elected according to the following algorithm:
  * </p>
  * <ol>
- * <li><tt>ExpiresByType</tt> matching the exact content-type returned by
- * <tt>HttpServletResponse.getContentType()</tt> possibly including the charset
- * (e.g. &#x27;<tt>text/xml;charset=UTF-8</tt>&#x27;),</li>
- * <li><tt>ExpiresByType</tt> matching the content-type without the charset if
- * <tt>HttpServletResponse.getContentType()</tt> contains a charset (e.g. &#x27;
- * <tt>text/xml;charset=UTF-8</tt>&#x27; -&gt; &#x27;<tt>text/xml</tt>&#x27;),</li>
- * <li><tt>ExpiresByType</tt> matching the major type (e.g. substring before
- * &#x27;<tt>/</tt>&#x27;) of <tt>HttpServletResponse.getContentType()</tt>
- * (e.g. &#x27;<tt>text/xml;charset=UTF-8</tt>&#x27; -&gt; &#x27;<tt>text</tt>
+ * <li>{@code ExpiresByType} matching the exact content-type returned by
+ * {@code HttpServletResponse.getContentType()} possibly including the charset
+ * (e.g. &#x27;{@code text/xml;charset=UTF-8}&#x27;),</li>
+ * <li>{@code ExpiresByType} matching the content-type without the charset if
+ * {@code HttpServletResponse.getContentType()} contains a charset (e.g. &#x27;
+ * {@code text/xml;charset=UTF-8}&#x27; -&gt; &#x27;{@code text/xml}&#x27;),</li>
+ * <li>{@code ExpiresByType} matching the major type (e.g. substring before
+ * &#x27;{@code /}&#x27;) of {@code HttpServletResponse.getContentType()}
+ * (e.g. &#x27;{@code text/xml;charset=UTF-8}&#x27; -&gt; &#x27;{@code text}
  * &#x27;),</li>
- * <li><tt>ExpiresDefault</tt></li>
+ * <li>{@code ExpiresDefault}</li>
  * </ol>
  * <h1>Implementation Details</h1><h2>When to write the expiration headers ?</h2>
  * <p>
- * The <tt>ExpiresFilter</tt> traps the &#x27;on before write response
+ * The {@code ExpiresFilter} traps the &#x27;on before write response
  * body&#x27; event to decide whether it should generate expiration headers or
  * not.
  * </p>
  * <p>
  * To trap the &#x27;before write response body&#x27; event, the
- * <tt>ExpiresFilter</tt> wraps the http servlet response&#x27;s writer and
- * outputStream to intercept calls to the methods <tt>write()</tt>,
- * <tt>print()</tt>, <tt>close()</tt> and <tt>flush()</tt>. For empty response
- * body (e.g. empty files), the <tt>write()</tt>, <tt>print()</tt>,
- * <tt>close()</tt> and <tt>flush()</tt> methods are not called; to handle this
- * case, the <tt>ExpiresFilter</tt>, at the end of its <tt>doFilter()</tt>
- * method, manually triggers the <tt>onBeforeWriteResponseBody()</tt> method.
+ * {@code ExpiresFilter} wraps the http servlet response&#x27;s writer and
+ * outputStream to intercept calls to the methods {@code write()},
+ * {@code print()}, {@code close()} and {@code flush()}. For empty response
+ * body (e.g. empty files), the {@code write()}, {@code print()},
+ * {@code close()} and {@code flush()} methods are not called; to handle this
+ * case, the {@code ExpiresFilter}, at the end of its {@code doFilter()}
+ * method, manually triggers the {@code onBeforeWriteResponseBody()} method.
  * </p>
  * <h2>Configuration syntax</h2>
  * <p>
- * The <tt>ExpiresFilter</tt> supports the same configuration syntax as Apache
+ * The {@code ExpiresFilter} supports the same configuration syntax as Apache
  * Httpd mod_expires.
  * </p>
  * <p>
- * A challenge has been to choose the name of the <tt>&lt;param-name&gt;</tt>
- * associated with <tt>ExpiresByType</tt> in the <tt>&lt;filter&gt;</tt>
- * declaration. Indeed, Several <tt>ExpiresByType</tt> directives can be
- * declared when <tt>web.xml</tt> syntax does not allow to declare several
- * <tt>&lt;init-param&gt;</tt> with the same name.
+ * A challenge has been to choose the name of the {@code <param-name>}
+ * associated with {@code ExpiresByType} in the {@code <filter>}
+ * declaration. Indeed, Several {@code ExpiresByType} directives can be
+ * declared when {@code web.xml} syntax does not allow to declare several
+ * {@code <init-param>} with the same name.
  * </p>
  * <p>
  * The workaround has been to declare the content type in the
- * <tt>&lt;param-name&gt;</tt> rather than in the <tt>&lt;param-value&gt;</tt>.
+ * {@code <param-name>} rather than in the {@code <param-value>}.
  * </p>
  * <h2>Designed for extension : the open/close principle</h2>
  * <p>
- * The <tt>ExpiresFilter</tt> has been designed for extension following the
+ * The {@code ExpiresFilter} has been designed for extension following the
  * open/close principle.
  * </p>
  * <p>
@@ -362,7 +384,7 @@ import org.apache.juli.logging.LogFactory;
  * <h1>Troubleshooting</h1>
  * <p>
  * To troubleshoot, enable logging on the
- * <tt>org.apache.catalina.filters.ExpiresFilter</tt>.
+ * {@code org.apache.catalina.filters.ExpiresFilter}.
  * </p>
  * <p>
  * Extract of logging.properties
@@ -386,7 +408,7 @@ import org.apache.juli.logging.LogFactory;
  *       application/javascript=ExpiresConfiguration[startingPoint=ACCESS_TIME, duration=[10 MINUTE]]}]
  * </code>
  * <p>
- * Sample of per-request log message where <tt>ExpiresFilter</tt> adds an
+ * Sample of per-request log message where {@code ExpiresFilter} adds an
  * expiration date
  * </p>
  *
@@ -395,7 +417,7 @@ import org.apache.juli.logging.LogFactory;
  * FINE: Request "/tomcat.gif" with response status "200" content-type "image/gif", set expiration date 3/26/10 2:19 PM
  * </code>
  * <p>
- * Sample of per-request log message where <tt>ExpiresFilter</tt> does not add
+ * Sample of per-request log message where {@code ExpiresFilter} does not add
  * an expiration date
  * </p>
  *
@@ -459,7 +481,7 @@ public class ExpiresFilter extends FilterBase {
      * Main piece of configuration of the filter.
      * </p>
      * <p>
-     * Can be expressed like '<tt>access plus 1 month 15   days 2 hours</tt>'.
+     * Can be expressed like '{@code access plus 1 month 15 days 2 hours}'.
      * </p>
      */
     protected static class ExpiresConfiguration {
@@ -513,20 +535,20 @@ public class ExpiresFilter extends FilterBase {
      * <p>
      * For performance optimization : this extended response holds the
      * {@link #lastModifiedHeader} and {@link #cacheControlHeader} values access
-     * to the slow {@link #getHeader(String)} and to spare the <tt>string</tt>
-     * to <tt>date</tt> to <tt>long</tt> conversion.
+     * to the slow {@link #getHeader(String)} and to spare the {@code string}
+     * to {@code date} to {@code long} conversion.
      * </p>
      */
     public class XHttpServletResponse extends HttpServletResponseWrapper {
 
         /**
-         * Value of the <tt>Cache-Control/tt> http response header if it has
+         * Value of the {@code Cache-Control} http response header if it has
          * been set.
          */
         private String cacheControlHeader;
 
         /**
-         * Value of the <tt>Last-Modified</tt> http response header if it has
+         * Value of the {@code Last-Modified} http response header if it has
          * been set.
          */
         private long lastModifiedHeader;
@@ -540,8 +562,8 @@ public class ExpiresFilter extends FilterBase {
         private ServletOutputStream servletOutputStream;
 
         /**
-         * Indicates whether calls to write methods (<tt>write(...)</tt>,
-         * <tt>print(...)</tt>, etc) of the response body have been called or
+         * Indicates whether calls to write methods ({@code write(...)},
+         * {@code print(...)}, etc) of the response body have been called or
          * not.
          */
         private boolean writeResponseBodyStarted;
@@ -1037,11 +1059,11 @@ public class ExpiresFilter extends FilterBase {
     private static final String PARAMETER_EXPIRES_EXCLUDED_RESPONSE_STATUS_CODES = "ExpiresExcludedResponseStatusCodes";
 
     /**
-     * Convert a comma delimited list of numbers into an <tt>int[]</tt>.
+     * Convert a comma delimited list of numbers into an {@code int[]}.
      *
      * @param commaDelimitedInts
-     *            can be <code>null</code>
-     * @return never <code>null</code> array
+     *            can be {@code null}
+     * @return never {@code null} array
      */
     protected static int[] commaDelimitedListToIntArray(
             String commaDelimitedInts) {
@@ -1063,7 +1085,7 @@ public class ExpiresFilter extends FilterBase {
     /**
      * Convert a given comma delimited list of strings into an array of String
      *
-     * @return array of patterns (non <code>null</code>)
+     * @return array of patterns (non {@code null})
      */
     protected static String[] commaDelimitedListToStringArray(
             String commaDelimitedStrings) {
@@ -1072,8 +1094,8 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Return <code>true</code> if the given <code>str</code> contains the given
-     * <code>searchStr</code>.
+     * Return {@code true} if the given {@code str} contains the given
+     * {@code searchStr}.
      */
     protected static boolean contains(String str, String searchStr) {
         if (str == null || searchStr == null) {
@@ -1102,15 +1124,15 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Return <code>true</code> if the given <code>str</code> is
-     * <code>null</code> or has a zero characters length.
+     * Return {@code true} if the given {@code str} is
+     * {@code null} or has a zero characters length.
      */
     protected static boolean isEmpty(String str) {
         return str == null || str.length() == 0;
     }
 
     /**
-     * Return <code>true</code> if the given <code>str</code> has at least one
+     * Return {@code true} if the given {@code str} has at least one
      * character (can be a withespace).
      */
     protected static boolean isNotEmpty(String str) {
@@ -1118,13 +1140,13 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Return <code>true</code> if the given <code>string</code> starts with the
-     * given <code>prefix</code> ignoring case.
+     * Return {@code true} if the given {@code string} starts with the
+     * given {@code prefix} ignoring case.
      *
      * @param string
-     *            can be <code>null</code>
+     *            can be {@code null}
      * @param prefix
-     *            can be <code>null</code>
+     *            can be {@code null}
      */
     protected static boolean startsWithIgnoreCase(String string, String prefix) {
         if (string == null || prefix == null) {
@@ -1138,15 +1160,15 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Return the subset of the given <code>str</code> that is before the first
-     * occurence of the given <code>separator</code>. Return <code>null</code>
-     * if the given <code>str</code> or the given <code>separator</code> is
-     * null. Return and empty string if the <code>separator</code> is empty.
+     * Return the subset of the given {@code str} that is before the first
+     * occurence of the given {@code separator}. Return {@code null}
+     * if the given {@code str} or the given {@code separator} is
+     * null. Return and empty string if the {@code separator} is empty.
      *
      * @param str
-     *            can be <code>null</code>
+     *            can be {@code null}
      * @param separator
-     *            can be <code>null</code>
+     *            can be {@code null}
      */
     protected static String substringBefore(String str, String separator) {
         if (str == null || str.isEmpty() || separator == null) {
@@ -1225,11 +1247,11 @@ public class ExpiresFilter extends FilterBase {
     /**
      * <p>
      * Returns the expiration date of the given {@link XHttpServletResponse} or
-     * <code>null</code> if no expiration date has been configured for the
+     * {@code null} if no expiration date has been configured for the
      * declared content type.
      * </p>
      * <p>
-     * <code>protected</code> for extension.
+     * {@code protected} for extension.
      * </p>
      *
      * @see HttpServletResponse#getContentType()
@@ -1306,7 +1328,7 @@ public class ExpiresFilter extends FilterBase {
      * {@link HttpServletRequest} and {@link XHttpServletResponse}.
      * </p>
      * <p>
-     * <code>protected</code> for extension.
+     * {@code protected} for extension.
      * </p>
      */
     protected Date getExpirationDate(ExpiresConfiguration configuration,
@@ -1390,7 +1412,7 @@ public class ExpiresFilter extends FilterBase {
     /**
      *
      * <p>
-     * <code>protected</code> for extension.
+     * {@code protected} for extension.
      * </p>
      */
     protected boolean isEligibleToExpirationHeaderGeneration(
@@ -1426,18 +1448,18 @@ public class ExpiresFilter extends FilterBase {
     /**
      * <p>
      * If no expiration header has been set by the servlet and an expiration has
-     * been defined in the {@link ExpiresFilter} configuration, sets the '
-     * <tt>Expires</tt>' header and the attribute '<tt>max-age</tt>' of the '
-     * <tt>Cache-Control</tt>' header.
+     * been defined in the {@link ExpiresFilter} configuration, sets the
+     * '{@code Expires}' header and the attribute '{@code max-age}' of the
+     * '{@code Cache-Control}' header.
      * </p>
      * <p>
      * Must be called on the "Start Write Response Body" event.
      * </p>
      * <p>
-     * Invocations to <tt>Logger.debug(...)</tt> are guarded by
+     * Invocations to {@code Logger.debug(...)} are guarded by
      * {@link Log#isDebugEnabled()} because
      * {@link HttpServletRequest#getRequestURI()} and
-     * {@link HttpServletResponse#getContentType()} costs <tt>String</tt>
+     * {@link HttpServletResponse#getContentType()} costs {@code String}
      * objects instantiations (as of Tomcat 7).
      * </p>
      */
@@ -1477,9 +1499,9 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Parse configuration lines like '
-     * <tt>access plus 1 month 15 days 2 hours</tt>' or '
-     * <tt>modification 1 day 2 hours 5 seconds</tt>'
+     * Parse configuration lines like
+     * '{@code access plus 1 month 15 days 2 hours}' or
+     * '{@code modification 1 day 2 hours 5 seconds}'
      *
      * @param inputLine
      */
