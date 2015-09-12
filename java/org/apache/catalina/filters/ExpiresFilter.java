@@ -1524,7 +1524,7 @@ public class ExpiresFilter extends FilterBase {
             currentToken = tokenizer.nextToken();
         } catch (NoSuchElementException e) {
             throw new IllegalStateException(sm.getString(
-                    "Duration not found in directive '{}'", line));
+                    "expiresFilter.noDurationFound", line));
         }
 
         if ("plus".equalsIgnoreCase(currentToken)) {
@@ -1533,7 +1533,7 @@ public class ExpiresFilter extends FilterBase {
                 currentToken = tokenizer.nextToken();
             } catch (NoSuchElementException e) {
                 throw new IllegalStateException(sm.getString(
-                        "Duration not found in directive '{}'", line));
+                        "expiresFilter.noDurationFound", line));
             }
         }
 
@@ -1545,7 +1545,7 @@ public class ExpiresFilter extends FilterBase {
                 amount = Integer.parseInt(currentToken);
             } catch (NumberFormatException e) {
                 throw new IllegalStateException(sm.getString(
-                        "Invalid duration (number) '{}' in directive '{}'",
+                        "expiresFilter.invalidDurationNumber",
                         currentToken, line));
             }
 
@@ -1554,7 +1554,7 @@ public class ExpiresFilter extends FilterBase {
             } catch (NoSuchElementException e) {
                 throw new IllegalStateException(
                         sm.getString(
-                                "Duration unit not found after amount {} in directive '{}'",
+                                "expiresFilter.noDurationUnitAfterAmount",
                                 Integer.valueOf(amount), line));
             }
             DurationUnit durationUnit;
@@ -1582,7 +1582,7 @@ public class ExpiresFilter extends FilterBase {
             } else {
                 throw new IllegalStateException(
                         sm.getString(
-                                "Invalid duration unit (years|months|weeks|days|hours|minutes|seconds) '{}' in directive '{}'",
+                                "expiresFilter.invalidDurationUnit",
                                 currentToken, line));
             }
 
