@@ -2191,7 +2191,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                 errn -=  Status.APR_OS_START_USERERR;
                             }
                             getLog().error(sm.getString(
-                                    "Unexpected poller error",
+                                    "endpoint.apr.pollError",
                                     Integer.valueOf(errn),
                                     Error.strerror(errn)));
                             // Handle poll critical failure
