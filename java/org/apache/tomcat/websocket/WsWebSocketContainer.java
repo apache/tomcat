@@ -293,7 +293,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 subProtocol = protocolHeaders.get(0);
             } else {
                 throw new DeploymentException(
-                        sm.getString("Sec-WebSocket-Protocol"));
+                        sm.getString("wsWebSocketContainer.invalidSubProtocol"));
             }
 
             // Extensions
