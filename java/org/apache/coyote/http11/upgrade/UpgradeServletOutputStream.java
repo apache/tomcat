@@ -70,7 +70,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     public final boolean isReady() {
         if (listener == null) {
             throw new IllegalStateException(
-                    sm.getString("upgrade.sos.canWrite.is"));
+                    sm.getString("upgrade.sos.canWrite.ise"));
         }
         if (closed) {
             return false;
