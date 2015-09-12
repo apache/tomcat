@@ -368,7 +368,7 @@ public final class UDecoder {
             } else if (b == '%') {
                 if (ix + 2 > len) {
                     throw new IllegalArgumentException(
-                            sm.getString("requestUtil.urlDecode.missingDigit"));
+                            sm.getString("uDecoder.urlDecode.missingDigit"));
                 }
                 b = (byte) ((convertHexDigit(bytes[ix++]) << 4)
                             + convertHexDigit(bytes[ix++]));
