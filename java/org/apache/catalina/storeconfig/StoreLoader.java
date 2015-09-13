@@ -31,21 +31,24 @@ import org.xml.sax.SAXException;
  * <b>XML Format </b>
  *
  * <pre>
- *
- *       &lt;Registry name=&quot;&quot; encoding=&quot;UTF8&quot; &gt;
- *       &lt;Description tag=&quot;Server&quot; standard=&quot;true&quot; default=&quot;true&quot;/&gt;
- *          tagClass=&quot;org.apache.catalina.core.StandardServer&quot;
- *          storeFactory=&quot;org.apache.catalina.storeconfig.StandardServerSF&quot;&gt;
- *        &lt;TransientAttributes&gt;
- *          &lt;Attribute&gt;&lt;/Attribute&gt;
- *        &lt;/TransientAttributes&gt;
- *        &lt;TransientChildren&gt;
- *          &lt;Child&gt;&lt;/Child&gt;
- *        &lt;/TransientChildren&gt;
- *       &lt;/Description&gt;
+ * {@code
+ *       <Registry name="" encoding="UTF8" >
+ *         <Description
+ *             tag="Server"
+ *             standard="true"
+ *             default="true"
+ *             tagClass="org.apache.catalina.core.StandardServer"
+ *             storeFactoryClass="org.apache.catalina.storeconfig.StandardServerSF">
+ *           <TransientAttributes>
+ *             <Attribute></Attribute>
+ *           </TransientAttributes>
+ *           <TransientChildren>
+ *             <Child></Child>
+ *           </TransientChildren>
+ *         </Description>
  *   ...
- *       &lt;/Tegistry&gt;
- *
+ *       </Registry>
+ * }
  * </pre>
  *
  *
