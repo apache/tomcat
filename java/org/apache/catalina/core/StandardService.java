@@ -578,7 +578,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                     connector.destroy();
                 } catch (Exception e) {
                     log.error(sm.getString(
-                            "standardService.connector.destroyfailed",
+                            "standardService.connector.destroyFailed",
                             connector), e);
                 }
             }
