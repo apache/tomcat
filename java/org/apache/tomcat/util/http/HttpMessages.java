@@ -54,13 +54,14 @@ public class HttpMessages {
     }
 
 
-    /** Get the status string associated with a status code.
-     *  No I18N - return the messages defined in the HTTP spec.
-     *  ( the user isn't supposed to see them, this is the last
-     *  thing to translate)
+    /**
+     * Get the status string associated with a status code. Common messages are
+     * cached.
      *
-     *  Common messages are cached.
+     * @param status The HTTP status code to retrieve the message for
      *
+     * @return The HTTP status string that conforms to the requirements of the
+     *         HTTP specification
      */
     public String getMessage(int status) {
         // method from Response.
