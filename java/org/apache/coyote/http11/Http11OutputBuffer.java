@@ -26,7 +26,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -134,9 +133,6 @@ public class Http11OutputBuffer implements OutputBuffer {
         finished = false;
 
         outputStreamOutputBuffer = new SocketOutputBuffer();
-
-        // Cause loading of HttpMessages
-        HttpMessages.getInstance(response.getLocale()).getMessage(200);
     }
 
 
@@ -399,18 +395,9 @@ public class Http11OutputBuffer implements OutputBuffer {
 
         headerBuffer[pos++] = Constants.SP;
 
-        // Write message
-        String message = null;
-        if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER &&
-                HttpMessages.isSafeInHttpHeader(response.getMessage())) {
-            message = response.getMessage();
-        }
-        if (message == null) {
-            write(HttpMessages.getInstance(
-                    response.getLocale()).getMessage(status));
-        } else {
-            write(message);
-        }
+        // The reason phrase is optional but the space before it is not. Skip
+        // sending the reason phrase. Clients should ignore it (RFC 7230) and it
+        // just wastes bytes.
 
         headerBuffer[pos++] = Constants.CR;
         headerBuffer[pos++] = Constants.LF;

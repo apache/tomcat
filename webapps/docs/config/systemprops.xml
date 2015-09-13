@@ -653,15 +653,6 @@
 
   <properties>
 
-    <property
-    name="org.apache.coyote. USE_CUSTOM_STATUS_MSG_IN_HEADER"><p>If this is
-      <code>true</code>, custom HTTP status messages will be used within HTTP
-      headers. If a custom message is specified that is not valid for use in an
-      HTTP header (as defined by RFC2616) then the custom message will be
-      ignored and the default message used.</p>
-      <p>If not specified, the default value of <code>false</code> will be used.</p>
-    </property>
-
     <property name="catalina.useNaming">
       <p>If this is <code>false</code> it will override the
       <code>useNaming</code> attribute for all <a href="context.html">

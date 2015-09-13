@@ -56,14 +56,6 @@ public final class Constants {
 
 
     /**
-     * If true, custom HTTP status messages will be used in headers.
-     */
-    public static final boolean USE_CUSTOM_STATUS_MSG_IN_HEADER =
-        Boolean.valueOf(System.getProperty(
-                "org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER",
-                "false")).booleanValue();
-
-    /**
      * The request attribute that is set to the value of {@code Boolean.TRUE}
      * if connector processing this request supports use of sendfile.
      */
