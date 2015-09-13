@@ -83,6 +83,13 @@
         Based on code contributed by Numa de Montmollin and derived from code
         developed by Twitter and Netty. (remm)
       </add>
+      <fix>
+        RFC 7230 states that clients should ignore reason phrases in HTTP/1.1
+        response messages. Since the reason phrase is optional, Tomcat no longer
+        sends it. As a result the system property
+        <code>org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER</code> is no
+        longer used and has been removed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

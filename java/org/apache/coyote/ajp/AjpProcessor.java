@@ -44,7 +44,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -1389,20 +1388,9 @@ public class AjpProcessor extends AbstractProcessor {
 
         // HTTP header contents
         responseMessage.appendInt(statusCode);
-        String message = null;
-        if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER &&
-                HttpMessages.isSafeInHttpHeader(response.getMessage())) {
-            message = response.getMessage();
-        }
-        if (message == null){
-            message = HttpMessages.getInstance(
-                    response.getLocale()).getMessage(response.getStatus());
-        }
-        if (message == null) {
-            // mod_jk + httpd 2.x fails with a null status message - bug 45026
-            message = Integer.toString(response.getStatus());
-        }
-        tmpMB.setString(message);
+        // Reason phrase is optional but mod_jk + httpd 2.x fails with a null
+        // reason phrase - bug 45026
+        tmpMB.setString(Integer.toString(response.getStatus()));
         responseMessage.appendBytes(tmpMB);
 
         // Special headers
