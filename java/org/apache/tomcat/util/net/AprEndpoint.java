@@ -2062,7 +2062,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    getLog().warn(sm.getString("endpoint.timeout.error"), t);
+                    getLog().warn(sm.getString("endpoint.timeout.err"), t);
                 }
             }
 
