@@ -2562,7 +2562,7 @@ public class StandardContext extends ContainerBase
 
         if (getState().isAvailable()) {
             throw new IllegalStateException
-                (sm.getString("standardContext.resources.started"));
+                (sm.getString("standardContext.resourcesStart"));
         }
 
         DirContext oldResources = this.webappResources;
