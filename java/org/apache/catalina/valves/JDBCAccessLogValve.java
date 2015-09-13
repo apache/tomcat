@@ -634,7 +634,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         try {
             conn.close();
         } catch (SQLException e) {
-            container.getLogger().error(sm.getString("jdbcAccessLogValeve.close"), e); // Just log it here
+            container.getLogger().error(sm.getString("jdbcAccessLogValve.close"), e); // Just log it here
         } finally {
            this.conn = null;
         }
