@@ -1716,9 +1716,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     @Override
     public SocketState upgradeDispatch() throws IOException {
         // Should never reach this code but in case we do...
-        // TODO
         throw new IOException(
-                sm.getString("TODO"));
+                sm.getString("http11Processor.upgrade"));
     }
 
 
