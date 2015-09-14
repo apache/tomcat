@@ -1639,6 +1639,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                             if (socket.getSocket().isHandshakeComplete() ||
                                     status == SocketStatus.STOP) {
                                 handshake = 0;
+                            } else if (status == SocketStatus.ERROR) {
+                                handshake = -1;
                             } else {
                                 handshake = socket.getSocket().handshake();
                                 // The handshake process reads/writes from/to the
