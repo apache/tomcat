@@ -818,15 +818,16 @@ public class StandardContext extends ContainerBase
 
     @Override
     public void setCookieProcessor(CookieProcessor cookieProcessor) {
+        if (cookieProcessor == null) {
+            throw new IllegalArgumentException(
+                    sm.getString("standardContext.cookieProcessor.null"));
+        }
         this.cookieProcessor = cookieProcessor;
     }
 
 
     @Override
     public CookieProcessor getCookieProcessor() {
-        if (cookieProcessor == null) {
-            cookieProcessor = new LegacyCookieProcessor();
-        }
         return cookieProcessor;
     }
 
@@ -4976,6 +4977,11 @@ public class StandardContext extends ContainerBase
             WebappLoader webappLoader = new WebappLoader(getParentClassLoader());
             webappLoader.setDelegate(getDelegate());
             setLoader(webappLoader);
+        }
+
+        // An explicit cookie processor hasn't been specified; use the default
+        if (cookieProcessor == null) {
+            cookieProcessor = new LegacyCookieProcessor();
         }
 
         // Initialize character set mapper
