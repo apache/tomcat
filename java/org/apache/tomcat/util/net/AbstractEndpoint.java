@@ -700,8 +700,8 @@ public abstract class AbstractEndpoint<S> {
 
     public void shutdownExecutor() {
         Executor executor = this.executor;
-        this.executor = null;
         if (executor != null && internalExecutor) {
+            this.executor = null;
             if (executor instanceof ThreadPoolExecutor) {
                 //this is our internal one, so we need to shut it down
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
