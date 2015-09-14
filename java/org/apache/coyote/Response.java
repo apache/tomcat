@@ -88,7 +88,7 @@ public final class Response {
     /**
      * Committed flag.
      */
-    protected boolean commited = false;
+    protected volatile boolean commited = false;
 
 
     /**
