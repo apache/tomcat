@@ -60,6 +60,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        The default HTTP cookie parser has been changed to
+        <code>org.apache.tomcat.util.http.Rfc6265CookieProcessor</code>. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>

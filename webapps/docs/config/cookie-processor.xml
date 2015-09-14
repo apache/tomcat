@@ -45,34 +45,6 @@
   <a href="context.html">Context</a> component. If it is not included, a default
   implementation will be created automatically.</p>
 
-  <p><strong>Note:</strong> <strong>CookieProcessor</strong> is a new
-  configuration element, introduced in Tomcat 8.0.15.
-  <strong>This is work in progress.</strong>
-  The goal is to review the current implementation of HTTP Cookie headers
-  processing in Tomcat to provide better compliance with RFC6265 specification.
-  The ideas are summarized on a
-  <a href="https://wiki.apache.org/tomcat/Cookies">Wiki page</a> and discussed
-  on <a href="http://tomcat.apache.org/lists.html">mailing lists</a>.
-  Notable points:</p>
-
-  <ul>
-    <li><strong>CookieProcessor</strong> element allows to configure cookie
-    parsing separately in each web application, or globally in the default
-    <code>conf/context.xml</code> file. The legacy cookie parsing algorithm
-    supported only limited global configuration via several
-    <a href="systemprops.html#Specifications">system properties</a>. Those
-    system properties are still supported, but are going to be deprecated in
-    favor of this new configuration element.
-    </li>
-    <li>The new RFC6265-compliant (<em>work in progress</em>) implementation
-    is a stand-in replacement for the original legacy one. Until the new code
-    is stabilized, the legacy implementation remains the default one.
-    You can select the implementation by setting <code>className</code>
-    attribute on <strong>CookieProcessor</strong> element.</li>
-    <li>This is work in progress. Configuration attributes may change in a
-    future release.</li>
-  </ul>
-
 </section>
 
 
@@ -100,10 +72,34 @@
   <subsection name="Standard Implementation">
 
     <p>The standard implementation of <strong>CookieProcessor</strong> is
-    <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code>. Note
-    that it is anticipated that this will change to
-    <code>org.apache.tomcat.util.http.Rfc6265CookieProcessor</code> in a future
-    Tomcat 8 release.</p>
+    <code>org.apache.tomcat.util.http.Rfc6265CookieProcessor</code>.</p>
+
+    <p>This cookie processor is based on RFC6265 with the following changes to
+    support better interoperability:</p>
+
+    <ul>
+      <li>Values 0x80 to 0xFF are permitted in cookie-octet to support the use
+      of UTF-8 in cookie values as used by HTML 5.</li>
+      <li>For cookies without a value, the '=' is not required after the name as
+      some browsers do not sent it.</li>
+    </ul>
+
+    <p>The RFC 6265 cookie processor is generally more lenient than the legacy
+    cookie parser. In particular:</p>
+
+    <ul>
+      <li>The '<code>=</code>' and '<code>/</code>' characters are always
+      permitted in a cookie value.</li>
+      <li>Name only cookies are always permitted.</li>
+      <li>The cookie header is always preserved.</li>
+    </ul>
+
+    <p>No additional attributes are supported by the <strong>RFC 6265 Cookie
+    Processor</strong>.</p>
+
+  </subsection>
+
+  <subsection name="Legacy Cookie Processor - org.apache.tomcat.util.http.LegacyCookieProcessor">
 
     <p>This is the legacy  cookie parser based on RFC6265, RFC2109 and RFC2616.
     It implements a strict interpretation of the cookie specifications. Due to
@@ -169,33 +165,6 @@
       </attribute>
 
     </attributes>
-
-  </subsection>
-
-  <subsection name="RFC 6265 Cookie Processor - org.apache.tomcat.util.http.Rfc6265CookieProcessor">
-
-    <p>This cookie processor is based on RFC6265 with the following changes to
-    support better interoperability:</p>
-
-    <ul>
-      <li>Values 0x80 to 0xFF are permitted in cookie-octet to support the use
-      of UTF-8 in cookie values as used by HTML 5.</li>
-      <li>For cookies without a value, the '=' is not required after the name as
-      some browsers do not sent it.</li>
-    </ul>
-
-    <p>The RFC 6265 cookie processor is generally more lenient than the legacy
-    cookie parser. In particular:</p>
-
-    <ul>
-      <li>The '<code>=</code>' and '<code>/</code>' characters are always
-      permitted in a cookie value.</li>
-      <li>Name only cookies are always permitted.</li>
-      <li>The cookie header is always preserved.</li>
-    </ul>
-
-    <p>No additional attributes are supported by the <strong>RFC 6265 Cookie
-    Processor</strong>.</p>
 
   </subsection>
 

@@ -129,7 +129,7 @@ import org.apache.tomcat.util.descriptor.web.MessageDestinationRef;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.CookieProcessor;
-import org.apache.tomcat.util.http.LegacyCookieProcessor;
+import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
@@ -4981,7 +4981,7 @@ public class StandardContext extends ContainerBase
 
         // An explicit cookie processor hasn't been specified; use the default
         if (cookieProcessor == null) {
-            cookieProcessor = new LegacyCookieProcessor();
+            cookieProcessor = new Rfc6265CookieProcessor();
         }
 
         // Initialize character set mapper
