@@ -203,39 +203,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Returns the digest encoding charset.
-     *
-     * @return The charset (may be null) for platform default
-     *
-     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
-     *              by the CredentialHandler
-     */
-    @Deprecated
-    public String getDigestEncoding() {
-        CredentialHandler ch = credentialHandler;
-        if (ch instanceof MessageDigestCredentialHandler) {
-            return ((MessageDigestCredentialHandler) ch).getEncoding();
-        }
-        return null;
-    }
-
-
-    /**
-     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
-     *              by the CredentialHandler
-     */
-    @Deprecated
-    protected Charset getDigestCharset() throws UnsupportedEncodingException {
-        String charset = getDigestEncoding();
-        if (charset == null) {
-            return StandardCharsets.ISO_8859_1;
-        } else {
-            return B2CConverter.getCharset(charset);
-        }
-    }
-
-
-    /**
      * Return the "validate certificate chains" flag.
      * @return The value of the validate certificate chains flag
      */
@@ -1119,6 +1086,25 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
 
         return MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(valueBytes));
+    }
+
+
+    private String getDigestEncoding() {
+        CredentialHandler ch = credentialHandler;
+        if (ch instanceof MessageDigestCredentialHandler) {
+            return ((MessageDigestCredentialHandler) ch).getEncoding();
+        }
+        return null;
+    }
+
+
+    private Charset getDigestCharset() throws UnsupportedEncodingException {
+        String charset = getDigestEncoding();
+        if (charset == null) {
+            return StandardCharsets.ISO_8859_1;
+        } else {
+            return B2CConverter.getCharset(charset);
+        }
     }
 
 
