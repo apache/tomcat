@@ -87,18 +87,13 @@ public final class LegacyCookieProcessor implements CookieProcessor {
     private final boolean STRICT_SERVLET_COMPLIANCE =
             Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
 
-    @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
-    private boolean allowEqualsInValue = CookieSupport.ALLOW_EQUALS_IN_VALUE;
+    private boolean allowEqualsInValue = false;
 
-    @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
-    private boolean allowNameOnly = CookieSupport.ALLOW_NAME_ONLY;
+    private boolean allowNameOnly = false;
 
-    @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
-    private boolean allowHttpSepsInV0 = CookieSupport.ALLOW_HTTP_SEPARATORS_IN_V0;
+    private boolean allowHttpSepsInV0 = false;
 
-    @SuppressWarnings("deprecation") // Default to STRICT_SERVLET_COMPLIANCE
-                                     // when deprecated code is removed
-    private boolean preserveCookieHeader = CookieSupport.PRESERVE_COOKIE_HEADER;
+    private boolean preserveCookieHeader = STRICT_SERVLET_COMPLIANCE;
 
     private boolean alwaysAddExpires = !STRICT_SERVLET_COMPLIANCE;
 
@@ -112,9 +107,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
         for (char c : HTTP_SEPARATORS) {
             httpSeparatorFlags.set(c);
         }
-        @SuppressWarnings("deprecation") // Default to STRICT_SERVLET_COMPLIANCE
-                                         // when deprecated code is removed
-        boolean b = CookieSupport.FWD_SLASH_IS_SEPARATOR;
+        boolean b = STRICT_SERVLET_COMPLIANCE;
         if (b) {
             httpSeparatorFlags.set('/');
         }

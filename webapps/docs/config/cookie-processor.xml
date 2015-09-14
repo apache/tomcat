@@ -120,20 +120,14 @@
         '<code>=</code>' is encountered and the remainder of the cookie value
         will be dropped.</p>
         <p>If not set the specification compliant default value of
-        <code>false</code> will be used. This default may be changed by setting
-        the
-        <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_EQUALS_IN_VALUE</code>
-        <a href="systemprops.html">system property</a>.</p>
+        <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="allowHttpSepsInV0" required="false">
         <p>If this is <code>true</code> Tomcat will allow HTTP separators in
         cookie names and values.</p>
         <p>If not specified, the default specification compliant value of
-        <code>false</code> will be used. This default may be changed by setting
-        the
-        <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0</code>
-        <a href="systemprops.html">system property</a>.</p>
+        <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="allowNameOnly" required="false">
@@ -141,10 +135,7 @@
         (with or without trailing '<code>=</code>') when parsing cookie headers.
         If <code>false</code>, name only cookies will be dropped.</p>
         <p>If not set the specification compliant default value of
-        <code>false</code> will be used. This default may be changed by setting
-        the
-        <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_NAME_ONLY</code>
-        <a href="systemprops.html">system property</a>.</p>
+        <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="alwaysAddExpires" required="false">
@@ -164,9 +155,7 @@
         headers. If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
         is set to <code>true</code>, the default of this setting will be
         <code>true</code>, else the default value will be <code>false</code>.
-        This default may be overridden by setting the
-        <code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>
-        system property.</p>
+        </p>
       </attribute>
 
       <attribute name="preserveCookieHeader" required="false">
@@ -176,9 +165,7 @@
         <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
         <code>true</code>, the default of this setting will be
         <code>true</code>, else the default value will be <code>false</code>.
-        This default may be overridden by setting the
-        <code>org.apache.tomcat.util.http.ServerCookie.PRESERVE_COOKIE_HEADER</code>
-        system property.</p>
+        </p>
       </attribute>
 
     </attributes>

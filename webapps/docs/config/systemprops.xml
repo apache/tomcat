@@ -288,10 +288,6 @@
       <li><code>org.apache.catalina.core.<br/>StandardHostValve.ACCESS_SESSION</code></li>
       <li><code>org.apache.catalina.session.<br/>StandardSession.ACTIVITY_CHECK</code></li>
       <li><code>org.apache.catalina.session.<br/>StandardSession.LAST_ACCESS_AT_START</code></li>
-      <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.ALWAYS_ADD_EXPIRES</code></li>
-      <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.FWD_SLASH_IS_SEPARATOR</code></li>
-      <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.PRESERVE_COOKIE_HEADER</code></li>
-      <li><code>org.apache.tomcat.util.http.<br/>ServerCookie.STRICT_NAMING</code></li>
       <li>The <code>URIEncoding</code> attribute of any
           <a href="http.html">HTTP connector</a> or
           <a href="ajp.html">AJP connector</a> element.</li>
@@ -304,15 +300,6 @@
       <li>The <code>xmlValidation</code> attribute of any
           <a href="context.html">Context</a> element.</li>
       </ul>
-
-      <p>Note that changing a number of the above defaults is likely to break
-      the majority of systems as some browsers are unable to correctly handle
-      the cookie headers that result from a strict adherence to the
-      specifications. Defaults, regardless of whether or not they have been
-      changed by setting
-      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> can always be
-      overridden by explicitly setting the appropriate system property or element
-      attribute.</p>
     </property>
 
     <property name="org.apache.catalina.connector. Response.ENFORCE_ENCODING_IN_GET_WRITER">
@@ -355,97 +342,6 @@
         (default changes from <code>false</code> to <code>true</code>)</li>
       </ul>
 
-    </property>
-
-    <property
-    name="org.apache.tomcat.util.http. ServerCookie.ALLOW_EQUALS_IN_VALUE">
-      <p>Deprecated. This will be removed in Tomcat 9. Specify the
-      <code>allowEqualsInValue</code> attribute on the
-      <a href="cookie-processor.html">org.apache.tomcat.util.http.LegacyCookieProcessor</a>
-      instead.</p>
-      <p>This sets the default value for <code>allowEqualsInValue</code>
-      attribute on the
-      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code>.
-      If this is <code>true</code> Tomcat will allow '<code>=</code>'
-      characters when parsing unquoted cookie values. If <code>false</code>,
-      cookie values containing '<code>=</code>' will be terminated when the
-      '<code>=</code>' is encountered and the remainder of the cookie value will
-      be dropped.</p>
-      <p>If not specified, the default specification compliant value of
-      <code>false</code> will be used.</p>
-    </property>
-
-    <property
-    name="org.apache.tomcat.util.http. ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0">
-      <p>Deprecated. This will be removed in Tomcat 9. Specify the
-      <code>allowHttpSepsInV0</code> attribute on the
-      <a href="cookie-processor.html">org.apache.tomcat.util.http.LegacyCookieProcessor</a>
-      instead.</p>
-      <p>This sets the default value for <code>allowHttpSepsInV0</code>
-      attribute on the
-      <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code>.
-      If this is <code>true</code> Tomcat will allow HTTP separators in
-      cookie names and values.</p>
-      <p>If not specified, the default specification compliant value of
-      <code>false</code> will be used.</p>
-    </property>
-
-    <property name="org.apache.tomcat.util.http. ServerCookie.ALLOW_NAME_ONLY">
-      <p>Deprecated. This will be removed in Tomcat 9. Specify the
-      <code>allowNameOnly</code> attribute on the
-      <a href="cookie-processor.html">org.apache.tomcat.util.http.LegacyCookieProcessor</a>
-      instead.</p>
-      <p>If this is <code>false</code> then the requirements of the cookie specifications
-      that cookies must have values will be enforced and cookies consisting only
-      of a name but no value will be ignored.</p>
-      <p>If not specified, the default specification compliant value of
-      <code>false</code> will be used.</p>
-    </property>
-
-    <property
-    name="org.apache.tomcat.util.http. ServerCookie.ALWAYS_ADD_EXPIRES">
-      <p>If this is <code>true</code> Tomcat will always add an expires
-      parameter to a SetCookie header even for cookies with version greater than
-      zero. This is to work around a known IE6 and IE7 bug that causes IE to
-      ignore the Max-Age parameter in a SetCookie header.</p>
-      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
-      <code>true</code>, the default of this setting will be <code>false</code>,
-      else the default value will be <code>true</code>.</p>
-    </property>
-
-    <property
-    name="org.apache.tomcat.util.http. ServerCookie.FWD_SLASH_IS_SEPARATOR">
-      <p> If this is true then the <code>/</code> (forward slash) character will
-      be treated as a separator. Note that this character is frequently used in
-      cookie path attributes and some browsers will fail to process a cookie if
-      the path attribute is quoted as is required by a strict adherence to the
-      specifications. This is highly likely to break session tracking using
-      cookies.</p>
-      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
-      <code>true</code>, the default of this setting will be <code>true</code>,
-      else the default value will be <code>false</code>.</p>
-    </property>
-
-    <property name="org.apache.tomcat.util.http. ServerCookie.PRESERVE_COOKIE_HEADER">
-      <p>Deprecated. This will be removed in Tomcat 9. Specify the
-      <code>preserveCookieHeader</code> attribute on the
-      <a href="cookie-processor.html">org.apache.tomcat.util.http.LegacyCookieProcessor</a>
-      instead.</p>
-      <p>If this is <code>true</code> Tomcat will ensure that cookie
-      processing does not modify cookie header returned by
-      <code>HttpServletRequest.getHeader()</code>.</p>
-      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
-      <code>true</code>, the default of this setting will be <code>true</code>,
-      else the default value will be <code>false</code>.</p>
-    </property>
-
-    <property name="org.apache.tomcat.util.http. ServerCookie.STRICT_NAMING">
-      <p> If this is true then the requirements of the Servlet specification
-      that Cookie names must adhere to RFC2109 (no use of separators) will be
-      enforced.</p>
-      <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
-      <code>true</code>, the default of this setting will be <code>true</code>,
-      else the default value will be <code>false</code>.</p>
     </property>
 
   </properties>
