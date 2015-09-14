@@ -147,6 +147,17 @@
         <a href="systemprops.html">system property</a>.</p>
       </attribute>
 
+      <attribute name="alwaysAddExpires" required="false">
+        <p>If this is <code>true</code> Tomcat will always add an expires
+        parameter to a SetCookie header even for cookies with version greater
+        than zero. This is to work around a known IE6 and IE7 bug that causes I
+        to ignore the Max-Age parameter in a SetCookie header.</p>
+        <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set
+        to <code>true</code>, the default of this setting will be
+        <code>false</code>, else the default value will be <code>true</code>.
+        </p>
+      </attribute>
+
       <attribute name="forwardSlashIsSeparator" required="false">
         <p>If this is <code>true</code> Tomcat will treat the forward slash
         character ('<code>/</code>') as an HTTP separator when processing cookie
