@@ -91,7 +91,7 @@ public class JAASCallbackHandler implements CallbackHandler {
         this.username = username;
 
         if (realm.hasMessageDigest()) {
-            this.password = realm.digest(password);
+            this.password = realm.getCredentialHandler().mutate(password);
         }
         else {
             this.password = password;

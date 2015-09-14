@@ -1116,7 +1116,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @param credentials Password or other credentials to use in
      *  authenticating this username
+     *
+     * @deprecated Used. Will be removed in Tomcat 9.
      */
+    @Deprecated
     protected String digest(String credentials)  {
 
         // If no MessageDigest instance is specified, return unchanged
