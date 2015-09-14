@@ -185,7 +185,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int lineStart = 0;
         int lineEnd = resultString.indexOf('\n', 0);
         String line = resultString.substring(lineStart, lineEnd + 1);
-        Assert.assertEquals("HTTP/1.1 200 OK\r\n", line);
+        Assert.assertEquals("HTTP/1.1 200 \r\n", line);
 
         // Check headers - looking to see if response is chunked (it should be)
         boolean chunked = false;
@@ -337,7 +337,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int lineStart = 0;
         int lineEnd = resultString.indexOf('\n', 0);
         String line = resultString.substring(lineStart, lineEnd + 1);
-        Assert.assertEquals("HTTP/1.1 200 OK\r\n", line);
+        Assert.assertEquals("HTTP/1.1 200 \r\n", line);
 
         // Listeners are invoked and access valve entries created on a different
         // thread so give that thread a chance to complete its work.
