@@ -28,7 +28,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,7 +53,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.res.StringManager;
@@ -123,24 +121,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     private CredentialHandler credentialHandler;
-
-
-    /**
-     * The MessageDigest object for digesting user credentials (passwords).
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
-     */
-    @Deprecated
-    protected volatile MessageDigest md = null;
-
-
-    /**
-     * MD5 message digest provider.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
-     */
-    @Deprecated
-    protected static volatile MessageDigest md5Helper;
 
 
     /**
@@ -602,69 +582,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         // Fail in all other cases
         return null;
-    }
-
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
-     */
-    @Deprecated
-    protected boolean compareCredentials(String userCredentials,
-            String serverCredentials) {
-
-        if (serverCredentials == null) {
-            return false;
-        }
-
-        if (hasMessageDigest()) {
-            // Some directories and databases prefix the password with the hash
-            // type. The string is in a format compatible with Base64.encode not
-            // the normal hex encoding of the digest
-            if (serverCredentials.startsWith("{MD5}") ||
-                    serverCredentials.startsWith("{SHA}")) {
-                // Server is storing digested passwords with a prefix indicating
-                // the digest type
-                String serverDigest = serverCredentials.substring(5);
-                String userDigest = Base64.encodeBase64String(ConcurrentMessageDigest.digest(
-                        getDigest(), userCredentials.getBytes(StandardCharsets.ISO_8859_1)));
-                return userDigest.equals(serverDigest);
-
-            } else if (serverCredentials.startsWith("{SSHA}")) {
-                // Server is storing digested passwords with a prefix indicating
-                // the digest type and the salt used when creating that digest
-
-                String serverDigestPlusSalt = serverCredentials.substring(6);
-
-                // Need to convert the salt to bytes to apply it to the user's
-                // digested password.
-                byte[] serverDigestPlusSaltBytes =
-                        Base64.decodeBase64(serverDigestPlusSalt);
-                final int saltPos = 20;
-                byte[] serverDigestBytes = new byte[saltPos];
-                System.arraycopy(serverDigestPlusSaltBytes, 0,
-                        serverDigestBytes, 0, saltPos);
-                final int saltLength = serverDigestPlusSaltBytes.length - saltPos;
-                byte[] serverSaltBytes = new byte[saltLength];
-                System.arraycopy(serverDigestPlusSaltBytes, saltPos,
-                        serverSaltBytes, 0, saltLength);
-
-                // Generate the digested form of the user provided password
-                // using the salt
-                byte[] userDigestBytes = ConcurrentMessageDigest.digest(getDigest(),
-                        userCredentials.getBytes(StandardCharsets.ISO_8859_1),
-                        serverSaltBytes);
-
-                return Arrays.equals(userDigestBytes, serverDigestBytes);
-
-            } else {
-                // Hex hashes should be compared case-insensitively
-                String userDigest = digest(userCredentials);
-                return serverCredentials.equalsIgnoreCase(userDigest);
-            }
-        } else {
-            // No digests, compare directly
-            return serverCredentials.equals(userCredentials);
-        }
     }
 
 
@@ -1227,19 +1144,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      */
     @Override
     protected void startInternal() throws LifecycleException {
-
-        // Create a MessageDigest instance for credentials, if desired
-        if (getDigest() != null) {
-            try {
-                md = MessageDigest.getInstance(getDigest());
-                ConcurrentMessageDigest.init(getDigest());
-            } catch (NoSuchAlgorithmException e) {
-                throw new LifecycleException
-                    (sm.getString("realmBase.algorithm", getDigest()), e);
-            }
-
-        }
-
         if (credentialHandler == null) {
             credentialHandler = new MessageDigestCredentialHandler();
         }
@@ -1258,11 +1162,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      */
     @Override
     protected void stopInternal() throws LifecycleException {
-
         setState(LifecycleState.STOPPING);
-
-        // Clean up allocated resources
-        md = null;
     }
 
 
