@@ -355,7 +355,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         Map<String,List<String>> respHeaders = new HashMap<>();
 
         if (useCookie && (cookies != null)) {
-            reqHeaders.put(CLIENT_COOKIE_HEADER + ":", cookies);
+            addCookies(reqHeaders);
         }
 
         ByteChunk bc = new ByteChunk();
@@ -379,7 +379,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         Map<String,List<String>> respHeaders = new HashMap<>();
 
         if (useCookie && (cookies != null)) {
-            reqHeaders.put(CLIENT_COOKIE_HEADER + ":", cookies);
+            addCookies(reqHeaders);
         }
         else {
             if (credentials != null) {
@@ -554,18 +554,36 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
      * extract and save the server cookies from the incoming response
      */
     protected void saveCookies(Map<String,List<String>> respHeaders) {
-
         // we only save the Cookie values, not header prefix
-        cookies = respHeaders.get(SERVER_COOKIE_HEADER);
+        List<String> cookieHeaders = respHeaders.get(SERVER_COOKIE_HEADER);
+        if (cookieHeaders == null) {
+            cookies = null;
+        } else {
+            cookies = new ArrayList<>(cookieHeaders.size());
+            for (String cookieHeader : cookieHeaders) {
+                cookies.add(cookieHeader.substring(0, cookieHeader.indexOf(';')));
+            }
+        }
     }
 
     /*
      * add all saved cookies to the outgoing request
      */
     protected void addCookies(Map<String,List<String>> reqHeaders) {
-
         if ((cookies != null) && (cookies.size() > 0)) {
-            reqHeaders.put(CLIENT_COOKIE_HEADER + ":", cookies);
+            StringBuilder cookieHeader = new StringBuilder();
+            boolean first = true;
+            for (String cookie : cookies) {
+                if (!first) {
+                    cookieHeader.append(';');
+                } else {
+                    first = false;
+                }
+                cookieHeader.append(cookie);
+            }
+            List<String> cookieHeaderList = new ArrayList<>(1);
+            cookieHeaderList.add(cookieHeader.toString());
+            reqHeaders.put(CLIENT_COOKIE_HEADER, cookieHeaderList);
         }
     }
 

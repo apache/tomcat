@@ -470,16 +470,35 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
     protected void saveCookies(Map<String,List<String>> respHeaders) {
 
         // we only save the Cookie values, not header prefix
-        cookies = respHeaders.get(SERVER_COOKIES);
+        List<String> cookieHeaders = respHeaders.get(SERVER_COOKIES);
+        if (cookieHeaders == null) {
+            cookies = null;
+        } else {
+            cookies = new ArrayList<>(cookieHeaders.size());
+            for (String cookieHeader : cookieHeaders) {
+                cookies.add(cookieHeader.substring(0, cookieHeader.indexOf(';')));
+            }
+        }
     }
 
     /*
      * add all saved cookies to the outgoing request
      */
     protected void addCookies(Map<String,List<String>> reqHeaders) {
-
         if ((cookies != null) && (cookies.size() > 0)) {
-            reqHeaders.put(BROWSER_COOKIES + ":", cookies);
+            StringBuilder cookieHeader = new StringBuilder();
+            boolean first = true;
+            for (String cookie : cookies) {
+                if (!first) {
+                    cookieHeader.append(';');
+                } else {
+                    first = false;
+                }
+                cookieHeader.append(cookie);
+            }
+            List<String> cookieHeaderList = new ArrayList<>(1);
+            cookieHeaderList.add(cookieHeader.toString());
+            reqHeaders.put(BROWSER_COOKIES, cookieHeaderList);
         }
     }
 }
