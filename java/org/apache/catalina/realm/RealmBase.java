@@ -1108,44 +1108,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     // ------------------------------------------------------ Protected Methods
 
-
-    /**
-     * Digest the password using the specified algorithm and
-     * convert the result to a corresponding hexadecimal string.
-     * If exception, the plain credentials string is returned.
-     *
-     * @param credentials Password or other credentials to use in
-     *  authenticating this username
-     *
-     * @deprecated Used. Will be removed in Tomcat 9.
-     */
-    @Deprecated
-    protected String digest(String credentials)  {
-
-        // If no MessageDigest instance is specified, return unchanged
-        if (hasMessageDigest() == false)
-            return (credentials);
-
-        // Digest the user credentials and return as hexadecimal
-        synchronized (this) {
-            try {
-                byte[] bytes = null;
-                try {
-                    bytes = credentials.getBytes(getDigestCharset());
-                } catch (UnsupportedEncodingException uee) {
-                    log.error("Illegal digestEncoding: " + getDigestEncoding(), uee);
-                    throw new IllegalArgumentException(uee.getMessage());
-                }
-
-                return (HexUtils.toHexString(ConcurrentMessageDigest.digest(getDigest(), bytes)));
-            } catch (Exception e) {
-                log.error(sm.getString("realmBase.digest"), e);
-                return (credentials);
-            }
-        }
-
-    }
-
     protected boolean hasMessageDigest() {
         return getDigest() != null;
     }
