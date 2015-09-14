@@ -100,26 +100,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected Log containerLog = null;
 
 
-    /**
-     * Digest algorithm used in storing passwords in a non-plaintext format.
-     * Valid values are those accepted for the algorithm name by the
-     * MessageDigest class, or <code>null</code> if no digesting should
-     * be performed.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
-     */
-    @Deprecated
-    protected String digest = null;
-
-    /**
-     * The encoding charset for the digest.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9.0.x onwards.
-     */
-    @Deprecated
-    protected String digestEncoding = null;
-
-
     private CredentialHandler credentialHandler;
 
 
@@ -242,34 +222,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Set the digest algorithm used for storing credentials.
-     *
-     * @param digest The new digest algorithm
-     *
-     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
-     *              by the CredentialHandler
-     */
-    @Deprecated
-    public void setDigest(String digest) {
-        CredentialHandler ch = credentialHandler;
-        if (ch == null) {
-            ch = new MessageDigestCredentialHandler();
-            credentialHandler = ch;
-        }
-        if (ch instanceof MessageDigestCredentialHandler) {
-            try {
-                ((MessageDigestCredentialHandler) ch).setAlgorithm(digest);
-            } catch (NoSuchAlgorithmException e) {
-                throw new IllegalArgumentException(e);
-            }
-        } else {
-            log.warn(sm.getString("realmBase.credentialHandler.customCredentialHandler",
-                    "digest", digest));
-        }
-        this.digest = digest;
-    }
-
-    /**
      * Returns the digest encoding charset.
      *
      * @return The charset (may be null) for platform default
@@ -284,30 +236,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             return ((MessageDigestCredentialHandler) ch).getEncoding();
         }
         return null;
-    }
-
-    /**
-     * Sets the digest encoding charset.
-     *
-     * @param charset The charset (null for platform default)
-     *
-     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
-     *              by the CredentialHandler
-     */
-    @Deprecated
-    public void setDigestEncoding(String charset) {
-        CredentialHandler ch = credentialHandler;
-        if (ch == null) {
-            ch = new MessageDigestCredentialHandler();
-            credentialHandler = ch;
-        }
-        if (ch instanceof MessageDigestCredentialHandler) {
-            ((MessageDigestCredentialHandler) ch).setEncoding(charset);
-        } else {
-            log.warn(sm.getString("realmBase.credentialHandler.customCredentialHandler",
-                    "digestEncoding", charset));
-        }
-        this.digestEncoding = charset;
     }
 
 
