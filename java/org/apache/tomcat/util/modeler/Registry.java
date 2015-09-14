@@ -59,10 +59,6 @@ import org.apache.tomcat.util.modeler.modules.ModelerSource;
  * This is the main entry point into modeler. It provides methods to create
  * and manipulate model mbeans and simplify their use.
  *
- * Starting with version 1.1, this is no longer a singleton and the static
- * methods are strongly deprecated. In a container environment we can expect
- * different applications to use different registries.
- *
  * This class is itself an mbean.
  *
  * IMPORTANT: public methods not marked with @since x.x are experimental or
@@ -133,9 +129,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     /**
      * Factory method to create (if necessary) and return our
      * <code>Registry</code> instance.
-     *
-     * Use this method to obtain a Registry - all other static methods
-     * are deprecated and shouldn't be used.
      *
      * The current version uses a static - future versions could use
      * the thread class loader.
