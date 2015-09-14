@@ -100,7 +100,7 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * Keep-alive.
      */
-    protected boolean keepAlive = true;
+    protected volatile boolean keepAlive = true;
 
 
     /**
