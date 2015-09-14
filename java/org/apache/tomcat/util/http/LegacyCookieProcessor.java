@@ -84,6 +84,8 @@ public final class LegacyCookieProcessor implements CookieProcessor {
         ANCIENT_DATE = COOKIE_DATE_FORMAT.get().format(new Date(10000));
     }
 
+    private final boolean STRICT_SERVLET_COMPLIANCE =
+            Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
 
     @SuppressWarnings("deprecation") // Default to false when deprecated code is removed
     private boolean allowEqualsInValue = CookieSupport.ALLOW_EQUALS_IN_VALUE;
@@ -98,9 +100,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                                      // when deprecated code is removed
     private boolean preserveCookieHeader = CookieSupport.PRESERVE_COOKIE_HEADER;
 
-    @SuppressWarnings("deprecation") // Default to !STRICT_SERVLET_COMPLIANCE
-                                     // when deprecated code is removed
-    private boolean alwaysAddExpires = SetCookieSupport.ALWAYS_ADD_EXPIRES;
+    private boolean alwaysAddExpires = !STRICT_SERVLET_COMPLIANCE;
 
     private final BitSet httpSeparatorFlags = new BitSet(128);
 
