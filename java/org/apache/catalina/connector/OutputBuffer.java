@@ -94,7 +94,7 @@ public class OutputBuffer extends Writer
     /**
      * Flag which indicates if the output buffer is closed.
      */
-    private boolean closed = false;
+    private volatile boolean closed = false;
 
 
     /**
@@ -136,7 +136,7 @@ public class OutputBuffer extends Writer
     /**
      * Suspended flag. All output bytes will be swallowed if this is true.
      */
-    private boolean suspended = false;
+    private volatile boolean suspended = false;
 
 
     // ----------------------------------------------------------- Constructors
