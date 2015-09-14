@@ -1142,9 +1142,9 @@ public class Http11Processor extends AbstractProcessor {
             if (getErrorState().isError()) {
                 response.setStatus(500);
             }
-            request.updateCounters();
 
             if (!isAsync() || getErrorState().isError()) {
+                request.updateCounters();
                 if (getErrorState().isIoAllowed()) {
                     inputBuffer.nextRequest();
                     outputBuffer.nextRequest();
@@ -1751,10 +1751,12 @@ public class Http11Processor extends AbstractProcessor {
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
         if (getErrorState().isError()) {
+            request.updateCounters();
             return SocketState.CLOSED;
         } else if (isAsync()) {
             return SocketState.LONG;
         } else {
+            request.updateCounters();
             if (!keepAlive) {
                 return SocketState.CLOSED;
             } else {
