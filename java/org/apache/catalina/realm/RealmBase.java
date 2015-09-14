@@ -203,25 +203,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Return the digest algorithm used for storing credentials.
-     *
-     * @return The currently configured algorithm used to digest stored
-     *         credentials
-     *
-     * @deprecated  This will be removed in Tomcat 9.0.x as it has been replaced
-     *              by the CredentialHandler
-     */
-    @Deprecated
-    public String getDigest() {
-        CredentialHandler ch = credentialHandler;
-        if (ch instanceof MessageDigestCredentialHandler) {
-            return ((MessageDigestCredentialHandler) ch).getAlgorithm();
-        }
-        return null;
-    }
-
-
-    /**
      * Returns the digest encoding charset.
      *
      * @return The charset (may be null) for platform default
@@ -1109,8 +1090,13 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     // ------------------------------------------------------ Protected Methods
 
     protected boolean hasMessageDigest() {
-        return getDigest() != null;
+        CredentialHandler ch = credentialHandler;
+        if (ch instanceof MessageDigestCredentialHandler) {
+            return ((MessageDigestCredentialHandler) ch).getAlgorithm() != null;
+        }
+        return false;
     }
+
 
     /**
      * Return the digest associated with given principal's user name.
