@@ -269,12 +269,10 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.buf.StringCache$ByteEntry");
         loader.loadClass(basePackage + "util.buf.StringCache$CharEntry");
         // http
-        loader.loadClass(basePackage + "util.http.HttpMessages");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(
                 basePackage + "util.http.FastHttpDateFormat");
         clazz.newInstance();
-        loader.loadClass(basePackage + "util.http.HttpMessages");
         loader.loadClass(basePackage + "util.http.parser.HttpParser");
         loader.loadClass(basePackage + "util.http.parser.MediaType");
         loader.loadClass(basePackage + "util.http.parser.MediaTypeCache");
