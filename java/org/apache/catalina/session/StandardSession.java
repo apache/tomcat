@@ -222,13 +222,13 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * the servlet container may invalidate this session.  A negative time
      * indicates that the session should never time out.
      */
-    protected int maxInactiveInterval = -1;
+    protected volatile int maxInactiveInterval = -1;
 
 
     /**
      * Flag indicating whether this session is new or not.
      */
-    protected boolean isNew = false;
+    protected volatile boolean isNew = false;
 
 
     /**
