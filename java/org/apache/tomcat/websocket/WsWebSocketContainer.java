@@ -92,7 +92,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long defaultMaxSessionIdleTimeout = 0;
-    private int backgroundProcessCount = 0;
+    private volatile int backgroundProcessCount = 0;
     private int processPeriod = Constants.DEFAULT_PROCESS_PERIOD;
 
 
