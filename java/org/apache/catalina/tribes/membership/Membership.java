@@ -139,7 +139,10 @@ public class Membership implements Cloneable {
 
     /**
      * Add a member to this component and sort array with memberComparator
+     *
      * @param member The member to add
+     *
+     * @return The member entry created for this new member.
      */
     public synchronized MbrEntry addMember(Member member) {
       synchronized (membersLock) {
@@ -217,7 +220,10 @@ public class Membership implements Cloneable {
     }
 
     /**
-     * Returning that service has members or not
+     * Returning that service has members or not.
+     *
+     * @return <code>true</code> if there are one or more members, otherwise
+     *         <code>false</code>
      */
     public boolean hasMembers() {
         return members.length > 0 ;
@@ -241,8 +247,10 @@ public class Membership implements Cloneable {
     }
 
     /**
-     * Returning a list of all the members in the membership
+     * Returning a list of all the members in the membership.
      * We not need a copy: add and remove generate new arrays.
+     *
+     * @return An array of the current members
      */
     public Member[] getMembers() {
         if(hasMembers()) {
@@ -293,15 +301,21 @@ public class Membership implements Cloneable {
         }
 
         /**
-         * Return the actual Member object
+         * Obtain the member associated with this entry.
+         *
+         * @return The member for this entry.
          */
         public Member getMember() {
             return mbr;
         }
 
         /**
-         * Check if this dude has expired
+         * Check if this member has expired.
+         *
          * @param maxtime The time threshold
+         *
+         * @return <code>true</code> if the member has expired, otherwise
+         *         <code>false</false>
          */
         public boolean hasExpired(long maxtime) {
             long delta = System.currentTimeMillis() - lastHeardFrom;
