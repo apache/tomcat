@@ -255,10 +255,12 @@ public class Membership implements Cloneable {
     }
 
     /**
-     * get a copy from all member entries
+     * Get a copy from all member entries.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x.
      */
-    protected synchronized MbrEntry[] getMemberEntries()
-    {
+    @Deprecated
+    protected synchronized MbrEntry[] getMemberEntries() {
         MbrEntry[] result = new MbrEntry[map.size()];
         Iterator<Map.Entry<Member,MbrEntry>> i = map.entrySet().iterator();
         int pos = 0;
