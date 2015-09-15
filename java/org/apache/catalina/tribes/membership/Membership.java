@@ -24,8 +24,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.catalina.tribes.Member;
 
 /**
@@ -254,20 +252,6 @@ public class Membership implements Cloneable {
         }
     }
 
-    /**
-     * Get a copy from all member entries.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9.0.x.
-     */
-    @Deprecated
-    protected synchronized MbrEntry[] getMemberEntries() {
-        MbrEntry[] result = new MbrEntry[map.size()];
-        Iterator<Map.Entry<Member,MbrEntry>> i = map.entrySet().iterator();
-        int pos = 0;
-        while ( i.hasNext() )
-            result[pos++] = i.next().getValue();
-        return result;
-    }
 
     // --------------------------------------------- Inner Class
 
