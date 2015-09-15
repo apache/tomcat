@@ -27,9 +27,10 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.catalina.tribes.io.ObjectReader;
@@ -56,7 +57,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
 
-    protected final LinkedList<Runnable> events = new LinkedList<>();
+    protected final Deque<Runnable> events = new ConcurrentLinkedDeque<>();
 
     public NioReceiver() {
     }
@@ -68,8 +69,10 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     }
 
     /**
-     * start cluster receiver
-     * @throws IOException
+     * Start cluster receiver.
+     *
+     * @throws IOException If the receiver fails to start
+     *
      * @see org.apache.catalina.tribes.ChannelReceiver#start()
      */
     @Override
@@ -141,25 +144,33 @@ public class NioReceiver extends ReceiverBase implements Runnable {
 
     public void addEvent(Runnable event) {
         Selector selector = this.selector.get();
-        if ( selector != null ) {
+        if (selector != null) {
             synchronized (events) {
                 events.add(event);
             }
-            if ( log.isTraceEnabled() ) log.trace("Adding event to selector:"+event);
-            if ( isListening() ) selector.wakeup();
+            if (log.isTraceEnabled()) {
+                log.trace("Adding event to selector:" + event);
+            }
+            if (isListening()) {
+                selector.wakeup();
+            }
         }
     }
 
     public void events() {
-        if ( events.size() == 0 ) return;
+        if (events.size() == 0) {
+            return;
+        }
         synchronized (events) {
             Runnable r = null;
-            while ( (events.size() > 0) && (r = events.removeFirst()) != null ) {
+            while ((r = events.pollFirst()) != null ) {
                 try {
-                    if ( log.isTraceEnabled() ) log.trace("Processing event in selector:"+r);
+                    if (log.isTraceEnabled()) {
+                        log.trace("Processing event in selector:" + r);
+                    }
                     r.run();
-                } catch ( Exception x ) {
-                    log.error("",x);
+                } catch (Exception x) {
+                    log.error("", x);
                 }
             }
             events.clear();
