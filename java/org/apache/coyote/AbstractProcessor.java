@@ -41,7 +41,7 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     protected final AbstractEndpoint<?> endpoint;
     protected final Request request;
     protected final Response response;
-    protected SocketWrapperBase<?> socketWrapper = null;
+    protected volatile SocketWrapperBase<?> socketWrapper = null;
     private String clientCertProvider = null;
 
     /**
