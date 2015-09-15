@@ -46,12 +46,12 @@ public class Membership implements Cloneable {
     /**
      * A map of all the members in the cluster.
      */
-    protected HashMap<Member, MbrEntry> map = new HashMap<>();
+    protected HashMap<Member, MbrEntry> map = new HashMap<>(); // Guarded by membersLock
 
     /**
      * A list of all the members in the cluster.
      */
-    protected Member[] members = EMPTY_MEMBERS;
+    protected volatile Member[] members = EMPTY_MEMBERS; // Guarded by membersLock
 
     /**
      * Comparator for sorting members by alive time.
@@ -90,19 +90,21 @@ public class Membership implements Cloneable {
 
     public Membership(Member local, Comparator<Member> comp, boolean includeLocal) {
         this.local = local;
+        this.memberComparator = comp;
         if (includeLocal) {
             addMember(local);
         }
-        this.memberComparator = comp;
     }
 
     /**
      * Reset the membership and start over fresh. i.e., delete all the members
      * and wait for them to ping again and join this membership.
      */
-    public synchronized void reset() {
-        map.clear();
-        members = EMPTY_MEMBERS ;
+    public void reset() {
+        synchronized (membersLock) {
+            map.clear();
+            members = EMPTY_MEMBERS ;
+        }
     }
 
     /**
@@ -112,29 +114,31 @@ public class Membership implements Cloneable {
      * @return - true if this member is new to the cluster, false otherwise.<br>
      * - false if this member is the local member or updated.
      */
-    public synchronized boolean memberAlive(Member member) {
-        //ignore ourselves
-        if ( member.equals(local)) {
+    public boolean memberAlive(Member member) {
+        // Ignore ourselves
+        if (member.equals(local)) {
             return false;
         }
 
         boolean result = false;
-        MbrEntry entry = map.get(member);
-        if (entry == null) {
-            entry = addMember(member);
-            result = true;
-       } else {
-            //update the member alive time
-            Member updateMember = entry.getMember();
-            if(updateMember.getMemberAliveTime() != member.getMemberAliveTime()) {
-                //update fields that can change
-                updateMember.setMemberAliveTime(member.getMemberAliveTime());
-                updateMember.setPayload(member.getPayload());
-                updateMember.setCommand(member.getCommand());
-                Arrays.sort(members, memberComparator);
+        synchronized (membersLock) {
+            MbrEntry entry = map.get(member);
+            if (entry == null) {
+                entry = addMember(member);
+                result = true;
+            } else {
+                // Update the member alive time
+                Member updateMember = entry.getMember();
+                if (updateMember.getMemberAliveTime() != member.getMemberAliveTime()) {
+                    // Update fields that can change
+                    updateMember.setMemberAliveTime(member.getMemberAliveTime());
+                    updateMember.setPayload(member.getPayload());
+                    updateMember.setCommand(member.getCommand());
+                    Arrays.sort(members, memberComparator);
+                }
             }
+            entry.accessed();
         }
-        entry.accessed();
         return result;
     }
 
@@ -145,9 +149,9 @@ public class Membership implements Cloneable {
      *
      * @return The member entry created for this new member.
      */
-    public synchronized MbrEntry addMember(Member member) {
+    public MbrEntry addMember(Member member) {
+        MbrEntry entry = new MbrEntry(member);
         synchronized (membersLock) {
-            MbrEntry entry = new MbrEntry(member);
             if (!map.containsKey(member) ) {
                 map.put(member, entry);
                 Member results[] = new Member[members.length + 1];
@@ -158,8 +162,8 @@ public class Membership implements Cloneable {
                 members = results;
                 Arrays.sort(members, memberComparator);
             }
-            return entry;
         }
+        return entry;
     }
 
     /**
@@ -168,8 +172,8 @@ public class Membership implements Cloneable {
      * @param member The member to remove
      */
     public void removeMember(Member member) {
-        map.remove(member);
         synchronized (membersLock) {
+            map.remove(member);
             int n = -1;
             for (int i = 0; i < members.length; i++) {
                 if (members[i] == member || members[i].equals(member)) {
@@ -196,33 +200,35 @@ public class Membership implements Cloneable {
      * @param maxtime - the max time a member can remain unannounced before it is considered dead.
      * @return the list of expired members
      */
-    public synchronized Member[] expire(long maxtime) {
-        if (!hasMembers()) {
-           return EMPTY_MEMBERS;
-        }
+    public Member[] expire(long maxtime) {
+        synchronized (membersLock) {
+            if (!hasMembers()) {
+               return EMPTY_MEMBERS;
+            }
 
-        ArrayList<Member> list = null;
-        Iterator<MbrEntry> i = map.values().iterator();
-        while (i.hasNext()) {
-            MbrEntry entry = i.next();
-            if (entry.hasExpired(maxtime)) {
-                if (list == null) {
-                    // Only need a list when members are expired (smaller gc)
-                    list = new java.util.ArrayList<>();
+            ArrayList<Member> list = null;
+            Iterator<MbrEntry> i = map.values().iterator();
+            while (i.hasNext()) {
+                MbrEntry entry = i.next();
+                if (entry.hasExpired(maxtime)) {
+                    if (list == null) {
+                        // Only need a list when members are expired (smaller gc)
+                        list = new java.util.ArrayList<>();
+                    }
+                    list.add(entry.getMember());
                 }
-                list.add(entry.getMember());
             }
-        }
 
-        if (list != null) {
-            Member[] result = new Member[list.size()];
-            list.toArray(result);
-            for (int j=0; j<result.length; j++) {
-                removeMember(result[j]);
+            if (list != null) {
+                Member[] result = new Member[list.size()];
+                list.toArray(result);
+                for (int j=0; j<result.length; j++) {
+                    removeMember(result[j]);
+                }
+                return result;
+            } else {
+                return EMPTY_MEMBERS ;
             }
-            return result;
-        } else {
-            return EMPTY_MEMBERS ;
         }
     }
 
@@ -233,14 +239,15 @@ public class Membership implements Cloneable {
      *         <code>false</code>
      */
     public boolean hasMembers() {
-        return members.length > 0 ;
+        return members.length > 0;
     }
 
 
     public Member getMember(Member mbr) {
-        if (hasMembers()) {
+        Member[] members = this.members;
+        if (members.length > 0) {
             Member result = null;
-            for (int i = 0; i < this.members.length && result == null; i++) {
+            for (int i = 0; i < members.length && result == null; i++) {
                 if (members[i].equals(mbr)) {
                     result = members[i];
                 }
@@ -262,11 +269,7 @@ public class Membership implements Cloneable {
      * @return An array of the current members
      */
     public Member[] getMembers() {
-        if (hasMembers()) {
-            return members;
-        } else {
-            return EMPTY_MEMBERS;
-        }
+        return members;
     }
 
 
