@@ -66,7 +66,7 @@ public class Membership implements Cloneable {
             final HashMap<Member, MbrEntry> tmpclone = (HashMap<Member, MbrEntry>) map.clone();
             clone.map = tmpclone;
             clone.members = new Member[members.length];
-            System.arraycopy(members,0,clone.members,0,members.length);
+            System.arraycopy(members, 0, clone.members, 0, members.length);
             return clone;
         }
     }
@@ -134,7 +134,12 @@ public class Membership implements Cloneable {
                     updateMember.setMemberAliveTime(member.getMemberAliveTime());
                     updateMember.setPayload(member.getPayload());
                     updateMember.setCommand(member.getCommand());
-                    Arrays.sort(members, memberComparator);
+                    // Re-order. Can't sort in place since a call to
+                    // getMembers() may then receive an intermediate result.
+                    Member[] newMembers = new Member[members.length];
+                    System.arraycopy(members, 0, newMembers, 0, members.length);
+                    Arrays.sort(newMembers, memberComparator);
+                    members = newMembers;
                 }
             }
             entry.accessed();
@@ -155,12 +160,10 @@ public class Membership implements Cloneable {
             if (!map.containsKey(member) ) {
                 map.put(member, entry);
                 Member results[] = new Member[members.length + 1];
-                for (int i = 0; i < members.length; i++) {
-                    results[i] = members[i];
-                }
+                System.arraycopy(members, 0, results, 0, members.length);
                 results[members.length] = member;
+                Arrays.sort(results, memberComparator);
                 members = results;
-                Arrays.sort(members, memberComparator);
             }
         }
         return entry;
@@ -247,15 +250,13 @@ public class Membership implements Cloneable {
         Member[] members = this.members;
         if (members.length > 0) {
             Member result = null;
-            for (int i = 0; i < members.length && result == null; i++) {
+            for (int i = 0; i < members.length; i++) {
                 if (members[i].equals(mbr)) {
-                    result = members[i];
+                    return result;
                 }
             }
-            return result;
-        } else {
-            return null;
         }
+        return null;
     }
 
     public boolean contains(Member mbr) {
