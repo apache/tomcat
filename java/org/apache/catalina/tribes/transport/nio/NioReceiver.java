@@ -145,9 +145,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     public void addEvent(Runnable event) {
         Selector selector = this.selector.get();
         if (selector != null) {
-            synchronized (events) {
-                events.add(event);
-            }
+            events.add(event);
             if (log.isTraceEnabled()) {
                 log.trace("Adding event to selector:" + event);
             }
@@ -158,22 +156,19 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     }
 
     public void events() {
-        if (events.size() == 0) {
+        if (events.isEmpty()) {
             return;
         }
-        synchronized (events) {
-            Runnable r = null;
-            while ((r = events.pollFirst()) != null ) {
-                try {
-                    if (log.isTraceEnabled()) {
-                        log.trace("Processing event in selector:" + r);
-                    }
-                    r.run();
-                } catch (Exception x) {
-                    log.error("", x);
+        Runnable r = null;
+        while ((r = events.pollFirst()) != null ) {
+            try {
+                if (log.isTraceEnabled()) {
+                    log.trace("Processing event in selector:" + r);
                 }
+                r.run();
+            } catch (Exception x) {
+                log.error("", x);
             }
-            events.clear();
         }
     }
 
