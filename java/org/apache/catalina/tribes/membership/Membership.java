@@ -250,10 +250,9 @@ public class Membership implements Cloneable {
     public Member getMember(Member mbr) {
         Member[] members = this.members;
         if (members.length > 0) {
-            Member result = null;
             for (int i = 0; i < members.length; i++) {
                 if (members[i].equals(mbr)) {
-                    return result;
+                    return members[i];
                 }
             }
         }
