@@ -149,7 +149,6 @@ public class NioReplicationTask extends AbstractRxTask {
      * so the selector will resume watching this channel.
      */
     protected void drainChannel (final SelectionKey key, ObjectReader reader) throws Exception {
-        reader.setLastAccess(System.currentTimeMillis());
         reader.access();
         ReadableByteChannel channel = (ReadableByteChannel) key.channel();
         int count=-1;
