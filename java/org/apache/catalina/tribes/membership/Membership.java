@@ -66,8 +66,7 @@ public class Membership implements Cloneable {
             @SuppressWarnings("unchecked")
             final HashMap<Member, MbrEntry> tmpclone = (HashMap<Member, MbrEntry>) map.clone();
             clone.map = tmpclone;
-            clone.members = new Member[members.length];
-            System.arraycopy(members, 0, clone.members, 0, members.length);
+            clone.members = members.clone();
             return clone;
         }
     }
@@ -137,8 +136,7 @@ public class Membership implements Cloneable {
                     updateMember.setCommand(member.getCommand());
                     // Re-order. Can't sort in place since a call to
                     // getMembers() may then receive an intermediate result.
-                    Member[] newMembers = new Member[members.length];
-                    System.arraycopy(members, 0, newMembers, 0, members.length);
+                    Member[] newMembers = members.clone();
                     Arrays.sort(newMembers, memberComparator);
                     members = newMembers;
                 }
