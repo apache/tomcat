@@ -71,6 +71,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             // TODO Assuming the body has been read at this point is not valid
             state.recievedEndOfStream();
         }
+        // No sendfile for HTTP/2 (it is enabled by default in the request)
+        this.coyoteRequest.setSendfile(false);
         this.coyoteResponse.setOutputBuffer(outputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
     }
