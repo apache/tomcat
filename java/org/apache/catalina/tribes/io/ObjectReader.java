@@ -82,7 +82,7 @@ public class ObjectReader {
         this.lastAccess = System.currentTimeMillis();
     }
 
-    public boolean isAccessed() {
+    public synchronized boolean isAccessed() {
         return this.accessed;
     }
 
@@ -150,7 +150,7 @@ public class ObjectReader {
         this.buffer = null;
     }
 
-    public long getLastAccess() {
+    public synchronized long getLastAccess() {
         return lastAccess;
     }
 
@@ -158,7 +158,7 @@ public class ObjectReader {
         return cancelled;
     }
 
-    public void setLastAccess(long lastAccess) {
+    public synchronized void setLastAccess(long lastAccess) {
         this.lastAccess = lastAccess;
     }
 
