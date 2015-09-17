@@ -1071,8 +1071,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         NioSocketWrapper ka = (NioSocketWrapper) key.attachment();
                         if ( ka == null ) {
                             cancelledKey(key); //we don't support any keys without attachments
-                        } else if ( ka.getError() != null) {
-                            cancelledKey(key);//TODO this is not yet being used
                         } else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
                                   (ka.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                             if (close) {
