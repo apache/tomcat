@@ -577,6 +577,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         private final Semaphore writePending = new Semaphore(1);
         private boolean writeInterest = false; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
+        private volatile IOException error = null;
 
         private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> awaitBytesHandler
                 = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
@@ -846,6 +847,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf; }
         public SendfileData getSendfileData() { return this.sendfileData; }
+
+        public IOException getError() { return error; }
+        public void setError(IOException error) { this.error = error; }
 
 
         @Override
@@ -1250,6 +1254,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         @Override
         protected void flushBlocking() throws IOException {
+            if (getError() != null) {
+                throw getError();
+            }
+
+
             // Before doing a blocking flush, make sure that any pending non
             // blocking write has completed.
             try {
@@ -1266,7 +1275,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         }
 
         @Override
-        protected boolean flushNonBlocking() {
+        protected boolean flushNonBlocking() throws IOException {
+            if (getError() != null) {
+                throw getError();
+            }
+
             return flushNonBlocking(false);
         }
 
