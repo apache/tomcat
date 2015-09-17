@@ -56,7 +56,7 @@ public final class Mapper {
     /**
      * Array containing the virtual hosts definitions.
      */
-    protected MappedHost[] hosts = new MappedHost[0];
+    protected volatile MappedHost[] hosts = new MappedHost[0];
 
 
     /**
@@ -168,7 +168,7 @@ public final class Mapper {
         }
     }
 
-    private boolean addHostAliasImpl(MappedHost newAlias) {
+    private synchronized boolean addHostAliasImpl(MappedHost newAlias) {
         MappedHost[] newHosts = new MappedHost[hosts.length + 1];
         if (insertMap(hosts, newHosts, newAlias)) {
             hosts = newHosts;
