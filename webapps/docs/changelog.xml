@@ -60,6 +60,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        The default HTTP cookie parser has been changed to
+        <code>org.apache.tomcat.util.http.Rfc6265CookieProcessor</code>. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
@@ -69,14 +77,27 @@
         Refactor HTTP upgrade and AJP implementations to reduce duplication.
         (markt)
       </scode>
-      <fix>
-        <bug>55988</bug>: Add support for Java 8 JSSE server-preferred TLS
-        cipher suite ordering. Patch provided by Ognjen Blagojevic. (schultz)
-      </fix>
       <add>
         Add support for HPACK header encoding and decoding, contributed
         by Stuart Douglas. (remm)
       </add>
+      <add>
+        <bug>57108</bug>: Add support for Server Name Indication (SNI). There
+        has been significant changes to the SSL configuration in server.xml to
+        support this. (markt)
+      </add>
+      <add>
+        Add SSL engine for JSSE backed by OpenSSL. Includes ALPN support.
+        Based on code contributed by Numa de Montmollin and derived from code
+        developed by Twitter and Netty. (remm)
+      </add>
+      <fix>
+        RFC 7230 states that clients should ignore reason phrases in HTTP/1.1
+        response messages. Since the reason phrase is optional, Tomcat no longer
+        sends it. As a result the system property
+        <code>org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER</code> is no
+        longer used and has been removed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
@@ -84,6 +105,15 @@
       <fix>
         Clarify the handling of Copy message and Copy nodes. (kfujino)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Support the use of the <code>threads</code> attribute on Ant&apos;s
+        junit task. Note that using this with a value of greater than one will
+        disable Cobertura code coverage. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

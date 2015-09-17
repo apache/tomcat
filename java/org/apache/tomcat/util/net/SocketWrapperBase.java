@@ -18,10 +18,12 @@ package org.apache.tomcat.util.net;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.CompletionHandler;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -39,14 +41,11 @@ public abstract class SocketWrapperBase<E> {
 
     // Volatile because I/O and setting the timeout values occurs on a different
     // thread to the thread checking the timeout.
-    private volatile long lastRead = System.currentTimeMillis();
-    private volatile long lastWrite = lastRead;
     private volatile long lastAsyncStart = 0;
     private volatile long asyncTimeout = -1;
     private volatile long readTimeout = -1;
     private volatile long writeTimeout = -1;
 
-    private IOException error = null;
     private volatile int keepAliveLeft = 100;
     private volatile boolean async = false;
     private boolean keptAlive = false;
@@ -199,11 +198,6 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    public void updateLastWrite() { lastWrite = System.currentTimeMillis(); }
-    public long getLastWrite() { return lastWrite; }
-    public long getLastRead() { return lastRead; }
-    public IOException getError() { return error; }
-    public void setError(IOException error) { this.error = error; }
     public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
     public int decrementKeepAlive() { return (--keepAliveLeft);}
     public boolean isKeptAlive() {return keptAlive;}
@@ -268,6 +262,7 @@ public abstract class SocketWrapperBase<E> {
     public Object getWriteThreadLock() { return writeThreadLock; }
     public SocketBufferHandler getSocketBufferHandler() { return socketBufferHandler; }
     public abstract boolean isReadPending();
+    public abstract boolean isWritePending();
 
     public boolean hasDataToWrite() {
         return !socketBufferHandler.isWriteBufferEmpty() || bufferedWrites.size() > 0;
@@ -386,8 +381,6 @@ public abstract class SocketWrapperBase<E> {
             return;
         }
 
-        lastWrite = System.currentTimeMillis();
-
         // While the implementations for blocking and non-blocking writes are
         // very similar they have been split into separate methods to allow
         // sub-classes to override them individually. NIO2, for example,
@@ -488,10 +481,6 @@ public abstract class SocketWrapperBase<E> {
             return false;
         }
 
-        if (getError() != null) {
-            throw getError();
-        }
-
         boolean result = false;
         if (block) {
             // A blocking flush will always empty the buffer.
@@ -566,7 +555,6 @@ public abstract class SocketWrapperBase<E> {
      *                     write
      */
     protected final void doWrite(boolean block) throws IOException {
-        lastWrite = System.currentTimeMillis();
         doWriteInternal(block);
     }
 
@@ -592,6 +580,17 @@ public abstract class SocketWrapperBase<E> {
         }
         holder.getBuf().put(buf,offset,length);
     }
+
+
+    public void processSocket(SocketStatus socketStatus, boolean dispatch) {
+        endpoint.processSocket(this, socketStatus, dispatch);
+    }
+
+
+    public void executeNonBlockingDispatches() {
+        endpoint.executeNonBlockingDispatches(this);
+    }
+
 
     public abstract void registerReadInterest();
 
@@ -624,26 +623,212 @@ public abstract class SocketWrapperBase<E> {
     public abstract SSLSupport getSslSupport(String clientCertProvider);
 
 
-    /*
-     * TODO
-     * Temporary method to aid in some refactoring.
-     * It is currently expected that this method will be removed in a subsequent
-     * refactoring.
-     */
-    public void processSocket(SocketStatus socketStatus, boolean dispatch) {
-        endpoint.processSocket(this, socketStatus, dispatch);
-    }
+    // ------------------------------------------------------- NIO 2 style APIs
 
 
-    /*
-     * TODO
-     * Temporary method to aid in some refactoring.
-     * It is currently expected that this method will be removed in a subsequent
-     * refactoring.
-     */
-    public void executeNonBlockingDispatches() {
-        endpoint.executeNonBlockingDispatches(this);
+    public enum CompletionState {
+        /**
+         * Operation is still pending.
+         */
+        PENDING,
+        /**
+         * The operation completed inline.
+         */
+        INLINE,
+        /**
+         * The operation completed inline but failed.
+         */
+        ERROR,
+        /**
+         * The operation completed, but not inline.
+         */
+        DONE
     }
+
+    public enum CompletionHandlerCall {
+        /**
+         * Operation should continue, the completion handler shouldn't be
+         * called.
+         */
+        CONTINUE,
+        /**
+         * The operation completed but the completion handler shouldn't be
+         * called.
+         */
+        NONE,
+        /**
+         * The operation is complete, the completion handler should be
+         * called.
+         */
+        DONE
+    }
+
+    public interface CompletionCheck {
+        /**
+         * Return true if enough data has been read or written and the
+         * handler should be notified. Return false if the IO is
+         * incomplete (data has not been fully written while it should,
+         * or more data read is needed for further processing) and should
+         * be continued before the completion handler is called.
+         *
+         * @param state of the operation (done or done inline since the
+         *        IO call is done)
+         * @param buffers ByteBuffer[] that has been passed to the
+         *        original IO call
+         * @param offset that has been passed to the original IO call
+         * @param length that has been passed to the original IO call
+         */
+        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length);
+    }
+
+    /**
+     * This utility CompletionCheck will cause the write to fully write
+     * all remaining data. If the operation completes inline, the
+     * completion handler will not be called.
+     */
+    public static final CompletionCheck COMPLETE_WRITE = new CompletionCheck() {
+        @Override
+        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length) {
+            for (int i = 0; i < offset; i++) {
+                if (buffers[i].remaining() > 0) {
+                    return CompletionHandlerCall.CONTINUE;
+                }
+            }
+            return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE : CompletionHandlerCall.NONE;
+        }
+    };
+
+    /**
+     * This utility CompletionCheck will cause the completion handler
+     * to be called once some data has been read. If the operation
+     * completes inline, the completion handler will not be called.
+     */
+    public static final CompletionCheck READ_DATA = new CompletionCheck() {
+        @Override
+        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length) {
+            return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE : CompletionHandlerCall.NONE;
+        }
+    };
+
+    /**
+     * Scatter read. The completion handler will be called once some
+     * data has been read or an error occurred. If a CompletionCheck
+     * object has been provided, the completion handler will only be
+     * called if the callHandler method returned true. If no
+     * CompletionCheck object has been provided, the default NIO2
+     * behavior is used: the completion handler will be called as soon
+     * as some data has been read, even if the read has completed inline.
+     *
+     * @param block true to block until any pending read is done, if the
+     *        timeout occurs and a read is still pending, a
+     *        ReadPendingException will be thrown; false to
+     *        not block but any pending read operation will cause
+     *        a ReadPendingException
+     * @param timeout
+     * @param unit
+     * @param attachment
+     * @param check for the IO operation completion
+     * @param handler to call when the IO is complete
+     * @param dsts buffers
+     * @return the completion state (done, done inline, or still pending)
+     */
+    public <A> CompletionState read(boolean block, long timeout, TimeUnit unit, A attachment,
+            CompletionCheck check, CompletionHandler<Long, ? super A> handler,
+            ByteBuffer... dsts) {
+        if (dsts == null) {
+            throw new IllegalArgumentException();
+        }
+        return read(dsts, 0, dsts.length, block, timeout, unit, attachment, check, handler);
+    }
+
+    /**
+     * Scatter read. The completion handler will be called once some
+     * data has been read or an error occurred. If a CompletionCheck
+     * object has been provided, the completion handler will only be
+     * called if the callHandler method returned true. If no
+     * CompletionCheck object has been provided, the default NIO2
+     * behavior is used: the completion handler will be called as soon
+     * as some data has been read, even if the read has completed inline.
+     *
+     * @param dsts buffers
+     * @param offset in the buffer array
+     * @param length in the buffer array
+     * @param block true to block until any pending read is done, if the
+     *        timeout occurs and a read is still pending, a
+     *        ReadPendingException will be thrown; false to
+     *        not block but any pending read operation will cause
+     *        a ReadPendingException
+     * @param timeout
+     * @param unit
+     * @param attachment
+     * @param check for the IO operation completion
+     * @param handler to call when the IO is complete
+     * @return the completion state (done, done inline, or still pending)
+     */
+    public abstract <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
+            boolean block, long timeout, TimeUnit unit, A attachment,
+            CompletionCheck check, CompletionHandler<Long, ? super A> handler);
+
+    /**
+     * Gather write. The completion handler will be called once some
+     * data has been written or an error occurred. If a CompletionCheck
+     * object has been provided, the completion handler will only be
+     * called if the callHandler method returned true. If no
+     * CompletionCheck object has been provided, the default NIO2
+     * behavior is used: the completion handler will be called, even
+     * if the write is incomplete and data remains in the buffers, or
+     * if the write completed inline.
+     *
+     * @param block true to block until any pending write is done, if the
+     *        timeout occurs and a write is still pending, a
+     *        WritePendingException will be thrown; false to
+     *        not block but any pending write operation will cause
+     *        a WritePendingException
+     * @param timeout
+     * @param unit
+     * @param attachment
+     * @param check for the IO operation completion
+     * @param handler to call when the IO is complete
+     * @param srcs buffers
+     * @return the completion state (done, done inline, or still pending)
+     */
+    public <A> CompletionState write(boolean block, long timeout, TimeUnit unit, A attachment,
+            CompletionCheck check, CompletionHandler<Long, ? super A> handler,
+            ByteBuffer... srcs) {
+        if (srcs == null) {
+            throw new IllegalArgumentException();
+        }
+        return write(srcs, 0, srcs.length, block, timeout, unit, attachment, check, handler);
+    }
+
+    /**
+     * Gather write. The completion handler will be called once some
+     * data has been written or an error occurred. If a CompletionCheck
+     * object has been provided, the completion handler will only be
+     * called if the callHandler method returned true. If no
+     * CompletionCheck object has been provided, the default NIO2
+     * behavior is used: the completion handler will be called, even
+     * if the write is incomplete and data remains in the buffers, or
+     * if the write completed inline.
+     *
+     * @param srcs buffers
+     * @param offset in the buffer array
+     * @param length in the buffer array
+     * @param block true to block until any pending write is done, if the
+     *        timeout occurs and a write is still pending, a
+     *        WritePendingException will be thrown; false to
+     *        not block but any pending write operation will cause
+     *        a WritePendingException
+     * @param timeout
+     * @param unit
+     * @param attachment
+     * @param check for the IO operation completion
+     * @param handler to call when the IO is complete
+     * @return the completion state (done, done inline, or still pending)
+     */
+    public abstract <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
+            boolean block, long timeout, TimeUnit unit, A attachment,
+            CompletionCheck check, CompletionHandler<Long, ? super A> handler);
 
 
     // --------------------------------------------------------- Utility methods
@@ -661,4 +846,5 @@ public abstract class SocketWrapperBase<E> {
         to.put(from);
         from.limit(fromLimit);
     }
+
 }

@@ -42,7 +42,7 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool;
  * @author Dirk Verbeeck
  * @since 2.0
  */
-public class PoolingDataSource<C extends Connection> implements DataSource {
+public class PoolingDataSource<C extends Connection> implements DataSource, AutoCloseable {
 
     private static final Log log = LogFactory.getLog(PoolingDataSource.class);
 
@@ -70,9 +70,24 @@ public class PoolingDataSource<C extends Connection> implements DataSource {
     }
 
     /**
+     * Close and free all {@link Connection}s from the pool.
+     * @since 2.1
+     */
+    @Override
+    public void close() throws Exception {
+        try {
+            _pool.close();
+        } catch(RuntimeException rte) {
+            throw new RuntimeException(Utils.getMessage("pool.close.fail"), rte);
+        } catch(Exception e) {
+            throw new SQLException(Utils.getMessage("pool.close.fail"), e);
+        }
+    }
+
+    /**
      * Returns the value of the accessToUnderlyingConnectionAllowed property.
      *
-     * @return true if access to the underlying is allowed, false otherwise.
+     * @return true if access to the underlying {@link Connection} is allowed, false otherwise.
      */
     public boolean isAccessToUnderlyingConnectionAllowed() {
         return this.accessToUnderlyingConnectionAllowed;

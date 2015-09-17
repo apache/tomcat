@@ -16,20 +16,22 @@
  */
 package org.apache.tomcat.util.net.jsse;
 
-import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtil;
 
 public class TesterBug50640SslImpl extends JSSEImplementation {
 
-    public static final String PROPERTY_NAME = "bug50640";
-    public static final String PROPERTY_VALUE = "pass";
+    public static final String PROPERTY_NAME = "sslEnabledProtocols";
+    public static final String PROPERTY_VALUE = "magic";
 
 
     @Override
-    public SSLUtil getSSLUtil(AbstractEndpoint<?> endpoint) {
-        String flag = endpoint.getProperty(PROPERTY_NAME);
-        if (PROPERTY_VALUE.equals(flag)) {
-            return super.getSSLUtil(endpoint);
+    public SSLUtil getSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
+        if (sslHostConfig.getProtocols().size() == 1 &&
+                sslHostConfig.getProtocols().contains(PROPERTY_VALUE)) {
+            sslHostConfig.setProtocols("TLSv1,TLSv1.1,TLSv1.2");
+            return super.getSSLUtil(sslHostConfig, certificate);
         } else {
             return null;
         }

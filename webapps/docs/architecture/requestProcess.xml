@@ -45,11 +45,16 @@ TODO
 </p>
 </subsection>
 
-<subsection name="diagram">
+<subsection name="diagrams">
 <p>
 A UML sequence diagram of the request process is available
-<a href="requestProcess/requestProcess.pdf">here.</a>
+<a href="requestProcess/request-process.png">here.</a>
 </p>
+<p>
+A UML sequence diagram of the authentication process is available
+<a href="requestProcess/authentication-process.png">here.</a>
+</p>
+
 </subsection>
 
 <subsection name="comments">

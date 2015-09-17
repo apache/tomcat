@@ -18,10 +18,11 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
@@ -29,9 +30,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Globals;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Response;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -47,11 +50,13 @@ public class OutputBuffer extends Writer
 
     private static final StringManager sm = StringManager.getManager(OutputBuffer.class);
 
-    // -------------------------------------------------------------- Constants
-
-    public static final String DEFAULT_ENCODING =
-        org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
+
+    /**
+     * Encoder cache.
+     */
+    private static final ConcurrentHashMap<Charset, SynchronizedStack<C2BConverter>> encoders =
+            new ConcurrentHashMap<>();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -89,7 +94,7 @@ public class OutputBuffer extends Writer
     /**
      * Flag which indicates if the output buffer is closed.
      */
-    private boolean closed = false;
+    private volatile boolean closed = false;
 
 
     /**
@@ -117,18 +122,6 @@ public class OutputBuffer extends Writer
 
 
     /**
-     * Encoder is set.
-     */
-    private boolean gotEnc = false;
-
-
-    /**
-     * List of encoders.
-     */
-    protected final HashMap<String, C2BConverter> encoders = new HashMap<>();
-
-
-    /**
      * Current char to byte converter.
      */
     protected C2BConverter conv;
@@ -143,7 +136,7 @@ public class OutputBuffer extends Writer
     /**
      * Suspended flag. All output bytes will be swallowed if this is true.
      */
-    private boolean suspended = false;
+    private volatile boolean suspended = false;
 
 
     // ----------------------------------------------------------- Constructors
@@ -238,20 +231,13 @@ public class OutputBuffer extends Writer
         suspended = false;
         doFlush = false;
 
-        if (conv!= null) {
+        if (conv != null) {
             conv.recycle();
+            encoders.get(conv.getCharset()).push(conv);
+            conv = null;
         }
 
-        gotEnc = false;
         enc = null;
-    }
-
-
-    /**
-     * Clear cached encoders (to save memory for async requests).
-     */
-    public void clearEncoders() {
-        encoders.clear();
     }
 
 
@@ -555,59 +541,64 @@ public class OutputBuffer extends Writer
     }
 
 
-    public void checkConverter()
-        throws IOException {
-
-        if (!gotEnc) {
+    public void checkConverter() throws IOException {
+        if (conv == null) {
             setConverter();
         }
-
     }
 
 
-    protected void setConverter()
-        throws IOException {
+    private void setConverter() throws IOException {
 
         if (coyoteResponse != null) {
             enc = coyoteResponse.getCharacterEncoding();
         }
 
-        gotEnc = true;
         if (enc == null) {
-            enc = DEFAULT_ENCODING;
+            enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
         }
-        conv = encoders.get(enc);
+
+        final Charset charset = B2CConverter.getCharset(enc);
+        SynchronizedStack<C2BConverter> stack = encoders.get(charset);
+        if (stack == null) {
+            stack = new SynchronizedStack<>();
+            encoders.putIfAbsent(charset, stack);
+            stack = encoders.get(charset);
+        }
+        conv = stack.pop();
+
         if (conv == null) {
-            if (Globals.IS_SECURITY_ENABLED){
-                try{
-                    conv = AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<C2BConverter>(){
+            conv = createConverter(charset);
+        }
+    }
 
-                                @Override
-                                public C2BConverter run() throws IOException{
-                                    return new C2BConverter(enc);
-                                }
 
+    private static C2BConverter createConverter(Charset charset) throws IOException {
+        if (Globals.IS_SECURITY_ENABLED){
+            try {
+                return AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<C2BConverter>(){
+                            @Override
+                            public C2BConverter run() throws IOException{
+                                return new C2BConverter(charset);
                             }
-                    );
-                }catch(PrivilegedActionException ex){
-                    Exception e = ex.getException();
-                    if (e instanceof IOException) {
-                        throw (IOException)e;
-                    }
+                        }
+                );
+            } catch (PrivilegedActionException ex) {
+                Exception e = ex.getException();
+                if (e instanceof IOException) {
+                    throw (IOException) e;
+                } else {
+                    throw new IOException(ex);
                 }
-            } else {
-                conv = new C2BConverter(enc);
             }
-
-            encoders.put(enc, conv);
-
+        } else {
+            return new C2BConverter(charset);
         }
     }
 
 
     // --------------------  BufferedOutputStream compatibility
-
 
     public long getContentWritten() {
         return bytesWritten + charsWritten;
@@ -641,7 +632,11 @@ public class OutputBuffer extends Writer
         bytesWritten = 0;
         charsWritten = 0;
         if (resetWriterStreamFlags) {
-            gotEnc = false;
+            if (conv != null) {
+                conv.recycle();
+                encoders.get(conv.getCharset()).push(conv);
+            }
+            conv = null;
             enc = null;
         }
         initial = true;

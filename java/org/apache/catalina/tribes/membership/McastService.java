@@ -62,7 +62,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     /**
      * A membership listener delegate (should be the cluster :)
      */
-    protected MembershipListener listener;
+    protected volatile MembershipListener listener;
     /**
      * A message listener delegate for broadcasts
      */
@@ -269,7 +269,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @param name The property to check for
      */
     protected void hasProperty(Properties properties, String name){
-        if ( properties.getProperty(name)==null) throw new IllegalArgumentException("McastService:Required property \""+name+"\" is missing.");
+        if ( properties.getProperty(name)==null) throw new IllegalArgumentException(sm.getString("mcastService.missing.property", name));
     }
 
     /**
@@ -334,7 +334,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
             try {
                 soTimeout = Integer.parseInt(properties.getProperty("mcastSoTimeout"));
             } catch ( Exception x ) {
-                log.error(sm.getString("McastService.parseTTL",
+                log.error(sm.getString("McastService.parseSoTimeout",
                         properties.getProperty("mcastSoTimeout")), x);
             }
         }
@@ -459,7 +459,10 @@ public class McastService implements MembershipService,MembershipListener,Messag
 
     @Override
     public void memberAdded(Member member) {
-        if ( listener!=null ) listener.memberAdded(member);
+        MembershipListener listener = this.listener;
+        if (listener != null) {
+            listener.memberAdded(member);
+        }
     }
 
     /**
@@ -467,9 +470,11 @@ public class McastService implements MembershipService,MembershipListener,Messag
      * @param member The member
      */
     @Override
-    public void memberDisappeared(Member member)
-    {
-        if ( listener!=null ) listener.memberDisappeared(member);
+    public void memberDisappeared(Member member) {
+        MembershipListener listener = this.listener;
+        if (listener != null) {
+            listener.memberDisappeared(member);
+        }
     }
 
     @Override
@@ -484,11 +489,13 @@ public class McastService implements MembershipService,MembershipListener,Messag
     @Override
     public void broadcast(ChannelMessage message) throws ChannelException {
         if (impl==null || (impl.startLevel & Channel.MBR_TX_SEQ)!=Channel.MBR_TX_SEQ )
-            throw new ChannelException("Multicast send is not started or enabled.");
+            throw new ChannelException(sm.getString("mcastService.noStart"));
 
         byte[] data = XByteBuffer.createDataPackage((ChannelData)message);
         if (data.length>McastServiceImpl.MAX_PACKET_SIZE) {
-            throw new ChannelException("Packet length["+data.length+"] exceeds max packet size of "+McastServiceImpl.MAX_PACKET_SIZE+" bytes.");
+            throw new ChannelException(sm.getString("mcastService.exceed.maxPacketSize",
+                    Integer.toString(data.length) ,
+                    Integer.toString(McastServiceImpl.MAX_PACKET_SIZE)));
         }
         DatagramPacket packet = new DatagramPacket(data,0,data.length);
         try {

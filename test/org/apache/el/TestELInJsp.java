@@ -93,21 +93,19 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "00-hello world");
         assertEcho(result, "01-hello 'world");
         assertEcho(result, "02-hello \"world");
-        assertEcho(result, "03-hello world");
-        assertEcho(result, "04-hello 'world");
-        assertEcho(result, "05-hello \"world");
-        assertEcho(result, "06-hello world");
-        assertEcho(result, "07-hello 'world");
-        assertEcho(result, "08-hello \"world");
-        assertEcho(result, "09-hello world");
-        assertEcho(result, "10-hello 'world");
+        assertEcho(result, "03-hello \"world");
+        assertEcho(result, "04-hello world");
+        assertEcho(result, "05-hello 'world");
+        assertEcho(result, "06-hello 'world");
+        assertEcho(result, "07-hello \"world");
+        assertEcho(result, "08-hello world");
+        assertEcho(result, "09-hello 'world");
+        assertEcho(result, "10-hello \"world");
         assertEcho(result, "11-hello \"world");
         assertEcho(result, "12-hello world");
         assertEcho(result, "13-hello 'world");
-        assertEcho(result, "14-hello \"world");
-        assertEcho(result, "15-hello world");
-        assertEcho(result, "16-hello 'world");
-        assertEcho(result, "17-hello \"world");
+        assertEcho(result, "14-hello 'world");
+        assertEcho(result, "15-hello \"world");
     }
 
     @Test
@@ -121,8 +119,6 @@ public class TestELInJsp extends TomcatBaseTest {
         // Warning: JSP attribute escaping != Java String escaping
         assertEcho(result, "00-\\'hello world\\'");
         assertEcho(result, "01-\\'hello world\\'");
-        assertEcho(result, "02-\\'hello world\\'");
-        assertEcho(result, "03-\\'hello world\\'");
 
         res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45451b.jsp");
         result = res.toString();
@@ -133,18 +129,25 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "01-${1+1}");
         assertEcho(result, "02-\\${1+1}");
         assertEcho(result, "03-\\\\${1+1}");
-        assertEcho(result, "04-\\$500");
+        assertEcho(result, "04-$500");
+        // Inside an EL literal '\' is only used to escape '\', ''' and '"'
+        assertEcho(result, "05-\\$");
+        assertEcho(result, "06-\\${");
         assertEcho(result, "10-2");
         assertEcho(result, "11-${1+1}");
         assertEcho(result, "12-\\2");
         assertEcho(result, "13-\\${1+1}");
         assertEcho(result, "14-\\\\2");
-        assertEcho(result, "15-\\$500");
+        assertEcho(result, "15-$500");
+        assertEcho(result, "16-\\$");
+        assertEcho(result, "17-\\${");
         assertEcho(result, "20-2");
         assertEcho(result, "21-#{1+1}");
         assertEcho(result, "22-\\2");
         assertEcho(result, "23-\\#{1+1}");
         assertEcho(result, "24-\\\\2");
+        assertEcho(result, "25-\\#");
+        assertEcho(result, "26-\\#{");
 
         res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45451c.jsp");
         result = res.toString();
@@ -176,13 +179,13 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "01-${1+1}");
         assertEcho(result, "02-\\${1+1}");
         assertEcho(result, "03-\\\\${1+1}");
-        assertEcho(result, "04-\\$500");
+        assertEcho(result, "04-$500");
         assertEcho(result, "10-2");
         assertEcho(result, "11-${1+1}");
         assertEcho(result, "12-\\${1+1}");
         assertEcho(result, "13-\\\\${1+1}");
         assertEcho(result, "14-\\\\\\${1+1}");
-        assertEcho(result, "15-\\$500");
+        assertEcho(result, "15-$500");
         assertEcho(result, "20-2");
         assertEcho(result, "21-#{1+1}");
         assertEcho(result, "22-\\#{1+1}");
@@ -198,13 +201,13 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "01-${1+1}");
         assertEcho(result, "02-\\${1+1}");
         assertEcho(result, "03-\\\\${1+1}");
-        assertEcho(result, "04-\\$500");
+        assertEcho(result, "04-$500");
         assertEcho(result, "10-2");
         assertEcho(result, "11-${1+1}");
         assertEcho(result, "12-\\2");
         assertEcho(result, "13-\\${1+1}");
         assertEcho(result, "14-\\\\2");
-        assertEcho(result, "15-\\$500");
+        assertEcho(result, "15-$500");
         assertEcho(result, "20-#{1+1}");
         assertEcho(result, "21-\\#{1+1}");
         assertEcho(result, "22-\\#{1+1}");
@@ -303,13 +306,13 @@ public class TestELInJsp extends TomcatBaseTest {
         assertEcho(result, "08-a2z");
         assertEcho(result, "09-az2");
         assertEcho(result, "10-${'foo'}bar");
-        assertEcho(result, "11-\"}");
+        assertEcho(result, "11-\\\"}");
         assertEcho(result, "12-foo\\bar\\baz");
         assertEcho(result, "13-foo\\bar\\baz");
         assertEcho(result, "14-foo\\bar\\baz");
         assertEcho(result, "15-foo\\bar\\baz");
         assertEcho(result, "16-foo\\bar\\baz");
-        assertEcho(result, "17-foo\\bar\\baz");
+        assertEcho(result, "17-foo\\&apos;bar&apos;\\&quot;baz&quot;");
         assertEcho(result, "18-3");
         assertEcho(result, "19-4");
         assertEcho(result, "20-4");

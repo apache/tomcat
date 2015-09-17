@@ -65,7 +65,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     // Timeout thread (where used) checks for timeout every second
     private static final long TIMEOUT_MARGIN = 1000;
     // Default timeout for these tests
-    private static final long TIMEOUT = 3000;
+    private static final long TIMEOUT = 5000;
 
     private static StringBuilder tracker;
 

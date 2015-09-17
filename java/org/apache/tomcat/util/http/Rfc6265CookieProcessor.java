@@ -74,7 +74,8 @@ public class Rfc6265CookieProcessor implements CookieProcessor {
             if (cookieValue != null && !cookieValue.isNull() ) {
                 if (cookieValue.getType() != MessageBytes.T_BYTES ) {
                     Exception e = new Exception();
-                    log.warn("Cookies: Parsing cookie as String. Expected bytes.", e);
+                    // TODO: Review this in light of HTTP/2
+                    log.debug("Cookies: Parsing cookie as String. Expected bytes.", e);
                     cookieValue.toBytes();
                 }
                 if (log.isDebugEnabled()) {

@@ -91,7 +91,7 @@
         tagClass="org.apache.catalina.deploy.NamingResourcesImpl"
         storeFactoryClass="org.apache.catalina.storeconfig.GlobalNamingResourcesSF">
      </Description>
-      <Description
+     <Description
         tag="Connector"
         standard="true"
         default="true"
@@ -101,7 +101,32 @@
         storeAppenderClass="org.apache.catalina.storeconfig.ConnectorStoreAppender">
         <TransientAttribute>URIEncoding</TransientAttribute>
         <TransientAttribute>maxProcessor</TransientAttribute>
-         <TransientAttribute>minProcessor</TransientAttribute>
+        <TransientAttribute>minProcessor</TransientAttribute>
+     </Description>
+     <Description
+        tag="UpgradeProtocol"
+        standard="false"
+        default="false"
+        tagClass="org.apache.coyote.UpgradeProtocol"
+        children="false"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+     </Description>
+     <Description
+        tag="SSLHostConfig"
+        standard="true"
+        default="true"
+        tagClass="org.apache.tomcat.util.net.SSLHostConfig"
+        children="true"
+        storeFactoryClass="org.apache.catalina.storeconfig.SSLHostConfigSF">
+        <TransientAttribute>openSslContext</TransientAttribute>
+     </Description>
+     <Description
+        tag="Certificate"
+        standard="true"
+        default="true"
+        tagClass="org.apache.tomcat.util.net.SSLHostConfigCertificate"
+        children="false"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
         tag="NamingResources"
@@ -168,7 +193,7 @@
         tag="CredentialHandler"
         standard="false"
         default="false"
-        children="false"
+        children="true"
         tagClass="org.apache.catalina.CredentialHandler"
         storeFactoryClass="org.apache.catalina.storeconfig.CredentialHandlerSF">
      </Description>

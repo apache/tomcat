@@ -80,6 +80,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.compat.JreVendor;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -142,6 +143,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private static final String CLASS_FILE_SUFFIX = ".class";
     private static final String SERVICES_PREFIX = "/META-INF/services/";
 
+    private static final Manifest MANIFEST_UNKNOWN = new Manifest();
+
     static {
         ClassLoader.registerAsParallelCapable();
         JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
@@ -153,15 +156,17 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         protected final String name;
         protected final String path;
+        protected final boolean manifestRequired;
 
-        PrivilegedFindResourceByName(String name, String path) {
+        PrivilegedFindResourceByName(String name, String path, boolean manifestRequired) {
             this.name = name;
             this.path = path;
+            this.manifestRequired = manifestRequired;
         }
 
         @Override
         public ResourceEntry run() {
-            return findResourceInternal(name, path);
+            return findResourceInternal(name, path, manifestRequired);
         }
 
     }
@@ -190,9 +195,11 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * from a webapp class loader without delegating first.
      */
     protected final Matcher packageTriggersDeny = Pattern.compile(
-            "^javax\\.el\\.|" +
-            "^javax\\.servlet\\.|" +
-            "^org\\.apache\\.(catalina|coyote|el|jasper|juli|naming|tomcat)\\."
+            "^javax(\\.|/)el(\\.|/)|" +
+            "^javax(\\.|/)security(\\.|/)auth(\\.|/)message(\\.|/)|" +
+            "^javax(\\.|/)servlet(\\.|/)|" +
+            "^javax(\\.|/)websocket(\\.|/)|" +
+            "^org(\\.|/)apache(\\.|/)(catalina|coyote|el|jasper|juli|naming|tomcat)(\\.|/)"
             ).matcher("");
 
 
@@ -202,8 +209,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * {@link #packageTriggersDeny}.
      */
     protected final Matcher packageTriggersPermit =
-            Pattern.compile("^javax\\.servlet\\.jsp\\.jstl\\.|" +
-                    "^org\\.apache\\.tomcat\\.jdbc\\.").matcher("");
+            Pattern.compile("^javax(\\.|/)servlet(\\.|/)jsp(\\.|/)jstl(\\.|/)|" +
+                    "^org(\\.|/)apache(\\.|/)tomcat(\\.|/)jdbc(\\.|/)").matcher("");
 
 
     /**
@@ -928,10 +935,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (entry == null) {
             if (securityManager != null) {
                 PrivilegedAction<ResourceEntry> dp =
-                    new PrivilegedFindResourceByName(name, path);
+                    new PrivilegedFindResourceByName(name, path, false);
                 entry = AccessController.doPrivileged(dp);
             } else {
-                entry = findResourceInternal(name, path);
+                entry = findResourceInternal(name, path, false);
             }
         }
         if (entry != null) {
@@ -1025,8 +1032,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         URL url = null;
 
+        boolean delegateFirst = delegate || filter(name);
+
         // (1) Delegate to parent if requested
-        if (delegate) {
+        if (delegateFirst) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader " + parent);
             url = parent.getResource(name);
@@ -1046,7 +1055,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         // (3) Delegate to parent unconditionally if not already attempted
-        if( !delegate ) {
+        if (!delegateFirst) {
             url = parent.getResource(name);
             if (url != null) {
                 if (log.isDebugEnabled())
@@ -1090,8 +1099,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             return (stream);
         }
 
+        boolean delegateFirst = delegate || filter(name);
+
         // (1) Delegate to parent if requested
-        if (delegate) {
+        if (delegateFirst) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader " + parent);
             stream = parent.getResourceAsStream(name);
@@ -1123,7 +1134,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         // (3) Delegate to parent unconditionally
-        if (!delegate) {
+        if (!delegateFirst) {
             if (log.isDebugEnabled())
                 log.debug("  Delegating to parent classloader unconditionally " + parent);
             stream = parent.getResourceAsStream(name);
@@ -1217,10 +1228,28 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // (0.2) Try loading the class with the system class loader, to prevent
-            //       the webapp from overriding J2SE classes
+            //       the webapp from overriding Java SE classes. This implements
+            //       SRV.10.7.2
             String resourceName = binaryNameToPath(name, false);
+
             ClassLoader javaseLoader = getJavaseClassLoader();
-            if (javaseLoader.getResource(resourceName) != null) {
+            boolean tryLoadingFromJavaseLoader;
+            try {
+                // Use getResource as it won't trigger an expensive
+                // ClassNotFoundException if the resource is not available from
+                // the Java SE class loader. However (see
+                // https://bz.apache.org/bugzilla/show_bug.cgi?id=58125 for
+                // details) when running under a security manager in rare cases
+                // this call may trigger a ClassCircularityError.
+                tryLoadingFromJavaseLoader = (javaseLoader.getResource(resourceName) != null);
+            } catch (ClassCircularityError cce) {
+                // The getResource() trick won't work for this class. We have to
+                // try loading it directly and accept that we might get a
+                // ClassNotFoundException.
+                tryLoadingFromJavaseLoader = true;
+            }
+
+            if (tryLoadingFromJavaseLoader) {
                 try {
                     clazz = javaseLoader.loadClass(name);
                     if (clazz != null) {
@@ -2360,7 +2389,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     "webappClassLoader.clearReferencesResourceBundlesFail",
                     getContextName()), e);
         } catch (NoSuchFieldException e) {
-            if (Globals.IS_ORACLE_JVM) {
+            if (JreVendor.IS_ORACLE_JVM) {
                 log.warn(sm.getString(
                         "webappClassLoader.clearReferencesResourceBundlesFail",
                         getContextName()), e);
@@ -2390,20 +2419,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     protected Class<?> findClassInternal(String name) {
 
-        if (!validate(name)) {
-            return null;
-        }
-
         String path = binaryNameToPath(name, true);
 
         ResourceEntry entry = null;
 
         if (securityManager != null) {
             PrivilegedAction<ResourceEntry> dp =
-                new PrivilegedFindResourceByName(name, path);
+                new PrivilegedFindResourceByName(name, path, true);
             entry = AccessController.doPrivileged(dp);
         } else {
-            entry = findResourceInternal(name, path);
+            entry = findResourceInternal(name, path, true);
         }
 
         if (entry == null) {
@@ -2523,7 +2548,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      *
      * @return the loaded resource, or null if the resource isn't found
      */
-    protected ResourceEntry findResourceInternal(final String name, final String path) {
+    protected ResourceEntry findResourceInternal(final String name, final String path,
+            boolean manifestRequired) {
 
         checkStateForResourceLoading(name);
 
@@ -2531,8 +2557,17 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             return null;
         }
 
+        WebResource resource = null;
+
         ResourceEntry entry = resourceEntries.get(path);
         if (entry != null) {
+            if (manifestRequired && entry.manifest == MANIFEST_UNKNOWN) {
+                // This resource was added to the cache when a request was made
+                // for the resource that did not need the manifest. Now the
+                // manifest is required, the cache entry needs to be updated.
+                resource = resources.getClassLoaderResource(path);
+                entry.manifest = resource.getManifest();
+            }
             return entry;
         }
 
@@ -2542,7 +2577,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
              isCacheable = path.startsWith(SERVICES_PREFIX);
         }
 
-        WebResource resource = null;
 
         boolean fileNeedConvert = false;
 
@@ -2597,7 +2631,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 entry.certificates = resource.getCertificates();
             }
         }
-        entry.manifest = resource.getManifest();
+
+        if (manifestRequired) {
+            entry.manifest = resource.getManifest();
+        } else {
+            entry.manifest = MANIFEST_UNKNOWN;
+        }
 
         if (isClassResource && entry.binaryContent != null &&
                 this.transformers.size() > 0) {
@@ -2742,7 +2781,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         String packageName = null;
         int pos = name.lastIndexOf('.');
         if (pos != -1)
-            packageName = name.substring(0, pos);
+            // Package names in the filters include the last '.'
+            packageName = name.substring(0, pos + 1);
         else
             return false;
 
@@ -2757,46 +2797,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         return false;
-    }
-
-
-    /**
-     * Validate a classname. As per SRV.9.7.2, we must restrict loading of
-     * classes from J2SE (java.*) and most classes of the servlet API
-     * (javax.servlet.*). That should enhance robustness and prevent a number
-     * of user error (where an older version of servlet.jar would be present
-     * in /WEB-INF/lib).
-     *
-     * @param name class name
-     * @return true if the name is valid
-     */
-    protected boolean validate(String name) {
-
-        // Need to be careful with order here
-        if (name == null) {
-            // Can't load a class without a name
-            return false;
-        }
-        if (name.startsWith("java.")) {
-            // Must never load java.* classes
-            return false;
-        }
-        if (name.startsWith("javax.servlet.jsp.jstl")) {
-            // OK for web apps to package JSTL
-            return true;
-        }
-        if (name.startsWith("javax.servlet.")) {
-            // Web apps should never package any other Servlet or JSP classes
-            return false;
-        }
-        if (name.startsWith("javax.el")) {
-            // Must never load javax.el.* classes
-            return false;
-        }
-
-        // Assume everything else is OK
-        return true;
-
     }
 
 

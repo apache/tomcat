@@ -539,7 +539,7 @@ found. For example, you may be using a classes12.zip file from Oracle Version 8.
 Oracle client. The classeXXXs.zip file and Oracle client software versions must match.
 </li>
 <li>A <code>$PATH</code>, <code>LD_LIBRARY_PATH</code> problem.</li>
-<li>It has been reported that ignoring the driver you have downloded from otn and using
+<li>It has been reported that ignoring the driver you have downloaded from otn and using
 the classes12.zip file from the directory <code>$ORAHOME\jdbc\lib</code> will also work.
 </li>
 </ul>

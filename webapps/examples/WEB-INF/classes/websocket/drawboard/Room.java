@@ -166,7 +166,10 @@ public final class Room {
 
     /**
      * Creates a Player from the given Client and adds it to this room.
+     *
      * @param client the client
+     *
+     * @return The newly created player
      */
     public Player createAndAddPlayer(Client client) {
         if (players.size() >= MAX_PLAYER_COUNT) {
@@ -338,7 +341,8 @@ public final class Room {
      * runnable on this Room, it will not be executed recursively, but instead
      * cached until the original runnable is finished, to keep the behavior of
      * using a Executor.
-     * @param task
+     *
+     * @param task The task to be executed
      */
     public void invokeAndWait(Runnable task)  {
 
@@ -465,8 +469,9 @@ public final class Room {
         /**
          * Handles the given DrawMessage by drawing it onto this Room's
          * image and by broadcasting it to the connected players.
-         * @param msg
-         * @param msgId
+         *
+         * @param msg   The draw message received
+         * @param msgId The ID for the draw message recieved
          */
         public void handleDrawMessage(DrawMessage msg, long msgId) {
             room.internalHandleDrawMessage(this, msg, msgId);

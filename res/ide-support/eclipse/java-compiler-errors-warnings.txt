@@ -18,7 +18,7 @@
 # Java -> Compiler -> Errors/Warnings
 =======================================
 
-The following settings are for Juno Service Release 1 (Eclipse 4.2.1)
+The following settings are for Mars (Eclipse 4.5)
 W = Warning
 I = Ignore
 E = Error
@@ -63,6 +63,7 @@ Unnecessary code
    ([x] on all additional check boxes)
    except the following:
 
+   - Value of exception parameter is...   - I
    - Unnecessary else                     - I
 
 Generic types

@@ -25,17 +25,17 @@
     <tags:echo echo="${'2'}az-04" />
     <tags:echo echo="05-a${'2'}z" />
     <tags:echo echo="06-az${'2'}" />
-    <tags:echo echo="${\"2\"}az-07" />
-    <tags:echo echo="08-a${\"2\"}z" />
-    <tags:echo echo="09-az${\"2\"}" />
+    <tags:echo echo="${"2"}az-07" />
+    <tags:echo echo="08-a${"2"}z" />
+    <tags:echo echo="09-az${"2"}" />
     <tags:echo echo="10-\${'foo'}${'bar'}" />
-    <tags:echo echo="11-${\"\\\"}\"}" />
+    <tags:echo echo="11-${"\\"}\"}" />
     <tags:echo echo="12-${'foo'}\\${'bar'}\\${'baz'}" />
-    <tags:echo echo="13-${'foo'}\\${\"bar\"}\\${'baz'}" />
-    <tags:echo echo="14-${\"foo\"}\\${'bar'}\\${\"baz\"}" />
-    <tags:echo echo='15-${\'foo\'}\\${"bar"}\\${\'baz\'}' />
-    <tags:echo echo='16-${"foo"}\\${\'bar\'}\\${"baz"}' />
-    <tags:echo echo='17-${"foo"}\\${&apos;bar&apos;}\\${&quot;baz&quot;}' />
+    <tags:echo echo="13-${'foo'}\\${"bar"}\\${'baz'}" />
+    <tags:echo echo="14-${"foo"}\\${'bar'}\\${"baz"}" />
+    <tags:echo echo='15-${'foo'}\\${"bar"}\\${'baz'}' />
+    <tags:echo echo='16-${"foo"}\\${'bar'}\\${"baz"}' />
+    <tags:echo echo='17-${"foo"}\\${"&apos;bar&apos;"}\\${"&quot;baz&quot;"}' />
     <tags:echo echo='18-${((x,y)->x+y)(1,2)}' />
     <tags:echo echo='19-${{1,2,3,4}.stream().max().orElse(-1)}' />
     <p>20-${{1,2,3,4}.stream().max().orElse(-1)}</p>

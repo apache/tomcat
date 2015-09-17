@@ -80,7 +80,8 @@ public class Client {
      * will be buffered and sent when possible.<br><br>
      *
      * This method can be called from multiple threads.
-     * @param msg
+     *
+     * @param msg The message to send
      */
     public void sendMessage(AbstractWebsocketMessage msg) {
         synchronized (messagesToSend) {

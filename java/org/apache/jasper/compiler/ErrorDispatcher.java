@@ -397,7 +397,8 @@ public class ErrorDispatcher {
         if ((errNode != null) && (errNode.getStart() != null)) {
             // If this is a scriplet node then there is a one to one mapping
             // between JSP lines and Java lines
-            if (errVisitor.getJspSourceNode() instanceof Node.Scriptlet) {
+            if (errVisitor.getJspSourceNode() instanceof Node.Scriptlet ||
+                    errVisitor.getJspSourceNode() instanceof Node.Declaration) {
                 javacError = new JavacErrorDetail(
                         fname,
                         lineNum,

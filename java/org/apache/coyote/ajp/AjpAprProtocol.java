@@ -16,11 +16,9 @@
  */
 package org.apache.coyote.ajp;
 
-import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AprEndpoint;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
@@ -57,10 +55,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
     public int getPollTime() { return ((AprEndpoint)getEndpoint()).getPollTime(); }
     public void setPollTime(int pollTime) { ((AprEndpoint)getEndpoint()).setPollTime(pollTime); }
 
-    // pollerSize is now a synonym for maxConnections
-    public void setPollerSize(int pollerSize) { getEndpoint().setMaxConnections(pollerSize); }
-    public int getPollerSize() { return getEndpoint().getMaxConnections(); }
-
 
     // ----------------------------------------------------- JMX related methods
 
@@ -82,17 +76,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
         @Override
         protected Log getLog() {
             return log;
-        }
-
-        @Override
-        public void release(SocketWrapperBase<Long> socket,
-                Processor processor, boolean addToPoller) {
-            processor.recycle();
-            recycledProcessors.push(processor);
-            if (addToPoller) {
-                socket.setReadTimeout(getProtocol().getEndpoint().getKeepAliveTimeout());
-                socket.registerReadInterest();
-            }
         }
     }
 }

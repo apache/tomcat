@@ -27,6 +27,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.util.StringManager;
 
 
 /**
@@ -53,6 +54,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * @version 1.1
  */
 public class OrderInterceptor extends ChannelInterceptorBase {
+    protected static final StringManager sm = StringManager.getManager(OrderInterceptor.class);
     private final HashMap<Member, Counter> outcounter = new HashMap<>();
     private final HashMap<Member, Counter> incounter = new HashMap<>();
     private final HashMap<Member, MessageOrder> incoming = new HashMap<>();
@@ -292,7 +294,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
                 add.next = iter;
 
             } else {
-                throw new ArithmeticException("Message added has the same counter, synchronization bug. Disable the order interceptor");
+                throw new ArithmeticException(sm.getString("orderInterceptor.messageAdded.sameCounter"));
             }
 
             return head;

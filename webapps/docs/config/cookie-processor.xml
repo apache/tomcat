@@ -45,34 +45,6 @@
   <a href="context.html">Context</a> component. If it is not included, a default
   implementation will be created automatically.</p>
 
-  <p><strong>Note:</strong> <strong>CookieProcessor</strong> is a new
-  configuration element, introduced in Tomcat 8.0.15.
-  <strong>This is work in progress.</strong>
-  The goal is to review the current implementation of HTTP Cookie headers
-  processing in Tomcat to provide better compliance with RFC6265 specification.
-  The ideas are summarized on a
-  <a href="https://wiki.apache.org/tomcat/Cookies">Wiki page</a> and discussed
-  on <a href="http://tomcat.apache.org/lists.html">mailing lists</a>.
-  Notable points:</p>
-
-  <ul>
-    <li><strong>CookieProcessor</strong> element allows to configure cookie
-    parsing separately in each web application, or globally in the default
-    <code>conf/context.xml</code> file. The legacy cookie parsing algorithm
-    supported only limited global configuration via several
-    <a href="systemprops.html#Specifications">system properties</a>. Those
-    system properties are still supported, but are going to be deprecated in
-    favor of this new configuration element.
-    </li>
-    <li>The new RFC6265-compliant (<em>work in progress</em>) implementation
-    is a stand-in replacement for the original legacy one. Until the new code
-    is stabilized, the legacy implementation remains the default one.
-    You can select the implementation by setting <code>className</code>
-    attribute on <strong>CookieProcessor</strong> element.</li>
-    <li>This is work in progress. Configuration attributes may change in a
-    future release.</li>
-  </ul>
-
 </section>
 
 
@@ -100,81 +72,7 @@
   <subsection name="Standard Implementation">
 
     <p>The standard implementation of <strong>CookieProcessor</strong> is
-    <code>org.apache.tomcat.util.http.LegacyCookieProcessor</code>. Note
-    that it is anticipated that this will change to
-    <code>org.apache.tomcat.util.http.Rfc6265CookieProcessor</code> in a future
-    Tomcat 8 release.</p>
-
-    <p>This is the legacy  cookie parser based on RFC6265, RFC2109 and RFC2616.
-    It implements a strict interpretation of the cookie specifications. Due to
-    various interoperability issues with browsers not all strict behaviours
-    are enabled by default and additional options are available to further
-    relax the behaviour of this cookie processor if required.</p>
-
-    <attributes>
-
-      <attribute name="allowEqualsInValue" required="false">
-        <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'
-        characters when parsing unquoted cookie values. If <code>false</code>,
-        cookie values containing '<code>=</code>' will be terminated when the
-        '<code>=</code>' is encountered and the remainder of the cookie value
-        will be dropped.</p>
-        <p>If not set the specification compliant default value of
-        <code>false</code> will be used. This default may be changed by setting
-        the
-        <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_EQUALS_IN_VALUE</code>
-        <a href="systemprops.html">system property</a>.</p>
-      </attribute>
-
-      <attribute name="allowHttpSepsInV0" required="false">
-        <p>If this is <code>true</code> Tomcat will allow HTTP separators in
-        cookie names and values.</p>
-        <p>If not specified, the default specification compliant value of
-        <code>false</code> will be used. This default may be changed by setting
-        the
-        <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0</code>
-        <a href="systemprops.html">system property</a>.</p>
-      </attribute>
-
-      <attribute name="allowNameOnly" required="false">
-        <p>If this is <code>true</code> Tomcat will allow name only cookies
-        (with or without trailing '<code>=</code>') when parsing cookie headers.
-        If <code>false</code>, name only cookies will be dropped.</p>
-        <p>If not set the specification compliant default value of
-        <code>false</code> will be used. This default may be changed by setting
-        the
-        <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_NAME_ONLY</code>
-        <a href="systemprops.html">system property</a>.</p>
-      </attribute>
-
-      <attribute name="forwardSlashIsSeparator" required="false">
-        <p>If this is <code>true</code> Tomcat will treat the forward slash
-        character ('<code>/</code>') as an HTTP separator when processing cookie
-        headers. If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
-        is set to <code>true</code>, the default of this setting will be
-        <code>true</code>, else the default value will be <code>false</code>.
-        This default may be overridden by setting the
-        <code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>
-        system property.</p>
-      </attribute>
-
-      <attribute name="preserveCookieHeader" required="false">
-        <p>If this is <code>true</code> Tomcat will ensure that cookie
-        processing does not modify cookie header returned by
-        <code>HttpServletRequest.getHeader()</code>. If
-        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
-        <code>true</code>, the default of this setting will be
-        <code>true</code>, else the default value will be <code>false</code>.
-        This default may be overridden by setting the
-        <code>org.apache.tomcat.util.http.ServerCookie.PRESERVE_COOKIE_HEADER</code>
-        system property.</p>
-      </attribute>
-
-    </attributes>
-
-  </subsection>
-
-  <subsection name="RFC 6265 Cookie Processor - org.apache.tomcat.util.http.Rfc6265CookieProcessor">
+    <code>org.apache.tomcat.util.http.Rfc6265CookieProcessor</code>.</p>
 
     <p>This cookie processor is based on RFC6265 with the following changes to
     support better interoperability:</p>
@@ -198,6 +96,75 @@
 
     <p>No additional attributes are supported by the <strong>RFC 6265 Cookie
     Processor</strong>.</p>
+
+  </subsection>
+
+  <subsection name="Legacy Cookie Processor - org.apache.tomcat.util.http.LegacyCookieProcessor">
+
+    <p>This is the legacy  cookie parser based on RFC6265, RFC2109 and RFC2616.
+    It implements a strict interpretation of the cookie specifications. Due to
+    various interoperability issues with browsers not all strict behaviours
+    are enabled by default and additional options are available to further
+    relax the behaviour of this cookie processor if required.</p>
+
+    <attributes>
+
+      <attribute name="allowEqualsInValue" required="false">
+        <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'
+        characters when parsing unquoted cookie values. If <code>false</code>,
+        cookie values containing '<code>=</code>' will be terminated when the
+        '<code>=</code>' is encountered and the remainder of the cookie value
+        will be dropped.</p>
+        <p>If not set the specification compliant default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="allowHttpSepsInV0" required="false">
+        <p>If this is <code>true</code> Tomcat will allow HTTP separators in
+        cookie names and values.</p>
+        <p>If not specified, the default specification compliant value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="allowNameOnly" required="false">
+        <p>If this is <code>true</code> Tomcat will allow name only cookies
+        (with or without trailing '<code>=</code>') when parsing cookie headers.
+        If <code>false</code>, name only cookies will be dropped.</p>
+        <p>If not set the specification compliant default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
+      <attribute name="alwaysAddExpires" required="false">
+        <p>If this is <code>true</code> Tomcat will always add an expires
+        parameter to a SetCookie header even for cookies with version greater
+        than zero. This is to work around a known IE6 and IE7 bug that causes I
+        to ignore the Max-Age parameter in a SetCookie header.</p>
+        <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set
+        to <code>true</code>, the default of this setting will be
+        <code>false</code>, else the default value will be <code>true</code>.
+        </p>
+      </attribute>
+
+      <attribute name="forwardSlashIsSeparator" required="false">
+        <p>If this is <code>true</code> Tomcat will treat the forward slash
+        character ('<code>/</code>') as an HTTP separator when processing cookie
+        headers. If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        is set to <code>true</code>, the default of this setting will be
+        <code>true</code>, else the default value will be <code>false</code>.
+        </p>
+      </attribute>
+
+      <attribute name="preserveCookieHeader" required="false">
+        <p>If this is <code>true</code> Tomcat will ensure that cookie
+        processing does not modify cookie header returned by
+        <code>HttpServletRequest.getHeader()</code>. If
+        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+        <code>true</code>, the default of this setting will be
+        <code>true</code>, else the default value will be <code>false</code>.
+        </p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 

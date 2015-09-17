@@ -315,13 +315,13 @@ public class WsSession implements Session {
             removed = true;
         }
 
-        if (listener.equals(binaryMessageHandler) ||
+        if (wrapped.equals(binaryMessageHandler) ||
                 listener.equals(binaryMessageHandler)) {
             binaryMessageHandler = null;
             removed = true;
         }
 
-        if (listener.equals(pongMessageHandler) ||
+        if (wrapped.equals(pongMessageHandler) ||
                 listener.equals(pongMessageHandler)) {
             pongMessageHandler = null;
             removed = true;
@@ -415,7 +415,7 @@ public class WsSession implements Session {
     @Override
     public Set<Session> getOpenSessions() {
         checkState();
-        return webSocketContainer.getOpenSessions(localEndpoint.getClass());
+        return webSocketContainer.getOpenSessions(localEndpoint);
     }
 
 

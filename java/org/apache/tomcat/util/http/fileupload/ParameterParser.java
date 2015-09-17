@@ -76,8 +76,8 @@ public class ParameterParser {
     /**
      * Are there any characters left to parse?
      *
-     * @return <tt>true</tt> if there are unparsed characters,
-     *         <tt>false</tt> otherwise.
+     * @return {@code true} if there are unparsed characters,
+     *         {@code false} otherwise.
      */
     private boolean hasChar() {
         return this.pos < this.len;
@@ -88,8 +88,8 @@ public class ParameterParser {
      * leading and trailing blanks as well as enclosing quotation marks,
      * when necessary.
      *
-     * @param quoted <tt>true</tt> if quotation marks are expected,
-     *               <tt>false</tt> otherwise.
+     * @param quoted {@code true} if quotation marks are expected,
+     *               {@code false} otherwise.
      * @return the token
      */
     private String getToken(boolean quoted) {
@@ -122,8 +122,8 @@ public class ParameterParser {
      * @param ch the character to test for presense in the array of characters
      * @param charray the array of characters to test against
      *
-     * @return <tt>true</tt> if the character is present in the array of
-     *   characters, <tt>false</tt> otherwise.
+     * @return {@code true} if the character is present in the array of
+     *   characters, {@code false} otherwise.
      */
     private boolean isOneOf(char ch, final char[] charray) {
         boolean result = false;
@@ -193,12 +193,12 @@ public class ParameterParser {
     }
 
     /**
-     * Returns <tt>true</tt> if parameter names are to be converted to lower
+     * Returns {@code true} if parameter names are to be converted to lower
      * case when name/value pairs are parsed.
      *
-     * @return <tt>true</tt> if parameter names are to be
+     * @return {@code true} if parameter names are to be
      * converted to lower case when name/value pairs are parsed.
-     * Otherwise returns <tt>false</tt>
+     * Otherwise returns {@code false}
      */
     public boolean isLowerCaseNames() {
         return this.lowerCaseNames;
@@ -208,9 +208,9 @@ public class ParameterParser {
      * Sets the flag if parameter names are to be converted to lower case when
      * name/value pairs are parsed.
      *
-     * @param b <tt>true</tt> if parameter names are to be
+     * @param b {@code true} if parameter names are to be
      * converted to lower case when name/value pairs are parsed.
-     * <tt>false</tt> otherwise.
+     * {@code false} otherwise.
      */
     public void setLowerCaseNames(boolean b) {
         this.lowerCaseNames = b;

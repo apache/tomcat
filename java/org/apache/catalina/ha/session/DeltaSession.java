@@ -40,7 +40,6 @@ import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterSession;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.StandardSession;
-import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.ReplicatedMapEntry;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -161,8 +160,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     @Override
     public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException {
         lock();
-        try {
-            ReplicationStream stream = ( (ClusterManager) getManager()).getReplicationStream(diff, offset, length);
+        try (ObjectInputStream stream = ((ClusterManager) getManager()).getReplicationStream(diff, offset, length)) {
             ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
             try {
                 ClassLoader[] loaders = getClassLoaders();

@@ -126,9 +126,10 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     // ------------------------------------------------------------- Properties
 
     /**
-     * The name used at remote MbeanServer
+     * Get the name used at remote MbeanServer.
+     *
+     * @return the name used at remote MbeanServer
      */
-
     public String getName() {
         return (this.name);
     }

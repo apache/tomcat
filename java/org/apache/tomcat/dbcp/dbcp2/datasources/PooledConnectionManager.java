@@ -37,7 +37,7 @@ interface PooledConnectionManager {
     void invalidate(PooledConnection pc) throws SQLException;
 
     /**
-     * Sets the databsase password used when creating connections.
+     * Sets the database password used when creating connections.
      *
      * @param password password used when authenticating to the database
      */

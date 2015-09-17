@@ -83,7 +83,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private final Object asynchronousChannelGroupLock = new Object();
 
     private final Log log = LogFactory.getLog(WsWebSocketContainer.class);
-    private final Map<Class<?>, Set<WsSession>> endpointSessionMap =
+    private final Map<Endpoint, Set<WsSession>> endpointSessionMap =
             new HashMap<>();
     private final Map<WsSession,WsSession> sessions = new ConcurrentHashMap<>();
     private final Object endPointSessionMapLock = new Object();
@@ -108,7 +108,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                             pojo.getClass().getName()));
         }
 
-        Endpoint ep = new PojoEndpointClient(pojo, annotation.decoders());
+        Endpoint ep = new PojoEndpointClient(pojo, Arrays.asList(annotation.decoders()));
 
         Class<? extends ClientEndpointConfig.Configurator> configuratorClazz =
                 annotation.configurator();
@@ -293,7 +293,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 subProtocol = protocolHeaders.get(0);
             } else {
                 throw new DeploymentException(
-                        sm.getString("Sec-WebSocket-Protocol"));
+                        sm.getString("wsWebSocketContainer.invalidSubProtocol"));
             }
 
             // Extensions
@@ -370,8 +370,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     protected void registerSession(Endpoint endpoint, WsSession wsSession) {
 
-        Class<?> endpointClazz = endpoint.getClass();
-
         if (!wsSession.isOpen()) {
             // The session was closed during onOpen. No need to register it.
             return;
@@ -380,10 +378,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             if (endpointSessionMap.size() == 0) {
                 BackgroundProcessManager.getInstance().register(this);
             }
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpointClazz);
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
             if (wsSessions == null) {
                 wsSessions = new HashSet<>();
-                endpointSessionMap.put(endpointClazz, wsSessions);
+                endpointSessionMap.put(endpoint, wsSessions);
             }
             wsSessions.add(wsSession);
         }
@@ -393,14 +391,12 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
     protected void unregisterSession(Endpoint endpoint, WsSession wsSession) {
 
-        Class<?> endpointClazz = endpoint.getClass();
-
         synchronized (endPointSessionMapLock) {
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpointClazz);
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
             if (wsSessions != null) {
                 wsSessions.remove(wsSession);
                 if (wsSessions.size() == 0) {
-                    endpointSessionMap.remove(endpointClazz);
+                    endpointSessionMap.remove(endpoint);
                 }
             }
             if (endpointSessionMap.size() == 0) {
@@ -411,7 +407,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    Set<Session> getOpenSessions(Class<?> endpoint) {
+    Set<Session> getOpenSessions(Endpoint endpoint) {
         HashSet<Session> result = new HashSet<>();
         synchronized (endPointSessionMapLock) {
             Set<WsSession> sessions = endpointSessionMap.get(endpoint);
@@ -559,7 +555,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
      * @throws DeploymentException
      * @throws TimeoutException
      */
-    @SuppressWarnings("null")
     private HandshakeResponse processResponse(ByteBuffer response,
             AsyncChannelWrapper channel, long timeout) throws InterruptedException,
             ExecutionException, DeploymentException, EOFException,

@@ -74,6 +74,9 @@ public class SSLSocket {
      * <br>
      * @param sock  The socket to change.
      * @param level Type of Client Certificate verification.
+     * @param depth Maximum number of certificates to permit in chain from
+     *              client to trusted CA. Use a value of 0 or less to leave the
+     *              current value unchanged
      */
     public static native void setVerify(long sock, int level, int depth);
 

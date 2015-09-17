@@ -97,8 +97,6 @@ public final class Request {
 
     private final MimeHeaders headers = new MimeHeaders();
 
-    private final MessageBytes instanceId = MessageBytes.newInstance();
-
     /**
      * Notes.
      */
@@ -133,7 +131,7 @@ public final class Request {
     private final HashMap<String,Object> attributes = new HashMap<>();
 
     private Response response;
-    private ActionHook hook;
+    private volatile ActionHook hook;
 
     private long bytesRead=0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
@@ -142,6 +140,7 @@ public final class Request {
 
     private final RequestInfo reqProcessorMX=new RequestInfo(this);
 
+    private boolean sendfile = true;
 
     protected volatile ReadListener listener;
 
@@ -178,18 +177,6 @@ public final class Request {
 
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * Get the instance id (or JVM route). Currently Ajp is sending it with each
-     * request. In future this should be fixed, and sent only once ( or
-     * 'negotiated' at config time so both tomcat and apache share the same name.
-     *
-     * @return the instance id
-     */
-    public MessageBytes instanceId() {
-        return instanceId;
-    }
-
 
     public MimeHeaders getMimeHeaders() {
         return headers;
@@ -363,18 +350,18 @@ public final class Request {
         return response;
     }
 
-    public void setResponse( Response response ) {
-        this.response=response;
-        response.setRequest( this );
+    public void setResponse(Response response) {
+        this.response = response;
+        response.setRequest(this);
+    }
+
+    protected void setHook(ActionHook hook) {
+        this.hook = hook;
     }
 
     public void action(ActionCode actionCode, Object param) {
-        if( hook==null && response!=null ) {
-            hook=response.getHook();
-        }
-
         if (hook != null) {
-            if( param==null ) {
+            if (param == null) {
                 hook.action(actionCode, this);
             } else {
                 hook.action(actionCode, param);
@@ -434,6 +421,14 @@ public final class Request {
 
     public void setAvailable(int available) {
         this.available = available;
+    }
+
+    public boolean getSendfile() {
+        return sendfile;
+    }
+
+    public void setSendfile(boolean sendfile) {
+        this.sendfile = sendfile;
     }
 
     public boolean isFinished() {
@@ -536,6 +531,7 @@ public final class Request {
         localPort = -1;
         remotePort = -1;
         available = 0;
+        sendfile = true;
 
         serverCookies.recycle();
         parameters.recycle();
@@ -548,7 +544,6 @@ public final class Request {
 
         schemeMB.recycle();
 
-        instanceId.recycle();
         remoteUser.recycle();
         remoteUserNeedsAuthorization = false;
         authType.recycle();

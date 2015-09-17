@@ -26,6 +26,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -116,5 +117,19 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
             return SocketState.CLOSED;
         }
         return SocketState.UPGRADED;
+    }
+
+
+    // ----------------------------------------- Unimplemented Processor methods
+
+    @Override
+    public final void setSslSupport(SSLSupport sslSupport) {
+        // NO-OP
+    }
+
+
+    @Override
+    public void pause() {
+        // NOOP for AJP
     }
 }

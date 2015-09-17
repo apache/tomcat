@@ -25,7 +25,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * This the NIO based protocol handler implementation for AJP.
@@ -95,31 +94,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("ajpnioprotocol.releaseEnd",
                         socket, Boolean.valueOf(released)));
-        }
-
-
-        /**
-         * Expected to be used by the Poller to release resources on socket
-         * close, errors etc.
-         */
-        @Override
-        public void release(SocketWrapperBase<NioChannel> socket) {
-            Processor processor = connections.remove(socket.getSocket());
-            if (processor != null) {
-                processor.recycle();
-                recycledProcessors.push(processor);
-            }
-        }
-
-
-        @Override
-        public void release(SocketWrapperBase<NioChannel> socket,
-               Processor processor,  boolean addToPoller) {
-            processor.recycle();
-            recycledProcessors.push(processor);
-            if (addToPoller) {
-                socket.registerReadInterest();
-            }
         }
     }
 }

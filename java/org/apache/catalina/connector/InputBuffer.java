@@ -18,10 +18,11 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ReadListener;
 
@@ -32,6 +33,7 @@ import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -51,12 +53,6 @@ public class InputBuffer extends Reader
      */
     protected static final StringManager sm = StringManager.getManager(InputBuffer.class);
 
-
-    // -------------------------------------------------------------- Constants
-
-
-    public static final String DEFAULT_ENCODING =
-        org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
 
     // The buffer can be used for byte[] and char[] reading
@@ -65,8 +61,15 @@ public class InputBuffer extends Reader
     public final int CHAR_STATE = 1;
     public final int BYTE_STATE = 2;
 
-    // ----------------------------------------------------- Instance Variables
 
+    /**
+     * Encoder cache.
+     */
+    private static final ConcurrentHashMap<Charset,SynchronizedStack<B2CConverter>> encoders =
+            new ConcurrentHashMap<>();
+
+
+    // ----------------------------------------------------- Instance Variables
 
     /**
      * The byte buffer.
@@ -96,18 +99,6 @@ public class InputBuffer extends Reader
      * Encoding to use.
      */
     private String enc;
-
-
-    /**
-     * Encoder is set.
-     */
-    private boolean gotEnc = false;
-
-
-    /**
-     * List of encoders.
-     */
-    protected final HashMap<String,B2CConverter> encoders = new HashMap<>();
 
 
     /**
@@ -205,18 +196,11 @@ public class InputBuffer extends Reader
 
         if (conv != null) {
             conv.recycle();
+            encoders.get(conv.getCharset()).push(conv);
+            conv = null;
         }
 
-        gotEnc = false;
         enc = null;
-    }
-
-
-    /**
-     * Clear cached encoders (to save memory for async requests).
-     */
-    public void clearEncoders() {
-        encoders.clear();
     }
 
 
@@ -260,6 +244,10 @@ public class InputBuffer extends Reader
         // is not required.
         if (!coyoteRequest.isFinished() && isReady()) {
             coyoteRequest.action(ActionCode.DISPATCH_READ, null);
+            if (!ContainerThreadMarker.isContainerThread()) {
+                // Not on a container thread so need to execute the dispatch
+                coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
+            }
         }
     }
 
@@ -311,16 +299,10 @@ public class InputBuffer extends Reader
     /**
      * Reads new bytes in the byte chunk.
      *
-     * @param cbuf Byte buffer to be written to the response
-     * @param off Offset
-     * @param len Length
-     *
      * @throws IOException An underlying IOException occurred
      */
     @Override
-    public int realReadBytes(byte cbuf[], int off, int len)
-            throws IOException {
-
+    public int realReadBytes() throws IOException {
         if (closed) {
             return -1;
         }
@@ -335,13 +317,10 @@ public class InputBuffer extends Reader
         int result = coyoteRequest.doRead(bb);
 
         return result;
-
     }
 
 
-    public int readByte()
-        throws IOException {
-
+    public int readByte() throws IOException {
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
@@ -350,9 +329,7 @@ public class InputBuffer extends Reader
     }
 
 
-    public int read(byte[] b, int off, int len)
-        throws IOException {
-
+    public int read(byte[] b, int off, int len) throws IOException {
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
@@ -371,8 +348,7 @@ public class InputBuffer extends Reader
      * mark is lost.
      */
     @Override
-    public void realWriteChars(char c[], int off, int len)
-        throws IOException {
+    public void realWriteChars(char c[], int off, int len) throws IOException {
         markPos = -1;
         cb.setOffset(0);
         cb.setEnd(0);
@@ -385,17 +361,13 @@ public class InputBuffer extends Reader
 
 
     @Override
-    public int realReadChars(char cbuf[], int off, int len)
-        throws IOException {
-
-        if (!gotEnc) {
-            setConverter();
-        }
+    public int realReadChars() throws IOException {
+        checkConverter();
 
         boolean eof = false;
 
         if (bb.getLength() <= 0) {
-            int nRead = realReadBytes(bb.getBytes(), 0, bb.getBytes().length);
+            int nRead = realReadBytes();
             if (nRead < 0) {
                 eof = true;
             }
@@ -463,10 +435,7 @@ public class InputBuffer extends Reader
 
 
     @Override
-    public long skip(long n)
-        throws IOException {
-
-
+    public long skip(long n) throws IOException {
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
@@ -483,28 +452,18 @@ public class InputBuffer extends Reader
             } else {
                 nRead += cb.getLength();
                 cb.setOffset(cb.getEnd());
-                int toRead = 0;
-                if (cb.getChars().length < (n - nRead)) {
-                    toRead = cb.getChars().length;
-                } else {
-                    toRead = (int) (n - nRead);
-                }
-                int nb = realReadChars(cb.getChars(), 0, toRead);
+                int nb = realReadChars();
                 if (nb < 0) {
                     break;
                 }
             }
         }
-
         return nRead;
-
     }
 
 
     @Override
-    public boolean ready()
-        throws IOException {
-
+    public boolean ready() throws IOException {
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
@@ -568,53 +527,60 @@ public class InputBuffer extends Reader
     }
 
 
-    public void checkConverter()
-        throws IOException {
-
-        if (!gotEnc) {
+    public void checkConverter() throws IOException {
+        if (conv == null) {
             setConverter();
         }
-
     }
 
 
-    protected void setConverter()
-        throws IOException {
-
+    private void setConverter() throws IOException {
         if (coyoteRequest != null) {
             enc = coyoteRequest.getCharacterEncoding();
         }
 
-        gotEnc = true;
         if (enc == null) {
-            enc = DEFAULT_ENCODING;
+            enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
         }
-        conv = encoders.get(enc);
+
+        Charset charset = B2CConverter.getCharset(enc);
+        SynchronizedStack<B2CConverter> stack = encoders.get(charset);
+        if (stack == null) {
+            stack = new SynchronizedStack<>();
+            encoders.putIfAbsent(charset, stack);
+            stack = encoders.get(charset);
+        }
+        conv = stack.pop();
+
         if (conv == null) {
-            if (SecurityUtil.isPackageProtectionEnabled()){
-                try{
-                    conv = AccessController.doPrivileged(
-                            new PrivilegedExceptionAction<B2CConverter>(){
+            conv = createConverter(charset);
+        }
+    }
 
-                                @Override
-                                public B2CConverter run() throws IOException {
-                                    return new B2CConverter(enc);
-                                }
 
+    private static B2CConverter createConverter(Charset charset) throws IOException {
+        if (SecurityUtil.isPackageProtectionEnabled()){
+            try {
+                return AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<B2CConverter>(){
+
+                            @Override
+                            public B2CConverter run() throws IOException {
+                                return new B2CConverter(charset);
                             }
-                    );
-                }catch(PrivilegedActionException ex){
-                    Exception e = ex.getException();
-                    if (e instanceof IOException) {
-                        throw (IOException)e;
-                    }
+                        }
+                );
+            } catch (PrivilegedActionException ex) {
+                Exception e = ex.getException();
+                if (e instanceof IOException) {
+                    throw (IOException) e;
+                } else {
+                    throw new IOException(e);
                 }
-            } else {
-                conv = new B2CConverter(enc);
             }
-            encoders.put(enc, conv);
+        } else {
+            return new B2CConverter(charset);
         }
 
     }
-
 }

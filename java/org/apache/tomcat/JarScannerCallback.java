@@ -35,6 +35,8 @@ public interface JarScannerCallback {
      * @param isWebapp   Indicates if the JAR was found within a web
      *                       application. If <code>false</code> the JAR should
      *                       be treated as being provided by the container
+     *
+     * @throws IOException if an I/O error occurs while scanning the JAR
      */
     public void scan(JarURLConnection urlConn, String webappPath, boolean isWebapp)
             throws IOException;
@@ -50,6 +52,8 @@ public interface JarScannerCallback {
      * @param isWebapp   Indicates if the JAR was found within a web
      *                       application. If <code>false</code> the JAR should
      *                       be treated as being provided by the container
+     *
+     * @throws IOException if an I/O error occurs while scanning the JAR
      */
     public void scan(File file, String webappPath, boolean isWebapp) throws IOException;
 
@@ -58,6 +62,8 @@ public interface JarScannerCallback {
      * /WEB-INF/classes that should be handled as an unpacked JAR. Note that all
      * resource access must be via the ServletContext to ensure that any
      * additional resources are visible.
+     *
+     * @throws IOException if an I/O error occurs while scanning WEB-INF/classes
      */
     public void scanWebInfClasses() throws IOException;
 }

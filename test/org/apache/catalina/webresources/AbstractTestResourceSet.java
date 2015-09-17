@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.jar.Manifest;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -180,6 +181,9 @@ public abstract class AbstractTestResourceSet {
         optional.add(".svn");
         // Files visible in some tests only
         optional.add(getMount() + ".ignore-me.txt");
+        optional.add("META-INF");
+        // When running tests in parallel the following may be present
+        optional.add("new-test");
 
         for (String result : results) {
             Assert.assertTrue(result,
@@ -273,6 +277,8 @@ public abstract class AbstractTestResourceSet {
         optional.add(getMount() + "/.svn/");
         // Files visible in some tests only
         optional.add(getMount() + "/.ignore-me.txt");
+        // Files visible in some configurations only
+        optional.add(getMount() + "/META-INF/");
 
         for (String result : results) {
             Assert.assertTrue(result,
@@ -497,6 +503,21 @@ public abstract class AbstractTestResourceSet {
             Assert.assertNotNull(doesNotExistCanonicalPath);
         } else {
             Assert.assertNull(doesNotExistCanonicalPath);
+        }
+    }
+
+
+    // ----------------------------------------------------------- getManifest()
+
+    @Test
+    public final void testGetManifest() {
+        WebResource exists = resourceRoot.getResource(getMount() + "/d1/d1-f1.txt");
+        boolean manifestExists = resourceRoot.getResource("/META-INF/MANIFEST.MF").exists();
+        Manifest m = exists.getManifest();
+        if (getMount().equals("") && manifestExists) {
+            Assert.assertNotNull(m);
+        } else {
+            Assert.assertNull(m);
         }
     }
 

@@ -956,11 +956,11 @@ public class TestStandardContext extends TomcatBaseTest {
 
         doTestBug57556(testContext, "", base + File.separatorChar);
         doTestBug57556(testContext, "/", base + File.separatorChar);
-        doTestBug57556(testContext, "/jsp", base + File.separatorChar+ "jsp" + File.separatorChar);
+        doTestBug57556(testContext, "/jsp", base + File.separatorChar+ "jsp");
         doTestBug57556(testContext, "/jsp/", base + File.separatorChar+ "jsp" + File.separatorChar);
         doTestBug57556(testContext, "/index.html", base + File.separatorChar + "index.html");
-        // Doesn't exist so Tomcat will assume it is a file, not a directory.
         doTestBug57556(testContext, "/foo", base + File.separatorChar + "foo");
+        doTestBug57556(testContext, "/foo/", base + File.separatorChar + "foo" + File.separatorChar);
     }
 
     @Test

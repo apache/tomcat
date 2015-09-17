@@ -35,6 +35,7 @@ public final class ValueExpressionLiteral extends ValueExpression implements
     private static final long serialVersionUID = 1L;
 
     private Object value;
+    private String valueString;
 
     private Class<?> expectedType;
 
@@ -89,7 +90,10 @@ public final class ValueExpressionLiteral extends ValueExpression implements
 
     @Override
     public String getExpressionString() {
-        return (this.value != null) ? this.value.toString() : null;
+        if (this.valueString == null) {
+            this.valueString = (this.value != null) ? this.value.toString() : null;
+        }
+        return this.valueString;
     }
 
     @Override

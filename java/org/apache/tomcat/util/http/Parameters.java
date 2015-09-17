@@ -66,10 +66,10 @@ public final class Parameters {
     private int parameterCount = 0;
 
     /**
-     * Is set to <code>true</code> if there were failures during parameter
-     * parsing.
+     * Set to the reason for the failure (the first failure if there is more
+     * than one) if there were failures during parameter parsing.
      */
-    private boolean parseFailed = false;
+    private FailReason parseFailedReason = null;
 
     public Parameters() {
         // NO-OP
@@ -101,13 +101,23 @@ public final class Parameters {
         }
     }
 
+
     public boolean isParseFailed() {
-        return parseFailed;
+        return parseFailedReason != null;
     }
 
-    public void setParseFailed(boolean parseFailed) {
-        this.parseFailed = parseFailed;
+
+    public FailReason getParseFailedReason() {
+        return parseFailedReason;
     }
+
+
+    public void setParseFailedReason(FailReason failReason) {
+        if (this.parseFailedReason == null) {
+            this.parseFailedReason = failReason;
+        }
+    }
+
 
     public void recycle() {
         parameterCount = 0;
@@ -115,8 +125,9 @@ public final class Parameters {
         didQueryParameters=false;
         encoding=null;
         decodedQuery.recycle();
-        parseFailed = false;
+        parseFailedReason = null;
     }
+
 
     // -------------------- Data access --------------------
     // Access to the current name/values, no side effect ( processing ).
@@ -189,7 +200,7 @@ public final class Parameters {
         if (limit > -1 && parameterCount > limit) {
             // Processing this parameter will push us over the limit. ISE is
             // what Request.parseParts() uses for requests that are too big
-            parseFailed = true;
+            setParseFailedReason(FailReason.TOO_MANY_PARAMETERS);
             throw new IllegalStateException(sm.getString(
                     "parameters.maxCountFail", Integer.valueOf(limit)));
         }
@@ -334,7 +345,7 @@ public final class Parameters {
                             log.debug(message);
                     }
                 }
-                parseFailed = true;
+                setParseFailedReason(FailReason.NO_NAME);
                 continue;
                 // invalid chunk - it's better to ignore
             }
@@ -388,7 +399,6 @@ public final class Parameters {
                 } catch (IllegalStateException ise) {
                     // Hitting limit stops processing further params but does
                     // not cause request to fail.
-                    parseFailed = true;
                     UserDataHelper.Mode logMode = maxParamCountLog.getNextMode();
                     if (logMode != null) {
                         String message = ise.getMessage();
@@ -407,7 +417,7 @@ public final class Parameters {
                     break;
                 }
             } catch (IOException e) {
-                parseFailed = true;
+                setParseFailedReason(FailReason.URL_DECODING);
                 decodeFailCount++;
                 if (decodeFailCount == 1 || log.isDebugEnabled()) {
                     if (log.isDebugEnabled()) {
@@ -510,5 +520,19 @@ public final class Parameters {
             sb.append('\n');
         }
         return sb.toString();
+    }
+
+
+    public enum FailReason {
+        CLIENT_DISCONNECT,
+        MULTIPART_CONFIG_INVALID,
+        INVALID_CONTENT_TYPE,
+        IO_ERROR,
+        NO_NAME,
+        POST_TOO_LARGE,
+        REQUEST_BODY_INCOMPLETE,
+        TOO_MANY_PARAMETERS,
+        UNKNOWN,
+        URL_DECODING
     }
 }

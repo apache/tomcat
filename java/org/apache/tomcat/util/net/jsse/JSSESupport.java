@@ -50,8 +50,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
 
     private static final Log log = LogFactory.getLog(JSSESupport.class);
 
-    private static final StringManager sm =
-        StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
+    private static final StringManager sm = StringManager.getManager(JSSESupport.class);
 
     private static final Map<String,Integer> keySizeCache = new HashMap<>();
 
@@ -75,7 +74,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     private SSLSession session;
 
 
-    JSSESupport(SSLSession session) {
+    public JSSESupport(SSLSession session) {
         this.session = session;
     }
 

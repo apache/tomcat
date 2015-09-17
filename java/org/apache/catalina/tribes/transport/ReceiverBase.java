@@ -31,6 +31,7 @@ import org.apache.catalina.tribes.ChannelReceiver;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.util.ExecutorFactory;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -41,6 +42,8 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private static final Log log = LogFactory.getLog(ReceiverBase.class);
 
     private static final Object bindLock = new Object();
+
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     private MessageListener listener;
     private String host = "auto";
@@ -157,7 +160,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     log.debug("Starting replication listener on address:"+ host);
                 bind = java.net.InetAddress.getByName(host);
             } catch (IOException ioe) {
-                log.error("Failed bind replication listener on address:"+ host, ioe);
+                log.error(sm.getString("receiverBase.bind.failed", host), ioe);
             }
         }
         return bind;
@@ -183,13 +186,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     addr = new InetSocketAddress(getBind(), port);
                     socket.bind(addr);
                     setPort(port);
-                    log.info("Receiver Server Socket bound to:"+addr);
+                    log.info(sm.getString("receiverBase.socket.bind", addr));
                     retries = 0;
                 } catch ( IOException x) {
                     retries--;
                     if ( retries <= 0 ) {
-                        log.info("Unable to bind server socket to:" + addr +
-                                " throwing error.");
+                        log.info(sm.getString("receiverBase.unable.bind", addr));
                         throw x;
                     }
                     port++;
@@ -213,12 +215,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                 addr = new InetSocketAddress(getBind(), portstart);
                 socket.bind(addr);
                 setUdpPort(portstart);
-                log.info("UDP Receiver Server Socket bound to:"+addr);
+                log.info(sm.getString("receiverBase.udp.bind", addr));
                 return 0;
             }catch ( IOException x) {
                 retries--;
                 if ( retries <= 0 ) {
-                    log.info("Unable to bind UDP socket to:"+addr+" throwing error.");
+                    log.info(sm.getString("receiverBase.unable.bind.udp", addr));
                     throw x;
                 }
                 portstart++;

@@ -111,7 +111,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
             getConnectionInternal().removeTrace(this);
         }
 
-        // The JDBC spec requires that a statment close any open
+        // The JDBC spec requires that a statement close any open
         // ResultSet's when it is closed.
         // FIXME The PreparedStatement we're wrapping should handle this for us.
         // See DBCP-10 for what could happen when ResultSets are closed twice.

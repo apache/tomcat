@@ -276,24 +276,13 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     }
 
 
-    @SuppressWarnings("deprecation") // Use of JSP_FILE to be removed in 9.0.x
     @Override
-    public void service (HttpServletRequest request,
-                             HttpServletResponse response)
-                throws ServletException, IOException {
+    public void service (HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        //jspFile may be configured as an init-param for this servlet instance
+        // jspFile may be configured as an init-param for this servlet instance
         String jspUri = jspFile;
 
-        if (jspUri == null) {
-            // JSP specified via <jsp-file> in <servlet> declaration and
-            // supplied through custom servlet container code
-            String jspFile = (String) request.getAttribute(Constants.JSP_FILE);
-            if (jspFile != null) {
-                jspUri = jspFile;
-                request.removeAttribute(Constants.JSP_FILE);
-            }
-        }
         if (jspUri == null) {
             /*
              * Check to see if the requested JSP has been the target of a

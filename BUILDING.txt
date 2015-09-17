@@ -64,12 +64,9 @@ source distribution, do the following:
     into which you installed the JDK release.
 
 
-(2) Install Apache Ant version 1.9.3 or later on your computer.
+(2) Install Apache Ant version 1.9.5 or later on your computer.
 
-    Note: Ant 1.9.4 has a regression and cannot be used for Tomcat's
-    release build (Ant bug 56641).
-
- 1. If Apache Ant version 1.9.3 or later is already installed on your
+ 1. If Apache Ant version 1.9.5 or later is already installed on your
     computer, skip to (3).
 
  2. Download a binary distribution of Ant from:
@@ -346,8 +343,7 @@ For example:
 
 It is possible to further limit such run to a number of selected test
 methods by adding "test.entry.methods" property. The property specifies a
-comma-separated list of test case methods. (This feature requires
-Apache Ant 1.8.2 or later).
+comma-separated list of test case methods.
 
 For example:
 
@@ -407,7 +403,7 @@ For example:
  6. The performance tests are written to run reasonably powerful machines (such
     as a developer may use day to day) assuming no other resource hungry
     processes are running. These assumptions are not always true (e.g. on CI
-    systems running ina virtual machine) so the performance tests may be
+    systems running in a virtual machine) so the performance tests may be
     disabled by using the following property:
 
         test.excludePerformance=true

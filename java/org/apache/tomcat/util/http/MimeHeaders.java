@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Enumeration;
@@ -173,6 +174,16 @@ public class MimeHeaders {
         }
         return sw.toString();
     }
+
+
+    public void duplicate(MimeHeaders source) throws IOException {
+        for (int i = 0; i < source.size(); i++) {
+            MimeHeaderField mhf = createHeader();
+            mhf.getName().duplicate(source.getName(i));
+            mhf.getValue().duplicate(source.getValue(i));
+        }
+    }
+
 
     // -------------------- Idx access to headers ----------
 

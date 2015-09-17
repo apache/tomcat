@@ -59,7 +59,7 @@ public class StaticMember extends MemberImpl {
      */
     public void setUniqueId(String id) {
         byte[] uuid = Arrays.fromString(id);
-        if ( uuid==null || uuid.length != 16 ) throw new RuntimeException("UUID must be exactly 16 bytes, not:"+id);
+        if ( uuid==null || uuid.length != 16 ) throw new RuntimeException(sm.getString("staticMember.invalid.uuidLength", id));
         setUniqueId(uuid);
     }
 

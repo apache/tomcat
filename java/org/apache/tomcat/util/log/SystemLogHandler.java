@@ -39,6 +39,8 @@ public class SystemLogHandler extends PrintStream {
 
     /**
      * Construct the handler to capture the output of the given steam.
+     *
+     * @param wrapped The stream to capture
      */
     public SystemLogHandler(PrintStream wrapped) {
         super(wrapped);
@@ -94,7 +96,9 @@ public class SystemLogHandler extends PrintStream {
 
 
     /**
-     * Stop capturing thread's output and return captured data as a String.
+     * Stop capturing thread's output.
+     *
+     * @return The captured data
      */
     public static String stopCapture() {
         Stack<CaptureLog> stack = logs.get();

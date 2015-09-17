@@ -41,7 +41,7 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     protected final AbstractEndpoint<?> endpoint;
     protected final Request request;
     protected final Response response;
-    protected SocketWrapperBase<?> socketWrapper = null;
+    protected volatile SocketWrapperBase<?> socketWrapper = null;
     private String clientCertProvider = null;
 
     /**
@@ -61,15 +61,32 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
         response = null;
     }
 
-    public AbstractProcessor(AbstractEndpoint<?> endpoint) {
-        this.endpoint = endpoint;
-        asyncStateMachine = new AsyncStateMachine(this);
-        request = new Request();
-        response = new Response();
-        response.setHook(this);
-        request.setResponse(response);
+
+    /**
+     * Used by HTTP/2.
+     *
+     * @param coyoteRequest
+     * @param coyoteResponse
+     */
+    protected AbstractProcessor(Request coyoteRequest, Response coyoteResponse) {
+        this(null, coyoteRequest, coyoteResponse);
     }
 
+
+    public AbstractProcessor(AbstractEndpoint<?> endpoint) {
+        this(endpoint, new Request(), new Response());
+    }
+
+
+    private AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest, Response coyoteResponse) {
+        this.endpoint = endpoint;
+        asyncStateMachine = new AsyncStateMachine(this);
+        request = coyoteRequest;
+        response = coyoteResponse;
+        response.setHook(this);
+        request.setResponse(response);
+        request.setHook(this);
+    }
 
     /**
      * Update the current error state to the new error state if the new error

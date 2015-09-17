@@ -24,8 +24,11 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.DataSender;
 import org.apache.catalina.tribes.transport.PooledSender;
+import org.apache.catalina.tribes.util.StringManager;
 
 public class PooledParallelSender extends PooledSender {
+    protected static final StringManager sm = StringManager.getManager(PooledParallelSender.class);
+
     protected boolean connected = true;
     public PooledParallelSender() {
         super();
@@ -33,11 +36,14 @@ public class PooledParallelSender extends PooledSender {
 
     @Override
     public void sendMessage(Member[] destination, ChannelMessage message) throws ChannelException {
-        if ( !connected ) throw new ChannelException("Sender not connected.");
+        if ( !connected ) throw new ChannelException(sm.getString("pooledParallelSender.sender.disconnected"));
         ParallelNioSender sender = (ParallelNioSender)getSender();
         if (sender == null) {
-            ChannelException cx = new ChannelException("Unable to retrieve a data sender, time out("+getMaxWait()+" ms) error.");
-            for (int i = 0; i < destination.length; i++) cx.addFaultyMember(destination[i], new NullPointerException("Unable to retrieve a sender from the sender pool"));
+            ChannelException cx = new ChannelException(sm.getString(
+                    "pooledParallelSender.unable.retrieveSender.timeout",
+                    Long.toString(getMaxWait())));
+            for (int i = 0; i < destination.length; i++)
+                cx.addFaultyMember(destination[i], new NullPointerException(sm.getString("pooledParallelSender.unable.retrieveSender")));
             throw cx;
         } else {
             try {
@@ -60,7 +66,7 @@ public class PooledParallelSender extends PooledSender {
             AbstractSender.transferProperties(this,sender);
             return sender;
         } catch ( IOException x ) {
-            throw new RuntimeException("Unable to open NIO selector.",x);
+            throw new RuntimeException(sm.getString("pooledParallelSender.unable.open"),x);
         }
     }
 

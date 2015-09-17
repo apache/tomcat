@@ -255,7 +255,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private String pathInfo = null;
+        private volatile String pathInfo = null;
 
         public String getPathInfo() {
             return pathInfo;
@@ -265,7 +265,8 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
 
-            // Not thread safe
+            // Not thread safe. Concurrent requests to this servlet will
+            // over-write all the results but the last processed.
             pathInfo = req.getPathInfo();
         }
     }

@@ -101,6 +101,8 @@ public class RequestInfo  {
     /**
      * Obtain the remote address for this connection as reported by an
      * intermediate proxy (if any).
+     *
+     * @return The remote address for the this connection
      */
     public String getRemoteAddrForwarded() {
         String remoteAddrProxy = (String) req.getAttribute(Constants.REMOTE_ADDR_ATTRIBUTE);

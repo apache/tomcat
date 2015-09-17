@@ -304,11 +304,6 @@ public class CoyoteAdapter implements Adapter {
             if (!success || !request.isAsync()) {
                 request.recycle();
                 response.recycle();
-            } else {
-                // Clear converters so that the minimum amount of memory
-                // is used by this processor
-                request.clearEncoders();
-                response.clearEncoders();
             }
         }
         return success;
@@ -405,14 +400,8 @@ public class CoyoteAdapter implements Adapter {
             if (!async || error.get()) {
                 request.recycle();
                 response.recycle();
-            } else {
-                // Clear converters so that the minimum amount of memory
-                // is used by this processor
-                request.clearEncoders();
-                response.clearEncoders();
             }
         }
-
     }
 
 
@@ -1079,7 +1068,7 @@ public class CoyoteAdapter implements Adapter {
             B2CConverter conv = request.getURIConverter();
             try {
                 if (conv == null) {
-                    conv = new B2CConverter(enc, true);
+                    conv = new B2CConverter(B2CConverter.getCharset(enc), true);
                     request.setURIConverter(conv);
                 } else {
                     conv.recycle();

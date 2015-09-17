@@ -116,6 +116,9 @@ public interface SSLSupport {
     /**
      * @return the protocol String indicating how the SSL socket was created
      *  e.g. TLSv1 or TLSv1.2 etc.
+     *
+     * @throws IOException If an error occurs trying to obtain the protocol
+     *   information from the socket
      */
     public String getProtocol() throws IOException;
 }

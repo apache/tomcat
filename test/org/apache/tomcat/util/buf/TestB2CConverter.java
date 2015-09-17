@@ -18,6 +18,7 @@ package org.apache.tomcat.util.buf;
 
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 import org.junit.Assert;
@@ -48,7 +49,7 @@ public class TestB2CConverter {
     }
 
     private void testMessages(int msgCount) throws Exception {
-        B2CConverter conv = new B2CConverter("UTF-16");
+        B2CConverter conv = new B2CConverter(StandardCharsets.UTF_16);
 
         ByteChunk bc = new ByteChunk();
         CharChunk cc = new CharChunk(32);
@@ -96,7 +97,7 @@ public class TestB2CConverter {
     @Test(expected=MalformedInputException.class)
     public void testBug54602a() throws Exception {
         // Check invalid input is rejected straight away
-        B2CConverter conv = new B2CConverter("UTF-8");
+        B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8);
         ByteChunk bc = new ByteChunk();
         CharChunk cc = new CharChunk();
 
@@ -109,7 +110,7 @@ public class TestB2CConverter {
     @Test(expected=MalformedInputException.class)
     public void testBug54602b() throws Exception {
         // Check partial input is rejected
-        B2CConverter conv = new B2CConverter("UTF-8");
+        B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8);
         ByteChunk bc = new ByteChunk();
         CharChunk cc = new CharChunk();
 
@@ -122,7 +123,7 @@ public class TestB2CConverter {
     @Test
     public void testBug54602c() throws Exception {
         // Check partial input is rejected once it is known to be all available
-        B2CConverter conv = new B2CConverter("UTF-8");
+        B2CConverter conv = new B2CConverter(StandardCharsets.UTF_8);
         ByteChunk bc = new ByteChunk();
         CharChunk cc = new CharChunk();
 

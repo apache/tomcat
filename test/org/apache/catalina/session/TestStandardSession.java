@@ -16,88 +16,130 @@
  */
 package org.apache.catalina.session;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.ha.tcp.SimpleTcpCluster;
-import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.catalina.Manager;
+import org.apache.catalina.core.StandardContext;
 
-public class TestStandardSession extends TomcatBaseTest {
+public class TestStandardSession {
 
-    /*
-     * Test session.invalidate() in a clustered environment.
-     */
-    @Test
-    public void testBug56578a() throws Exception {
-        doTestInvalidate(true);
+    private static final Manager TEST_MANAGER;
+
+    static {
+        TEST_MANAGER = new StandardManager();
+        TEST_MANAGER.setContext(new StandardContext());
     }
+
 
     @Test
-    public void testBug56578b() throws Exception {
-        doTestInvalidate(false);
+    public void testSerializationEmpty() throws Exception {
+
+        StandardSession s1 = new StandardSession(TEST_MANAGER);
+        s1.setValid(true);
+        StandardSession s2 = serializeThenDeserialize(s1);
+
+        validateSame(s1, s2, 0);
     }
 
-    private void doTestInvalidate(boolean useClustering) throws Exception {
-        // Setup Tomcat instance
-        Tomcat tomcat = getTomcatInstance();
 
-        // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+    @Test
+    public void testSerializationSimple01() throws Exception {
 
-        Tomcat.addServlet(ctx, "bug56578", new Bug56578Servlet());
-        ctx.addServletMapping("/bug56578", "bug56578");
+        StandardSession s1 = new StandardSession(TEST_MANAGER);
+        s1.setValid(true);
+        s1.setAttribute("attr01", "value01");
 
-        if (useClustering) {
-            tomcat.getEngine().setCluster(new SimpleTcpCluster());
-            ctx.setDistributable(true);
-            ctx.setManager(ctx.getCluster().createManager(""));
-        }
-        tomcat.start();
+        StandardSession s2 = serializeThenDeserialize(s1);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() + "/bug56578");
-        Assert.assertEquals("PASS", res.toString());
+        validateSame(s1, s2, 1);
     }
 
-    private static class Bug56578Servlet extends HttpServlet {
 
-        private static final long serialVersionUID = 1L;
+    @Test
+    public void testSerializationSimple02() throws Exception {
 
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            resp.setContentType("text/plain");
-            resp.setCharacterEncoding("UTF-8");
-            PrintWriter pw = resp.getWriter();
+        StandardSession s1 = new StandardSession(TEST_MANAGER);
+        s1.setValid(true);
+        s1.setAttribute("attr01", new NonSerializable());
 
-            HttpSession session = req.getSession(true);
-            session.invalidate();
+        StandardSession s2 = serializeThenDeserialize(s1);
 
-            // Ugly but the easiest way to test of the session is valid or not
-            boolean result;
-            try {
-                session.getCreationTime();
-                result = false;
-            } catch (IllegalStateException ise) {
-                result = true;
-            }
+        validateSame(s1, s2, 0);
+    }
 
-            if (result) {
-                pw.print("PASS");
-            } else {
-                pw.print("FAIL");
-            }
+
+    @Test
+    public void testSerializationSimple03() throws Exception {
+
+        StandardSession s1 = new StandardSession(TEST_MANAGER);
+        s1.setValid(true);
+        s1.setAttribute("attr01", "value01");
+        s1.setAttribute("attr02", new NonSerializable());
+
+        StandardSession s2 = serializeThenDeserialize(s1);
+
+        validateSame(s1, s2, 1);
+    }
+
+
+    @Test
+    @Ignore // This currently fails on de-serialization - bug 58284
+    public void testSerializationComplex01() throws Exception {
+
+        StandardSession s1 = new StandardSession(TEST_MANAGER);
+        s1.setValid(true);
+        Map<String,NonSerializable> value = new HashMap<>();
+        value.put("key", new NonSerializable());
+        s1.setAttribute("attr01", value);
+
+        StandardSession s2 = serializeThenDeserialize(s1);
+
+        validateSame(s1, s2, 0);
+    }
+
+
+    private StandardSession serializeThenDeserialize(StandardSession source)
+            throws IOException, ClassNotFoundException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        source.writeObjectData(oos);
+
+        StandardSession dest = new StandardSession(TEST_MANAGER);
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        dest.readObjectData(ois);
+
+        return dest;
+    }
+
+
+    private void validateSame(StandardSession s1, StandardSession s2, int expectedCount) {
+        int count = 0;
+        Enumeration<String> names = s1.getAttributeNames();
+        while (names.hasMoreElements()) {
+            count ++;
+            String name = names.nextElement();
+            Object v1 = s1.getAttribute(name);
+            Object v2 = s2.getAttribute(name);
+
+            Assert.assertEquals(v1,  v2);
         }
+
+        Assert.assertEquals(expectedCount, count);
+    }
+
+
+    private static class NonSerializable {
     }
 }

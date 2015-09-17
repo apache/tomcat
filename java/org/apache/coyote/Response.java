@@ -88,13 +88,13 @@ public final class Response {
     /**
      * Committed flag.
      */
-    protected boolean commited = false;
+    protected volatile boolean commited = false;
 
 
     /**
      * Action hook.
      */
-    public ActionHook hook;
+    protected volatile ActionHook hook;
 
 
     /**
@@ -143,18 +143,12 @@ public final class Response {
     }
 
 
-    public ActionHook getHook() {
-        return hook;
-    }
-
-
-    public void setHook(ActionHook hook) {
+    protected void setHook(ActionHook hook) {
         this.hook = hook;
     }
 
 
     // -------------------- Per-Response "notes" --------------------
-
 
     public final void setNote(int pos, Object value) {
         notes[pos] = value;
@@ -168,19 +162,18 @@ public final class Response {
 
     // -------------------- Actions --------------------
 
-
     public void action(ActionCode actionCode, Object param) {
         if (hook != null) {
-            if( param==null )
+            if (param == null) {
                 hook.action(actionCode, this);
-            else
+            } else {
                 hook.action(actionCode, param);
+            }
         }
     }
 
 
     // -------------------- State --------------------
-
 
     public int getStatus() {
         return status;
@@ -581,7 +574,6 @@ public final class Response {
         // the container will call listener.onWritePossible() once data can be
         // written.
         if (isReady()) {
-            action(ActionCode.DISPATCH_WRITE, null);
             synchronized (nonBlockingStateLock) {
                 // Ensure we don't get multiple write registrations if
                 // ServletOutputStream.isReady() returns false during a call to
@@ -591,6 +583,11 @@ public final class Response {
                 // container tries to trigger onWritePossible, nothing will
                 // happen
                 fireListener = true;
+            }
+            action(ActionCode.DISPATCH_WRITE, null);
+            if (!ContainerThreadMarker.isContainerThread()) {
+                // Not on a container thread so need to execute the dispatch
+                action(ActionCode.DISPATCH_EXECUTE, null);
             }
         }
     }

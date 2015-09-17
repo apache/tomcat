@@ -57,7 +57,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
-import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
 import org.apache.catalina.WebResourceRoot;
@@ -540,17 +539,18 @@ public class ApplicationContext
      *  in the correct form
      */
     @Override
-    public URL getResource(String path)
-        throws MalformedURLException {
+    public URL getResource(String path) throws MalformedURLException {
 
-        if (path == null ||
-                !path.startsWith("/") && GET_RESOURCE_REQUIRE_SLASH)
-            throw new MalformedURLException(sm.getString(
-                    "applicationContext.requestDispatcher.iae", path));
+        String validatedPath = validateResourcePath(path);
+
+        if (validatedPath == null) {
+            throw new MalformedURLException(
+                    sm.getString("applicationContext.requestDispatcher.iae", path));
+        }
 
         WebResourceRoot resources = context.getResources();
         if (resources != null) {
-            return resources.getResource(path).getURL();
+            return resources.getResource(validatedPath).getURL();
         }
 
         return null;
@@ -568,18 +568,39 @@ public class ApplicationContext
     @Override
     public InputStream getResourceAsStream(String path) {
 
-        if (path == null)
-            return (null);
+        String validatedPath = validateResourcePath(path);
 
-        if (!path.startsWith("/") && GET_RESOURCE_REQUIRE_SLASH)
+        if (validatedPath == null) {
             return null;
+        }
 
         WebResourceRoot resources = context.getResources();
         if (resources != null) {
-            return resources.getResource(path).getInputStream();
+            return resources.getResource(validatedPath).getInputStream();
         }
 
         return null;
+    }
+
+
+    /*
+     * Returns null if the input path is not valid or a path that will be
+     * acceptable to resoucres.getResource().
+     */
+    private String validateResourcePath(String path) {
+        if (path == null) {
+            return null;
+        }
+
+        if (!path.startsWith("/")) {
+            if (GET_RESOURCE_REQUIRE_SLASH) {
+                return null;
+            } else {
+                return "/" + path;
+            }
+        }
+
+        return path;
     }
 
 
@@ -782,17 +803,13 @@ public class ApplicationContext
             return;
         }
 
-        Object oldValue = null;
-        boolean replaced = false;
-
         // Add or replace the specified attribute
         // Check for read only attribute
         if (readOnlyAttributes.containsKey(name))
             return;
-        oldValue = attributes.get(name);
-        if (oldValue != null)
-            replaced = true;
-        attributes.put(name, value);
+
+        Object oldValue = attributes.put(name, value);
+        boolean replaced = oldValue != null;
 
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
@@ -1458,7 +1475,9 @@ public class ApplicationContext
     @Override
     public String getVirtualServerName() {
         // Constructor will fail if context or its parent is null
-        return ((Host) context.getParent()).getName();
+        Container host = context.getParent();
+        Container engine = host.getParent();
+        return engine.getName() + "/" + host.getName();
     }
 
 

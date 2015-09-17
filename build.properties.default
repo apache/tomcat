@@ -41,6 +41,12 @@ test.haltonfailure=false
 # Activate AccessLog during testing
 test.accesslog=false
 
+# Number of parallel threads to use for testing. The recommended value is one
+# thread per core.
+# Note: Cobertura code coverage currently requires this to be set to 1. Setting
+#       a value above one will disable code coverage if enabled.
+test.threads=1
+
 # Note the Cobertura code coverage tool is GPLv2 licensed
 test.cobertura=false
 
@@ -65,8 +71,6 @@ base.path=/usr/share/java
 #base.path=C:/path/to/the/repository
 #base.path=/usr/local
 
-compile.source=1.8
-compile.target=1.8
 compile.debug=true
 
 # Do not pass -deprecation (-Xlint:deprecation) flag to javac
@@ -134,21 +138,15 @@ wsdl4j-lib.home=${base.path}/wsdl4j-${wsdl4j-lib.version}
 wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${wsdl4j-lib.version}.jar
 wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
 
-# ----- Eclipse JDT, version 4.4 or later -----#
+# ----- Eclipse JDT, version 4.5 or later -----#
 # See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
-jdt.version=4.4.2
-jdt.release=R-4.4.2-201502041700
+jdt.version=4.5
+jdt.release=R-4.5-201506032000
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
 jdt.loc.1=http://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
-
-# ---- NPN support
-npn.version=8.1.2.v20120308
-npn.home=${base.path}/npn-${npn.version}
-npn.jar=${npn.home}/npn-${npn.version}.jar
-npn.loc=http://repo1.maven.org/maven2/org/eclipse/jetty/npn/npn-api/${npn.version}/npn-api-${npn.version}.jar
 
 # ----- Tomcat native library -----
 tomcat-native.version=1.1.33
@@ -213,7 +211,7 @@ objenesis.loc=https://objenesis.googlecode.com/files/objenesis-${objenesis.versi
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.0 or later -----
-checkstyle.version=6.5
+checkstyle.version=6.8.1
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar

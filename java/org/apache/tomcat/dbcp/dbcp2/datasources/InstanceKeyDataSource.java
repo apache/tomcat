@@ -84,7 +84,7 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericKeyedObjectPoolConfig;
  * @since 2.0
  */
 public abstract class InstanceKeyDataSource
-        implements DataSource, Referenceable, Serializable {
+        implements DataSource, Referenceable, Serializable, AutoCloseable {
 
     private static final long serialVersionUID = -6819270431752240878L;
 
@@ -186,6 +186,7 @@ public abstract class InstanceKeyDataSource
     /**
      * Close the connection pool being maintained by this datasource.
      */
+    @Override
     public abstract void close() throws Exception;
 
     protected abstract PooledConnectionManager getConnectionManager(UserPassKey upkey);
@@ -230,7 +231,6 @@ public abstract class InstanceKeyDataSource
         this.defaultBlockWhenExhausted = blockWhenExhausted;
     }
 
-
     /**
      * Gets the default value for
      * {@link GenericKeyedObjectPoolConfig#getEvictionPolicyClassName()} for
@@ -251,7 +251,6 @@ public abstract class InstanceKeyDataSource
         this.defaultEvictionPolicyClassName = evictionPolicyClassName;
     }
 
-
     /**
      * Gets the default value for
      * {@link GenericKeyedObjectPoolConfig#getLifo()} for each per user pool.
@@ -268,7 +267,6 @@ public abstract class InstanceKeyDataSource
         assertInitializationAllowed();
         this.defaultLifo = lifo;
     }
-
 
     /**
      * Gets the default value for
@@ -289,7 +287,6 @@ public abstract class InstanceKeyDataSource
         this.defaultMaxIdle = maxIdle;
     }
 
-
     /**
      * Gets the default value for
      * {@link GenericKeyedObjectPoolConfig#getMaxTotalPerKey()} for each per
@@ -309,7 +306,6 @@ public abstract class InstanceKeyDataSource
         this.defaultMaxTotal = maxTotal;
     }
 
-
     /**
      * Gets the default value for
      * {@link GenericKeyedObjectPoolConfig#getMaxWaitMillis()} for each per user
@@ -328,7 +324,6 @@ public abstract class InstanceKeyDataSource
         assertInitializationAllowed();
         this.defaultMaxWaitMillis = maxWaitMillis;
     }
-
 
     /**
      * Gets the default value for
@@ -350,7 +345,6 @@ public abstract class InstanceKeyDataSource
         this.defaultMinEvictableIdleTimeMillis = minEvictableIdleTimeMillis;
     }
 
-
     /**
      * Gets the default value for
      * {@link GenericKeyedObjectPoolConfig#getMinIdlePerKey()} for each per user
@@ -369,7 +363,6 @@ public abstract class InstanceKeyDataSource
         assertInitializationAllowed();
         this.defaultMinIdle = minIdle;
     }
-
 
     /**
      * Gets the default value for
@@ -390,7 +383,6 @@ public abstract class InstanceKeyDataSource
         this.defaultNumTestsPerEvictionRun = numTestsPerEvictionRun;
     }
 
-
     /**
      * Gets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each
@@ -410,7 +402,6 @@ public abstract class InstanceKeyDataSource
         this.defaultSoftMinEvictableIdleTimeMillis = softMinEvictableIdleTimeMillis;
     }
 
-
     /**
      * Gets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestOnCreate()} for each per user pool.
@@ -427,7 +418,6 @@ public abstract class InstanceKeyDataSource
         assertInitializationAllowed();
         this.defaultTestOnCreate = testOnCreate;
     }
-
 
     /**
      * Gets the default value for
@@ -446,7 +436,6 @@ public abstract class InstanceKeyDataSource
         this.defaultTestOnBorrow = testOnBorrow;
     }
 
-
     /**
      * Gets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestOnReturn()} for each per user pool.
@@ -464,7 +453,6 @@ public abstract class InstanceKeyDataSource
         this.defaultTestOnReturn = testOnReturn;
     }
 
-
     /**
      * Gets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestWhileIdle()} for each per user pool.
@@ -481,7 +469,6 @@ public abstract class InstanceKeyDataSource
         assertInitializationAllowed();
         this.defaultTestWhileIdle = testWhileIdle;
     }
-
 
     /**
      * Gets the default value for
@@ -502,22 +489,6 @@ public abstract class InstanceKeyDataSource
         assertInitializationAllowed();
         this.defaultTimeBetweenEvictionRunsMillis = timeBetweenEvictionRunsMillis ;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * Get the value of connectionPoolDataSource.  This method will return
@@ -940,7 +911,7 @@ public abstract class InstanceKeyDataSource
             }
             /*
              * Password must have changed -> destroy connection and keep retrying until we get a new, good one,
-             * destroying any idle connections with the old passowrd as we pull them from the pool.
+             * destroying any idle connections with the old password as we pull them from the pool.
              */
             final UserPassKey upkey = info.getUserPassKey();
             final PooledConnectionManager manager = getConnectionManager(upkey);

@@ -239,7 +239,15 @@ public final class CGIServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    /** the debugging detail level for this servlet. */
+    /**
+     * The debugging detail level for this servlet. Useful values range from 0
+     * to 5 where 0 means no logging and 5 means maximum logging. Values of 10
+     * or more mean maximum logging and debug info added to the HTTP response.
+     * If an error occurs and debug is 10 or more the standard error page
+     * mechanism will be disabled and a response body with debug information
+     * will be produced. Note that any value of 10 or more has the same effect
+     * as a value of 10.
+     */
     private int debug = 0;
 
     /**
@@ -538,39 +546,34 @@ public final class CGIServlet extends HttpServlet {
 
 
     /**
-     * Provides CGI Gateway service -- delegates to <code>doGet</code>
+     * Provides CGI Gateway service -- delegates to
+     * {@link #doGet(HttpServletRequest, HttpServletResponse)}.
      *
      * @param  req   HttpServletRequest passed in by servlet container
      * @param  res   HttpServletResponse passed in by servlet container
      *
      * @exception  ServletException  if a servlet-specific exception occurs
      * @exception  IOException  if a read/write exception occurs
-     *
-     * @see javax.servlet.http.HttpServlet
-     *
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
         doGet(req, res);
     }
 
 
     /**
-     * Provides CGI Gateway service
+     * Provides CGI Gateway service.
      *
      * @param  req   HttpServletRequest passed in by servlet container
      * @param  res   HttpServletResponse passed in by servlet container
      *
      * @exception  ServletException  if a servlet-specific exception occurs
      * @exception  IOException  if a read/write exception occurs
-     *
-     * @see javax.servlet.http.HttpServlet
-     *
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
 
         CGIEnvironment cgiEnv = new CGIEnvironment(req, getServletContext());
 
@@ -579,17 +582,16 @@ public final class CGIServlet extends HttpServlet {
                                           cgiEnv.getEnvironment(),
                                           cgiEnv.getWorkingDirectory(),
                                           cgiEnv.getParameters());
-            //if POST, we need to cgi.setInput
-            //REMIND: how does this interact with Servlet API 2.3's Filters?!
+
             if ("POST".equals(req.getMethod())) {
                 cgi.setInput(req.getInputStream());
             }
             cgi.setResponse(res);
             cgi.run();
-        }
-
-        if (!cgiEnv.isValid()) {
-            res.setStatus(404);
+        } else {
+            if (setStatus(res, 404)) {
+                return;
+            }
         }
 
         if (debug >= 10) {
@@ -625,11 +627,31 @@ public final class CGIServlet extends HttpServlet {
             printServletEnvironment(out, req, res);
 
             out.println("</BODY></HTML>");
-
         }
+    }
 
 
-    } //doGet
+    /*
+     * Behaviour depends on the status code and the value of debug.
+     *
+     * Status < 400  - Always calls setStatus. Returns false. CGI servlet will
+     *                 provide the response body.
+     * Status >= 400 - Depends on debug
+     *   debug < 10    - Calls sendError(status), returns true. Standard error
+     *                   page mechanism will provide the response body.
+     *   debug >= 10   - Calls setStatus(status), return false. CGI servlet will
+     *                   provide the response body.
+     */
+    private boolean setStatus(HttpServletResponse response, int status) throws IOException {
+
+        if (status >= HttpServletResponse.SC_BAD_REQUEST && debug < 10) {
+            response.sendError(status);
+            return true;
+        } else {
+            response.setStatus(status);
+            return false;
+        }
+    }
 
 
     /**
@@ -1644,6 +1666,12 @@ public final class CGIServlet extends HttpServlet {
                 cgiHeaderReader =
                     new BufferedReader(new InputStreamReader(cgiHeaderStream));
 
+                // Need to be careful here. If sendError() is called the
+                // response body should be provided by the standard error page
+                // process. But, if the output of the CGI process isn't read
+                // then that process can hang.
+                boolean skipBody = false;
+
                 while (isRunning) {
                     try {
                         //set headers
@@ -1654,14 +1682,14 @@ public final class CGIServlet extends HttpServlet {
                                 log("runCGI: addHeader(\"" + line + "\")");
                             }
                             if (line.startsWith("HTTP")) {
-                                response.setStatus(getSCFromHttpStatusLine(line));
+                                skipBody = setStatus(response, getSCFromHttpStatusLine(line));
                             } else if (line.indexOf(":") >= 0) {
                                 String header =
                                     line.substring(0, line.indexOf(":")).trim();
                                 String value =
                                     line.substring(line.indexOf(":") + 1).trim();
                                 if (header.equalsIgnoreCase("status")) {
-                                    response.setStatus(getSCFromCGIStatusHeader(value));
+                                    skipBody = setStatus(response, getSCFromCGIStatusHeader(value));
                                 } else {
                                     response.addHeader(header , value);
                                 }
@@ -1677,7 +1705,7 @@ public final class CGIServlet extends HttpServlet {
                         cgiOutput = proc.getInputStream();
 
                         try {
-                            while ((bufRead = cgiOutput.read(bBuf)) != -1) {
+                            while (!skipBody && (bufRead = cgiOutput.read(bBuf)) != -1) {
                                 if (debug >= 4) {
                                     log("runCGI: output " + bufRead +
                                         " bytes of data");

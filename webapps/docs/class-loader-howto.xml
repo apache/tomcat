@@ -156,7 +156,6 @@ loaders as it is initialized:</p>
     <li><em>tomcat-jdbc.jar</em> &#8212; An alternative database connection pool
         implementation, known as Tomcat JDBC pool. See
         <a href="jdbc-pool.html">documentation</a> for more details.</li>
-    <li><em>tomcat-spdy.jar</em> &#8212; SPDY implementation</li>
     <li><em>tomcat-util.jar</em> &#8212; Common classes used by various components of
         Apache Tomcat.</li>
     <li><em>tomcat-websocket.jar</em> &#8212; WebSocket 1.1 implementation</li>
@@ -181,10 +180,10 @@ part of the JRE base classes cannot be overridden. There are some exceptions
 such as the XML parser components which can be overridden using the appropriate
 JVM feature which is the endorsed standards override feature for Java &lt;= 8
 and the upgradeable modules feature for Java 9+.
-Last, any JAR file that contains Servlet API classes will be explicitly
-ignored by the classloader &#8212; Do not include such JARs in your web
-application.
-All other class loaders in Tomcat follow the usual delegation pattern.</p>
+Lastly, the web application class loader will always delegate first for JavaEE
+API classes for the specifications implemented by Tomcat
+(Servlet, JSP, EL, WebSocket). All other class loaders in Tomcat follow the
+usual delegation pattern.</p>
 
 <p>Therefore, from the perspective of a web application, class or resource
 loading looks in the following repositories, in this order:</p>

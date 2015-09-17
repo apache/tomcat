@@ -19,6 +19,8 @@ package org.apache.coyote;
 
 import java.util.concurrent.Executor;
 
+import org.apache.tomcat.util.net.SSLHostConfig;
+
 
 /**
  * Abstract the protocol implementation, including threading, etc.
@@ -94,4 +96,12 @@ public interface ProtocolHandler {
      * Does this ProtocolHandler support sendfile?
      */
     public boolean isSendfileSupported();
+
+
+    public void addSslHostConfig(SSLHostConfig sslHostConfig);
+    public SSLHostConfig[] findSslHostConfigs();
+
+
+    public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol);
+    public UpgradeProtocol[] findUpgradeProtocols();
 }

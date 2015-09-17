@@ -17,15 +17,18 @@
 
 package org.apache.tomcat.jni;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /** SSL Context
  *
  * @author Mladen Turk
  */
 public final class SSLContext {
 
-
     /**
-     * Initialize new SSL context
+     * Create a new SSL context.
+     *
      * @param pool The pool to use.
      * @param protocol The SSL protocol to use. It can be any combination of
      * the following:
@@ -43,9 +46,13 @@ public final class SSLContext {
      * SSL_MODE_SERVER
      * SSL_MODE_COMBINED
      * </PRE>
+     *
+     * @return The Java representation of a pointer to the newly created SSL
+     *         Context
+     *
+     * @throws Exception If the SSL Context could not be created
      */
-    public static native long make(long pool, int protocol, int mode)
-        throws Exception;
+    public static native long make(long pool, int protocol, int mode) throws Exception;
 
     /**
      * Free the resources used by the Context
@@ -88,6 +95,13 @@ public final class SSLContext {
      * @param options  See SSL.SSL_OP_* for option flags.
      */
     public static native void setOptions(long ctx, int options);
+
+    /**
+     * Get OpenSSL Option.
+     * @param ctx Server or Client context to use.
+     * @return options  See SSL.SSL_OP_* for option flags.
+     */
+    public static native int getOptions(long ctx);
 
     /**
      * Clears OpenSSL Options.
@@ -208,6 +222,62 @@ public final class SSLContext {
         throws Exception;
 
     /**
+     * Set the size of the internal session cache.
+     * http://www.openssl.org/docs/ssl/SSL_CTX_sess_set_cache_size.html
+     */
+    public static native long setSessionCacheSize(long ctx, long size);
+
+    /**
+     * Get the size of the internal session cache.
+     * http://www.openssl.org/docs/ssl/SSL_CTX_sess_get_cache_size.html
+     */
+    public static native long getSessionCacheSize(long ctx);
+
+    /**
+     * Set the timeout for the internal session cache in seconds.
+     * http://www.openssl.org/docs/ssl/SSL_CTX_set_timeout.html
+     */
+    public static native long setSessionCacheTimeout(long ctx, long timeoutSeconds);
+
+    /**
+     * Get the timeout for the internal session cache in seconds.
+     * http://www.openssl.org/docs/ssl/SSL_CTX_set_timeout.html
+     */
+    public static native long getSessionCacheTimeout(long ctx);
+
+    /**
+     * Set the mode of the internal session cache and return the previous used mode.
+     */
+    public static native long setSessionCacheMode(long ctx, long mode);
+
+    /**
+     * Get the mode of the current used internal session cache.
+     */
+    public static native long getSessionCacheMode(long ctx);
+
+    /**
+     * Session resumption statistics methods.
+     * http://www.openssl.org/docs/ssl/SSL_CTX_sess_number.html
+     */
+    public static native long sessionAccept(long ctx);
+    public static native long sessionAcceptGood(long ctx);
+    public static native long sessionAcceptRenegotiate(long ctx);
+    public static native long sessionCacheFull(long ctx);
+    public static native long sessionCbHits(long ctx);
+    public static native long sessionConnect(long ctx);
+    public static native long sessionConnectGood(long ctx);
+    public static native long sessionConnectRenegotiate(long ctx);
+    public static native long sessionHits(long ctx);
+    public static native long sessionMisses(long ctx);
+    public static native long sessionNumber(long ctx);
+    public static native long sessionTimeouts(long ctx);
+
+    /**
+     * Set TLS session keys. This allows us to share keys across TFEs.
+     */
+    public static native void setSessionTicketKeys(long ctx, byte[] keys);
+
+    /**
      * Set File and Directory of concatenated PEM-encoded CA Certificates
      * for Client Auth
      * <br>
@@ -289,4 +359,154 @@ public final class SSLContext {
     public static native void setVerify(long ctx, int level, int depth);
 
     public static native int setALPN(long ctx, byte[] proto, int len);
+
+    /**
+     * When tc-native encounters a SNI extension in the TLS handshake it will
+     * call this method to determine which OpenSSL SSLContext to use for the
+     * connection.
+     *
+     * @param currentCtx   The OpenSSL SSLContext that the handshake started to
+     *                     use. This will be the default OpenSSL SSLContext for
+     *                     the endpoint associated with the socket.
+     * @param sniHostName  The host name requested by the client
+     *
+     * @return The Java representation of the pointer to the OpenSSL SSLContext
+     *         to use for the given host or zero if no SSLContext could be
+     *         identified
+     */
+    public static long sniCallBack(long currentCtx, String sniHostName) {
+        SNICallBack sniCallBack = sniCallBacks.get(Long.valueOf(currentCtx));
+        if (sniCallBack == null) {
+            return 0;
+        }
+        return sniCallBack.getSslContext(sniHostName);
+    }
+
+    /*
+     * A map of default SSL Contexts to SNICallBack instances (in Tomcat these
+     * are instances of AprEndpoint) that will be used to determine the SSL
+     * Context to use bases on the SNI host name. It is structured this way
+     * since a Tomcat instance may have several TLS enabled endpoints that each
+     * have different SSL Context mappings for the same host name.
+     */
+    private static Map<Long,SNICallBack> sniCallBacks = new ConcurrentHashMap<>();
+
+    /**
+     * Register an OpenSSL SSLContext that will be used to initiate TLS
+     * connections that may use the SNI extension with the component that will
+     * be used to map the requested hostname to the correct OpenSSL SSLContext
+     * for the remainder of the connection.
+     *
+     * @param defaultSSLContext The Java representation of a pointer to the
+     *                          OpenSSL SSLContext that will be used to
+     *                          initiate TLS connections
+     * @param sniCallBack The component that will map SNI hosts names received
+     *                    via connections initiated using
+     *                    <code>defaultSSLContext</code> to the correct  OpenSSL
+     *                    SSLContext
+     */
+    public static void registerDefault(Long defaultSSLContext,
+            SNICallBack sniCallBack) {
+        sniCallBacks.put(defaultSSLContext, sniCallBack);
+    }
+
+    /**
+     * Unregister an OpenSSL SSLContext that will no longer be used to initiate
+     * TLS connections that may use the SNI extension.
+     *
+     * @param defaultSSLContext The Java representation of a pointer to the
+     *                          OpenSSL SSLContext that will no longer be used
+     */
+    public static void unregisterDefault(Long defaultSSLContext) {
+        sniCallBacks.remove(defaultSSLContext);
+    }
+
+
+    /**
+     * Interface implemented by components that will receive the call back to
+     * select an OpenSSL SSLContext based on the host name requested by the
+     * client.
+     */
+    public static interface SNICallBack {
+
+        /**
+         * This callback is made during the TLS handshake when the client uses
+         * the SNI extension to request a specific TLS host.
+         *
+         * @param sniHostName The host name requested by the client
+         *
+         * @return The Java representation of the pointer to the OpenSSL
+         *         SSLContext to use for the given host or zero if no SSLContext
+         *         could be identified
+         */
+        public long getSslContext(String sniHostName);
+    }
+
+    /**
+     * Allow to hook {@link CertificateVerifier} into the handshake processing.
+     * This will call {@code SSL_CTX_set_cert_verify_callback} and so replace the default verification
+     * callback used by openssl
+     * @param ctx Server or Client context to use.
+     * @param verifier the verifier to call during handshake.
+     */
+    public static native void setCertVerifyCallback(long ctx, CertificateVerifier verifier);
+
+    /**
+     * Set next protocol for next protocol negotiation extension
+     * @param ctx Server context to use.
+     * @param nextProtos comma delimited list of protocols in priority order
+     *
+     * @deprecated use {@link #setNpnProtos(long, String[], int)}
+     */
+    @Deprecated
+    public static void setNextProtos(long ctx, String nextProtos) {
+        setNpnProtos(ctx, nextProtos.split(","), SSL.SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL);
+    }
+
+    /**
+     * Set next protocol for next protocol negotiation extension
+     * @param ctx Server context to use.
+     * @param nextProtos protocols in priority order
+     * @param selectorFailureBehavior see {@link SSL#SSL_SELECTOR_FAILURE_NO_ADVERTISE}
+     *                                and {@link SSL#SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL}
+     */
+    public static native void setNpnProtos(long ctx, String[] nextProtos, int selectorFailureBehavior);
+
+    /**
+     * Set application layer protocol for application layer protocol negotiation extension
+     * @param ctx Server context to use.
+     * @param alpnProtos protocols in priority order
+     * @param selectorFailureBehavior see {@link SSL#SSL_SELECTOR_FAILURE_NO_ADVERTISE}
+     *                                and {@link SSL#SSL_SELECTOR_FAILURE_CHOOSE_MY_LAST_PROTOCOL}
+     */
+    public static native void setAlpnProtos(long ctx, String[] alpnProtos, int selectorFailureBehavior);
+
+    /**
+     * Set DH parameters
+     * @param ctx Server context to use.
+     * @param cert DH param file (can be generated from e.g. {@code openssl dhparam -rand - 2048 > dhparam.pem} -
+     *             see the <a href="https://www.openssl.org/docs/apps/dhparam.html">OpenSSL documentation</a>).
+     */
+    public static native void setTmpDH(long ctx, String cert)
+            throws Exception;
+
+    /**
+     * Set ECDH elliptic curve by name
+     * @param ctx Server context to use.
+     * @param curveName the name of the elliptic curve to use
+     *             (available names can be obtained from {@code openssl ecparam -list_curves}).
+     */
+    public static native void setTmpECDHByCurveName(long ctx, String curveName)
+            throws Exception;
+
+    /**
+     * Set the context within which session be reused (server side only)
+     * http://www.openssl.org/docs/ssl/SSL_CTX_set_session_id_context.html
+     *
+     * @param ctx Server context to use.
+     * @param sidCtx can be any kind of binary data, it is therefore possible to use e.g. the name
+     *               of the application and/or the hostname and/or service name
+     * @return {@code true} if success, {@code false} otherwise.
+     */
+    public static native boolean setSessionIdContext(long ctx, byte[] sidCtx);
 }

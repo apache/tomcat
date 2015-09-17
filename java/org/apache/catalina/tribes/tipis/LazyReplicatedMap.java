@@ -161,19 +161,21 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
             }
             MapMessage msg = null;
             try {
-                backup = wrap(next);
+                Member[] tmpBackup = wrap(next);
                 //publish the backup data to one node
                 msg = new MapMessage(getMapContextName(), MapMessage.MSG_BACKUP, false,
-                                     (Serializable) key, (Serializable) value, null, channel.getLocalMember(false), backup);
+                                     (Serializable) key, (Serializable) value, null, channel.getLocalMember(false), tmpBackup);
                 if ( log.isTraceEnabled() )
                     log.trace("Publishing backup data:"+msg+" to: "+next.getName());
-                UniqueId id = getChannel().send(backup, msg, getChannelSendOptions());
+                UniqueId id = getChannel().send(tmpBackup, msg, getChannelSendOptions());
                 if ( log.isTraceEnabled() )
                     log.trace("Data published:"+msg+" msg Id:"+id);
                 //we published out to a backup, mark the test success
                 success = true;
+                backup = tmpBackup;
             }catch ( ChannelException x ) {
-                log.error("Unable to replicate backup key:"+key+" to backup:"+next+". Reason:"+x.getMessage(),x);
+                log.error(sm.getString("lazyReplicatedMap.unableReplicate.backup", key, next, x.getMessage()), x);
+                continue;
             }
             try {
                 //publish the data out to all nodes
@@ -182,14 +184,14 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                     msg = new MapMessage(getMapContextName(), MapMessage.MSG_PROXY, false,
                                          (Serializable) key, null, null, channel.getLocalMember(false),backup);
                     if ( log.isTraceEnabled() )
-                    log.trace("Publishing proxy data:"+msg+" to: "+Arrays.toNameString(proxies));
+                        log.trace("Publishing proxy data:"+msg+" to: "+Arrays.toNameString(proxies));
                     getChannel().send(proxies, msg, getChannelSendOptions());
                 }
             }catch  ( ChannelException x ) {
                 //log the error, but proceed, this should only happen if a node went down,
                 //and if the node went down, then it can't receive the message, the others
                 //should still get it.
-                log.error("Unable to replicate proxy key:"+key+" to backup:"+next+". Reason:"+x.getMessage(),x);
+                log.error(sm.getString("lazyReplicatedMap.unableReplicate.proxy", key, next, x.getMessage()), x);
             }
         } while ( !success && (firstIdx!=nextIdx));
         return backup;

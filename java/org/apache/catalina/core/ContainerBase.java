@@ -717,19 +717,18 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Start child
         // Don't do this inside sync block - start can be a slow process and
         // locking the children object can cause problems elsewhere
-        if ((getState().isAvailable() ||
-                LifecycleState.STARTING_PREP.equals(getState())) &&
-                startChildren) {
-            try {
+        try {
+            if ((getState().isAvailable() ||
+                    LifecycleState.STARTING_PREP.equals(getState())) &&
+                    startChildren) {
                 child.start();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.addChild: start: ", e);
-                throw new IllegalStateException
-                    ("ContainerBase.addChild: start: " + e);
             }
+        } catch (LifecycleException e) {
+            log.error("ContainerBase.addChild: start: ", e);
+            throw new IllegalStateException("ContainerBase.addChild: start: " + e);
+        } finally {
+            fireContainerEvent(ADD_CHILD_EVENT, child);
         }
-
-        fireContainerEvent(ADD_CHILD_EVENT, child);
     }
 
 

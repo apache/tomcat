@@ -201,6 +201,13 @@
     <Bug code="SQL" />
   </Match>
   <Match>
+    <!-- Correct behaviour does not assume sequential operations on concurrent
+         hash map are atomic. -->
+    <Class name="org.apache.coyote.AbstractProtocol$AbstractConnectionHandler" />
+    <Method name="process" />
+    <Bug pattern="AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION" />
+  </Match>
+  <Match>
     <!-- Locks are always released. Non-standard pattern is required because -->
     <!-- of lock upgrade that is used. -->
     <Class name="org.apache.coyote.http11.upgrade.AprServletInputStream" />
@@ -227,6 +234,24 @@
     <Class name="org.apache.coyote.http11.InternalAprOutputBuffer" />
     <Method name="writeToSocket"/>
     <Bug code="UL" />
+  </Match>
+  <Match>
+    <!-- Number being tested is unsigned. -->
+    <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
+    <Method name="createRemoteStream" />
+    <Bug pattern="IM_BAD_CHECK_FOR_ODD" />
+  </Match>
+  <Match>
+    <!-- Notify is correct. Condition changed outside of this method. -->
+    <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
+    <Mehtod name="releaseBackLog" />
+    <Bug pattern="NN_NAKED_NOTIFY" />
+  </Match>
+  <Match>
+    <!-- Notify is correct. Condition changed outside of this method. -->
+    <Class name="org.apache.coyote.http2.Stream" />
+    <Mehtod name="incrementWindowSize" />
+    <Bug pattern="NN_NAKED_NOTIFY" />
   </Match>
   <Match>
     <!-- Returning null is required by the EL specification -->
@@ -289,6 +314,18 @@
     <!-- Class name needs to start with a lower case letter in this case -->
     <Class name="org.apache.naming.java.javaURLContextFactory" />
     <Bug code="Nm" />
+  </Match>
+  <Match>
+    <!-- Return value is never used -->
+    <Class name="org.apache.tomcat.dbcp.dbcp2.DelegatingConnection" />
+    <Method name="prepareStatement" />
+    <Bug pattern="NP_NONNULL_RETURN_VIOLATION" />
+  </Match>
+  <Match>
+    <!-- Pooled objects can't be null so this is OK -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.BaseGenericObjectPool$IdentityWrapper" />
+    <Method name="equals" />
+    <Bug pattern="NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT" />
   </Match>
   <Match>
     <!-- Increment is in sync block so it is safe. Volatile is used so reading
@@ -454,7 +491,10 @@
   </Match>
   <Match>
     <!-- Object is only ever set to null, sync therefore is still valid -->
-    <Class name="org.apache.tomcat.util.net.NioEndpoint$SocketProcessor"/>
+    <Or>
+      <Class name="org.apache.tomcat.util.net.NioEndpoint$SocketProcessor"/>
+      <Class name="org.apache.tomcat.util.net.Nio2Endpoint$SocketProcessor"/>
+    </Or>
     <Method name="run"/>
     <Bug code="ML"/>
   </Match>

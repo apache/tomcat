@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes.io;
 
 
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -29,6 +30,8 @@ public class BufferPool {
     private static final Log log = LogFactory.getLog(BufferPool.class);
 
     public static final int DEFAULT_POOL_SIZE = 100*1024*1024; //100MB
+
+    protected static final StringManager sm = StringManager.getManager(BufferPool.class);
 
 
 
@@ -59,9 +62,8 @@ public class BufferPool {
                 if (instance == null) {
                    BufferPoolAPI pool = new BufferPool15Impl();
                    pool.setMaxSize(DEFAULT_POOL_SIZE);
-                   log.info("Created a buffer pool with max size:" +
-                           DEFAULT_POOL_SIZE + " bytes of type: " +
-                           pool.getClass().getName());
+                   log.info(sm.getString("bufferPool.created",
+                           Integer.toString(DEFAULT_POOL_SIZE), pool.getClass().getName()));
                    instance = new BufferPool(pool);
                 }
             }

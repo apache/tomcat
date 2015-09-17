@@ -40,43 +40,73 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestCoyoteOutputStream extends TomcatBaseTest {
 
     @Test
-    public void testNonBlockingWriteNoneBlockingWriteNone() throws Exception {
-        doNonBlockingTest(0, 0);
+    public void testNonBlockingWriteNoneBlockingWriteNoneContainerThread() throws Exception {
+        doNonBlockingTest(0, 0, true);
     }
 
     @Test
-    public void testNonBlockingWriteOnceBlockingWriteNone() throws Exception {
-        doNonBlockingTest(1, 0);
+    public void testNonBlockingWriteOnceBlockingWriteNoneContainerThread() throws Exception {
+        doNonBlockingTest(1, 0, true);
     }
 
     @Test
-    public void testNonBlockingWriteTwiceBlockingWriteNone() throws Exception {
-        doNonBlockingTest(2, 0);
+    public void testNonBlockingWriteTwiceBlockingWriteNoneContainerThread() throws Exception {
+        doNonBlockingTest(2, 0, true);
     }
 
     @Test
-    public void testNonBlockingWriteNoneBlockingWriteOnce() throws Exception {
-        doNonBlockingTest(0, 1);
+    public void testNonBlockingWriteNoneBlockingWriteOnceContainerThread() throws Exception {
+        doNonBlockingTest(0, 1, true);
     }
 
     @Test
-    public void testNonBlockingWriteOnceBlockingWriteOnce() throws Exception {
-        doNonBlockingTest(1, 1);
+    public void testNonBlockingWriteOnceBlockingWriteOnceContainerThread() throws Exception {
+        doNonBlockingTest(1, 1, true);
     }
 
     @Test
-    public void testNonBlockingWriteTwiceBlockingWriteOnce() throws Exception {
-        doNonBlockingTest(2, 1);
+    public void testNonBlockingWriteTwiceBlockingWriteOnceContainerThread() throws Exception {
+        doNonBlockingTest(2, 1, true);
     }
 
-    private void doNonBlockingTest(int asyncWriteTarget, int syncWriteTarget)
-            throws Exception {
+    @Test
+    public void testNonBlockingWriteNoneBlockingWriteNoneNonContainerThread() throws Exception {
+        doNonBlockingTest(0, 0, false);
+    }
+
+    @Test
+    public void testNonBlockingWriteOnceBlockingWriteNoneNonContainerThread() throws Exception {
+        doNonBlockingTest(1, 0, false);
+    }
+
+    @Test
+    public void testNonBlockingWriteTwiceBlockingWriteNoneNonContainerThread() throws Exception {
+        doNonBlockingTest(2, 0, false);
+    }
+
+    @Test
+    public void testNonBlockingWriteNoneBlockingWriteOnceNonContainerThread() throws Exception {
+        doNonBlockingTest(0, 1, false);
+    }
+
+    @Test
+    public void testNonBlockingWriteOnceBlockingWriteOnceNonContainerThread() throws Exception {
+        doNonBlockingTest(1, 1, false);
+    }
+
+    @Test
+    public void testNonBlockingWriteTwiceBlockingWriteOnceNonContainerThread() throws Exception {
+        doNonBlockingTest(2, 1, false);
+    }
+
+    private void doNonBlockingTest(int asyncWriteTarget, int syncWriteTarget,
+            boolean useContainerThreadToSetListener) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w = Tomcat.addServlet(root, "nbWrite",
-                new NonBlockingWriteServlet(asyncWriteTarget));
+                new NonBlockingWriteServlet(asyncWriteTarget, useContainerThreadToSetListener));
         w.setAsyncSupported(true);
         root.addServletMapping("/nbWrite", "nbWrite");
         Tomcat.addServlet(root, "write",
@@ -110,9 +140,12 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
         private final int asyncWriteTarget;
         private final AtomicInteger asyncWriteCount = new AtomicInteger(0);
+        private final boolean useContainerThreadToSetListener;
 
-        public NonBlockingWriteServlet(int asyncWriteTarget) {
+        public NonBlockingWriteServlet(int asyncWriteTarget,
+                boolean useContainerThreadToSetListener) {
             this.asyncWriteTarget = asyncWriteTarget;
+            this.useContainerThreadToSetListener = useContainerThreadToSetListener;
         }
 
         @Override
@@ -125,9 +158,14 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
 
             AsyncContext asyncCtxt = req.startAsync();
-            // Infinite timeout for debugging
-            asyncCtxt.setTimeout(0);
-            asyncCtxt.start(new AsyncTask(asyncCtxt, sos));
+            asyncCtxt.setTimeout(5);
+            Runnable task = new AsyncTask(asyncCtxt, sos);
+            if (useContainerThreadToSetListener) {
+                asyncCtxt.start(task);
+            } else {
+                Thread t = new Thread(task);
+                t.start();
+            }
         }
 
         private void doAsyncWrite(AsyncContext asyncCtxt,

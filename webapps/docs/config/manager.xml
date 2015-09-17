@@ -429,7 +429,7 @@
 
     <attribute name="sessionValidCol" required="false">
       <p>Name of the database column, contained in the specified session table,
-      that contains a flag indicating whether this swapped out session is stil
+      that contains a flag indicating whether this swapped out session is still
       valid or not. The column type must accept a single character. If not
       specified the default value of <code>valid</code> will be used.</p>
     </attribute>
@@ -452,7 +452,7 @@
 );</source>
 
   <p>Note: The SQL command above does not use the default names for either the
-  table or the clumns so the JDBC Store would need to be configured to reflect
+  table or the columns so the JDBC Store would need to be configured to reflect
   this.</p>
 
   <p>In order for the JDBC Based Store to successfully connect to your

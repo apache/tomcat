@@ -121,7 +121,8 @@ public class TestWebSocketFrameClient extends TomcatBaseTest {
         wsSession.addMessageHandler(handler);
         wsSession.getBasicRemote().sendText("Hello");
 
-        handler.getLatch().await(100, TimeUnit.MILLISECONDS);
+        boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
+        Assert.assertTrue(latchResult);
 
         Queue<String> messages = handler.getMessages();
         Assert.assertEquals(1, messages.size());

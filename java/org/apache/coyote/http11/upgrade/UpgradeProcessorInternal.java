@@ -23,6 +23,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -47,6 +48,18 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
     @Override
     public SocketState dispatch(SocketStatus status) {
         return internalHttpUpgradeHandler.upgradeDispatch(status);
+    }
+
+
+    @Override
+    public final void setSslSupport(SSLSupport sslSupport) {
+        internalHttpUpgradeHandler.setSslSupport(sslSupport);
+    }
+
+
+    @Override
+    public void pause() {
+        internalHttpUpgradeHandler.pause();
     }
 
 

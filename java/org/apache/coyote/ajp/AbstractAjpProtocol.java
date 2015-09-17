@@ -21,9 +21,9 @@ import java.nio.ByteBuffer;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
-import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -126,6 +126,33 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         }
     }
 
+
+    // --------------------------------------------- SSL is not supported in AJP
+
+    @Override
+    public void addSslHostConfig(SSLHostConfig sslHostConfig) {
+        getLog().warn(sm.getString("ajpprotocol.noSSL", sslHostConfig.getHostName()));
+    }
+
+
+    @Override
+    public SSLHostConfig[] findSslHostConfigs() {
+        return new SSLHostConfig[0];
+    }
+
+
+    @Override
+    public void addUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
+        getLog().warn(sm.getString("ajpprotocol.noUpgrade", upgradeProtocol.getClass().getName()));
+    }
+
+
+    @Override
+    public UpgradeProtocol[] findUpgradeProtocols() {
+        return new UpgradeProtocol[0];
+    }
+
+
     protected void configureProcessor(AjpProcessor processor) {
         processor.setAdapter(getAdapter());
         processor.setTomcatAuthentication(getTomcatAuthentication());
@@ -158,11 +185,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
             return processor;
         }
 
-        @Override
-        protected void longPoll(SocketWrapperBase<S> socket, Processor processor) {
-            // Same requirements for all AJP connectors
-            socket.setAsync(true);
-        }
 
         @Override
         protected AjpProcessor createUpgradeProcessor(SocketWrapperBase<?> socket,

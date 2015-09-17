@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
 
@@ -38,6 +39,7 @@ import org.apache.tools.ant.BuildException;
  * @since 4.1
  */
 public class DeployTask extends AbstractCatalinaCommandTask {
+    private static final Pattern PROTOCOL_PATTERN = Pattern.compile("\\w{3,5}\\:");
 
 
     // ------------------------------------------------------------- Properties
@@ -138,32 +140,32 @@ public class DeployTask extends AbstractCatalinaCommandTask {
         // Building an input stream on the WAR to upload, if any
         BufferedInputStream stream = null;
         String contentType = null;
-        int contentLength = -1;
+        long contentLength = -1;
         if (war != null) {
-            if (war.startsWith("file:")) {
+            if (PROTOCOL_PATTERN.matcher(war).lookingAt()) {
                 try {
                     URL url = new URL(war);
                     URLConnection conn = url.openConnection();
-                    contentLength = conn.getContentLength();
+                    contentLength = conn.getContentLengthLong();
                     stream = new BufferedInputStream
                         (conn.getInputStream(), 1024);
                 } catch (IOException e) {
                     throw new BuildException(e);
                 }
             } else {
+                FileInputStream fsInput = null;
                 try {
-                    FileInputStream fsInput = new FileInputStream(war);
-                    long size = fsInput.getChannel().size();
-
-                    if (size > Integer.MAX_VALUE)
-                        throw new UnsupportedOperationException(
-                                "DeployTask does not support WAR files " +
-                                "greater than 2 Gb");
-                    contentLength = (int) size;
-
+                    fsInput = new FileInputStream(war);
+                    contentLength = fsInput.getChannel().size();
                     stream = new BufferedInputStream(fsInput, 1024);
-
                 } catch (IOException e) {
+                    if (fsInput != null) {
+                        try {
+                            fsInput.close();
+                        } catch (IOException ioe) {
+                            // Ignore
+                        }
+                    }
                     throw new BuildException(e);
                 }
             }
@@ -188,11 +190,19 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                 sb.append("&tag=");
                 sb.append(URLEncoder.encode(tag, getCharset()));
             }
+
+            execute(sb.toString(), stream, contentType, contentLength);
         } catch (UnsupportedEncodingException e) {
             throw new BuildException("Invalid 'charset' attribute: " + getCharset());
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+            }
         }
-
-        execute(sb.toString(), stream, contentType, contentLength);
 
     }
 

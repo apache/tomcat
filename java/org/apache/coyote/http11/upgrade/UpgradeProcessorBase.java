@@ -26,7 +26,6 @@ import javax.servlet.http.WebConnection;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public abstract class UpgradeProcessorBase implements Processor, WebConnection {
@@ -103,12 +102,6 @@ public abstract class UpgradeProcessorBase implements Processor, WebConnection {
     @Override
     public String getClientCertProvider() {
         return null;
-    }
-
-
-    @Override
-    public final void setSslSupport(SSLSupport sslSupport) {
-        // NOOP
     }
 
 

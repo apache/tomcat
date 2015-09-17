@@ -85,7 +85,7 @@ public class Util {
 
     static CloseCode getCloseCode(int code) {
         if (code > 2999 && code < 5000) {
-            return CloseCodes.NORMAL_CLOSURE;
+            return CloseCodes.getCloseCode(code);
         }
         switch (code) {
             case 1000:
@@ -331,7 +331,7 @@ public class Util {
 
 
     public static List<DecoderEntry> getDecoders(
-            Class<? extends Decoder>[] decoderClazzes)
+            List<Class<? extends Decoder>> decoderClazzes)
                     throws DeploymentException{
 
         List<DecoderEntry> result = new ArrayList<>();
@@ -464,9 +464,7 @@ public class Util {
         try {
             List<Class<? extends Decoder>> decoders =
                     endpointConfig.getDecoders();
-            @SuppressWarnings("unchecked")
-            List<DecoderEntry> decoderEntries = getDecoders(
-                    decoders.toArray(new Class[decoders.size()]));
+            List<DecoderEntry> decoderEntries = getDecoders(decoders);
             decoderMatch = new DecoderMatch(target, decoderEntries);
         } catch (DeploymentException e) {
             throw new IllegalArgumentException(e);

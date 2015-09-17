@@ -697,7 +697,7 @@ Default maximum session inactive interval 30 minutes
 3 - <4 minutes: 1 sessions
 >0 minutes: 2 sessions were expired]]></source>
 
-<p>Actually <code>/sessions</code> and <code>/expire</code> are synonims for
+<p>Actually <code>/sessions</code> and <code>/expire</code> are synonyms for
 the same command. The difference is in the presence of <code>idle</code>
 parameter.</p>
 
@@ -781,7 +781,7 @@ error message.  Possible causes for problems include:</p>
 <p><strong><span style="color: red;">WARNING</span> - This command will delete any web
 application artifacts that exist within <code>appBase</code> directory
 (typically "webapps") for this virtual host</strong>.
-This will delete the the application .WAR, if present,
+This will delete the application .WAR, if present,
 the application directory resulting either from a deploy in unpacked form
 or from .WAR expansion as well as the XML Context definition from
 <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> directory.
@@ -1054,7 +1054,7 @@ on each of deployed web applications will be available.</p>
       </li>
     </ul>
     <p>
-    You'll need to experiment with this to really understand its capabilites.
+    You'll need to experiment with this to really understand its capabilities
     If you provide no <code>qry</code> parameter, then all of the MBeans will
     be displayed. We really recommend looking at the tomcat source code and
     understand the JMX spec to get a better understanding of all the queries
@@ -1147,17 +1147,14 @@ commands, you must perform the following setup operations:</p>
     You must use version <strong>1.4</strong> or later.</li>
 <li>Install the Ant distribution in a convenient directory (called
     ANT_HOME in the remainder of these instructions).</li>
-<li>Copy the file <code>server/lib/catalina-ant.jar</code> from your Tomcat
-    installation into Ant's library directory (<code>$ANT_HOME/lib</code>).
-    </li>
 <li>Add the <code>$ANT_HOME/bin</code> directory to your <code>PATH</code>
     environment variable.</li>
 <li>Configure at least one username/password combination in your Tomcat
     user database that includes the <code>manager-script</code> role.</li>
 </ul>
 
-<p>To use custom tasks within Ant, you must declare them first with a
-<code>&lt;taskdef&gt;</code> element.  Therefore, your <code>build.xml</code>
+<p>To use custom tasks within Ant, you must declare them first with an
+<code>&lt;import&gt;</code> element.  Therefore, your <code>build.xml</code>
 file might look something like this:</p>
 
 <source><![CDATA[<project name="My Application" default="compile" basedir=".">
@@ -1173,19 +1170,11 @@ file might look something like this:</p>
   <property name="username" value="myusername"/>
   <property name="password" value="mypassword"/>
 
+  <!-- Configure the path to the Tomcat installation -->
+  <property name="catalina.home" value="/usr/local/apache-tomcat"/>
+
   <!-- Configure the custom Ant tasks for the Manager application -->
-  <taskdef name="list"      classname="org.apache.catalina.ant.ListTask"/>
-  <taskdef name="deploy"    classname="org.apache.catalina.ant.DeployTask"/>
-  <taskdef name="start"     classname="org.apache.catalina.ant.StartTask"/>
-  <taskdef name="reload"    classname="org.apache.catalina.ant.ReloadTask"/>
-  <taskdef name="stop"      classname="org.apache.catalina.ant.StopTask"/>
-  <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/>
-  <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"/>
-  <typedef name="sessions"  classname="org.apache.catalina.ant.SessionsTask"/>
-  <taskdef name="findleaks" classname="org.apache.catalina.ant.FindLeaksTask"/>
-  <typedef name="vminfo"    classname="org.apache.catalina.ant.VminfoTask"/>
-  <typedef name="threaddump" classname="org.apache.catalina.ant.ThreaddumpTask"/>
-  <typedef name="sslConnectorCiphers" classname="org.apache.catalina.ant.SslConnectorCiphersTask"/>
+  <import file="${catalina.home}/bin/catalina-tasks.xml"/>
 
   <!-- Executable Targets -->
   <target name="compile" description="Compile web application">
@@ -1212,9 +1201,10 @@ file might look something like this:</p>
 
 </project>]]></source>
 
-<p>Note: The definition of the resources task above will override the resources
-datatype added in Ant 1.7. If you wish to use the resources datatype you will
-need to use Ant's namespace support to assign the Tomcat tasks to their own
+<p>Note: The definition of the resources task via the import above will override
+the resources datatype added in Ant 1.7. If you wish to use the resources
+datatype you will need to use Ant's namespace support to modify
+<code>catalina-tasks.xml</code> to assign the Tomcat tasks to their own
 namespace.</p>
 
 <p>Now, you can execute commands like <code>ant deploy</code> to deploy the

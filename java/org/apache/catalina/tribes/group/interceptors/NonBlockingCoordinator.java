@@ -32,6 +32,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.Membership;
 import org.apache.catalina.tribes.util.Arrays;
+import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -123,6 +124,7 @@ import org.apache.juli.logging.LogFactory;
 public class NonBlockingCoordinator extends ChannelInterceptorBase {
 
     private static final Log log = LogFactory.getLog(NonBlockingCoordinator.class);
+    protected static final StringManager sm = StringManager.getManager(NonBlockingCoordinator.class);
 
     /**
      * header for a coordination message
@@ -151,7 +153,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * Our current view
      */
-    protected Membership view = null;
+    protected volatile Membership view = null;
     /**
      * Out current viewId
      */
@@ -167,9 +169,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * and this is the one we are running
      */
     protected UniqueId suggestedviewId;
-    protected Membership suggestedView;
+    protected volatile Membership suggestedView;
 
-    protected boolean started = false;
+    protected volatile boolean started = false;
     protected final int startsvc = 0xFFFF;
 
     protected final Object electionMutex = new Object();
@@ -267,7 +269,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                 sendElectionMsg(local, msg.getMembers()[current], msg);
                 sent = true;
             }catch ( ChannelException x  ) {
-                log.warn("Unable to send election message to:"+msg.getMembers()[current]);
+                log.warn(sm.getString("nonBlockingCoordinator.electionMessage.sendfailed", msg.getMembers()[current]));
                 current = Arrays.nextIndex(msg.getMembers()[current],msg.getMembers());
                 if ( current == next ) throw x;
             }
@@ -494,7 +496,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                 fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MSG_ARRIVE,this,"Coord Msg Arrived("+Arrays.toNameString(cmbr)+")"));
                 processCoordMessage(cmsg);
             }catch ( ChannelException x ) {
-                log.error("Error processing coordination message. Could be fatal.",x);
+                log.error(sm.getString("nonBlockingCoordinator.processCoordinationMessage.failed"),x);
             }
         } else {
             super.messageReceived(msg);
@@ -513,7 +515,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_MBR_ADD,this,"Member add("+member.getName()+")"));
             if (started && elect) startElection(false);
         } catch (ChannelException x) {
-            log.error("Unable to start election when member was added.",x);
+            log.error(sm.getString("nonBlockingCoordinator.memberAdded.failed"),x);
         }
     }
 
@@ -526,7 +528,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             if (started && (isCoordinator() || isHighest()))
                 startElection(true); //to do, if a member disappears, only the coordinator can start
         } catch (ChannelException x) {
-            log.error("Unable to start election when member was removed.",x);
+            log.error(sm.getString("nonBlockingCoordinator.memberDisappeared.failed"),x);
         }
     }
 
@@ -548,12 +550,12 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             if ( view != null && (Arrays.diff(view,membership,local).length != 0 ||  Arrays.diff(membership,view,local).length != 0) ) {
                 if ( isHighest() ) {
                     fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_START_ELECT, this,
-                                                               "Heartbeat found inconsistency, restart election"));
+                            sm.getString("nonBlockingCoordinator.heartbeat.inconsistency")));
                     startElection(true);
                 }
             }
         } catch ( Exception x  ){
-            log.error("Unable to perform heartbeat.",x);
+            log.error(sm.getString("nonBlockingCoordinator.heartbeat.failed"),x);
         } finally {
             super.heartbeat();
         }

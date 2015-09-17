@@ -51,11 +51,4 @@ public class TesterLeakingServlet1 extends HttpServlet {
                 "The current thread served this servlet "
                         + counter.getCount() + " times");
     }
-
-    @Override
-    public void destroy() {
-        super.destroy();
-        // normally not needed, just to make my point
-        myThreadLocal = null;
-    }
 }

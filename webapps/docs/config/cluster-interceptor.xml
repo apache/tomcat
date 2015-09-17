@@ -214,7 +214,7 @@
        3. byte array in string form, for example {216,123,12,3}<br/>
      </attribute>
      <attribute name="domain" required="true">
-       The logical cluster domain for this this static member listens for cluster messages.
+       The logical cluster domain for that this static member listens for cluster messages.
        Two different type of values are possible:<br/>
        1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes
        using ISO-8859-1 encoding.

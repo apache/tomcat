@@ -58,7 +58,9 @@ public class UUIDGenerator {
 
     public static byte[] randomUUID(boolean secure, byte[] into, int offset) {
         if ( (offset+UUID_LENGTH)>into.length )
-            throw new ArrayIndexOutOfBoundsException("Unable to fit "+UUID_LENGTH+" bytes into the array. length:"+into.length+" required length:"+(offset+UUID_LENGTH));
+            throw new ArrayIndexOutOfBoundsException(sm.getString("uuidGenerator.unable.fit",
+                    Integer.toString(UUID_LENGTH), Integer.toString(into.length),
+                    Integer.toString(offset+UUID_LENGTH)));
         Random r = (secure&&(secrand!=null))?secrand:rand;
         nextBytes(into,offset,UUID_LENGTH,r);
         into[6+offset] &= 0x0F;

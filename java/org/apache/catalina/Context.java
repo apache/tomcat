@@ -324,12 +324,16 @@ public interface Context extends Container {
 
     /**
      * Return the alternate Deployment Descriptor name.
+     *
+     * @return the name
      */
     public String getAltDDName();
 
 
     /**
      * Set an alternate Deployment Descriptor name.
+     *
+     * @param altDDName The new name
      */
     public void setAltDDName(String altDDName) ;
 
@@ -344,6 +348,8 @@ public interface Context extends Container {
 
     /**
      * Return the deny-uncovered-http-methods flag for this web application.
+     *
+     * @return The current value of the flag
      */
     public boolean getDenyUncoveredHttpMethods();
 
@@ -358,6 +364,8 @@ public interface Context extends Container {
 
     /**
      * Return the display name of this web application.
+     *
+     * @return The display name
      */
     public String getDisplayName();
 
@@ -371,7 +379,9 @@ public interface Context extends Container {
 
 
     /**
-     * Return the distributable flag for this web application.
+     * Get the distributable flag for this web application.
+     *
+     * @return The value of the distributable flag for this web application.
      */
     public boolean getDistributable();
 
@@ -1659,6 +1669,9 @@ public interface Context extends Container {
      * for this Context.
      *
      * @param cookieProcessor   The new cookie processor
+     *
+     * @throws IllegalArgumentException If a {@code null} CookieProcessor is
+     *         specified
      */
     public void setCookieProcessor(CookieProcessor cookieProcessor);
 

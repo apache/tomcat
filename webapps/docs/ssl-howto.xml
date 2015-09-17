@@ -123,7 +123,7 @@ identity is important, a Certificate is typically purchased from a well-known
 <em>Certificate Authority</em> (CA) such as VeriSign or Thawte.  Such
 certificates can be electronically verified -- in effect, the Certificate
 Authority will vouch for the authenticity of the certificates that it grants,
-so you can believe that that Certificate is valid if you trust the Certificate
+so you can believe that the Certificate is valid if you trust the Certificate
 Authority that granted it.</p>
 
 <p>In many cases, however, authentication is not really a concern.  An
@@ -286,7 +286,7 @@ JSSE implementation.
 </p>
 
 <p>
-As configuration attributes for SSL support significally differ between
+As configuration attributes for SSL support significantly differ between
 APR vs. JSSE implementations, it is <strong>recommended</strong> to
 avoid auto-selection of implementation. It is done by specifying a classname
 in the <b>protocol</b> attribute of the <a href="config/http.html">Connector</a>.</p>
@@ -300,11 +300,20 @@ loaded or not, use one of the following:</p>
 <!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO2 implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11Nio2Protocol"
            port="8443" .../>]]></source>
+
+<p>Tomcat also provides a SSL engine that directly uses OpenSSL. If the APR library
+is installed (as for using the APR connector), using the sslImplementationName attribute
+allows enabling it. In that case, the configuration must not use the JSSE attributes, but
+all the attributes that are defined for the APR connector.</p>
+<source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO implementation and OpenSSL -->
+<Connector protocol="org.apache.coyote.http11.Http11NioProtocol" port="8443"
+           sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"
+           .../>]]></source>
+
 <p>Alternatively, to specify an APR connector (the APR library must be available) use:</p>
 <source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, APR implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11AprProtocol"
            port="8443" .../>]]></source>
-
 
 <p>If you are using APR, you have the option of configuring an alternative engine to OpenSSL.</p>
 <source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
@@ -483,6 +492,24 @@ SSL communications, and what to do about them.</p>
     <a href="#Edit_the_Tomcat_Configuration_File">Tomcat configuration file</a>.
     <strong>REMINDER</strong> - <code>keyAlias</code> values may be case
     sensitive!</p>
+    </li>
+
+<li>My Java-based client aborts handshakes with exceptions such as
+    "java.lang.RuntimeException: Could not generate DH keypair" and
+    "java.security.InvalidAlgorithmParameterException: Prime size must be multiple
+    of 64, and can only range from 512 to 1024 (inclusive)"
+
+    <p>If you are using the APR/native connector,
+    it will determine the strength of ephemeral DH keys from the key size of
+    your RSA certificate. For example a 2048 bit RSA key will result in
+    using a 2048 bit prime for the DH keys. Unfortunately Java 6 only supports
+    768 bit and Java 7 only supports 1024 bit. So if your certificate has a
+    stronger key, old Java clients might produce such handshake failures.
+    As a mitigation you can either try to force them to use another cipher by
+    configuring an appropriate <code>SSLCipherSuite</code> and activate
+    <code>SSLHonorCipherOrder</code>, or embed weak DH params in your
+    certificate file. The latter approach is not recommended because it weakens
+    the SSL security (logjam attack).</p>
     </li>
 
 </ul>

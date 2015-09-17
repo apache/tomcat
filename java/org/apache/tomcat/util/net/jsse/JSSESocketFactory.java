@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net.jsse;
 
 import java.io.File;
@@ -46,7 +45,6 @@ import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSessionContext;
@@ -56,10 +54,11 @@ import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.net.AbstractEndpoint;
-import org.apache.tomcat.util.net.Constants;
+import org.apache.tomcat.util.compat.JreVendor;
+import org.apache.tomcat.util.net.SSLContext;
+import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtil;
-import org.apache.tomcat.util.net.jsse.openssl.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -77,37 +76,22 @@ import org.apache.tomcat.util.res.StringManager;
 public class JSSESocketFactory implements SSLUtil {
 
     private static final Log log = LogFactory.getLog(JSSESocketFactory.class);
-    private static final StringManager sm =
-        StringManager.getManager("org.apache.tomcat.util.net.jsse.res");
+    private static final StringManager sm = StringManager.getManager(JSSESocketFactory.class);
 
-    // Defaults - made public where re-used
-    private static final String defaultProtocol = "TLS";
-    private static final String defaultKeystoreType = "JKS";
-    private static final String defaultKeystoreFile
-        = System.getProperty("user.home") + "/.keystore";
-    private static final int defaultSessionCacheSize = 0;
-    private static final int defaultSessionTimeout = 86400;
-    private static final String ALLOW_ALL_SUPPORTED_CIPHERS = "ALL";
-    public static final String DEFAULT_KEY_PASS = "changeit";
-
-    private AbstractEndpoint<?> endpoint;
+    private final SSLHostConfig sslHostConfig;
+    private final SSLHostConfigCertificate certificate;
 
     private final String[] defaultServerProtocols;
-    private final String[] defaultServerCipherSuites;
 
 
-    public JSSESocketFactory (AbstractEndpoint<?> endpoint) {
-        this.endpoint = endpoint;
-
-        String sslProtocol = endpoint.getSslProtocol();
-        if (sslProtocol == null) {
-            sslProtocol = defaultProtocol;
-        }
+    public JSSESocketFactory (SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
+        this.sslHostConfig = sslHostConfig;
+        this.certificate = certificate;
 
         SSLContext context;
         try {
-             context = SSLContext.getInstance(sslProtocol);
-             context.init(null,  null,  null);
+            context = createSSLContext(null);
+            context.init(null,  null,  null);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             // This is fatal for the connector so throw an exception to prevent
             // it from starting
@@ -124,37 +108,27 @@ public class JSSESocketFactory implements SSLUtil {
             // This is very likely to be fatal but there is a slim chance that
             // the JSSE implementation just doesn't like creating unbound
             // sockets so allow the code to proceed.
-            defaultServerCipherSuites = new String[0];
             defaultServerProtocols = new String[0];
-            log.warn(sm.getString("jsse.noDefaultCiphers", endpoint.getName()));
-            log.warn(sm.getString("jsse.noDefaultProtocols", endpoint.getName()));
+            log.warn(sm.getString("jsse.noDefaultProtocols", sslHostConfig.getHostName()));
             return;
         }
 
         try {
-            defaultServerCipherSuites = socket.getEnabledCipherSuites();
-            if (defaultServerCipherSuites.length == 0) {
-                log.warn(sm.getString("jsse.noDefaultCiphers",
-                        endpoint.getName()));
-            }
-
             // Filter out all the SSL protocols (SSLv2 and SSLv3) from the
             // defaults
             // since they are no longer considered secure
             List<String> filteredProtocols = new ArrayList<>();
             for (String protocol : socket.getEnabledProtocols()) {
                 if (protocol.toUpperCase(Locale.ENGLISH).contains("SSL")) {
-                    log.debug(sm.getString("jsse.excludeDefaultProtocol",
-                            protocol));
+                    log.debug(sm.getString("jsse.excludeDefaultProtocol", protocol));
                     continue;
                 }
                 filteredProtocols.add(protocol);
             }
-            defaultServerProtocols = filteredProtocols
-                    .toArray(new String[filteredProtocols.size()]);
+            defaultServerProtocols =
+                    filteredProtocols.toArray(new String[filteredProtocols.size()]);
             if (defaultServerProtocols.length == 0) {
-                log.warn(sm.getString("jsse.noDefaultProtocols",
-                        endpoint.getName()));
+                log.warn(sm.getString("jsse.noDefaultProtocols", sslHostConfig.getHostName()));
             }
         } finally {
             try {
@@ -168,37 +142,31 @@ public class JSSESocketFactory implements SSLUtil {
 
     @Override
     public String[] getEnableableCiphers(SSLContext context) {
-        String requestedCiphersStr = endpoint.getCiphers();
+        List<String> requestedCiphers = sslHostConfig.getJsseCipherNames();
 
-        if (ALLOW_ALL_SUPPORTED_CIPHERS.equals(requestedCiphersStr)) {
-            return context.getSupportedSSLParameters().getCipherSuites();
-        }
-        if ((requestedCiphersStr == null)
-                || (requestedCiphersStr.trim().length() == 0)) {
-            return defaultServerCipherSuites;
-        }
-
-        List<String> requestedCiphers = new ArrayList<>();
-        if (requestedCiphersStr.indexOf(':') != -1) {
-            requestedCiphers = OpenSSLCipherConfigurationParser.parseExpression(requestedCiphersStr);
-        } else {
-            for (String rc : requestedCiphersStr.split(",")) {
-                final String cipher = rc.trim();
-                if (cipher.length() > 0) {
-                    requestedCiphers.add(cipher);
+        List<String> ciphers = new ArrayList<>(requestedCiphers);
+        String[] supportedCipherSuiteArray = context.getSupportedSSLParameters().getCipherSuites();
+        // The IBM JRE will accept cipher suites names SSL_xxx or TLS_xxx but
+        // only returns the SSL_xxx form for supported cipher suites. Therefore
+        // need to filter the requested cipher suites using both forms with an
+        // IBM JRE.
+        List<String> supportedCipherSuiteList;
+        if (JreVendor.IS_IBM_JVM) {
+            supportedCipherSuiteList = new ArrayList<>(supportedCipherSuiteArray.length * 2);
+            for (String name : supportedCipherSuiteArray) {
+                supportedCipherSuiteList.add(name);
+                if (name.startsWith("SSL")) {
+                    supportedCipherSuiteList.add("TLS" + name.substring(3));
                 }
             }
+        } else {
+            supportedCipherSuiteList = Arrays.asList(supportedCipherSuiteArray);
         }
-        if (requestedCiphers.isEmpty()) {
-            return defaultServerCipherSuites;
-        }
-        List<String> ciphers = new ArrayList<>(requestedCiphers);
-        ciphers.retainAll(Arrays.asList(context.getSupportedSSLParameters()
-                .getCipherSuites()));
+        ciphers.retainAll(supportedCipherSuiteList);
 
         if (ciphers.isEmpty()) {
             log.warn(sm.getString("jsse.requested_ciphers_not_supported",
-                    requestedCiphersStr));
+                    sslHostConfig.getCiphers()));
         }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("jsse.enableable_ciphers", ciphers));
@@ -212,84 +180,21 @@ public class JSSESocketFactory implements SSLUtil {
         return ciphers.toArray(new String[ciphers.size()]);
     }
 
-    /*
-     * Gets the SSL server's keystore password.
-     */
-    protected String getKeystorePassword() {
-        String keystorePass = endpoint.getKeystorePass();
-        if (keystorePass == null) {
-            keystorePass = endpoint.getKeyPass();
-        }
-        if (keystorePass == null) {
-            keystorePass = DEFAULT_KEY_PASS;
-        }
-        return keystorePass;
-    }
-
-    /*
-     * Gets the SSL server's keystore.
-     */
-    protected KeyStore getKeystore(String type, String provider, String pass)
-            throws IOException {
-
-        String keystoreFile = endpoint.getKeystoreFile();
-        if (keystoreFile == null)
-            keystoreFile = defaultKeystoreFile;
-
-        return getStore(type, provider, keystoreFile, pass);
-    }
 
     /*
      * Gets the SSL server's truststore.
      */
-    protected KeyStore getTrustStore(String keystoreType,
-            String keystoreProvider) throws IOException {
+    protected KeyStore getTrustStore() throws IOException {
         KeyStore trustStore = null;
 
-        String truststoreFile = endpoint.getTruststoreFile();
-        if(truststoreFile == null) {
-            truststoreFile = System.getProperty("javax.net.ssl.trustStore");
-        }
-        if(log.isDebugEnabled()) {
-            log.debug("Truststore = " + truststoreFile);
-        }
-
-        String truststorePassword = endpoint.getTruststorePass();
-        if( truststorePassword == null) {
-            truststorePassword =
-                System.getProperty("javax.net.ssl.trustStorePassword");
-        }
-        if(log.isDebugEnabled()) {
-            log.debug("TrustPass = " + truststorePassword);
-        }
-
-        String truststoreType = endpoint.getTruststoreType();
-        if( truststoreType == null) {
-            truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
-        }
-        if(truststoreType == null) {
-            truststoreType = keystoreType;
-        }
-        if(log.isDebugEnabled()) {
-            log.debug("trustType = " + truststoreType);
-        }
-
-        String truststoreProvider = endpoint.getTruststoreProvider();
-        if( truststoreProvider == null) {
-            truststoreProvider =
-                System.getProperty("javax.net.ssl.trustStoreProvider");
-        }
-        if (truststoreProvider == null) {
-            truststoreProvider = keystoreProvider;
-        }
-        if(log.isDebugEnabled()) {
-            log.debug("trustProvider = " + truststoreProvider);
-        }
+        String truststoreFile = SSLHostConfig.adjustRelativePath(sslHostConfig.getTruststoreFile());
+        String truststoreType = sslHostConfig.getTruststoreType();
+        String truststoreProvider = sslHostConfig.getTruststoreProvider();
 
         if (truststoreFile != null){
             try {
                 trustStore = getStore(truststoreType, truststoreProvider,
-                        truststoreFile, truststorePassword);
+                        truststoreFile, sslHostConfig.getTruststorePassword());
             } catch (IOException ioe) {
                 Throwable cause = ioe.getCause();
                 if (cause instanceof UnrecoverableKeyException) {
@@ -309,6 +214,7 @@ public class JSSESocketFactory implements SSLUtil {
         return trustStore;
     }
 
+
     /*
      * Gets the key- or truststore with the specified type, path, and password.
      */
@@ -324,12 +230,9 @@ public class JSSESocketFactory implements SSLUtil {
                 ks = KeyStore.getInstance(type, provider);
             }
             if(!("PKCS11".equalsIgnoreCase(type) ||
-                    "".equalsIgnoreCase(path))) {
+                    "".equalsIgnoreCase(path)) ||
+                    "NONE".equalsIgnoreCase(path)) {
                 File keyStoreFile = new File(path);
-                if (!keyStoreFile.isAbsolute()) {
-                    keyStoreFile = new File(System.getProperty(
-                            Constants.CATALINA_BASE_PROP), path);
-                }
                 istream = new FileInputStream(keyStoreFile);
             }
 
@@ -364,112 +267,51 @@ public class JSSESocketFactory implements SSLUtil {
         return ks;
     }
 
+
     @Override
-    public SSLContext createSSLContext() throws Exception {
-
-        // SSL protocol variant (e.g., TLS, SSL v3, etc.)
-        String protocol = endpoint.getSslProtocol();
-        if (protocol == null) {
-            protocol = defaultProtocol;
-        }
-
-        SSLContext context = SSLContext.getInstance(protocol);
-
-        return context;
+    public SSLContext createSSLContext(List<String> negotiableProtocols) throws NoSuchAlgorithmException {
+        return new JSSESSLContext(sslHostConfig.getSslProtocol());
     }
+
 
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
-        String keystoreType = endpoint.getKeystoreType();
-        if (keystoreType == null) {
-            keystoreType = defaultKeystoreType;
+        String keystoreType = certificate.getCertificateKeystoreType();
+        String keystoreProvider = certificate.getCertificateKeystoreProvider();
+        String keystoreFile = SSLHostConfig.adjustRelativePath(
+                certificate.getCertificateKeystoreFile());
+        String keystorePass = certificate.getCertificateKeystorePassword();
+        String keyAlias = certificate.getCertificateKeyAlias();
+        String algorithm = sslHostConfig.getKeyManagerAlgorithm();
+        String keyPass = certificate.getCertificateKeyPassword();
+        // This has to be here as it can't be moved to SSLHostConfig since the
+        // defaults vary between JSSE and OpenSSL.
+        if (keyPass == null) {
+            keyPass = certificate.getCertificateKeystorePassword();
         }
-
-        String algorithm = endpoint.getAlgorithm();
-        if (algorithm == null) {
-            algorithm = KeyManagerFactory.getDefaultAlgorithm();
-        }
-
-        return getKeyManagers(keystoreType, endpoint.getKeystoreProvider(),
-                algorithm, endpoint.getKeyAlias());
-    }
-
-    @Override
-    public TrustManager[] getTrustManagers() throws Exception {
-        String truststoreType = endpoint.getTruststoreType();
-        if (truststoreType == null) {
-            truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
-        }
-        if (truststoreType == null) {
-            truststoreType = endpoint.getKeystoreType();
-        }
-        if (truststoreType == null) {
-            truststoreType = defaultKeystoreType;
-        }
-
-        String algorithm = endpoint.getTruststoreAlgorithm();
-        if (algorithm == null) {
-            algorithm = TrustManagerFactory.getDefaultAlgorithm();
-        }
-
-        return getTrustManagers(truststoreType, endpoint.getKeystoreProvider(),
-                algorithm);
-    }
-
-    @Override
-    public void configureSessionContext(SSLSessionContext sslSessionContext) {
-        int sessionCacheSize;
-        if (endpoint.getSessionCacheSize() != null) {
-            sessionCacheSize = Integer.parseInt(
-                    endpoint.getSessionCacheSize());
-        } else {
-            sessionCacheSize = defaultSessionCacheSize;
-        }
-
-        int sessionTimeout;
-        if (endpoint.getSessionTimeout() != null) {
-            sessionTimeout = Integer.parseInt(endpoint.getSessionTimeout());
-        } else {
-            sessionTimeout = defaultSessionTimeout;
-        }
-
-        sslSessionContext.setSessionCacheSize(sessionCacheSize);
-        sslSessionContext.setSessionTimeout(sessionTimeout);
-    }
-
-    /**
-     * Gets the initialized key managers.
-     */
-    protected KeyManager[] getKeyManagers(String keystoreType,
-                                          String keystoreProvider,
-                                          String algorithm,
-                                          String keyAlias)
-                throws Exception {
 
         KeyManager[] kms = null;
 
-        String keystorePass = getKeystorePassword();
-
-        KeyStore ks = getKeystore(keystoreType, keystoreProvider, keystorePass);
+        KeyStore ks = getStore(keystoreType, keystoreProvider, keystoreFile, keystorePass);
         if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
-            throw new IOException(
-                    sm.getString("jsse.alias_no_key_entry", keyAlias));
+            throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));
         }
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-        String keyPass = endpoint.getKeyPass();
-        if (keyPass == null) {
-            keyPass = keystorePass;
-        }
         kmf.init(ks, keyPass.toCharArray());
 
         kms = kmf.getKeyManagers();
+        if (kms == null) {
+            return kms;
+        }
+
         if (keyAlias != null) {
             String alias = keyAlias;
+            // JKS keystores always convert the alias name to lower case
             if ("JKS".equals(keystoreType)) {
                 alias = alias.toLowerCase(Locale.ENGLISH);
             }
-            for(int i=0; i<kms.length; i++) {
+            for(int i = 0; i < kms.length; i++) {
                 kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], alias);
             }
         }
@@ -477,15 +319,15 @@ public class JSSESocketFactory implements SSLUtil {
         return kms;
     }
 
-    /**
-     * Gets the initialized trust managers.
-     */
-    protected TrustManager[] getTrustManagers(String keystoreType,
-            String keystoreProvider, String algorithm)
-        throws Exception {
-        String crlf = endpoint.getCrlFile();
 
-        String className = endpoint.getTrustManagerClassName();
+    @Override
+    public TrustManager[] getTrustManagers() throws Exception {
+        String algorithm = sslHostConfig.getTruststoreAlgorithm();
+
+        String crlf = SSLHostConfig.adjustRelativePath(
+                sslHostConfig.getCertificateRevocationListFile());
+
+        String className = sslHostConfig.getTrustManagerClassName();
         if(className != null && className.length() > 0) {
              ClassLoader classLoader = getClass().getClassLoader();
              Class<?> clazz = classLoader.loadClass(className);
@@ -500,20 +342,16 @@ public class JSSESocketFactory implements SSLUtil {
 
         TrustManager[] tms = null;
 
-        KeyStore trustStore = getTrustStore(keystoreType, keystoreProvider);
-        if (trustStore != null || endpoint.getTrustManagerClassName() != null) {
+        KeyStore trustStore = getTrustStore();
+        if (trustStore != null || className != null) {
             if (crlf == null) {
-                TrustManagerFactory tmf =
-                    TrustManagerFactory.getInstance(algorithm);
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
                 tmf.init(trustStore);
                 tms = tmf.getTrustManagers();
             } else {
-                TrustManagerFactory tmf =
-                    TrustManagerFactory.getInstance(algorithm);
-                CertPathParameters params =
-                    getParameters(algorithm, crlf, trustStore);
-                ManagerFactoryParameters mfp =
-                    new CertPathTrustManagerParameters(params);
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
+                CertPathParameters params = getParameters(algorithm, crlf, trustStore);
+                ManagerFactoryParameters mfp = new CertPathTrustManagerParameters(params);
                 tmf.init(mfp);
                 tms = tmf.getTrustManagers();
             }
@@ -521,6 +359,13 @@ public class JSSESocketFactory implements SSLUtil {
 
         return tms;
     }
+
+    @Override
+    public void configureSessionContext(SSLSessionContext sslSessionContext) {
+        sslSessionContext.setSessionCacheSize(sslHostConfig.getSessionCacheSize());
+        sslSessionContext.setSessionTimeout(sslHostConfig.getSessionTimeout());
+    }
+
 
     /**
      * Return the initialization parameters for the TrustManager.
@@ -531,33 +376,22 @@ public class JSSESocketFactory implements SSLUtil {
      * @param trustStore The configured TrustStore.
      * @return The parameters including the CRLs and TrustStore.
      */
-    protected CertPathParameters getParameters(String algorithm,
-                                                String crlf,
-                                                KeyStore trustStore)
-        throws Exception {
-        CertPathParameters params = null;
+    protected CertPathParameters getParameters(String algorithm, String crlf,
+            KeyStore trustStore) throws Exception {
+
         if("PKIX".equalsIgnoreCase(algorithm)) {
             PKIXBuilderParameters xparams =
-                new PKIXBuilderParameters(trustStore, new X509CertSelector());
+                    new PKIXBuilderParameters(trustStore, new X509CertSelector());
             Collection<? extends CRL> crls = getCRLs(crlf);
             CertStoreParameters csp = new CollectionCertStoreParameters(crls);
             CertStore store = CertStore.getInstance("Collection", csp);
             xparams.addCertStore(store);
             xparams.setRevocationEnabled(true);
-            String trustLength = endpoint.getTrustMaxCertLength();
-            if(trustLength != null) {
-                try {
-                    xparams.setMaxPathLength(Integer.parseInt(trustLength));
-                } catch(Exception ex) {
-                    log.warn("Bad maxCertLength: "+trustLength);
-                }
-            }
-
-            params = xparams;
+            xparams.setMaxPathLength(sslHostConfig.getCertificateVerificationDepth());
+            return xparams;
         } else {
             throw new CRLException("CRLs not supported for type: "+algorithm);
         }
-        return params;
     }
 
 
@@ -569,10 +403,6 @@ public class JSSESocketFactory implements SSLUtil {
         throws IOException, CRLException, CertificateException {
 
         File crlFile = new File(crlf);
-        if( !crlFile.isAbsolute() ) {
-            crlFile = new File(
-                    System.getProperty(Constants.CATALINA_BASE_PROP), crlf);
-        }
         Collection<? extends CRL> crls = null;
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -591,25 +421,25 @@ public class JSSESocketFactory implements SSLUtil {
 
     @Override
     public String[] getEnableableProtocols(SSLContext context) {
-        String[] requestedProtocols = endpoint.getSslEnabledProtocolsArray();
-        if ((requestedProtocols == null) || (requestedProtocols.length == 0)) {
+        if (sslHostConfig.getProtocols().size() == 0) {
+            // JSSE fallback used if protocols=""
             return defaultServerProtocols;
         }
 
-        List<String> protocols = new ArrayList<>(
-                Arrays.asList(requestedProtocols));
+        List<String> protocols = new ArrayList<>();
+        protocols.addAll(sslHostConfig.getProtocols());
         protocols.retainAll(Arrays.asList(context.getSupportedSSLParameters()
                 .getProtocols()));
 
         if (protocols.isEmpty()) {
             log.warn(sm.getString("jsse.requested_protocols_not_supported",
-                    Arrays.asList(requestedProtocols)));
+                    sslHostConfig.getProtocols()));
         }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("jsse.enableable_protocols", protocols));
-            if (protocols.size() != requestedProtocols.length) {
-                List<String> skipped = new ArrayList<>(
-                        Arrays.asList(requestedProtocols));
+            if (protocols.size() != sslHostConfig.getProtocols().size()) {
+                List<String> skipped = new ArrayList<>();
+                skipped.addAll(sslHostConfig.getProtocols());
                 skipped.removeAll(protocols);
                 log.debug(sm.getString("jsse.unsupported_protocols", skipped));
             }

@@ -19,14 +19,20 @@
 <p>02-\\${1+1}</p>
 <p>03-\\\${1+1}</p>
 <p>04-\$500</p>
+<p>05-${'\\$'}</p>
+<p>06-${'\\${'}</p>
 <tags:echo echo="10-${1+1}" />
 <tags:echo echo="11-\${1+1}" />
 <tags:echo echo="12-\\${1+1}" />
 <tags:echo echo="13-\\\${1+1}" />
 <tags:echo echo="14-\\\\${1+1}" />
 <tags:echo echo="15-\$500" />
+<tags:echo echo="16-${'\\$'}" />
+<tags:echo echo="17-${'\\${'}" />
 <tags:echo-deferred echo="20-#{1+1}" />
 <tags:echo-deferred echo="21-\#{1+1}" />
 <tags:echo-deferred echo="22-\\#{1+1}" />
 <tags:echo-deferred echo="23-\\\#{1+1}" />
 <tags:echo-deferred echo="24-\\\\#{1+1}" />
+<tags:echo-deferred echo="25-#{'\\#'}" />
+<tags:echo-deferred echo="26-#{'\\#{'}" />

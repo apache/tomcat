@@ -150,6 +150,9 @@ public class StringManager {
      *
      * @param key  The key for the required message
      * @param args The values to insert into the message
+     *
+     * @return The request string formatted with the provided arguments or the
+     *         key if the key was not found.
      */
     public String getString(final String key, final Object... args) {
         String value = getString(key);
@@ -164,7 +167,9 @@ public class StringManager {
 
 
     /**
-     * Identify the Locale this StringManager is associated with
+     * Identify the Locale this StringManager is associated with.
+     *
+     * @return The Locale associated with the StringManager
      */
     public Locale getLocale() {
         return locale;
@@ -186,6 +191,8 @@ public class StringManager {
      * StringManager will be created and returned.
      *
      * @param clazz The class for which to retrieve the StringManager
+     *
+     * @return The instance associated with the package of the provide class
      */
     public static final StringManager getManager(Class<?> clazz) {
         return getManager(clazz.getPackage().getName());
@@ -198,6 +205,9 @@ public class StringManager {
      * StringManager will be created and returned.
      *
      * @param packageName The package name
+     *
+     * @return The instance associated with the given package and the default
+     *         Locale
      */
     public static final StringManager getManager(String packageName) {
         return getManager(packageName, Locale.getDefault());
@@ -211,6 +221,8 @@ public class StringManager {
      *
      * @param packageName The package name
      * @param locale      The Locale
+     *
+     * @return The instance associated with the given package and Locale
      */
     public static final synchronized StringManager getManager(
             String packageName, Locale locale) {
@@ -252,7 +264,9 @@ public class StringManager {
      * Retrieve the StringManager for a list of Locales. The first StringManager
      * found will be returned.
      *
-     * @param requestedLocales the list of Locales
+     * @param packageName      The package for which the StringManager was
+     *                         requested
+     * @param requestedLocales The list of Locales
      *
      * @return the found StringManager or the default StringManager
      */

@@ -17,10 +17,12 @@
 package org.apache.catalina.webresources;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
+import java.util.jar.Manifest;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
@@ -28,11 +30,15 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceRoot.ResourceSetType;
 import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.ResourceSet;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a directory.
  */
 public class DirResourceSet extends AbstractFileResourceSet {
+
+    private static final Log log = LogFactory.getLog(DirResourceSet.class);
 
     /**
      * A no argument constructor is required for this to work with the digester.
@@ -102,7 +108,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
             if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
                 path = path + '/';
             }
-            return new FileResource(root, path, f, isReadOnly());
+            return new FileResource(root, path, f, isReadOnly(), getManifest());
         } else {
             return new EmptyResource(root, path);
         }
@@ -246,6 +252,24 @@ public class DirResourceSet extends AbstractFileResourceSet {
         if (file.isDirectory() == false) {
             throw new IllegalArgumentException(sm.getString("dirResourceSet.notDirectory",
                     getBase(), File.separator, getInternalPath()));
+        }
+    }
+
+    //-------------------------------------------------------- Lifecycle methods
+    @Override
+    protected void initInternal() throws LifecycleException {
+        super.initInternal();
+        // Is this an exploded web application?
+        if (getWebAppMount().equals("")) {
+            // Look for a manifest
+            File mf = file("META-INF/MANIFEST.MF", true);
+            if (mf != null && mf.isFile()) {
+                try (FileInputStream fis = new FileInputStream(mf)) {
+                    setManifest(new Manifest(fis));
+                } catch (IOException e) {
+                    log.warn(sm.getString("dirResourceSet.manifestFail", mf.getAbsolutePath()), e);
+                }
+            }
         }
     }
 }

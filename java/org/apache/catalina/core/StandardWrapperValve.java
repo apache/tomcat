@@ -168,10 +168,8 @@ final class StandardWrapperValve
         request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                 requestPathMB);
         // Create the filter chain for this request
-        ApplicationFilterFactory factory =
-            ApplicationFilterFactory.getInstance();
         ApplicationFilterChain filterChain =
-            factory.createFilterChain(request, wrapper, servlet);
+                ApplicationFilterFactory.createFilterChain(request, wrapper, servlet);
 
         // Call the filter chain for this request
         // NOTE: This also calls the servlet's service() method

@@ -67,6 +67,13 @@ public class B2CConverter {
 
     /**
      * Only to be used when it is known that the encoding name is in lower case.
+     * @param lowerCaseEnc The name of the encoding for the required charset in
+     *                     lower case
+     *
+     * @return The Charset corresponding to the requested encoding
+     *
+     * @throws UnsupportedEncodingException If the requested Charset is not
+     *                                      available
      */
     public static Charset getCharsetLower(String lowerCaseEnc)
             throws UnsupportedEncodingException {
@@ -90,12 +97,11 @@ public class B2CConverter {
      */
     private final ByteBuffer leftovers;
 
-    public B2CConverter(String encoding) throws IOException {
-        this(encoding, false);
+    public B2CConverter(Charset charset) {
+        this(charset, false);
     }
 
-    public B2CConverter(String encoding, boolean replaceOnError)
-            throws IOException {
+    public B2CConverter(Charset charset, boolean replaceOnError) {
         byte[] left = new byte[LEFTOVER_SIZE];
         leftovers = ByteBuffer.wrap(left);
         CodingErrorAction action;
@@ -104,7 +110,6 @@ public class B2CConverter {
         } else {
             action = CodingErrorAction.REPORT;
         }
-        Charset charset = getCharset(encoding);
         // Special case. Use the Apache Harmony based UTF-8 decoder because it
         // - a) rejects invalid sequences that the JVM decoder does not
         // - b) fails faster for some invalid sequences
@@ -131,6 +136,8 @@ public class B2CConverter {
      * @param bc byte input
      * @param cc char output
      * @param endOfInput    Is this all of the available data
+     *
+     * @throws IOException If the conversion can not be completed
      */
     public void convert(ByteChunk bc, CharChunk cc, boolean endOfInput)
             throws IOException {
@@ -190,5 +197,10 @@ public class B2CConverter {
                 bc.substract(leftovers.array(), 0, bc.getLength());
             }
         }
+    }
+
+
+    public Charset getCharset() {
+        return decoder.charset();
     }
 }

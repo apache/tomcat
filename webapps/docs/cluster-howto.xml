@@ -63,7 +63,7 @@
     <li>Multicast port is 45564 (the port and the address together determine cluster membership.</li>
     <li>The IP broadcasted is <code>java.net.InetAddress.getLocalHost().getHostAddress()</code> (make sure you don't broadcast 127.0.0.1, this is a common error)</li>
     <li>The TCP port listening for replication messages is the first available server socket in range <code>4000-4100</code></li>
-    <li>Two listeners are configured <code>ClusterSessionListener</code></li>
+    <li>Listener is configured <code>ClusterSessionListener</code></li>
     <li>Two interceptors are configured <code>TcpFailureDetector</code> and <code>MessageDispatch15Interceptor</code></li>
   </ol>
   <p>
@@ -119,7 +119,7 @@ should be completed:</p>
   <li>All your session attributes must implement <code>java.io.Serializable</code></li>
   <li>Uncomment the <code>Cluster</code> element in server.xml</li>
   <li>If you have defined custom cluster valves, make sure you have the <code>ReplicationValve</code>  defined as well under the Cluster element in server.xml</li>
-  <li>If your Tomcat instances are running on the same machine, make sure the <code>tcpListenPort</code>
+  <li>If your Tomcat instances are running on the same machine, make sure the <code>Receiver.port</code>
       attribute is unique for each instance, in most cases Tomcat is smart enough to resolve this on it's own by autodetecting available ports in the range 4000-4100</li>
   <li>Make sure your <code>web.xml</code> has the
       <code>&lt;distributable/&gt;</code> element</li>
@@ -368,9 +368,9 @@ should be completed:</p>
         Using interceptors, logic can be broken into more manageable pieces of code. The interceptors configured above are:<br/>
         TcpFailureDetector - verifies crashed members through TCP, if multicast packets get dropped, this interceptor protects against false positives,
         ie the node marked as crashed even though it still is alive and running.<br/>
-        MessageDispatch15Interceptor - dispatches messages to a thread (thread pool) to send message asynchrously.<br/>
+        MessageDispatch15Interceptor - dispatches messages to a thread (thread pool) to send message asynchronously.<br/>
         ThroughputInterceptor - prints out simple stats on message traffic.<br/>
-        Please note that the order of interceptors is important. the way they are defined in server.xml is the way they are represented in the
+        Please note that the order of interceptors is important. The way they are defined in server.xml is the way they are represented in the
         channel stack. Think of it as a linked list, with the head being the first most interceptor and the tail the last.
         <br/>For more info, Please visit the <a href="config/cluster-interceptor.html">reference documentation</a>
     </p>
@@ -474,7 +474,7 @@ should be completed:</p>
 <li><code>TomcatA</code> The session <code>S2</code> expires due to inactivity.</li>
 </ol>
 
-<p>Ok, now that we have a good sequence, we will take you through exactly what happens in the session repliction code</p>
+<p>Ok, now that we have a good sequence, we will take you through exactly what happens in the session replication code</p>
 
 <ol>
 <li><b><code>TomcatA</code> starts up</b>
@@ -506,7 +506,7 @@ should be completed:</p>
         The request coming in to TomcatA is treated exactly the same way as without session replication.
         The action happens when the request is completed, the <code>ReplicationValve</code> will intercept
         the request before the response is returned to the user.
-        At this point it finds that the session has been modified, and it uses TCP to replicata the
+        At this point it finds that the session has been modified, and it uses TCP to replicate the
         session to TomcatB. Once the serialized data has been handed off to the operating systems TCP logic,
         the request returns to the user, back through the valve pipeline.
         For each request the entire session is replicated, this allows code that modifies attributes

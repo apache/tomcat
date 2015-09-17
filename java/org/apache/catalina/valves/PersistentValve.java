@@ -16,20 +16,22 @@
  */
 package org.apache.catalina.valves;
 
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
+import org.apache.catalina.Host;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
 import org.apache.catalina.StoreManager;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-
 
 /**
  * Valve that implements per-request session persistence. It is intended to be
@@ -44,13 +46,33 @@ import org.apache.catalina.connector.Response;
  */
 public class PersistentValve extends ValveBase {
 
+    // Saves a couple of calls to getClassLoader() on every request. Under high
+    // load these calls took just long enough to appear as a hot spot (although
+    // a very minor one) in a profiler.
+    private static final ClassLoader MY_CLASSLOADER = PersistentValve.class.getClassLoader();
+
+    private volatile boolean clBindRequired;
+
+
     //------------------------------------------------------ Constructor
+
     public PersistentValve() {
         super(true);
     }
 
 
     // --------------------------------------------------------- Public Methods
+
+    @Override
+    public void setContainer(Container container) {
+        super.setContainer(container);
+        if (container instanceof Engine || container instanceof Host) {
+            clBindRequired = true;
+        } else {
+            clBindRequired = false;
+        }
+    }
+
 
     /**
      * Select the appropriate child Context to process this request,
@@ -70,45 +92,41 @@ public class PersistentValve extends ValveBase {
         // Select the Context to be used for this Request
         Context context = request.getContext();
         if (context == null) {
-            response.sendError
-                (HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                 sm.getString("standardHost.noContext"));
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    sm.getString("standardHost.noContext"));
             return;
         }
-
-        // Bind the context CL to the current thread
-        Thread.currentThread().setContextClassLoader
-            (context.getLoader().getClassLoader());
 
         // Update the session last access time for our session (if any)
         String sessionId = request.getRequestedSessionId();
         Manager manager = context.getManager();
-        if (sessionId != null && manager != null) {
-            if (manager instanceof StoreManager) {
-                Store store = ((StoreManager) manager).getStore();
-                if (store != null) {
-                    Session session = null;
-                    try {
-                        session = store.load(sessionId);
-                    } catch (Exception e) {
-                        container.getLogger().error("deserializeError");
-                    }
-                    if (session != null) {
-                        if (!session.isValid() ||
-                            isSessionStale(session, System.currentTimeMillis())) {
-                            if (container.getLogger().isDebugEnabled()) {
-                                container.getLogger().debug("session swapped in is invalid or expired");
-                            }
-                            session.expire();
-                            store.remove(sessionId);
-                        } else {
-                            session.setManager(manager);
-                            // session.setId(sessionId); Only if new ???
-                            manager.add(session);
-                            // ((StandardSession)session).activate();
-                            session.access();
-                            session.endAccess();
+        if (sessionId != null && manager instanceof StoreManager) {
+            Store store = ((StoreManager) manager).getStore();
+            if (store != null) {
+                Session session = null;
+                try {
+                    bind(context);
+                    session = store.load(sessionId);
+                } catch (Exception e) {
+                    container.getLogger().error("deserializeError");
+                } finally {
+                    unbind(context);
+                }
+                if (session != null) {
+                    if (!session.isValid() ||
+                        isSessionStale(session, System.currentTimeMillis())) {
+                        if (container.getLogger().isDebugEnabled()) {
+                            container.getLogger().debug("session swapped in is invalid or expired");
                         }
+                        session.expire();
+                        store.remove(sessionId);
+                    } else {
+                        session.setManager(manager);
+                        // session.setId(sessionId); Only if new ???
+                        manager.add(session);
+                        // ((StandardSession)session).activate();
+                        session.access();
+                        session.endAccess();
                     }
                 }
             }
@@ -121,8 +139,6 @@ public class PersistentValve extends ValveBase {
         getNext().invoke(request, response);
 
         // If still processing async, don't try to store the session
-        // TODO: Are there some async states where it would be safe to store
-        // the session?
         if (!request.isAsync()) {
             // Read the sessionid after the response.
             // HttpSession hsess = hreq.getSession(false);
@@ -141,38 +157,43 @@ public class PersistentValve extends ValveBase {
                 container.getLogger().debug("newsessionId: " + newsessionId);
             }
             if (newsessionId!=null) {
-                /* store the session and remove it from the manager */
-                if (manager instanceof StoreManager) {
-                    Session session = manager.findSession(newsessionId);
-                    Store store = ((StoreManager) manager).getStore();
-                    if (store != null && session!=null &&
-                        session.isValid() &&
-                        !isSessionStale(session, System.currentTimeMillis())) {
-                        // ((StandardSession)session).passivate();
-                        store.save(session);
-                        ((StoreManager) manager).removeSuper(session);
-                        session.recycle();
+                try {
+                    bind(context);
+
+                    /* store the session and remove it from the manager */
+                    if (manager instanceof StoreManager) {
+                        Session session = manager.findSession(newsessionId);
+                        Store store = ((StoreManager) manager).getStore();
+                        if (store != null && session != null && session.isValid() &&
+                                !isSessionStale(session, System.currentTimeMillis())) {
+                            store.save(session);
+                            ((StoreManager) manager).removeSuper(session);
+                            session.recycle();
+                        } else {
+                            if (container.getLogger().isDebugEnabled()) {
+                                container.getLogger().debug("newsessionId store: " +
+                                        store + " session: " + session +
+                                        " valid: " +
+                                        (session == null ? "N/A" : Boolean.toString(
+                                                session.isValid())) +
+                                        " stale: " + isSessionStale(session,
+                                                System.currentTimeMillis()));
+                            }
+
+                        }
                     } else {
                         if (container.getLogger().isDebugEnabled()) {
-                            container.getLogger().debug("newsessionId store: " +
-                                    store + " session: " + session +
-                                    " valid: " +
-                                    (session == null ? "N/A" : Boolean.toString(
-                                            session.isValid())) +
-                                    " stale: " + isSessionStale(session,
-                                            System.currentTimeMillis()));
+                            container.getLogger().debug("newsessionId Manager: " +
+                                    manager);
                         }
-
                     }
-                } else {
-                    if (container.getLogger().isDebugEnabled()) {
-                        container.getLogger().debug("newsessionId Manager: " +
-                                manager);
-                    }
+                } finally {
+                    unbind(context);
                 }
             }
         }
     }
+
 
     /**
      * Indicate whether the session has been idle for longer
@@ -194,7 +215,19 @@ public class PersistentValve extends ValveBase {
         }
 
         return false;
-
     }
 
+
+    private void bind(Context context) {
+        if (clBindRequired) {
+            context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
+        }
+    }
+
+
+    private void unbind(Context context) {
+        if (clBindRequired) {
+            context.unbind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
+        }
+    }
 }

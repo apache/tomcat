@@ -129,15 +129,15 @@
      <p>When deploying a web application that provides management functions for
      the Tomcat instance, the following guidelines should be followed:</p>
      <ul>
-       <ol>Ensure that any users permitted to access the management application
-           have strong passwords.</ol>
-       <ol>Do not remove the use of the <a
+       <li>Ensure that any users permitted to access the management application
+           have strong passwords.</li>
+       <li>Do not remove the use of the <a
            href="config/realm.html#LockOut_Realm_-_org.apache.catalina.realm.LockOutRealm">LockOutRealm</a>
-           which prevents brute force attacks against user passwords.</ol>
-       <ol>Uncomment the <a href="config/valve.html#Remote_Address_Filter">RemoteAddrValve</a>
+           which prevents brute force attacks against user passwords.</li>
+       <li>Uncomment the <a href="config/valve.html#Remote_Address_Filter">RemoteAddrValve</a>
            in <code>/META-INF/context.xml</code> which limits access to
            localhost. If remote access is required, limit it to specific IP
-           addresses using this valve.</ol>
+           addresses using this valve.</li>
      </ul>
    </subsection>
   </section>
@@ -289,7 +289,7 @@
 
       <p>The <strong>tomcatAuthentication</strong> and
       <strong>tomcatAuthorization</strong> attributes are used with the
-      AJP connectors to determine if Tomcat should handle all authenication and
+      AJP connectors to determine if Tomcat should handle all authentication and
       authorisation or if authentication should be delegated to the reverse
       proxy (the authenticated user name is passed to Tomcat as part of the AJP
       protocol) with the option for Tomcat to still perform authorization.</p>
@@ -468,6 +468,13 @@
     can be configured and used to reject requests that had errors during
     request parameter parsing. Without the filter the default behaviour is
     to ignore invalid or excessive parameters.</p>
+
+    <p><a href="config/filter.html">HttpHeaderSecurityFilter</a> can be
+    used to add headers to responses to improve security. If clients access
+    Tomcat directly, then you probably want to enable this filter and all the
+    headers it sets unless your application is already setting them. If Tomcat
+    is accessed via a reverse proxy, then the configuration of this filter needs
+    to be co-ordinated with any headers that the reverse proxy sets.</p>
   </section>
 
   <section name="General">

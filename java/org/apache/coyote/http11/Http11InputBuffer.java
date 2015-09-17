@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http11;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -381,7 +382,7 @@ public class Http11InputBuffer implements InputBuffer {
      * @return true if data is properly fed; false if no data is available
      * immediately and thread should be freed
      */
-    boolean parseRequestLine(boolean useAvailableDataOnly) throws IOException {
+    boolean parseRequestLine(boolean keptAlive) throws IOException {
 
         //check state
         if ( !parsingRequestLine ) return true;
@@ -394,15 +395,19 @@ public class Http11InputBuffer implements InputBuffer {
 
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (useAvailableDataOnly) {
-                        return false;
+                    if (keptAlive) {
+                        // Haven't read any request data yet so use the keep-alive
+                        // timeout.
+                        wrapper.setReadTimeout(wrapper.getEndpoint().getKeepAliveTimeout());
                     }
-                    // Do a simple read with a short timeout
                     if (!fill(false)) {
                         // A read is pending, so no longer in initial state
                         parsingRequestLinePhase = 1;
                         return false;
                     }
+                    // At least one byte of the request has been received.
+                    // Switch to the socket timeout.
+                    wrapper.setReadTimeout(wrapper.getEndpoint().getSoTimeout());
                 }
                 // Set the start time once we start reading data (even if it is
                 // just skipping blank lines)
@@ -725,9 +730,12 @@ public class Http11InputBuffer implements InputBuffer {
         if (nRead > 0) {
             lastValid = pos + nRead;
             return true;
+        } else if (nRead == -1) {
+            throw new EOFException(sm.getString("iib.eof.error"));
+        } else {
+            return false;
         }
 
-        return false;
     }
 
 

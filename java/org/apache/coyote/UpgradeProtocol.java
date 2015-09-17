@@ -16,16 +16,20 @@
  */
 package org.apache.coyote;
 
+import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public interface UpgradeProtocol {
 
     /**
+     * @param isSecure Is this for a connector that is configured to support
+     *                 TLS. Some protocols (e.g. HTTP/2) only support HTTP
+     *                 upgrade over non-secure connections.
      * @return The name that clients will use to request an upgrade to this
      *         protocol via an HTTP/1.1 upgrade request or <code>null</code> if
      *         upgrade via an HTTP/1.1 upgrade request is not supported.
      */
-    public String getHttpUpgradeName();
+    public String getHttpUpgradeName(boolean isSecure);
 
     /**
      * @return The byte sequence as listed in the IANA registry for this
@@ -54,9 +58,36 @@ public interface UpgradeProtocol {
     public String getAlpnName();
 
     /**
+     * @param socketWrapper The socketWrapper for the connection that requires
+     *                      a processor
+     * @param adapter The Adapter instance that provides access to the standard
+     *                Engine/Host/Context/Wrapper processing chain
      *
      * @return A processor instance for processing a connection using this
      *         protocol.
      */
-    public Processor getProcessor(SocketWrapperBase<?> socketWrapper);
+    public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter);
+
+
+    /**
+     * @param adapter The Adapter to use to configure the new upgrade handler
+     * @param request A copy (may be incomplete) of the request that triggered
+     *                the upgrade
+     *
+     * @return An instance of the HTTP upgrade handler for this protocol
+     */
+    public InternalHttpUpgradeHandler getInteralUpgradeHandler(Adapter adapter, Request request);
+
+
+    /**
+     * Allows the implementation to examine the request and accept or reject it
+     * based on what it finds.
+     *
+     * @param request The request that included an upgrade header for this
+     *                protocol
+     *
+     * @return <code>true</code> if the request is accepted, otherwise
+     *         <code>false</code>
+     */
+    public boolean accept(Request request);
 }

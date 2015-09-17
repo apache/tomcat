@@ -51,8 +51,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(AbstractProtocol.class);
 
 
     /**
@@ -282,6 +281,20 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     public long getConnectionCount() {
         return endpoint.getConnectionCount();
+    }
+
+    public void setAcceptorThreadCount(int threadCount) {
+        endpoint.setAcceptorThreadCount(threadCount);
+    }
+    public int getAcceptorThreadCount() {
+      return endpoint.getAcceptorThreadCount();
+    }
+
+    public void setAcceptorThreadPriority(int threadPriority) {
+        endpoint.setAcceptorThreadPriority(threadPriority);
+    }
+    public int getAcceptorThreadPriority() {
+      return endpoint.getAcceptorThreadPriority();
     }
 
 
@@ -648,7 +661,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         UpgradeProtocol upgradeProtocol =
                                 getProtocol().getNegotiatedProtocol(negotiatedProtocol);
                         if (upgradeProtocol != null) {
-                            processor = upgradeProtocol.getProcessor(wrapper);
+                            processor = upgradeProtocol.getProcessor(
+                                    wrapper, getProtocol().getAdapter());
+                            connections.put(socket, processor);
                         } else if (negotiatedProtocol.equals("http/1.1")) {
                             // Explicitly negotiated the default protocol.
                             // Obtain a processor below.
@@ -688,6 +703,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         state = processor.dispatch(status);
                     } else if (state == SocketState.ASYNC_END) {
                         state = processor.dispatch(status);
+                        // release() won't get called so in case this request
+                        // takes a long time to process remove the socket from
+                        // the waiting requests now else the async timeout will
+                        // fire
+                        getProtocol().getEndpoint().removeWaitingRequest(wrapper);
                         if (state == SocketState.OPEN) {
                             // There may be pipe-lined data to read. If the data
                             // isn't processed now, execution will exit this
@@ -789,6 +809,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 // IOExceptions are normal
                 getLog().debug(sm.getString(
                         "abstractConnectionHandler.ioexception.debug"), e);
+            } catch (ProtocolException e) {
+                // Protocol exceptions normally mean the client sent invalid or
+                // incomplete data.
+                getLog().debug(sm.getString(
+                        "abstractConnectionHandler.protocolexception.debug"), e);
             }
             // Future developers: if you discover any other
             // rare-but-nonfatal exceptions, catch them here, and log as
@@ -815,8 +840,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
         protected abstract P createProcessor();
-        protected abstract void longPoll(SocketWrapperBase<S> socket,
-                Processor processor);
+
+
+        protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
+            if (processor.isAsync()) {
+                // Async
+                socket.setAsync(true);
+            } else {
+                // This branch is currently only used with HTTP
+                // Either:
+                //  - this is an upgraded connection
+                //  - the request line/headers have not been completely
+                //    read
+                socket.registerReadInterest();
+            }
+        }
+
 
         /**
          * Expected to be used by the handler once the processor is no longer
@@ -829,11 +868,36 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
          * @param addToPoller Should the socket be added to the poller for
          *                    reading
          */
-        protected abstract void release(SocketWrapperBase<S> socket,
-                Processor processor, boolean addToPoller);
+        public void release(SocketWrapperBase<S> socket, Processor processor, boolean addToPoller) {
+            processor.recycle();
+            recycledProcessors.push(processor);
+            if (addToPoller) {
+                socket.registerReadInterest();
+            }
+        }
+
+
+        /**
+         * Expected to be used by the Endpoint to release resources on socket
+         * close, errors etc.
+         */
+        @Override
+        public void release(SocketWrapperBase<S> socketWrapper) {
+            S socket = socketWrapper.getSocket();
+            if (socket != null) {
+                Processor processor = connections.remove(socket);
+                if (processor != null) {
+                    processor.recycle();
+                    recycledProcessors.push(processor);
+                }
+            }
+        }
+
+
         protected abstract Processor createUpgradeProcessor(
                 SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
                 HttpUpgradeHandler httpUpgradeHandler) throws IOException;
+
 
         protected void register(AbstractProcessor processor) {
             if (getProtocol().getDomain() != null) {
@@ -884,6 +948,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         getLog().warn("Error unregistering request", e);
                     }
                 }
+            }
+        }
+
+        @Override
+        public final void pause() {
+            /*
+             * Inform all the processors associated with current connections
+             * that the endpoint is being paused. Most won't care. Those
+             * processing multiplexed streams may wish to take action. For
+             * example, HTTP/2 may wish to stop accepting new streams.
+             *
+             * Note that even if the endpoint is resumed, there is (currently)
+             * no API to inform the Processors of this.
+             */
+            for (Processor processor : connections.values()) {
+                processor.pause();
             }
         }
     }

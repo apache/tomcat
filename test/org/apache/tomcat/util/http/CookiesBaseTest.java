@@ -70,6 +70,7 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
     public static void addServlets(Tomcat tomcat) {
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
+        ctx.setCookieProcessor(new LegacyCookieProcessor());
 
         Tomcat.addServlet(ctx, "invalid", new CookieServlet("na;me", "value"));
         ctx.addServletMapping("/invalid", "invalid");

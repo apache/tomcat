@@ -171,18 +171,23 @@ class CPDSConnectionFactory
         }
         boolean valid = false;
         PooledConnection pconn = p.getObject().getPooledConnection();
+        Connection conn = null;
+        validatingSet.add(pconn);
         if (null == _validationQuery) {
             int timeout = _validationQueryTimeout;
             if (timeout < 0) {
                 timeout = 0;
             }
             try {
-                valid = pconn.getConnection().isValid(timeout);
+                conn = pconn.getConnection();
+                valid = conn.isValid(timeout);
             } catch (SQLException e) {
                 valid = false;
+            } finally {
+                Utils.closeQuietly(conn);
+                validatingSet.remove(pconn);
             }
         } else {
-            Connection conn = null;
             Statement stmt = null;
             ResultSet rset = null;
             // logical Connection from the PooledConnection must be closed

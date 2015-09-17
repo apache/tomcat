@@ -22,10 +22,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
- * Utility methods
+ * Utility methods.
  * @since 2.0
  */
 public final class Utils {
@@ -36,6 +38,31 @@ public final class Utils {
     public static final boolean IS_SECURITY_ENABLED =
             System.getSecurityManager() != null;
 
+    /** Any SQL_STATE starting with this value is considered a fatal disconnect */
+    public static final String DISCONNECTION_SQL_CODE_PREFIX = "08";
+
+    /**
+     * SQL codes of fatal connection errors.
+     * <ul>
+     *  <li>57P01 (ADMIN SHUTDOWN)</li>
+     *  <li>57P02 (CRASH SHUTDOWN)</li>
+     *  <li>57P03 (CANNOT CONNECT NOW)</li>
+     *  <li>01002 (SQL92 disconnect error)</li>
+     *  <li>JZ0C0 (Sybase disconnect error)</li>
+     *  <li>JZ0C1 (Sybase disconnect error)</li>
+     * </ul>
+     */
+    public static final Set<String> DISCONNECTION_SQL_CODES;
+
+    static {
+        DISCONNECTION_SQL_CODES = new HashSet<>();
+        DISCONNECTION_SQL_CODES.add("57P01"); // ADMIN SHUTDOWN
+        DISCONNECTION_SQL_CODES.add("57P02"); // CRASH SHUTDOWN
+        DISCONNECTION_SQL_CODES.add("57P03"); // CANNOT CONNECT NOW
+        DISCONNECTION_SQL_CODES.add("01002"); // SQL92 disconnect error
+        DISCONNECTION_SQL_CODES.add("JZ0C0"); // Sybase disconnect error
+        DISCONNECTION_SQL_CODES.add("JZ0C1"); // Sybase disconnect error
+    }
 
     private Utils() {
         // not instantiable

@@ -113,7 +113,7 @@
     <attribute name="maxPostSize" required="false">
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
-      setting this attribute to a value less than or equal to 0.
+      setting this attribute to a value less than zero.
       If not specified, this attribute is set to 2097152 (2 megabytes).</p>
     </attribute>
 
@@ -689,13 +689,6 @@
         <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
       </attribute>
 
-      <attribute name="socket.socketWrapperCache" required="false">
-        <p>(int)Tomcat will cache SocketWrapper objects to reduce garbage
-        collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>500</code>. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
-      </attribute>
-
     </attributes>
   </subsection>
 
@@ -711,13 +704,6 @@
         , but will use more CPU as more poll calls are being made. The default
         value is 2000 (2ms).
         </p>
-    </attribute>
-
-    <attribute name="pollerSize" required="false">
-      <p>Amount of sockets that the poller responsible for polling kept alive
-      connections can hold at a given time. Extra connections will be closed
-      right away. The default value is 8192, corresponding to 8192 keep-alive
-      connections.</p>
     </attribute>
 
     </attributes>

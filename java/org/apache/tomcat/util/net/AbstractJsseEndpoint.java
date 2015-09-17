@@ -16,111 +16,190 @@
  */
 package org.apache.tomcat.util.net;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSessionContext;
-import javax.net.ssl.X509KeyManager;
 
-import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
+import org.apache.tomcat.util.net.SSLHostConfig.Type;
+import org.apache.tomcat.util.net.jsse.openssl.Cipher;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
+    private static final Log log = LogFactory.getLog(AbstractJsseEndpoint.class);
+
+    private String sslImplementationName = null;
+    private int sniParseLimit = 64 * 1024;
+
     private SSLImplementation sslImplementation = null;
+
+
+    public String getSslImplementationName() {
+        return sslImplementationName;
+    }
+
+
+    public void setSslImplementationName(String s) {
+        this.sslImplementationName = s;
+    }
+
+
     public SSLImplementation getSslImplementation() {
         return sslImplementation;
     }
 
-    private String[] enabledCiphers;
-    @Override
-    public String[] getCiphersUsed() {
-        return enabledCiphers;
+
+    public int getSniParseLimit() {
+        return sniParseLimit;
     }
 
-    private String[] enabledProtocols;
 
-    private SSLContext sslContext = null;
-    public SSLContext getSSLContext() { return sslContext;}
-    public void setSSLContext(SSLContext c) { sslContext = c;}
+    public void setSniParseLimit(int sniParseLimit) {
+        this.sniParseLimit = sniParseLimit;
+    }
+
+
+    @Override
+    protected Type getSslConfigType() {
+        if (OpenSSLImplementation.IMPLEMENTATION_NAME.equals(sslImplementationName)) {
+            return SSLHostConfig.Type.OPENSSL;
+        } else {
+            return SSLHostConfig.Type.JSSE;
+        }
+    }
 
 
     protected void initialiseSsl() throws Exception {
         if (isSSLEnabled()) {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
-            SSLUtil sslUtil = sslImplementation.getSSLUtil(this);
 
-            sslContext = sslUtil.createSSLContext();
-            sslContext.init(wrap(sslUtil.getKeyManagers()),
-                    sslUtil.getTrustManagers(), null);
+            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+                    SSLUtil sslUtil = sslImplementation.getSSLUtil(sslHostConfig, certificate);
 
-            SSLSessionContext sessionContext =
-                sslContext.getServerSessionContext();
-            if (sessionContext != null) {
-                sslUtil.configureSessionContext(sessionContext);
+                    SSLContext sslContext = sslUtil.createSSLContext(negotiableProtocols);
+                    sslContext.init(sslUtil.getKeyManagers(), sslUtil.getTrustManagers(), null);
+
+                    SSLSessionContext sessionContext = sslContext.getServerSessionContext();
+                    if (sessionContext != null) {
+                        sslUtil.configureSessionContext(sessionContext);
+                    }
+                    SSLContextWrapper sslContextWrapper = new SSLContextWrapper(sslContext, sslUtil);
+                    certificate.setSslContextWrapper(sslContextWrapper);
+                }
             }
-            // Determine which cipher suites and protocols to enable
-            enabledCiphers = sslUtil.getEnableableCiphers(sslContext);
-            enabledProtocols = sslUtil.getEnableableProtocols(sslContext);
+
         }
     }
 
 
-    protected SSLEngine createSSLEngine(String sniHostName) {
-        SSLEngine engine = sslContext.createSSLEngine();
-        if ("false".equals(getClientAuth())) {
+    protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers) {
+        SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
+
+        SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers);
+
+        SSLContextWrapper sslContextWrapper = certificate.getSslContextWrapper();
+        if (sslContextWrapper == null) {
+            throw new IllegalStateException(
+                    sm.getString("endpoint.jsse.noSslContext", sniHostName));
+        }
+
+        SSLEngine engine = sslContextWrapper.getSSLContext().createSSLEngine();
+        switch (sslHostConfig.getCertificateVerification()) {
+        case NONE:
             engine.setNeedClientAuth(false);
             engine.setWantClientAuth(false);
-        } else if ("true".equals(getClientAuth()) || "yes".equals(getClientAuth())){
-            engine.setNeedClientAuth(true);
-        } else if ("want".equals(getClientAuth())) {
+            break;
+        case OPTIONAL:
+        case OPTIONAL_NO_CA:
             engine.setWantClientAuth(true);
+            break;
+        case REQUIRED:
+            engine.setNeedClientAuth(true);
+            break;
         }
         engine.setUseClientMode(false);
-        engine.setEnabledCipherSuites(enabledCiphers);
-        engine.setEnabledProtocols(enabledProtocols);
+        engine.setEnabledCipherSuites(sslContextWrapper.getEnabledCiphers());
+        engine.setEnabledProtocols(sslContextWrapper.getEnabledProtocols());
 
-        configureUseServerCipherSuitesOrder(engine);
+        SSLParameters sslParameters = engine.getSSLParameters();
+        sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
+        // In case the getter returns a defensive copy
+        engine.setSSLParameters(sslParameters);
 
         return engine;
     }
 
 
+    private SSLHostConfigCertificate selectCertificate(
+            SSLHostConfig sslHostConfig, List<Cipher> clientCiphers) {
+
+        Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
+        if (certificates.size() == 1) {
+            return certificates.iterator().next();
+        }
+
+        LinkedHashSet<Cipher> serverCiphers = sslHostConfig.getCipherList();
+
+        List<Cipher> candidateCiphers = new ArrayList<>();
+        if (sslHostConfig.getHonorCipherOrder()) {
+            candidateCiphers.addAll(serverCiphers);
+            candidateCiphers.retainAll(clientCiphers);
+        } else {
+            candidateCiphers.addAll(clientCiphers);
+            candidateCiphers.retainAll(serverCiphers);
+        }
+
+        Iterator<Cipher> candidateIter = candidateCiphers.iterator();
+        while (candidateIter.hasNext()) {
+            Cipher candidate = candidateIter.next();
+            for (SSLHostConfigCertificate certificate : certificates) {
+                if (certificate.getType().isCompatibleWith(candidate.getAu())) {
+                    return certificate;
+                }
+            }
+        }
+
+        // No matches. Just return the first certificate. The handshake will
+        // then fail due to no matching ciphers.
+        return certificates.iterator().next();
+    }
+
 
     @Override
     public void unbind() throws Exception {
-        sslContext = null;
-    }
-
-
-    /**
-     * Configures SSLEngine to honor cipher suites ordering based upon
-     * endpoint configuration.
-     */
-    private void configureUseServerCipherSuitesOrder(SSLEngine engine) {
-        String useServerCipherSuitesOrderStr = this
-                .getUseServerCipherSuitesOrder().trim();
-
-        SSLParameters sslParameters = engine.getSSLParameters();
-        boolean useServerCipherSuitesOrder =
-            ("true".equalsIgnoreCase(useServerCipherSuitesOrderStr)
-                || "yes".equalsIgnoreCase(useServerCipherSuitesOrderStr));
-
-        sslParameters.setUseCipherSuitesOrder(useServerCipherSuitesOrder);
-        engine.setSSLParameters(sslParameters);
-    }
-
-
-    private KeyManager[] wrap(KeyManager[] managers) {
-        if (managers==null) return null;
-        KeyManager[] result = new KeyManager[managers.length];
-        for (int i=0; i<result.length; i++) {
-            if (managers[i] instanceof X509KeyManager && getKeyAlias()!=null) {
-                result[i] = new NioX509KeyManager((X509KeyManager)managers[i],getKeyAlias());
-            } else {
-                result[i] = managers[i];
+        for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+                certificate.setSslContextWrapper(null);
             }
         }
-        return result;
+    }
+
+
+    static class SSLContextWrapper {
+
+        private final SSLContext sslContext;
+        private final String[] enabledCiphers;
+        private final String[] enabledProtocols;
+
+        public SSLContextWrapper(SSLContext sslContext, SSLUtil sslUtil) {
+            this.sslContext = sslContext;
+            // Determine which cipher suites and protocols to enable
+            enabledCiphers = sslUtil.getEnableableCiphers(sslContext);
+            enabledProtocols = sslUtil.getEnableableProtocols(sslContext);
+        }
+
+        public SSLContext getSSLContext() { return sslContext;}
+        public String[] getEnabledCiphers() { return enabledCiphers; }
+        public String[] getEnabledProtocols() { return enabledProtocols; }
     }
 }

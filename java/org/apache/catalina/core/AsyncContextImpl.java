@@ -58,6 +58,15 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
+    /* When a request uses a sequence of multiple start(); dispatch() with
+     * non-container threads it is possible for a previous dispatch() to
+     * interfere with a following start(). This lock prevents that from
+     * happening. It is a dedicated object as user code may lock on the
+     * AsyncContext so if container code also locks on that object deadlocks may
+     * occur.
+     */
+    private final Object asyncContextLock = new Object();
+
     private volatile ServletRequest servletRequest = null;
     private volatile ServletResponse servletResponse = null;
     private final List<AsyncListenerWrapper> listeners = new ArrayList<>();
@@ -67,7 +76,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     // Default of 30000 (30s) is set by the connector
     private long timeout = -1;
     private AsyncEvent event = null;
-    private Request request;
+    private volatile Request request;
     private volatile InstanceManager instanceManager;
 
     public AsyncContextImpl(Request request) {
@@ -180,46 +189,48 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void dispatch(ServletContext context, String path) {
-        if (log.isDebugEnabled()) {
-            logDebug("dispatch   ");
-        }
-        check();
-        if (dispatch != null) {
-            throw new IllegalStateException(
-                    sm.getString("asyncContextImpl.dispatchingStarted"));
-        }
-        if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
-            request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI());
-            request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
-            request.setAttribute(ASYNC_SERVLET_PATH, request.getServletPath());
-            request.setAttribute(ASYNC_PATH_INFO, request.getPathInfo());
-            request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
-        }
-        final RequestDispatcher requestDispatcher = context.getRequestDispatcher(path);
-        if (!(requestDispatcher instanceof AsyncDispatcher)) {
-            throw new UnsupportedOperationException(
-                    sm.getString("asyncContextImpl.noAsyncDispatcher"));
-        }
-        final AsyncDispatcher applicationDispatcher =
-                (AsyncDispatcher) requestDispatcher;
-        final ServletRequest servletRequest = getRequest();
-        final ServletResponse servletResponse = getResponse();
-        Runnable run = new Runnable() {
-            @Override
-            public void run() {
-                request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCHED, null);
-                try {
-                    applicationDispatcher.dispatch(servletRequest, servletResponse);
-                }catch (Exception x) {
-                    //log.error("Async.dispatch",x);
-                    throw new RuntimeException(x);
-                }
+        synchronized (asyncContextLock) {
+            if (log.isDebugEnabled()) {
+                logDebug("dispatch   ");
             }
-        };
+            check();
+            if (dispatch != null) {
+                throw new IllegalStateException(
+                        sm.getString("asyncContextImpl.dispatchingStarted"));
+            }
+            if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
+                request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI());
+                request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
+                request.setAttribute(ASYNC_SERVLET_PATH, request.getServletPath());
+                request.setAttribute(ASYNC_PATH_INFO, request.getPathInfo());
+                request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
+            }
+            final RequestDispatcher requestDispatcher = context.getRequestDispatcher(path);
+            if (!(requestDispatcher instanceof AsyncDispatcher)) {
+                throw new UnsupportedOperationException(
+                        sm.getString("asyncContextImpl.noAsyncDispatcher"));
+            }
+            final AsyncDispatcher applicationDispatcher =
+                    (AsyncDispatcher) requestDispatcher;
+            final ServletRequest servletRequest = getRequest();
+            final ServletResponse servletResponse = getResponse();
+            Runnable run = new Runnable() {
+                @Override
+                public void run() {
+                    request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCHED, null);
+                    try {
+                        applicationDispatcher.dispatch(servletRequest, servletResponse);
+                    }catch (Exception x) {
+                        //log.error("Async.dispatch",x);
+                        throw new RuntimeException(x);
+                    }
+                }
+            };
 
-        this.dispatch = run;
-        this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
-        clearServletRequestResponse();
+            this.dispatch = run;
+            this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
+            clearServletRequestResponse();
+        }
     }
 
     @Override
@@ -332,25 +343,27 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     public void setStarted(Context context, ServletRequest request,
             ServletResponse response, boolean originalRequestResponse) {
 
-        this.request.getCoyoteRequest().action(
-                ActionCode.ASYNC_START, this);
+        synchronized (asyncContextLock) {
+            this.request.getCoyoteRequest().action(
+                    ActionCode.ASYNC_START, this);
 
-        this.context = context;
-        this.servletRequest = request;
-        this.servletResponse = response;
-        this.hasOriginalRequestAndResponse = originalRequestResponse;
-        this.event = new AsyncEvent(this, request, response);
+            this.context = context;
+            this.servletRequest = request;
+            this.servletResponse = response;
+            this.hasOriginalRequestAndResponse = originalRequestResponse;
+            this.event = new AsyncEvent(this, request, response);
 
-        List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
-        listenersCopy.addAll(listeners);
-        listeners.clear();
-        for (AsyncListenerWrapper listener : listenersCopy) {
-            try {
-                listener.fireOnStartAsync(event);
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.warn("onStartAsync() failed for listener of type [" +
-                        listener.getClass().getName() + "]", t);
+            List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
+            listenersCopy.addAll(listeners);
+            listeners.clear();
+            for (AsyncListenerWrapper listener : listenersCopy) {
+                try {
+                    listener.fireOnStartAsync(event);
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    log.warn("onStartAsync() failed for listener of type [" +
+                            listener.getClass().getName() + "]", t);
+                }
             }
         }
     }

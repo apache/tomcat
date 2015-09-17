@@ -331,11 +331,25 @@ public class Catalina {
         digester.addRule("Server/Service/Connector",
                          new ConnectorCreateRule());
         digester.addRule("Server/Service/Connector",
-                         new SetAllPropertiesRule(new String[]{"executor"}));
+                         new SetAllPropertiesRule(new String[]{"executor", "sslImplementationName"}));
         digester.addSetNext("Server/Service/Connector",
                             "addConnector",
                             "org.apache.catalina.connector.Connector");
 
+        digester.addObjectCreate("Server/Service/Connector/SSLHostConfig",
+                                 "org.apache.tomcat.util.net.SSLHostConfig");
+        digester.addSetProperties("Server/Service/Connector/SSLHostConfig");
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig",
+                "addSslHostConfig",
+                "org.apache.tomcat.util.net.SSLHostConfig");
+
+        digester.addRule("Server/Service/Connector/SSLHostConfig/Certificate",
+                         new CertificateCreateRule());
+        digester.addRule("Server/Service/Connector/SSLHostConfig/Certificate",
+                         new SetAllPropertiesRule(new String[]{"type"}));
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig/Certificate",
+                            "addCertificate",
+                            "org.apache.tomcat.util.net.SSLHostConfigCertificate");
 
         digester.addObjectCreate("Server/Service/Connector/Listener",
                                  null, // MUST be specified in the element
@@ -345,7 +359,15 @@ public class Catalina {
                             "addLifecycleListener",
                             "org.apache.catalina.LifecycleListener");
 
-        // Add RuleSets for nested elements
+        digester.addObjectCreate("Server/Service/Connector/UpgradeProtocol",
+                                  null, // MUST be specified in the element
+                                  "className");
+        digester.addSetProperties("Server/Service/Connector/UpgradeProtocol");
+        digester.addSetNext("Server/Service/Connector/UpgradeProtocol",
+                            "addUpgradeProtocol",
+                            "org.apache.coyote.UpgradeProtocol");
+
+// Add RuleSets for nested elements
         digester.addRuleSet(new NamingRuleSet("Server/GlobalNamingResources/"));
         digester.addRuleSet(new EngineRuleSet("Server/Service/"));
         digester.addRuleSet(new HostRuleSet("Server/Service/Engine/"));

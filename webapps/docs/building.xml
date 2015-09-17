@@ -59,10 +59,10 @@ directory into which you installed the JDK release.
 
 </section>
 
-<section name="Install Apache Ant 1.9.3 or later">
+<section name="Install Apache Ant 1.9.5 or later">
 
 <p>
-Download a binary distribution of Ant 1.9.3 or later from
+Download a binary distribution of Ant 1.9.5 or later from
 <a href="http://ant.apache.org/bindownload.cgi">here</a>.
 </p>
 
@@ -71,7 +71,7 @@ Unpack the binary distribution into a convenient location so that the
 Ant release resides in its own directory (conventionally named
 <code>apache-ant-1.9.x</code>).  For the remainder of this guide,
 the symbolic name <code>${ant.home}</code> is used to refer to the full pathname of
- the Ant installation directory directory.
+ the Ant installation directory.
 </p>
 
 <p>
@@ -230,7 +230,7 @@ Variables</em> to add two new <em>Classpath Variables</em>:
 <table class="defaultTable">
  <tr><td>TOMCAT_LIBS_BASE</td><td>The same location as the <code>base.path</code>
   setting in <code>build.properties</code>, where the binary dependencies have been downloaded</td></tr>
- <tr><td>ANT_HOME</td><td>the base path of Ant 1.9.3 or later</td></tr>
+ <tr><td>ANT_HOME</td><td>the base path of Ant 1.9.5 or later</td></tr>
 </table>
 
 

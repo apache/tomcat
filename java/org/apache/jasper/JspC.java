@@ -1054,78 +1054,73 @@ public class JspC extends Task implements Options {
         String insertEndMarker =
             Localizer.getMessage("jspc.webinc.insertEnd");
 
-        BufferedReader reader = new BufferedReader(openWebxmlReader(webXml));
-        BufferedReader fragmentReader = new BufferedReader(
-                openWebxmlReader(new File(webxmlFile)));
-        PrintWriter writer = new PrintWriter(openWebxmlWriter(webXml2));
+        try (BufferedReader reader = new BufferedReader(openWebxmlReader(webXml));
+                BufferedReader fragmentReader =
+                        new BufferedReader(openWebxmlReader(new File(webxmlFile)));
+                PrintWriter writer = new PrintWriter(openWebxmlWriter(webXml2))) {
 
-        // Insert the <servlet> and <servlet-mapping> declarations
-        boolean inserted = false;
-        int current = reader.read();
-        while (current > -1) {
-            if (current == '<') {
-                String element = getElement(reader);
-                if (!inserted && insertBefore.contains(element)) {
-                    // Insert generated content here
-                    writer.println(insertStartMarker);
-                    while (true) {
-                        String line = fragmentReader.readLine();
-                        if (line == null) {
-                            writer.println();
-                            break;
-                        }
-                        writer.println(line);
-                    }
-                    writer.println(insertEndMarker);
-                    writer.println();
-                    writer.write(element);
-                    inserted = true;
-                } else if (element.equals(insertStartMarker)) {
-                    // Skip the previous auto-generated content
-                    while (true) {
-                        current = reader.read();
-                        if (current < 0) {
-                            throw new EOFException();
-                        }
-                        if (current == '<') {
-                            element = getElement(reader);
-                            if (element.equals(insertEndMarker)) {
+            // Insert the <servlet> and <servlet-mapping> declarations
+            boolean inserted = false;
+            int current = reader.read();
+            while (current > -1) {
+                if (current == '<') {
+                    String element = getElement(reader);
+                    if (!inserted && insertBefore.contains(element)) {
+                        // Insert generated content here
+                        writer.println(insertStartMarker);
+                        while (true) {
+                            String line = fragmentReader.readLine();
+                            if (line == null) {
+                                writer.println();
                                 break;
                             }
+                            writer.println(line);
                         }
-                    }
-                    current = reader.read();
-                    while (current == '\n' || current == '\r') {
+                        writer.println(insertEndMarker);
+                        writer.println();
+                        writer.write(element);
+                        inserted = true;
+                    } else if (element.equals(insertStartMarker)) {
+                        // Skip the previous auto-generated content
+                        while (true) {
+                            current = reader.read();
+                            if (current < 0) {
+                                throw new EOFException();
+                            }
+                            if (current == '<') {
+                                element = getElement(reader);
+                                if (element.equals(insertEndMarker)) {
+                                    break;
+                                }
+                            }
+                        }
                         current = reader.read();
+                        while (current == '\n' || current == '\r') {
+                            current = reader.read();
+                        }
+                        continue;
+                    } else {
+                        writer.write(element);
                     }
-                    continue;
                 } else {
-                    writer.write(element);
+                    writer.write(current);
                 }
-            } else {
-                writer.write(current);
+                current = reader.read();
             }
-            current = reader.read();
-        }
-        writer.close();
-
-        reader.close();
-        fragmentReader.close();
-
-        FileInputStream fis = new FileInputStream(webXml2);
-        FileOutputStream fos = new FileOutputStream(webXml);
-
-        byte buf[] = new byte[512];
-        while (true) {
-            int n = fis.read(buf);
-            if (n < 0) {
-                break;
-            }
-            fos.write(buf, 0, n);
         }
 
-        fis.close();
-        fos.close();
+        try (FileInputStream fis = new FileInputStream(webXml2);
+                FileOutputStream fos = new FileOutputStream(webXml)) {
+
+            byte buf[] = new byte[512];
+            while (true) {
+                int n = fis.read(buf);
+                if (n < 0) {
+                    break;
+                }
+                fos.write(buf, 0, n);
+            }
+        }
 
         if(!webXml2.delete() && log.isDebugEnabled())
             log.debug(Localizer.getMessage("jspc.delete.fail",
