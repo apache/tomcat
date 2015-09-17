@@ -147,7 +147,7 @@ public class TestSsl extends TomcatBaseTest {
     }
 
     private void doRequest(OutputStream os, Reader r) throws IOException {
-        char[] expectedResponseLine = "HTTP/1.1 200 OK\r\n".toCharArray();
+        char[] expectedResponseLine = "HTTP/1.1 200 \r\n".toCharArray();
 
         os.write("GET /tester HTTP/1.1\r\n".getBytes());
         os.write("Host: localhost\r\n".getBytes());
