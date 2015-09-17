@@ -94,7 +94,7 @@ public final class Response {
     /**
      * Action hook.
      */
-    public ActionHook hook;
+    protected volatile ActionHook hook;
 
 
     /**
@@ -143,18 +143,12 @@ public final class Response {
     }
 
 
-    public ActionHook getHook() {
-        return hook;
-    }
-
-
-    public void setHook(ActionHook hook) {
+    protected void setHook(ActionHook hook) {
         this.hook = hook;
     }
 
 
     // -------------------- Per-Response "notes" --------------------
-
 
     public final void setNote(int pos, Object value) {
         notes[pos] = value;
@@ -168,19 +162,18 @@ public final class Response {
 
     // -------------------- Actions --------------------
 
-
     public void action(ActionCode actionCode, Object param) {
         if (hook != null) {
-            if( param==null )
+            if (param == null) {
                 hook.action(actionCode, this);
-            else
+            } else {
                 hook.action(actionCode, param);
+            }
         }
     }
 
 
     // -------------------- State --------------------
-
 
     public int getStatus() {
         return status;

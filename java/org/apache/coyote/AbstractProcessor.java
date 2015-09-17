@@ -85,6 +85,7 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
         response = coyoteResponse;
         response.setHook(this);
         request.setResponse(response);
+        request.setHook(this);
     }
 
     /**
