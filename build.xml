@@ -346,7 +346,6 @@
 
   <patternset id="files.tomcat-api">
     <include name="org/apache/tomcat/*" />
-    <include name="org/apache/tomcat/util/compat/**" />
     <exclude name="org/apache/tomcat/buildutil" />
     <exclude name="org/apache/tomcat/dbcp" />
     <exclude name="org/apache/tomcat/jni" />
@@ -357,6 +356,7 @@
   <patternset id="files.tomcat-util">
     <include name="org/apache/tomcat/util/buf/**" />
     <include name="org/apache/tomcat/util/codec/**" />
+    <include name="org/apache/tomcat/util/compat/**" />
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/security/**" />
@@ -2063,6 +2063,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
           <exclude name="org/apache/tomcat/util/buf" />
           <exclude name="org/apache/tomcat/util/codec" />
           <exclude name="org/apache/tomcat/util/collections" />
+          <exclude name="org/apache/tomcat/util/compat" />
           <exclude name="org/apache/tomcat/util/descriptor" />
           <exclude name="org/apache/tomcat/util/file" />
           <exclude name="org/apache/tomcat/util/http" />
