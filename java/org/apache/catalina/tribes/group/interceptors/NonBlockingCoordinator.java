@@ -153,7 +153,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     /**
      * Our current view
      */
-    protected Membership view = null;
+    protected volatile Membership view = null;
     /**
      * Out current viewId
      */
@@ -169,9 +169,9 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
      * and this is the one we are running
      */
     protected UniqueId suggestedviewId;
-    protected Membership suggestedView;
+    protected volatile Membership suggestedView;
 
-    protected boolean started = false;
+    protected volatile boolean started = false;
     protected final int startsvc = 0xFFFF;
 
     protected final Object electionMutex = new Object();
