@@ -46,7 +46,7 @@ public abstract class LifecycleBase implements Lifecycle {
     /**
      * The list of registered LifecycleListeners for event notifications.
      */
-    private final List<LifecycleListener> listeners = new CopyOnWriteArrayList<>();
+    private final List<LifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<>();
 
 
     /**
@@ -60,7 +60,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     @Override
     public void addLifecycleListener(LifecycleListener listener) {
-        listeners.add(listener);
+        lifecycleListeners.add(listener);
     }
 
 
@@ -69,7 +69,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     @Override
     public LifecycleListener[] findLifecycleListeners() {
-        return listeners.toArray(new LifecycleListener[0]);
+        return lifecycleListeners.toArray(new LifecycleListener[0]);
     }
 
 
@@ -78,7 +78,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     @Override
     public void removeLifecycleListener(LifecycleListener listener) {
-        listeners.remove(listener);
+        lifecycleListeners.remove(listener);
     }
 
 
@@ -90,7 +90,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     protected void fireLifecycleEvent(String type, Object data) {
         LifecycleEvent event = new LifecycleEvent(this, type, data);
-        for (LifecycleListener listener : listeners) {
+        for (LifecycleListener listener : lifecycleListeners) {
             listener.lifecycleEvent(event);
         }
     }
