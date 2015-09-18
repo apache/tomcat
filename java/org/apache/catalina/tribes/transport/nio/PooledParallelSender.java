@@ -29,14 +29,11 @@ import org.apache.catalina.tribes.util.StringManager;
 public class PooledParallelSender extends PooledSender {
     protected static final StringManager sm = StringManager.getManager(PooledParallelSender.class);
 
-    protected boolean connected = true;
-    public PooledParallelSender() {
-        super();
-    }
-
     @Override
     public void sendMessage(Member[] destination, ChannelMessage message) throws ChannelException {
-        if ( !connected ) throw new ChannelException(sm.getString("pooledParallelSender.sender.disconnected"));
+        if (!isConnected()) {
+            throw new ChannelException(sm.getString("pooledParallelSender.sender.disconnected"));
+        }
         ParallelNioSender sender = (ParallelNioSender)getSender();
         if (sender == null) {
             ChannelException cx = new ChannelException(sm.getString(
@@ -54,7 +51,6 @@ public class PooledParallelSender extends PooledSender {
                 throw x;
             } finally {
                 returnSender(sender);
-                if (!connected) disconnect();
             }
         }
     }
@@ -69,17 +65,4 @@ public class PooledParallelSender extends PooledSender {
             throw new RuntimeException(sm.getString("pooledParallelSender.unable.open"),x);
         }
     }
-
-    @Override
-    public synchronized void disconnect() {
-        this.connected = false;
-        super.disconnect();
-    }
-
-    @Override
-    public synchronized void connect() throws IOException {
-        this.connected = true;
-        super.connect();
-    }
-
 }
