@@ -73,7 +73,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * The number of milliseconds since this member was
      * created, is kept track of using the start time
      */
-    protected long memberAliveTime = 0;
+    protected volatile long memberAliveTime = 0;
 
     /**
      * For the local member only
