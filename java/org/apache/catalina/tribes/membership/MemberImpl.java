@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.XByteBuffer;
@@ -66,7 +67,8 @@ public class MemberImpl implements Member, java.io.Externalizable {
     /**
      * Counter for how many broadcast messages have been sent from this member
      */
-    protected int msgCount = 0;
+    protected AtomicInteger msgCount = new AtomicInteger(0);
+
     /**
      * The number of milliseconds since this member was
      * created, is kept track of using the start time
@@ -156,7 +158,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * Increment the message count.
      */
     protected void inc() {
-        msgCount++;
+        msgCount.incrementAndGet();
     }
 
     /**
@@ -458,7 +460,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     }
 
     public int getMsgCount() {
-        return this.msgCount;
+        return msgCount.get();
     }
 
     /**
@@ -587,7 +589,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     }
 
     public void setMsgCount(int msgCount) {
-        this.msgCount = msgCount;
+        this.msgCount.set(msgCount);
     }
 
     public synchronized void setPort(int port) {
