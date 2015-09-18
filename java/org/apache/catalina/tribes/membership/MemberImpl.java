@@ -200,14 +200,18 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
     @Override
     public synchronized byte[] getData(boolean getalive, boolean reset)  {
-        if ( reset ) dataPkg = null;
-        //look in cache first
-        if ( dataPkg!=null ) {
-            if ( getalive ) {
-                //you'd be surprised, but System.currentTimeMillis
-                //shows up on the profiler
-                long alive=System.currentTimeMillis()-getServiceStartTime();
-                XByteBuffer.toBytes(alive, dataPkg, TRIBES_MBR_BEGIN.length+4);
+        if (reset) {
+            dataPkg = null;
+        }
+        // Look in cache first
+        if (dataPkg != null) {
+            if (getalive) {
+                // You'd be surprised, but System.currentTimeMillis
+                // shows up on the profiler
+                long alive = System.currentTimeMillis() - getServiceStartTime();
+                byte[] result = dataPkg.clone();
+                XByteBuffer.toBytes(alive, result, TRIBES_MBR_BEGIN.length + 4);
+                dataPkg = result;
             }
             return dataPkg;
         }
