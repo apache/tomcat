@@ -99,6 +99,11 @@ public class AsyncFileHandler extends FileHandler {
         if (!isLoggable(record)) {
             return;
         }
+        if (record != null) {
+            // fill source entries, before we hand the record over to another
+            // thread with another class loader
+            record.getSourceMethodName();
+        }
         LogEntry entry = new LogEntry(record,this);
         boolean added = false;
         try {
