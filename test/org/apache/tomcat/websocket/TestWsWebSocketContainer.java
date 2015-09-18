@@ -62,6 +62,7 @@ import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TestWsWebSocketContainer extends TomcatBaseTest {
 
+    private static final String MESSAGE_EMPTY = "";
     private static final String MESSAGE_STRING_1 = "qwerty";
     private static final String MESSAGE_TEXT_4K;
     private static final byte[] MESSAGE_BINARY_4K = new byte[4096];
@@ -937,7 +938,18 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
 
     @Test
-    public void testPerMessageDefalteClient() throws Exception {
+    public void testPerMessageDefalteClient01() throws Exception {
+        doTestPerMessageDefalteClient01(MESSAGE_STRING_1);
+    }
+
+
+    @Test
+    public void testPerMessageDefalteClient02() throws Exception {
+        doTestPerMessageDefalteClient01(MESSAGE_EMPTY);
+    }
+
+
+    private void doTestPerMessageDefalteClient01(String msg) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -964,7 +976,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);
-        wsSession.getBasicRemote().sendText(MESSAGE_STRING_1);
+        wsSession.getBasicRemote().sendText(msg);
 
         boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
 
@@ -972,7 +984,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
         Queue<String> messages = handler.getMessages();
         Assert.assertEquals(1, messages.size());
-        Assert.assertEquals(MESSAGE_STRING_1, messages.peek());
+        Assert.assertEquals(msg, messages.peek());
 
         ((WsWebSocketContainer) wsContainer).destroy();
     }
