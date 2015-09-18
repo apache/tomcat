@@ -520,6 +520,14 @@ public class Tomcat {
      * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String contextPath, String docBase) {
+        return addWebapp(host,  contextPath, docBase, new ContextConfig());
+    }
+
+    /**
+     * @see #addWebapp(String, String)
+     */
+    public Context addWebapp(Host host, String contextPath, String docBase, ContextConfig config) {
+
         silence(host, contextPath);
 
         Context ctx = createContext(host, contextPath);
@@ -528,11 +536,10 @@ public class Tomcat {
         ctx.addLifecycleListener(new DefaultWebXmlListener());
         ctx.setConfigFile(getWebappConfigFile(docBase, contextPath));
 
-        ContextConfig ctxCfg = new ContextConfig();
-        ctx.addLifecycleListener(ctxCfg);
+        ctx.addLifecycleListener(config);
 
         // prevent it from looking ( if it finds one - it'll have dup error )
-        ctxCfg.setDefaultWebXml(noDefaultWebXmlPath());
+        config.setDefaultWebXml(noDefaultWebXmlPath());
 
         if (host == null) {
             getHost().addChild(ctx);
