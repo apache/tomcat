@@ -150,6 +150,10 @@
         removal could fail for binary and pong MessageHandlers. Patch provided
         by DJ. (markt)
       </fix>
+      <fix>
+        <bug>58414</bug>: Correctly handle sending zero length messages when
+        using per message deflate. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
