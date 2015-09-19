@@ -939,17 +939,29 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
 
     @Test
     public void testPerMessageDefalteClient01() throws Exception {
-        doTestPerMessageDefalteClient01(MESSAGE_STRING_1);
+        doTestPerMessageDefalteClient(MESSAGE_STRING_1, 1);
     }
 
 
     @Test
     public void testPerMessageDefalteClient02() throws Exception {
-        doTestPerMessageDefalteClient01(MESSAGE_EMPTY);
+        doTestPerMessageDefalteClient(MESSAGE_EMPTY, 1);
     }
 
 
-    private void doTestPerMessageDefalteClient01(String msg) throws Exception {
+    @Test
+    public void testPerMessageDefalteClient03() throws Exception {
+        doTestPerMessageDefalteClient(MESSAGE_STRING_1, 2);
+    }
+
+
+    @Test
+    public void testPerMessageDefalteClient04() throws Exception {
+        doTestPerMessageDefalteClient(MESSAGE_EMPTY, 2);
+    }
+
+
+    private void doTestPerMessageDefalteClient(String msg, int count) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -973,18 +985,16 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 clientConfig,
                 new URI("ws://localhost:" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
-        CountDownLatch latch = new CountDownLatch(1);
-        BasicText handler = new BasicText(latch);
+        CountDownLatch latch = new CountDownLatch(count);
+        BasicText handler = new BasicText(latch, msg);
         wsSession.addMessageHandler(handler);
-        wsSession.getBasicRemote().sendText(msg);
+        for (int i = 0; i < count; i++) {
+            wsSession.getBasicRemote().sendText(msg);
+        }
 
         boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
 
         Assert.assertTrue(latchResult);
-
-        Queue<String> messages = handler.getMessages();
-        Assert.assertEquals(1, messages.size());
-        Assert.assertEquals(msg, messages.peek());
 
         ((WsWebSocketContainer) wsContainer).destroy();
     }
