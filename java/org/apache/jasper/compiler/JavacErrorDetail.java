@@ -142,6 +142,7 @@ public class JavacErrorDetail {
                 }
             } catch (IOException ioe) {
                 // Can't read files - ignore
+            } finally {
                 if (is != null) {
                     try {
                         is.close();
