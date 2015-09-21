@@ -689,7 +689,7 @@
 
   <subsection name="Connector Comparison">
 
-    <p>Below is a small chart that shows how the connectors differentiate.</p>
+    <p>Below is a small chart that shows how the connectors differ.</p>
     <source>
                        Java Blocking Connector   Java Nio Blocking Connector   APR/native Connector
                                  BIO                         NIO                       APR
@@ -697,9 +697,9 @@
     Tomcat Version           3.x onwards                 7.x onwards              5.5.x onwards
     Support Polling              NO                          YES                       YES
     Polling Size                 N/A                   maxConnections             maxConnections
-    Read Request Headers      Blocking                  Sim Blocking                   Blocking
-    Read Request Body         Blocking                  Sim Blocking                   Blocking
-    Write Response            Blocking                  Sim Blocking                   Blocking
+    Read Request Headers      Blocking                    Blocking                   Blocking
+    Read Request Body         Blocking                    Blocking                   Blocking
+    Write Response            Blocking                    Blocking                   Blocking
     Wait for next Request     Blocking                  Non Blocking               Non Blocking
     Max Connections        maxConnections              maxConnections             maxConnections
 

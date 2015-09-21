@@ -1316,7 +1316,7 @@
   </subsection>
   <subsection name="Connector Comparison">
 
-    <p>Below is a small chart that shows how the connectors differentiate.</p>
+    <p>Below is a small chart that shows how the connectors differ.</p>
     <source>
                        Java Blocking Connector   Java Non Blocking Connector   APR/native Connector
                                  BIO                         NIO                       APR
@@ -1324,9 +1324,9 @@
     Tomcat Version           3.x onwards                 6.x onwards              5.5.x onwards
     Support Polling              NO                          YES                       YES
     Polling Size                 N/A                   maxConnections             maxConnections
-    Read HTTP Request         Blocking                  Non Blocking                 Blocking
-    Read HTTP Body            Blocking                  Sim Blocking                 Blocking
-    Write HTTP Response       Blocking                  Sim Blocking                 Blocking
+    Read HTTP Request         Blocking                    Blocking                   Blocking
+    Read HTTP Body            Blocking                    Blocking                   Blocking
+    Write HTTP Response       Blocking                    Blocking                   Blocking
     Wait for next Request     Blocking                  Non Blocking               Non Blocking
     SSL Support               Java SSL                    Java SSL                   OpenSSL
     SSL Handshake             Blocking                  Non blocking                 Blocking
