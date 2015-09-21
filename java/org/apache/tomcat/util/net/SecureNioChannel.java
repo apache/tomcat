@@ -584,7 +584,7 @@ public class SecureNioChannel extends NioChannel  {
             return written;
         } else {
             // Are we closing or closed?
-            if ( closing || closed) {
+            if (closing || closed) {
                 throw new IOException(sm.getString("channel.nio.ssl.closing"));
             }
 
