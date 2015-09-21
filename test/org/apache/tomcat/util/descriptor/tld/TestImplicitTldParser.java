@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class TestImplicitTldParser {
     private TldParser parser;
@@ -41,7 +42,7 @@ public class TestImplicitTldParser {
         Assert.assertEquals("Ignored", xml.getShortName());
     }
 
-    @Test
+    @Test(expected=SAXParseException.class)
     public void testImpicitTldBad() throws Exception {
         TaglibXml xml = parse("test/tld/implicit-bad.tld");
         Assert.assertEquals("1.0", xml.getTlibVersion());
