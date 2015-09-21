@@ -87,7 +87,7 @@ public class ClassLoaderLogManager extends LogManager {
      * application redeployment.
      */
     protected final Map<ClassLoader, ClassLoaderLogInfo> classLoaderLoggers = 
-        new WeakHashMap<ClassLoader, ClassLoaderLogInfo>();
+            new WeakHashMap<ClassLoader, ClassLoaderLogInfo>(); // Guarded by this
 
     
     /**
@@ -274,7 +274,7 @@ public class ClassLoaderLogManager extends LogManager {
     }
 
 
-    private String findProperty(String name) {
+    private synchronized String findProperty(String name) {
         ClassLoader classLoader = Thread.currentThread()
                 .getContextClassLoader();
         ClassLoaderLogInfo info = getClassLoaderInfo(classLoader);
@@ -341,7 +341,7 @@ public class ClassLoaderLogManager extends LogManager {
     /**
      * Shuts down the logging system.
      */
-    public void shutdown() {
+    public synchronized void shutdown() {
         // The JVM is being shutdown. Make sure all loggers for all class
         // loaders are shutdown
         for (ClassLoaderLogInfo clLogInfo : classLoaderLoggers.values()) {
@@ -385,7 +385,7 @@ public class ClassLoaderLogManager extends LogManager {
      * @param classLoader The classloader for which we will retrieve or build the 
      *                    configuration
      */
-    protected ClassLoaderLogInfo getClassLoaderInfo(ClassLoader classLoader) {
+    protected synchronized ClassLoaderLogInfo getClassLoaderInfo(ClassLoader classLoader) {
         
         if (classLoader == null) {
             classLoader = ClassLoader.getSystemClassLoader();
@@ -416,7 +416,7 @@ public class ClassLoaderLogManager extends LogManager {
      * @param classLoader 
      * @throws IOException Error
      */
-    protected void readConfiguration(ClassLoader classLoader)
+    protected synchronized void readConfiguration(ClassLoader classLoader)
         throws IOException {
         
         InputStream is = null;
@@ -514,7 +514,7 @@ public class ClassLoaderLogManager extends LogManager {
      * @param classLoader for which the configuration will be loaded
      * @throws IOException If something wrong happens during loading
      */
-    protected void readConfiguration(InputStream is, ClassLoader classLoader)
+    protected synchronized void readConfiguration(InputStream is, ClassLoader classLoader)
         throws IOException {
         
         ClassLoaderLogInfo info = classLoaderLoggers.get(classLoader);

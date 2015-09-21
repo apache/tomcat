@@ -96,6 +96,10 @@
         Tomcat because the Tomcat process is waiting on some system call or is
         uninterruptible. (markt)
       </fix>
+      <fix>
+        <bug>58436</bug>: Fix some rare data races in JULI&apos;s
+        <code>ClassLoaderLogManager</code> during shutdown. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
