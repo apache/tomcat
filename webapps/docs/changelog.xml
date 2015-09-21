@@ -91,6 +91,11 @@
         gracefully from <code>catalina.sh</code> even if using
         <code>-force</code>. Patch provided by  Alexandre Garnier. (markt)
       </fix>
+      <fix>
+        <bug>58416</bug>: Correctly detect when a forced stop fails to stop
+        Tomcat because the Tomcat process is waiting on some system call or is
+        uninterruptible. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

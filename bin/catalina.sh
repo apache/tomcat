@@ -505,8 +505,6 @@ elif [ "$1" = "stop" ] ; then
                         echo "The PID file could not be removed."
                     fi
                 fi
-                # Set this to zero else a warning will be issued about the process still running
-                KILL_SLEEP_INTERVAL=0
                 echo "The Tomcat process has been killed."
                 break
             fi
@@ -515,7 +513,7 @@ elif [ "$1" = "stop" ] ; then
             fi
             KILL_SLEEP_INTERVAL=`expr $KILL_SLEEP_INTERVAL - 1 `
         done
-        if [ $KILL_SLEEP_INTERVAL -gt 0 ]; then
+        if [ $KILL_SLEEP_INTERVAL -lt 0 ]; then
             echo "Tomcat has not been killed completely yet. The process might be waiting on some system call or might be UNINTERRUPTIBLE."
         fi
       fi
