@@ -577,34 +577,33 @@ public class SecureNioChannel extends NioChannel  {
     @Override
     public int write(ByteBuffer src) throws IOException {
         checkInterruptStatus();
-        if ( src == this.netOutBuffer ) {
+        if (src == this.netOutBuffer) {
             //we can get here through a recursive call
             //by using the NioBlockingSelector
             int written = sc.write(src);
             return written;
         } else {
-            //are we closing or closed?
-            if ( closing || closed) throw new IOException(sm.getString("channel.nio.ssl.closing"));
-            //make sure we can handle expand, and that we only use one buffer
+            // Are we closing or closed?
+            if ( closing || closed) {
+                throw new IOException(sm.getString("channel.nio.ssl.closing"));
+            }
+
+            // Make sure we can handle expand, and that we only use one buffer
             if (!this.isSendFile() && src != bufHandler.getWriteBuffer()) {
                 throw new IllegalArgumentException(sm.getString("channel.nio.ssl.invalidBuffer"));
             }
 
-            //the number of bytes written
-            int written = 0;
-
             if (!flush(netOutBuffer)) {
-                //we haven't emptied out the buffer yet
-                return written;
+                // We haven't emptied out the buffer yet
+                return 0;
             }
 
-            /*
-             * The data buffer is empty, we can reuse the entire buffer.
-             */
+            // The data buffer is empty, we can reuse the entire buffer.
             netOutBuffer.clear();
 
             SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
-            written = result.bytesConsumed();
+            // The number of bytes written
+            int written = result.bytesConsumed();
             netOutBuffer.flip();
 
             if (result.getStatus() == Status.OK) {
@@ -613,7 +612,7 @@ public class SecureNioChannel extends NioChannel  {
                 throw new IOException(sm.getString("channel.nio.ssl.wrapFail", result.getStatus()));
             }
 
-            //force a flush
+            // Force a flush
             flush(netOutBuffer);
 
             return written;
