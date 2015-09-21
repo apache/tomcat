@@ -22,6 +22,7 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.WriteAbortedException;
 import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedAction;
@@ -139,14 +140,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * Type array.
      */
     protected static final String EMPTY_ARRAY[] = new String[0];
-
-
-    /**
-     * The dummy attribute value serialized when a NotSerializableException is
-     * encountered in <code>writeObject()</code>.
-     */
-    protected static final String NOT_SERIALIZED =
-        "___NOT_SERIALIZABLE_EXCEPTION___";
 
 
     /**
@@ -1616,9 +1609,16 @@ public class StandardSession implements HttpSession, Session, Serializable {
         isValid = true;
         for (int i = 0; i < n; i++) {
             String name = (String) stream.readObject();
-            Object value = stream.readObject();
-            if ((value instanceof String) && (value.equals(NOT_SERIALIZED)))
-                continue;
+            final Object value;
+            try {
+                value = stream.readObject();
+            } catch (WriteAbortedException wae) {
+                if (wae.getCause() instanceof NotSerializableException) {
+                    // Skip non serializable attributes
+                    continue;
+                }
+                throw wae;
+            }
             if (manager.getContainer().getLogger().isDebugEnabled())
                 manager.getContainer().getLogger().debug("  loading attribute '" + name +
                     "' with value '" + value + "'");
@@ -1694,18 +1694,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
             try {
                 stream.writeObject(saveValues.get(i));
                 if (manager.getContainer().getLogger().isDebugEnabled())
-                    manager.getContainer().getLogger().debug
-                        ("  storing attribute '" + saveNames.get(i) +
-                        "' with value '" + saveValues.get(i) + "'");
+                    manager.getContainer().getLogger().debug(
+                            "  storing attribute '" + saveNames.get(i) + "' with value '" + saveValues.get(i) + "'");
             } catch (NotSerializableException e) {
-                manager.getContainer().getLogger().warn
-                    (sm.getString("standardSession.notSerializable",
-                     saveNames.get(i), id), e);
-                stream.writeObject(NOT_SERIALIZED);
-                if (manager.getContainer().getLogger().isDebugEnabled())
-                    manager.getContainer().getLogger().debug
-                       ("  storing attribute '" + saveNames.get(i) +
-                        "' with value NOT_SERIALIZED");
+                manager.getContainer().getLogger().warn(
+                        sm.getString("standardSession.notSerializable", saveNames.get(i), id), e);
             }
         }
 

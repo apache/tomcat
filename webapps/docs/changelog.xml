@@ -73,6 +73,11 @@
         deployment background process. (markt)
       </fix>
       <fix>
+        <bug>58284</bug>: Correctly implement session serialization so
+        non-serializable attributes are skipped with a warning. Patch provided
+        by Andrew Shore. (markt)
+      </fix>
+      <fix>
         <bug>58313</bug>: Fix concurrent access of encoders map when clearing
         encoders prior to switch to async. (markt)
       </fix>
