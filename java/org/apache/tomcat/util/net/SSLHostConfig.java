@@ -169,6 +169,7 @@ public class SSLHostConfig {
                 certificates.iterator().next().getType() == SSLHostConfigCertificate.Type.UNDEFINED ||
                         certificate.getType() == SSLHostConfigCertificate.Type.UNDEFINED) {
             // Invalid config
+            throw new IllegalArgumentException(sm.getString("sslHostConfig.certificate.notype"));
         }
 
         certificates.add(certificate);
