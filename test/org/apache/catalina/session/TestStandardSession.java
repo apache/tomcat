@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Manager;
@@ -93,19 +92,29 @@ public class TestStandardSession {
     }
 
 
+    /*
+     * See Bug 58284
+     */
     @Test
-    @Ignore // This currently fails on de-serialization - bug 58284
-    public void testSerializationComplex01() throws Exception {
+    public void serializeSkipsNonSerializableAttributes() throws Exception {
+        final String nonSerializableKey = "nonSerializable";
+        final String nestedNonSerializableKey = "nestedNonSerializable";
+        final String serializableKey = "serializable";
+        final Object serializableValue = "foo";
 
         StandardSession s1 = new StandardSession(TEST_MANAGER);
         s1.setValid(true);
-        Map<String,NonSerializable> value = new HashMap<>();
+        Map<String, NonSerializable> value = new HashMap<>();
         value.put("key", new NonSerializable());
-        s1.setAttribute("attr01", value);
+        s1.setAttribute(nestedNonSerializableKey, value);
+        s1.setAttribute(serializableKey, serializableValue);
+        s1.setAttribute(nonSerializableKey, new NonSerializable());
 
         StandardSession s2 = serializeThenDeserialize(s1);
 
-        validateSame(s1, s2, 0);
+        Assert.assertNull(s2.getAttribute(nestedNonSerializableKey));
+        Assert.assertNull(s2.getAttribute(nonSerializableKey));
+        Assert.assertEquals(serializableValue, s2.getAttribute(serializableKey));
     }
 
 

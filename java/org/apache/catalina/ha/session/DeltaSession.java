@@ -24,6 +24,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.WriteAbortedException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -771,9 +772,16 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         isValid = true;
         for (int i = 0; i < n; i++) {
             String name = (String) stream.readObject();
-            Object value = stream.readObject();
-            if ( (value instanceof String) && (value.equals(NOT_SERIALIZED)))
-                continue;
+            final Object value;
+            try {
+                value = stream.readObject();
+            } catch (WriteAbortedException wae) {
+                if (wae.getCause() instanceof NotSerializableException) {
+                    // Skip non serializable attributes
+                    continue;
+                }
+                throw wae;
+            }
             attributes.put(name, value);
         }
         isValid = isValidSave;
@@ -871,9 +879,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             try {
                 stream.writeObject(saveValues.get(i));
             } catch (NotSerializableException e) {
-                log.error(sm.getString("standardSession.notSerializable",saveNames.get(i), id), e);
-                stream.writeObject(NOT_SERIALIZED);
-                log.error("  storing attribute '" + saveNames.get(i)+ "' with value NOT_SERIALIZED");
+                log.error(sm.getString("standardSession.notSerializable", saveNames.get(i), id), e);
             }
         }
 
