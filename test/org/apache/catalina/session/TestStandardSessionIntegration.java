@@ -34,9 +34,9 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestStandardSession extends TomcatBaseTest {
+public class TestStandardSessionIntegration extends TomcatBaseTest {
 
-    /**
+    /*
      * Test session.invalidate() in a clustered environment.
      */
     @Test
