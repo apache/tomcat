@@ -457,16 +457,16 @@ public class SecureNioChannel extends NioChannel  {
     }
 
     /**
-     * Sends a SSL close message, will not physically close the connection here.<br>
-     * To close the connection, you could do something like
+     * Sends a SSL close message, will not physically close the connection here.
+     * <br>To close the connection, you could do something like
      * <pre><code>
      *   close();
      *   while (isOpen() &amp;&amp; !myTimeoutFunction()) Thread.sleep(25);
      *   if ( isOpen() ) close(true); //forces a close if you timed out
      * </code></pre>
      * @throws IOException if an I/O error occurs
-     * @throws IOException if there is data on the outgoing network buffer and we are unable to flush it
-     * TODO Implement this java.io.Closeable method
+     * @throws IOException if there is data on the outgoing network buffer and
+     *                     we are unable to flush it
      */
     @Override
     public void close() throws IOException {
@@ -512,10 +512,11 @@ public class SecureNioChannel extends NioChannel  {
      * Reads a sequence of bytes from this channel into the given buffer.
      *
      * @param dst The buffer into which bytes are to be transferred
-     * @return The number of bytes read, possibly zero, or <tt>-1</tt> if the channel has reached end-of-stream
+     * @return The number of bytes read, possibly zero, or <tt>-1</tt> if the
+     *         channel has reached end-of-stream
      * @throws IOException If some other I/O error occurs
-     * @throws IllegalArgumentException if the destination buffer is different than bufHandler.getReadBuffer()
-     * TODO Implement this java.nio.channels.ReadableByteChannel method
+     * @throws IllegalArgumentException if the destination buffer is different
+     *                                  than bufHandler.getReadBuffer()
      */
     @Override
     public int read(ByteBuffer dst) throws IOException {
@@ -572,7 +573,6 @@ public class SecureNioChannel extends NioChannel  {
      * @param src The buffer from which bytes are to be retrieved
      * @return The number of bytes written, possibly zero
      * @throws IOException If some other I/O error occurs
-     * TODO Implement this java.nio.channels.WritableByteChannel method
      */
     @Override
     public int write(ByteBuffer src) throws IOException {
