@@ -25,6 +25,9 @@ import javax.servlet.http.HttpUpgradeHandler;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
+import org.apache.coyote.AsyncContextCallback;
+import org.apache.coyote.AsyncStateMachine;
+import org.apache.coyote.ContainerThreadMarker;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -39,6 +42,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     private static final StringManager sm = StringManager.getManager(StreamProcessor.class);
 
     private final Stream stream;
+    private final AsyncStateMachine asyncStateMachine;
 
     private volatile SSLSupport sslSupport;
 
@@ -46,6 +50,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     public StreamProcessor(Stream stream, Adapter adapter, SocketWrapperBase<?> socketWrapper) {
         super(stream.getCoyoteRequest(), stream.getCoyoteResponse());
         this.stream = stream;
+        asyncStateMachine = new AsyncStateMachine(this);
         setAdapter(adapter);
         setSocketWrapper(socketWrapper);
     }
@@ -53,13 +58,28 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     @Override
     public void run() {
+        // HTTP/2 equivalent of AbstractConnectionHandler#process()
+        ContainerThreadMarker.set();
+        SocketState state = SocketState.CLOSED;
         try {
-            adapter.service(request, response);
-            // Ensure the response is complete
-            response.action(ActionCode.CLOSE, null);
+            do {
+                if (asyncStateMachine.isAsync()) {
+                    adapter.asyncDispatch(request, response, SocketStatus.OPEN_READ);
+                } else {
+                    adapter.service(request, response);
+                }
+
+                if (asyncStateMachine.isAsync()) {
+                    state = asyncStateMachine.asyncPostProcess();
+                } else {
+                    response.action(ActionCode.CLOSE, null);
+                }
+            } while (state == SocketState.ASYNC_END);
         } catch (Exception e) {
             // TODO
             e.printStackTrace();
+        } finally {
+            ContainerThreadMarker.clear();
         }
     }
 
@@ -92,6 +112,69 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         }
         case IS_ERROR: {
             ((AtomicBoolean) param).set(getErrorState().isError());
+            break;
+        }
+
+        // Servlet 3.0 asynchronous support
+        case ASYNC_START: {
+            asyncStateMachine.asyncStart((AsyncContextCallback) param);
+            break;
+        }
+        case ASYNC_COMPLETE: {
+            if (asyncStateMachine.asyncComplete()) {
+                socketWrapper.getEndpoint().getExecutor().execute(this);
+            }
+            break;
+        }
+        case ASYNC_DISPATCH: {
+            if (asyncStateMachine.asyncDispatch()) {
+                socketWrapper.getEndpoint().getExecutor().execute(this);
+            }
+            break;
+        }
+        case ASYNC_DISPATCHED: {
+            asyncStateMachine.asyncDispatched();
+            break;
+        }
+        case ASYNC_ERROR: {
+            asyncStateMachine.asyncError();
+            break;
+        }
+        case ASYNC_IS_ASYNC: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
+            break;
+        }
+        case ASYNC_IS_COMPLETING: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isCompleting());
+            break;
+        }
+        case ASYNC_IS_DISPATCHING: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
+            break;
+        }
+        case ASYNC_IS_ERROR: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
+            break;
+        }
+        case ASYNC_IS_STARTED: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
+            break;
+        }
+        case ASYNC_IS_TIMINGOUT: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
+            break;
+        }
+        case ASYNC_RUN: {
+            asyncStateMachine.asyncRun((Runnable) param);
+            break;
+        }
+        case ASYNC_SETTIMEOUT: {
+            // TODO
+            break;
+        }
+        case ASYNC_TIMEOUT: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(asyncStateMachine.asyncTimeout());
             break;
         }
 
