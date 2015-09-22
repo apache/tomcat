@@ -30,7 +30,7 @@ import org.apache.catalina.WebResourceSet;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestDirResourceSetVirtual extends TestDirResourceSet {
+public class TestDirResourceSetVirtual extends AbstractTestResourceSet {
 
     private static Path tempDir;
     private static File dir1;
@@ -83,5 +83,10 @@ public class TestDirResourceSetVirtual extends TestDirResourceSet {
     @Override
     public File getBaseDir() {
         return new File("test/webresources/dir3");
+    }
+
+    @Override
+    public void testNoArgConstructor() {
+        // NO-OP. Tested in TestDirResource
     }
 }
