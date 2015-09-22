@@ -25,11 +25,10 @@ public class TestDirResourceSetVirtual extends TestDirResourceSet {
 
     @Override
     public WebResourceRoot getWebResourceRoot() {
-        File f = new File(getBaseDir());
         TesterWebResourceRoot root = new TesterWebResourceRoot();
         WebResourceSet webResourceSet =
                 new DirResourceSet(new TesterWebResourceRoot(), "/",
-                        f.getAbsolutePath(), "/");
+                        getBaseDir().getAbsolutePath(), "/");
         root.setMainResources(webResourceSet);
 
         WebResourceSet f1 = new FileResourceSet(root, "/f1.txt",
@@ -57,7 +56,7 @@ public class TestDirResourceSetVirtual extends TestDirResourceSet {
     }
 
     @Override
-    public String getBaseDir() {
-        return "test/webresources/dir3";
+    public File getBaseDir() {
+        return new File("test/webresources/dir3");
     }
 }
