@@ -19,6 +19,6 @@ package org.apache.catalina.webresources;
 public class TestFileResourceSet extends AbstractTestFileResourceSet {
 
     public TestFileResourceSet() {
-        super(true);
+        super(false);
     }
 }
