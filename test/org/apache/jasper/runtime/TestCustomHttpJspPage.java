@@ -18,10 +18,11 @@ package org.apache.jasper.runtime;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestCustomHttpJspPage extends TomcatBaseTest {
 
