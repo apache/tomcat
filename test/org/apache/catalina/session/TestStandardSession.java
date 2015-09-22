@@ -37,7 +37,7 @@ public class TestStandardSession {
 
     static {
         TEST_MANAGER = new StandardManager();
-        TEST_MANAGER.setContext(new StandardContext());
+        TEST_MANAGER.setContainer(new StandardContext());
     }
 
 
@@ -104,7 +104,7 @@ public class TestStandardSession {
 
         StandardSession s1 = new StandardSession(TEST_MANAGER);
         s1.setValid(true);
-        Map<String, NonSerializable> value = new HashMap<>();
+        Map<String, NonSerializable> value = new HashMap<String, NonSerializable>();
         value.put("key", new NonSerializable());
         s1.setAttribute(nestedNonSerializableKey, value);
         s1.setAttribute(serializableKey, serializableValue);
