@@ -17,6 +17,16 @@
 package org.apache.catalina.webresources;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+
+import org.apache.catalina.startup.ExpandWar;
+import org.apache.catalina.startup.TomcatBaseTest;
 
 /**
  * Mounts file resources in sub directories that do not exist in the main
@@ -24,9 +34,29 @@ import java.io.File;
  */
 public class TestFileResourceSetVirtual extends TestFileResourceSet {
 
+    private static Path tempDir;
+    private static File dir1;
+
+    @BeforeClass
+    public static void before() throws IOException {
+        tempDir = Files.createTempDirectory("test", new FileAttribute[0]);
+        dir1 = new File(tempDir.toFile(), "dir1");
+        TomcatBaseTest.recurrsiveCopy(new File("test/webresources/dir1").toPath(), dir1.toPath());
+    }
+
+    @AfterClass
+    public static void after() {
+        ExpandWar.delete(tempDir.toFile());
+    }
+
+
     @Override
     public File getBaseDir() {
         return new File("test/webresources/dir3");
     }
 
+    @Override
+    protected String getDir1() {
+        return dir1.getAbsolutePath();
+    }
 }
