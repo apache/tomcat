@@ -28,8 +28,7 @@ public class TestDirResourceSetInternal extends TestDirResourceSet {
         File f = new File("test/");
         TesterWebResourceRoot root = new TesterWebResourceRoot();
         WebResourceSet webResourceSet =
-                new DirResourceSet(new TesterWebResourceRoot(), "/",
-                        f.getAbsolutePath(), "/webresources/dir1");
+                new DirResourceSet(root, "/", f.getAbsolutePath(), "/webresources/dir1");
         root.setMainResources(webResourceSet);
         return root;
     }
