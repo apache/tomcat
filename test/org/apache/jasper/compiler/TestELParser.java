@@ -238,13 +238,15 @@ public class TestELParser {
 
     @Test
     public void testEscape04() throws JasperException {
-        doTestParser("\\$", "\\$");
+        // When parsed as EL in JSP the escaping of $ as \$ is optional
+        doTestParser("\\$", "\\$", "$");
     }
 
 
     @Test
     public void testEscape05() throws JasperException {
-        doTestParser("\\#", "\\#");
+        // When parsed as EL in JSP the escaping of # as \# is optional
+        doTestParser("\\#", "\\#", "#");
     }
 
 
@@ -280,17 +282,22 @@ public class TestELParser {
 
 
     private void doTestParser(String input, String expected) throws JasperException {
+        doTestParser(input, expected, input);
+    }
+
+    private void doTestParser(String input, String expectedResult, String expectedBuilderOutput) throws JasperException {
+
         ELException elException = null;
         String elResult = null;
 
         // Don't try and evaluate expressions that depend on variables or functions
-        if (expected != null) {
+        if (expectedResult != null) {
             try {
                 ExpressionFactory factory = ExpressionFactory.newInstance();
                 ELContext context = new ELContextImpl();
                 ValueExpression ve = factory.createValueExpression(context, input, String.class);
                 elResult = ve.getValue(context).toString();
-                Assert.assertEquals(expected, elResult);
+                Assert.assertEquals(expectedResult, elResult);
             } catch (ELException ele) {
                 elException = ele;
             }
@@ -311,6 +318,6 @@ public class TestELParser {
 
         nodes.visit(textBuilder);
 
-        Assert.assertEquals(input, textBuilder.getText());
+        Assert.assertEquals(expectedBuilderOutput, textBuilder.getText());
     }
 }

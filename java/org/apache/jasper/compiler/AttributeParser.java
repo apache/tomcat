@@ -202,11 +202,11 @@ public class AttributeParser {
     }
 
     /*
-     * For EL need to unquote everything but no need to convert anything. The
-     * EL is terminated by '}'. The only other valid location for '}' is inside
-     * a StringLiteral. The literals are delimited by '\'' or '\"'. The only
-     * other valid location for '\'' or '\"' is also inside a StringLiteral. A
-     * quote character inside a StringLiteral must be escaped if the same quote
+     * Once inside EL, no need to unquote or convert anything. The EL is
+     * terminated by '}'. The only other valid location for '}' is inside a
+     * StringLiteral. The literals are delimited by '\'' or '\"'. The only other
+     * valid location for '\'' or '\"' is also inside a StringLiteral. A quote
+     * character inside a StringLiteral must be escaped if the same quote
      * character is used to delimit the StringLiteral.
      */
     private void parseEL() {
@@ -214,7 +214,7 @@ public class AttributeParser {
         boolean insideLiteral = false;
         char literalQuote = 0;
         while (i < size && !endEL) {
-            char ch = nextChar();
+            char ch = input.charAt(i++);
             if (ch == '\'' || ch == '\"') {
                 if (insideLiteral) {
                     if (literalQuote == ch) {
@@ -228,7 +228,7 @@ public class AttributeParser {
             } else if (ch == '\\') {
                 result.append(ch);
                 if (insideLiteral && size < i) {
-                    ch = nextChar();
+                    ch = input.charAt(i++);
                     result.append(ch);
                 }
             } else if (ch == '}') {
