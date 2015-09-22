@@ -37,13 +37,13 @@ public class Rfc6265CookieProcessor implements CookieProcessor {
     private static final BitSet domainValid = new BitSet(128);
 
     static {
-        for (char c = '0'; c < '9'; c++) {
+        for (char c = '0'; c <= '9'; c++) {
             domainValid.set(c);
         }
-        for (char c = 'a'; c < 'z'; c++) {
+        for (char c = 'a'; c <= 'z'; c++) {
             domainValid.set(c);
         }
-        for (char c = 'A'; c < 'Z'; c++) {
+        for (char c = 'A'; c <= 'Z'; c++) {
             domainValid.set(c);
         }
         domainValid.set('.');
