@@ -30,6 +30,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.el.lang.ELSupport;
@@ -206,6 +207,32 @@ public class TestELEvaluation {
         }
         assertNotNull(e);
     }
+
+    @Test
+    public void testEscape01() {
+        Assert.assertEquals("$${", evaluateExpression("$\\${"));
+    }
+
+    @Test
+    public void testBug49081a() {
+        Assert.assertEquals("$2", evaluateExpression("$${1+1}"));
+    }
+
+    @Test
+    public void testBug49081b() {
+        Assert.assertEquals("#2", evaluateExpression("##{1+1}"));
+    }
+
+    @Test
+    public void testBug49081c() {
+        Assert.assertEquals("#2", evaluateExpression("#${1+1}"));
+    }
+
+    @Test
+    public void testBug49081d() {
+        Assert.assertEquals("$2", evaluateExpression("$#{1+1}"));
+    }
+
 
     // ************************************************************************
 
