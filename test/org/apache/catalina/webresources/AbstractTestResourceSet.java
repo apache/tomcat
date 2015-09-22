@@ -182,8 +182,6 @@ public abstract class AbstractTestResourceSet {
         // Files visible in some tests only
         optional.add(getMount() + ".ignore-me.txt");
         optional.add("META-INF");
-        // When running tests in parallel the following may be present
-        optional.add("new-test");
 
         for (String result : results) {
             Assert.assertTrue(result,
