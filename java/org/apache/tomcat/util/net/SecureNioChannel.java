@@ -588,11 +588,6 @@ public class SecureNioChannel extends NioChannel  {
                 throw new IOException(sm.getString("channel.nio.ssl.closing"));
             }
 
-            // Make sure we can handle expand, and that we only use one buffer
-            if (!this.isSendFile() && src != bufHandler.getWriteBuffer()) {
-                throw new IllegalArgumentException(sm.getString("channel.nio.ssl.invalidBuffer"));
-            }
-
             if (!flush(netOutBuffer)) {
                 // We haven't emptied out the buffer yet
                 return 0;
