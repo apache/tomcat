@@ -22,7 +22,7 @@ import java.io.File;
  * Mounts file resources in sub directories that do not exist in the main
  * resoucres.
  */
-public class TestFileResourceSetVirtual extends TestFileResourceSet {
+public class TestFileResourceSetVirtual extends TestFileResourceSetReadOnly {
 
     @Override
     public File getBaseDir() {
