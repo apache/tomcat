@@ -31,6 +31,8 @@ public abstract class AbstractTestFileResourceSet extends AbstractTestResourceSe
         this.readOnly = readOnly;
     }
 
+    protected abstract String getDir1();
+
     @Override
     public WebResourceRoot getWebResourceRoot() {
         TesterWebResourceRoot root = new TesterWebResourceRoot();
@@ -39,22 +41,22 @@ public abstract class AbstractTestFileResourceSet extends AbstractTestResourceSe
         root.setMainResources(webResourceSet);
 
         WebResourceSet f1 = new FileResourceSet(root, "/f1.txt",
-                "test/webresources/dir1/f1.txt", "/");
+                getDir1() + "/f1.txt", "/");
         f1.setReadOnly(readOnly);
         root.addPreResources(f1);
 
         WebResourceSet f2 = new FileResourceSet(root, "/f2.txt",
-                "test/webresources/dir1/f2.txt", "/");
+                getDir1() + "/f2.txt", "/");
         f2.setReadOnly(readOnly);
         root.addPreResources(f2);
 
         WebResourceSet d1f1 = new FileResourceSet(root, "/d1/d1-f1.txt",
-                "test/webresources/dir1/d1/d1-f1.txt", "/");
+                getDir1() + "/d1/d1-f1.txt", "/");
         d1f1.setReadOnly(readOnly);
         root.addPreResources(d1f1);
 
         WebResourceSet d2f1 = new FileResourceSet(root, "/d2/d2-f1.txt",
-                "test/webresources/dir1/d2/d2-f1.txt", "/");
+                getDir1() + "/d2/d2-f1.txt", "/");
         d2f1.setReadOnly(readOnly);
         root.addPreResources(d2f1);
 
