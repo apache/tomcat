@@ -39,6 +39,8 @@ public interface ProtocolHandler {
 
     /**
      * The adapter, used to call the connector.
+     *
+     * @param adapter The adapter to associate
      */
     public void setAdapter(Adapter adapter);
     public Adapter getAdapter();
