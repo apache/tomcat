@@ -494,8 +494,6 @@ public class SecureNioChannel extends NioChannel  {
             int written = sc.write(src);
             return written;
         } else {
-            //make sure we can handle expand, and that we only use on buffer
-            if ( (!this.isSendFile()) && (src != bufHandler.getWriteBuffer()) ) throw new IllegalArgumentException("You can only write using the application write buffer provided by the handler.");
             //are we closing or closed?
             if ( closing || closed) throw new IOException("Channel is in closing state.");
 

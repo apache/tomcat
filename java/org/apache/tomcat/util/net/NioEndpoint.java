@@ -1353,7 +1353,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
 
                 //configure output channel
                 sc = attachment.getChannel();
-                sc.setSendFile(true);
                 //ssl channel is slightly different
                 WritableByteChannel wc = ((sc instanceof SecureNioChannel)?sc:sc.getIOChannel());
 
@@ -1420,8 +1419,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 log.error("",t);
                 cancelledKey(sk, SocketStatus.ERROR, false);
                 return false;
-            }finally {
-                if (sc!=null) sc.setSendFile(false);
             }
             return true;
         }

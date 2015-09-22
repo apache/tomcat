@@ -127,6 +127,9 @@
         connections by treating this as <code>EAGAIN</code>. The same fix has
         now been applied to the standard HTTP connector. (markt)
       </fix>
+      <fix>
+        <bug>57799</bug>: Remove useless sendfile check for NIO SSL. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
