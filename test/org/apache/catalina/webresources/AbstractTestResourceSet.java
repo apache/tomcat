@@ -44,7 +44,7 @@ public abstract class AbstractTestResourceSet {
         return "";
     }
 
-    public abstract String getBaseDir();
+    public abstract File getBaseDir();
 
     @Before
     public final void setup() throws LifecycleException {

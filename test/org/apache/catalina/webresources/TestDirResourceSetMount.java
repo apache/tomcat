@@ -25,11 +25,10 @@ public class TestDirResourceSetMount extends AbstractTestResourceSetMount {
 
     @Override
     public WebResourceRoot getWebResourceRoot() {
-        File f = new File(getBaseDir());
         TesterWebResourceRoot root = new TesterWebResourceRoot();
         WebResourceSet webResourceSet =
                 new DirResourceSet(new TesterWebResourceRoot(), getMount(),
-                        f.getAbsolutePath(), "/");
+                        getBaseDir().getAbsolutePath(), "/");
         root.setMainResources(webResourceSet);
         return root;
     }
@@ -40,7 +39,7 @@ public class TestDirResourceSetMount extends AbstractTestResourceSetMount {
     }
 
     @Override
-    public String getBaseDir() {
-        return "test/webresources/dir1";
+    public File getBaseDir() {
+        return new File("test/webresources/dir1");
     }
 }

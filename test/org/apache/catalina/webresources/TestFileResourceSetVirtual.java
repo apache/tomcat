@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.webresources;
 
+import java.io.File;
+
 /**
  * Mounts file resources in sub directories that do not exist in the main
  * resoucres.
@@ -23,8 +25,8 @@ package org.apache.catalina.webresources;
 public class TestFileResourceSetVirtual extends TestFileResourceSet {
 
     @Override
-    public String getBaseDir() {
-        return "test/webresources/dir3";
+    public File getBaseDir() {
+        return new File("test/webresources/dir3");
     }
 
 }
