@@ -1663,9 +1663,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File dir = new File(getTomcatInstance().getHost().getAppBaseFile(),
                 APP_NAME.getBaseName());
         if (withXml) {
-            recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
+            recursiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
         } else {
-            recurrsiveCopy(DIR_SOURCE.toPath(), dir.toPath());
+            recursiveCopy(DIR_SOURCE.toPath(), dir.toPath());
         }
         return dir;
     }
@@ -1673,16 +1673,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private File createDirXmlInAppbase() throws IOException {
         File dir = new File(getTomcatInstance().getHost().getAppBaseFile(),
                 APP_NAME.getBaseName() + "/META-INF");
-        recurrsiveCopy(DIR_XML_SOURCE_META_INF.toPath(), dir.toPath());
+        recursiveCopy(DIR_XML_SOURCE_META_INF.toPath(), dir.toPath());
         return dir;
     }
 
     private File createDirInExternal(boolean withXml) throws IOException {
         File ext = new File(external, "external" + ".war");
         if (withXml) {
-            recurrsiveCopy(DIR_XML_SOURCE.toPath(), ext.toPath());
+            recursiveCopy(DIR_XML_SOURCE.toPath(), ext.toPath());
         } else {
-            recurrsiveCopy(DIR_SOURCE.toPath(), ext.toPath());
+            recursiveCopy(DIR_SOURCE.toPath(), ext.toPath());
         }
         return ext;
     }
