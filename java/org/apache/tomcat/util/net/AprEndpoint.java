@@ -1133,7 +1133,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     // -------------------------------------------------- SocketList Inner Class
 
     public class SocketList {
-        protected int size;
+        protected volatile int size;
         protected int pos;
 
         protected long[] sockets;
