@@ -826,7 +826,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     }
 
 
-    public static void recurrsiveCopy(final Path src, final Path dest)
+    public static void recursiveCopy(final Path src, final Path dest)
             throws IOException {
 
         Files.walkFileTree(src, new FileVisitor<Path>() {

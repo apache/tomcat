@@ -39,7 +39,7 @@ public class TestDirResourceSetMount extends AbstractTestResourceSetMount {
     public static void before() throws IOException {
         tempDir = Files.createTempDirectory("test", new FileAttribute[0]);
         dir1 = new File(tempDir.toFile(), "dir1");
-        TomcatBaseTest.recurrsiveCopy(new File("test/webresources/dir1").toPath(), dir1.toPath());
+        TomcatBaseTest.recursiveCopy(new File("test/webresources/dir1").toPath(), dir1.toPath());
     }
 
     @AfterClass
