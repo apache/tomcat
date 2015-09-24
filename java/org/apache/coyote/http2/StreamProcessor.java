@@ -87,6 +87,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     public void action(ActionCode actionCode, Object param) {
         switch (actionCode) {
+        // 'Normal' servlet support
         case COMMIT: {
             if (!response.isCommitted()) {
                 response.setCommitted(true);
@@ -106,14 +107,20 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             stream.flushData();
             break;
         }
-        case REQ_HOST_ADDR_ATTRIBUTE: {
-            request.remoteAddr().setString(socketWrapper.getRemoteAddr());
-            break;
-        }
         case IS_ERROR: {
             ((AtomicBoolean) param).set(getErrorState().isError());
             break;
         }
+
+        // Request attribute support
+        case REQ_HOST_ADDR_ATTRIBUTE: {
+            request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+            break;
+        }
+        //case REQ_HOST_ATTRIBUTE: {
+        //    request.remoteHost().setString(socketWrapper.getRemoteHost());
+        //    break;
+        //}
 
         // Servlet 3.0 asynchronous support
         case ASYNC_START: {
@@ -178,13 +185,34 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
 
-        //case REQ_HOST_ATTRIBUTE: {
-        //    request.remoteHost().setString(socketWrapper.getRemoteHost());
-        //    break;
-        //}
-        default:
-            // TODO
-            log.debug("TODO: Action: " + actionCode);
+        // Unsupported / illegal under HTTP/2
+        case UPGRADE:
+            throw new UnsupportedOperationException(
+                    sm.getString("streamProcessor.httpupgrade.notsupported"));
+
+        // Unimplemented / to review
+        case ACK:
+        case AVAILABLE:
+        case CLOSE_NOW:
+        case DISABLE_SWALLOW_INPUT:
+        case DISPATCH_EXECUTE:
+        case DISPATCH_READ:
+        case DISPATCH_WRITE:
+        case END_REQUEST:
+        case NB_READ_INTEREST:
+        case NB_WRITE_INTEREST:
+        case REQUEST_BODY_FULLY_READ:
+        case REQ_HOST_ATTRIBUTE:
+        case REQ_LOCALPORT_ATTRIBUTE:
+        case REQ_LOCAL_ADDR_ATTRIBUTE:
+        case REQ_LOCAL_NAME_ATTRIBUTE:
+        case REQ_REMOTEPORT_ATTRIBUTE:
+        case REQ_SET_BODY_REPLAY:
+        case REQ_SSL_ATTRIBUTE:
+        case REQ_SSL_CERTIFICATE:
+        case RESET:
+            log.info("TODO: Implement [" + actionCode + "] for HTTP/2");
+            break;
         }
     }
 
