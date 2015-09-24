@@ -104,8 +104,8 @@ public class StreamStateMachine {
 
 
     public synchronized void checkFrameType(FrameType frameType) throws Http2Exception {
-        // No state change. Checks that the frame type is valid for the current
-        // state of this stream.
+        // No state change. Checks that receiving the frame type is valid for
+        // the current state of this stream.
         if (!isFrameTypePermitted(frameType)) {
             if (state.connectionErrorForInvalidFrame) {
                 throw new ConnectionException(sm.getString("streamStateMachine.invalidFrame",
