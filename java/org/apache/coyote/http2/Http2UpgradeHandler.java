@@ -269,7 +269,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             switch(status) {
             case OPEN_READ:
                 try {
-
+                    // There is data to read so use the read timeout while
+                    // reading frames.
+                   socketWrapper.setReadTimeout(getReadTimeout());
                     while (true) {
                         try {
                             if (!parser.readFrame(false)) {
@@ -281,6 +283,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                             closeStream(se);
                         }
                     }
+                    // No more frames to read so switch to the keep-alive
+                    // timeout.
+                    socketWrapper.setReadTimeout(getKeepAliveTimeout());
                 } catch (Http2Exception ce) {
                     // Really ConnectionError
                     if (log.isDebugEnabled()) {

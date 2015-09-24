@@ -30,7 +30,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 public class Http2Protocol implements UpgradeProtocol {
 
     static final long DEFAULT_READ_TIMEOUT = 10000;
-    static final long DEFAULT_KEEP_ALIVE_TIMEOUT = 30000;
+    static final long DEFAULT_KEEP_ALIVE_TIMEOUT = -1;
     static final long DEFAULT_WRITE_TIMEOUT = 10000;
     // The HTTP/2 specification recommends a minimum default of 100
     static final long DEFAULT_MAX_CONCURRENT_STREAMS = 200;
