@@ -2695,11 +2695,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         @Override
         protected void populateRemoteAddr() {
-            long socket = getSocket().longValue();
-            if (socket == 0) {
+            if (closed) {
                 return;
             }
             try {
+                long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_REMOTE, socket);
                 remoteAddr = Address.getip(sa);
             } catch (Exception e) {
@@ -2710,11 +2710,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         @Override
         protected void populateRemoteHost() {
-            long socket = getSocket().longValue();
-            if (socket == 0) {
+            if (closed) {
                 return;
             }
             try {
+                long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_REMOTE, socket);
                 remoteHost = Address.getnameinfo(sa, 0);
                 if (remoteAddr == null) {
@@ -2728,11 +2728,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         @Override
         protected void populateRemotePort() {
-            long socket = getSocket().longValue();
-            if (socket == 0) {
+            if (closed) {
                 return;
             }
             try {
+                long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_REMOTE, socket);
                 Sockaddr addr = Address.getInfo(sa);
                 remotePort = addr.port;
@@ -2744,11 +2744,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         @Override
         protected void populateLocalName() {
-            long socket = getSocket().longValue();
-            if (socket == 0) {
+            if (closed) {
                 return;
             }
             try {
+                long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 localName =Address.getnameinfo(sa, 0);
             } catch (Exception e) {
@@ -2759,11 +2759,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         @Override
         protected void populateLocalAddr() {
-            long socket = getSocket().longValue();
-            if (socket == 0) {
+            if (closed) {
                 return;
             }
             try {
+                long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 localAddr = Address.getip(sa);
             } catch (Exception e) {
@@ -2774,11 +2774,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         @Override
         protected void populateLocalPort() {
-            long socket = getSocket().longValue();
-            if (socket == 0) {
+            if (closed) {
                 return;
             }
             try {
+                long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 Sockaddr addr = Address.getInfo(sa);
                 localPort = addr.port;
