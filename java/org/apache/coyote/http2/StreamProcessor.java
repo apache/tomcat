@@ -138,6 +138,54 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
 
+        // SSL request attribute support
+        case REQ_SSL_ATTRIBUTE: {
+            try {
+                if (sslSupport != null) {
+                    Object sslO = sslSupport.getCipherSuite();
+                    if (sslO != null) {
+                        request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
+                    }
+                    sslO = sslSupport.getPeerCertificateChain();
+                    if (sslO != null) {
+                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                    }
+                    sslO = sslSupport.getKeySize();
+                    if (sslO != null) {
+                        request.setAttribute(SSLSupport.KEY_SIZE_KEY, sslO);
+                    }
+                    sslO = sslSupport.getSessionId();
+                    if (sslO != null) {
+                        request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
+                    }
+                    sslO = sslSupport.getProtocol();
+                    if (sslO != null) {
+                        request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                    }
+                    request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
+                }
+            } catch (Exception e) {
+                log.warn(sm.getString("streamProcessor.ssl.error"), e);
+            }
+            break;
+        }
+        case REQ_SSL_CERTIFICATE: {
+            // No re-negotiation support in HTTP/2. Either the certificate is
+            // available or it isn't.
+            try {
+                if (sslSupport != null) {
+                    Object sslO = sslSupport.getCipherSuite();
+                    sslO = sslSupport.getPeerCertificateChain();
+                    if (sslO != null) {
+                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                    }
+                }
+            } catch (Exception e) {
+                log.warn(sm.getString("streamProcessor.ssl.error"), e);
+            }
+            break;
+        }
+
         // Servlet 3.0 asynchronous support
         case ASYNC_START: {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
@@ -219,8 +267,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case NB_WRITE_INTEREST:
         case REQUEST_BODY_FULLY_READ:
         case REQ_SET_BODY_REPLAY:
-        case REQ_SSL_ATTRIBUTE:
-        case REQ_SSL_CERTIFICATE:
         case RESET:
             log.info("TODO: Implement [" + actionCode + "] for HTTP/2");
             break;
