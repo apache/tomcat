@@ -287,7 +287,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     // timeout.
                     socketWrapper.setReadTimeout(getKeepAliveTimeout());
                 } catch (Http2Exception ce) {
-                    // Really ConnectionError
+                    // Really ConnectionException
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("upgradeHandler.connectionError"), ce);
                     }
