@@ -65,6 +65,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             do {
                 if (asyncStateMachine.isAsync()) {
                     adapter.asyncDispatch(request, response, SocketStatus.OPEN_READ);
+                } else if (state == SocketState.ASYNC_END) {
+                    adapter.asyncDispatch(request, response, SocketStatus.OPEN_READ);
+                    // Only ever one request per stream so always treat as
+                    // closed at this point.
+                    state = SocketState.CLOSED;
                 } else {
                     adapter.service(request, response);
                 }
@@ -104,7 +109,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         }
         case CLIENT_FLUSH: {
             action(ActionCode.COMMIT, null);
-            stream.flushData();
+            try {
+                stream.flushData();
+            } catch (IOException ioe) {
+                response.setErrorException(ioe);
+                // TODO: Shut stream down?
+            }
             break;
         }
         case IS_ERROR: {

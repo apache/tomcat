@@ -222,16 +222,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void flushData() {
+    void flushData() throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.write", getConnectionId(), getIdentifier()));
         }
-        try {
-            outputBuffer.flush();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        outputBuffer.flush();
     }
 
 
