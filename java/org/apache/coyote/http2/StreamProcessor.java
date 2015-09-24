@@ -259,6 +259,14 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
 
+        // Servlet 3.1 non-blocking I/O
+        case REQUEST_BODY_FULLY_READ: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(stream.isInputFinished());
+            break;
+        }
+
+
         // Unsupported / illegal under HTTP/2
         case UPGRADE:
             throw new UnsupportedOperationException(
@@ -275,7 +283,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case END_REQUEST:
         case NB_READ_INTEREST:
         case NB_WRITE_INTEREST:
-        case REQUEST_BODY_FULLY_READ:
         case REQ_SET_BODY_REPLAY:
         case RESET:
             log.info("TODO: Implement [" + actionCode + "] for HTTP/2");
