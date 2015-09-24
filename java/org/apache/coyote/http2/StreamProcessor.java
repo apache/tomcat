@@ -117,10 +117,26 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             break;
         }
-        //case REQ_HOST_ATTRIBUTE: {
-        //    request.remoteHost().setString(socketWrapper.getRemoteHost());
-        //    break;
-        //}
+        case REQ_HOST_ATTRIBUTE: {
+            request.remoteHost().setString(socketWrapper.getRemoteHost());
+            break;
+        }
+        case REQ_LOCALPORT_ATTRIBUTE: {
+            request.setLocalPort(socketWrapper.getLocalPort());
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
+            request.localAddr().setString(socketWrapper.getLocalAddr());
+            break;
+        }
+        case REQ_LOCAL_NAME_ATTRIBUTE: {
+            request.localName().setString(socketWrapper.getLocalName());
+            break;
+        }
+        case REQ_REMOTEPORT_ATTRIBUTE: {
+            request.setRemotePort(socketWrapper.getRemotePort());
+            break;
+        }
 
         // Servlet 3.0 asynchronous support
         case ASYNC_START: {
@@ -202,11 +218,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case NB_READ_INTEREST:
         case NB_WRITE_INTEREST:
         case REQUEST_BODY_FULLY_READ:
-        case REQ_HOST_ATTRIBUTE:
-        case REQ_LOCALPORT_ATTRIBUTE:
-        case REQ_LOCAL_ADDR_ATTRIBUTE:
-        case REQ_LOCAL_NAME_ATTRIBUTE:
-        case REQ_REMOTEPORT_ATTRIBUTE:
         case REQ_SET_BODY_REPLAY:
         case REQ_SSL_ATTRIBUTE:
         case REQ_SSL_CERTIFICATE:
