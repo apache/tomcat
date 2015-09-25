@@ -195,13 +195,15 @@ public enum ActionCode {
 
     /**
      * Indicator that Servlet is interested in being
-     * notified when data is available to be read
+     * notified when data is available to be read.
      */
     NB_READ_INTEREST,
 
     /**
-     *Indicator that the Servlet is interested
-     *in being notified when it can write data
+     * Used with non-blocking writes to determine if a write is currently
+     * allowed (sets passed parameter to <code>true</code>) or not (sets passed
+     * parameter to <code>false</code>). If a write is not allowed then callback
+     * will be triggered at some future point when write becomes possible again.
      */
     NB_WRITE_INTEREST,
 

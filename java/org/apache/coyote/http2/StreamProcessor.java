@@ -17,20 +17,28 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncContextCallback;
-import org.apache.coyote.AsyncStateMachine;
 import org.apache.coyote.ContainerThreadMarker;
+import org.apache.coyote.ErrorState;
+import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -42,7 +50,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     private static final StringManager sm = StringManager.getManager(StreamProcessor.class);
 
     private final Stream stream;
-    private final AsyncStateMachine asyncStateMachine;
+    private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
     private volatile SSLSupport sslSupport;
 
@@ -50,36 +58,61 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     public StreamProcessor(Stream stream, Adapter adapter, SocketWrapperBase<?> socketWrapper) {
         super(stream.getCoyoteRequest(), stream.getCoyoteResponse());
         this.stream = stream;
-        asyncStateMachine = new AsyncStateMachine(this);
         setAdapter(adapter);
         setSocketWrapper(socketWrapper);
     }
 
 
     @Override
-    public void run() {
-        // HTTP/2 equivalent of AbstractConnectionHandler#process()
+    public synchronized void run() {
+        process(SocketStatus.OPEN_READ);
+    }
+
+
+    private synchronized void process(SocketStatus status) {
+        // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
+        // socket <-> processor mapping
         ContainerThreadMarker.set();
         SocketState state = SocketState.CLOSED;
         try {
+            Iterator<DispatchType> dispatches = getIteratorAndClearDispatches();
             do {
-                if (asyncStateMachine.isAsync()) {
-                    adapter.asyncDispatch(request, response, SocketStatus.OPEN_READ);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("streamProcessor.process.loopstart",
+                            stream.getConnectionId(), stream.getIdentifier(), status, dispatches));
+                }
+                // TODO CLOSE_NOW ?
+                if (dispatches != null) {
+                    DispatchType nextDispatch = dispatches.next();
+                    state = dispatch(nextDispatch.getSocketStatus());
+                // TODO DISCONNECT ?
+                } else if (isAsync()) {
+                    state = dispatch(status);
                 } else if (state == SocketState.ASYNC_END) {
-                    adapter.asyncDispatch(request, response, SocketStatus.OPEN_READ);
-                    // Only ever one request per stream so always treat as
-                    // closed at this point.
-                    state = SocketState.CLOSED;
+                    state = dispatch(status);
                 } else {
-                    adapter.service(request, response);
+                    state = process((SocketWrapperBase<?>) null);
                 }
 
-                if (asyncStateMachine.isAsync()) {
+                if (state != SocketState.CLOSED && isAsync()) {
                     state = asyncStateMachine.asyncPostProcess();
-                } else {
-                    response.action(ActionCode.CLOSE, null);
                 }
-            } while (state == SocketState.ASYNC_END);
+
+                if (dispatches == null || !dispatches.hasNext()) {
+                    // Only returns non-null iterator if there are
+                    // dispatches to process.
+                    dispatches = getIteratorAndClearDispatches();
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("streamProcessor.process.loopend",
+                            stream.getConnectionId(), stream.getIdentifier(), state, dispatches));
+                }
+            } while (state == SocketState.ASYNC_END ||
+                    dispatches != null && state != SocketState.CLOSED);
+
+            if (state == SocketState.CLOSED) {
+                // TODO
+            }
         } catch (Exception e) {
             // TODO
             e.printStackTrace();
@@ -265,7 +298,24 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             result.set(stream.isInputFinished());
             break;
         }
-
+        case NB_WRITE_INTEREST: {
+            // TODO: Thread safe? Do this in output buffer?
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(stream.getOutputBuffer().isReady());
+            break;
+        }
+        case DISPATCH_READ: {
+            dispatches.add(DispatchType.NON_BLOCKING_READ);
+            break;
+        }
+        case DISPATCH_WRITE: {
+            dispatches.add(DispatchType.NON_BLOCKING_WRITE);
+            break;
+        }
+        case DISPATCH_EXECUTE: {
+            socketWrapper.getEndpoint().getExecutor().execute(this);
+            break;
+        }
 
         // Unsupported / illegal under HTTP/2
         case UPGRADE:
@@ -277,12 +327,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case AVAILABLE:
         case CLOSE_NOW:
         case DISABLE_SWALLOW_INPUT:
-        case DISPATCH_EXECUTE:
-        case DISPATCH_READ:
-        case DISPATCH_WRITE:
         case END_REQUEST:
         case NB_READ_INTEREST:
-        case NB_WRITE_INTEREST:
         case REQ_SET_BODY_REPLAY:
         case RESET:
             log.info("TODO: Implement [" + actionCode + "] for HTTP/2");
@@ -328,15 +374,126 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     @Override
     public SocketState process(SocketWrapperBase<?> socket) throws IOException {
-        // Should never happen
-        throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));
+        try {
+            adapter.service(request, response);
+        } catch (Exception e) {
+            setErrorState(ErrorState.CLOSE_NOW, e);
+        }
+
+        if (getErrorState().isError()) {
+            action(ActionCode.CLOSE, null);
+            request.updateCounters();
+            return SocketState.CLOSED;
+        } else if (isAsync()) {
+            return SocketState.LONG;
+        } else {
+            action(ActionCode.CLOSE, null);
+            request.updateCounters();
+            return SocketState.CLOSED;
+        }
     }
 
 
     @Override
     public SocketState dispatch(SocketStatus status) {
-        // Should never happen
-        throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("streamProcessor.dispatch", stream.getConnectionId(),
+                    stream.getIdentifier(), status));
+        }
+        if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
+            try {
+                asyncStateMachine.asyncOperation();
+
+                if (stream.getOutputBuffer().flush(false)) {
+                    // The buffer wasn't fully flushed so re-register the
+                    // stream for write. Note this does not go via the
+                    // Response since the write registration state at
+                    // that level should remain unchanged. Once the buffer
+                    // has been emptied then the code below will call
+                    // dispatch() which will enable the
+                    // Response to respond to this event.
+                    if (stream.getOutputBuffer().isReady()) {
+                        // Unexpected
+                        throw new IllegalStateException();
+                    }
+                    return SocketState.LONG;
+                }
+            } catch (IOException | IllegalStateException x) {
+                // IOE - Problem writing to socket
+                // ISE - Request/Response not in correct state for async write
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to write async data.",x);
+                }
+                status = SocketStatus.ASYNC_WRITE_ERROR;
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
+            }
+        } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
+            try {
+                asyncStateMachine.asyncOperation();
+            } catch (IllegalStateException x) {
+                // ISE - Request/Response not in correct state for async read
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to read async data.",x);
+                }
+                status = SocketStatus.ASYNC_READ_ERROR;
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
+            }
+        }
+
+        RequestInfo rp = request.getRequestProcessor();
+        try {
+            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+            if (!getAdapter().asyncDispatch(request, response, status)) {
+                setErrorState(ErrorState.CLOSE_NOW, null);
+            }
+        } catch (InterruptedIOException e) {
+            setErrorState(ErrorState.CLOSE_NOW, e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            setErrorState(ErrorState.CLOSE_NOW, t);
+            log.error(sm.getString("http11processor.request.process"), t);
+        }
+
+        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
+        if (getErrorState().isError()) {
+            request.updateCounters();
+            return SocketState.CLOSED;
+        } else if (isAsync()) {
+            return SocketState.LONG;
+        } else {
+            request.updateCounters();
+            return SocketState.CLOSED;
+        }
+    }
+
+
+    public void addDispatch(DispatchType dispatchType) {
+        synchronized (dispatches) {
+            dispatches.add(dispatchType);
+        }
+    }
+    public Iterator<DispatchType> getIteratorAndClearDispatches() {
+        // Note: Logic in AbstractProtocol depends on this method only returning
+        // a non-null value if the iterator is non-empty. i.e. it should never
+        // return an empty iterator.
+        Iterator<DispatchType> result;
+        synchronized (dispatches) {
+            // Synchronized as the generation of the iterator and the clearing
+            // of dispatches needs to be an atomic operation.
+            result = dispatches.iterator();
+            if (result.hasNext()) {
+                dispatches.clear();
+            } else {
+                result = null;
+            }
+        }
+        return result;
+    }
+    public void clearDispatches() {
+        synchronized (dispatches) {
+            dispatches.clear();
+        }
     }
 
 

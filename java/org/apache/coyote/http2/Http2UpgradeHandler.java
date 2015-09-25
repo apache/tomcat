@@ -638,11 +638,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 if (allocation > 0) {
                     backLogSize -= allocation;
                     synchronized (entry.getKey()) {
-                        entry.getKey().notifyAll();
+                        entry.getKey().doNotifyAll();
                     }
                 }
             }
         }
+    }
+
+
+
+    @Override
+    protected synchronized void doNotifyAll() {
+        this.notifyAll();
     }
 
 
