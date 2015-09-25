@@ -87,7 +87,7 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
      * Underlying socket.
      */
     private long socket;
-    private SocketWrapper wrapper;
+    private SocketWrapper<Long> wrapper;
 
 
     // --------------------------------------------------------- Public Methods
