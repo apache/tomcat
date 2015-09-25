@@ -69,7 +69,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
 
     private Tomcat tomcat;
     private Context context;
-    private WebappClassLoaderBase loader;
+    private WebappClassLoader loader;
 
     @Before
     @Override
@@ -83,9 +83,9 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
 
         ClassLoader loader = this.context.getLoader().getClassLoader();
         assertNotNull("The class loader should not be null.", loader);
-        assertSame("The class loader is not correct.", WebappClassLoaderBase.class, loader.getClass());
+        assertSame("The class loader is not correct.", WebappClassLoader.class, loader.getClass());
 
-        this.loader = (WebappClassLoaderBase) loader;
+        this.loader = (WebappClassLoader) loader;
 
     }
 
@@ -250,7 +250,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
         assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
 
-        WebappClassLoader copiedLoader = (WebappClassLoader) this.loader.copyWithoutTransformers();
+        WebappClassLoader copiedLoader = this.loader.copyWithoutTransformers();
 
         result = invokeDoMethodOnClass(copiedLoader, "TesterNeverWeavedClass");
         assertEquals("The third result is not correct.", "This will never be weaved.", result);
