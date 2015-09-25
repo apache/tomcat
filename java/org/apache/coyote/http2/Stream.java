@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
@@ -537,11 +538,31 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
 
-        synchronized boolean isRegisteredForRead() {
+        synchronized boolean isRequestBodyFullyRead() {
+            return inBuffer.position() == 0 && isInputFinished();
+        }
+
+
+        synchronized int available() {
+            return inBuffer.position();
+        }
+
+
+        /*
+         * Called after placing some data in the inBuffer.
+         */
+        synchronized boolean onDataAvailable() {
             if (readInterest) {
                 readInterest = false;
+                coyoteRequest.action(ActionCode.DISPATCH_READ, null);
+                if (!ContainerThreadMarker.isContainerThread()) {
+                    coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
+                }
                 return true;
             } else {
+                synchronized (inBuffer) {
+                    inBuffer.notifyAll();
+                }
                 return false;
             }
         }

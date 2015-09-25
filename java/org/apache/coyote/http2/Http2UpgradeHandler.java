@@ -953,10 +953,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public ByteBuffer getInputByteBuffer(int streamId, int payloadSize) throws Http2Exception {
+    public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) throws Http2Exception {
         Stream stream = getStream(streamId, true);
         stream.checkState(FrameType.DATA);
         return stream.getInputByteBuffer();
+    }
+
+
+
+    @Override
+    public void endRequestBodyFrame(int streamId) throws Http2Exception {
+        Stream stream = getStream(streamId, true);
+        stream.getInputBuffer().onDataAvailable();
     }
 
 
