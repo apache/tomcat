@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
+import org.apache.coyote.ActionCode;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
@@ -134,11 +135,15 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    private synchronized int reserveWindowSize(int reservation) throws IOException {
+    private synchronized int reserveWindowSize(int reservation, boolean block) throws IOException {
         long windowSize = getWindowSize();
         while (windowSize < 1) {
             try {
-                wait();
+                if (block) {
+                    wait();
+                } else {
+                    return 0;
+                }
             } catch (InterruptedException e) {
                 // Possible shutdown / rst or similar. Use an IOException to
                 // signal to the client that further I/O isn't possible for this
@@ -155,6 +160,20 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
         decrementWindowSize(allocation);
         return allocation;
+    }
+
+
+    @Override
+    protected synchronized void doNotifyAll() {
+        if (coyoteResponse.getWriteListener() == null) {
+            // Blocking IO so thread will be waiting. Release it.
+            // Use notifyAll() to be safe (should be unnecessary)
+            this.notifyAll();
+        } else {
+            if (outputBuffer.isRegisteredForWrite()) {
+                coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
+            }
+        }
     }
 
 
@@ -226,7 +245,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.write", getConnectionId(), getIdentifier()));
         }
-        outputBuffer.flush();
+        outputBuffer.flush(true);
     }
 
 
@@ -308,6 +327,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         private volatile long written = 0;
         private volatile boolean closed = false;
         private volatile boolean endOfStreamSent = false;
+        private volatile boolean writeInterest = false;
 
         /* The write methods are synchronized to ensure that only one thread at
          * a time is able to access the buffer. Without this protection, a
@@ -330,22 +350,25 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 if (len > 0 && !buffer.hasRemaining()) {
                     // Only flush if we have more data to write and the buffer
                     // is full
-                    flush(true);
+                    if (flush(true, coyoteResponse.getWriteListener() == null)) {
+                        break;
+                    }
                 }
             }
             written += offset;
             return offset;
         }
 
-        public synchronized void flush() throws IOException {
-            flush(false);
+        public synchronized boolean flush(boolean block) throws IOException {
+            return flush(false, block);
         }
 
-        private synchronized void flush(boolean writeInProgress) throws IOException {
+        private synchronized boolean flush(boolean writeInProgress, boolean block)
+                throws IOException {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("stream.outputBuffer.flush.debug", getConnectionId(), getIdentifier(),
-                        Integer.toString(buffer.position()), Boolean.toString(writeInProgress),
-                        Boolean.toString(closed)));
+                log.debug(sm.getString("stream.outputBuffer.flush.debug", getConnectionId(),
+                        getIdentifier(), Integer.toString(buffer.position()),
+                        Boolean.toString(writeInProgress), Boolean.toString(closed)));
             }
             if (!coyoteResponse.isCommitted()) {
                 coyoteResponse.sendHeaders();
@@ -357,12 +380,17 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     handler.writeBody(Stream.this, buffer, 0, true);
                 }
                 // Buffer is empty. Nothing to do.
-                return;
+                return false;
             }
             buffer.flip();
             int left = buffer.remaining();
             while (left > 0) {
-                int streamReservation  = reserveWindowSize(left);
+                int streamReservation  = reserveWindowSize(left, block);
+                if (streamReservation == 0) {
+                    // Must be non-blocking
+                    buffer.compact();
+                    return true;
+                }
                 while (streamReservation > 0) {
                     int connectionReservation =
                                 handler.reserveWindowSize(Stream.this, streamReservation);
@@ -375,6 +403,25 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 }
             }
             buffer.clear();
+            return false;
+        }
+
+        synchronized boolean isReady() {
+            if (getWindowSize() > 0 && handler.getWindowSize() > 0) {
+                return true;
+            } else {
+                writeInterest = true;
+                return false;
+            }
+        }
+
+        synchronized boolean isRegisteredForWrite() {
+            if (writeInterest) {
+                writeInterest = false;
+                return true;
+            } else {
+                return false;
+            }
         }
 
         @Override

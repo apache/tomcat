@@ -78,7 +78,8 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     }
 
 
-    private AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest, Response coyoteResponse) {
+    private AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest,
+            Response coyoteResponse) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine(this);
         request = coyoteRequest;
