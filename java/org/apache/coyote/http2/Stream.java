@@ -292,6 +292,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    StreamInputBuffer getInputBuffer() {
+        return inputBuffer;
+    }
+
+
     StreamOutputBuffer getOutputBuffer() {
         return outputBuffer;
     }
@@ -473,6 +478,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         // This buffer is the destination for incoming data. It is normally is
         // 'write mode'.
         private volatile ByteBuffer inBuffer;
+        private volatile boolean readInterest;
 
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
@@ -519,6 +525,28 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
 
+        boolean isReady() {
+            synchronized (inBuffer) {
+                if (inBuffer.position() == 0) {
+                    readInterest = true;
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+
+
+        synchronized boolean isRegisteredForRead() {
+            if (readInterest) {
+                readInterest = false;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+
         public ByteBuffer getInBuffer() {
             ensureBuffersExist();
             return inBuffer;
@@ -526,13 +554,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
         private void ensureBuffersExist() {
-            if (inBuffer != null) {
-                return;
-            }
-            synchronized (this) {
-                if (inBuffer == null) {
-                    inBuffer = ByteBuffer.allocate(16 * 1024);
-                    outBuffer = new byte[16 * 1024];
+            if (inBuffer == null) {
+                synchronized (this) {
+                    if (inBuffer == null) {
+                        inBuffer = ByteBuffer.allocate(16 * 1024);
+                        outBuffer = new byte[16 * 1024];
+                    }
                 }
             }
         }

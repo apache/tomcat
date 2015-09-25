@@ -298,6 +298,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             result.set(stream.isInputFinished());
             break;
         }
+        case NB_READ_INTEREST: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(stream.getInputBuffer().isReady());
+            break;
+        }
         case NB_WRITE_INTEREST: {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(stream.getOutputBuffer().isReady());
@@ -327,7 +332,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case CLOSE_NOW:
         case DISABLE_SWALLOW_INPUT:
         case END_REQUEST:
-        case NB_READ_INTEREST:
         case REQ_SET_BODY_REPLAY:
         case RESET:
             log.info("TODO: Implement [" + actionCode + "] for HTTP/2");
