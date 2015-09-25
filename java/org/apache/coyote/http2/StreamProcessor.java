@@ -299,7 +299,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case NB_WRITE_INTEREST: {
-            // TODO: Thread safe? Do this in output buffer?
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(stream.getOutputBuffer().isReady());
             break;
