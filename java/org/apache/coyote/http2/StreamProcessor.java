@@ -154,6 +154,9 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             ((AtomicBoolean) param).set(getErrorState().isError());
             break;
         }
+        case AVAILABLE: {
+            request.setAvailable(stream.getInputBuffer().available());
+        }
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {
@@ -295,7 +298,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // Servlet 3.1 non-blocking I/O
         case REQUEST_BODY_FULLY_READ: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(stream.isInputFinished());
+            result.set(stream.getInputBuffer().isRequestBodyFullyRead());
             break;
         }
         case NB_READ_INTEREST: {
@@ -328,7 +331,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
         // Unimplemented / to review
         case ACK:
-        case AVAILABLE:
         case CLOSE_NOW:
         case DISABLE_SWALLOW_INPUT:
         case END_REQUEST:
