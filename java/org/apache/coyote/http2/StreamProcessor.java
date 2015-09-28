@@ -156,6 +156,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         }
         case AVAILABLE: {
             request.setAvailable(stream.getInputBuffer().available());
+            break;
         }
 
         // Request attribute support
