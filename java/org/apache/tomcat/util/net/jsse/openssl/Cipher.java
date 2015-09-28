@@ -4284,8 +4284,8 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             false,
-            128,
-            128,
+            256,
+            256,
             null,
             null
     ),
@@ -4318,8 +4318,8 @@ public enum Cipher {
             false,
             EncryptionLevel.HIGH,
             false,
-            128,
-            128,
+            256,
+            256,
             null,
             null
     ),
