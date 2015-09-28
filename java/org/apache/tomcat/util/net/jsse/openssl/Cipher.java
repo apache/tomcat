@@ -4259,7 +4259,7 @@ public enum Cipher {
     TLS_ECDHE_ECDSA_WITH_AES_128_CCM(
             0xC0AC,
             "ECDHE-ECDSA-AES128-CCM",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES128CCM,
             MessageDigest.AEAD,
@@ -4276,7 +4276,7 @@ public enum Cipher {
     TLS_ECDHE_ECDSA_WITH_AES_256_CCM(
             0xC0AD,
             "ECDHE-ECDSA-AES256-CCM",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES256CCM,
             MessageDigest.AEAD,
@@ -4293,7 +4293,7 @@ public enum Cipher {
     TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8(
             0xC0AE,
             "ECDHE-ECDSA-AES128-CCM8",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES128CCM8,
             MessageDigest.AEAD,
@@ -4310,7 +4310,7 @@ public enum Cipher {
     TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8(
             0xC0AF,
             "ECDHE-ECDSA-AES256-CCM8",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.AES256CCM8,
             MessageDigest.AEAD,
