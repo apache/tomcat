@@ -669,24 +669,18 @@ public class AjpProcessor extends AbstractProcessor {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (isAsync()) {
-            if (getErrorState().isError()) {
-                request.updateCounters();
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.LONG;
-            }
+        if (getErrorState().isError()) {
+            request.updateCounters();
+            return SocketState.CLOSED;
+        } else if (isAsync()) {
+            return SocketState.LONG;
         } else {
             // Set keep alive timeout for next request if enabled
             if (keepAliveTimeout > 0) {
                 socketWrapper.setReadTimeout(keepAliveTimeout);
             }
             request.updateCounters();
-            if (getErrorState().isError()) {
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.OPEN;
-            }
+            return SocketState.OPEN;
         }
     }
 
