@@ -270,6 +270,26 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_PSK_WITH_AES_128_GCM_SHA256);
             unimplemented.add(Cipher.TLS_PSK_WITH_AES_256_GCM_SHA384);
             unimplemented.add(Cipher.TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256);
+            unimplemented.add(Cipher.TLS_RSA_WITH_AES_128_CCM);
+            unimplemented.add(Cipher.TLS_RSA_WITH_AES_256_CCM);
+            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_AES_128_CCM);
+            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_AES_256_CCM);
+            unimplemented.add(Cipher.TLS_RSA_WITH_AES_128_CCM_8);
+            unimplemented.add(Cipher.TLS_RSA_WITH_AES_256_CCM_8);
+            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_AES_128_CCM_8);
+            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_AES_256_CCM_8);
+            unimplemented.add(Cipher.TLS_PSK_WITH_AES_128_CCM);
+            unimplemented.add(Cipher.TLS_PSK_WITH_AES_256_CCM);
+            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_128_CCM);
+            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_AES_256_CCM);
+            unimplemented.add(Cipher.TLS_PSK_WITH_AES_128_CCM_8);
+            unimplemented.add(Cipher.TLS_PSK_WITH_AES_256_CCM_8);
+            unimplemented.add(Cipher.TLS_PSK_DHE_WITH_AES_128_CCM_8);
+            unimplemented.add(Cipher.TLS_PSK_DHE_WITH_AES_256_CCM_8);
+            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_128_CCM);
+            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_256_CCM);
+            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8);
+            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8);
         } else {
             // These were removed in 1.1.0 so won't be available from that
             // version onwards.
