@@ -4221,7 +4221,7 @@ public enum Cipher {
             null
     ),
     // Cipher C0AA
-    TLS_DHE_PSK_WITH_AES_128_CCM_8(
+    TLS_PSK_DHE_WITH_AES_128_CCM_8(
             0xC0AA,
             "DHE-PSK-AES128-CCM8",
             KeyExchange.DHEPSK,
@@ -4238,7 +4238,7 @@ public enum Cipher {
             null
     ),
     // Cipher C0AB
-    TLS_DHE_PSK_WITH_AES_256_CCM_8(
+    TLS_PSK_DHE_WITH_AES_256_CCM_8(
             0xC0AB,
             "DHE-PSK-AES256-CCM8",
             KeyExchange.DHEPSK,
