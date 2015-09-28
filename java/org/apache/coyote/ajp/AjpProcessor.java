@@ -625,8 +625,7 @@ public class AjpProcessor extends AbstractProcessor {
                 asyncStateMachine.asyncOperation();
                 try {
                     if (hasDataToWrite()) {
-                        boolean blocking = (response.getWriteListener() == null);
-                        socketWrapper.flush(blocking);
+                        socketWrapper.flush(false);
                         if (hasDataToWrite()) {
                             // There is data to write but go via Response to
                             // maintain a consistent view of non-blocking state
