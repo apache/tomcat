@@ -659,14 +659,11 @@ public class AjpProcessor extends AbstractProcessor {
         } else if (isAsync()) {
             return SocketState.LONG;
         } else {
-            // Set keep alive timeout for next request if enabled
-            if (keepAliveTimeout > 0) {
-                socketWrapper.setReadTimeout(keepAliveTimeout);
-            }
             request.updateCounters();
-            return SocketState.OPEN;
+            return dispatchEndRequest();
         }
     }
+
 
     @Override
     protected boolean flushBufferedWrite() throws IOException {
@@ -682,12 +679,24 @@ public class AjpProcessor extends AbstractProcessor {
         return false;
     }
 
+
     @Override
     protected void dispatchNonBlockingRead() {
         if (available()) {
             super.dispatchNonBlockingRead();
         }
     }
+
+
+    @Override
+    protected SocketState dispatchEndRequest() {
+        // Set keep alive timeout for next request if enabled
+        if (keepAliveTimeout > 0) {
+            socketWrapper.setReadTimeout(keepAliveTimeout);
+        }
+        return SocketState.OPEN;
+    }
+
 
     /**
      * Process pipelined HTTP requests using the specified input and output

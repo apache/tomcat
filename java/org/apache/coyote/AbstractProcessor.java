@@ -248,6 +248,15 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
         asyncStateMachine.asyncOperation();
     }
 
+    /**
+     * Perform any necessary clean-up processing if the dispatch resulted in the
+     * completion of processing for the current request.
+     *
+     * @return The state to return for the socket once the clean-up for the
+     *         current request has completed
+     */
+    protected abstract SocketState dispatchEndRequest();
+
     @Override
     public abstract HttpUpgradeHandler getHttpUpgradeHandler();
 

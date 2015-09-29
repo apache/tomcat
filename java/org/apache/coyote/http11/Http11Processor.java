@@ -1737,17 +1737,7 @@ public class Http11Processor extends AbstractProcessor {
             return SocketState.LONG;
         } else {
             request.updateCounters();
-            if (!keepAlive) {
-                return SocketState.CLOSED;
-            } else {
-                inputBuffer.nextRequest();
-                outputBuffer.nextRequest();
-                if (socketWrapper.isReadPending()) {
-                    return SocketState.LONG;
-                } else {
-                    return SocketState.OPEN;
-                }
-            }
+            return dispatchEndRequest();
         }
     }
 
@@ -1768,6 +1758,22 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
         return false;
+    }
+
+
+    @Override
+    protected SocketState dispatchEndRequest() {
+        if (!keepAlive) {
+            return SocketState.CLOSED;
+        } else {
+            inputBuffer.nextRequest();
+            outputBuffer.nextRequest();
+            if (socketWrapper.isReadPending()) {
+                return SocketState.LONG;
+            } else {
+                return SocketState.OPEN;
+            }
+        }
     }
 
 
