@@ -25,7 +25,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 
 public class TestConfigFileLoader {
@@ -33,7 +32,7 @@ public class TestConfigFileLoader {
     @BeforeClass
     public static void setup() {
         TomcatURLStreamHandlerFactory.getInstance();
-        System.setProperty("catalina.base",TomcatBaseTest.getBuildDirectory().getAbsolutePath());
+        System.setProperty("catalina.base", "");
     }
 
     @Test
