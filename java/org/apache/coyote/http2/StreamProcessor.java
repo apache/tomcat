@@ -17,14 +17,12 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProcessor;
@@ -33,10 +31,8 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
-import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -396,54 +392,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             action(ActionCode.CLOSE, null);
             request.updateCounters();
             return SocketState.CLOSED;
-        }
-    }
-
-
-    @Override
-    public SocketState dispatch(SocketStatus status) {
-
-        if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
-            asyncStateMachine.asyncOperation();
-            try {
-                if (flushBufferedWrite()) {
-                    return SocketState.LONG;
-                }
-            } catch (IOException ioe) {
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Unable to write async data.", ioe);
-                }
-                status = SocketStatus.ASYNC_WRITE_ERROR;
-                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
-            }
-        } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
-            dispatchNonBlockingRead();
-        }
-
-        RequestInfo rp = request.getRequestProcessor();
-        try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            if (!getAdapter().asyncDispatch(request, response, status)) {
-                setErrorState(ErrorState.CLOSE_NOW, null);
-            }
-        } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW, e);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            setErrorState(ErrorState.CLOSE_NOW, t);
-            getLog().error(sm.getString("http11processor.request.process"), t);
-        }
-
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-
-        if (getErrorState().isError()) {
-            request.updateCounters();
-            return SocketState.CLOSED;
-        } else if (isAsync()) {
-            return SocketState.LONG;
-        } else {
-            request.updateCounters();
-            return dispatchEndRequest();
         }
     }
 
