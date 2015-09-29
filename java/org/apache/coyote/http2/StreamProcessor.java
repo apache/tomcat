@@ -402,30 +402,16 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     @Override
     public SocketState dispatch(SocketStatus status) {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("streamProcessor.dispatch", stream.getConnectionId(),
-                    stream.getIdentifier(), status));
-        }
+
         if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
             asyncStateMachine.asyncOperation();
             try {
-                if (stream.getOutputBuffer().flush(false)) {
-                    // The buffer wasn't fully flushed so re-register the
-                    // stream for write. Note this does not go via the
-                    // Response since the write registration state at
-                    // that level should remain unchanged. Once the buffer
-                    // has been emptied then the code below will call
-                    // dispatch() which will enable the
-                    // Response to respond to this event.
-                    if (stream.getOutputBuffer().isReady()) {
-                        // Unexpected
-                        throw new IllegalStateException();
-                    }
+                if (flushBufferedWrite()) {
                     return SocketState.LONG;
                 }
             } catch (IOException ioe) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to write async data.", ioe);
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Unable to write async data.", ioe);
                 }
                 status = SocketStatus.ASYNC_WRITE_ERROR;
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
@@ -445,7 +431,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             setErrorState(ErrorState.CLOSE_NOW, t);
-            log.error(sm.getString("http11processor.request.process"), t);
+            getLog().error(sm.getString("http11processor.request.process"), t);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
@@ -459,6 +445,26 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             request.updateCounters();
             return SocketState.CLOSED;
         }
+    }
+
+
+    @Override
+    protected boolean flushBufferedWrite() throws IOException {
+        if (stream.getOutputBuffer().flush(false)) {
+            // The buffer wasn't fully flushed so re-register the
+            // stream for write. Note this does not go via the
+            // Response since the write registration state at
+            // that level should remain unchanged. Once the buffer
+            // has been emptied then the code below will call
+            // dispatch() which will enable the
+            // Response to respond to this event.
+            if (stream.getOutputBuffer().isReady()) {
+                // Unexpected
+                throw new IllegalStateException();
+            }
+            return true;
+        }
+        return false;
     }
 
 
