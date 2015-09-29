@@ -33,7 +33,7 @@ public class ConfigFileLoader {
     private static final URI CATALINA_BASE_URI;
 
     static {
-        File catalinaBase = new File("");
+        File catalinaBase = new File(System.getProperty("catalina.base"));
         CATALINA_BASE_URI = catalinaBase.toURI();
     }
 
