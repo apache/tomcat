@@ -1700,22 +1700,12 @@ public class Http11Processor extends AbstractProcessor {
         if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
             asyncStateMachine.asyncOperation();
             try {
-                if (outputBuffer.hasDataToWrite()) {
-                    if (outputBuffer.flushBuffer(false)) {
-                        // The buffer wasn't fully flushed so re-register the
-                        // socket for write. Note this does not go via the
-                        // Response since the write registration state at
-                        // that level should remain unchanged. Once the buffer
-                        // has been emptied then the code below will call
-                        // Adaptor.asyncDispatch() which will enable the
-                        // Response to respond to this event.
-                        outputBuffer.registerWriteInterest();
-                        return SocketState.LONG;
-                    }
+                if (flushBufferedWrite()) {
+                    return SocketState.LONG;
                 }
             } catch (IOException ioe) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to write async data.", ioe);
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Unable to write async data.", ioe);
                 }
                 status = SocketStatus.ASYNC_WRITE_ERROR;
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
@@ -1735,7 +1725,7 @@ public class Http11Processor extends AbstractProcessor {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             setErrorState(ErrorState.CLOSE_NOW, t);
-            log.error(sm.getString("http11processor.request.process"), t);
+            getLog().error(sm.getString("http11processor.request.process"), t);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
@@ -1759,6 +1749,25 @@ public class Http11Processor extends AbstractProcessor {
                 }
             }
         }
+    }
+
+
+    @Override
+    protected boolean flushBufferedWrite() throws IOException {
+        if (outputBuffer.hasDataToWrite()) {
+            if (outputBuffer.flushBuffer(false)) {
+                // The buffer wasn't fully flushed so re-register the
+                // socket for write. Note this does not go via the
+                // Response since the write registration state at
+                // that level should remain unchanged. Once the buffer
+                // has been emptied then the code below will call
+                // Adaptor.asyncDispatch() which will enable the
+                // Response to respond to this event.
+                outputBuffer.registerWriteInterest();
+                return true;
+            }
+        }
+        return false;
     }
 
 

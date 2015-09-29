@@ -229,6 +229,18 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     public abstract SocketState dispatch(SocketStatus status);
 
     /**
+     * Flush any pending writes. Used during non-blocking writes to flush any
+     * remaining data from a previous incomplete write.
+     *
+     * @return <code>true</code> if data remains to be flushed at the end of
+     *         method
+     *
+     * @throws IOException If an I/O error occurs while attempting to flush the
+     *         data
+     */
+    protected abstract boolean flushBufferedWrite() throws IOException ;
+
+    /**
      * Perform any necessary processing for a non-blocking read before
      * dispatching to the adapter.
      */

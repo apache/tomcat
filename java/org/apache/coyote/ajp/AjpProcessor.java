@@ -623,14 +623,8 @@ public class AjpProcessor extends AbstractProcessor {
         if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
             asyncStateMachine.asyncOperation();
             try {
-                if (hasDataToWrite()) {
-                    socketWrapper.flush(false);
-                    if (hasDataToWrite()) {
-                        // There is data to write but go via Response to
-                        // maintain a consistent view of non-blocking state
-                        response.checkRegisterForWrite();
-                        return SocketState.LONG;
-                    }
+                if (flushBufferedWrite()) {
+                    return SocketState.LONG;
                 }
             } catch (IOException ioe) {
                 if (getLog().isDebugEnabled()) {
@@ -646,7 +640,7 @@ public class AjpProcessor extends AbstractProcessor {
         RequestInfo rp = request.getRequestProcessor();
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            if(!getAdapter().asyncDispatch(request, response, status)) {
+            if (!getAdapter().asyncDispatch(request, response, status)) {
                 setErrorState(ErrorState.CLOSE_NOW, null);
             }
         } catch (InterruptedIOException e) {
@@ -672,6 +666,20 @@ public class AjpProcessor extends AbstractProcessor {
             request.updateCounters();
             return SocketState.OPEN;
         }
+    }
+
+    @Override
+    protected boolean flushBufferedWrite() throws IOException {
+        if (hasDataToWrite()) {
+            socketWrapper.flush(false);
+            if (hasDataToWrite()) {
+                // There is data to write but go via Response to
+                // maintain a consistent view of non-blocking state
+                response.checkRegisterForWrite();
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
