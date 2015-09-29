@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.util.net.jsse;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,6 +53,7 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JreVendor;
+import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
@@ -187,7 +186,7 @@ public class JSSESocketFactory implements SSLUtil {
     protected KeyStore getTrustStore() throws IOException {
         KeyStore trustStore = null;
 
-        String truststoreFile = SSLHostConfig.adjustRelativePath(sslHostConfig.getTruststoreFile());
+        String truststoreFile = sslHostConfig.getTruststoreFile();
         String truststoreType = sslHostConfig.getTruststoreType();
         String truststoreProvider = sslHostConfig.getTruststoreProvider();
 
@@ -232,8 +231,7 @@ public class JSSESocketFactory implements SSLUtil {
             if(!("PKCS11".equalsIgnoreCase(type) ||
                     "".equalsIgnoreCase(path)) ||
                     "NONE".equalsIgnoreCase(path)) {
-                File keyStoreFile = new File(path);
-                istream = new FileInputStream(keyStoreFile);
+                istream = ConfigFileLoader.getInputStream(path);
             }
 
             char[] storePass = null;
@@ -278,8 +276,7 @@ public class JSSESocketFactory implements SSLUtil {
     public KeyManager[] getKeyManagers() throws Exception {
         String keystoreType = certificate.getCertificateKeystoreType();
         String keystoreProvider = certificate.getCertificateKeystoreProvider();
-        String keystoreFile = SSLHostConfig.adjustRelativePath(
-                certificate.getCertificateKeystoreFile());
+        String keystoreFile = certificate.getCertificateKeystoreFile();
         String keystorePass = certificate.getCertificateKeystorePassword();
         String keyAlias = certificate.getCertificateKeyAlias();
         String algorithm = sslHostConfig.getKeyManagerAlgorithm();
@@ -324,8 +321,7 @@ public class JSSESocketFactory implements SSLUtil {
     public TrustManager[] getTrustManagers() throws Exception {
         String algorithm = sslHostConfig.getTruststoreAlgorithm();
 
-        String crlf = SSLHostConfig.adjustRelativePath(
-                sslHostConfig.getCertificateRevocationListFile());
+        String crlf = sslHostConfig.getCertificateRevocationListFile();
 
         String className = sslHostConfig.getTrustManagerClassName();
         if(className != null && className.length() > 0) {
@@ -402,11 +398,10 @@ public class JSSESocketFactory implements SSLUtil {
     protected Collection<? extends CRL> getCRLs(String crlf)
         throws IOException, CRLException, CertificateException {
 
-        File crlFile = new File(crlf);
         Collection<? extends CRL> crls = null;
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            try (InputStream is = new FileInputStream(crlFile)) {
+            try (InputStream is = ConfigFileLoader.getInputStream(crlf)) {
                 crls = cf.generateCRLs(is);
             }
         } catch(IOException iex) {
