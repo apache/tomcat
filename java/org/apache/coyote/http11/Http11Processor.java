@@ -1721,7 +1721,7 @@ public class Http11Processor extends AbstractProcessor {
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
             }
         } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
-            asyncStateMachine.asyncOperation();
+            dispatchNonBlockingRead();
         }
 
         RequestInfo rp = request.getRequestProcessor();
