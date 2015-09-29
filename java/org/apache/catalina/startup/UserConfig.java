@@ -353,11 +353,7 @@ public final class UserConfig
         File app = new File(home, directoryName);
         if (!app.exists() || !app.isDirectory())
             return;
-        /*
-        File dd = new File(app, "/WEB-INF/web.xml");
-        if (!dd.exists() || !dd.isFile() || !dd.canRead())
-            return;
-        */
+
         host.getLogger().info(sm.getString("userConfig.deploy", user));
 
         // Deploy the web application for this user

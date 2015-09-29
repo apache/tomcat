@@ -80,7 +80,7 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
         }
 
         File file = new File(path, Constants.ApplicationWebXml);
-        if ((!file.exists()) || (!file.canRead())) {
+        if (!file.canRead()) {
             throw new BuildException("Cannot find web.xml");
         }
 
