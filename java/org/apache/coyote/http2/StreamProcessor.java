@@ -409,7 +409,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
             asyncStateMachine.asyncOperation();
             try {
-
                 if (stream.getOutputBuffer().flush(false)) {
                     // The buffer wasn't fully flushed so re-register the
                     // stream for write. Note this does not go via the
@@ -432,7 +431,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
             }
         } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
-            asyncStateMachine.asyncOperation();
+            dispatchNonBlockingRead();
         }
 
         RequestInfo rp = request.getRequestProcessor();

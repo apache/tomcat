@@ -640,9 +640,7 @@ public class AjpProcessor extends AbstractProcessor {
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
             }
         } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
-            if (available()) {
-                asyncStateMachine.asyncOperation();
-            }
+            dispatchNonBlockingRead();
         }
 
         RequestInfo rp = request.getRequestProcessor();
@@ -676,6 +674,12 @@ public class AjpProcessor extends AbstractProcessor {
         }
     }
 
+    @Override
+    protected void dispatchNonBlockingRead() {
+        if (available()) {
+            super.dispatchNonBlockingRead();
+        }
+    }
 
     /**
      * Process pipelined HTTP requests using the specified input and output

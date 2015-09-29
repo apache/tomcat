@@ -228,6 +228,13 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     @Override
     public abstract SocketState dispatch(SocketStatus status);
 
+    /**
+     * Perform any necessary processing for a non-blocking read before
+     * dispatching to the adapter.
+     */
+    protected void dispatchNonBlockingRead() {
+        asyncStateMachine.asyncOperation();
+    }
 
     @Override
     public abstract HttpUpgradeHandler getHttpUpgradeHandler();
