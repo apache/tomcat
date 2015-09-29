@@ -1467,7 +1467,7 @@ public class Http11Processor extends AbstractProcessor {
 
         // Sendfile support
         boolean sendingWithSendfile = false;
-        if (getEndpoint().getUseSendfile()) {
+        if (endpoint.getUseSendfile()) {
             sendingWithSendfile = prepareSendfile(outputFilters);
         }
 

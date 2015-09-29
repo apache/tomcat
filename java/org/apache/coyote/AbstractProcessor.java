@@ -111,13 +111,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
         return errorState;
     }
 
-    /**
-     * The endpoint receiving connections that are handled by this processor.
-     */
-    protected AbstractEndpoint<?> getEndpoint() {
-        return endpoint;
-    }
-
 
     /**
      * The request associated with this processor.
