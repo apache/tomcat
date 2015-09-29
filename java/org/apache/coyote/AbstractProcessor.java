@@ -54,18 +54,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
 
 
     /**
-     * Intended for use by the Upgrade sub-classes that have no need to
-     * initialise the request, response, etc.
-     */
-    protected AbstractProcessor() {
-        asyncStateMachine = null;
-        endpoint = null;
-        request = null;
-        response = null;
-    }
-
-
-    /**
      * Used by HTTP/2.
      *
      * @param coyoteRequest
@@ -198,7 +186,7 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
 
     @Override
     public boolean isAsync() {
-        return (asyncStateMachine != null && asyncStateMachine.isAsync());
+        return asyncStateMachine.isAsync();
     }
 
 
