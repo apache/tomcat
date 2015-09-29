@@ -443,7 +443,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             return SocketState.LONG;
         } else {
             request.updateCounters();
-            return SocketState.CLOSED;
+            return dispatchEndRequest();
         }
     }
 
@@ -465,6 +465,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             return true;
         }
         return false;
+    }
+
+
+    @Override
+    protected SocketState dispatchEndRequest() {
+        return SocketState.CLOSED;
     }
 
 
