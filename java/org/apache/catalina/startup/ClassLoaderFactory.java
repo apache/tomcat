@@ -85,7 +85,7 @@ public final class ClassLoaderFactory {
         if (unpacked != null) {
             for (int i = 0; i < unpacked.length; i++)  {
                 File file = unpacked[i];
-                if (!file.exists() || !file.canRead())
+                if (!file.canRead())
                     continue;
                 file = new File(file.getCanonicalPath() + File.separator);
                 URL url = file.toURI().toURL();
@@ -99,8 +99,7 @@ public final class ClassLoaderFactory {
         if (packed != null) {
             for (int i = 0; i < packed.length; i++) {
                 File directory = packed[i];
-                if (!directory.isDirectory() || !directory.exists() ||
-                    !directory.canRead())
+                if (!directory.isDirectory() || !directory.canRead())
                     continue;
                 String filenames[] = directory.list();
                 for (int j = 0; j < filenames.length; j++) {
@@ -231,7 +230,7 @@ public final class ClassLoaderFactory {
     private static boolean validateFile(File file,
             RepositoryType type) throws IOException {
         if (RepositoryType.DIR == type || RepositoryType.GLOB == type) {
-            if (!file.exists() || !file.isDirectory() || !file.canRead()) {
+            if (!file.isDirectory() || !file.canRead()) {
                 String msg = "Problem with directory [" + file +
                         "], exists: [" + file.exists() +
                         "], isDirectory: [" + file.isDirectory() +
@@ -256,7 +255,7 @@ public final class ClassLoaderFactory {
                 return false;
             }
         } else if (RepositoryType.JAR == type) {
-            if (!file.exists() || !file.canRead()) {
+            if (!file.canRead()) {
                 log.warn("Problem with JAR file [" + file +
                         "], exists: [" + file.exists() +
                         "], canRead: [" + file.canRead() + "]");
