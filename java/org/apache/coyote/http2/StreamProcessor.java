@@ -61,11 +61,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     @Override
     public synchronized void run() {
-        process(SocketStatus.OPEN_READ);
-    }
+        SocketStatus status = SocketStatus.OPEN_READ;
 
-
-    private synchronized void process(SocketStatus status) {
         // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
         // socket <-> processor mapping
         ContainerThreadMarker.set();
