@@ -821,8 +821,8 @@
       </attribute>
 
       <attribute name="pathname" required="false">
-        <p>Absolute or relative (to $CATALINA_BASE) pathname to the XML file
-        containing our user information.  See below for details on the
+        <p>URL, absolute path or relative path (to $CATALINA_BASE) for the XML
+        file containing our user information.  See below for details on the
         XML element format required.  If no pathname is specified, the
         default value is <code>conf/tomcat-users.xml</code>.</p>
       </attribute>
