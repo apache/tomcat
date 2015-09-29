@@ -1698,9 +1698,8 @@ public class Http11Processor extends AbstractProcessor {
     public SocketState dispatch(SocketStatus status) {
 
         if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
+            asyncStateMachine.asyncOperation();
             try {
-                asyncStateMachine.asyncOperation();
-
                 if (outputBuffer.hasDataToWrite()) {
                     if (outputBuffer.flushBuffer(false)) {
                         // The buffer wasn't fully flushed so re-register the

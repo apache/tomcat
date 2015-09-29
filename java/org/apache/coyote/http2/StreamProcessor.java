@@ -407,8 +407,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                     stream.getIdentifier(), status));
         }
         if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
+            asyncStateMachine.asyncOperation();
             try {
-                asyncStateMachine.asyncOperation();
 
                 if (stream.getOutputBuffer().flush(false)) {
                     // The buffer wasn't fully flushed so re-register the
