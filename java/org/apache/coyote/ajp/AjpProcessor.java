@@ -825,18 +825,15 @@ public class AjpProcessor extends AbstractProcessor {
     @Override
     public void recycle() {
         getAdapter().checkRecycled(request, response);
-
         asyncStateMachine.recycle();
-
-        // Recycle Request object
+        request.recycle();
+        response.recycle();
         first = true;
         endOfStream = false;
         waitingForBodyMessage = false;
         empty = true;
         replay = false;
         finished = false;
-        request.recycle();
-        response.recycle();
         certificates.recycle();
         swallowResponse = false;
         bytesWritten = 0;

@@ -80,13 +80,13 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * Input.
      */
-    protected Http11InputBuffer inputBuffer;
+    protected final Http11InputBuffer inputBuffer;
 
 
     /**
      * Output.
      */
-    protected Http11OutputBuffer outputBuffer;
+    protected final Http11OutputBuffer outputBuffer;
 
 
     /**
@@ -1830,20 +1830,13 @@ public class Http11Processor extends AbstractProcessor {
     @Override
     public final void recycle() {
         getAdapter().checkRecycled(request, response);
-
-        if (inputBuffer != null) {
-            inputBuffer.recycle();
-        }
-        if (outputBuffer != null) {
-            outputBuffer.recycle();
-        }
-        if (asyncStateMachine != null) {
-            asyncStateMachine.recycle();
-        }
+        asyncStateMachine.recycle();
+        inputBuffer.recycle();
+        outputBuffer.recycle();
         httpUpgradeHandler = null;
-        resetErrorState();
         socketWrapper = null;
         sendfileData = null;
+        resetErrorState();
     }
 
 
