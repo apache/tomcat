@@ -621,35 +621,27 @@ public class AjpProcessor extends AbstractProcessor {
     public SocketState dispatch(SocketStatus status) {
 
         if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
+            asyncStateMachine.asyncOperation();
             try {
-                asyncStateMachine.asyncOperation();
-                try {
+                if (hasDataToWrite()) {
+                    socketWrapper.flush(false);
                     if (hasDataToWrite()) {
-                        socketWrapper.flush(false);
-                        if (hasDataToWrite()) {
-                            // There is data to write but go via Response to
-                            // maintain a consistent view of non-blocking state
-                            response.checkRegisterForWrite();
-                            return SocketState.LONG;
-                        }
+                        // There is data to write but go via Response to
+                        // maintain a consistent view of non-blocking state
+                        response.checkRegisterForWrite();
+                        return SocketState.LONG;
                     }
-                } catch (IOException x) {
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("Unable to write async data.",x);
-                    }
-                    status = SocketStatus.ASYNC_WRITE_ERROR;
-                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
                 }
-            } catch (IllegalStateException x) {
-                socketWrapper.registerWriteInterest();
+            } catch (IOException ioe) {
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Unable to write async data.", ioe);
+                }
+                status = SocketStatus.ASYNC_WRITE_ERROR;
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
             }
         } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
-            try {
-                if (available()) {
-                    asyncStateMachine.asyncOperation();
-                }
-            } catch (IllegalStateException x) {
-                socketWrapper.registerReadInterest();
+            if (available()) {
+                asyncStateMachine.asyncOperation();
             }
         }
 
