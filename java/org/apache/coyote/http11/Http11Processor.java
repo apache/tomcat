@@ -1714,26 +1714,15 @@ public class Http11Processor extends AbstractProcessor {
                         return SocketState.LONG;
                     }
                 }
-            } catch (IOException | IllegalStateException x) {
-                // IOE - Problem writing to socket
-                // ISE - Request/Response not in correct state for async write
+            } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Unable to write async data.",x);
+                    log.debug("Unable to write async data.", ioe);
                 }
                 status = SocketStatus.ASYNC_WRITE_ERROR;
-                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
             }
         } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
-            try {
-                asyncStateMachine.asyncOperation();
-            } catch (IllegalStateException x) {
-                // ISE - Request/Response not in correct state for async read
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to read async data.",x);
-                }
-                status = SocketStatus.ASYNC_READ_ERROR;
-                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
-            }
+            asyncStateMachine.asyncOperation();
         }
 
         RequestInfo rp = request.getRequestProcessor();
