@@ -343,9 +343,7 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case CLOSE: {
-            // End the processing of the current request, and stop any further
-            // transactions with the client
-
+            action(ActionCode.COMMIT, null);
             try {
                 finish();
             } catch (IOException e) {
@@ -1388,17 +1386,6 @@ public class AjpProcessor extends AbstractProcessor {
      * Finish AJP response.
      */
     private void finish() throws IOException {
-
-        if (!response.isCommitted()) {
-            // Validate and write response headers
-            try {
-                prepareResponse();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
-                return;
-            }
-        }
-
         if (finished)
             return;
 
