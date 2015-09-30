@@ -371,7 +371,7 @@ public class AjpProcessor extends AbstractProcessor {
             }
 
             try {
-                flush(true);
+                flush();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_NOW, e);
             }
@@ -1383,11 +1383,11 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * Callback to write data from the buffer.
      */
-    private void flush(boolean explicit) throws IOException {
+    private void flush() throws IOException {
         // Calling code should ensure that there is no data in the buffers for
         // non-blocking writes.
         // TODO Validate the assertion above
-        if (explicit && !finished) {
+        if (!finished) {
             // Send the flush message
             socketWrapper.write(true, flushMessageArray, 0, flushMessageArray.length);
             socketWrapper.flush(true);
