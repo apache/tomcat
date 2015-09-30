@@ -332,16 +332,14 @@ public class AjpProcessor extends AbstractProcessor {
 
         switch (actionCode) {
         case COMMIT: {
-            if (response.isCommitted())
-                return;
-
-            try {
-                // Validate and write response headers
-                prepareResponse();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+            if (!response.isCommitted()) {
+                try {
+                    // Validate and write response headers
+                    prepareResponse();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_NOW, e);
+                }
             }
-
             break;
         }
         case CLOSE: {
