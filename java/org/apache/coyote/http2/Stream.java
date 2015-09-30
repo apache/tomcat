@@ -232,13 +232,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void writeHeaders() {
-        try {
-            handler.writeHeaders(this, coyoteResponse);
-        } catch (IOException e) {
-            // TODO Handle this
-            e.printStackTrace();
-        }
+    void writeHeaders() throws IOException {
+        handler.writeHeaders(this, coyoteResponse);
     }
 
 
