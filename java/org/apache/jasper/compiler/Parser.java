@@ -232,7 +232,7 @@ class Parser implements TagConstants {
         }
         watchString = watchString + quote;
 
-        String attrValue = parseAttributeValue(watchString, ignoreEL);
+        String attrValue = parseAttributeValue(qName, watchString, ignoreEL);
         attrs.addAttribute(uri, localName, qName, "CDATA", attrValue);
         return true;
     }
@@ -263,11 +263,11 @@ class Parser implements TagConstants {
      * RTAttributeValueDouble ::= ((QuotedChar - '"')* - ((QuotedChar-'"')'%>"')
      * ('%>"' | TRANSLATION_ERROR)
      */
-    private String parseAttributeValue(String watch, boolean ignoreEL) throws JasperException {
+    private String parseAttributeValue(String qName, String watch, boolean ignoreEL) throws JasperException {
         Mark start = reader.mark();
         Mark stop = reader.skipUntilIgnoreEsc(watch, ignoreEL);
         if (stop == null) {
-            err.jspError(start, "jsp.error.attribute.unterminated", watch);
+            err.jspError(start, "jsp.error.attribute.unterminated", qName);
         }
 
         String ret = null;
