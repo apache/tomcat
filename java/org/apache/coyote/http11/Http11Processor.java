@@ -692,6 +692,7 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case CLIENT_FLUSH: {
+            action(ActionCode.COMMIT, null);
             try {
                 outputBuffer.flush();
             } catch (IOException e) {
