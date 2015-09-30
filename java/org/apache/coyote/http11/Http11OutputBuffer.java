@@ -233,14 +233,6 @@ public class Http11OutputBuffer implements OutputBuffer {
      * @throws IOException an underlying I/O error occurred
      */
     public void flush() throws IOException {
-
-        if (!committed) {
-            // Send the connector a request for commit. The connector should
-            // then validate the headers, send them (using sendHeader) and
-            // set the filters accordingly.
-            response.action(ActionCode.COMMIT, null);
-        }
-
         // go through the filters and if there is gzip filter
         // invoke it to flush
         for (int i = 0; i <= lastActiveFilter; i++) {
