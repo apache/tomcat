@@ -152,12 +152,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Is there an expectation ?
-     */
-    protected boolean expectation = false;
-
-
-    /**
      * Regular expression that defines the restricted user agents.
      */
     protected Pattern restrictedUserAgents = null;
@@ -678,15 +672,13 @@ public class Http11Processor extends AbstractProcessor {
             // Acknowledge request
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
-            if ((response.isCommitted()) || !expectation) {
-                return;
-            }
-
-            inputBuffer.setSwallowInput(true);
-            try {
-                outputBuffer.sendAck();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+            if (!response.isCommitted() && request.hasExpectation()) {
+                inputBuffer.setSwallowInput(true);
+                try {
+                    outputBuffer.sendAck();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_NOW, e);
+                }
             }
             break;
         }
@@ -1227,7 +1219,8 @@ public class Http11Processor extends AbstractProcessor {
 
 
     private void checkExpectationAndResponseStatus() {
-        if (expectation && (response.getStatus() < 200 || response.getStatus() > 299)) {
+        if (request.hasExpectation() &&
+                (response.getStatus() < 200 || response.getStatus() > 299)) {
             // Client sent Expect: 100-continue but received a
             // non-2xx final response. Disable keep-alive (if enabled)
             // to ensure that the connection is closed. Some clients may
@@ -1248,7 +1241,6 @@ public class Http11Processor extends AbstractProcessor {
         http11 = true;
         http09 = false;
         contentDelimitation = false;
-        expectation = false;
         sendfileData = null;
 
         if (endpoint.isSSLEnabled()) {
@@ -1307,7 +1299,7 @@ public class Http11Processor extends AbstractProcessor {
         if (expectMB != null) {
             if (expectMB.indexOfIgnoreCase("100-continue", 0) != -1) {
                 inputBuffer.setSwallowInput(false);
-                expectation = true;
+                request.setExpectation(true);
             } else {
                 response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
                 setErrorState(ErrorState.CLOSE_CLEAN, null);
