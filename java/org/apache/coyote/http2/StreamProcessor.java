@@ -139,6 +139,16 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             }
             break;
         }
+        case ACK: {
+            if (!response.isCommitted() && request.hasExpectation()) {
+                try {
+                    stream.writeAck();
+                } catch (IOException ioe) {
+                    // TODO
+                }
+            }
+            break;
+        }
         case CLIENT_FLUSH: {
             action(ActionCode.COMMIT, null);
             try {
@@ -330,7 +340,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                     sm.getString("streamProcessor.httpupgrade.notsupported"));
 
         // Unimplemented / to review
-        case ACK:
         case CLOSE_NOW:
         case DISABLE_SWALLOW_INPUT:
         case END_REQUEST:

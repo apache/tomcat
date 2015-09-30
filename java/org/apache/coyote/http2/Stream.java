@@ -37,6 +37,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private static final Log log = LogFactory.getLog(Stream.class);
     private static final StringManager sm = StringManager.getManager(Stream.class);
 
+    private static final Response ACK_RESPONSE = new Response();
+
+    static {
+        ACK_RESPONSE.setStatus(101);
+    }
+
     private volatile int weight = Constants.DEFAULT_WEIGHT;
 
     private final Http2UpgradeHandler handler;
@@ -225,6 +231,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             break;
         }
         default: {
+            if ("expect".equals(name) && "100-continue".equals(value)) {
+                coyoteRequest.setExpectation(true);
+            }
             // Assume other HTTP header
             coyoteRequest.getMimeHeaders().addValue(name).setString(value);
         }
@@ -233,8 +242,15 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void writeHeaders() throws IOException {
-        handler.writeHeaders(this, coyoteResponse);
+        // TODO: Is 1k the optimal value?
+        handler.writeHeaders(this, coyoteResponse, 1024);
     }
+
+    void writeAck() throws IOException {
+        // TODO: Is 64 too big? Just the status header with compression
+        handler.writeHeaders(this, ACK_RESPONSE, 64);
+    }
+
 
 
     void flushData() throws IOException {

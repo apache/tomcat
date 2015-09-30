@@ -232,12 +232,17 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void sendSimplePostRequest(int streamId, byte[] padding, boolean writeBody)
             throws IOException {
+        sendSimplePostRequest(streamId, padding, writeBody, false);
+    }
+
+    protected void sendSimplePostRequest(int streamId, byte[] padding, boolean writeBody,
+            boolean useExpectation) throws IOException {
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
         byte[] dataFrameHeader = new byte[9];
         ByteBuffer dataPayload = ByteBuffer.allocate(128);
 
-        buildPostRequest(headersFrameHeader, headersPayload,
+        buildPostRequest(headersFrameHeader, headersPayload, useExpectation,
                 dataFrameHeader, dataPayload, padding, streamId);
         writeFrame(headersFrameHeader, headersPayload);
         if (writeBody) {
@@ -247,11 +252,15 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
-            byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding, int streamId) {
+            boolean useExpectation, byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding,
+            int streamId) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("POST");
         headers.addValue(":path").setString("/simple");
         headers.addValue(":authority").setString("localhost:" + getPort());
+        if (useExpectation) {
+            headers.addValue("expect").setString("100-continue");
+        }
         hpackEncoder.encode(headers, headersPayload);
 
         headersPayload.flip();
