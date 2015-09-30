@@ -331,17 +331,6 @@ public class AjpProcessor extends AbstractProcessor {
     public final void action(ActionCode actionCode, Object param) {
 
         switch (actionCode) {
-        case CLOSE: {
-            // End the processing of the current request, and stop any further
-            // transactions with the client
-
-            try {
-                finish();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
-            }
-            break;
-        }
         case COMMIT: {
             if (response.isCommitted())
                 return;
@@ -355,6 +344,17 @@ public class AjpProcessor extends AbstractProcessor {
 
             try {
                 flush(false);
+            } catch (IOException e) {
+                setErrorState(ErrorState.CLOSE_NOW, e);
+            }
+            break;
+        }
+        case CLOSE: {
+            // End the processing of the current request, and stop any further
+            // transactions with the client
+
+            try {
+                finish();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_NOW, e);
             }
