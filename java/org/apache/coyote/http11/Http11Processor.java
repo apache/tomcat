@@ -655,16 +655,14 @@ public class Http11Processor extends AbstractProcessor {
         switch (actionCode) {
         case COMMIT: {
             // Commit current response
-            if (response.isCommitted()) {
-                return;
-            }
-
-            // Validate and write response headers
-            try {
-                prepareResponse();
-                outputBuffer.commit();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+            if (!response.isCommitted()) {
+                // Validate and write response headers
+                try {
+                    prepareResponse();
+                    outputBuffer.commit();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_NOW, e);
+                }
             }
             break;
         }
