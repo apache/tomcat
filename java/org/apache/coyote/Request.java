@@ -121,6 +121,10 @@ public final class Request {
     private long contentLength = -1;
     private MessageBytes contentTypeMB = null;
     private String charEncoding = null;
+    /**
+     * Is there an expectation ?
+     */
+    private boolean expectation = false;
 
     private final ServerCookies serverCookies = new ServerCookies(INITIAL_COOKIE_SIZE);
     private final Parameters parameters = new Parameters();
@@ -344,6 +348,17 @@ public final class Request {
         return headers.getHeader(name);
     }
 
+
+    public void setExpectation(boolean expectation) {
+        this.expectation = expectation;
+    }
+
+
+    public boolean hasExpectation() {
+        return expectation;
+    }
+
+
     // -------------------- Associated response --------------------
 
     public Response getResponse() {
@@ -524,6 +539,7 @@ public final class Request {
         contentLength = -1;
         contentTypeMB = null;
         charEncoding = null;
+        expectation = false;
         headers.recycle();
         serverNameMB.recycle();
         serverPort=-1;
