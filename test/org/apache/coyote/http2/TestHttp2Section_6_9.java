@@ -167,7 +167,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         byte[] dataFrameHeader = new byte[9];
         ByteBuffer dataPayload = ByteBuffer.allocate(8 * 1024);
 
-        buildPostRequest(headersFrameHeader, headersPayload,
+        buildPostRequest(headersFrameHeader, headersPayload, false,
                 dataFrameHeader, dataPayload, null, 3);
 
         // Write the headers

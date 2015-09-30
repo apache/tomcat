@@ -458,7 +458,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    void writeHeaders(Stream stream, Response coyoteResponse) throws IOException {
+    void writeHeaders(Stream stream, Response coyoteResponse, int payloadSize)
+            throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
                     stream.getIdentifier()));
@@ -468,10 +469,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         headers.addValue(":status").setString(Integer.toString(coyoteResponse.getStatus()));
         // This ensures the Stream processing thread has control of the socket.
         synchronized (socketWrapper) {
-            // Frame sizes are allowed to be bigger than 4k but for headers that
-            // should be plenty
             byte[] header = new byte[9];
-            ByteBuffer target = ByteBuffer.allocate(4 * 1024);
+            ByteBuffer target = ByteBuffer.allocate(payloadSize);
             boolean first = true;
             State state = null;
             while (state != State.COMPLETE) {
