@@ -358,16 +358,7 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case CLIENT_FLUSH: {
-            if (!response.isCommitted()) {
-                // Validate and write response headers
-                try {
-                    prepareResponse();
-                } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
-                    return;
-                }
-            }
-
+            action(ActionCode.COMMIT, null);
             try {
                 flush();
             } catch (IOException e) {
