@@ -653,15 +653,6 @@ public class Http11Processor extends AbstractProcessor {
     public final void action(ActionCode actionCode, Object param) {
 
         switch (actionCode) {
-        case CLOSE: {
-            // End the processing of the current request
-            try {
-                outputBuffer.endRequest();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
-            }
-            break;
-        }
         case COMMIT: {
             // Commit current response
             if (response.isCommitted()) {
@@ -672,6 +663,15 @@ public class Http11Processor extends AbstractProcessor {
             try {
                 prepareResponse();
                 outputBuffer.commit();
+            } catch (IOException e) {
+                setErrorState(ErrorState.CLOSE_NOW, e);
+            }
+            break;
+        }
+        case CLOSE: {
+            // End the processing of the current request
+            try {
+                outputBuffer.endRequest();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_NOW, e);
             }
