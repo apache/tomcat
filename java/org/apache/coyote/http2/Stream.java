@@ -430,8 +430,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             return written;
         }
 
-        public void close() {
+        public void close() throws IOException {
             closed = true;
+            flushData();
         }
 
         public boolean isClosed() {
