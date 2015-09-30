@@ -329,8 +329,8 @@ public class AjpProcessor extends AbstractProcessor {
      */
     @Override
     public final void action(ActionCode actionCode, Object param) {
-
         switch (actionCode) {
+        // 'Normal' servlet support
         case COMMIT: {
             if (!response.isCommitted()) {
                 try {

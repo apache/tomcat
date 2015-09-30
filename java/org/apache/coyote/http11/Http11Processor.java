@@ -651,13 +651,12 @@ public class Http11Processor extends AbstractProcessor {
      */
     @Override
     public final void action(ActionCode actionCode, Object param) {
-
         switch (actionCode) {
+        // 'Normal' servlet support
         case COMMIT: {
-            // Commit current response
             if (!response.isCommitted()) {
-                // Validate and write response headers
                 try {
+                    // Validate and write response headers
                     prepareResponse();
                     outputBuffer.commit();
                 } catch (IOException e) {
