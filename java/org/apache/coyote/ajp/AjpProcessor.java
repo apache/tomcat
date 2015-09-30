@@ -338,8 +338,6 @@ public class AjpProcessor extends AbstractProcessor {
             try {
                 // Validate and write response headers
                 prepareResponse();
-                // Tell the proxy to flush this data to the client
-                flush(false);
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_NOW, e);
             }
