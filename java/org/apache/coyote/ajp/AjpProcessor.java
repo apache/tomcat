@@ -335,18 +335,15 @@ public class AjpProcessor extends AbstractProcessor {
             if (response.isCommitted())
                 return;
 
-            // Validate and write response headers
             try {
+                // Validate and write response headers
                 prepareResponse();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
-            }
-
-            try {
+                // Tell the proxy to flush this data to the client
                 flush(false);
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_NOW, e);
             }
+
             break;
         }
         case CLOSE: {
