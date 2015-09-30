@@ -307,14 +307,6 @@ public class Http11OutputBuffer implements OutputBuffer {
      * @throws IOException an underlying I/O error occurred
      */
     public void endRequest() throws IOException {
-
-        if (!committed) {
-            // Send the connector a request for commit. The connector should
-            // then validate the headers, send them (using sendHeader) and
-            // set the filters accordingly.
-            response.action(ActionCode.COMMIT, null);
-        }
-
         if (finished) {
             return;
         }

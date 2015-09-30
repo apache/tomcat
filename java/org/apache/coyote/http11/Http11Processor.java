@@ -666,7 +666,7 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case CLOSE: {
-            // End the processing of the current request
+            action(ActionCode.COMMIT, null);
             try {
                 outputBuffer.endRequest();
             } catch (IOException e) {
