@@ -121,8 +121,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // 'Normal' servlet support
         case COMMIT: {
             if (!response.isCommitted()) {
-                response.setCommitted(true);
-                stream.writeHeaders();
+                try {
+                    response.setCommitted(true);
+                    stream.writeHeaders();
+                } catch (IOException ioe) {
+                    // TODO: Handle this
+                }
             }
             break;
         }
