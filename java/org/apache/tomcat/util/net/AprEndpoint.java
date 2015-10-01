@@ -173,14 +173,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     /**
-     * Sendfile thread count.
-     */
-    protected int sendfileThreadCount = 0;
-    public void setSendfileThreadCount(int sendfileThreadCount) { this.sendfileThreadCount = sendfileThreadCount; }
-    public int getSendfileThreadCount() { return sendfileThreadCount; }
-
-
-    /**
      * The socket poller.
      */
     protected Poller poller = null;
