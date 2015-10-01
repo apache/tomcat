@@ -338,6 +338,25 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         return !state.isFrameTypePermitted(FrameType.DATA);
     }
 
+
+    void close(Http2Exception http2Exception) {
+        if (http2Exception instanceof StreamException) {
+            try {
+                handler.closeStream((StreamException) http2Exception);
+            } catch (ConnectionException ce) {
+                handler.closeConnection(ce);
+            } catch (IOException ioe) {
+                // TODO i18n
+                ConnectionException ce = new ConnectionException("", Http2Error.PROTOCOL_ERROR);
+                ce.initCause(ioe);
+                handler.closeConnection(ce);
+            }
+        } else {
+            handler.closeConnection(http2Exception);
+        }
+    }
+
+
     class StreamOutputBuffer implements OutputBuffer {
 
         private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);

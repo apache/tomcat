@@ -74,15 +74,19 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                     log.debug(sm.getString("streamProcessor.process.loopstart",
                             stream.getConnectionId(), stream.getIdentifier(), status, dispatches));
                 }
-                // TODO CLOSE_NOW ?
-                if (dispatches != null) {
+                if (status == SocketStatus.CLOSE_NOW) {
+                    setErrorState(ErrorState.CLOSE_NOW, null);
+                    state = SocketState.CLOSED;
+                } else if (dispatches != null) {
                     DispatchType nextDispatch = dispatches.next();
                     state = dispatch(nextDispatch.getSocketStatus());
-                // TODO DISCONNECT ?
                 } else if (isAsync()) {
                     state = dispatch(status);
                 } else if (state == SocketState.ASYNC_END) {
                     state = dispatch(status);
+                } else if (status == SocketStatus.DISCONNECT) {
+                    // Should never happen
+                    throw new IllegalStateException();
                 } else {
                     state = process((SocketWrapperBase<?>) null);
                 }
@@ -104,11 +108,25 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                     dispatches != null && state != SocketState.CLOSED);
 
             if (state == SocketState.CLOSED) {
-                // TODO
+                if (!getErrorState().isConnectionIoAllowed()) {
+                    ConnectionException ce = new ConnectionException(sm.getString(
+                            "streamProcessor.error.connection", stream.getConnectionId(),
+                            stream.getIdentifier()), Http2Error.INTERNAL_ERROR);
+                    stream.close(ce);
+                } else if (!getErrorState().isIoAllowed()) {
+                    StreamException se = new StreamException(sm.getString(
+                            "streamProcessor.error.stream", stream.getConnectionId(),
+                            stream.getIdentifier()), Http2Error.INTERNAL_ERROR,
+                            stream.getIdentifier().intValue());
+                    stream.close(se);
+                }
             }
         } catch (Exception e) {
-            // TODO
-            e.printStackTrace();
+            ConnectionException ce = new ConnectionException(sm.getString(
+                    "streamProcessor.error.connection", stream.getConnectionId(),
+                    stream.getIdentifier()), Http2Error.INTERNAL_ERROR);
+            ce.initCause(e);
+            stream.close(ce);
         } finally {
             ContainerThreadMarker.clear();
         }
@@ -125,7 +143,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                     response.setCommitted(true);
                     stream.writeHeaders();
                 } catch (IOException ioe) {
-                    // TODO: Handle this
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 }
             }
             break;
@@ -135,7 +153,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             try {
                 stream.getOutputBuffer().close();
             } catch (IOException ioe) {
-                // TODO
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
             }
             break;
         }
@@ -144,7 +162,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                 try {
                     stream.writeAck();
                 } catch (IOException ioe) {
-                    // TODO
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 }
             }
             break;
@@ -155,7 +173,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                 stream.flushData();
             } catch (IOException ioe) {
                 response.setErrorException(ioe);
-                // TODO: Shut stream down?
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
             }
             break;
         }
