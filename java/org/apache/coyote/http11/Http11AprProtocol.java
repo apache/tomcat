@@ -57,9 +57,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     public int getSendfileSize() { return ((AprEndpoint)getEndpoint()).getSendfileSize(); }
     public void setSendfileSize(int sendfileSize) { ((AprEndpoint)getEndpoint()).setSendfileSize(sendfileSize); }
 
-    public void setSendfileThreadCount(int sendfileThreadCount) { ((AprEndpoint)getEndpoint()).setSendfileThreadCount(sendfileThreadCount); }
-    public int getSendfileThreadCount() { return ((AprEndpoint)getEndpoint()).getSendfileThreadCount(); }
-
     public boolean getDeferAccept() { return ((AprEndpoint)getEndpoint()).getDeferAccept(); }
     public void setDeferAccept(boolean deferAccept) { ((AprEndpoint)getEndpoint()).setDeferAccept(deferAccept); }
 

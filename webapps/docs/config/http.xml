@@ -895,13 +895,6 @@
         specified amount. The default value is 1024.</p>
       </attribute>
 
-      <attribute name="sendfileThreadCount" required="false">
-        <p>Number of threads used service sendfile sockets. On Windows the
-        default is chosen so that the sockets managed by each thread is
-        less than 1024. For Linux the default is 1. Changing the default on
-        Windows is likely to have a negative performance impact.</p>
-      </attribute>
-
       <attribute name="threadPriority" required="false">
         <p>(int)The priority of the acceptor and poller threads.
         The default value is <code>5</code> (the value of the
