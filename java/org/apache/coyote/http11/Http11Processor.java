@@ -1773,6 +1773,7 @@ public class Http11Processor extends AbstractProcessor {
         }
         if (getErrorState().isIoAllowed()) {
             try {
+                action(ActionCode.COMMIT, null);
                 outputBuffer.endRequest();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
