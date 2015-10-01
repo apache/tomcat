@@ -749,6 +749,7 @@ public class AjpProcessor extends AbstractProcessor {
             // Finish the response if not done yet
             if (!finished && getErrorState().isIoAllowed()) {
                 try {
+                    action(ActionCode.COMMIT, null);
                     finish();
                 } catch (IOException ioe){
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
