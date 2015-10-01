@@ -402,7 +402,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void closeStream(StreamException se) throws ConnectionException, IOException {
+    void closeStream(StreamException se) throws ConnectionException, IOException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
@@ -433,7 +433,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void closeConnection(Http2Exception ce) {
+    void closeConnection(Http2Exception ce) {
         // Write a GOAWAY frame.
         byte[] fixedPayload = new byte[8];
         ByteUtil.set31Bits(fixedPayload, 0, maxProcessedStreamId);
