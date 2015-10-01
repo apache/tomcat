@@ -21,7 +21,7 @@ public enum ErrorState {
     /**
      * Not in an error state.
      */
-    NONE(false, 0, true),
+    NONE(false, 0, true, true),
 
     /**
      * The current request/response is in an error state and while it is safe to
@@ -29,22 +29,36 @@ public enum ErrorState {
      * existing connection which must be closed once the response has been
      * completed.
      */
-    CLOSE_CLEAN(true, 1, true),
+    CLOSE_CLEAN(true, 1, true, true),
 
     /**
      * The current request/response is in an error state and it is not safe to
-     * continue to use the existing connection which must be closed immediately.
+     * continue to use them. For multiplexed protocols (such as HTTP/2) the
+     * stream/channel must be closed immediately but the connection may
+     * continue. For non-multiplexed protocols (AJP, HTTP/1.x) the current
+     * connection must be closed.
      */
-    CLOSE_NOW(true, 2, false);
+    CLOSE_NOW(true, 2, false, true),
+
+    /**
+     * An error has been detected that impacts the underlying network
+     * connection. It is not safe to continue using the network connection which
+     * must be closed immediately. For multiplexed protocols (such as HTTP/2)
+     * this impacts all multiplexed channels.
+     */
+    CLOSE_CONNECTION_NOW(true, 3, false, false);
 
     private final boolean error;
     private final int severity;
     private final boolean ioAllowed;
+    private final boolean connectionIoAllowed;
 
-    private ErrorState(boolean error, int severity, boolean ioAllowed) {
+    private ErrorState(boolean error, int severity, boolean ioAllowed,
+            boolean connectionIoAllowed) {
         this.error = error;
         this.severity = severity;
         this.ioAllowed = ioAllowed;
+        this.connectionIoAllowed = connectionIoAllowed;
     }
 
     public boolean isError() {
@@ -70,5 +84,9 @@ public enum ErrorState {
 
     public boolean isIoAllowed() {
         return ioAllowed;
+    }
+
+    public boolean isConnectionIoAllowed() {
+        return connectionIoAllowed;
     }
 }
