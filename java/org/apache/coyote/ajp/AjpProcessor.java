@@ -337,7 +337,7 @@ public class AjpProcessor extends AbstractProcessor {
                     // Validate and write response headers
                     prepareResponse();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 }
             }
             break;
@@ -347,7 +347,7 @@ public class AjpProcessor extends AbstractProcessor {
             try {
                 finish();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
             break;
         }
@@ -360,7 +360,7 @@ public class AjpProcessor extends AbstractProcessor {
             try {
                 flush();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
             break;
         }
@@ -675,7 +675,7 @@ public class AjpProcessor extends AbstractProcessor {
                         socketWrapper.write(true, pongMessageArray, 0, pongMessageArray.length);
                         socketWrapper.flush(true);
                     } catch (IOException e) {
-                        setErrorState(ErrorState.CLOSE_NOW, e);
+                        setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                     }
                     recycle();
                     continue;
@@ -685,13 +685,13 @@ public class AjpProcessor extends AbstractProcessor {
                     if (getLog().isDebugEnabled()) {
                         getLog().debug("Unexpected message: " + type);
                     }
-                    setErrorState(ErrorState.CLOSE_NOW, null);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                     break;
                 }
                 keptAlive = true;
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
@@ -731,7 +731,7 @@ public class AjpProcessor extends AbstractProcessor {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     getAdapter().service(request, response);
                 } catch (InterruptedIOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     getLog().error(sm.getString("ajpprocessor.request.process"), t);
@@ -750,6 +750,8 @@ public class AjpProcessor extends AbstractProcessor {
             if (!finished && getErrorState().isIoAllowed()) {
                 try {
                     finish();
+                } catch (IOException ioe){
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     setErrorState(ErrorState.CLOSE_NOW, t);
@@ -1541,7 +1543,7 @@ public class AjpProcessor extends AbstractProcessor {
                 try {
                     prepareResponse();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 }
             }
 

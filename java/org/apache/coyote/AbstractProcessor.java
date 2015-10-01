@@ -237,7 +237,7 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
                 setErrorState(ErrorState.CLOSE_NOW, null);
             }
         } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW, e);
+            setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             setErrorState(ErrorState.CLOSE_NOW, t);

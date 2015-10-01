@@ -654,7 +654,7 @@ public class Http11Processor extends AbstractProcessor {
                     prepareResponse();
                     outputBuffer.commit();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 }
             }
             break;
@@ -664,7 +664,7 @@ public class Http11Processor extends AbstractProcessor {
             try {
                 outputBuffer.endRequest();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
             break;
         }
@@ -677,7 +677,7 @@ public class Http11Processor extends AbstractProcessor {
                 try {
                     outputBuffer.sendAck();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 }
             }
             break;
@@ -687,7 +687,7 @@ public class Http11Processor extends AbstractProcessor {
             try {
                 outputBuffer.flush();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 response.setErrorException(e);
             }
             break;
@@ -1002,7 +1002,7 @@ public class Http11Processor extends AbstractProcessor {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.header.parse"), e);
                 }
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
@@ -1094,7 +1094,7 @@ public class Http11Processor extends AbstractProcessor {
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
                     }
                 } catch (InterruptedIOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 } catch (HeadersTooLargeException e) {
                     // The response should not have been committed but check it
                     // anyway to be safe
@@ -1760,7 +1760,7 @@ public class Http11Processor extends AbstractProcessor {
             try {
                 inputBuffer.endRequest();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 // 500 - Internal Server Error
@@ -1775,7 +1775,7 @@ public class Http11Processor extends AbstractProcessor {
             try {
                 outputBuffer.endRequest();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 setErrorState(ErrorState.CLOSE_NOW, t);
@@ -1809,7 +1809,7 @@ public class Http11Processor extends AbstractProcessor {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.sendfile.error"));
                 }
-                setErrorState(ErrorState.CLOSE_NOW, null);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                 return true;
             }
         }

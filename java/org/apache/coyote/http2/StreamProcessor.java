@@ -390,6 +390,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     public SocketState process(SocketWrapperBase<?> socket) throws IOException {
         try {
             adapter.service(request, response);
+        } catch (IOException ioe) {
+            setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
         } catch (Exception e) {
             setErrorState(ErrorState.CLOSE_NOW, e);
         }
