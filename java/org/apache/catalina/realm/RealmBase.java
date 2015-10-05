@@ -305,6 +305,14 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         String serverCredentials = getPassword(username);
 
+        if (credentials == null || serverCredentials == null) {
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace(sm.getString("realmBase.authenticateFailure",
+                                                username));
+            }
+            return null;
+        }
+
         boolean validated = getCredentialHandler().matches(credentials, serverCredentials);
         if (!validated) {
             if (containerLog.isTraceEnabled()) {

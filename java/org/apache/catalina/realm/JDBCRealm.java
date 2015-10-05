@@ -386,6 +386,13 @@ public class JDBCRealm
         // Look up the user's credentials
         String dbCredentials = getPassword(username);
 
+        if (credentials == null || dbCredentials == null) {
+            if (containerLog.isTraceEnabled())
+                containerLog.trace(sm.getString("jdbcRealm.authenticateFailure",
+                                                username));
+            return null;
+        }
+
         // Validate the user's credentials
         boolean validated = getCredentialHandler().matches(credentials, dbCredentials);
 
