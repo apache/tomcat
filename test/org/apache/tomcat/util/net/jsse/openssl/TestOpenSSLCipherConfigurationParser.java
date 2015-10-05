@@ -28,10 +28,13 @@ public class TestOpenSSLCipherConfigurationParser {
     public void testDEFAULT() throws Exception {
         // EXPORT was removed from DEFAULT in 1.1.0 but we prefer the old
         // behaviour
+        // DES, RC2 and RC4 were removed from default in 1.1.0-dev
         if (TesterOpenSSL.VERSION < 10000) {
             // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
             // (using aRSA:!SSLv2:!eNULL as an EC alias isn't available)
-            testSpecification("DEFAULT:!EXPORT:aRSA:!SSLv2:!eNULL");
+            testSpecification("DEFAULT:!EXPORT:aRSA:!SSLv2:!eNULL:!DES:!RC2:!RC4");
+        } else if (TesterOpenSSL.VERSION < 10100) {
+            testSpecification("DEFAULT:!EXPORT:!DES:!RC2:!RC4");
         } else {
             testSpecification("DEFAULT:!EXPORT");
         }
@@ -42,9 +45,12 @@ public class TestOpenSSLCipherConfigurationParser {
     public void testCOMPLEMENTOFDEFAULT() throws Exception {
         // EXPORT was removed from DEFAULT in 1.1.0 but we prefer the old
         // behaviour
+        // DES, RC2 and RC4 were removed from default in 1.1.0-dev
         if (TesterOpenSSL.VERSION < 10000) {
             // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            testSpecification("COMPLEMENTOFDEFAULT:EXPORT:aNULL");
+            testSpecification("COMPLEMENTOFDEFAULT:EXPORT:aNULL:DES:RC2:RC4");
+        } else if (TesterOpenSSL.VERSION < 10100) {
+            testSpecification("COMPLEMENTOFDEFAULT:EXPORT:aNULL:DES:RC2:RC4");
         } else {
             testSpecification("COMPLEMENTOFDEFAULT:EXPORT");
         }
