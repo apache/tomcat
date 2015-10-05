@@ -524,7 +524,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 if (!stream.isActive()) {
                     activeRemoteStreamCount.decrementAndGet();
                 }
-             }
+            }
             ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
             socketWrapper.write(true, header, 0, header.length);
             socketWrapper.write(true, data.array(), data.arrayOffset() + data.position(),
@@ -545,6 +545,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // Change stream Id and re-use
             ByteUtil.set31Bits(frame, 5, stream.getIdentifier().intValue());
             socketWrapper.write(true, frame, 0, frame.length);
+            socketWrapper.flush(true);
         }
     }
 
