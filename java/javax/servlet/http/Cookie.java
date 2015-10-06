@@ -416,10 +416,10 @@ public class Cookie implements Cloneable, Serializable {
 
     }
 
-    /*
+    /**
      * Tests a string and returns true if the string counts as a reserved token
      * in the Java language.
-     * @param value the <code>String</code> to be tested
+     * @param possibleToken the <code>String</code> to be tested
      * @return <code>true</code> if the <code>String</code> is a reserved token;
      * <code>false</code> if it is not
      */
