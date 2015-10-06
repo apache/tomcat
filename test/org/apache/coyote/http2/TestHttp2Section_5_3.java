@@ -116,35 +116,44 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         // At this point 17 is blocked because the stream window is zero and
         // 19 & 21 are blocked because the connection window is zero.
-
-        // This should release a single byte from each of 19 and 21 (the update
-        // is allocated by weight and then rounded up).
-        sendWindowUpdate(0, 1);
-        parser.readFrame(true);
-        // Debugging Gump failure
-        log.info(output.getTrace());
-
-        // This frame is not always written
-        int count = 0;
-        while (!parser.readFrame(false) && count < 10) {
-            Thread.sleep(100);
-            count++;
+        //
+        // Note: All these streams are processed in their own threads so it is
+        //       possible that not all of them reach the point where output
+        //       is blocked at the same time.
+        //
+        // The loop below handles 0, 1 or 2 stream being blocked
+        // - If 0 streams are blocked the connection window will be set to one
+        //   and that will be consumed by the first stream to attempt to write.
+        //   That body frame will be read by the client. The stream will then be
+        //   blocked and the loop will start again.
+        // - If 1 stream is blocked, the connection window will be set to one
+        //   which will then be consumed by the blocked stream. After writing
+        //   the single byte the stream will again be blocked and the loop will
+        //   start again.
+        // - If 2 streams are blocked the connection window will be set to one
+        //   but one byte will be permitted for both streams (due to rounding in
+        //   the allocation). The window size will be -1. Two frames (one for
+        //   each stream will be written) one of which will be consumed by the
+        //   client. The loop will start again and the Window size incremented
+        //   to zero. No data will be written by the streams but the second data
+        //   frame written in the last iteration of the loop will be read. The
+        //   loop will then exit since frames from both streams will have been
+        //   observed.
+        boolean seen19 = false;
+        boolean seen21 = false;
+        while (!seen19 || !seen21) {
+            sendWindowUpdate(0, 1);
+            parser.readFrame(true);
+            if (output.getTrace().contains("19-Body-1")) {
+                seen19 = true;
+            } else if (output.getTrace().contains("21-Body-1")) {
+                seen21 = true;
+            } else {
+                // Unexpected trace
+                Assert.fail(output.getTrace());
+            }
+            output.clearTrace();
         }
-        if (count == 10) {
-            Assert.fail("Second 1 byte body frame not received");
-        }
-
-        // Debugging Gump failure
-        log.info(output.getTrace());
-
-        String trace = output.getTrace();
-        Assert.assertTrue(trace, trace.contains("19-Body-1"));
-        Assert.assertTrue(trace, trace.contains("21-Body-1"));
-        output.clearTrace();
-
-        // This should address the 'overrun' of the connection flow control
-        // window above.
-        sendWindowUpdate(0, 1);
 
         sendWindowUpdate(0, 1024);
         parser.readFrame(true);
@@ -154,7 +163,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // Debugging Gump failure
         log.info(output.getTrace());
 
-        trace = output.getTrace();
+        String trace = output.getTrace();
         Assert.assertTrue(trace, trace.contains("19-Body-256"));
         Assert.assertTrue(trace, trace.contains("21-Body-768"));
 
