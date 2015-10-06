@@ -493,7 +493,7 @@
   <patternset id="files.tomcat-extras-juli-adapters">
     <include name="org/apache/juli/logging/impl/**" />
     <exclude name="org/apache/juli/logging/impl/WeakHashtable*" />
-    <exclude name="org/apache/juli/logging/impl/LogFactoryImpl" />
+    <exclude name="org/apache/juli/logging/impl/LogFactoryImpl*" />
     <!-- Javadoc and i18n exclusions -->
     <exclude name="**/package.html" />
     <exclude name="**/LocalStrings_*" />
