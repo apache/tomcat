@@ -35,8 +35,6 @@ import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
-    private static final Log log = LogFactory.getLog(AbstractJsseEndpoint.class);
-
     private String sslImplementationName = null;
     private int sniParseLimit = 64 * 1024;
 
@@ -70,6 +68,8 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     @Override
     protected Type getSslConfigType() {
+        // TODO: Add configuration to allow the OpenSSLImplementation to optionally use the JSSE configuration
+        // (it should still default to OpenSSL style since it is the most logical and straightforward)
         if (OpenSSLImplementation.IMPLEMENTATION_NAME.equals(sslImplementationName)) {
             return SSLHostConfig.Type.OPENSSL;
         } else {
