@@ -14,13 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
 import java.util.concurrent.Executor;
 
 import org.apache.tomcat.util.net.SSLHostConfig;
-
 
 /**
  * Abstract the protocol implementation, including threading, etc.
@@ -48,12 +46,16 @@ public interface ProtocolHandler {
 
     /**
      * The executor, provide access to the underlying thread pool.
+     *
+     * @return The executor used to process requests
      */
     public Executor getExecutor();
 
 
     /**
      * Initialise the protocol.
+     *
+     * @throws Exception If the protocol handler fails to initialise
      */
     public void init() throws Exception;
 
