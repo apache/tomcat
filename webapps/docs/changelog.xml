@@ -194,6 +194,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Extras">
+    <changelog>
+      <fix>
+        Ensure JULI adapters does not include the LogFactoryImpl class. Patch
+        provided by Benjamin Gandon. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <add>
