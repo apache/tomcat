@@ -170,7 +170,8 @@ public class TestSsl extends TomcatBaseTest {
 
         SSLContext sslCtx = SSLContext.getInstance("TLS");
         sslCtx.init(null, TesterSupport.getTrustManagers(), null);
-        SSLSocketFactory socketFactory = sslCtx.getSocketFactory();
+        SSLSocketFactory socketFactory = 
+                new TesterSupport.NoSSLv2SocketFactory(sslCtx.getSocketFactory());
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
                 getPort());
 

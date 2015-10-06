@@ -20,16 +20,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -162,11 +171,13 @@ public final class TesterSupport {
 
     protected static void configureClientSsl() {
         try {
+            System.setProperty("https.protocols", "TLSv1");
             SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(TesterSupport.getUser1KeyManagers(),
                     TesterSupport.getTrustManagers(),
                     null);
-            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(
+                    new NoSSLv2SocketFactory(sc.getSocketFactory()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -295,6 +306,66 @@ public final class TesterSupport {
         public void checkServerTrusted(X509Certificate[] certs,
                 String authType) {
             // NOOP - Trust everything
+        }
+    }
+    
+    public static class NoSSLv2SocketFactory extends SSLSocketFactory {
+
+        SSLSocketFactory factory;
+        
+        public NoSSLv2SocketFactory(SSLSocketFactory factory) {
+            this.factory = factory;
+        }
+        
+        @Override
+        public String[] getDefaultCipherSuites() {
+            return factory.getDefaultCipherSuites();
+        }
+
+        @Override
+        public String[] getSupportedCipherSuites() {
+            return factory.getSupportedCipherSuites();
+        }
+
+        @Override
+        public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+            return filterProtocols((SSLSocket) factory.createSocket(s, host, port, autoClose));
+        }
+
+        @Override
+        public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
+            return filterProtocols((SSLSocket) factory.createSocket(host, port));
+        }
+
+        @Override
+        public Socket createSocket(InetAddress host, int port) throws IOException {
+            return filterProtocols((SSLSocket) factory.createSocket(host, port));
+        }
+
+        @Override
+        public Socket createSocket(String host, int port, InetAddress localHost, int localPort)
+                throws IOException, UnknownHostException {
+            return filterProtocols((SSLSocket) factory.createSocket(host, port, localHost, localPort));
+        }
+
+        @Override
+        public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort)
+                throws IOException {
+            return filterProtocols((SSLSocket) factory.createSocket(address, port, localAddress, localPort));
+        }
+
+        private SSLSocket filterProtocols(SSLSocket socket) {
+            List<String> protocols = new ArrayList<String>();
+            protocols.addAll(Arrays.asList(socket.getSupportedProtocols()));
+            Iterator<String> protocolsIter = protocols.iterator();
+            while (protocolsIter.hasNext()) {
+                String protocol = protocolsIter.next();
+                if (protocol.contains("SSLv2")) {
+                    protocolsIter.remove();
+                }
+            }
+            socket.setEnabledProtocols(protocols.toArray(new String[protocols.size()]));
+            return socket;
         }
     }
 }
