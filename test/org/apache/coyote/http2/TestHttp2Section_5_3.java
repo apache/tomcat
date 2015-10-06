@@ -132,13 +132,13 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         //   start again.
         // - If 2 streams are blocked the connection window will be set to one
         //   but one byte will be permitted for both streams (due to rounding in
-        //   the allocation). The window size will be -1. Two frames (one for
-        //   each stream will be written) one of which will be consumed by the
-        //   client. The loop will start again and the Window size incremented
-        //   to zero. No data will be written by the streams but the second data
-        //   frame written in the last iteration of the loop will be read. The
-        //   loop will then exit since frames from both streams will have been
-        //   observed.
+        //   the allocation). The window size should be -1 (see below). Two
+        //   frames (one for each stream will be written) one of which will be
+        //   consumed by the client. The loop will start again and the Window
+        //   size incremented to zero. No data will be written by the streams
+        //   but the second data frame written in the last iteration of the loop
+        //   will be read. The loop will then exit since frames from both
+        //   streams will have been observed.
         boolean seen19 = false;
         boolean seen21 = false;
         while (!seen19 || !seen21) {
@@ -159,6 +159,21 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         sendWindowUpdate(0, 1024);
         parser.readFrame(true);
+
+        // Make sure you have read the big comment before the loop above.
+        // The 2 streams blocked case assumes that the server processes the
+        // window update fast enough that both streams will have written their
+        // byte and updated the connection window size to -1 before the next
+        // window update frame is processed. That doesn't always happen. If it
+        // doesn't another 1 byte data frame will be sent for each stream. Those
+        // need to be swallowed here.
+        while (output.getTrace().contains("Body-1")) {
+            // Debugging Gump failure
+            log.info(output.getTrace());
+            output.clearTrace();
+            parser.readFrame(true);
+        }
+
         // Debugging Gump failure
         log.info(output.getTrace());
         parser.readFrame(true);
