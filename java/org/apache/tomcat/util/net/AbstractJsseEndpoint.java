@@ -26,9 +26,6 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSessionContext;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
 import org.apache.tomcat.util.net.jsse.openssl.Cipher;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
