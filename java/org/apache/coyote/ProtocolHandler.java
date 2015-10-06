@@ -62,42 +62,58 @@ public interface ProtocolHandler {
 
     /**
      * Start the protocol.
+     *
+     * @throws Exception If the protocol handler fails to start
      */
     public void start() throws Exception;
 
 
     /**
      * Pause the protocol (optional).
+     *
+     * @throws Exception If the protocol handler fails to pause
      */
     public void pause() throws Exception;
 
 
     /**
      * Resume the protocol (optional).
+     *
+     * @throws Exception If the protocol handler fails to resume
      */
     public void resume() throws Exception;
 
 
     /**
      * Stop the protocol.
+     *
+     * @throws Exception If the protocol handler fails to stop
      */
     public void stop() throws Exception;
 
 
     /**
      * Destroy the protocol (optional).
+     *
+     * @throws Exception If the protocol handler fails to destroy
      */
     public void destroy() throws Exception;
 
 
     /**
      * Requires APR/native library
+     *
+     * @return <code>true</code> if this Protocol Handler requires the
+     *         APR/native library, otherwise <code>false</code>
      */
     public boolean isAprRequired();
 
 
     /**
      * Does this ProtocolHandler support sendfile?
+     *
+     * @return <code>true</code> if this Protocol Handler supports sendfile,
+     *         otherwise <code>false</code>
      */
     public boolean isSendfileSupported();
 
