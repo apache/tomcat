@@ -56,13 +56,21 @@ public class ConfigFileLoader {
      *                     provided location
      */
     public static InputStream getInputStream(String location) throws IOException {
-
-        // Absolute URIs will be left alone
+    	// Absolute URIs will be left alone
         // Relative files will be resolved relative to catalina base
         // Absolute files will be converted to URIs
-        URI uri = CATALINA_BASE_URI.resolve(location);
-        URL url = uri.toURL();
-
+    	URI uri;
+    	if (location != null &&
+    			(location.length() > 2 && ":\\".equals(location.substring(1, 3)) ||
+    				location.startsWith("\\\\"))) {
+			// This is an absolute file path in Windows or a UNC path
+			File f = new File(location);
+			uri =f.getAbsoluteFile().toURI();
+		} else {
+			// URL, relative path or an absolute path on a non-Windows platforms
+			uri = CATALINA_BASE_URI.resolve(location);
+		}
+    	URL url = uri.toURL();
         return url.openConnection().getInputStream();
     }
 }
