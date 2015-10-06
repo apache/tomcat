@@ -144,6 +144,8 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         while (!seen19 || !seen21) {
             sendWindowUpdate(0, 1);
             parser.readFrame(true);
+            // Debugging Gump failure
+            log.info(output.getTrace());
             if (output.getTrace().contains("19-Body-1")) {
                 seen19 = true;
             } else if (output.getTrace().contains("21-Body-1")) {
