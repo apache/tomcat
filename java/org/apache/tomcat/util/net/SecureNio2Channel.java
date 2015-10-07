@@ -86,9 +86,9 @@ public class SecureNio2Channel extends Nio2Channel  {
             public void completed(Integer result, SocketWrapperBase<Nio2Channel> attachment) {
                 if (result.intValue() < 0) {
                     failed(new EOFException(), attachment);
-                    return;
+                } else {
+                    endpoint.processSocket(attachment, SocketStatus.OPEN_READ, false);
                 }
-                endpoint.processSocket(attachment, SocketStatus.OPEN_READ, false);
             }
             @Override
             public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
@@ -100,9 +100,9 @@ public class SecureNio2Channel extends Nio2Channel  {
             public void completed(Integer result, SocketWrapperBase<Nio2Channel> attachment) {
                 if (result.intValue() < 0) {
                     failed(new EOFException(), attachment);
-                    return;
+                } else {
+                    endpoint.processSocket(attachment, SocketStatus.OPEN_WRITE, false);
                 }
-                endpoint.processSocket(attachment, SocketStatus.OPEN_WRITE, false);
             }
             @Override
             public void failed(Throwable exc, SocketWrapperBase<Nio2Channel> attachment) {
