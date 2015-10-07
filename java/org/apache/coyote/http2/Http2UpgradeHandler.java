@@ -570,11 +570,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     long windowSize = getWindowSize();
                     if (windowSize < 1 || backLogSize > 0) {
                         // Has this stream been granted an allocation
-                        int[] value = backLogStreams.remove(stream);
-                        if (value != null && value[1] > 0) {
-                            allocation = value[1];
-                            decrementWindowSize(allocation);
-                        } else {
+                        int[] value = backLogStreams.get(stream);
+                        if (value == null) {
                             value = new int[] { reservation, 0 };
                             backLogStreams.put(stream, value);
                             backLogSize += reservation;
@@ -582,6 +579,23 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                             AbstractStream parent = stream.getParentStream();
                             while (parent != null && backLogStreams.putIfAbsent(parent, new int[2]) == null) {
                                 parent = parent.getParentStream();
+                            }
+                        } else {
+                            if (value[1] > 0) {
+                                allocation = value[1];
+                                decrementWindowSize(allocation);
+                                if (value[0] == 0) {
+                                    // The reservation has been fully allocated
+                                    // so this stream can be removed from the
+                                    // backlog.
+                                    backLogStreams.remove(stream);
+                                } else {
+                                    // This allocation has been used. Reset the
+                                    // allocation to zero. Leave the stream on
+                                    // the backlog as it still has more bytes to
+                                    // write.
+                                    value[1] = 0;
+                                }
                             }
                         }
                     } else if (windowSize < reservation) {
@@ -612,7 +626,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     protected synchronized void incrementWindowSize(int increment) throws Http2Exception {
         long windowSize = getWindowSize();
         if (windowSize < 1 && windowSize + increment > 0) {
-            releaseBackLog(increment);
+            releaseBackLog((int) (windowSize +increment));
         }
         super.incrementWindowSize(increment);
     }
@@ -662,7 +676,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         int[] value = backLogStreams.get(stream);
         if (value[0] >= allocation) {
             value[0] -= allocation;
-            value[1] = allocation;
+            value[1] += allocation;
             return 0;
         }
 
