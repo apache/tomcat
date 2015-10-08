@@ -609,6 +609,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
 
+        protected synchronized void insertReplayedBody(ByteChunk body) {
+            inBuffer = ByteBuffer.wrap(body.getBytes(),  body.getOffset(),  body.getLength());
+        }
+
+
         private void ensureBuffersExist() {
             if (inBuffer == null) {
                 synchronized (this) {

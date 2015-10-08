@@ -33,6 +33,7 @@ import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -179,6 +180,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         }
         case AVAILABLE: {
             request.setAvailable(stream.getInputBuffer().available());
+            break;
+        }
+        case REQ_SET_BODY_REPLAY: {
+            ByteChunk body = (ByteChunk) param;
+            stream.getInputBuffer().insertReplayedBody(body);
+            stream.receivedEndOfStream();
             break;
         }
         case RESET: {
@@ -382,11 +389,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case UPGRADE:
             throw new UnsupportedOperationException(
                     sm.getString("streamProcessor.httpupgrade.notsupported"));
-
-        // Unimplemented / to review
-        case REQ_SET_BODY_REPLAY:
-            log.info("TODO: Implement [" + actionCode + "] for HTTP/2");
-            break;
         }
     }
 
