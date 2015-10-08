@@ -110,13 +110,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Flag that indicates that send file processing is in progress and that the
-     * socket should not be returned to the poller (where a poller is used).
-     */
-    protected boolean sendfileInProgress = false;
-
-
-    /**
      * Flag that indicates if the request headers have been completely read.
      */
     protected boolean readComplete = true;
@@ -938,7 +931,6 @@ public class Http11Processor extends AbstractProcessor {
         // Flags
         keepAlive = true;
         openSocket = false;
-        sendfileInProgress = false;
         readComplete = true;
         boolean keptAlive = false;
 
@@ -1139,7 +1131,7 @@ public class Http11Processor extends AbstractProcessor {
         } else if (isUpgrade()) {
             return SocketState.UPGRADING;
         } else {
-            if (sendfileInProgress) {
+            if (sendfileData != null) {
                 return SocketState.SENDFILE;
             } else {
                 if (openSocket) {
@@ -1775,9 +1767,9 @@ public class Http11Processor extends AbstractProcessor {
             switch (socketWrapper.processSendfile(sendfileData)) {
             case DONE:
                 // If sendfile is complete, no need to break keep-alive loop
+                sendfileData = null;
                 return false;
             case PENDING:
-                sendfileInProgress = true;
                 return true;
             case ERROR:
                 // Write failed
