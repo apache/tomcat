@@ -177,12 +177,38 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             }
             break;
         }
+        case AVAILABLE: {
+            request.setAvailable(stream.getInputBuffer().available());
+            break;
+        }
+        case RESET: {
+            stream.getOutputBuffer().reset();
+            break;
+        }
+
+        // Error handling
         case IS_ERROR: {
             ((AtomicBoolean) param).set(getErrorState().isError());
             break;
         }
-        case AVAILABLE: {
-            request.setAvailable(stream.getInputBuffer().available());
+        case CLOSE_NOW: {
+            // No need to block further output. This is called by the error
+            // reporting valve if the response is already committed. It will
+            // flush any remaining response data before this call.
+            // Setting the error state will then cause this stream to be reset.
+            setErrorState(ErrorState.CLOSE_NOW,  null);
+            break;
+        }
+        case DISABLE_SWALLOW_INPUT: {
+            // NO-OP
+            // HTTP/2 has to swallow any input received to ensure that the flow
+            // control windows are correctly tracked.
+            break;
+        }
+        case END_REQUEST: {
+            // NO-OP
+            // This action is geared towards handling HTTP/1.1 expectations and
+            // keep-alive. Does not apply to HTTP/2 streams.
             break;
         }
 
@@ -358,11 +384,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                     sm.getString("streamProcessor.httpupgrade.notsupported"));
 
         // Unimplemented / to review
-        case CLOSE_NOW:
-        case DISABLE_SWALLOW_INPUT:
-        case END_REQUEST:
         case REQ_SET_BODY_REPLAY:
-        case RESET:
             log.info("TODO: Implement [" + actionCode + "] for HTTP/2");
             break;
         }
