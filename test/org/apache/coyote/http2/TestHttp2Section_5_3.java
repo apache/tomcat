@@ -117,9 +117,17 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         // At this point 17 is blocked because the stream window is zero and
         // 19 & 21 are blocked because the connection window is zero.
         //
-        // Note: All these streams are processed in their own threads so it is
-        //       possible that not all of them reach the point where output
-        //       is blocked at the same time.
+        // To test allocation, the connection window size is increased by 1.
+        // This should result in an allocation of 1 byte each to streams 19 and
+        // 21 but because each stream is processed in a separate thread it is
+        // not guaranteed that both streams will be blocked when the connection
+        // window size is increased. The test therefore sends 1 byte window
+        // updates until a small body has been seen from each stream. Then the
+        // tests sends a larger (1024 byte) window update and checks that it is
+        // correctly distributed between the streams.
+        //
+        // The test includes a margin to allow for the potential differences in
+        // response caused by timing differences on the server.
         //
         // The loop below handles 0, 1 or 2 stream being blocked
         // - If 0 streams are blocked the connection window will be set to one
@@ -146,13 +154,18 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
             parser.readFrame(true);
             // Debugging Gump failure
             log.info(output.getTrace());
-            if (output.getTrace().contains("19-Body-1")) {
+            int[] data = parseBodyFrame(output.getTrace());
+            if (data[0] == 19) {
                 seen19 = true;
-            } else if (output.getTrace().contains("21-Body-1")) {
+            } else if (data[0] == 21) {
                 seen21 = true;
             } else {
-                // Unexpected trace
-                Assert.fail(output.getTrace());
+                // Unexpected stream
+                Assert.fail("Unexpected stream: [" + output.getTrace() + "]");
+            }
+            if (data[1] > 3) {
+                // Larger than expected body size
+                Assert.fail("Larger than expected body: [" + output.getTrace() + "]");
             }
             output.clearTrace();
         }
@@ -160,29 +173,44 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
         sendWindowUpdate(0, 1024);
         parser.readFrame(true);
 
-        // Make sure you have read the big comment before the loop above.
-        // The 2 streams blocked case assumes that the server processes the
-        // window update fast enough that both streams will have written their
-        // byte and updated the connection window size to -1 before the next
-        // window update frame is processed. That doesn't always happen. If it
-        // doesn't another 1 byte data frame will be sent for each stream. Those
-        // need to be swallowed here.
-        while (output.getTrace().contains("Body-1")) {
+        // Make sure you have read the big comment before the loop above. It is
+        // possible that the timing of the server threads is such that there are
+        // still small body frames to read.
+        int[] data = parseBodyFrame(output.getTrace());
+        while (data[1] < 4) {
             // Debugging Gump failure
             log.info(output.getTrace());
             output.clearTrace();
             parser.readFrame(true);
+            data = parseBodyFrame(output.getTrace());
         }
 
+        // Should now have two larger body frames. One has already been read.
+        seen19 = false;
+        seen21 = false;
+        while (!seen19 && !seen21) {
+            // Debugging Gump failure
+            log.info(output.getTrace());
+            if (data[0] == 19) {
+                seen19 = true;
+                if (data[1] < 256 || data[1] > 260) {
+                    Assert.fail("Unexpected body size: [" + output.getTrace() + "]");
+                }
+            } else if (data[0] == 21) {
+                seen21 = true;
+                if (data[1] < 768 || data[1] > 772) {
+                    Assert.fail("Unexpected body size: [" + output.getTrace() + "]");
+                }
+            } else {
+                Assert.fail("Unexpected stream: [" + output.getTrace() + "]");
+            }
+            output.clearTrace();
+            parser.readFrame(true);
+            data = parseBodyFrame(output.getTrace());
+        }
         // Debugging Gump failure
         log.info(output.getTrace());
-        parser.readFrame(true);
-        // Debugging Gump failure
-        log.info(output.getTrace());
-
-        String trace = output.getTrace();
-        Assert.assertTrue(trace, trace.contains("19-Body-256"));
-        Assert.assertTrue(trace, trace.contains("21-Body-768"));
+        output.clearTrace();
 
         // Release everything and read all the remaining data
         sendWindowUpdate(0, 1024 * 1024);
@@ -195,5 +223,20 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
             // Debugging Gump failure
             log.info(output.getTrace());
         }
+    }
+
+
+    private int[] parseBodyFrame(String output) {
+        String[] parts = output.trim().split("-");
+        if (parts.length != 3 || !"Body".equals(parts[1])) {
+            Assert.fail("Unexpected output: [" + output + "]");
+        }
+
+        int[] result = new int[2];
+
+        result[0] = Integer.parseInt(parts[0]);
+        result[1] = Integer.parseInt(parts[2]);
+
+        return result;
     }
 }
