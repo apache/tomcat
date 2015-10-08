@@ -21,7 +21,6 @@ import java.io.InterruptedIOException;
 import java.util.concurrent.Executor;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -193,16 +192,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
         getAdapter().errorDispatch(request, response);
     }
 
-    @Override
-    public abstract boolean isUpgrade();
-
-    /**
-     * Process HTTP requests. All requests are treated as HTTP requests to start
-     * with although they may change type during processing.
-     */
-    @Override
-    public abstract SocketState process(SocketWrapperBase<?> socket) throws IOException;
-
 
     /**
      * Process an in-progress request that is not longer in standard HTTP mode.
@@ -286,9 +275,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
      *         current request has completed
      */
     protected abstract SocketState dispatchEndRequest();
-
-    @Override
-    public abstract HttpUpgradeHandler getHttpUpgradeHandler();
 
     protected abstract Log getLog();
 }
