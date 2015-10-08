@@ -26,6 +26,7 @@ import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -44,6 +45,7 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     protected final Request request;
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
+    protected volatile SSLSupport sslSupport;
     private String clientCertProvider = null;
 
     /**
@@ -168,6 +170,15 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
 
 
     /**
+     * Set the SSL information for this HTTP connection.
+     */
+    @Override
+    public final void setSslSupport(SSLSupport sslSupport) {
+        this.sslSupport = sslSupport;
+    }
+
+
+    /**
      * Obtain the Executor used by the underlying endpoint.
      */
     @Override
@@ -248,6 +259,14 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
 
 
     /**
+     * Perform any necessary processing for a non-blocking read before
+     * dispatching to the adapter.
+     */
+    protected void dispatchNonBlockingRead() {
+        asyncStateMachine.asyncOperation();
+    }
+
+    /**
      * Flush any pending writes. Used during non-blocking writes to flush any
      * remaining data from a previous incomplete write.
      *
@@ -258,14 +277,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
      *         data
      */
     protected abstract boolean flushBufferedWrite() throws IOException ;
-
-    /**
-     * Perform any necessary processing for a non-blocking read before
-     * dispatching to the adapter.
-     */
-    protected void dispatchNonBlockingRead() {
-        asyncStateMachine.asyncOperation();
-    }
 
     /**
      * Perform any necessary clean-up processing if the dispatch resulted in the

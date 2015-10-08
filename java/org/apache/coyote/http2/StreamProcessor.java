@@ -394,12 +394,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    public void setSslSupport(SSLSupport sslSupport) {
-        this.sslSupport = sslSupport;
-    }
-
-
-    @Override
     public void recycle() {
         // StreamProcessor instances are not re-used.
         // Clear fields that can be cleared to aid GC and trigger NPEs if this

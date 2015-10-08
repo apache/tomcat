@@ -231,12 +231,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * SSL information.
-     */
-    protected SSLSupport sslSupport;
-
-
-    /**
      * UpgradeProtocol information
      */
     private final Map<String,UpgradeProtocol> httpUpgradeProtocols;
@@ -625,15 +619,6 @@ public class Http11Processor extends AbstractProcessor {
                           " Unsupported transfer encoding [" + encodingName + "]");
             }
         }
-    }
-
-
-    /**
-     * Set the SSL information for this HTTP connection.
-     */
-    @Override
-    public void setSslSupport(SSLSupport sslSupport) {
-        this.sslSupport = sslSupport;
     }
 
 
