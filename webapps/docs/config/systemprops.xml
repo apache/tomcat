@@ -485,7 +485,7 @@
          value for <code>pluggabilitySkip</code> and <code>tldSkip</code>
          attributes of the standard
          <a href="jar-scan-filter.html">JarScanFilter</a> implementation.</p>
-      <p>The coded default empty, however the system property is set in
+      <p>The coded default is empty, however the system property is set in
          a default Tomcat installation via the
          <code>$CATALINA_BASE/conf/catalina.properties</code> file.</p>
     </property>
@@ -495,7 +495,7 @@
          value for <code>pluggabilityScan</code> and <code>tldScan</code>
          attributes of the standard
          <a href="jar-scan-filter.html">JarScanFilter</a> implementation.</p>
-      <p>The coded default empty, however the system property is set in
+      <p>The coded default is empty, however the system property is set in
          a default Tomcat installation via the
          <code>$CATALINA_BASE/conf/catalina.properties</code> file.</p>
     </property>
