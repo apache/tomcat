@@ -442,6 +442,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             return false;
         }
 
+        synchronized void reset() {
+            buffer.clear();
+        }
+
         synchronized boolean isReady() {
             if (getWindowSize() > 0 && handler.getWindowSize() > 0) {
                 return true;
