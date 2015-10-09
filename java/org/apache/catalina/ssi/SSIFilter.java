@@ -28,9 +28,8 @@ import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
+import javax.servlet.GenericFilter;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -45,8 +44,8 @@ import org.apache.catalina.Globals;
  * @author David Becker
  * @see org.apache.catalina.ssi.SSIServlet
  */
-public class SSIFilter implements Filter {
-    protected FilterConfig config = null;
+public class SSIFilter extends GenericFilter {
+    private static final long serialVersionUID = 1L;
     /** Debug level for this servlet. */
     protected int debug = 0;
     /** Expiration time in seconds for the doc. */
@@ -62,37 +61,27 @@ public class SSIFilter implements Filter {
     protected boolean allowExec = false;
 
 
-    //----------------- Public methods.
-    /**
-     * Initialize this servlet.
-     *
-     * @exception ServletException
-     *                if an error occurs
-     */
     @Override
-    public void init(FilterConfig config) throws ServletException {
-        this.config = config;
-
-        if (config.getInitParameter("debug") != null) {
-            debug = Integer.parseInt(config.getInitParameter("debug"));
+    public void init() throws ServletException {
+        if (getInitParameter("debug") != null) {
+            debug = Integer.parseInt(getInitParameter("debug"));
         }
 
-        if (config.getInitParameter("contentType") != null) {
-            contentTypeRegEx = Pattern.compile(config.getInitParameter("contentType"));
+        if (getInitParameter("contentType") != null) {
+            contentTypeRegEx = Pattern.compile(getInitParameter("contentType"));
         } else {
             contentTypeRegEx = shtmlRegEx;
         }
 
-        isVirtualWebappRelative =
-            Boolean.parseBoolean(config.getInitParameter("isVirtualWebappRelative"));
+        isVirtualWebappRelative = Boolean.parseBoolean(getInitParameter("isVirtualWebappRelative"));
 
-        if (config.getInitParameter("expires") != null)
-            expires = Long.valueOf(config.getInitParameter("expires"));
+        if (getInitParameter("expires") != null)
+            expires = Long.valueOf(getInitParameter("expires"));
 
-        allowExec = Boolean.parseBoolean(config.getInitParameter("allowExec"));
+        allowExec = Boolean.parseBoolean(getInitParameter("allowExec"));
 
         if (debug > 0)
-            config.getServletContext().log(
+            getServletContext().log(
                     "SSIFilter.init() SSI invoker started with 'debug'=" + debug);
     }
 
@@ -109,7 +98,7 @@ public class SSIFilter implements Filter {
         // setup to capture output
         ByteArrayServletOutputStream basos = new ByteArrayServletOutputStream();
         ResponseIncludeWrapper responseIncludeWrapper =
-            new ResponseIncludeWrapper(config.getServletContext(),req, res, basos);
+                new ResponseIncludeWrapper(getServletContext(),req, res, basos);
 
         // process remainder of filter chain
         chain.doFilter(req, responseIncludeWrapper);
@@ -127,7 +116,7 @@ public class SSIFilter implements Filter {
 
             // set up SSI processing
             SSIExternalResolver ssiExternalResolver =
-                new SSIServletExternalResolver(config.getServletContext(), req,
+                new SSIServletExternalResolver(getServletContext(), req,
                         res, isVirtualWebappRelative, debug, encoding);
             SSIProcessor ssiProcessor = new SSIProcessor(ssiExternalResolver,
                     debug, allowExec);
