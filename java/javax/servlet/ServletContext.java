@@ -90,19 +90,19 @@ public interface ServletContext {
 
     /**
      * Returns the major version of the Java Servlet API that this servlet
-     * container supports. All implementations that comply with Version 3.1 must
-     * have this method return the integer 3.
+     * container supports. All implementations that comply with Version 4.0 must
+     * have this method return the integer 4.
      *
-     * @return 3
+     * @return 4
      */
     public int getMajorVersion();
 
     /**
      * Returns the minor version of the Servlet API that this servlet container
-     * supports. All implementations that comply with Version 3.1 must have this
-     * method return the integer 1.
+     * supports. All implementations that comply with Version 4.0 must have this
+     * method return the integer 0.
      *
-     * @return 1
+     * @return 0
      */
     public int getMinorVersion();
 

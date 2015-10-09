@@ -324,25 +324,15 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Return the major version of the Java Servlet API that we implement.
-     */
     @Override
     public int getMajorVersion() {
-
-        return (Constants.MAJOR_VERSION);
-
+        return Constants.MAJOR_VERSION;
     }
 
 
-    /**
-     * Return the minor version of the Java Servlet API that we implement.
-     */
     @Override
     public int getMinorVersion() {
-
-        return (Constants.MINOR_VERSION);
-
+        return Constants.MINOR_VERSION;
     }
 
 

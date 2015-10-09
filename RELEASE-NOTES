@@ -77,7 +77,7 @@ for use by web applications (by placing them in "lib"):
 * jasper.jar (Jasper 2 Compiler and Runtime)
 * jasper-el.jar (Jasper 2 EL implementation)
 * jsp-api.jar (JSP 2.3 API)
-* servlet-api.jar (Servlet 3.1 API)
+* servlet-api.jar (Servlet 4.0 API)
 * tomcat-api.jar (Interfaces shared by Catalina and Jasper)
 * tomcat-coyote.jar (Tomcat connectors and utility classes)
 * tomcat-dbcp.jar (package renamed database connection pool based on Commons DBCP)

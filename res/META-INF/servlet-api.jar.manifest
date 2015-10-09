@@ -4,8 +4,8 @@ X-Compile-Target-JDK: @target.jdk@
 
 Name: javax/servlet/
 Specification-Title: Java API for Servlets
-Specification-Version: 3.1
+Specification-Version: 4.0
 Specification-Vendor: Sun Microsystems, Inc.
 Implementation-Title: javax.servlet
-Implementation-Version: 3.1.@servlet.revision@
+Implementation-Version: 4.0.@servlet.revision@
 Implementation-Vendor: Apache Software Foundation
