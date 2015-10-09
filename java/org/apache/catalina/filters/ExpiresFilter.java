@@ -215,7 +215,7 @@ import org.apache.juli.logging.LogFactory;
  * </p>
  *
  * <pre>
- * <code>
+ * {@code
  * <init-param>
  *    <param-name>ExpiresDefault</param-name>
  *    <param-value><base> [plus] {<num> <type>}*</param-value>
@@ -225,7 +225,7 @@ import org.apache.juli.logging.LogFactory;
  *    <param-name>ExpiresByType type/encoding</param-name>
  *    <param-value><base> [plus] {<num> <type>}*</param-value>
  * </init-param>
- * </code>
+ * }
  * </pre>
  * <p>
  * where {@code <base>} is one of:
