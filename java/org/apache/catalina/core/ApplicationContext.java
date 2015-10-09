@@ -806,71 +806,24 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Add servlet to context.
-     * @param   servletName  Name of servlet to add
-     * @param   servletClass Name of servlet class
-     * @return  <code>null</code> if the servlet has already been fully defined,
-     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
-     *          that can be used to further configure the servlet
-     * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
-     */
     @Override
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            String servletClass) throws IllegalStateException {
-
-        return addServlet(servletName, servletClass, null);
+    public ServletRegistration.Dynamic addServlet(String servletName, String className) {
+        return addServlet(servletName, className, null);
     }
 
 
-    /**
-     * Add servlet to context.
-     * @param   servletName Name of servlet to add
-     * @param   servlet     Servlet instance to add
-     * @return  <code>null</code> if the servlet has already been fully defined,
-     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
-     *          that can be used to further configure the servlet
-     * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
-     */
     @Override
-    public ServletRegistration.Dynamic addServlet(String servletName,
-            Servlet servlet) throws IllegalStateException {
-
+    public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet) {
         return addServlet(servletName, null, servlet);
     }
 
 
-    /**
-     * Add servlet to context.
-     * @param   servletName  Name of servlet to add
-     * @param   servletClass Class of servlet to add
-     * @return  <code>null</code> if the servlet has already been fully defined,
-     *          else a {@link javax.servlet.ServletRegistration.Dynamic} object
-     *          that can be used to further configure the servlet
-     * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
-     */
     @Override
     public ServletRegistration.Dynamic addServlet(String servletName,
-            Class<? extends Servlet> servletClass)
-    throws IllegalStateException {
-
+            Class<? extends Servlet> servletClass) {
         return addServlet(servletName, servletClass.getName(), null);
     }
+
 
     private ServletRegistration.Dynamic addServlet(String servletName,
             String servletClass, Servlet servlet) throws IllegalStateException {
@@ -951,18 +904,11 @@ public class ApplicationContext
     }
 
 
-    /**
-     * By default {@link SessionTrackingMode#URL} is always supported, {@link
-     * SessionTrackingMode#COOKIE} is supported unless the <code>cookies</code>
-     * attribute has been set to <code>false</code> for the context and {@link
-     * SessionTrackingMode#SSL} is supported if at least one of the connectors
-     * used by this context has the attribute <code>secure</code> set to
-     * <code>true</code>.
-     */
     @Override
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
         return defaultSessionTrackingModes;
     }
+
 
     private void populateSessionTrackingModes() {
         // URL re-writing is always enabled by default
@@ -987,10 +933,7 @@ public class ApplicationContext
         }
     }
 
-    /**
-     * Return the supplied value if one was previously set, else return the
-     * defaults.
-     */
+
     @Override
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
         if (sessionTrackingModes != null) {
@@ -1006,15 +949,8 @@ public class ApplicationContext
     }
 
 
-    /**
-     * @throws IllegalStateException if the context has already been initialised
-     * @throws IllegalArgumentException If SSL is requested in combination with
-     *                                  anything else or if an unsupported
-     *                                  tracking mode is requested
-     */
     @Override
-    public void setSessionTrackingModes(
-            Set<SessionTrackingMode> sessionTrackingModes) {
+    public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
 
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(
