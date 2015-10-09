@@ -668,10 +668,13 @@ public interface ServletContext {
     public Map<String, ? extends ServletRegistration> getServletRegistrations();
 
     /**
-     * TODO SERVLET3 - Add comments
-     * @param filterName TODO
-     * @param className  TODO
-     * @return TODO
+    /**
+     * Add filter to context.
+     * @param   filterName  Name of filter to add
+     * @param   className Name of filter class
+     * @return  <code>null</code> if the filter has already been fully defined,
+     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     *          that can be used to further configure the filter
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -683,14 +686,15 @@ public interface ServletContext {
      *             If the context has already been initialised
      * @since Servlet 3.0
      */
-    public FilterRegistration.Dynamic addFilter(String filterName,
-            String className);
+    public FilterRegistration.Dynamic addFilter(String filterName, String className);
 
     /**
-     * TODO SERVLET3 - Add comments
-     * @param filterName TODO
-     * @param filter     TODO
-     * @return TODO
+     * Add filter to context.
+     * @param   filterName  Name of filter to add
+     * @param   filter      Filter to add
+     * @return  <code>null</code> if the filter has already been fully defined,
+     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     *          that can be used to further configure the filter
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -705,10 +709,12 @@ public interface ServletContext {
     public FilterRegistration.Dynamic addFilter(String filterName, Filter filter);
 
     /**
-     * TODO SERVLET3 - Add comments
-     * @param filterName  TODO
-     * @param filterClass TODO
-     * @return TODO
+     * Add filter to context.
+     * @param   filterName  Name of filter to add
+     * @param   filterClass Class of filter to add
+     * @return  <code>null</code> if the filter has already been fully defined,
+     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
+     *          that can be used to further configure the filter
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
      *    method of a {@link ServletContextListener} that was not defined in a
@@ -738,8 +744,7 @@ public interface ServletContext {
      * @throws ServletException TODO
      * @since Servlet 3.
      */
-    public <T extends Filter> T createFilter(Class<T> c)
-            throws ServletException;
+    public <T extends Filter> T createFilter(Class<T> c) throws ServletException;
 
     /**
      * TODO SERVLET3 - Add comments

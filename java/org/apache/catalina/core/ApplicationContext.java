@@ -715,70 +715,24 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Add filter to context.
-     * @param   filterName  Name of filter to add
-     * @param   filterClass Name of filter class
-     * @return  <code>null</code> if the filter has already been fully defined,
-     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
-     *          that can be used to further configure the filter
-     * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
-     */
     @Override
-    public FilterRegistration.Dynamic addFilter(String filterName,
-            String filterClass) throws IllegalStateException {
-
-        return addFilter(filterName, filterClass, null);
+    public FilterRegistration.Dynamic addFilter(String filterName, String className) {
+        return addFilter(filterName, className, null);
     }
 
 
-    /**
-     * Add filter to context.
-     * @param   filterName  Name of filter to add
-     * @param   filter      Filter to add
-     * @return  <code>null</code> if the filter has already been fully defined,
-     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
-     *          that can be used to further configure the filter
-     * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
-     */
     @Override
-    public FilterRegistration.Dynamic addFilter(String filterName,
-            Filter filter) throws IllegalStateException {
-
+    public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
         return addFilter(filterName, null, filter);
     }
 
 
-    /**
-     * Add filter to context.
-     * @param   filterName  Name of filter to add
-     * @param   filterClass Class of filter to add
-     * @return  <code>null</code> if the filter has already been fully defined,
-     *          else a {@link javax.servlet.FilterRegistration.Dynamic} object
-     *          that can be used to further configure the filter
-     * @throws IllegalStateException if the context has already been initialised
-     * @throws UnsupportedOperationException - if this context was passed to the
-     *         {@link ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)}
-     *         method of a {@link ServletContextListener} that was not declared
-     *         in web.xml, a web-fragment or annotated with
-     *         {@link javax.servlet.annotation.WebListener}.
-     */
     @Override
     public FilterRegistration.Dynamic addFilter(String filterName,
-            Class<? extends Filter> filterClass) throws IllegalStateException {
-
+            Class<? extends Filter> filterClass) {
         return addFilter(filterName, filterClass.getName(), null);
     }
+
 
     private FilterRegistration.Dynamic addFilter(String filterName,
             String filterClass, Filter filter) throws IllegalStateException {
@@ -820,9 +774,9 @@ public class ApplicationContext
         return new ApplicationFilterRegistration(filterDef, context);
     }
 
+
     @Override
-    public <T extends Filter> T createFilter(Class<T> c)
-    throws ServletException {
+    public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
         try {
             @SuppressWarnings("unchecked")
             T filter = (T) context.getInstanceManager().newInstance(c.getName());
