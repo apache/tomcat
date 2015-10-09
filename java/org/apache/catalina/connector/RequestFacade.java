@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
+import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
@@ -1111,5 +1112,16 @@ public class RequestFacade implements HttpServletRequest {
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {
         return request.upgrade(httpUpgradeHandlerClass);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public PushBuilder getPushBuilder() {
+        return request.getPushBuilder();
     }
 }
