@@ -28,8 +28,7 @@ import java.util.Enumeration;
  * @see HttpSessionBindingEvent
  * @see HttpSessionBindingListener
  */
-@SuppressWarnings("dep-ann")
-// Spec API does not use @Deprecated
+@Deprecated
 public interface HttpSessionContext {
 
     /**
@@ -40,7 +39,7 @@ public interface HttpSessionContext {
      *             must return null and will be removed in a future version of
      *             this API.
      */
-    // Spec API does not use @Deprecated
+    @Deprecated
     public HttpSession getSession(String sessionId);
 
     /**
@@ -50,6 +49,6 @@ public interface HttpSessionContext {
      *             must return an empty <code>Enumeration</code> and will be
      *             removed in a future version of this API.
      */
-    // Spec API does not use @Deprecated
+    @Deprecated
     public Enumeration<String> getIds();
 }

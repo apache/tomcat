@@ -283,8 +283,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
     @Override
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         return this._getHttpServletRequest().isRequestedSessionIdFromUrl();
     }
