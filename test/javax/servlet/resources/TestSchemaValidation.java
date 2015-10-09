@@ -129,4 +129,6 @@ public class TestSchemaValidation {
         Assert.assertEquals(0, handler.getErrors().size());
         Assert.assertEquals(0, handler.getWarnings().size());
     }
+
+    // TODO Servlet 4.0
 }

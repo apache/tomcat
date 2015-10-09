@@ -143,7 +143,7 @@ loaders as it is initialized:</p>
     <li><em>jasper.jar</em> &#8212; Tomcat Jasper JSP Compiler and Runtime.</li>
     <li><em>jasper-el.jar</em> &#8212; Tomcat Jasper EL implementation.</li>
     <li><em>jsp-api.jar</em> &#8212; JSP 2.3 API.</li>
-    <li><em>servlet-api.jar</em> &#8212; Servlet 3.1 API.</li>
+    <li><em>servlet-api.jar</em> &#8212; Servlet 4.0 API.</li>
     <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.</li>
     <li><em>tomcat-coyote.jar</em> &#8212; Tomcat connectors and utility classes.</li>
     <li><em>tomcat-dbcp.jar</em> &#8212; Database connection pool

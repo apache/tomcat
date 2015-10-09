@@ -130,6 +130,17 @@ public class TestWebXml {
     }
 
     @Test
+    public void testParseVersion40() {
+
+        WebXml webxml = new WebXml();
+
+        webxml.setVersion("4.0");
+        Assert.assertEquals(4, webxml.getMajorVersion());
+        Assert.assertEquals(0, webxml.getMinorVersion());
+        Assert.assertEquals("4.0", webxml.getVersion());
+    }
+
+    @Test
     public void testValidateVersion22() throws IOException, SAXException {
         doTestValidateVersion("2.2");
     }
@@ -158,6 +169,8 @@ public class TestWebXml {
     public void testValidateVersion31() throws IOException, SAXException {
         doTestValidateVersion("3.1");
     }
+
+    // TODO Servlet 4.0
 
     private void doTestValidateVersion(String version) throws IOException, SAXException {
         WebXml webxml = new WebXml();

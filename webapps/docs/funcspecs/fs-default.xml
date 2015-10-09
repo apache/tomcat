@@ -52,7 +52,7 @@
     partially define the correct behavior of the default servlet:</p>
     <ul>
     <li><a href="http://jcp.org/aboutJava/communityprocess/final/jsr340/index.html">
-        Servlet Specification</a> (Version 3.1)</li>
+        Servlet Specification</a> (Version 4.0)</li>
     <li><a href="http://www.rfc-editor.org/rfc/rfc2046.txt">Multipurpose
         Internet Mail Extensions (MIME) Part Two: Media Types</a></li>
     <li><a href="http://www.rfc-editor.org/rfc/rfc2616.txt">Hypertext
