@@ -308,8 +308,7 @@ public interface ServletContext {
      *
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public Servlet getServlet(String name) throws ServletException;
 
     /**
@@ -323,8 +322,7 @@ public interface ServletContext {
      *
      * @deprecated As of Java Servlet API 2.0, with no replacement.
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public Enumeration<Servlet> getServlets();
 
     /**
@@ -339,8 +337,7 @@ public interface ServletContext {
      *
      * @deprecated As of Java Servlet API 2.1, with no replacement.
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public Enumeration<String> getServletNames();
 
     /**
@@ -365,8 +362,7 @@ public interface ServletContext {
      *             stack trace and an explanatory error message to the servlet
      *             log file.
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public void log(Exception exception, String msg);
 
     /**

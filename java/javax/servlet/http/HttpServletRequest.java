@@ -427,8 +427,7 @@ public interface HttpServletRequest extends ServletRequest {
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *             {@link #isRequestedSessionIdFromURL} instead.
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl();
 
     /**
