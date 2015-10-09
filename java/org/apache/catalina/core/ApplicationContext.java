@@ -381,25 +381,12 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Return the real path for a given virtual path, if possible; otherwise
-     * return <code>null</code>.
-     *
-     * @param path The path to the desired resource
-     */
     @Override
     public String getRealPath(String path) {
         return context.getRealPath(path);
     }
 
 
-    /**
-     * Return a <code>RequestDispatcher</code> instance that acts as a
-     * wrapper for the resource at the given path.  The path must begin
-     * with a "/" and is interpreted as relative to the current context root.
-     *
-     * @param path The path to the desired resource.
-     */
     @Override
     public RequestDispatcher getRequestDispatcher(String path) {
 
@@ -484,17 +471,6 @@ public class ApplicationContext
     }
 
 
-
-    /**
-     * Return the URL to the resource that is mapped to a specified path.
-     * The path must begin with a "/" and is interpreted as relative to the
-     * current context root.
-     *
-     * @param path The path to the desired resource
-     *
-     * @exception MalformedURLException if the path is not given
-     *  in the correct form
-     */
     @Override
     public URL getResource(String path) throws MalformedURLException {
 
@@ -514,14 +490,6 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Return the requested resource as an <code>InputStream</code>.  The
-     * path must be specified according to the rules described under
-     * <code>getResource</code>.  If no such resource can be identified,
-     * return <code>null</code>.
-     *
-     * @param path The path to the desired resource.
-     */
     @Override
     public InputStream getResourceAsStream(String path) {
 
@@ -561,14 +529,6 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Return a Set containing the resource paths of resources member of the
-     * specified collection. Each path will be a String starting with
-     * a "/" character. Paths representing directories will end with a "/"
-     * character.
-     *
-     * @param path Collection path
-     */
     @Override
     public Set<String> getResourcePaths(String path) {
 
@@ -590,43 +550,25 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Return the name and version of the servlet container.
-     */
     @Override
     public String getServerInfo() {
-
-        return (ServerInfo.getServerInfo());
-
+        return ServerInfo.getServerInfo();
     }
 
 
-    /**
-     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
-     */
     @Override
     @Deprecated
     public Servlet getServlet(String name) {
-
-        return (null);
-
+        return null;
     }
 
 
-    /**
-     * Return the display name of this web application.
-     */
     @Override
     public String getServletContextName() {
-
-        return (context.getDisplayName());
-
+        return context.getDisplayName();
     }
 
 
-    /**
-     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
-     */
     @Override
     @Deprecated
     public Enumeration<String> getServletNames() {
@@ -634,9 +576,6 @@ public class ApplicationContext
     }
 
 
-    /**
-     * @deprecated As of Java Servlet API 2.1, with no direct replacement.
-     */
     @Override
     @Deprecated
     public Enumeration<Servlet> getServlets() {
@@ -644,56 +583,25 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Writes the specified message to a servlet log file.
-     *
-     * @param message Message to be written
-     */
     @Override
     public void log(String message) {
-
         context.getLogger().info(message);
-
     }
 
 
-    /**
-     * Writes the specified exception and message to a servlet log file.
-     *
-     * @param exception Exception to be reported
-     * @param message Message to be written
-     *
-     * @deprecated As of Java Servlet API 2.1, use
-     *  <code>log(String, Throwable)</code> instead
-     */
     @Override
     @Deprecated
     public void log(Exception exception, String message) {
-
         context.getLogger().error(message, exception);
-
     }
 
 
-    /**
-     * Writes the specified message and exception to a servlet log file.
-     *
-     * @param message Message to be written
-     * @param throwable Exception to be reported
-     */
     @Override
     public void log(String message, Throwable throwable) {
-
         context.getLogger().error(message, throwable);
-
     }
 
 
-    /**
-     * Remove the context attribute with the specified name, if any.
-     *
-     * @param name Name of the context attribute to be removed
-     */
     @Override
     public void removeAttribute(String name) {
 
@@ -735,20 +643,11 @@ public class ApplicationContext
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
         }
-
     }
 
 
-    /**
-     * Bind the specified value with the specified context attribute name,
-     * replacing any existing value for that name.
-     *
-     * @param name Attribute name to be bound
-     * @param value New attribute value to be bound
-     */
     @Override
     public void setAttribute(String name, Object value) {
-
         // Name cannot be null
         if (name == null)
             throw new IllegalArgumentException
@@ -813,7 +712,6 @@ public class ApplicationContext
                 log(sm.getString("applicationContext.attributeEvent"), t);
             }
         }
-
     }
 
 
