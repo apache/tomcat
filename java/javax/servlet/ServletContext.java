@@ -430,6 +430,8 @@ public interface ServletContext {
      *            whose value is requested
      * @return a <code>String</code> containing the value of the initialization
      *         parameter
+     * @throws NullPointerException If the provided parameter name is
+     *         <code>null</code>
      * @see ServletConfig#getInitParameter
      */
     public String getInitParameter(String name);
@@ -462,6 +464,8 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
+     * @throws NullPointerException If the provided parameter name is
+     *         <code>null</code>
      * @since Servlet 3.0
      */
     public boolean setInitParameter(String name, String value);
@@ -483,6 +487,8 @@ public interface ServletContext {
      *            a <code>String</code> specifying the name of the attribute
      * @return an <code>Object</code> containing the value of the attribute, or
      *         <code>null</code> if no attribute exists matching the given name
+     * @throws NullPointerException If the provided attribute name is
+     *         <code>null</code>
      * @see ServletContext#getAttributeNames
      */
     public Object getAttribute(String name);
@@ -516,6 +522,8 @@ public interface ServletContext {
      *            a <code>String</code> specifying the name of the attribute
      * @param object
      *            an <code>Object</code> representing the attribute to be bound
+     * @throws NullPointerException If the provided attribute name is
+     *         <code>null</code>
      */
     public void setAttribute(String name, Object object);
 
