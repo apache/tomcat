@@ -42,8 +42,8 @@ public interface ServletRegistration extends Registration {
     public static interface Dynamic
     extends ServletRegistration, Registration.Dynamic {
         public void setLoadOnStartup(int loadOnStartup);
+        public Set<String> setServletSecurity(ServletSecurityElement constraint);
         public void setMultipartConfig(MultipartConfigElement multipartConfig);
         public void setRunAsRole(String roleName);
-        public Set<String> setServletSecurity(ServletSecurityElement constraint);
     }
 }

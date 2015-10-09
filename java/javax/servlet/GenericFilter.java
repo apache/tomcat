@@ -16,6 +16,7 @@
  */
 package javax.servlet;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Enumeration;
 
@@ -26,15 +27,14 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
     private volatile FilterConfig filterConfig;
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * Default NO-OP implementation.
+     */
     @Override
-    public String getFilterName() {
-        return getFilterConfig().getFilterName();
-    }
-
-
-    @Override
-    public ServletContext getServletContext() {
-        return getFilterConfig().getServletContext();
+    public void destroy() {
+        // NO-OP
     }
 
 
@@ -50,13 +50,6 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
     }
 
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        this.filterConfig  = filterConfig;
-        init();
-    }
-
-
     /**
      * Obtain the FilterConfig used to initialise this Filter instance.
      *
@@ -65,6 +58,19 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
      */
     public FilterConfig getFilterConfig() {
         return filterConfig;
+    }
+
+
+    @Override
+    public ServletContext getServletContext() {
+        return getFilterConfig().getServletContext();
+    }
+
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        this.filterConfig  = filterConfig;
+        init();
     }
 
 
@@ -80,13 +86,13 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
     }
 
 
-    /**
-     * {@inheritDoc}
-     *
-     * Default NO-OP implementation.
-     */
     @Override
-    public void destroy() {
-        // NO-OP
+    public abstract void doFilter(ServletRequest request, ServletResponse response,
+            FilterChain chain) throws IOException, ServletException;
+
+
+    @Override
+    public String getFilterName() {
+        return getFilterConfig().getFilterName();
     }
 }
