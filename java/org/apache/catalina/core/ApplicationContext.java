@@ -209,22 +209,12 @@ public class ApplicationContext
 
     // ------------------------------------------------- ServletContext Methods
 
-    /**
-     * Return the value of the specified context attribute, if any;
-     * otherwise return <code>null</code>.
-     *
-     * @param name Name of the context attribute to return
-     */
     @Override
     public Object getAttribute(String name) {
         return (attributes.get(name));
     }
 
 
-    /**
-     * Return an enumeration of the names of the context attributes
-     * associated with this context.
-     */
     @Override
     public Enumeration<String> getAttributeNames() {
         Set<String> names = new HashSet<>();
@@ -233,16 +223,6 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Return a <code>ServletContext</code> object that corresponds to a
-     * specified URI on the server.  This method allows servlets to gain
-     * access to the context for various parts of the server, and as needed
-     * obtain <code>RequestDispatcher</code> objects or resources from the
-     * context.  The given path must be absolute (beginning with a "/"),
-     * and is interpreted based on our virtual host's document root.
-     *
-     * @param uri Absolute URI of a resource on the server
-     */
     @Override
     public ServletContext getContext(String uri) {
 
@@ -304,21 +284,12 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Return the main path associated with this context.
-     */
     @Override
     public String getContextPath() {
         return context.getPath();
     }
 
 
-    /**
-     * Return the value of the specified initialization parameter, or
-     * <code>null</code> if this parameter does not exist.
-     *
-     * @param name Name of the initialization parameter to retrieve
-     */
     @Override
     public String getInitParameter(final String name) {
         // Special handling for XML settings as the context setting must
@@ -337,10 +308,6 @@ public class ApplicationContext
     }
 
 
-    /**
-     * Return the names of the context's initialization parameters, or an
-     * empty enumeration if the context has no initialization parameters.
-     */
     @Override
     public Enumeration<String> getInitParameterNames() {
         Set<String> names = new HashSet<>();

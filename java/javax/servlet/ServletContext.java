@@ -58,6 +58,11 @@ public interface ServletContext {
      */
     public static final String ORDERED_LIBS = "javax.servlet.context.orderedLibs";
 
+    /**
+     * Return the main path associated with this context.
+     *
+     * @since Servlet 2.5
+     */
     public String getContextPath();
 
     /**
