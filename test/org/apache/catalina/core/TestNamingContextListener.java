@@ -71,11 +71,6 @@ public class TestNamingContextListener extends TomcatBaseTest {
     public static final class Bug49132Listener implements ServletContextListener {
 
         @Override
-        public void contextDestroyed(ServletContextEvent sce) {
-            // NOOP
-        }
-
-        @Override
         public void contextInitialized(ServletContextEvent sce) {
             javax.naming.Context initCtx;
             try {
@@ -149,11 +144,6 @@ public class TestNamingContextListener extends TomcatBaseTest {
 
     public static final class Bug54096Listener implements
             ServletContextListener {
-
-        @Override
-        public void contextDestroyed(ServletContextEvent sce) {
-            // NOOP
-        }
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {
