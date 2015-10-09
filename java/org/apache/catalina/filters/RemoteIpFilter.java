@@ -42,9 +42,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
+import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -620,6 +622,11 @@ public class RemoteIpFilter extends GenericFilter {
 
         public void setServerPort(int serverPort) {
             this.serverPort = serverPort;
+        }
+
+        @Override
+        public PushBuilder getPushBuilder() {
+            return new ApplicationPushBuilder(this);
         }
     }
 

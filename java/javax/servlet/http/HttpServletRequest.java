@@ -215,6 +215,21 @@ public interface HttpServletRequest extends ServletRequest {
     public String getPathTranslated();
 
     /**
+     * Obtain a builder for generating push requests. {@link PushBuilder}
+     * documents how this request will be used as the basis for a push request.
+     * Each call to this method will return a new instance, independent of any
+     * previous instance obtained.
+     *
+     * @return A builder than can be used to generate push requests based on
+     *         this request.
+     *
+     * @since Servlet 4.0
+     */
+    public default PushBuilder getPushBuilder() {
+        return null;
+    }
+
+    /**
      * Returns the portion of the request URI that indicates the context of the
      * request. The context path always comes first in a request URI. The path
      * starts with a "/" character but does not end with a "/" character. For
