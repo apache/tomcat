@@ -78,4 +78,15 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
     public void init() throws ServletException {
         // NO-OP
     }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * Default NO-OP implementation.
+     */
+    @Override
+    public void destroy() {
+        // NO-OP
+    }
 }
