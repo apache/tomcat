@@ -27,7 +27,7 @@ version.major=7
 version.minor=0
 version.build=65
 version.patch=0
-version.suffix=-dev
+version.suffix=
 
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
