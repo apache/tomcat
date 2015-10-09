@@ -30,12 +30,6 @@ public class WsSessionListener implements HttpSessionListener{
 
 
     @Override
-    public void sessionCreated(HttpSessionEvent se) {
-        // NO-OP
-    }
-
-
-    @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         wsServerContainer.closeAuthenticatedSession(se.getSession().getId());
     }
