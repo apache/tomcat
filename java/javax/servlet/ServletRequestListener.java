@@ -32,13 +32,17 @@ public interface ServletRequestListener extends EventListener {
 
     /**
      * The request is about to go out of scope of the web application.
+     * The default implementation is a NO-OP.
      * @param sre Information about the request
      */
-    public void requestDestroyed (ServletRequestEvent sre);
+    public default void requestDestroyed (ServletRequestEvent sre) {
+    }
 
     /**
      * The request is about to come into scope of the web application.
+     * The default implementation is a NO-OP.
      * @param sre Information about the request
      */
-    public void requestInitialized (ServletRequestEvent sre);
+    public default void requestInitialized (ServletRequestEvent sre) {
+    }
 }
