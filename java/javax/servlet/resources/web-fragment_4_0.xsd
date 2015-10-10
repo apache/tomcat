@@ -44,12 +44,12 @@
 
 -->
 <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
-	    targetNamespace="http://xmlns.jcp.org/xml/ns/javaee"
-	    xmlns:javaee="http://xmlns.jcp.org/xml/ns/javaee"
-	    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	    elementFormDefault="qualified"
-	    attributeFormDefault="unqualified"
-	    version="4.0">
+            targetNamespace="http://xmlns.jcp.org/xml/ns/javaee"
+            xmlns:javaee="http://xmlns.jcp.org/xml/ns/javaee"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
+            version="4.0">
 
   <xsd:annotation>
     <xsd:documentation>
@@ -61,31 +61,31 @@
     <xsd:documentation>
       <![CDATA[
 
-	This is the XML Schema for the Servlet 3.1 deployment descriptor.
-	The deployment descriptor must be named "META-INF/web-fragment.xml"
-	in the web fragment's jar file.  All Servlet deployment descriptors
-	must indicate the web application schema by using the Java EE
-	namespace:
+        This is the XML Schema for the Servlet 3.1 deployment descriptor.
+        The deployment descriptor must be named "META-INF/web-fragment.xml"
+        in the web fragment's jar file.  All Servlet deployment descriptors
+        must indicate the web application schema by using the Java EE
+        namespace:
 
-	http://xmlns.jcp.org/xml/ns/javaee 
+        http://xmlns.jcp.org/xml/ns/javaee 
 
-	and by indicating the version of the schema by 
-	using the version element as shown below: 
+        and by indicating the version of the schema by 
+        using the version element as shown below: 
 
-	    <web-fragment xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	      xsi:schemaLocation="..."
-	      version="3.1"> 
-	      ...
-	    </web-fragment>
+            <web-fragment xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="..."
+              version="3.1"> 
+              ...
+            </web-fragment>
 
-	The instance documents may indicate the published version of
-	the schema using the xsi:schemaLocation attribute for Java EE
-	namespace with the following location:
+        The instance documents may indicate the published version of
+        the schema using the xsi:schemaLocation attribute for Java EE
+        namespace with the following location:
 
-	http://xmlns.jcp.org/xml/ns/javaee/web-fragment_4_0.xsd
+        http://xmlns.jcp.org/xml/ns/javaee/web-fragment_4_0.xsd
 
-	]]>
+        ]]>
     </xsd:documentation>
   </xsd:annotation>
 
@@ -105,32 +105,32 @@
     <xsd:annotation>
       <xsd:documentation>
 
-	The web-fragment element is the root of the deployment
-	descriptor for a web fragment.  Note that the sub-elements
-	of this element can be in the arbitrary order. Because of
-	that, the multiplicity of the elements of distributable,
-	session-config, welcome-file-list, jsp-config, login-config,
-	and locale-encoding-mapping-list was changed from "?" to "*"
-	in this schema.  However, the deployment descriptor instance
-	file must not contain multiple elements of session-config,
-	jsp-config, and login-config. When there are multiple elements of
-	welcome-file-list or locale-encoding-mapping-list, the container
-	must concatenate the element contents.  The multiple occurence
-	of the element distributable is redundant and the container
-	treats that case exactly in the same way when there is only
-	one distributable. 
+        The web-fragment element is the root of the deployment
+        descriptor for a web fragment.  Note that the sub-elements
+        of this element can be in the arbitrary order. Because of
+        that, the multiplicity of the elements of distributable,
+        session-config, welcome-file-list, jsp-config, login-config,
+        and locale-encoding-mapping-list was changed from "?" to "*"
+        in this schema.  However, the deployment descriptor instance
+        file must not contain multiple elements of session-config,
+        jsp-config, and login-config. When there are multiple elements of
+        welcome-file-list or locale-encoding-mapping-list, the container
+        must concatenate the element contents.  The multiple occurence
+        of the element distributable is redundant and the container
+        treats that case exactly in the same way when there is only
+        one distributable. 
 
       </xsd:documentation>
     </xsd:annotation>
 
     <xsd:unique name="web-common-servlet-name-uniqueness">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  The servlet element contains the name of a servlet.
-	  The name must be unique within the web application.
+          The servlet element contains the name of a servlet.
+          The name must be unique within the web application.
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:servlet"/>
       <xsd:field    xpath="javaee:servlet-name"/>
@@ -138,12 +138,12 @@
 
     <xsd:unique name="web-common-filter-name-uniqueness">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  The filter element contains the name of a filter.
-	  The name must be unique within the web application.
+          The filter element contains the name of a filter.
+          The name must be unique within the web application.
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:filter"/>
       <xsd:field    xpath="javaee:filter-name"/>
@@ -151,17 +151,17 @@
 
     <xsd:unique name="web-common-ejb-local-ref-name-uniqueness">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  The ejb-local-ref-name element contains the name of an EJB
-	  reference. The EJB reference is an entry in the web
-	  application's environment and is relative to the
-	  java:comp/env context.  The name must be unique within
-	  the web application.
+          The ejb-local-ref-name element contains the name of an EJB
+          reference. The EJB reference is an entry in the web
+          application's environment and is relative to the
+          java:comp/env context.  The name must be unique within
+          the web application.
 
-	  It is recommended that name is prefixed with "ejb/".
+          It is recommended that name is prefixed with "ejb/".
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:ejb-local-ref"/>
       <xsd:field    xpath="javaee:ejb-ref-name"/>
@@ -169,17 +169,17 @@
 
     <xsd:unique name="web-common-ejb-ref-name-uniqueness">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  The ejb-ref-name element contains the name of an EJB
-	  reference. The EJB reference is an entry in the web
-	  application's environment and is relative to the
-	  java:comp/env context.  The name must be unique within
-	  the web application.
+          The ejb-ref-name element contains the name of an EJB
+          reference. The EJB reference is an entry in the web
+          application's environment and is relative to the
+          java:comp/env context.  The name must be unique within
+          the web application.
 
-	  It is recommended that name is prefixed with "ejb/".
+          It is recommended that name is prefixed with "ejb/".
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:ejb-ref"/>
       <xsd:field    xpath="javaee:ejb-ref-name"/>
@@ -187,15 +187,15 @@
 
     <xsd:unique name="web-common-resource-env-ref-uniqueness">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  The resource-env-ref-name element specifies the name of
-	  a resource environment reference; its value is the
-	  environment entry name used in the web application code.
-	  The name is a JNDI name relative to the java:comp/env
-	  context and must be unique within a web application.
+          The resource-env-ref-name element specifies the name of
+          a resource environment reference; its value is the
+          environment entry name used in the web application code.
+          The name is a JNDI name relative to the java:comp/env
+          context and must be unique within a web application.
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:resource-env-ref"/>
       <xsd:field    xpath="javaee:resource-env-ref-name"/>
@@ -203,15 +203,15 @@
 
     <xsd:unique name="web-common-message-destination-ref-uniqueness">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  The message-destination-ref-name element specifies the name of
-	  a message destination reference; its value is the
-	  environment entry name used in the web application code.
-	  The name is a JNDI name relative to the java:comp/env
-	  context and must be unique within a web application.
+          The message-destination-ref-name element specifies the name of
+          a message destination reference; its value is the
+          environment entry name used in the web application code.
+          The name is a JNDI name relative to the java:comp/env
+          context and must be unique within a web application.
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:message-destination-ref"/>
       <xsd:field    xpath="javaee:message-destination-ref-name"/>
@@ -220,14 +220,14 @@
 
     <xsd:unique name="web-common-res-ref-name-uniqueness">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  The res-ref-name element specifies the name of a
-	  resource manager connection factory reference.  The name
-	  is a JNDI name relative to the java:comp/env context.
-	  The name must be unique within a web application.
+          The res-ref-name element specifies the name of a
+          resource manager connection factory reference.  The name
+          is a JNDI name relative to the java:comp/env context.
+          The name must be unique within a web application.
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:resource-ref"/>
       <xsd:field    xpath="javaee:res-ref-name"/>
@@ -235,14 +235,14 @@
 
     <xsd:unique name="web-common-env-entry-name-uniqueness">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  The env-entry-name element contains the name of a web
-	  application's environment entry.  The name is a JNDI
-	  name relative to the java:comp/env context.  The name
-	  must be unique within a web application.
+          The env-entry-name element contains the name of a web
+          application's environment entry.  The name is a JNDI
+          name relative to the java:comp/env context.  The name
+          must be unique within a web application.
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
 
       <xsd:selector xpath="javaee:env-entry"/>
@@ -251,26 +251,26 @@
 
     <xsd:key name="web-common-role-name-key">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  A role-name-key is specified to allow the references
-	  from the security-role-refs.
+          A role-name-key is specified to allow the references
+          from the security-role-refs.
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:security-role"/>
       <xsd:field    xpath="javaee:role-name"/>
     </xsd:key>
 
     <xsd:keyref name="web-common-role-name-references"
-		refer="javaee:web-common-role-name-key">
+                refer="javaee:web-common-role-name-key">
       <xsd:annotation>
-	<xsd:documentation>
+        <xsd:documentation>
 
-	  The keyref indicates the references from
-	  security-role-ref to a specified role-name.
+          The keyref indicates the references from
+          security-role-ref to a specified role-name.
 
-	</xsd:documentation>
+        </xsd:documentation>
       </xsd:annotation>
       <xsd:selector xpath="javaee:servlet/javaee:security-role-ref"/>
       <xsd:field    xpath="javaee:role-link"/>

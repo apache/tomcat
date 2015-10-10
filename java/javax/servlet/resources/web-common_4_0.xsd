@@ -61,31 +61,31 @@
     <xsd:documentation>
       <![CDATA[
 
-	This is the common XML Schema for the Servlet 3.1 deployment descriptor.
-	This file is in turn used by web.xml and web-fragment.xml
-	web application's war file.  All Servlet deployment descriptors
-	must indicate the web common schema by using the Java EE
-	namespace:
+        This is the common XML Schema for the Servlet 3.1 deployment descriptor.
+        This file is in turn used by web.xml and web-fragment.xml
+        web application's war file.  All Servlet deployment descriptors
+        must indicate the web common schema by using the Java EE
+        namespace:
 
-	http://xmlns.jcp.org/xml/ns/javaee 
+        http://xmlns.jcp.org/xml/ns/javaee 
 
-	and by indicating the version of the schema by 
-	using the version element as shown below: 
+        and by indicating the version of the schema by 
+        using the version element as shown below: 
 
-	    <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	      xsi:schemaLocation="..."
-	      version="3.1"> 
-	      ...
-	    </web-app>
+            <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="..."
+              version="3.1"> 
+              ...
+            </web-app>
 
-	The instance documents may indicate the published version of
-	the schema using the xsi:schemaLocation attribute for Java EE
-	namespace with the following location:
+        The instance documents may indicate the published version of
+        the schema using the xsi:schemaLocation attribute for Java EE
+        namespace with the following location:
 
-	http://xmlns.jcp.org/xml/ns/javaee/web-common_4_0.xsd
+        http://xmlns.jcp.org/xml/ns/javaee/web-common_4_0.xsd
 
-	]]>
+        ]]>
     </xsd:documentation>
   </xsd:annotation>
 

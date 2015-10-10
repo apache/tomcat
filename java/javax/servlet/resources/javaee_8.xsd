@@ -277,7 +277,7 @@
       </xsd:element>
       <xsd:element name="interface-name"
                    type="javaee:fully-qualified-classType"
-		   minOccurs="0">
+                   minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
 
@@ -332,7 +332,7 @@
 
         Configuration of a Connector Connection Factory resource.
 
-      </xsd:documentation>	
+      </xsd:documentation>        
     </xsd:annotation>
     <xsd:sequence>
       <xsd:element name="description"
@@ -404,8 +404,8 @@
         </xsd:annotation>
       </xsd:element>
       <xsd:element name="transaction-support"
-		   type="javaee:transaction-supportType"
-		   minOccurs="0">
+                   type="javaee:transaction-supportType"
+                   minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
 
@@ -1083,8 +1083,8 @@
               java.lang.Long
               java.lang.Float
               java.lang.Double
-			  java.lang.Class
-			  any enumeration type (i.e. a subclass of java.lang.Enum)
+                          java.lang.Class
+                          any enumeration type (i.e. a subclass of java.lang.Enum)
 
           Examples:
 
@@ -1254,8 +1254,8 @@
     <xsd:annotation>
       <xsd:documentation>
 
-		The following transaction isolation levels are allowed
-		(see documentation for the java.sql.Connection interface):
+                The following transaction isolation levels are allowed
+                (see documentation for the java.sql.Connection interface):
                 TRANSACTION_READ_UNCOMMITTED
                 TRANSACTION_READ_COMMITTED
                 TRANSACTION_REPEATABLE_READ
@@ -3055,23 +3055,23 @@
     <xsd:annotation>
       <xsd:documentation>
 
-	The transaction-supportType specifies the level of
-	transaction support provided by the resource adapter. It is
-	used by transaction-support elements.
+        The transaction-supportType specifies the level of
+        transaction support provided by the resource adapter. It is
+        used by transaction-support elements.
 
-	The value must be one of the following:
+        The value must be one of the following:
 
-	    NoTransaction
-	    LocalTransaction
-	    XATransaction
+            NoTransaction
+            LocalTransaction
+            XATransaction
 
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:restriction base="javaee:string">
-	<xsd:enumeration value="NoTransaction"/>
-	<xsd:enumeration value="LocalTransaction"/>
-	<xsd:enumeration value="XATransaction"/>
+        <xsd:enumeration value="NoTransaction"/>
+        <xsd:enumeration value="LocalTransaction"/>
+        <xsd:enumeration value="XATransaction"/>
       </xsd:restriction>
     </xsd:simpleContent>
   </xsd:complexType>
