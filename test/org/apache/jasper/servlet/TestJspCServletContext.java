@@ -113,8 +113,15 @@ public class TestJspCServletContext {
         Assert.assertEquals(1, context.getEffectiveMinorVersion());
     }
 
-    // TODO Servlet 4.0
-    // Once a 4.0 web.xml is available
+    @Test
+    public void testWebapp_4_0() throws Exception {
+        File appDir = new File("test/webapp-4.0");
+        JspCServletContext context = new JspCServletContext(
+                null, appDir.toURI().toURL(), null, false, false);
+        Assert.assertEquals(4, context.getEffectiveMajorVersion());
+        Assert.assertEquals(0, context.getEffectiveMinorVersion());
+    }
+
 
     @Test
     public void testWebresources() throws Exception {

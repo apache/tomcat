@@ -170,7 +170,10 @@ public class TestWebXml {
         doTestValidateVersion("3.1");
     }
 
-    // TODO Servlet 4.0
+    @Test
+    public void testValidateVersion40() throws IOException, SAXException {
+        doTestValidateVersion("4.0");
+    }
 
     private void doTestValidateVersion(String version) throws IOException, SAXException {
         WebXml webxml = new WebXml();
