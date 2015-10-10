@@ -681,8 +681,8 @@ public class WebXml {
                 javaeeNamespace = XmlIdentifiers.JAVAEE_7_NS;
                 webXmlSchemaLocation = XmlIdentifiers.WEB_31_XSD;
             } else if ("4.0".equals(version)) {
-                // TODO Servlet 4.0
-                throw new UnsupportedOperationException();
+                javaeeNamespace = XmlIdentifiers.JAVAEE_8_NS;
+                webXmlSchemaLocation = XmlIdentifiers.WEB_40_XSD;
             }
             sb.append("<web-app xmlns=\"");
             sb.append(javaeeNamespace);
