@@ -44,8 +44,8 @@ public class TestWebXml {
         WebXml webxml = new WebXml();
 
         // Defaults
-        Assert.assertEquals(3, webxml.getMajorVersion());
-        Assert.assertEquals(1, webxml.getMinorVersion());
+        Assert.assertEquals(4, webxml.getMajorVersion());
+        Assert.assertEquals(0, webxml.getMinorVersion());
 
         // Both get changed
         webxml.setVersion("2.5");
