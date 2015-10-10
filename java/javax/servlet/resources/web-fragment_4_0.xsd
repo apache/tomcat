@@ -39,6 +39,9 @@
     only if the new code is made subject to such option by the copyright
     holder.
 
+    The Apache Software Foundation elects to include this software under the
+    CDDL license.
+
 -->
 <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
 	    targetNamespace="http://xmlns.jcp.org/xml/ns/javaee"
