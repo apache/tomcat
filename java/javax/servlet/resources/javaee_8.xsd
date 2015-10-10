@@ -145,21 +145,21 @@
       <xsd:element name="data-source"
                    type="javaee:data-sourceType"
                    minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="jms-connection-factory" 
-                   type="javaee:jms-connection-factoryType" 
+      <xsd:element name="jms-connection-factory"
+                   type="javaee:jms-connection-factoryType"
                    minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="jms-destination" 
-                   type="javaee:jms-destinationType" 
+      <xsd:element name="jms-destination"
+                   type="javaee:jms-destinationType"
                    minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="mail-session" 
-                   type="javaee:mail-sessionType" 
+      <xsd:element name="mail-session"
+                   type="javaee:mail-sessionType"
                    minOccurs="0" maxOccurs="unbounded"/>
-      <xsd:element name="connection-factory" 
-                   type="javaee:connection-factory-resourceType" 
-                   minOccurs="0" maxOccurs="unbounded"/> 
-      <xsd:element name="administered-object" 
-                   type="javaee:administered-objectType" 
-                   minOccurs="0" maxOccurs="unbounded"/> 
+      <xsd:element name="connection-factory"
+                   type="javaee:connection-factory-resourceType"
+                   minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="administered-object"
+                   type="javaee:administered-objectType"
+                   minOccurs="0" maxOccurs="unbounded"/>
     </xsd:sequence>
   </xsd:group>
 
@@ -313,7 +313,7 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            Property of the administered object property.  This may be a 
+            Property of the administered object property.  This may be a
             vendor-specific property.
 
           </xsd:documentation>
@@ -332,7 +332,7 @@
 
         Configuration of a Connector Connection Factory resource.
 
-      </xsd:documentation>        
+      </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
       <xsd:element name="description"
@@ -362,8 +362,8 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            The fully qualified class name of the connection factory 
-            interface. 
+            The fully qualified class name of the connection factory
+            interface.
 
 
           </xsd:documentation>
@@ -409,8 +409,8 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            The level of transaction support the connection factory 
-            needs to support. 
+            The level of transaction support the connection factory
+            needs to support.
 
           </xsd:documentation>
         </xsd:annotation>
@@ -466,7 +466,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-            
+
       <xsd:element name="class-name"
                    type="javaee:fully-qualified-classType"
                    minOccurs="0">
@@ -524,7 +524,7 @@
             such as <code>serverName</code>, <code>databaseName</code>
             and <code>portNumber</code>, the more specific properties will
             take precedence and <code>url</code> will be ignored.
-        
+
             ]]>
           </xsd:documentation>
         </xsd:annotation>
@@ -660,7 +660,7 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-       
+
     </xsd:sequence>
     <xsd:attribute name="id" type="xsd:ID"/>
   </xsd:complexType>
@@ -682,7 +682,7 @@
         contains the description.
 
         The lang attribute defines the language that the
-        description is provided in. The default value is "en" (English). 
+        description is provided in. The default value is "en" (English).
 
       </xsd:documentation>
     </xsd:annotation>
@@ -700,7 +700,7 @@
       <xsd:documentation>
 
         This type defines a dewey decimal that is used
-        to describe versions of documents. 
+        to describe versions of documents.
 
       </xsd:documentation>
     </xsd:annotation>
@@ -721,14 +721,14 @@
           to be displayed by tools. It is used by display-name
           elements.  The display name need not be unique.
 
-          Example: 
+          Example:
 
           ...
              <display-name xml:lang="en">
                Employee Self Service
              </display-name>
 
-          The value of the xml:lang attribute is "en" (English) by default. 
+          The value of the xml:lang attribute is "en" (English) by default.
 
           ]]>
       </xsd:documentation>
@@ -753,7 +753,7 @@
 
           The value of the ejb-link element must be the ejb-name of an
           enterprise bean in the same ejb-jar file or in another ejb-jar
-          file in the same Java EE application unit. 
+          file in the same Java EE application unit.
 
           Alternatively, the name in the ejb-link element may be
           composed of a path name specifying the ejb-jar containing the
@@ -790,18 +790,18 @@
         The declaration consists of:
 
             - an optional description
-            - the EJB reference name used in the code of the Deployment 
+            - the EJB reference name used in the code of the Deployment
               Component that's referencing the enterprise bean.
             - the optional expected type of the referenced enterprise bean
-            - the optional expected local interface of the referenced 
-              enterprise bean or the local business interface of the 
+            - the optional expected local interface of the referenced
+              enterprise bean or the local business interface of the
               referenced enterprise bean.
-            - the optional expected local home interface of the referenced 
+            - the optional expected local home interface of the referenced
               enterprise bean. Not applicable if this ejb-local-ref refers
               to the local business interface of a 3.0 bean.
-            - optional ejb-link information, used to specify the 
+            - optional ejb-link information, used to specify the
               referenced enterprise bean
-            - optional elements to define injection of the named enterprise  
+            - optional elements to define injection of the named enterprise
               bean into a component field or property.
 
       </xsd:documentation>
@@ -866,18 +866,18 @@
 
         The ejb-refType is used by ejb-ref elements for the
         declaration of a reference to an enterprise bean's home or
-        to the remote business interface of a 3.0 bean.  
+        to the remote business interface of a 3.0 bean.
         The declaration consists of:
 
             - an optional description
             - the EJB reference name used in the code of
               the Deployment Component that's referencing the enterprise
-              bean. 
+              bean.
             - the optional expected type of the referenced enterprise bean
             - the optional remote interface of the referenced enterprise bean
-              or the remote business interface of the referenced enterprise 
+              or the remote business interface of the referenced enterprise
               bean
-            - the optional expected home interface of the referenced 
+            - the optional expected home interface of the referenced
               enterprise bean.  Not applicable if this ejb-ref
               refers to the remote business interface of a 3.0 bean.
             - optional ejb-link information, used to specify the
@@ -945,7 +945,7 @@
       <xsd:documentation>
 
         This type is used to designate an empty
-        element when used. 
+        element when used.
 
       </xsd:documentation>
     </xsd:annotation>
@@ -974,7 +974,7 @@
         changed when no override has been specified.
 
         If a value is not specified and no injection is requested,
-        a value must be supplied during deployment. 
+        a value must be supplied during deployment.
 
         This type is used by env-entry elements.
 
@@ -995,7 +995,7 @@
               The env-entry-name element contains the name of a
               Deployment Component's environment entry.  The name
               is a JNDI name relative to the java:comp/env
-              context.  The name must be unique within a 
+              context.  The name must be unique within a
               Deployment Component. The uniqueness
               constraints must be defined within the declared
               context.
@@ -1127,7 +1127,7 @@
       <xsd:documentation>
 
         This type defines four different values which can designate
-        boolean values. This includes values yes and no which are 
+        boolean values. This includes values yes and no which are
         not designated by xsd:boolean
 
       </xsd:documentation>
@@ -1151,11 +1151,11 @@
         The icon type contains small-icon and large-icon elements
         that specify the file names for small and large GIF, JPEG,
         or PNG icon images used to represent the parent element in a
-        GUI tool. 
+        GUI tool.
 
         The xml:lang attribute defines the language that the
         icon file names are provided in. Its value is "en" (English)
-        by default. 
+        by default.
 
       </xsd:documentation>
     </xsd:annotation>
@@ -1191,7 +1191,7 @@
 
               The large-icon element contains the name of a file
               containing a large
-              (32 x 32) icon image. The file name is a relative 
+              (32 x 32) icon image. The file name is a relative
               path within the Deployment Component's Deployment
               File.
 
@@ -1278,7 +1278,7 @@
       <xsd:documentation>
 
         The java-identifierType defines a Java identifier.
-        The users of this type should further verify that 
+        The users of this type should further verify that
         the content does not contain Java reserved keywords.
 
       </xsd:documentation>
@@ -1313,7 +1313,7 @@
 
   <xsd:complexType name="jdbc-urlType">
     <xsd:annotation>
-      <xsd:documentation>          
+      <xsd:documentation>
     <![CDATA[
 
         The jdbc-urlType contains the url pattern of the mapping.
@@ -1377,7 +1377,7 @@
 
               Fully-qualified name of the JMS connection factory
               interface.  Permitted values are javax.jms.ConnectionFactory,
-              javax.jms.QueueConnectionFactory, or 
+              javax.jms.QueueConnectionFactory, or
               javax.jms.TopicConnectionFactory.  If not specified,
               javax.jms.ConnectionFactory will be used.
 
@@ -1391,7 +1391,7 @@
           <xsd:documentation>
 
               Fully-qualified name of the JMS connection factory
-              implementation class.  Ignored if a resource adapter  
+              implementation class.  Ignored if a resource adapter
               is used.
 
           </xsd:documentation>
@@ -1626,7 +1626,7 @@
         <![CDATA[
 
           The homeType defines the fully-qualified name of
-          an enterprise bean's home interface. 
+          an enterprise bean's home interface.
 
           Example:
 
@@ -2018,9 +2018,9 @@
             root of the persistence.xml file for the referenced
             persistence unit and appends the name of the persistence
             unit separated from the pathname by #. The pathname is
-            relative to the referencing application component jar file. 
+            relative to the referencing application component jar file.
             In this manner, multiple persistence units with the same
-            persistence unit name may be uniquely identified when the 
+            persistence unit name may be uniquely identified when the
             Application Assembler cannot change persistence unit names.
 
           </xsd:documentation>
@@ -2045,7 +2045,7 @@
             Used to specify properties for the container or persistence
             provider.  Vendor-specific properties may be included in
             the set of properties.  Properties that are not recognized
-            by a vendor must be ignored.  Entries that make use of the 
+            by a vendor must be ignored.  Entries that make use of the
             namespace javax.persistence and its subnamespaces must not
             be used for vendor-specific properties.  The namespace
             javax.persistence is reserved for use by the specification.
@@ -2067,11 +2067,11 @@
     <xsd:annotation>
       <xsd:documentation>
 
-        The persistence-context-synchronizationType specifies 
+        The persistence-context-synchronizationType specifies
         whether a container-managed persistence context is automatically
         synchronized with the current transaction.
 
-        The value of the persistence-context-synchronization element 
+        The value of the persistence-context-synchronization element
         must be one of the following:
             Synchronized
             Unsynchronized
@@ -2092,7 +2092,7 @@
       <xsd:documentation>
 
         The persistence-context-typeType specifies the transactional
-        nature of a persistence context reference.  
+        nature of a persistence context reference.
 
         The value of the persistence-context-type element must be
         one of the following:
@@ -2199,9 +2199,9 @@
             root of the persistence.xml file for the referenced
             persistence unit and appends the name of the persistence
             unit separated from the pathname by #. The pathname is
-            relative to the referencing application component jar file. 
+            relative to the referencing application component jar file.
             In this manner, multiple persistence units with the same
-            persistence unit name may be uniquely identified when the 
+            persistence unit name may be uniquely identified when the
             Application Assembler cannot change persistence unit names.
 
           </xsd:documentation>
@@ -2288,8 +2288,8 @@
             The resource-env-ref-name element specifies the name
             of a resource environment reference; its value is
             the environment entry name used in
-            the Deployment Component code.  The name is a JNDI 
-            name relative to the java:comp/env context and must 
+            the Deployment Component code.  The name is a JNDI
+            name relative to the java:comp/env context and must
             be unique within a Deployment Component.
 
           </xsd:documentation>
@@ -2369,8 +2369,8 @@
             The res-ref-name element specifies the name of a
             resource manager connection factory reference.
             The name is a JNDI name relative to the
-            java:comp/env context.  
-            The name must be unique within a Deployment File. 
+            java:comp/env context.
+            The name must be unique within a Deployment File.
 
           </xsd:documentation>
         </xsd:annotation>
@@ -2466,7 +2466,7 @@
       <xsd:documentation>
 
         The run-asType specifies the run-as identity to be
-        used for the execution of a component. It contains an 
+        used for the execution of a component. It contains an
         optional description, and the name of a security role.
 
       </xsd:documentation>
@@ -2565,7 +2565,7 @@
           <xsd:documentation>
 
             The value of the role-name element must be the String used
-            as the parameter to the 
+            as the parameter to the
             EJBContext.isCallerInRole(String roleName) method or the
             HttpServletRequest.isUserInRole(String role) method.
 
@@ -2801,18 +2801,18 @@
           destination. The logical destination described by this
           element is mapped to a physical destination by the Deployer.
 
-          The message destination element contains: 
+          The message destination element contains:
 
                   - an optional description
                   - an optional display-name
                   - an optional icon
                   - a message destination name which must be unique
-                    among message destination names within the same 
-                    Deployment File. 
+                    among message destination names within the same
+                    Deployment File.
                   - an optional mapped name
                   - an optional lookup name
 
-          Example: 
+          Example:
 
           <message-destination>
                   <message-destination-name>CorporateStocks
@@ -2848,7 +2848,7 @@
               should be mapped to.  Each message-destination-ref
               element that references this message destination will
               define a name in the namespace of the referencing
-              component or in one of the other predefined namespaces. 
+              component or in one of the other predefined namespaces.
               Many application servers provide a way to map these
               local names to names of resources known to the
               application server.  This mapped name is often a global
@@ -2898,7 +2898,7 @@
                   - the message destination reference name
                   - an optional message destination type
                   - an optional specification as to whether
-                    the destination is used for 
+                    the destination is used for
                     consuming or producing messages, or both.
                     if not specified, "both" is assumed.
                   - an optional link to the message destination
@@ -3003,7 +3003,7 @@
           the destination. The type is specified by the Java interface
           expected to be implemented by the destination.
 
-          Example: 
+          Example:
 
             <message-destination-type>javax.jms.Queue
             </message-destination-type>
