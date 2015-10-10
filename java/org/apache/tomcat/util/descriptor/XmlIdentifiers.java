@@ -73,6 +73,11 @@ public final class XmlIdentifiers {
     public static final String WEB_FRAGMENT_31_XSD = JAVAEE_7_NS + "/web-fragment_3_1.xsd";
     public static final String WEBSERVICES_14_XSD = JAVAEE_7_NS + "/javaee_web_services_1_4.xsd";
 
+    // from JavaEE 8
+    public static final String JAVAEE_8_NS = JAVAEE_7_NS;
+    public static final String WEB_40_XSD = JAVAEE_8_NS + "/web-app_4_0.xsd";
+    public static final String WEB_FRAGMENT_40_XSD = JAVAEE_8_NS + "/web-fragment_4_0.xsd";
+
     private XmlIdentifiers() {
     }
 }
