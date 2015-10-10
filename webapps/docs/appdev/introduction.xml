@@ -72,6 +72,7 @@ web applications with Tomcat.</p>
     and packaging JSP pages (Appendix A) is useful.  The Javadoc
     API Documentation is included in the specification, and with the
     Tomcat download.</p></li>
+<!-- TODO Servley 4.0 -->
 <li><p><a href="http://jcp.org/aboutJava/communityprocess/final/jsr340/index.html">http://jcp.org/aboutJava/communityprocess/final/jsr340/index.html</a> -
     <i>Servlet API Specification, Version 3.1</i>.  Describes the
     programming environment that must be provided by all servlet

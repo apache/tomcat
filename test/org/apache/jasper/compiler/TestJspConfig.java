@@ -33,8 +33,7 @@ public class TestJspConfig extends TomcatBaseTest {
     public void testServlet22NoEL() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir =
-            new File("test/webapp-2.2");
+        File appDir = new File("test/webapp-2.2");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -73,8 +72,7 @@ public class TestJspConfig extends TomcatBaseTest {
     public void testServlet24NoEL() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir =
-            new File("test/webapp-2.4");
+        File appDir = new File("test/webapp-2.4");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -93,8 +91,7 @@ public class TestJspConfig extends TomcatBaseTest {
     public void testServlet25NoEL() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir =
-            new File("test/webapp-2.5");
+        File appDir = new File("test/webapp-2.5");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -112,8 +109,7 @@ public class TestJspConfig extends TomcatBaseTest {
     public void testServlet30NoEL() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir =
-            new File("test/webapp-3.0");
+        File appDir = new File("test/webapp-3.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
@@ -131,8 +127,25 @@ public class TestJspConfig extends TomcatBaseTest {
     public void testServlet31NoEL() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir =
-            new File("test/webapp-3.1");
+        File appDir = new File("test/webapp-3.1");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/el-as-literal.jsp");
+
+        String result = res.toString();
+
+        assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+    }
+
+    @Test
+    public void testServlet40NoEL() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-4.0");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 

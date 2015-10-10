@@ -39,7 +39,7 @@ public class TestSchemaValidation {
         digester.push(new WebXml());
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp/WEB-INF/web.xml"));
-        Assert.assertEquals("3.1", desc.getVersion());
+        Assert.assertEquals("4.0", desc.getVersion());
         Assert.assertEquals(0, handler.getErrors().size());
         Assert.assertEquals(0, handler.getWarnings().size());
     }

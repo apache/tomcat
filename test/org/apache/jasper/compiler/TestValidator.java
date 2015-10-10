@@ -195,6 +195,31 @@ public class TestValidator extends TomcatBaseTest {
         assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
     }
 
+    @Test
+    public void testTldVersions40() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir =
+            new File("test/webapp-4.0");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/test/tld-versions.jsp");
+
+        String result = res.toString();
+
+        assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+    }
+
     public static class Echo extends TagSupport {
 
         private static final long serialVersionUID = 1L;

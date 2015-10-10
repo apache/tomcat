@@ -136,7 +136,7 @@ drivers that are required for both your application or internal Tomcat use
 <p>Out of the box, a standard Tomcat installation includes a variety
 of pre-installed shared library files, including:</p>
 <ul>
-<li>The <em>Servlet 3.1</em> and <em>JSP 2.3</em> APIs that are fundamental
+<li>The <em>Servlet 4.0</em> and <em>JSP 2.3</em> APIs that are fundamental
     to writing servlets and JavaServer Pages.<br/><br/></li>
 </ul>
 
