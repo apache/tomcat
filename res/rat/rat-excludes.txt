@@ -118,6 +118,7 @@ res/confinstall/tomcat-users_2.xml
 java/javax/servlet/resources/javaee_5.xsd
 java/javax/servlet/resources/javaee_6.xsd
 java/javax/servlet/resources/javaee_7.xsd
+java/javax/servlet/resources/javaee_8.xsd
 java/javax/servlet/resources/javaee_web_services_1_2.xsd
 java/javax/servlet/resources/javaee_web_services_1_3.xsd
 java/javax/servlet/resources/javaee_web_services_1_4.xsd
@@ -128,13 +129,17 @@ java/javax/servlet/resources/jsp_2_2.xsd
 java/javax/servlet/resources/jsp_2_3.xsd
 java/javax/servlet/resources/web-app_3_0.xsd
 java/javax/servlet/resources/web-app_3_1.xsd
+java/javax/servlet/resources/web-app_4_0.xsd
 java/javax/servlet/resources/web-common_3_0.xsd
 java/javax/servlet/resources/web-common_3_1.xsd
+java/javax/servlet/resources/web-common_4_0.xsd
 java/javax/servlet/resources/web-fragment_3_0.xsd
 java/javax/servlet/resources/web-fragment_3_1.xsd
+java/javax/servlet/resources/web-fragment_4_0.xsd
 output/classes/javax/servlet/resources/javaee_5.xsd
 output/classes/javax/servlet/resources/javaee_6.xsd
 output/classes/javax/servlet/resources/javaee_7.xsd
+output/classes/javax/servlet/resources/javaee_8.xsd
 output/classes/javax/servlet/resources/javaee_web_services_1_2.xsd
 output/classes/javax/servlet/resources/javaee_web_services_1_3.xsd
 output/classes/javax/servlet/resources/javaee_web_services_1_4.xsd
@@ -145,13 +150,17 @@ output/classes/javax/servlet/resources/jsp_2_2.xsd
 output/classes/javax/servlet/resources/jsp_2_3.xsd
 output/classes/javax/servlet/resources/web-app_3_0.xsd
 output/classes/javax/servlet/resources/web-app_3_1.xsd
+output/classes/javax/servlet/resources/web-app_4_0.xsd
 output/classes/javax/servlet/resources/web-common_3_0.xsd
 output/classes/javax/servlet/resources/web-common_3_1.xsd
+output/classes/javax/servlet/resources/web-common_4_0.xsd
 output/classes/javax/servlet/resources/web-fragment_3_0.xsd
 output/classes/javax/servlet/resources/web-fragment_3_1.xsd
+output/classes/javax/servlet/resources/web-fragment_4_0.xsd
 output/dist/src/java/javax/servlet/resources/javaee_5.xsd
 output/dist/src/java/javax/servlet/resources/javaee_6.xsd
 output/dist/src/java/javax/servlet/resources/javaee_7.xsd
+output/dist/src/java/javax/servlet/resources/javaee_8.xsd
 output/dist/src/java/javax/servlet/resources/javaee_web_services_1_2.xsd
 output/dist/src/java/javax/servlet/resources/javaee_web_services_1_3.xsd
 output/dist/src/java/javax/servlet/resources/javaee_web_services_1_4.xsd
@@ -162,10 +171,13 @@ output/dist/src/java/javax/servlet/resources/jsp_2_2.xsd
 output/dist/src/java/javax/servlet/resources/jsp_2_3.xsd
 output/dist/src/java/javax/servlet/resources/web-app_3_0.xsd
 output/dist/src/java/javax/servlet/resources/web-app_3_1.xsd
+output/dist/src/java/javax/servlet/resources/web-app_4_0.xsd
 output/dist/src/java/javax/servlet/resources/web-common_3_0.xsd
 output/dist/src/java/javax/servlet/resources/web-common_3_1.xsd
+output/dist/src/java/javax/servlet/resources/web-common_4_0.xsd
 output/dist/src/java/javax/servlet/resources/web-fragment_3_0.xsd
 output/dist/src/java/javax/servlet/resources/web-fragment_3_1.xsd
+output/dist/src/java/javax/servlet/resources/web-fragment_4_0.xsd
 
 output/dist/src/res/checkstyle/header-al2.txt
 res/checkstyle/header-al2.txt

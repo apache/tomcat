@@ -38,6 +38,7 @@
         javaee_5.xsd,
         javaee_6.xsd,
         javaee_7.xsd,
+        javaee_8.xsd,
         javaee_web_services_1_2.xsd,
         javaee_web_services_client_1_2.xsd,
         javaee_web_services_1_3.xsd,
@@ -50,8 +51,11 @@
         web-common_3_0.xsd,
         web-fragment_3_0.xsd,
         web-app_3_1.xsd,
-        web-common_3_1.xsd and
-        web-fragment_3_1.xsd
+        web-common_3_1.xsd,
+        web-fragment_3_1.xsd,
+        web-app_4_0.xsd,
+        web-common_4_0.xsd and
+        web-fragment_4_0.xsd
         to which the CDDL version 1.0 applies.
       </comments>
     </license>
