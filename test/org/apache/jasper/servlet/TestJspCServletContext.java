@@ -113,12 +113,15 @@ public class TestJspCServletContext {
         Assert.assertEquals(1, context.getEffectiveMinorVersion());
     }
 
+    // TODO Servlet 4.0
+    // Once a 4.0 web.xml is available
+
     @Test
     public void testWebresources() throws Exception {
         File appDir = new File("test/webresources/dir1");
         JspCServletContext context = new JspCServletContext(
                 null, appDir.toURI().toURL(), null, false, false);
-        Assert.assertEquals(3, context.getEffectiveMajorVersion());
-        Assert.assertEquals(1, context.getEffectiveMinorVersion());
+        Assert.assertEquals(4, context.getEffectiveMajorVersion());
+        Assert.assertEquals(0, context.getEffectiveMinorVersion());
     }
 }
