@@ -61,7 +61,7 @@
     <xsd:documentation>
       <![CDATA[
 
-        This is the XML Schema for the Servlet 3.1 deployment descriptor.
+        This is the XML Schema for the Servlet 4.0 deployment descriptor.
         The deployment descriptor must be named "WEB-INF/web.xml" in the
         web application's war file.  All Servlet deployment descriptors
         must indicate the web application schema by using the Java EE
@@ -75,7 +75,7 @@
             <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="..."
-              version="3.1">
+              version="4.0">
               ...
             </web-app>
 
