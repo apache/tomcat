@@ -61,6 +61,8 @@ public interface ServletContext {
     /**
      * Return the main path associated with this context.
      *
+     * @return The main context path
+     *
      * @since Servlet 2.5
      */
     public String getContextPath();
