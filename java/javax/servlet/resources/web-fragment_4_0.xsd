@@ -67,15 +67,15 @@
         must indicate the web application schema by using the Java EE
         namespace:
 
-        http://xmlns.jcp.org/xml/ns/javaee 
+        http://xmlns.jcp.org/xml/ns/javaee
 
-        and by indicating the version of the schema by 
-        using the version element as shown below: 
+        and by indicating the version of the schema by
+        using the version element as shown below:
 
             <web-fragment xmlns="http://xmlns.jcp.org/xml/ns/javaee"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="..."
-              version="3.1"> 
+              version="3.1">
               ...
             </web-fragment>
 
@@ -118,7 +118,7 @@
         must concatenate the element contents.  The multiple occurence
         of the element distributable is redundant and the container
         treats that case exactly in the same way when there is only
-        one distributable. 
+        one distributable.
 
       </xsd:documentation>
     </xsd:annotation>
@@ -278,7 +278,7 @@
   </xsd:element>
 
 <!-- **************************************************** -->
-   
+
   <xsd:complexType name="web-fragmentType">
     <xsd:choice minOccurs="0"
                 maxOccurs="unbounded">

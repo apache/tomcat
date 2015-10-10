@@ -67,15 +67,15 @@
         must indicate the web common schema by using the Java EE
         namespace:
 
-        http://xmlns.jcp.org/xml/ns/javaee 
+        http://xmlns.jcp.org/xml/ns/javaee
 
-        and by indicating the version of the schema by 
-        using the version element as shown below: 
+        and by indicating the version of the schema by
+        using the version element as shown below:
 
             <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="..."
-              version="3.1"> 
+              version="3.1">
               ...
             </web-app>
 
@@ -330,7 +330,7 @@
 
         If an error-page element in the deployment descriptor does not
         contain an exception-type or an error-code element, the error
-        page is a default error page. 
+        page is a default error page.
 
         Used in: web-app
 
@@ -436,7 +436,7 @@
       <xsd:documentation>
 
         Declaration of the filter mappings in this web
-        application is done by using filter-mappingType. 
+        application is done by using filter-mappingType.
         The container uses the filter-mapping
         declarations to decide which filters to apply to a request,
         and in what order. The container matches the request URI to
@@ -548,7 +548,7 @@
 
             The form-error-page element defines the location in
             the web app where the error page that is displayed
-            when login is not successful can be found. 
+            when login is not successful can be found.
             The path begins with a leading / and is interpreted
             relative to the root of the WAR.
 
@@ -576,7 +576,7 @@
     <xsd:restriction base="xsd:token">
       <xsd:pattern value="[&#33;-&#126;-[\(\)&#60;&#62;@,;:&#34;/\[\]?=\{\}\\\p{Z}]]+"/>
     </xsd:restriction>
-     
+
   </xsd:simpleType>
 
 <!-- **************************************************** -->
@@ -822,7 +822,7 @@
       <xsd:documentation>
 
         The servlet-mappingType defines a mapping between a
-        servlet and a url pattern. 
+        servlet and a url pattern.
 
         Used in: web-app
 
@@ -992,7 +992,7 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            Specifies whether any session tracking cookies created 
+            Specifies whether any session tracking cookies created
             by this web application will be marked as HttpOnly
 
           </xsd:documentation>
@@ -1004,7 +1004,7 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            Specifies whether any session tracking cookies created 
+            Specifies whether any session tracking cookies created
             by this web application will be marked as secure.
             When true, all session tracking cookies must be marked
             as secure independent of the nature of the request that
@@ -1024,7 +1024,7 @@
             The lifetime (in seconds) that will be assigned to any
             session tracking cookies created by this web application.
             Default is -1
- 
+
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
@@ -1243,7 +1243,7 @@
         elements, the security constraint applies to all methods
         except those identified in the collection.
         http-method-omission and http-method elements are never
-        mixed in the same collection. 
+        mixed in the same collection.
 
         Used in: security-constraint
 
