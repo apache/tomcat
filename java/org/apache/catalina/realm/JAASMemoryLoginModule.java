@@ -347,7 +347,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
                 file = new File(catalinaBase, pathname);
             }
         }
-        if (!file.exists() || !file.canRead()) {
+        if (!file.canRead()) {
             log.warn("Cannot load configuration file " + file.getAbsolutePath());
             return;
         }

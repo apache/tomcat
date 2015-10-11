@@ -40,7 +40,7 @@ public class LocalResolver implements EntityResolver2 {
     private static final String[] JAVA_EE_NAMESPACES = {
         XmlIdentifiers.JAVAEE_1_4_NS,
         XmlIdentifiers.JAVAEE_5_NS,
-        XmlIdentifiers.JAVAEE_7_NS };
+        XmlIdentifiers.JAVAEE_7_NS};
 
 
     private final Map<String,String> publicIds;

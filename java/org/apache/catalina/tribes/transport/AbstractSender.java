@@ -24,7 +24,7 @@ import org.apache.catalina.tribes.Member;
 
 public abstract class AbstractSender implements DataSender {
 
-    private boolean connected = false;
+    private volatile boolean connected = false;
     private int rxBufSize = 25188;
     private int txBufSize = 43800;
     private int udpRxBufSize = 25188;

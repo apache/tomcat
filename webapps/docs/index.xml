@@ -35,7 +35,7 @@
 
 <p>This is the top-level entry point of the documentation bundle for the
 <strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version
-<version-major-minor/> implements the Servlet 3.1 and JavaServer Pages 2.3
+<version-major-minor/> implements the Servlet 4.0 and JavaServer Pages 2.3
 <a href="http://wiki.apache.org/tomcat/Specifications">specifications</a> from the
 <a href="http://www.jcp.org">Java Community Process</a>, and includes many
 additional features that make it a useful platform for developing and deploying
@@ -166,6 +166,7 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     <strong>Specification</strong></a> and
     <a href="http://docs.oracle.com/javaee/7/api/javax/servlet/package-summary.html">
     <strong>Javadoc</strong></a>
+    <p>TODO Servlet 4.0</p>
     </li>
 <li>JSP 2.3
     <a href="http://jcp.org/aboutJava/communityprocess/mrel/jsr245/index2.html">

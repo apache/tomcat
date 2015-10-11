@@ -17,13 +17,16 @@
 package org.apache.coyote;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.concurrent.Executor;
 
-import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.RequestDispatcher;
 
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -42,24 +45,13 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     protected final Request request;
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
+    protected volatile SSLSupport sslSupport;
     private String clientCertProvider = null;
 
     /**
      * Error state for the request/response currently being processed.
      */
     private ErrorState errorState = ErrorState.NONE;
-
-
-    /**
-     * Intended for use by the Upgrade sub-classes that have no need to
-     * initialise the request, response, etc.
-     */
-    protected AbstractProcessor() {
-        asyncStateMachine = null;
-        endpoint = null;
-        request = null;
-        response = null;
-    }
 
 
     /**
@@ -78,7 +70,8 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     }
 
 
-    private AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest, Response coyoteResponse) {
+    private AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest,
+            Response coyoteResponse) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine(this);
         request = coyoteRequest;
@@ -117,13 +110,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
 
     protected ErrorState getErrorState() {
         return errorState;
-    }
-
-    /**
-     * The endpoint receiving connections that are handled by this processor.
-     */
-    protected AbstractEndpoint<?> getEndpoint() {
-        return endpoint;
     }
 
 
@@ -184,6 +170,15 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
 
 
     /**
+     * Set the SSL information for this HTTP connection.
+     */
+    @Override
+    public final void setSslSupport(SSLSupport sslSupport) {
+        this.sslSupport = sslSupport;
+    }
+
+
+    /**
      * Obtain the Executor used by the underlying endpoint.
      */
     @Override
@@ -194,7 +189,7 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
 
     @Override
     public boolean isAsync() {
-        return (asyncStateMachine != null && asyncStateMachine.isAsync());
+        return asyncStateMachine.isAsync();
     }
 
 
@@ -208,15 +203,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
         getAdapter().errorDispatch(request, response);
     }
 
-    @Override
-    public abstract boolean isUpgrade();
-
-    /**
-     * Process HTTP requests. All requests are treated as HTTP requests to start
-     * with although they may change type during processing.
-     */
-    @Override
-    public abstract SocketState process(SocketWrapperBase<?> socket) throws IOException;
 
     /**
      * Process an in-progress request that is not longer in standard HTTP mode.
@@ -225,11 +211,81 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
      * HTTP requests.
      */
     @Override
-    public abstract SocketState dispatch(SocketStatus status);
+    public final SocketState dispatch(SocketStatus status) {
+
+        if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
+            asyncStateMachine.asyncOperation();
+            try {
+                if (flushBufferedWrite()) {
+                    return SocketState.LONG;
+                }
+            } catch (IOException ioe) {
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug("Unable to write async data.", ioe);
+                }
+                status = SocketStatus.ASYNC_WRITE_ERROR;
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
+            }
+        } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
+            dispatchNonBlockingRead();
+        }
+
+        RequestInfo rp = request.getRequestProcessor();
+        try {
+            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+            if (!getAdapter().asyncDispatch(request, response, status)) {
+                setErrorState(ErrorState.CLOSE_NOW, null);
+            }
+        } catch (InterruptedIOException e) {
+            setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            setErrorState(ErrorState.CLOSE_NOW, t);
+            getLog().error(sm.getString("http11processor.request.process"), t);
+        }
+
+        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
+        if (getErrorState().isError()) {
+            request.updateCounters();
+            return SocketState.CLOSED;
+        } else if (isAsync()) {
+            return SocketState.LONG;
+        } else {
+            request.updateCounters();
+            return dispatchEndRequest();
+        }
+    }
 
 
-    @Override
-    public abstract HttpUpgradeHandler getHttpUpgradeHandler();
+    /**
+     * Perform any necessary processing for a non-blocking read before
+     * dispatching to the adapter.
+     */
+    protected void dispatchNonBlockingRead() {
+        asyncStateMachine.asyncOperation();
+    }
+
+    /**
+     * Flush any pending writes. Used during non-blocking writes to flush any
+     * remaining data from a previous incomplete write.
+     *
+     * @return <code>true</code> if data remains to be flushed at the end of
+     *         method
+     *
+     * @throws IOException If an I/O error occurs while attempting to flush the
+     *         data
+     */
+    protected abstract boolean flushBufferedWrite() throws IOException ;
+
+    /**
+     * Perform any necessary clean-up processing if the dispatch resulted in the
+     * completion of processing for the current request.
+     *
+     * @return The state to return for the socket once the clean-up for the
+     *         current request has completed
+     */
+    protected abstract SocketState dispatchEndRequest();
 
     protected abstract Log getLog();
 }

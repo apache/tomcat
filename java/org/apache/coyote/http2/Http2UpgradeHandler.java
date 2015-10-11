@@ -64,10 +64,8 @@ import org.apache.tomcat.util.res.StringManager;
  * <br>
  * Note:
  * <ul>
- * <li>Unless Tomcat is configured with an ECC certificate, FireFox (tested with
- *     v37.0.2) needs to be configured with
- *     network.http.spdy.enforce-tls-profile=false in order for FireFox to be
- *     able to connect.</li>
+ * <li>Tomcat needs to be configured with honorCipherOrder="false" otherwise
+ *     Tomcat will prefer a cipher suite that is blacklisted by HTTP/2.</li>
  * <li>You will need to nest an &lt;UpgradeProtocol
  *     className="org.apache.coyote.http2.Http2Protocol" /&gt; element inside
  *     a TLS enabled Connector element in server.xml to enable HTTP/2 support.
@@ -271,7 +269,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             switch(status) {
             case OPEN_READ:
                 try {
-
+                    // There is data to read so use the read timeout while
+                    // reading frames.
+                   socketWrapper.setReadTimeout(getReadTimeout());
                     while (true) {
                         try {
                             if (!parser.readFrame(false)) {
@@ -283,8 +283,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                             closeStream(se);
                         }
                     }
+                    // No more frames to read so switch to the keep-alive
+                    // timeout.
+                    socketWrapper.setReadTimeout(getKeepAliveTimeout());
                 } catch (Http2Exception ce) {
-                    // Really ConnectionError
+                    // Really ConnectionException
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("upgradeHandler.connectionError"), ce);
                     }
@@ -399,7 +402,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void closeStream(StreamException se) throws ConnectionException, IOException {
+    void closeStream(StreamException se) throws ConnectionException, IOException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
@@ -430,7 +433,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void closeConnection(Http2Exception ce) {
+    void closeConnection(Http2Exception ce) {
         // Write a GOAWAY frame.
         byte[] fixedPayload = new byte[8];
         ByteUtil.set31Bits(fixedPayload, 0, maxProcessedStreamId);
@@ -455,7 +458,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    void writeHeaders(Stream stream, Response coyoteResponse) throws IOException {
+    void writeHeaders(Stream stream, Response coyoteResponse, int payloadSize)
+            throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
                     stream.getIdentifier()));
@@ -465,10 +469,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         headers.addValue(":status").setString(Integer.toString(coyoteResponse.getStatus()));
         // This ensures the Stream processing thread has control of the socket.
         synchronized (socketWrapper) {
-            // Frame sizes are allowed to be bigger than 4k but for headers that
-            // should be plenty
             byte[] header = new byte[9];
-            ByteBuffer target = ByteBuffer.allocate(4 * 1024);
+            ByteBuffer target = ByteBuffer.allocate(payloadSize);
             boolean first = true;
             State state = null;
             while (state != State.COMPLETE) {
@@ -522,7 +524,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 if (!stream.isActive()) {
                     activeRemoteStreamCount.decrementAndGet();
                 }
-             }
+            }
             ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
             socketWrapper.write(true, header, 0, header.length);
             socketWrapper.write(true, data.array(), data.arrayOffset() + data.position(),
@@ -543,6 +545,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // Change stream Id and re-use
             ByteUtil.set31Bits(frame, 5, stream.getIdentifier().intValue());
             socketWrapper.write(true, frame, 0, frame.length);
+            socketWrapper.flush(true);
         }
     }
 
@@ -567,11 +570,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     long windowSize = getWindowSize();
                     if (windowSize < 1 || backLogSize > 0) {
                         // Has this stream been granted an allocation
-                        int[] value = backLogStreams.remove(stream);
-                        if (value != null && value[1] > 0) {
-                            allocation = value[1];
-                            decrementWindowSize(allocation);
-                        } else {
+                        int[] value = backLogStreams.get(stream);
+                        if (value == null) {
                             value = new int[] { reservation, 0 };
                             backLogStreams.put(stream, value);
                             backLogSize += reservation;
@@ -579,6 +579,23 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                             AbstractStream parent = stream.getParentStream();
                             while (parent != null && backLogStreams.putIfAbsent(parent, new int[2]) == null) {
                                 parent = parent.getParentStream();
+                            }
+                        } else {
+                            if (value[1] > 0) {
+                                allocation = value[1];
+                                decrementWindowSize(allocation);
+                                if (value[0] == 0) {
+                                    // The reservation has been fully allocated
+                                    // so this stream can be removed from the
+                                    // backlog.
+                                    backLogStreams.remove(stream);
+                                } else {
+                                    // This allocation has been used. Reset the
+                                    // allocation to zero. Leave the stream on
+                                    // the backlog as it still has more bytes to
+                                    // write.
+                                    value[1] = 0;
+                                }
                             }
                         }
                     } else if (windowSize < reservation) {
@@ -609,7 +626,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     protected synchronized void incrementWindowSize(int increment) throws Http2Exception {
         long windowSize = getWindowSize();
         if (windowSize < 1 && windowSize + increment > 0) {
-            releaseBackLog(increment);
+            releaseBackLog((int) (windowSize +increment));
         }
         super.incrementWindowSize(increment);
     }
@@ -635,11 +652,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 if (allocation > 0) {
                     backLogSize -= allocation;
                     synchronized (entry.getKey()) {
-                        entry.getKey().notifyAll();
+                        entry.getKey().doNotifyAll();
                     }
                 }
             }
         }
+    }
+
+
+
+    @Override
+    protected synchronized void doNotifyAll() {
+        this.notifyAll();
     }
 
 
@@ -652,7 +676,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         int[] value = backLogStreams.get(stream);
         if (value[0] >= allocation) {
             value[0] -= allocation;
-            value[1] = allocation;
+            value[1] += allocation;
             return 0;
         }
 
@@ -943,10 +967,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public ByteBuffer getInputByteBuffer(int streamId, int payloadSize) throws Http2Exception {
+    public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) throws Http2Exception {
         Stream stream = getStream(streamId, true);
         stream.checkState(FrameType.DATA);
         return stream.getInputByteBuffer();
+    }
+
+
+
+    @Override
+    public void endRequestBodyFrame(int streamId) throws Http2Exception {
+        Stream stream = getStream(streamId, true);
+        stream.getInputBuffer().onDataAvailable();
     }
 
 

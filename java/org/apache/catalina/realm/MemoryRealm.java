@@ -16,7 +16,8 @@
  */
 package org.apache.catalina.realm;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.file.ConfigFileLoader;
 
 
 /**
@@ -117,6 +119,11 @@ public class MemoryRealm  extends RealmBase {
         if (principal == null) {
             validated = false;
         } else {
+            if (credentials == null || principal.getPassword() == null) {
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("memoryRealm.authenticateFailure", username));
+                return (null);
+            }
             validated = getCredentialHandler().matches(credentials, principal.getPassword());
         }
 
@@ -241,31 +248,26 @@ public class MemoryRealm  extends RealmBase {
      */
     @Override
     protected void startInternal() throws LifecycleException {
-
-        // Validate the existence of our database file
-        File file = new File(pathname);
-        if (!file.isAbsolute())
-            file = new File(getContainer().getCatalinaBase(), pathname);
-        if (!file.exists() || !file.canRead())
-            throw new LifecycleException
-                (sm.getString("memoryRealm.loadExist",
-                              file.getAbsolutePath()));
-
-        // Load the contents of the database file
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("memoryRealm.loadPath",
-                             file.getAbsolutePath()));
-        Digester digester = getDigester();
-        try {
-            synchronized (digester) {
-                digester.push(this);
-                digester.parse(file);
+        String pathName = getPathname();
+        try (InputStream is = ConfigFileLoader.getInputStream(pathName)) {
+            // Load the contents of the database file
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("memoryRealm.loadPath", pathName));
             }
-        } catch (Exception e) {
-            throw new LifecycleException
-                (sm.getString("memoryRealm.readXml"), e);
-        } finally {
-            digester.reset();
+
+            Digester digester = getDigester();
+            try {
+                synchronized (digester) {
+                    digester.push(this);
+                    digester.parse(is);
+                }
+            } catch (Exception e) {
+                throw new LifecycleException(sm.getString("memoryRealm.readXml"), e);
+            } finally {
+                digester.reset();
+            }
+        } catch (IOException ioe) {
+            throw new LifecycleException(sm.getString("memoryRealm.loadExist", pathName), ioe);
         }
 
         super.startInternal();

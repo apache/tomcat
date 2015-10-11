@@ -25,6 +25,11 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -818,5 +823,43 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             }
             super.start();
         }
+    }
+
+
+    public static void recursiveCopy(final Path src, final Path dest)
+            throws IOException {
+
+        Files.walkFileTree(src, new FileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir,
+                    BasicFileAttributes attrs) throws IOException {
+                Files.copy(dir, dest.resolve(src.relativize(dir)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file,
+                    BasicFileAttributes attrs) throws IOException {
+                Path destPath = dest.resolve(src.relativize(file));
+                Files.copy(file, destPath);
+                // Make sure that HostConfig thinks all newly copied files have
+                // been modified.
+                destPath.toFile().setLastModified(
+                        System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException ioe)
+                    throws IOException {
+                throw ioe;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException ioe)
+                    throws IOException {
+                // NO-OP
+                return FileVisitResult.CONTINUE;
+            }});
     }
 }

@@ -154,6 +154,10 @@ public class WebXml {
                 majorVersion = 3;
                 minorVersion = 1;
                 break;
+            case "4.0":
+                majorVersion = 4;
+                minorVersion = 0;
+                break;
             default:
                 log.warn(sm.getString("webXml.version.unknown", version));
         }
@@ -205,9 +209,9 @@ public class WebXml {
     }
 
     // Derived major and minor version attributes
-    // Default to 3.1 until we know otherwise
-    private int majorVersion = 3;
-    private int minorVersion = 1;
+    // Default to 4.0 until we know otherwise
+    private int majorVersion = 4;
+    private int minorVersion = 0;
     public int getMajorVersion() { return majorVersion; }
     public int getMinorVersion() { return minorVersion; }
 
@@ -676,6 +680,9 @@ public class WebXml {
             } else if ("3.1".equals(version)) {
                 javaeeNamespace = XmlIdentifiers.JAVAEE_7_NS;
                 webXmlSchemaLocation = XmlIdentifiers.WEB_31_XSD;
+            } else if ("4.0".equals(version)) {
+                javaeeNamespace = XmlIdentifiers.JAVAEE_8_NS;
+                webXmlSchemaLocation = XmlIdentifiers.WEB_40_XSD;
             }
             sb.append("<web-app xmlns=\"");
             sb.append(javaeeNamespace);

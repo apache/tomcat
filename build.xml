@@ -44,7 +44,7 @@
   <property name="md5sum.binary-prefix" value=" *" />
 
   <!-- Exact spec versions (for the manifests) -->
-  <property name="servlet.revision" value="FR" />
+  <property name="servlet.revision" value="EDR-b01" />
   <property name="jsp.revision" value="FR" />
   <property name="el.revision" value="FR" />
   <property name="websocket.revision" value="FR" />
@@ -493,7 +493,7 @@
   <patternset id="files.tomcat-extras-juli-adapters">
     <include name="org/apache/juli/logging/impl/**" />
     <exclude name="org/apache/juli/logging/impl/WeakHashtable*" />
-    <exclude name="org/apache/juli/logging/impl/LogFactoryImpl" />
+    <exclude name="org/apache/juli/logging/impl/LogFactoryImpl*" />
     <!-- Javadoc and i18n exclusions -->
     <exclude name="**/package.html" />
     <exclude name="**/LocalStrings_*" />
@@ -706,7 +706,7 @@
       filesId="files.annotations-api"
       manifest="${tomcat.manifests}/annotations-api.jar.manifest" />
 
-    <!-- Servlet 3.1 Implementation JAR File -->
+    <!-- Servlet 4.0 Implementation JAR File -->
     <jarIt jarfile="${servlet-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.servlet-api"
@@ -1923,9 +1923,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/servletapi"
       version="true"
-      windowtitle="Servlet 3.1 API Documentation - Apache Tomcat ${version}"
-      doctitle="Servlet 3.1 API - Apache Tomcat ${version}"
-      header="&lt;b&gt;Servlet 3.1 - Apache Tomcat ${version}&lt;/b&gt;"
+      windowtitle="Servlet 4.0 API Documentation - Apache Tomcat ${version}"
+      doctitle="Servlet 4.0 API - Apache Tomcat ${version}"
+      header="&lt;b&gt;Servlet 4.0 - Apache Tomcat ${version}&lt;/b&gt;"
       bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation. All Rights Reserved."
       encoding="UTF-8"
       docencoding="UTF-8"
@@ -2632,7 +2632,7 @@ skip.installer property in build.properties" />
       filesId="files.annotations-api"
       manifest="${tomcat.manifests}/annotations-api.jar.manifest" />
 
-    <!-- Servlet 3.1 Implementation JAR File -->
+    <!-- Servlet 4.0 Implementation JAR File -->
     <jarIt jarfile="${servlet-api-src.jar}"
       filesDir="java"
       filesId="files.servlet-api"

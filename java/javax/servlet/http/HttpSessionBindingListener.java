@@ -34,20 +34,24 @@ public interface HttpSessionBindingListener extends EventListener {
     /**
      * Notifies the object that it is being bound to a session and identifies
      * the session.
+     * The default implementation is a NO-OP.
      *
      * @param event
      *            the event that identifies the session
      * @see #valueUnbound
      */
-    public void valueBound(HttpSessionBindingEvent event);
+    public default void valueBound(HttpSessionBindingEvent event) {
+    }
 
     /**
      * Notifies the object that it is being unbound from a session and
      * identifies the session.
+     * The default implementation is a NO-OP.
      *
      * @param event
      *            the event that identifies the session
      * @see #valueBound
      */
-    public void valueUnbound(HttpSessionBindingEvent event);
+    public default void valueUnbound(HttpSessionBindingEvent event) {
+    }
 }

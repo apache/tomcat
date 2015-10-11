@@ -147,4 +147,6 @@ abstract class AbstractStream {
     protected abstract String getConnectionId();
 
     protected abstract int getWeight();
+
+    protected abstract void doNotifyAll();
 }

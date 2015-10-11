@@ -17,11 +17,14 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -704,7 +707,24 @@ public class TestCorsFilter {
         TesterHttpServletResponse response = new TesterHttpServletResponse();
 
         CorsFilter corsFilter = new CorsFilter();
-        corsFilter.init(null);
+        corsFilter.init(new FilterConfig() {
+            @Override
+            public ServletContext getServletContext() {
+                return null;
+            }
+            @Override
+            public Enumeration<String> getInitParameterNames() {
+                return null;
+            }
+            @Override
+            public String getInitParameter(String name) {
+                return null;
+            }
+            @Override
+            public String getFilterName() {
+                return null;
+            }
+        });
         corsFilter.doFilter(request, response, filterChain);
 
         Assert.assertTrue(response.getHeader(

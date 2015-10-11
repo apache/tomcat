@@ -17,6 +17,9 @@
 
 package org.apache.catalina.util;
 
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
@@ -41,11 +44,9 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * The set of registered LifecycleListeners for event notifications.
+     * The list of registered LifecycleListeners for event notifications.
      */
-    private LifecycleListener listeners[] = new LifecycleListener[0];
-
-    private final Object listenersLock = new Object(); // Lock object for changes to listeners
+    private final List<LifecycleListener> lifecycleListeners = new CopyOnWriteArrayList<>();
 
 
     /**
@@ -59,14 +60,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     @Override
     public void addLifecycleListener(LifecycleListener listener) {
-        synchronized (listenersLock) {
-            LifecycleListener results[] = new LifecycleListener[listeners.length + 1];
-            for (int i = 0; i < listeners.length; i++) {
-                results[i] = listeners[i];
-            }
-            results[listeners.length] = listener;
-            listeners = results;
-        }
+        lifecycleListeners.add(listener);
     }
 
 
@@ -75,7 +69,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     @Override
     public LifecycleListener[] findLifecycleListeners() {
-        return listeners;
+        return lifecycleListeners.toArray(new LifecycleListener[0]);
     }
 
 
@@ -84,26 +78,7 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     @Override
     public void removeLifecycleListener(LifecycleListener listener) {
-        synchronized (listenersLock) {
-            int n = -1;
-            for (int i = 0; i < listeners.length; i++) {
-                if (listeners[i] == listener) {
-                    n = i;
-                    break;
-                }
-            }
-            if (n < 0) {
-                return;
-            }
-            LifecycleListener results[] = new LifecycleListener[listeners.length - 1];
-            int j = 0;
-            for (int i = 0; i < listeners.length; i++) {
-                if (i != n) {
-                    results[j++] = listeners[i];
-                }
-            }
-            listeners = results;
-        }
+        lifecycleListeners.remove(listener);
     }
 
 
@@ -115,9 +90,8 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     protected void fireLifecycleEvent(String type, Object data) {
         LifecycleEvent event = new LifecycleEvent(this, type, data);
-        LifecycleListener interested[] = listeners;
-        for (int i = 0; i < interested.length; i++) {
-            interested[i].lifecycleEvent(event);
+        for (LifecycleListener listener : lifecycleListeners) {
+            listener.lifecycleEvent(event);
         }
     }
 

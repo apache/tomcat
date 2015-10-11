@@ -26,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
 
     private static final String WAR_PROTOCOL = "war";
+    private static final String CLASSPTH_PROTOCOL = "classpath";
 
     // Singleton instance
     private static volatile TomcatURLStreamHandlerFactory instance = null;
@@ -150,6 +151,8 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
         // it.
         if (WAR_PROTOCOL.equals(protocol)) {
             return new WarURLStreamHandler();
+        } else if (CLASSPTH_PROTOCOL.equals(protocol)) {
+            return new ClasspathURLStreamHandler();
         }
 
         // Application handlers

@@ -21,9 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
+import javax.servlet.GenericFilter;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -48,7 +47,9 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  */
-public class RequestDumperFilter implements Filter {
+public class RequestDumperFilter extends GenericFilter {
+
+    private static final long serialVersionUID = 1L;
 
     private static final String NON_HTTP_REQ_MSG =
         "Not available. Non-http request.";
@@ -262,16 +263,6 @@ public class RequestDumperFilter implements Filter {
             ts.update();
         }
         return ts.dateString;
-    }
-
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        // NOOP
-    }
-
-    @Override
-    public void destroy() {
-        // NOOP
     }
 
     private static final class Timestamp {

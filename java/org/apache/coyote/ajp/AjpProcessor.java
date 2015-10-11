@@ -27,7 +27,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpUpgradeHandler;
 
@@ -330,34 +329,25 @@ public class AjpProcessor extends AbstractProcessor {
      */
     @Override
     public final void action(ActionCode actionCode, Object param) {
-
         switch (actionCode) {
-        case CLOSE: {
-            // End the processing of the current request, and stop any further
-            // transactions with the client
-
-            try {
-                finish();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+        // 'Normal' servlet support
+        case COMMIT: {
+            if (!response.isCommitted()) {
+                try {
+                    // Validate and write response headers
+                    prepareResponse();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                }
             }
             break;
         }
-        case COMMIT: {
-            if (response.isCommitted())
-                return;
-
-            // Validate and write response headers
+        case CLOSE: {
+            action(ActionCode.COMMIT, null);
             try {
-                prepareResponse();
+                finish();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
-            }
-
-            try {
-                flush(false);
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
             break;
         }
@@ -366,20 +356,11 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case CLIENT_FLUSH: {
-            if (!response.isCommitted()) {
-                // Validate and write response headers
-                try {
-                    prepareResponse();
-                } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
-                    return;
-                }
-            }
-
+            action(ActionCode.COMMIT, null);
             try {
-                flush(true);
+                flush();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
             break;
         }
@@ -618,77 +599,35 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    public SocketState dispatch(SocketStatus status) {
-
-        if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
-            try {
-                asyncStateMachine.asyncOperation();
-                try {
-                    if (hasDataToWrite()) {
-                        boolean blocking = (response.getWriteListener() == null);
-                        socketWrapper.flush(blocking);
-                        if (hasDataToWrite()) {
-                            // There is data to write but go via Response to
-                            // maintain a consistent view of non-blocking state
-                            response.checkRegisterForWrite();
-                            return SocketState.LONG;
-                        }
-                    }
-                } catch (IOException x) {
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("Unable to write async data.",x);
-                    }
-                    status = SocketStatus.ASYNC_WRITE_ERROR;
-                    request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
-                }
-            } catch (IllegalStateException x) {
-                socketWrapper.registerWriteInterest();
-            }
-        } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
-            try {
-                if (available()) {
-                    asyncStateMachine.asyncOperation();
-                }
-            } catch (IllegalStateException x) {
-                socketWrapper.registerReadInterest();
+    protected boolean flushBufferedWrite() throws IOException {
+        if (hasDataToWrite()) {
+            socketWrapper.flush(false);
+            if (hasDataToWrite()) {
+                // There is data to write but go via Response to
+                // maintain a consistent view of non-blocking state
+                response.checkRegisterForWrite();
+                return true;
             }
         }
+        return false;
+    }
 
-        RequestInfo rp = request.getRequestProcessor();
-        try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            if(!getAdapter().asyncDispatch(request, response, status)) {
-                setErrorState(ErrorState.CLOSE_NOW, null);
-            }
-        } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW, e);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            setErrorState(ErrorState.CLOSE_NOW, t);
-            getLog().error(sm.getString("http11processor.request.process"), t);
+
+    @Override
+    protected void dispatchNonBlockingRead() {
+        if (available()) {
+            super.dispatchNonBlockingRead();
         }
+    }
 
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (isAsync()) {
-            if (getErrorState().isError()) {
-                request.updateCounters();
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.LONG;
-            }
-        } else {
-            // Set keep alive timeout for next request if enabled
-            if (keepAliveTimeout > 0) {
-                socketWrapper.setReadTimeout(keepAliveTimeout);
-            }
-            request.updateCounters();
-            if (getErrorState().isError()) {
-                return SocketState.CLOSED;
-            } else {
-                return SocketState.OPEN;
-            }
+    @Override
+    protected SocketState dispatchEndRequest() {
+        // Set keep alive timeout for next request if enabled
+        if (keepAliveTimeout > 0) {
+            socketWrapper.setReadTimeout(keepAliveTimeout);
         }
+        return SocketState.OPEN;
     }
 
 
@@ -736,7 +675,7 @@ public class AjpProcessor extends AbstractProcessor {
                         socketWrapper.write(true, pongMessageArray, 0, pongMessageArray.length);
                         socketWrapper.flush(true);
                     } catch (IOException e) {
-                        setErrorState(ErrorState.CLOSE_NOW, e);
+                        setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                     }
                     recycle();
                     continue;
@@ -746,13 +685,13 @@ public class AjpProcessor extends AbstractProcessor {
                     if (getLog().isDebugEnabled()) {
                         getLog().debug("Unexpected message: " + type);
                     }
-                    setErrorState(ErrorState.CLOSE_NOW, null);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                     break;
                 }
                 keptAlive = true;
                 request.setStartTime(System.currentTimeMillis());
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
@@ -792,7 +731,7 @@ public class AjpProcessor extends AbstractProcessor {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     getAdapter().service(request, response);
                 } catch (InterruptedIOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     getLog().error(sm.getString("ajpprocessor.request.process"), t);
@@ -810,7 +749,10 @@ public class AjpProcessor extends AbstractProcessor {
             // Finish the response if not done yet
             if (!finished && getErrorState().isIoAllowed()) {
                 try {
+                    action(ActionCode.COMMIT, null);
                     finish();
+                } catch (IOException ioe){
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     setErrorState(ErrorState.CLOSE_NOW, t);
@@ -848,16 +790,6 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    public void setSslSupport(SSLSupport sslSupport) {
-        if (sslSupport != null) {
-            // Should never reach this code but in case we do...
-            throw new IllegalStateException(
-                    sm.getString("ajpprocessor.ssl.notsupported"));
-        }
-    }
-
-
-    @Override
     public HttpUpgradeHandler getHttpUpgradeHandler() {
         // Should never reach this code but in case we do...
         throw new IllegalStateException(
@@ -868,18 +800,15 @@ public class AjpProcessor extends AbstractProcessor {
     @Override
     public void recycle() {
         getAdapter().checkRecycled(request, response);
-
         asyncStateMachine.recycle();
-
-        // Recycle Request object
+        request.recycle();
+        response.recycle();
         first = true;
         endOfStream = false;
         waitingForBodyMessage = false;
         empty = true;
         replay = false;
         finished = false;
-        request.recycle();
-        response.recycle();
         certificates.recycle();
         swallowResponse = false;
         bytesWritten = 0;
@@ -1434,11 +1363,11 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * Callback to write data from the buffer.
      */
-    private void flush(boolean explicit) throws IOException {
+    private void flush() throws IOException {
         // Calling code should ensure that there is no data in the buffers for
         // non-blocking writes.
         // TODO Validate the assertion above
-        if (explicit && !finished) {
+        if (!finished) {
             // Send the flush message
             socketWrapper.write(true, flushMessageArray, 0, flushMessageArray.length);
             socketWrapper.flush(true);
@@ -1450,17 +1379,6 @@ public class AjpProcessor extends AbstractProcessor {
      * Finish AJP response.
      */
     private void finish() throws IOException {
-
-        if (!response.isCommitted()) {
-            // Validate and write response headers
-            try {
-                prepareResponse();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
-                return;
-            }
-        }
-
         if (finished)
             return;
 
@@ -1616,7 +1534,7 @@ public class AjpProcessor extends AbstractProcessor {
                 try {
                     prepareResponse();
                 } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 }
             }
 

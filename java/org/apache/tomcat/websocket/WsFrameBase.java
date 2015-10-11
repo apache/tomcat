@@ -78,13 +78,13 @@ public abstract class WsFrameBase {
     private final byte[] mask = new byte[4];
     private int maskIndex = 0;
     private long payloadLength = 0;
-    private long payloadWritten = 0;
+    private volatile long payloadWritten = 0;
 
     // Attributes tracking state
-    private State state = State.NEW_FRAME;
+    private volatile State state = State.NEW_FRAME;
     private volatile boolean open = true;
-    private int readPos = 0;
-    protected int writePos = 0;
+    private volatile int readPos = 0;
+    protected volatile int writePos = 0;
 
     public WsFrameBase(WsSession wsSession, Transformation transformation) {
         inputBuffer = new byte[Constants.DEFAULT_BUFFER_SIZE];

@@ -30,7 +30,7 @@ import javax.servlet.ServletInputStream;
  *                        with the default encoding and have been moved
  *                        to the request interfaces.
  */
-@SuppressWarnings("dep-ann") // Spec API does not use @Deprecated
+@Deprecated
 public class HttpUtils {
 
     private static final String LSTRING_FILE =

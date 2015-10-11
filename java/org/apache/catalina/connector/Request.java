@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.connector;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +63,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
+import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -74,6 +74,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationPart;
+import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
@@ -105,15 +106,13 @@ import org.apache.tomcat.util.res.StringManager;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 
-
 /**
  * Wrapper object for the Coyote request.
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
  */
-public class Request
-    implements HttpServletRequest {
+public class Request implements HttpServletRequest {
 
     private static final Log log = LogFactory.getLog(Request.class);
 
@@ -1834,6 +1833,16 @@ public class Request
 
 
     // --------------------------------------------- HttpServletRequest Methods
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public PushBuilder getPushBuilder() {
+        return new ApplicationPushBuilder(this);
+    }
 
     /**
      * {@inheritDoc}

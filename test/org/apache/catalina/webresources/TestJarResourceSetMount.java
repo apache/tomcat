@@ -39,7 +39,7 @@ public class TestJarResourceSetMount extends AbstractTestResourceSetMount {
     }
 
     @Override
-    public String getBaseDir() {
-        return "test/webresources";
+    public File getBaseDir() {
+        return new File("test/webresources");
     }
 }

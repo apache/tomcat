@@ -141,8 +141,7 @@ public interface HttpSession {
      *             replacement. It will be removed in a future version of the
      *             Java Servlet API.
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public HttpSessionContext getSessionContext();
 
     /**
@@ -166,8 +165,7 @@ public interface HttpSession {
      * @deprecated As of Version 2.2, this method is replaced by
      *             {@link #getAttribute}.
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public Object getValue(String name);
 
     /**
@@ -189,8 +187,7 @@ public interface HttpSession {
      * @deprecated As of Version 2.2, this method is replaced by
      *             {@link #getAttributeNames}
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public String[] getValueNames();
 
     /**
@@ -229,8 +226,7 @@ public interface HttpSession {
      * @deprecated As of Version 2.2, this method is replaced by
      *             {@link #setAttribute}
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public void putValue(String name, Object value);
 
     /**
@@ -259,8 +255,7 @@ public interface HttpSession {
      * @deprecated As of Version 2.2, this method is replaced by
      *             {@link #removeAttribute}
      */
-    @SuppressWarnings("dep-ann")
-    // Spec API does not use @Deprecated
+    @Deprecated
     public void removeValue(String name);
 
     /**

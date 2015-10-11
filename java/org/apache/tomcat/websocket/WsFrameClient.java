@@ -37,7 +37,7 @@ public class WsFrameClient extends WsFrameBase {
     private final AsyncChannelWrapper channel;
     private final CompletionHandler<Integer,Void> handler;
     // Not final as it may need to be re-sized
-    private ByteBuffer response;
+    private volatile ByteBuffer response;
 
     public WsFrameClient(ByteBuffer response, AsyncChannelWrapper channel,
             WsSession wsSession, Transformation transformation) {

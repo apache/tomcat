@@ -420,6 +420,77 @@ class Generator {
         page.visit(new ScriptingVarVisitor());
     }
 
+    /*
+     * Generates getters for
+     * - instance manager
+     * - expression factory
+     *
+     * For JSPs these methods use lazy init. This is not an option for tag files
+     * (at least it would be more complicated to generate) because the
+     * ServletConfig is not readily available.
+     */
+    private void generateGetters() {
+        out.printil("public javax.el.ExpressionFactory _jsp_getExpressionFactory() {");
+        out.pushIndent();
+        if (!ctxt.isTagFile()) {
+            out.printin("if (");
+            out.print(VAR_EXPRESSIONFACTORY);
+            out.println(" == null) {");
+            out.pushIndent();
+            out.printil("synchronized (this) {");
+            out.pushIndent();
+            out.printin("if (");
+            out.print(VAR_EXPRESSIONFACTORY);
+            out.println(" == null) {");
+            out.pushIndent();
+            out.printin(VAR_EXPRESSIONFACTORY);
+            out.println(" = _jspxFactory.getJspApplicationContext(getServletConfig().getServletContext()).getExpressionFactory();");
+            out.popIndent();
+            out.printil("}");
+            out.popIndent();
+            out.printil("}");
+            out.popIndent();
+            out.printil("}");
+        }
+        out.printin("return ");
+        out.print(VAR_EXPRESSIONFACTORY);
+        out.println(";");
+        out.popIndent();
+        out.printil("}");
+
+        out.println();
+
+        out.printil("public org.apache.tomcat.InstanceManager _jsp_getInstanceManager() {");
+        out.pushIndent();
+        if (!ctxt.isTagFile()) {
+            out.printin("if (");
+            out.print(VAR_INSTANCEMANAGER);
+            out.println(" == null) {");
+            out.pushIndent();
+            out.printil("synchronized (this) {");
+            out.pushIndent();
+            out.printin("if (");
+            out.print(VAR_INSTANCEMANAGER);
+            out.println(" == null) {");
+            out.pushIndent();
+            out.printin(VAR_INSTANCEMANAGER);
+            out.println(" = org.apache.jasper.runtime.InstanceManagerFactory.getInstanceManager(getServletConfig());");
+            out.popIndent();
+            out.printil("}");
+            out.popIndent();
+            out.printil("}");
+            out.popIndent();
+            out.printil("}");
+        }
+        out.printin("return ");
+        out.print(VAR_INSTANCEMANAGER);
+        out.println(";");
+        out.popIndent();
+        out.printil("}");
+
+        out.println();
+    }
+
     /**
      * Generates the _jspInit() method for instantiating the tag handler pools.
      * For tag file, _jspInit has to be invoked manually, and the ServletConfig
@@ -449,23 +520,14 @@ class Generator {
             }
         }
 
-        out.printin(VAR_EXPRESSIONFACTORY);
-        out.print(" = _jspxFactory.getJspApplicationContext(");
+        // Tag files can't (easily) use lazy init for these so initialise them
+        // here.
         if (ctxt.isTagFile()) {
-            out.print("config");
-        } else {
-            out.print("getServletConfig()");
+            out.printin(VAR_EXPRESSIONFACTORY);
+            out.println(" = _jspxFactory.getJspApplicationContext(config.getServletContext()).getExpressionFactory();");
+            out.printin(VAR_INSTANCEMANAGER);
+            out.println(" = org.apache.jasper.runtime.InstanceManagerFactory.getInstanceManager(config);");
         }
-        out.println(".getServletContext()).getExpressionFactory();");
-
-        out.printin(VAR_INSTANCEMANAGER);
-        out.print(" = org.apache.jasper.runtime.InstanceManagerFactory.getInstanceManager(");
-        if (ctxt.isTagFile()) {
-            out.print("config");
-        } else {
-            out.print("getServletConfig()");
-        }
-        out.println(");");
 
         out.popIndent();
         out.printil("}");
@@ -618,10 +680,10 @@ class Generator {
             }
             out.println();
         }
-        out.printin("private javax.el.ExpressionFactory ");
+        out.printin("private volatile javax.el.ExpressionFactory ");
         out.print(VAR_EXPRESSIONFACTORY);
         out.println(";");
-        out.printin("private org.apache.tomcat.InstanceManager ");
+        out.printin("private volatile org.apache.tomcat.InstanceManager ");
         out.print(VAR_INSTANCEMANAGER);
         out.println(";");
         out.println();
@@ -655,6 +717,7 @@ class Generator {
         out.println();
 
 
+        generateGetters();
         generateInit();
         generateDestroy();
     }
@@ -705,22 +768,23 @@ class Generator {
         out.printin("public void ");
         out.print(serviceMethodName);
         out.println("(final javax.servlet.http.HttpServletRequest request, final javax.servlet.http.HttpServletResponse response)");
-        out.println("        throws java.io.IOException, javax.servlet.ServletException {");
-
         out.pushIndent();
+        out.pushIndent();
+        out.printil("throws java.io.IOException, javax.servlet.ServletException {");
+        out.popIndent();
         out.println();
 
         // Method check
         if (!pageInfo.isErrorPage()) {
-            out.println("final java.lang.String _jspx_method = request.getMethod();");
-            out.print("if (!\"GET\".equals(_jspx_method) && !\"POST\".equals(_jspx_method) && !\"HEAD\".equals(_jspx_method) && ");
+            out.printil("final java.lang.String _jspx_method = request.getMethod();");
+            out.printin("if (!\"GET\".equals(_jspx_method) && !\"POST\".equals(_jspx_method) && !\"HEAD\".equals(_jspx_method) && ");
             out.println("!javax.servlet.DispatcherType.ERROR.equals(request.getDispatcherType())) {");
             out.pushIndent();
-            out.print("response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, ");
+            out.printin("response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, ");
             out.println("\"" + Localizer.getMessage("jsp.error.servlet.invalid.method") + "\");");
-            out.println("return;");
+            out.printil("return;");
             out.popIndent();
-            out.println("}");
+            out.printil("}");
             out.println();
         }
 
@@ -2425,8 +2489,7 @@ class Generator {
                 out.print(" = (");
                 out.print(tagHandlerClassName);
                 out.print(")");
-                out.print(VAR_INSTANCEMANAGER);
-                out.print(".newInstance(\"");
+                out.print("_jsp_getInstanceManager().newInstance(\"");
                 out.print(tagHandlerClassName);
                 out.println("\", this.getClass().getClassLoader());");
             } else {
@@ -2437,16 +2500,14 @@ class Generator {
                 out.print("new ");
                 out.print(tagHandlerClassName);
                 out.println("());");
-                out.printin(VAR_INSTANCEMANAGER);
-                out.print(".newInstance(");
+                out.printin("_jsp_getInstanceManager().newInstance(");
                 out.print(tagHandlerVar);
                 out.println(");");
             }
         }
 
         private void writeDestroyInstance(String tagHandlerVar) {
-            out.printin(VAR_INSTANCEMANAGER);
-            out.print(".destroyInstance(");
+            out.printin("_jsp_getInstanceManager().destroyInstance(");
             out.print(tagHandlerVar);
             out.println(");");
         }
@@ -2886,10 +2947,6 @@ class Generator {
             return "_jspx_page_context";
         }
 
-        private String getExpressionFactoryVar() {
-            return VAR_EXPRESSIONFACTORY;
-        }
-
         /*
          * Creates a tag variable name by concatenating the given prefix and
          * shortName and encoded to make the resultant string a valid Java
@@ -2998,9 +3055,7 @@ class Generator {
                         || ((tai != null) && ValueExpression.class.getName().equals(tai.getTypeName()))) {
                     sb.append("new org.apache.jasper.el.JspValueExpression(");
                     sb.append(quote(mark));
-                    sb.append(',');
-                    sb.append(getExpressionFactoryVar());
-                    sb.append(".createValueExpression(");
+                    sb.append(",_jsp_getExpressionFactory().createValueExpression(");
                     if (attr.getEL() != null) { // optimize
                         sb.append(elContext);
                         sb.append(',');
@@ -3033,9 +3088,7 @@ class Generator {
                         || ((tai != null) && MethodExpression.class.getName().equals(tai.getTypeName()))) {
                     sb.append("new org.apache.jasper.el.JspMethodExpression(");
                     sb.append(quote(mark));
-                    sb.append(',');
-                    sb.append(getExpressionFactoryVar());
-                    sb.append(".createMethodExpression(");
+                    sb.append(",_jsp_getExpressionFactory().createMethodExpression(");
                     sb.append(elContext);
                     sb.append(',');
                     sb.append(quote(attrValue));
@@ -3971,8 +4024,7 @@ class Generator {
                 out.print(quote(attrName));
                 out.print(',');
                 if (attrInfos[i].isDeferredMethod()) {
-                    out.print(VAR_EXPRESSIONFACTORY);
-                    out.print(".createValueExpression(");
+                    out.print("_jsp_getExpressionFactory().createValueExpression(");
                     out.print(toGetterMethod(attrName));
                     out.print(",javax.el.MethodExpression.class)");
                 } else {

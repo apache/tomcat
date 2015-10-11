@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpUpgradeHandler;
 
@@ -81,13 +80,13 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * Input.
      */
-    protected Http11InputBuffer inputBuffer;
+    protected final Http11InputBuffer inputBuffer;
 
 
     /**
      * Output.
      */
-    protected Http11OutputBuffer outputBuffer;
+    protected final Http11OutputBuffer outputBuffer;
 
 
     /**
@@ -108,24 +107,6 @@ public class Http11Processor extends AbstractProcessor {
      * alive or send file.
      */
     protected boolean openSocket = false;
-
-
-    /**
-     * Flag used to indicate that the socket should treat the next request
-     * processed like a keep-alive connection - i.e. one where there may not be
-     * any data to process. The initial value of this flag on entering the
-     * process method is different for connectors that use polling (NIO / APR -
-     * data is always expected) compared to those that use blocking (BIO - data
-     * is only expected if the connection isn't in the keep-alive state).
-     */
-    protected boolean keptAlive;
-
-
-    /**
-     * Flag that indicates that send file processing is in progress and that the
-     * socket should not be returned to the poller (where a poller is used).
-     */
-    protected boolean sendfileInProgress = false;
 
 
     /**
@@ -150,12 +131,6 @@ public class Http11Processor extends AbstractProcessor {
      * be closed at the end of the request).
      */
     protected boolean contentDelimitation = true;
-
-
-    /**
-     * Is there an expectation ?
-     */
-    protected boolean expectation = false;
 
 
     /**
@@ -235,12 +210,6 @@ public class Http11Processor extends AbstractProcessor {
      * Sendfile data.
      */
     protected SendfileDataBase sendfileData = null;
-
-
-    /**
-     * SSL information.
-     */
-    protected SSLSupport sslSupport;
 
 
     /**
@@ -636,15 +605,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Set the SSL information for this HTTP connection.
-     */
-    @Override
-    public void setSslSupport(SSLSupport sslSupport) {
-        this.sslSupport = sslSupport;
-    }
-
-
-    /**
      * Send an action to the connector.
      *
      * @param actionCode Type of the action
@@ -652,29 +612,26 @@ public class Http11Processor extends AbstractProcessor {
      */
     @Override
     public final void action(ActionCode actionCode, Object param) {
-
         switch (actionCode) {
-        case CLOSE: {
-            // End the processing of the current request
-            try {
-                outputBuffer.endRequest();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+        // 'Normal' servlet support
+        case COMMIT: {
+            if (!response.isCommitted()) {
+                try {
+                    // Validate and write response headers
+                    prepareResponse();
+                    outputBuffer.commit();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                }
             }
             break;
         }
-        case COMMIT: {
-            // Commit current response
-            if (response.isCommitted()) {
-                return;
-            }
-
-            // Validate and write response headers
+        case CLOSE: {
+            action(ActionCode.COMMIT, null);
             try {
-                prepareResponse();
-                outputBuffer.commit();
+                outputBuffer.endRequest();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
             break;
         }
@@ -682,23 +639,22 @@ public class Http11Processor extends AbstractProcessor {
             // Acknowledge request
             // Send a 100 status back if it makes sense (response not committed
             // yet, and client specified an expectation for 100-continue)
-            if ((response.isCommitted()) || !expectation) {
-                return;
-            }
-
-            inputBuffer.setSwallowInput(true);
-            try {
-                outputBuffer.sendAck();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+            if (!response.isCommitted() && request.hasExpectation()) {
+                inputBuffer.setSwallowInput(true);
+                try {
+                    outputBuffer.sendAck();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                }
             }
             break;
         }
         case CLIENT_FLUSH: {
+            action(ActionCode.COMMIT, null);
             try {
                 outputBuffer.flush();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 response.setErrorException(e);
             }
             break;
@@ -975,9 +931,8 @@ public class Http11Processor extends AbstractProcessor {
         // Flags
         keepAlive = true;
         openSocket = false;
-        sendfileInProgress = false;
         readComplete = true;
-        keptAlive = false;
+        boolean keptAlive = false;
 
         while (!getErrorState().isError() && keepAlive && !isAsync() &&
                 httpUpgradeHandler == null && !endpoint.isPaused()) {
@@ -1013,7 +968,7 @@ public class Http11Processor extends AbstractProcessor {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.header.parse"), e);
                 }
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
@@ -1105,7 +1060,7 @@ public class Http11Processor extends AbstractProcessor {
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
                     }
                 } catch (InterruptedIOException e) {
-                    setErrorState(ErrorState.CLOSE_NOW, e);
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 } catch (HeadersTooLargeException e) {
                     // The response should not have been committed but check it
                     // anyway to be safe
@@ -1176,7 +1131,7 @@ public class Http11Processor extends AbstractProcessor {
         } else if (isUpgrade()) {
             return SocketState.UPGRADING;
         } else {
-            if (sendfileInProgress) {
+            if (sendfileData != null) {
                 return SocketState.SENDFILE;
             } else {
                 if (openSocket) {
@@ -1230,7 +1185,8 @@ public class Http11Processor extends AbstractProcessor {
 
 
     private void checkExpectationAndResponseStatus() {
-        if (expectation && (response.getStatus() < 200 || response.getStatus() > 299)) {
+        if (request.hasExpectation() &&
+                (response.getStatus() < 200 || response.getStatus() > 299)) {
             // Client sent Expect: 100-continue but received a
             // non-2xx final response. Disable keep-alive (if enabled)
             // to ensure that the connection is closed. Some clients may
@@ -1251,7 +1207,6 @@ public class Http11Processor extends AbstractProcessor {
         http11 = true;
         http09 = false;
         contentDelimitation = false;
-        expectation = false;
         sendfileData = null;
 
         if (endpoint.isSSLEnabled()) {
@@ -1310,7 +1265,7 @@ public class Http11Processor extends AbstractProcessor {
         if (expectMB != null) {
             if (expectMB.indexOfIgnoreCase("100-continue", 0) != -1) {
                 inputBuffer.setSwallowInput(false);
-                expectation = true;
+                request.setExpectation(true);
             } else {
                 response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
                 setErrorState(ErrorState.CLOSE_CLEAN, null);
@@ -1468,7 +1423,7 @@ public class Http11Processor extends AbstractProcessor {
 
         // Sendfile support
         boolean sendingWithSendfile = false;
-        if (getEndpoint().getUseSendfile()) {
+        if (endpoint.getUseSendfile()) {
             sendingWithSendfile = prepareSendfile(outputFilters);
         }
 
@@ -1695,80 +1650,35 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    public SocketState dispatch(SocketStatus status) {
-
-        if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
-            try {
-                asyncStateMachine.asyncOperation();
-
-                if (outputBuffer.hasDataToWrite()) {
-                    if (outputBuffer.flushBuffer(false)) {
-                        // The buffer wasn't fully flushed so re-register the
-                        // socket for write. Note this does not go via the
-                        // Response since the write registration state at
-                        // that level should remain unchanged. Once the buffer
-                        // has been emptied then the code below will call
-                        // Adaptor.asyncDispatch() which will enable the
-                        // Response to respond to this event.
-                        outputBuffer.registerWriteInterest();
-                        return SocketState.LONG;
-                    }
-                }
-            } catch (IOException | IllegalStateException x) {
-                // IOE - Problem writing to socket
-                // ISE - Request/Response not in correct state for async write
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to write async data.",x);
-                }
-                status = SocketStatus.ASYNC_WRITE_ERROR;
-                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
-            }
-        } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
-            try {
-                asyncStateMachine.asyncOperation();
-            } catch (IllegalStateException x) {
-                // ISE - Request/Response not in correct state for async read
-                if (log.isDebugEnabled()) {
-                    log.debug("Unable to read async data.",x);
-                }
-                status = SocketStatus.ASYNC_READ_ERROR;
-                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, x);
+    protected boolean flushBufferedWrite() throws IOException {
+        if (outputBuffer.hasDataToWrite()) {
+            if (outputBuffer.flushBuffer(false)) {
+                // The buffer wasn't fully flushed so re-register the
+                // socket for write. Note this does not go via the
+                // Response since the write registration state at
+                // that level should remain unchanged. Once the buffer
+                // has been emptied then the code below will call
+                // Adaptor.asyncDispatch() which will enable the
+                // Response to respond to this event.
+                outputBuffer.registerWriteInterest();
+                return true;
             }
         }
+        return false;
+    }
 
-        RequestInfo rp = request.getRequestProcessor();
-        try {
-            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            if (!getAdapter().asyncDispatch(request, response, status)) {
-                setErrorState(ErrorState.CLOSE_NOW, null);
-            }
-        } catch (InterruptedIOException e) {
-            setErrorState(ErrorState.CLOSE_NOW, e);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            setErrorState(ErrorState.CLOSE_NOW, t);
-            log.error(sm.getString("http11processor.request.process"), t);
-        }
 
-        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-
-        if (getErrorState().isError()) {
-            request.updateCounters();
+    @Override
+    protected SocketState dispatchEndRequest() {
+        if (!keepAlive) {
             return SocketState.CLOSED;
-        } else if (isAsync()) {
-            return SocketState.LONG;
         } else {
-            request.updateCounters();
-            if (!keepAlive) {
-                return SocketState.CLOSED;
+            inputBuffer.nextRequest();
+            outputBuffer.nextRequest();
+            if (socketWrapper.isReadPending()) {
+                return SocketState.LONG;
             } else {
-                inputBuffer.nextRequest();
-                outputBuffer.nextRequest();
-                if (socketWrapper.isReadPending()) {
-                    return SocketState.LONG;
-                } else {
-                    return SocketState.OPEN;
-                }
+                return SocketState.OPEN;
             }
         }
     }
@@ -1816,7 +1726,7 @@ public class Http11Processor extends AbstractProcessor {
             try {
                 inputBuffer.endRequest();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 // 500 - Internal Server Error
@@ -1829,9 +1739,10 @@ public class Http11Processor extends AbstractProcessor {
         }
         if (getErrorState().isIoAllowed()) {
             try {
+                action(ActionCode.COMMIT, null);
                 outputBuffer.endRequest();
             } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_NOW, e);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 setErrorState(ErrorState.CLOSE_NOW, t);
@@ -1856,16 +1767,16 @@ public class Http11Processor extends AbstractProcessor {
             switch (socketWrapper.processSendfile(sendfileData)) {
             case DONE:
                 // If sendfile is complete, no need to break keep-alive loop
+                sendfileData = null;
                 return false;
             case PENDING:
-                sendfileInProgress = true;
                 return true;
             case ERROR:
                 // Write failed
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.sendfile.error"));
                 }
-                setErrorState(ErrorState.CLOSE_NOW, null);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                 return true;
             }
         }
@@ -1876,20 +1787,13 @@ public class Http11Processor extends AbstractProcessor {
     @Override
     public final void recycle() {
         getAdapter().checkRecycled(request, response);
-
-        if (inputBuffer != null) {
-            inputBuffer.recycle();
-        }
-        if (outputBuffer != null) {
-            outputBuffer.recycle();
-        }
-        if (asyncStateMachine != null) {
-            asyncStateMachine.recycle();
-        }
+        asyncStateMachine.recycle();
+        inputBuffer.recycle();
+        outputBuffer.recycle();
         httpUpgradeHandler = null;
-        resetErrorState();
         socketWrapper = null;
         sendfileData = null;
+        resetErrorState();
     }
 
 

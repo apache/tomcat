@@ -16,9 +16,35 @@
  */
 package org.apache.catalina.webresources;
 
-public class TestDirResourceSetReadOnly extends AbstractTestDirResourceSet {
+import java.io.File;
 
-    public TestDirResourceSetReadOnly() {
-        super(true);
+import org.apache.catalina.WebResourceRoot;
+import org.apache.catalina.WebResourceSet;
+
+public class TestDirResourceSetReadOnly extends AbstractTestResourceSet {
+
+    @Override
+    public WebResourceRoot getWebResourceRoot() {
+        TesterWebResourceRoot root = new TesterWebResourceRoot();
+        WebResourceSet webResourceSet =
+                new DirResourceSet(root, "/", getBaseDir().getAbsolutePath(), "/");
+        webResourceSet.setReadOnly(true);
+        root.setMainResources(webResourceSet);
+        return root;
+    }
+
+    @Override
+    protected boolean isWriteable() {
+        return false;
+    }
+
+    @Override
+    public File getBaseDir() {
+        return new File("test/webresources/dir1");
+    }
+
+    @Override
+    public void testNoArgConstructor() {
+        // NO-OP. Tested in TestDirResource
     }
 }

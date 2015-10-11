@@ -33,17 +33,19 @@ public class TestSecretKeyCredentialHandler {
         for (String digest : ALGORITHMS) {
             for (int saltLength = 1; saltLength < 20; saltLength++) {
                 for (int iterations = 1; iterations < 10000; iterations += 1000)
-                doTest(digest, saltLength, iterations);
+                    doTest(digest, saltLength, iterations);
             }
         }
     }
 
-    private void doTest(String digest, int saltLength, int iterations) throws NoSuchAlgorithmException {
+    private void doTest(String digest, int saltLength, int iterations)
+            throws NoSuchAlgorithmException {
         SecretKeyCredentialHandler pbech = new SecretKeyCredentialHandler();
         pbech.setAlgorithm(digest);
         pbech.setIterations(iterations);
         pbech.setSaltLength(saltLength);
         String storedCredential = pbech.mutate(PWD);
-        Assert.assertTrue(pbech.matches(PWD, storedCredential));
+        Assert.assertTrue("[" + digest + "] [" + saltLength + "] [" + iterations + "] [" + PWD +
+                "] [" + storedCredential +"]", pbech.matches(PWD, storedCredential));
     }
 }

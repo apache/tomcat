@@ -46,6 +46,10 @@ The original XML Schemas for Java EE Deployment Descriptors:
  - web-app_3_1.xsd
  - web-common_3_1.xsd
  - web-fragment_3_1.xsd
+ - javaee_8.xsd
+ - web-app_4_0.xsd
+ - web-common_4_0.xsd
+ - web-fragment_4_0.xsd
 
 may be obtained from:
 http://www.oracle.com/webfolder/technetwork/jsc/xml/ns/javaee/index.html

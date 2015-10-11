@@ -20,11 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -1667,9 +1663,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File dir = new File(getTomcatInstance().getHost().getAppBaseFile(),
                 APP_NAME.getBaseName());
         if (withXml) {
-            recurrsiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
+            recursiveCopy(DIR_XML_SOURCE.toPath(), dir.toPath());
         } else {
-            recurrsiveCopy(DIR_SOURCE.toPath(), dir.toPath());
+            recursiveCopy(DIR_SOURCE.toPath(), dir.toPath());
         }
         return dir;
     }
@@ -1677,16 +1673,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private File createDirXmlInAppbase() throws IOException {
         File dir = new File(getTomcatInstance().getHost().getAppBaseFile(),
                 APP_NAME.getBaseName() + "/META-INF");
-        recurrsiveCopy(DIR_XML_SOURCE_META_INF.toPath(), dir.toPath());
+        recursiveCopy(DIR_XML_SOURCE_META_INF.toPath(), dir.toPath());
         return dir;
     }
 
     private File createDirInExternal(boolean withXml) throws IOException {
         File ext = new File(external, "external" + ".war");
         if (withXml) {
-            recurrsiveCopy(DIR_XML_SOURCE.toPath(), ext.toPath());
+            recursiveCopy(DIR_XML_SOURCE.toPath(), ext.toPath());
         } else {
-            recurrsiveCopy(DIR_SOURCE.toPath(), ext.toPath());
+            recursiveCopy(DIR_SOURCE.toPath(), ext.toPath());
         }
         return ext;
     }
@@ -1754,44 +1750,6 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
         return xml;
     }
-
-    private static void recurrsiveCopy(final Path src, final Path dest)
-            throws IOException {
-
-        Files.walkFileTree(src, new FileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir,
-                    BasicFileAttributes attrs) throws IOException {
-                Files.copy(dir, dest.resolve(src.relativize(dir)));
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file,
-                    BasicFileAttributes attrs) throws IOException {
-                Path destPath = dest.resolve(src.relativize(file));
-                Files.copy(file, destPath);
-                // Make sure that HostConfig thinks all newly copied files have
-                // been modified.
-                destPath.toFile().setLastModified(
-                        System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException ioe)
-                    throws IOException {
-                throw ioe;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException ioe)
-                    throws IOException {
-                // NO-OP
-                return FileVisitResult.CONTINUE;
-            }});
-    }
-
 
     private static class StateTracker implements LifecycleListener {
 

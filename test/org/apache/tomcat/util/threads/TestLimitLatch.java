@@ -16,103 +16,218 @@
  */
 package org.apache.tomcat.util.threads;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestLimitLatch {
 
+    // This should be plenty of time, even on slow systems.
+    private static final long THREAD_WAIT_TIME = 60000;
+
     @Test
     public void testNoThreads() throws Exception {
         LimitLatch latch = new LimitLatch(0);
-        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
+        Assert.assertFalse("No threads should be waiting", latch.hasQueuedThreads());
     }
 
     @Test
     public void testOneThreadNoWait() throws Exception {
         LimitLatch latch = new LimitLatch(1);
-        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
-        Thread testThread = new TestThread(latch);
+        Object lock = new Object();
+        checkWaitingThreadCount(latch, 0);
+        TestThread testThread = new TestThread(latch, lock);
         testThread.start();
-        Thread.sleep(50);
-        assertEquals("0 threads should be waiting", 0,
-                latch.getQueuedThreads().size());
-        latch.countUpOrAwait();
-        Thread.sleep(50);
-        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
+        if (!waitForThreadToStart(testThread)) {
+            Assert.fail("Test thread did not start");
+        }
+        checkWaitingThreadCount(latch, 0);
+        if (!waitForThreadToStop(testThread, lock)) {
+            Assert.fail("Test thread did not stop");
+        }
+        checkWaitingThreadCount(latch, 0);
     }
 
     @Test
-    public void testOneThreadWaitCountUp() throws Exception {
+    public void testOneThreadWaitCountDown() throws Exception {
         LimitLatch latch = new LimitLatch(1);
-        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
-        Thread testThread = new TestThread(latch);
+        Object lock = new Object();
+        checkWaitingThreadCount(latch, 0);
+        TestThread testThread = new TestThread(latch, lock);
         latch.countUpOrAwait();
         testThread.start();
-        Thread.sleep(50);
-        assertEquals("1 threads should be waiting", 1,
-                latch.getQueuedThreads().size());
+        if (!waitForThreadToStart(testThread)) {
+            Assert.fail("Test thread did not start");
+        }
+        checkWaitingThreadCount(latch, 1);
         latch.countDown();
-        Thread.sleep(50);
-        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
+        if (!waitForThreadToStop(testThread, lock)) {
+            Assert.fail("Test thread did not stop");
+        }
+        checkWaitingThreadCount(latch, 0);
     }
 
     @Test
     public void testOneRelease() throws Exception {
         LimitLatch latch = new LimitLatch(1);
-        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
-        Thread testThread = new TestThread(latch);
+        Object lock = new Object();
+        checkWaitingThreadCount(latch, 0);
+        TestThread testThread = new TestThread(latch, lock);
         latch.countUpOrAwait();
         testThread.start();
-        Thread.sleep(50);
-        assertEquals("1 threads should be waiting", 1,
-                latch.getQueuedThreads().size());
+        if (!waitForThreadToStart(testThread)) {
+            Assert.fail("Test thread did not start");
+        }
+        checkWaitingThreadCount(latch, 1);
         latch.releaseAll();
-        Thread.sleep(50);
-        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
+        if (!waitForThreadToStop(testThread, lock)) {
+            Assert.fail("Test thread did not stop");
+        }
+        checkWaitingThreadCount(latch, 0);
     }
 
     @Test
     public void testTenWait() throws Exception {
-        final int pauseTime = 2000;
         LimitLatch latch = new LimitLatch(10);
-        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
-        Thread[] testThread = new TestThread[30];
+        Object lock = new Object();
+        checkWaitingThreadCount(latch, 0);
+
+        TestThread[] testThreads = new TestThread[30];
         for (int i = 0; i < 30; i++) {
-            testThread[i] = new TestThread(latch, pauseTime);
-            testThread[i].start();
+            testThreads[i] = new TestThread(latch, lock);
+            testThreads[i].start();
         }
-        Thread.sleep(pauseTime / 2);
-        assertEquals("20 threads should be waiting", 20,
-                latch.getQueuedThreads().size());
-        Thread.sleep(pauseTime);
-        assertEquals("10 threads should be waiting", 10,
-                latch.getQueuedThreads().size());
-        Thread.sleep(pauseTime);
-        assertFalse("No threads should be waiting", latch.hasQueuedThreads());
+
+        // Should have 10 threads in stage 2 and 20 in stage 1
+
+        for (int i = 0; i < 30; i++) {
+            if (!waitForThreadToStart(testThreads[i])) {
+                Assert.fail("Test thread [" + i + "] did not start");
+            }
+        }
+
+        if (!waitForThreadsToReachStage(testThreads, 20, 10, 0)) {
+            Assert.fail("Failed at 20-10-00");
+        }
+        checkWaitingThreadCount(latch, 20);
+
+        synchronized (lock) {
+            lock.notifyAll();
+        }
+
+        if (!waitForThreadsToReachStage(testThreads, 10, 10, 10)) {
+            Assert.fail("Failed at 10-10-10");
+        }
+        checkWaitingThreadCount(latch, 10);
+
+        synchronized (lock) {
+            lock.notifyAll();
+        }
+
+        if (!waitForThreadsToReachStage(testThreads, 0, 10, 20)) {
+            Assert.fail("Failed at 00-10-20");
+        }
+        checkWaitingThreadCount(latch, 0);
+
+        synchronized (lock) {
+            lock.notifyAll();
+        }
+
+        if (!waitForThreadsToReachStage(testThreads, 0, 0, 30)) {
+            Assert.fail("Failed at 00-00-30");
+        }
+    }
+
+    private boolean waitForThreadToStart(TestThread t) throws InterruptedException {
+        long wait = 0;
+        while (t.getStage() == 0 && wait < THREAD_WAIT_TIME) {
+            Thread.sleep(100);
+            wait += 100;
+        }
+        return t.getStage() > 0;
+    }
+
+    private boolean waitForThreadToStop(TestThread t, Object lock) throws InterruptedException {
+        long wait = 0;
+        while (t.getStage() < 3 && wait < THREAD_WAIT_TIME) {
+            Thread.sleep(100);
+            wait += 100;
+            synchronized (lock) {
+                lock.notifyAll();
+            }
+        }
+        return t.getStage() == 3;
+    }
+
+    private void checkWaitingThreadCount(LimitLatch latch, int target) throws InterruptedException {
+        long wait = 0;
+        while (latch.getQueuedThreads().size() != target && wait < THREAD_WAIT_TIME) {
+            Thread.sleep(100);
+            wait += 100;
+        }
+        Assert.assertEquals(target,  latch.getQueuedThreads().size());
+    }
+
+    private boolean waitForThreadsToReachStage(TestThread[] testThreads,
+            int stage1Target, int stage2Target, int stage3Target) throws InterruptedException {
+
+        long wait = 0;
+
+        int stage1 = 0;
+        int stage2 = 0;
+        int stage3 = 0;
+
+        while((stage1 != stage1Target || stage2 != stage2Target || stage3 != stage3Target) &&
+                wait < THREAD_WAIT_TIME) {
+            stage1 = 0;
+            stage2 = 0;
+            stage3 = 0;
+            for (TestThread testThread : testThreads) {
+                switch(testThread.getStage()){
+                    case 1:
+                        stage1++;
+                        break;
+                    case 2:
+                        stage2++;
+                        break;
+                    case 3:
+                        stage3++;
+                        break;
+                }
+            }
+            Thread.sleep(100);
+            wait += 100;
+        }
+        return stage1 == stage1Target && stage2 == stage2Target && stage3 == stage3Target;
     }
 
     private static class TestThread extends Thread {
 
-        private int holdTime;
-        private LimitLatch latch;
+        private final Object lock;
+        private final LimitLatch latch;
+        private volatile int stage = 0;
 
-        public TestThread(LimitLatch latch) {
-            this(latch, 100);
+        public TestThread(LimitLatch latch, Object lock) {
+            this.latch = latch;
+            this.lock = lock;
         }
 
-        public TestThread(LimitLatch latch, int holdTime) {
-            this.latch = latch;
-            this.holdTime = holdTime;
+        public int getStage() {
+            return stage;
         }
 
         @Override
         public void run() {
             try {
+                stage = 1;
                 latch.countUpOrAwait();
-                Thread.sleep(holdTime);
+                stage = 2;
+                if (lock != null) {
+                    synchronized (lock) {
+                        lock.wait();
+                    }
+                }
                 latch.countDown();
+                stage = 3;
             } catch (InterruptedException x) {
                 x.printStackTrace();
             }

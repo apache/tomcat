@@ -34,6 +34,18 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 public interface Processor {
     Executor getExecutor();
 
+    /**
+     * Process HTTP requests. All requests are treated as HTTP requests to start
+     * with although they may change type during processing.
+     *
+     * @param socketWrapper The connection to process
+     *
+     * @return The state the caller should put the socket in when this method
+     *         returns
+     *
+     * @throws IOException If an I/O error occurs during the processing of the
+     *         request
+     */
     SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException;
 
     SocketState dispatch(SocketStatus status);

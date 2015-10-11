@@ -203,7 +203,6 @@ public class McastServiceImpl {
         receivePacket.setAddress(address);
         receivePacket.setPort(port);
         member.setCommand(new byte[0]);
-        member.getData(true, true);
         if ( membership == null ) membership = new Membership(member);
     }
 
@@ -326,7 +325,6 @@ public class McastServiceImpl {
         if ( startLevel == 0 ) {
             //send a stop message
             member.setCommand(Member.SHUTDOWN_PAYLOAD);
-            member.getData(true, true);
             send(false);
             //leave mcast group
             try {socket.leaveGroup(address);}catch ( Exception ignore){}

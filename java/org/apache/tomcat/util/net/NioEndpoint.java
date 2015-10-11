@@ -958,9 +958,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
                 // Configure output channel
                 sc = socketWrapper.getSocket();
-                if (calledByProcessor) {
-                    sc.setSendFile(true);
-                }
                 // TLS/SSL channel is slightly different
                 WritableByteChannel wc = ((sc instanceof SecureNioChannel)?sc:sc.getIOChannel());
 
@@ -989,7 +986,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         log.debug("Send file complete for: "+sd.fileName);
                     }
                     socketWrapper.setSendfileData(null);
-                    sc.setSendFile(false);
                     try {
                         sd.fchannel.close();
                     } catch (Exception ignore) {

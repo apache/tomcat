@@ -18,7 +18,14 @@ package org.apache.catalina.webresources;
 
 public class TestFileResourceSetReadOnly extends AbstractTestFileResourceSet {
 
+    private static final String dir1 = "test/webresources/dir1";
+
     public TestFileResourceSetReadOnly() {
-        super(false);
+        super(true);
+    }
+
+    @Override
+    protected String getDir1() {
+        return dir1;
     }
 }

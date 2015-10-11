@@ -426,6 +426,7 @@ import org.apache.juli.logging.LogFactory;
  * FINE: Request "/docs/config/manager.html" with response status "200" content-type "text/html", no expiration configured
  * </code>
  */
+@SuppressWarnings("javadoc")
 public class ExpiresFilter extends FilterBase {
 
     /**

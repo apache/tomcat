@@ -33,9 +33,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
+import javax.servlet.GenericFilter;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -43,9 +42,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
+import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -440,7 +441,10 @@ import org.apache.tomcat.util.res.StringManager;
  * </p>
  * <hr>
  */
-public class RemoteIpFilter implements Filter {
+public class RemoteIpFilter extends GenericFilter {
+
+    private static final long serialVersionUID = 1L;
+
     public static class XForwardedRequest extends HttpServletRequestWrapper {
 
         static final ThreadLocal<SimpleDateFormat[]> threadLocalDateFormats = new ThreadLocal<SimpleDateFormat[]>() {
@@ -619,6 +623,11 @@ public class RemoteIpFilter implements Filter {
         public void setServerPort(int serverPort) {
             this.serverPort = serverPort;
         }
+
+        @Override
+        public PushBuilder getPushBuilder() {
+            return new ApplicationPushBuilder(this);
+        }
     }
 
     public static class XForwardedResponse extends HttpServletResponseWrapper {
@@ -777,11 +786,6 @@ public class RemoteIpFilter implements Filter {
      * @see #setTrustedProxies(String)
      */
     private Pattern trustedProxies = null;
-
-    @Override
-    public void destroy() {
-        // NOOP
-    }
 
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
@@ -977,50 +981,50 @@ public class RemoteIpFilter implements Filter {
     }
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        if (filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER) != null) {
-            setInternalProxies(filterConfig.getInitParameter(INTERNAL_PROXIES_PARAMETER));
+    public void init() throws ServletException {
+        if (getInitParameter(INTERNAL_PROXIES_PARAMETER) != null) {
+            setInternalProxies(getInitParameter(INTERNAL_PROXIES_PARAMETER));
         }
 
-        if (filterConfig.getInitParameter(PROTOCOL_HEADER_PARAMETER) != null) {
-            setProtocolHeader(filterConfig.getInitParameter(PROTOCOL_HEADER_PARAMETER));
+        if (getInitParameter(PROTOCOL_HEADER_PARAMETER) != null) {
+            setProtocolHeader(getInitParameter(PROTOCOL_HEADER_PARAMETER));
         }
 
-        if (filterConfig.getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER) != null) {
-            setProtocolHeaderHttpsValue(filterConfig.getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER));
+        if (getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER) != null) {
+            setProtocolHeaderHttpsValue(getInitParameter(PROTOCOL_HEADER_HTTPS_VALUE_PARAMETER));
         }
 
-        if (filterConfig.getInitParameter(PORT_HEADER_PARAMETER) != null) {
-            setPortHeader(filterConfig.getInitParameter(PORT_HEADER_PARAMETER));
+        if (getInitParameter(PORT_HEADER_PARAMETER) != null) {
+            setPortHeader(getInitParameter(PORT_HEADER_PARAMETER));
         }
 
-        if (filterConfig.getInitParameter(CHANGE_LOCAL_PORT_PARAMETER) != null) {
-            setChangeLocalPort(Boolean.parseBoolean(filterConfig.getInitParameter(CHANGE_LOCAL_PORT_PARAMETER)));
+        if (getInitParameter(CHANGE_LOCAL_PORT_PARAMETER) != null) {
+            setChangeLocalPort(Boolean.parseBoolean(getInitParameter(CHANGE_LOCAL_PORT_PARAMETER)));
         }
 
-        if (filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER) != null) {
-            setProxiesHeader(filterConfig.getInitParameter(PROXIES_HEADER_PARAMETER));
+        if (getInitParameter(PROXIES_HEADER_PARAMETER) != null) {
+            setProxiesHeader(getInitParameter(PROXIES_HEADER_PARAMETER));
         }
 
-        if (filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER) != null) {
-            setRemoteIpHeader(filterConfig.getInitParameter(REMOTE_IP_HEADER_PARAMETER));
+        if (getInitParameter(REMOTE_IP_HEADER_PARAMETER) != null) {
+            setRemoteIpHeader(getInitParameter(REMOTE_IP_HEADER_PARAMETER));
         }
 
-        if (filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER) != null) {
-            setTrustedProxies(filterConfig.getInitParameter(TRUSTED_PROXIES_PARAMETER));
+        if (getInitParameter(TRUSTED_PROXIES_PARAMETER) != null) {
+            setTrustedProxies(getInitParameter(TRUSTED_PROXIES_PARAMETER));
         }
 
-        if (filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER) != null) {
+        if (getInitParameter(HTTP_SERVER_PORT_PARAMETER) != null) {
             try {
-                setHttpServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTP_SERVER_PORT_PARAMETER)));
+                setHttpServerPort(Integer.parseInt(getInitParameter(HTTP_SERVER_PORT_PARAMETER)));
             } catch (NumberFormatException e) {
                 throw new NumberFormatException("Illegal " + HTTP_SERVER_PORT_PARAMETER + " : " + e.getMessage());
             }
         }
 
-        if (filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER) != null) {
+        if (getInitParameter(HTTPS_SERVER_PORT_PARAMETER) != null) {
             try {
-                setHttpsServerPort(Integer.parseInt(filterConfig.getInitParameter(HTTPS_SERVER_PORT_PARAMETER)));
+                setHttpsServerPort(Integer.parseInt(getInitParameter(HTTPS_SERVER_PORT_PARAMETER)));
             } catch (NumberFormatException e) {
                 throw new NumberFormatException("Illegal " + HTTPS_SERVER_PORT_PARAMETER + " : " + e.getMessage());
             }

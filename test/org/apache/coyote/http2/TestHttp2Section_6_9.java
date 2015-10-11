@@ -167,7 +167,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         byte[] dataFrameHeader = new byte[9];
         ByteBuffer dataPayload = ByteBuffer.allocate(8 * 1024);
 
-        buildPostRequest(headersFrameHeader, headersPayload,
+        buildPostRequest(headersFrameHeader, headersPayload, false,
                 dataFrameHeader, dataPayload, null, 3);
 
         // Write the headers
@@ -243,17 +243,27 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // Now use a settings frame to restore the size of the flow control
         // window.
         sendSettings(0, false, new SettingValue(4, 64 * 1024 - 1));
-        // Ack
-        parser.readFrame(true);
-        Assert.assertEquals("0-Settings-Ack\n", output.getTrace());
-        output.clearTrace();
 
-        // Stream remainder of stream 3 body
+        // Settings ack and stream 3 body are written from different threads.
+        // Order depends on server side timing. Handle both possibilities.
         parser.readFrame(true);
-        Assert.assertEquals(
-                "3-Body-4096\n" +
-                "3-EndOfStream\n", output.getTrace());
-                output.clearTrace();
+        String trace = output.getTrace();
+        String settingsAck = "0-Settings-Ack\n";
+        String endOfStreamThree = "3-Body-4096\n3-EndOfStream\n";
+
+        if (settingsAck.equals(trace)) {
+            // Ack the end of stream 3
+            output.clearTrace();
+            parser.readFrame(true);
+            Assert.assertEquals(endOfStreamThree, output.getTrace());
+        } else {
+            // End of stream 3 thenack
+            Assert.assertEquals(endOfStreamThree, output.getTrace());
+            output.clearTrace();
+            parser.readFrame(true);
+            Assert.assertEquals(settingsAck, output.getTrace());
+        }
+        output.clearTrace();
     }
 
 

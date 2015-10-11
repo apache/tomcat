@@ -163,7 +163,7 @@ class Http2Parser {
                     Integer.toString(streamId), Integer.toString(dataLength), padding));
         }
 
-        ByteBuffer dest = output.getInputByteBuffer(streamId, dataLength);
+        ByteBuffer dest = output.startRequestBodyFrame(streamId, payloadSize);
         if (dest == null) {
             swallow(streamId, dataLength, false);
             // Process padding before sending any notifications in case padding
@@ -185,7 +185,7 @@ class Http2Parser {
                 if (endOfStream) {
                     output.receiveEndOfStream(streamId);
                 }
-                dest.notifyAll();
+                output.endRequestBodyFrame(streamId);
             }
         }
         if (padLength > 0) {
@@ -586,7 +586,8 @@ class Http2Parser {
         HpackDecoder getHpackDecoder();
 
         // Data frames
-        ByteBuffer getInputByteBuffer(int streamId, int payloadSize) throws Http2Exception;
+        ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) throws Http2Exception;
+        void endRequestBodyFrame(int streamId) throws Http2Exception;
         void receiveEndOfStream(int streamId) throws ConnectionException;
         void swallowedPadding(int streamId, int paddingLength) throws ConnectionException, IOException;
 
