@@ -61,6 +61,8 @@ public interface Realm {
 
     /**
      * Set the CredentialHandler to be used by this Realm.
+     *
+     * @param credentialHandler the {@link CredentialHandler} to use
      */
     public void setCredentialHandler(CredentialHandler credentialHandler);
 
@@ -100,15 +102,16 @@ public interface Realm {
     /**
      * Try to authenticate with the specified username, which
      * matches the digest calculated using the given parameters using the
-     * method described in RFC 2069.
+     * method described in RFC 2617 (which is a superset of RFC 2069).
      *
      * @param username Username of the Principal to look up
      * @param digest Digest which has been submitted by the client
      * @param nonce Unique (or supposedly unique) token which has been used
      * for this request
-     * @param nc TODO
-     * @param cnonce TODO
-     * @param qop TODO
+     * @param nc the nonce counter
+     * @param cnonce the client chosen nonce
+     * @param qop the "quality of protection" (<code>nc</code> and <code>cnonce</code>
+     *        will only be used, if <code>qop</code> is not <code>null</code>).
      * @param realm Realm name
      * @param md5a2 Second MD5 digest used to calculate the digest :
      * MD5(Method + ":" + uri)
