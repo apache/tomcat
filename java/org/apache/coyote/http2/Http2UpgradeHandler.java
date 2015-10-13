@@ -410,25 +410,23 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         Stream stream = getStream(se.getStreamId(), false);
-        if (stream != null) {
-            stream.sendRst();
-        }
+        if (stream != null && stream.sendReset()) {
+            // Write a RST frame
+            byte[] rstFrame = new byte[13];
+            // Length
+            ByteUtil.setThreeBytes(rstFrame, 0, 4);
+            // Type
+            rstFrame[3] = FrameType.RST.getIdByte();
+            // No flags
+            // Stream ID
+            ByteUtil.set31Bits(rstFrame, 5, se.getStreamId());
+            // Payload
+            ByteUtil.setFourBytes(rstFrame, 9, se.getError().getCode());
 
-        // Write a RST frame
-        byte[] rstFrame = new byte[13];
-        // Length
-        ByteUtil.setThreeBytes(rstFrame, 0, 4);
-        // Type
-        rstFrame[3] = FrameType.RST.getIdByte();
-        // No flags
-        // Stream ID
-        ByteUtil.set31Bits(rstFrame, 5, se.getStreamId());
-        // Payload
-        ByteUtil.setFourBytes(rstFrame, 9, se.getError().getCode());
-
-        synchronized (socketWrapper) {
-            socketWrapper.write(true, rstFrame, 0, rstFrame.length);
-            socketWrapper.flush(true);
+            synchronized (socketWrapper) {
+                socketWrapper.write(true, rstFrame, 0, rstFrame.length);
+                socketWrapper.flush(true);
+            }
         }
     }
 

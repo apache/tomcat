@@ -314,8 +314,21 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void sendRst() {
-        state.sendReset();
+    /**
+     * Marks the stream as reset. This method will not change the stream state
+     * if:
+     * <ul>
+     * <li>The stream is already reset</li>
+     * <li>The stream is already closed</li>
+     *
+     * @return <code>true</code> if a reset frame needs to be sent to the peer,
+     *         otherwise <code>false</code>
+     *
+     * @throws IllegalStateException If the stream is in a state that does not
+     *         permit resets
+     */
+    boolean sendReset() {
+        return state.sendReset();
     }
 
 
