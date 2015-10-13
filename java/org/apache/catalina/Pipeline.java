@@ -44,7 +44,7 @@ public interface Pipeline {
 
 
     /**
-     * <p>Return the Valve instance that has been distinguished as the basic
+     * @return the Valve instance that has been distinguished as the basic
      * Valve for this Pipeline (if any).
      */
     public Valve getBasic();
@@ -95,7 +95,7 @@ public interface Pipeline {
 
 
     /**
-     * Return the set of Valves in the pipeline associated with this
+     * @return the set of Valves in the pipeline associated with this
      * Container, including the basic Valve (if any).  If there are no
      * such Valves, a zero-length array is returned.
      */
@@ -118,7 +118,7 @@ public interface Pipeline {
 
 
     /**
-     * <p>Return the Valve instance that has been distinguished as the basic
+     * @return the Valve instance that has been distinguished as the basic
      * Valve for this Pipeline (if any).
      */
     public Valve getFirst();
@@ -131,7 +131,7 @@ public interface Pipeline {
 
 
     /**
-     * Return the Container with which this Pipeline is associated.
+     * @return the Container with which this Pipeline is associated.
      */
     public Container getContainer();
 
