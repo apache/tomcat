@@ -280,7 +280,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                         } catch (StreamException se) {
                             // Stream errors are not fatal to the connection so
                             // continue reading frames
-                            closeStream(se);
+                            resetStream(se);
                         }
                     }
                     // No more frames to read so switch to the keep-alive
@@ -402,7 +402,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    void closeStream(StreamException se) throws ConnectionException, IOException {
+    void resetStream(StreamException se) throws ConnectionException, IOException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
@@ -1099,7 +1099,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     stream.incrementWindowSize(diff);
                 } catch (Http2Exception h2e) {
                     try {
-                        closeStream(new StreamException(sm.getString(
+                        resetStream(new StreamException(sm.getString(
                                 "upgradeHandler.windowSizeTooBig", connectionId,
                                 stream.getIdentifier()),
                                 h2e.getError(), stream.getIdentifier().intValue()));
