@@ -88,6 +88,7 @@ public class StreamStateMachine {
      * <ul>
      * <li>The stream is already reset</li>
      * <li>The stream is already closed</li>
+     * </ul>
      *
      * @return <code>true</code> if a reset frame needs to be sent to the peer,
      *         otherwise <code>false</code>
