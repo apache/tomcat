@@ -17,10 +17,12 @@
 package org.apache.catalina.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
@@ -125,6 +127,23 @@ public class ApplicationPushBuilder implements PushBuilder {
 
 
     @Override
+    public Set<String> getHeaderNames() {
+        return Collections.unmodifiableSet(headers.keySet());
+    }
+
+
+    @Override
+    public String getHeader(String name) {
+        List<String> values = headers.get(name);
+        if (values == null) {
+            return null;
+        } else {
+            return values.get(0);
+        }
+    }
+
+
+    @Override
     public void push() {
         if (path == null) {
             throw new IllegalStateException(sm.getString("pushBuilder.noPath"));
@@ -141,6 +160,8 @@ public class ApplicationPushBuilder implements PushBuilder {
         pushTarget.requestURI().setString(path);
         pushTarget.decodedURI().setString(path);
 
+        // TODO Copy headers
+        // TODO Implement other required attributes
         // TODO Copy across / set other required attributes
 
         coyoteRequest.action(ActionCode.PUSH_REQUEST, pushTarget);
