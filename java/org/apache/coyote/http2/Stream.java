@@ -321,14 +321,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
      * <li>The stream is already reset</li>
      * <li>The stream is already closed</li>
      *
-     * @return <code>true</code> if a reset frame needs to be sent to the peer,
-     *         otherwise <code>false</code>
-     *
      * @throws IllegalStateException If the stream is in a state that does not
      *         permit resets
      */
-    boolean sendReset() {
-        return state.sendReset();
+    void sendReset() {
+        state.sendReset();
     }
 
 
@@ -356,8 +353,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         if (http2Exception instanceof StreamException) {
             try {
                 handler.resetStream((StreamException) http2Exception);
-            } catch (ConnectionException ce) {
-                handler.closeConnection(ce);
             } catch (IOException ioe) {
                 // TODO i18n
                 ConnectionException ce = new ConnectionException("", Http2Error.PROTOCOL_ERROR);
