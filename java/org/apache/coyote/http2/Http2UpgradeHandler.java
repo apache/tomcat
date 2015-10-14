@@ -408,8 +408,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     Integer.toString(se.getStreamId()), se.getError()));
         }
 
+        // If the stream is null, the server knows nothing about it. The ID can
+        // only have come from the client so always send a reset.
+        // If the stream is not null, the server does know about the stream so
+        // only send the reset if the stream is in an appropriate state.
         Stream stream = getStream(se.getStreamId(), false);
-        if (stream != null && stream.sendReset()) {
+        if (stream == null || stream.sendReset()) {
             // Write a RST frame
             byte[] rstFrame = new byte[13];
             // Length
