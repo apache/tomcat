@@ -18,9 +18,32 @@ package javax.servlet.http;
 
 /**
  * Builds a push request based on the {@link HttpServletRequest} from which this
- * builder was obtained.
+ * builder was obtained. The push request will be constructed on the following
+ * basis:
+ * <ul>
+ * <li>The request method is set to <code>GET</code></li>
+ * <li>The path will not be set. This must be set explicitly via a call to
+ *     {@link #setPath(String)}</li>
+ * </ul>
  *
  * @since Servlet 4.0
  */
 public interface PushBuilder {
+
+    /**
+     * Sets the URI path to be used for the push request. This must be called
+     * before every call to {@link #push()}. If the path includes a query
+     * string, the query string will be appended to the existing query string
+     * (if any) and no de-duplication will occur.
+     *
+     * @param path Paths beginning with '/' are treated as absolute paths. All
+     *             other paths are treated as relative to the context path of
+     *             the request used to create this builder instance. The path
+     *             may include a query string.
+     *
+     * @return This builder instance
+     */
+    PushBuilder setPath(String path);
+
+    void push();
 }

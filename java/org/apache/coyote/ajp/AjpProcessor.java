@@ -594,6 +594,13 @@ public class AjpProcessor extends AbstractProcessor {
             // NO-OP for AJP
             break;
         }
+
+        // Servlet 4.0 Push requests
+        case PUSH_REQUEST: {
+            // HTTP2 connections only. Unsupported for AJP.
+            throw new UnsupportedOperationException(
+                    sm.getString("ajpprocessor.pushrequest.notsupported"));
+        }
         }
     }
 

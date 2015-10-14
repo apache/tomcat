@@ -31,6 +31,7 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
+import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -382,6 +383,17 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         }
         case DISPATCH_EXECUTE: {
             socketWrapper.getEndpoint().getExecutor().execute(this);
+            break;
+        }
+
+        // Servlet 4.0 Push requests
+        case PUSH_REQUEST: {
+            try {
+                stream.push((Request) param);
+            } catch (IOException ioe) {
+                response.setErrorException(ioe);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+            }
             break;
         }
 

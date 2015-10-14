@@ -236,5 +236,10 @@ public enum ActionCode {
      * Trigger end of request processing (remaining input swallowed, write any
      * remaining parts of the response etc.).
      */
-    END_REQUEST
+    END_REQUEST,
+
+    /**
+     * Push a request on behalf of the client of the current request.
+     */
+    PUSH_REQUEST
 }
