@@ -335,7 +335,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * method described in RFC 2617 (which is a superset of RFC 2069).
      *
      * @param username Username of the Principal to look up
-     * @param digest Digest which has been submitted by the client
+     * @param clientDigest Digest which has been submitted by the client
      * @param nonce Unique (or supposedly unique) token which has been used
      * for this request
      * @param nc the nonce counter
