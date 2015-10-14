@@ -640,9 +640,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             do {
                 synchronized (this) {
                     if (!stream.canWrite()) {
-                        throw new IOException("TODO i18n: Stream not writeable");
+                        throw new IOException(sm.getString("upgradeHandler.stream.notWritable",
+                                stream.getConnectionId(), stream.getIdentifier()));
                     }
-
                     long windowSize = getWindowSize();
                     if (windowSize < 1 || backLogSize > 0) {
                         // Has this stream been granted an allocation

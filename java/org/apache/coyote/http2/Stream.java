@@ -146,7 +146,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         long windowSize = getWindowSize();
         while (windowSize < 1) {
             if (!canWrite()) {
-                throw new IOException("TODO i18n: Stream not writeable");
+                throw new IOException(sm.getString("stream.notWritable", getConnectionId(),
+                        getIdentifier()));
             }
             try {
                 if (block) {
@@ -367,8 +368,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             try {
                 handler.resetStream((StreamException) http2Exception);
             } catch (IOException ioe) {
-                // TODO i18n
-                ConnectionException ce = new ConnectionException("", Http2Error.PROTOCOL_ERROR);
+                ConnectionException ce = new ConnectionException(
+                        sm.getString("stream.reset.fail"), Http2Error.PROTOCOL_ERROR);
                 ce.initCause(ioe);
                 handler.closeConnection(ce);
             }
