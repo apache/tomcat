@@ -568,7 +568,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
             // Increment client-side flow control windows by the number of bytes
             // read
-            handler.writeWindowUpdate(Stream.this, written);
+            handler.writeWindowUpdate(Stream.this, written, true);
 
             return written;
         }
