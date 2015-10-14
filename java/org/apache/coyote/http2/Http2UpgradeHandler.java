@@ -396,7 +396,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     socketWrapper.write(true, fixedPayload, 0, 8);
                     socketWrapper.flush(true);
                 }
-
             }
         }
     }
@@ -491,9 +490,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     log.debug(target.limit() + " bytes");
                 }
                 ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
-                socketWrapper.write(true, header, 0, header.length);
-                socketWrapper.write(true, target.array(), target.arrayOffset(), target.limit());
-                socketWrapper.flush(true);
+                try {
+                    socketWrapper.write(true, header, 0, header.length);
+                    socketWrapper.write(true, target.array(), target.arrayOffset(), target.limit());
+                    socketWrapper.flush(true);
+                } catch (IOException ioe) {
+                    handleAppInitiatedIOException(ioe);
+                }
             }
         }
     }
@@ -524,15 +527,40 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 }
             }
             ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
-            socketWrapper.write(true, header, 0, header.length);
-            socketWrapper.write(true, data.array(), data.arrayOffset() + data.position(),
-                    len);
-            socketWrapper.flush(true);
+            try {
+                socketWrapper.write(true, header, 0, header.length);
+                socketWrapper.write(true, data.array(), data.arrayOffset() + data.position(),
+                        len);
+                socketWrapper.flush(true);
+            } catch (IOException ioe) {
+                handleAppInitiatedIOException(ioe);
+            }
         }
     }
 
 
-    void writeWindowUpdate(Stream stream, int increment) throws IOException {
+    /*
+     * Handles an I/O error on the socket underlying the HTTP/2 connection when
+     * it is triggered by application code (usually reading the request or
+     * writing the response). Such I/O errors are fatal so the connection is
+     * closed. The exception is re-thrown to make the client code aware of the
+     * problem.
+     *
+     * Note: We can not rely on this exception reaching the socket processor
+     *       since the application code may swallow it.
+     */
+    private void handleAppInitiatedIOException(IOException ioe) throws IOException {
+        close();
+        throw ioe;
+    }
+
+
+    /*
+     * Needs to know if this was application initiated since that affects the
+     * error handling.
+     */
+    void writeWindowUpdate(Stream stream, int increment, boolean applicationInitiated)
+            throws IOException {
         synchronized (socketWrapper) {
             // Build window update frame for stream 0
             byte[] frame = new byte[13];
@@ -542,8 +570,16 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             socketWrapper.write(true, frame, 0, frame.length);
             // Change stream Id and re-use
             ByteUtil.set31Bits(frame, 5, stream.getIdentifier().intValue());
-            socketWrapper.write(true, frame, 0, frame.length);
-            socketWrapper.flush(true);
+            try {
+                socketWrapper.write(true, frame, 0, frame.length);
+                socketWrapper.flush(true);
+            } catch (IOException ioe) {
+                if (applicationInitiated) {
+                    handleAppInitiatedIOException(ioe);
+                } else {
+                    throw ioe;
+                }
+            }
         }
     }
 
@@ -997,7 +1033,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             ConnectionException, IOException {
         Stream stream = getStream(streamId, true);
         // +1 is for the payload byte used to define the padding length
-        writeWindowUpdate(stream, paddingLength + 1);
+        writeWindowUpdate(stream, paddingLength + 1, false);
     }
 
 
