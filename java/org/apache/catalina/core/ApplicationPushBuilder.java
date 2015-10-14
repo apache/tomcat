@@ -16,6 +16,12 @@
  */
 package org.apache.catalina.core;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +39,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     private final org.apache.coyote.Request coyoteRequest;
 
     private String path;
+    private Map<String,List<String>> headers = new HashMap<>();
 
     public ApplicationPushBuilder(HttpServletRequest request) {
         baseRequest = request;
@@ -46,6 +53,20 @@ public class ApplicationPushBuilder implements PushBuilder {
         } else {
             throw new UnsupportedOperationException(sm.getString(
                     "applicationPushBuilder.noCoyoteRequest", current.getClass().getName()));
+        }
+
+        // Populate the initial list of HTTP headers
+        // TODO Servlet 4.0
+        //      Filter headers as required by Servlet spec
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
+            List<String> values = new ArrayList<>();
+            headers.put(headerName, values);
+            Enumeration<String> headerValues = request.getHeaders(headerName);
+            while (headerValues.hasMoreElements()) {
+                values.add(headerValues.nextElement());
+            }
         }
     }
 
@@ -68,7 +89,47 @@ public class ApplicationPushBuilder implements PushBuilder {
 
 
     @Override
+    public PushBuilder addHeader(String name, String value) {
+        List<String> values = headers.get(name);
+        if (values == null) {
+            values = new ArrayList<>();
+            headers.put(name, values);
+        }
+        values.add(value);
+
+        return this;
+    }
+
+
+    @Override
+    public PushBuilder setHeader(String name, String value) {
+        List<String> values = headers.get(name);
+        if (values == null) {
+            values = new ArrayList<>();
+            headers.put(name, values);
+        } else {
+            values.clear();
+        }
+        values.add(value);
+
+        return this;
+    }
+
+
+    @Override
+    public PushBuilder removeHeader(String name) {
+        headers.remove(name);
+
+        return this;
+    }
+
+
+    @Override
     public void push() {
+        if (path == null) {
+            throw new IllegalStateException(sm.getString("pushBuilder.noPath"));
+        }
+
         org.apache.coyote.Request pushTarget = new org.apache.coyote.Request();
 
         pushTarget.method().setString("GET");
@@ -83,6 +144,9 @@ public class ApplicationPushBuilder implements PushBuilder {
         // TODO Copy across / set other required attributes
 
         coyoteRequest.action(ActionCode.PUSH_REQUEST, pushTarget);
+
+        // Reset for next call to this method
         pushTarget = null;
+        path = null;
     }
 }
