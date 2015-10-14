@@ -16,6 +16,8 @@
 */
 package javax.servlet.http;
 
+import java.util.Set;
+
 /**
  * Builds a push request based on the {@link HttpServletRequest} from which this
  * builder was obtained. The push request will be constructed on the following
@@ -89,4 +91,22 @@ public interface PushBuilder {
      * @return This builder instance
      */
     PushBuilder removeHeader(String name);
+
+    /**
+     * @return The current set of names of HTTP headers to be used the next time
+     *         {@code push()} is called.
+     */
+    Set<String> getHeaderNames();
+
+    /**
+     * Obtain a value for the given HTTP header.
+     * TODO Servlet 4.0
+     * Clarify the behaviour of this method
+     *
+     * @param name  The name of the header whose value is to be returned
+     *
+     * @return The value of the given header. If multiple values are defined
+     *         then any may be returned
+     */
+    String getHeader(String name);
 }
