@@ -145,6 +145,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private synchronized int reserveWindowSize(int reservation, boolean block) throws IOException {
         long windowSize = getWindowSize();
         while (windowSize < 1) {
+            if (!canWrite()) {
+                throw new IOException("TODO i18n: Stream not writeable");
+            }
             try {
                 if (block) {
                     wait();
@@ -329,8 +332,18 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    void sentPushPromise() {
+        state.sentPushPromise();
+    }
+
+
     boolean isActive() {
         return state.isActive();
+    }
+
+
+    boolean canWrite() {
+        return state.canWrite();
     }
 
 
@@ -362,6 +375,19 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         } else {
             handler.closeConnection(http2Exception);
         }
+    }
+
+
+    void push(Request request) throws IOException {
+        // Set the special HTTP/2 headers
+        request.getMimeHeaders().addValue(":method").duplicate(request.method());
+        request.getMimeHeaders().addValue(":scheme").duplicate(request.scheme());
+        // TODO: Query string
+        request.getMimeHeaders().addValue(":path").duplicate(request.decodedURI());
+        // TODO: Handle default ports
+        request.getMimeHeaders().addValue(":authority").setString(
+                request.serverName().getString() + ":" + request.getServerPort());
+        handler.push(request, this);
     }
 
 
