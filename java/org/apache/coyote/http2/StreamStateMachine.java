@@ -90,22 +90,16 @@ public class StreamStateMachine {
      * <li>The stream is already closed</li>
      * </ul>
      *
-     * @return <code>true</code> if a reset frame needs to be sent to the peer,
-     *         otherwise <code>false</code>
-     *
      * @throws IllegalStateException If the stream is in a state that does not
      *         permit resets
      */
-    public synchronized boolean sendReset() {
+    public synchronized void sendReset() {
         if (state == State.IDLE) {
             throw new IllegalStateException(sm.getString("streamStateMachine.debug.change",
                     stream.getConnectionId(), stream.getIdentifier(), state));
         }
         if (state.canReset()) {
             stateChange(state, State.CLOSED_RST_TX);
-            return true;
-        } else {
-            return false;
         }
     }
 
@@ -217,7 +211,7 @@ public class StreamStateMachine {
                                                        FrameType.RST,
                                                        FrameType.PUSH_PROMISE,
                                                        FrameType.WINDOW_UPDATE),
-        CLOSED_FINAL       (false, false, false, false,
+        CLOSED_FINAL       (false, false, false, true,
                             Http2Error.PROTOCOL_ERROR, FrameType.PRIORITY);
 
         private final boolean canRead;
