@@ -45,5 +45,48 @@ public interface PushBuilder {
      */
     PushBuilder setPath(String path);
 
+    /**
+     * Generates the push request. After calling this method the following
+     * fields are set to {@code null}:
+     * <ul>
+     * <li>{@code path}</li>
+     * <li>{@code etag}</li>
+     * <li>{@code lastModified}</li>
+     * </ul>
+     *
+     * @throws IllegalStateException If this method is called when {@code path}
+     *         is {@code null}
+     * @throws IllegalArgumentException If the request to push requires a body
+     */
     void push();
+
+    /**
+     * Adds a HTTP header to the request.
+     *
+     * @param name  The name of the header to add
+     * @param value The value of the header to add
+     *
+     * @return This builder instance
+     */
+    PushBuilder addHeader(String name, String value);
+
+    /**
+     * Sets a HTTP header on the request. Any existing headers of the same name
+     * are first remove.
+     *
+     * @param name  The name of the header to set
+     * @param value The value of the header to set
+     *
+     * @return This builder instance
+     */
+    PushBuilder setHeader(String name, String value);
+
+    /**
+     * Removes an HTTP header from the request.
+     *
+     * @param name  The name of the header to remove
+     *
+     * @return This builder instance
+     */
+    PushBuilder removeHeader(String name);
 }
