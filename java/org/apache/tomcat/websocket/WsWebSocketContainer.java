@@ -65,6 +65,7 @@ import javax.websocket.WebSocketContainer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 

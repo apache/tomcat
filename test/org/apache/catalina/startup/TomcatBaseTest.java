@@ -65,7 +65,7 @@ import org.apache.catalina.valves.AccessLogValve;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.websocket.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 
 /**
  * Base test case that provides a Tomcat instance for each test - mainly so we
