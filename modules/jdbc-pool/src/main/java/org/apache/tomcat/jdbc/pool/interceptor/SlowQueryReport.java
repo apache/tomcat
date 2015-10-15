@@ -447,17 +447,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
 
         @Override
         public int compare(QueryStats stats1, QueryStats stats2) {
-            if (stats1.lastInvocation == 0) return 1;
-            if (stats2.lastInvocation == 0) return -1;
-
-            long result = stats1.lastInvocation - stats2.lastInvocation;
-            if (result > 0) {
-                return 1;
-            } else if (result == 0) {
-                return 0;
-            } else {
-                return -1;
-            }
+            return Long.compare(stats1.lastInvocation, stats2.lastInvocation);
         }
     }
 
