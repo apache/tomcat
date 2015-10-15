@@ -23,9 +23,11 @@ import java.util.Set;
  * builder was obtained. The push request will be constructed on the following
  * basis:
  * <ul>
- * <li>The request method is set to <code>GET</code></li>
+ * <li>The request method is set to <code>GET</code>.</li>
  * <li>The path will not be set. This must be set explicitly via a call to
- *     {@link #path(String)}</li>
+ *     {@link #path(String)}.</li>
+ * <li>Conditional, range, expectation, authorization and referer headers will
+ *     be removed.</li>
  * </ul>
  *
  * @since Servlet 4.0
