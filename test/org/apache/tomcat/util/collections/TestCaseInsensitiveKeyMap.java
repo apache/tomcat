@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.websocket;
+package org.apache.tomcat.util.collections;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.junit.Assert;
 import org.junit.Test;
 
