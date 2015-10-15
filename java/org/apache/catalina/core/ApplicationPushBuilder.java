@@ -19,7 +19,6 @@ package org.apache.catalina.core;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +30,7 @@ import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.connector.Request;
 import org.apache.coyote.ActionCode;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
 
 public class ApplicationPushBuilder implements PushBuilder {
@@ -41,7 +41,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     private final org.apache.coyote.Request coyoteRequest;
 
     private String path;
-    private Map<String,List<String>> headers = new HashMap<>();
+    private Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
 
     public ApplicationPushBuilder(HttpServletRequest request) {
         baseRequest = request;
