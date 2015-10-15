@@ -33,7 +33,7 @@ public class SimpleImagePush extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        PushBuilder pb = req.getPushBuilder().setPath("servlets/images/code.gif");
+        PushBuilder pb = req.getPushBuilder().path("servlets/images/code.gif");
         pb.push();
 
         resp.setCharacterEncoding("UTF-8");
