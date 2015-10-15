@@ -375,7 +375,11 @@ public class ApplicationPushBuilder implements PushBuilder {
         }
 
         if (conditional) {
-            // TODO conditional
+            if (etag != null) {
+                setHeader("if-none-match", etag);
+            } else if (lastModified != null) {
+                setHeader("if-modified-since", lastModified);
+            }
         }
 
         // Cookies
@@ -388,6 +392,8 @@ public class ApplicationPushBuilder implements PushBuilder {
         path = null;
         etag = null;
         lastModified = null;
+        headers.remove("if-none-match");
+        headers.remove("if-modified-since");
     }
 
 
