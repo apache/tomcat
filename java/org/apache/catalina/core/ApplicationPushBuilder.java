@@ -40,6 +40,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     private final HttpServletRequest baseRequest;
     private final org.apache.coyote.Request coyoteRequest;
 
+    private String method = "GET";
     private String path;
     private Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
 
@@ -87,6 +88,19 @@ public class ApplicationPushBuilder implements PushBuilder {
             this.path = sb.toString();
         }
         return this;
+    }
+
+
+    @Override
+    public PushBuilder method(String method) {
+        this.method = method;
+        return this;
+    }
+
+
+    @Override
+    public String getMethod() {
+        return method;
     }
 
 
@@ -151,7 +165,7 @@ public class ApplicationPushBuilder implements PushBuilder {
 
         org.apache.coyote.Request pushTarget = new org.apache.coyote.Request();
 
-        pushTarget.method().setString("GET");
+        pushTarget.method().setString(method);
         // The next three are implied by the Javadoc getPath()
         pushTarget.serverName().setString(baseRequest.getServerName());
         pushTarget.setServerPort(baseRequest.getServerPort());
