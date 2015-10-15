@@ -23,6 +23,8 @@ import java.util.Map.Entry;
 
 import javax.websocket.HandshakeResponse;
 
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+
 /**
  * Represents the response to a WebSocket handshake.
  */

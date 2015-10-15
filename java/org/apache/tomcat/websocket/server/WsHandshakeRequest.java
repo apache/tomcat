@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.HandshakeRequest;
 
-import org.apache.tomcat.websocket.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 
 /**
  * Represents the request that this session was opened under.
