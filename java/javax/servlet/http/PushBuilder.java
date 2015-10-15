@@ -28,6 +28,15 @@ import java.util.Set;
  *     {@link #path(String)}.</li>
  * <li>Conditional, range, expectation, authorization and referer headers will
  *     be removed.</li>
+ * <li>Cookies added to the associated response will be added to the push
+ *     request unless maxAge <= 0 in which case any request cookie with the same
+ *     name will be removed.</li>
+ * <li>The referer header will be set to
+ *     {@link HttpServletRequest#getRequestURL()} plus, if present, the query
+ *     string from {@link HttpServletRequest#getQueryString()}.
+ * <li>If either of the headers @code If-Modified-Since} or
+ *     {@code If-None-Match} were present then {@link #isConditional()} will be
+ *     set to {@code true}.
  * </ul>
  *
  * @since Servlet 4.0

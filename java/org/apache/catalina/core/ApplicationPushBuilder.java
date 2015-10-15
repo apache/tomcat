@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,11 +29,13 @@ import java.util.Set;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.connector.Request;
+import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
@@ -43,18 +46,23 @@ public class ApplicationPushBuilder implements PushBuilder {
     private static final StringManager sm = StringManager.getManager(ApplicationPushBuilder.class);
 
     private final HttpServletRequest baseRequest;
+    private final Request catalinaRequest;
     private final org.apache.coyote.Request coyoteRequest;
+    private final String sessionCookieName;
+    private final String sessionPathParameterName;
+    private final boolean addSessionCookie;
+    private final boolean addSessionPathParameter;
 
+    private final Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
+    private final List<Cookie> cookies = new ArrayList<>();
     private String method = "GET";
-    private Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
     private String path;
     private String etag;
     private String lastModified;
     private String queryString;
     private String sessionId;
-    private boolean addSessionCookie;
-    private boolean addSessionPathParameter;
     private boolean conditional;
+
 
     public ApplicationPushBuilder(HttpServletRequest request) {
         baseRequest = request;
@@ -64,7 +72,8 @@ public class ApplicationPushBuilder implements PushBuilder {
             current = ((ServletRequestWrapper) current).getRequest();
         }
         if (current instanceof Request) {
-            coyoteRequest = ((Request) current).getCoyoteRequest();
+            catalinaRequest = ((Request) current);
+            coyoteRequest = catalinaRequest.getCoyoteRequest();
         } else {
             throw new UnsupportedOperationException(sm.getString(
                     "applicationPushBuilder.noCoyoteRequest", current.getClass().getName()));
@@ -84,14 +93,34 @@ public class ApplicationPushBuilder implements PushBuilder {
 
         // Remove the headers
         headers.remove("if-match");
-        headers.remove("if-none-match");
-        headers.remove("if-modified-since");
+        if (headers.remove("if-none-match") != null) {
+            conditional = true;
+        }
+        if (headers.remove("if-modified-since") != null) {
+            conditional = true;
+        }
         headers.remove("if-unmodified-since");
         headers.remove("if-range");
         headers.remove("range");
         headers.remove("expect");
         headers.remove("authorization");
         headers.remove("referer");
+        // Also remove the cookie header since it will be regenerated
+        headers.remove("cookie");
+
+        // set the referer header
+        StringBuffer referer = request.getRequestURL();
+        if (request.getQueryString() != null) {
+            referer.append('?');
+            referer.append(request.getQueryString());
+
+        }
+        addHeader("referer", referer.toString());
+
+        // Session
+        ApplicationContext appContext = (ApplicationContext) request.getServletContext();
+        sessionCookieName = SessionConfig.getSessionCookieName(appContext.getContext());
+        sessionPathParameterName = SessionConfig.getSessionUriParamName(appContext.getContext());
 
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -100,13 +129,35 @@ public class ApplicationPushBuilder implements PushBuilder {
         if (sessionId == null) {
             sessionId = request.getRequestedSessionId();
         }
-        addSessionCookie = request.isRequestedSessionIdFromCookie();
-        addSessionPathParameter = request.isRequestedSessionIdFromURL();
-        if (!addSessionCookie && !addSessionPathParameter && sessionId != null) {
+        if (!request.isRequestedSessionIdFromCookie() && !request.isRequestedSessionIdFromURL() &&
+                sessionId != null) {
             Set<SessionTrackingMode> sessionTrackingModes =
                     request.getServletContext().getEffectiveSessionTrackingModes();
             addSessionCookie = sessionTrackingModes.contains(SessionTrackingMode.COOKIE);
             addSessionPathParameter = sessionTrackingModes.contains(SessionTrackingMode.URL);
+        } else {
+            addSessionCookie = request.isRequestedSessionIdFromCookie();
+            addSessionPathParameter = request.isRequestedSessionIdFromURL();
+        }
+
+        // Cookies
+        for (Cookie requestCookie : request.getCookies()) {
+            cookies.add(requestCookie);
+        }
+        for (Cookie responseCookie : catalinaRequest.getResponse().getCookies()) {
+            if (responseCookie.getMaxAge() < 0) {
+                // Path information not available so can only remove based on
+                // name.
+                Iterator<Cookie> cookieIterator = cookies.iterator();
+                while (cookieIterator.hasNext()) {
+                    Cookie cookie = cookieIterator.next();
+                    if (cookie.getName().equals(responseCookie.getName())) {
+                        cookieIterator.remove();
+                    }
+                }
+            } else {
+                cookies.add(new Cookie(responseCookie.getName(), responseCookie.getValue()));
+            }
         }
     }
 
@@ -302,11 +353,11 @@ public class ApplicationPushBuilder implements PushBuilder {
         // Session ID (do this before setting the path since it may change it)
         if (sessionId != null) {
             if (addSessionPathParameter) {
-                // TODO: Update pushPath for client's benefit
-                // TODO: Figure out how to get this into the CoyoteRequest
+                pushPath = pushPath + ";" + sessionPathParameterName + "=" + sessionId;
+                pushTarget.addPathParameter(sessionPathParameterName, sessionId);
             }
             if (addSessionCookie) {
-                // TODO: add this
+                cookies.add(new Cookie(sessionCookieName, sessionId));
             }
         }
 
@@ -326,6 +377,9 @@ public class ApplicationPushBuilder implements PushBuilder {
         if (conditional) {
             // TODO conditional
         }
+
+        // Cookies
+        // TODO
 
         coyoteRequest.action(ActionCode.PUSH_REQUEST, pushTarget);
 
