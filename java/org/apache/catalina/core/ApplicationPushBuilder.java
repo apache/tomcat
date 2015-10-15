@@ -75,7 +75,7 @@ public class ApplicationPushBuilder implements PushBuilder {
 
 
     @Override
-    public PushBuilder setPath(String path) {
+    public PushBuilder path(String path) {
         if (path.startsWith("/")) {
             this.path = path;
         } else {

@@ -25,7 +25,7 @@ import java.util.Set;
  * <ul>
  * <li>The request method is set to <code>GET</code></li>
  * <li>The path will not be set. This must be set explicitly via a call to
- *     {@link #setPath(String)}</li>
+ *     {@link #path(String)}</li>
  * </ul>
  *
  * @since Servlet 4.0
@@ -42,6 +42,36 @@ public interface PushBuilder {
     PushBuilder method(String method);
 
     /**
+     * Sets a HTTP header on the request. Any existing headers of the same name
+     * are first remove.
+     *
+     * @param name  The name of the header to set
+     * @param value The value of the header to set
+     *
+     * @return This builder instance
+     */
+    PushBuilder setHeader(String name, String value);
+
+    /**
+     * Adds a HTTP header to the request.
+     *
+     * @param name  The name of the header to add
+     * @param value The value of the header to add
+     *
+     * @return This builder instance
+     */
+    PushBuilder addHeader(String name, String value);
+
+    /**
+     * Removes an HTTP header from the request.
+     *
+     * @param name  The name of the header to remove
+     *
+     * @return This builder instance
+     */
+    PushBuilder removeHeader(String name);
+
+    /**
      * Sets the URI path to be used for the push request. This must be called
      * before every call to {@link #push()}. If the path includes a query
      * string, the query string will be appended to the existing query string
@@ -54,7 +84,7 @@ public interface PushBuilder {
      *
      * @return This builder instance
      */
-    PushBuilder setPath(String path);
+    PushBuilder path(String path);
 
     /**
      * Generates the push request. After calling this method the following
@@ -78,36 +108,6 @@ public interface PushBuilder {
      * @return The HTTP method to be used for future push requests
      */
     String getMethod();
-
-    /**
-     * Adds a HTTP header to the request.
-     *
-     * @param name  The name of the header to add
-     * @param value The value of the header to add
-     *
-     * @return This builder instance
-     */
-    PushBuilder addHeader(String name, String value);
-
-    /**
-     * Sets a HTTP header on the request. Any existing headers of the same name
-     * are first remove.
-     *
-     * @param name  The name of the header to set
-     * @param value The value of the header to set
-     *
-     * @return This builder instance
-     */
-    PushBuilder setHeader(String name, String value);
-
-    /**
-     * Removes an HTTP header from the request.
-     *
-     * @param name  The name of the header to remove
-     *
-     * @return This builder instance
-     */
-    PushBuilder removeHeader(String name);
 
     /**
      * @return The current set of names of HTTP headers to be used the next time
