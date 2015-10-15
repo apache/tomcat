@@ -250,6 +250,12 @@ public class Response
     protected final CharChunk redirectURLCC = new CharChunk();
 
 
+    /*
+     * Not strictly required but it makes generating HTTP/2 push requests a lot
+     * easier if these are retained until the response is recycled.
+     */
+    private final List<Cookie> cookies = new ArrayList<>();
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -259,6 +265,7 @@ public class Response
      */
     public void recycle() {
 
+        cookies.clear();
         outputBuffer.recycle();
         usingOutputStream = false;
         usingWriter = false;
@@ -284,6 +291,11 @@ public class Response
             writer.recycle();
         }
 
+    }
+
+
+    public List<Cookie> getCookies() {
+        return cookies;
     }
 
 
@@ -893,6 +905,8 @@ public class Response
         if (included || isCommitted()) {
             return;
         }
+
+        cookies.add(cookie);
 
         String header = generateCookieString(cookie);
         //if we reached here, no exception, cookie is valid
