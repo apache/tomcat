@@ -38,6 +38,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -397,7 +398,16 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    private static String decode(String input, String charsetName) {
+    // Package private so it can be tested
+    static String decode(String input, String charsetName) {
+        int start = input.indexOf('%');
+        int end = 0;
+
+        // Shortcut
+        if (start == -1) {
+            return input;
+        }
+
         Charset charset;
         try {
             charset = B2CConverter.getCharset(charsetName);
@@ -407,7 +417,32 @@ public class ApplicationPushBuilder implements PushBuilder {
             throw new IllegalStateException(uee);
         }
 
-        // TODO implement %nn decoding
-        return input;
+        StringBuilder result = new StringBuilder(input.length());
+        while (start != -1) {
+            // Found the start of a %nn sequence. Copy everything form the last
+            // end to this start to the output.
+            result.append(input.substring(end, start));
+            // Advance the end 3 characters: %nn
+            end = start + 3;
+            while (end <input.length() && input.charAt(end) == '%') {
+                end += 3;
+            }
+            result.append(decode(input.substring(start, end), charset));
+            start = input.indexOf('%', end);
+        }
+        // Append the remaining text
+        result.append(input.substring(end));
+
+        return result.toString();
+    }
+
+    private static String decode(String percentSequence, Charset charset) {
+        byte[] bytes = new byte[percentSequence.length()/3];
+        for (int i = 0; i < bytes.length; i += 3) {
+            bytes[i] = (byte) (HexUtils.getDec(percentSequence.charAt(1 + 3 * i)) << 4 +
+                    HexUtils.getDec(percentSequence.charAt(2 + 3 * i)));
+        }
+
+        return new String(bytes, charset);
     }
 }
