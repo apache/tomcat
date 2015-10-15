@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.core;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -25,11 +27,14 @@ import java.util.Set;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestWrapper;
+import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.connector.Request;
 import org.apache.coyote.ActionCode;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -47,6 +52,8 @@ public class ApplicationPushBuilder implements PushBuilder {
     private String lastModified;
     private String queryString;
     private String sessionId;
+    private boolean addSessionCookie;
+    private boolean addSessionPathParameter;
     private boolean conditional;
 
     public ApplicationPushBuilder(HttpServletRequest request) {
@@ -64,8 +71,6 @@ public class ApplicationPushBuilder implements PushBuilder {
         }
 
         // Populate the initial list of HTTP headers
-        // TODO Servlet 4.0
-        //      Filter headers as required by Servlet spec
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
@@ -75,6 +80,33 @@ public class ApplicationPushBuilder implements PushBuilder {
             while (headerValues.hasMoreElements()) {
                 values.add(headerValues.nextElement());
             }
+        }
+
+        // Remove the headers
+        headers.remove("if-match");
+        headers.remove("if-none-match");
+        headers.remove("if-modified-since");
+        headers.remove("if-unmodified-since");
+        headers.remove("if-range");
+        headers.remove("range");
+        headers.remove("expect");
+        headers.remove("authorization");
+        headers.remove("referer");
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            sessionId = session.getId();
+        }
+        if (sessionId == null) {
+            sessionId = request.getRequestedSessionId();
+        }
+        addSessionCookie = request.isRequestedSessionIdFromCookie();
+        addSessionPathParameter = request.isRequestedSessionIdFromURL();
+        if (!addSessionCookie && !addSessionPathParameter && sessionId != null) {
+            Set<SessionTrackingMode> sessionTrackingModes =
+                    request.getServletContext().getEffectiveSessionTrackingModes();
+            addSessionCookie = sessionTrackingModes.contains(SessionTrackingMode.COOKIE);
+            addSessionPathParameter = sessionTrackingModes.contains(SessionTrackingMode.URL);
         }
     }
 
@@ -247,13 +279,53 @@ public class ApplicationPushBuilder implements PushBuilder {
         pushTarget.setServerPort(baseRequest.getServerPort());
         pushTarget.scheme().setString(baseRequest.getScheme());
 
-        pushTarget.requestURI().setString(path);
-        pushTarget.decodedURI().setString(path);
+        // Copy headers
+        for (Map.Entry<String,List<String>> header : headers.entrySet()) {
+            for (String value : header.getValue()) {
+                pushTarget.getMimeHeaders().addValue(header.getKey()).setString(value);
+            }
+        }
 
-        // TODO Copy headers
-        // TODO Implement other required attributes
-        // TODO Copy across / set other required attributes
-        // TODO Conditional request processing
+        // Path and query string
+        int queryIndex = path.indexOf('?');
+        String pushPath;
+        String pushQueryString = null;
+        if (queryIndex > -1) {
+            pushPath = path.substring(0, queryIndex);
+            if (queryIndex + 1 < path.length()) {
+                pushQueryString = path.substring(queryIndex + 1);
+            }
+        } else {
+            pushPath = path;
+        }
+
+        // Session ID (do this before setting the path since it may change it)
+        if (sessionId != null) {
+            if (addSessionPathParameter) {
+                // TODO: Update pushPath for client's benefit
+                // TODO: Figure out how to get this into the CoyoteRequest
+            }
+            if (addSessionCookie) {
+                // TODO: add this
+            }
+        }
+
+        // Undecoded path - just %nn encoded
+        pushTarget.requestURI().setString(pushPath);
+        pushTarget.decodedURI().setString(decode(pushPath, baseRequest.getCharacterEncoding()));
+
+        // Query string
+        if (pushQueryString == null && queryString != null) {
+            pushTarget.queryString().setString(queryString);
+        } else if (pushQueryString != null && queryString == null) {
+            pushTarget.queryString().setString(pushQueryString);
+        } else if (pushQueryString != null && queryString != null) {
+            pushTarget.queryString().setString(pushQueryString + "&" +queryString);
+        }
+
+        if (conditional) {
+            // TODO conditional
+        }
 
         coyoteRequest.action(ActionCode.PUSH_REQUEST, pushTarget);
 
@@ -261,5 +333,21 @@ public class ApplicationPushBuilder implements PushBuilder {
         pushTarget = null;
         path = null;
         etag = null;
+        lastModified = null;
+    }
+
+
+    private static String decode(String input, String charsetName) {
+        Charset charset;
+        try {
+            charset = B2CConverter.getCharset(charsetName);
+        } catch (UnsupportedEncodingException uee) {
+            // Impossible since original request would have triggered an error
+            // before reaching here
+            throw new IllegalStateException(uee);
+        }
+
+        // TODO implement %nn decoding
+        return input;
     }
 }
