@@ -407,20 +407,14 @@ public class Request implements HttpServletRequest {
     protected Boolean asyncSupported = null;
 
 
-    /**
-     * Path parameters
-     */
-    protected final Map<String,String> pathParameters = new HashMap<>();
-
     // --------------------------------------------------------- Public Methods
 
-
     protected void addPathParameter(String name, String value) {
-        pathParameters.put(name, value);
+        coyoteRequest.addPathParameter(name, value);
     }
 
     protected String getPathParameter(String name) {
-        return pathParameters.get(name);
+        return coyoteRequest.getPathParameter(name);
     }
 
     public void setAsyncSupported(boolean asyncSupported) {
@@ -513,8 +507,6 @@ public class Request implements HttpServletRequest {
             asyncContext.recycle();
         }
         asyncContext = null;
-
-        pathParameters.clear();
     }
 
 
