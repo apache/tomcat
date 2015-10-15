@@ -16,7 +16,6 @@
  */
 package javax.servlet;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Enumeration;
 
@@ -25,17 +24,6 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
     private static final long serialVersionUID = 1L;
 
     private volatile FilterConfig filterConfig;
-
-
-    /**
-     * {@inheritDoc}
-     *
-     * Default NO-OP implementation.
-     */
-    @Override
-    public void destroy() {
-        // NO-OP
-    }
 
 
     @Override
@@ -84,11 +72,6 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
     public void init() throws ServletException {
         // NO-OP
     }
-
-
-    @Override
-    public abstract void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException;
 
 
     @Override
