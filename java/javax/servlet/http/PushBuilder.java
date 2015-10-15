@@ -34,7 +34,7 @@ import java.util.Set;
  * <li>The referer header will be set to
  *     {@link HttpServletRequest#getRequestURL()} plus, if present, the query
  *     string from {@link HttpServletRequest#getQueryString()}.
- * <li>If either of the headers @code If-Modified-Since} or
+ * <li>If either of the headers {@code If-Modified-Since} or
  *     {@code If-None-Match} were present then {@link #isConditional()} will be
  *     set to {@code true}.
  * </ul>
