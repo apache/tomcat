@@ -41,8 +41,13 @@ public class ApplicationPushBuilder implements PushBuilder {
     private final org.apache.coyote.Request coyoteRequest;
 
     private String method = "GET";
-    private String path;
     private Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
+    private String path;
+    private String etag;
+    private String lastModified;
+    private String queryString;
+    private String sessionId;
+    private boolean conditional;
 
     public ApplicationPushBuilder(HttpServletRequest request) {
         baseRequest = request;
@@ -92,6 +97,12 @@ public class ApplicationPushBuilder implements PushBuilder {
 
 
     @Override
+    public String getPath() {
+        return path;
+    }
+
+
+    @Override
     public PushBuilder method(String method) {
         this.method = method;
         return this;
@@ -101,6 +112,71 @@ public class ApplicationPushBuilder implements PushBuilder {
     @Override
     public String getMethod() {
         return method;
+    }
+
+
+    @Override
+    public PushBuilder etag(String etag) {
+        this.etag = etag;
+        return this;
+    }
+
+
+    @Override
+    public String getEtag() {
+        return etag;
+    }
+
+
+    @Override
+    public PushBuilder lastModified(String lastModified) {
+        this.lastModified = lastModified;
+        return this;
+    }
+
+
+    @Override
+    public String getLastModified() {
+        return lastModified;
+    }
+
+
+    @Override
+    public PushBuilder queryString(String queryString) {
+        this.queryString = queryString;
+        return this;
+    }
+
+
+    @Override
+    public String getQueryString() {
+        return queryString;
+    }
+
+
+    @Override
+    public PushBuilder sessionId(String sessionId) {
+        this.sessionId = sessionId;
+        return this;
+    }
+
+
+    @Override
+    public String getSessionId() {
+        return sessionId;
+    }
+
+
+    @Override
+    public PushBuilder conditional(boolean conditional) {
+        this.conditional = conditional;
+        return this;
+    }
+
+
+    @Override
+    public boolean isConditional() {
+        return conditional;
     }
 
 
@@ -177,11 +253,13 @@ public class ApplicationPushBuilder implements PushBuilder {
         // TODO Copy headers
         // TODO Implement other required attributes
         // TODO Copy across / set other required attributes
+        // TODO Conditional request processing
 
         coyoteRequest.action(ActionCode.PUSH_REQUEST, pushTarget);
 
         // Reset for next call to this method
         pushTarget = null;
         path = null;
+        etag = null;
     }
 }
