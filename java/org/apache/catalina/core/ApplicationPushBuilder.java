@@ -364,7 +364,8 @@ public class ApplicationPushBuilder implements PushBuilder {
 
         // Undecoded path - just %nn encoded
         pushTarget.requestURI().setString(pushPath);
-        pushTarget.decodedURI().setString(decode(pushPath, baseRequest.getCharacterEncoding()));
+        pushTarget.decodedURI().setString(decode(pushPath,
+                catalinaRequest.getConnector().getURIEncodingLower()));
 
         // Query string
         if (pushQueryString == null && queryString != null) {
@@ -398,7 +399,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    // Package private so it can be tested
+    // Package private so it can be tested. charsetName must be in lower case.
     static String decode(String input, String charsetName) {
         int start = input.indexOf('%');
         int end = 0;
@@ -410,7 +411,7 @@ public class ApplicationPushBuilder implements PushBuilder {
 
         Charset charset;
         try {
-            charset = B2CConverter.getCharset(charsetName);
+            charset = B2CConverter.getCharsetLower(charsetName);
         } catch (UnsupportedEncodingException uee) {
             // Impossible since original request would have triggered an error
             // before reaching here

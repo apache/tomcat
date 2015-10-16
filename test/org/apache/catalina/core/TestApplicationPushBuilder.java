@@ -23,27 +23,27 @@ public class TestApplicationPushBuilder {
 
     @Test
     public void test01() {
-        doTest("foo", "UTF-8", "foo");
+        doTest("foo", "utf-8", "foo");
     }
 
     @Test
     public void test02() {
-        doTest("/foo", "UTF-8", "/foo");
+        doTest("/foo", "utf-8", "/foo");
     }
 
     @Test
     public void test03() {
-        doTest("%20foo", "UTF-8", " foo");
+        doTest("%20foo", "utf-8", " foo");
     }
 
     @Test
     public void test04() {
-        doTest("fo%20o", "UTF-8", "fo o");
+        doTest("fo%20o", "utf-8", "fo o");
     }
 
     @Test
     public void test05() {
-        doTest("foo%20", "UTF-8", "foo ");
+        doTest("foo%20", "utf-8", "foo ");
     }
 
 
