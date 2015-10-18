@@ -146,9 +146,9 @@
     <changelog>
       <fix>
         <bug>57136</bug>: Correct a regression in the previous fix for this
-        issue. <code>\${</code> should only an escape for <code>${</code> within
-        an EL expression. Within a JSP page <code>\$</code> should be an escape
-        for <code>$</code>. The EL specification applies when parsing the
+        issue. <code>\${</code> should only be an escape for <code>${</code>
+        within an EL expression. Within a JSP page <code>\$</code> should be an
+        escape for <code>$</code>. The EL specification applies when parsing the
         expression delimited by <code>${</code> and <code>}</code>. Parsing of
         the delimiting <code>${</code> and <code>}</code> is the responsibility
         of the JSP specification. (markt)
