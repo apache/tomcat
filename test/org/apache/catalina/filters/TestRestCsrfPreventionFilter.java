@@ -25,6 +25,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
@@ -41,6 +42,12 @@ public class TestRestCsrfPreventionFilter {
     private static final String GET_METHOD = "GET";
 
     private static final String POST_METHOD = "POST";
+
+    public static final String ACCEPTED_PATH1 = "/accepted/index1.jsp";
+
+    public static final String ACCEPTED_PATH2 = "/accepted/index2.jsp";
+
+    public static final String ACCEPTED_PATHS = ACCEPTED_PATH1 + "," + ACCEPTED_PATH2;
 
     private RestCsrfPreventionFilter filter;
 
@@ -83,45 +90,25 @@ public class TestRestCsrfPreventionFilter {
     @Test
     public void testPostRequestSessionNoNonce1() throws Exception {
         setRequestExpectations(POST_METHOD, session, null);
-        EasyMock.expect(session.getAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))
-                .andReturn(null);
-        EasyMock.replay(session);
-        filter.doFilter(request, response, filterChain);
-        verifyDenyResponse(HttpServletResponse.SC_FORBIDDEN);
-        EasyMock.verify(session);
+        testPostRequestHeaderScenarios(null, true);
     }
 
     @Test
     public void testPostRequestSessionNoNonce2() throws Exception {
         setRequestExpectations(POST_METHOD, session, null);
-        EasyMock.expect(session.getAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))
-                .andReturn(NONCE);
-        EasyMock.replay(session);
-        filter.doFilter(request, response, filterChain);
-        verifyDenyResponse(HttpServletResponse.SC_FORBIDDEN);
-        EasyMock.verify(session);
+        testPostRequestHeaderScenarios(NONCE, true);
     }
 
     @Test
     public void testPostRequestSessionInvalidNonce() throws Exception {
         setRequestExpectations(POST_METHOD, session, INVALID_NONCE);
-        EasyMock.expect(session.getAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))
-                .andReturn(NONCE);
-        EasyMock.replay(session);
-        filter.doFilter(request, response, filterChain);
-        verifyDenyResponse(HttpServletResponse.SC_FORBIDDEN);
-        EasyMock.verify(session);
+        testPostRequestHeaderScenarios(NONCE, true);
     }
 
     @Test
     public void testPostRequestSessionValidNonce() throws Exception {
         setRequestExpectations(POST_METHOD, session, NONCE);
-        EasyMock.expect(session.getAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))
-                .andReturn(NONCE);
-        EasyMock.replay(session);
-        filter.doFilter(request, response, filterChain);
-        verifyContinueChain();
-        EasyMock.verify(session);
+        testPostRequestHeaderScenarios(NONCE, false);
     }
 
     @Test
@@ -140,12 +127,7 @@ public class TestRestCsrfPreventionFilter {
     @Test
     public void testPostFetchRequestSessionNoNonce() throws Exception {
         setRequestExpectations(POST_METHOD, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
-        EasyMock.expect(session.getAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))
-                .andReturn(null);
-        EasyMock.replay(session);
-        filter.doFilter(request, response, filterChain);
-        verifyDenyResponse(HttpServletResponse.SC_FORBIDDEN);
-        EasyMock.verify(session);
+        testPostRequestHeaderScenarios(null, true);
     }
 
     @Test
@@ -162,12 +144,7 @@ public class TestRestCsrfPreventionFilter {
     @Test
     public void testPostFetchRequestSessionNonce() throws Exception {
         setRequestExpectations(POST_METHOD, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
-        EasyMock.expect(session.getAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))
-                .andReturn(NONCE);
-        EasyMock.replay(session);
-        filter.doFilter(request, response, filterChain);
-        verifyDenyResponse(HttpServletResponse.SC_FORBIDDEN);
-        EasyMock.verify(session);
+        testPostRequestHeaderScenarios(NONCE, true);
     }
 
     @Test
@@ -178,10 +155,120 @@ public class TestRestCsrfPreventionFilter {
         verifyDenyResponse(HttpServletResponse.SC_BAD_REQUEST);
     }
 
+    @Test
+    public void testPostRequestValidNonceAsParameterValidPath1() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH1);
+        testPostRequestParamsScenarios(NONCE, false, true);
+    }
+
+    @Test
+    public void testPostRequestValidNonceAsParameterValidPath2() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH2);
+        testPostRequestParamsScenarios(NONCE, false, true);
+    }
+
+    @Test
+    public void testPostRequestInvalidNonceAsParameterValidPath() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, new String[] { INVALID_NONCE },
+                ACCEPTED_PATH1);
+        testPostRequestParamsScenarios(NONCE, true, true);
+    }
+
+    @Test
+    public void testPostRequestValidNonceAsParameterInvalidPath() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH1
+                + "blah");
+        testPostRequestParamsScenarios(NONCE, true, true);
+    }
+
+    @Test
+    public void testPostRequestValidNonceAsParameterNoPath() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH1);
+        testPostRequestParamsScenarios(NONCE, true, false);
+    }
+
+    @Test
+    public void testPostRequestValidNonceAsParameterNoNonceInSession() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH1);
+        testPostRequestParamsScenarios(null, true, true);
+    }
+
+    @Test
+    public void testPostRequestValidNonceAsParameterInvalidNonceAsHeader() throws Exception {
+        setRequestExpectations(POST_METHOD, session, INVALID_NONCE, new String[] { NONCE },
+                ACCEPTED_PATH1);
+        testPostRequestParamsScenarios(NONCE, true, true);
+    }
+
+    @Test
+    public void testPostRequestNoNonceAsParameterAndHeaderValidPath() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, null, ACCEPTED_PATH1);
+        testPostRequestParamsScenarios(NONCE, true, true);
+    }
+
+    @Test
+    public void testPostRequestMultipleValidNoncesAsParameterValidPath() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE, NONCE },
+                ACCEPTED_PATH1);
+        testPostRequestParamsScenarios(NONCE, false, true);
+    }
+
+    @Test
+    public void testPostRequestMultipleNoncesAsParameterValidPath() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE, INVALID_NONCE },
+                ACCEPTED_PATH1);
+        testPostRequestParamsScenarios(NONCE, true, true);
+    }
+
+    @Test
+    public void testPostRequestMultipleInvalidNoncesAsParameterValidPath() throws Exception {
+        setRequestExpectations(POST_METHOD, session, null, new String[] { INVALID_NONCE,
+                INVALID_NONCE }, ACCEPTED_PATH1);
+        testPostRequestParamsScenarios(NONCE, true, true);
+    }
+
+    @Test
+    public void testGETRequestFetchNonceAsParameter() throws Exception {
+        setRequestExpectations(GET_METHOD, null, null,
+                new String[] { Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE }, ACCEPTED_PATH1);
+        filter.setPathsAcceptingParams(ACCEPTED_PATHS);
+        filter.doFilter(request, response, filterChain);
+        verifyContinueChainNonceNotAvailable();
+    }
+
+    private void testPostRequestHeaderScenarios(String sessionAttr, boolean denyResponse)
+            throws Exception {
+        testPostRequestParamsScenarios(sessionAttr, denyResponse, false);
+    }
+
+    private void testPostRequestParamsScenarios(String sessionAttr, boolean denyResponse,
+            boolean configurePaths) throws Exception {
+        EasyMock.expect(session.getAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))
+                .andReturn(sessionAttr);
+        EasyMock.replay(session);
+        if (configurePaths) {
+            filter.setPathsAcceptingParams(ACCEPTED_PATHS);
+        }
+        filter.doFilter(request, response, filterChain);
+        if (denyResponse) {
+            verifyDenyResponse(HttpServletResponse.SC_FORBIDDEN);
+        } else {
+            verifyContinueChain();
+        }
+        EasyMock.verify(session);
+    }
+
     private void setRequestExpectations(String method, HttpSession session, String headerValue) {
+        setRequestExpectations(method, session, headerValue, null, null);
+    }
+
+    private void setRequestExpectations(String method, HttpSession session, String headerValue,
+            String[] paramValues, String servletPath) {
         request.setMethod(method);
         request.setSession(session);
         request.setHeader(Constants.CSRF_REST_NONCE_HEADER_NAME, headerValue);
+        request.setParameterValues(paramValues);
+        request.setServletPath(servletPath);
     }
 
     private void verifyContinueChain() {
@@ -190,6 +277,11 @@ public class TestRestCsrfPreventionFilter {
 
     private void verifyContinueChainNonceAvailable() {
         assertTrue(NONCE.equals(response.getHeader(Constants.CSRF_REST_NONCE_HEADER_NAME)));
+        verifyContinueChain();
+    }
+
+    private void verifyContinueChainNonceNotAvailable() {
+        assertNull(response.getHeader(Constants.CSRF_REST_NONCE_HEADER_NAME));
         verifyContinueChain();
     }
 
@@ -216,6 +308,8 @@ public class TestRestCsrfPreventionFilter {
 
     private static class TesterRequest extends TesterHttpServletRequest {
         private HttpSession session;
+        private String[] paramValues;
+        private String servletPath;
 
         void setSession(HttpSession session) {
             this.session = session;
@@ -224,6 +318,29 @@ public class TestRestCsrfPreventionFilter {
         @Override
         public HttpSession getSession(boolean create) {
             return session;
+        }
+
+        void setParameterValues(String[] paramValues) {
+            this.paramValues = paramValues;
+        }
+
+        @Override
+        public String[] getParameterValues(String name) {
+            return paramValues;
+        }
+
+        void setServletPath(String servletPath) {
+            this.servletPath = servletPath;
+        }
+
+        @Override
+        public String getServletPath() {
+            return servletPath;
+        }
+
+        @Override
+        public String getPathInfo() {
+            return "";
         }
     }
 
