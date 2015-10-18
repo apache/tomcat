@@ -21,6 +21,7 @@ import java.util.Random;
 
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
@@ -121,4 +122,11 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
         return buffer.toString();
     }
 
+    protected String getRequestedPath(HttpServletRequest request) {
+        String path = request.getServletPath();
+        if (request.getPathInfo() != null) {
+            path = path + request.getPathInfo();
+        }
+        return path;
+    }
 }
