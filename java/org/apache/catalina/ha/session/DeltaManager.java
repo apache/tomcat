@@ -984,7 +984,6 @@ public class DeltaManager extends ClusterManagerBase{
      public ClusterMessage requestCompleted(String sessionId, boolean expires) {
         DeltaSession session = null;
         SessionMessage msg = null;
-        boolean isDeltaRequest = false ;
         try {
             session = (DeltaSession) findSession(sessionId);
             if (session == null) {
@@ -995,8 +994,7 @@ public class DeltaManager extends ClusterManagerBase{
             DeltaRequest deltaRequest = session.getDeltaRequest();
             session.lock();
             synchronized(deltaRequest) {
-                isDeltaRequest = deltaRequest.getSize() > 0 ;
-                if (isDeltaRequest) {
+                if (deltaRequest.getSize() > 0) {
                     counterSend_EVT_SESSION_DELTA++;
                     byte[] data = serializeDeltaRequest(session,deltaRequest);
                     msg = new SessionMessageImpl(getName(),
@@ -1014,7 +1012,7 @@ public class DeltaManager extends ClusterManagerBase{
         } finally {
             if (session!=null) session.unlock();
         }
-        if(!isDeltaRequest) {
+        if(msg == null) {
             if(!expires && !session.isPrimarySession()) {
                 counterSend_EVT_SESSION_ACCESSED++;
                 msg = new SessionMessageImpl(getName(),
