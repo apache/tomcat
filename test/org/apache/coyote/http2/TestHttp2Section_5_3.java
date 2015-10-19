@@ -195,14 +195,14 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
                 seen19 = true;
                 // If everything works instantly this should be 256 but allow a
                 // fairly large margin for timing differences
-                if (data[1] < 256 || data[1] > 290) {
+                if (data[1] < 236 || data[1] > 276) {
                     Assert.fail("Unexpected body size: [" + output.getTrace() + "]");
                 }
             } else if (data[0] == 21) {
                 seen21 = true;
                 // If everything works instantly this should be 768 but allow a
                 // fairly large margin for timing differences
-                if (data[1] < 768 || data[1] > 800) {
+                if (data[1] < 748 || data[1] > 788) {
                     Assert.fail("Unexpected body size: [" + output.getTrace() + "]");
                 }
             } else {
