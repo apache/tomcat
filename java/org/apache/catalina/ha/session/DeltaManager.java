@@ -1025,8 +1025,7 @@ public class DeltaManager extends ClusterManagerBase{
             }
         } else { // log only outside synch block!
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("deltaManager.createMessage.delta",
-                        getName(), sessionId));
+                log.debug(sm.getString("deltaManager.createMessage.delta", getName(), sessionId));
             }
         }
         if (!expires) session.setPrimarySession(true);
