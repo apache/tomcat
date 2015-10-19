@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.66 (violetagg)">
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Optimize the session lock range in DeltaManager.requestCompleted.
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
