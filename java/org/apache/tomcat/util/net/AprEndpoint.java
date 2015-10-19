@@ -2549,6 +2549,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
                     }
                     doWriteInternal();
+                    return;
                 }
             } finally {
                 readLock.unlock();
