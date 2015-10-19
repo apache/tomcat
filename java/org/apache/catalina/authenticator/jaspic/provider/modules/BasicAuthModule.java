@@ -87,7 +87,7 @@ public class BasicAuthModule extends TomcatAuthModule {
             handler.handle(new Callback[] { passwordCallback });
 
             if (!passwordCallback.getResult()) {
-                sendUnauthorizedError(response, realmName);
+                return sendUnauthorizedError(response, realmName);
             }
             handlePrincipalCallbacks(clientSubject, getPrincipal(passwordCallback));
             return AuthStatus.SUCCESS;
