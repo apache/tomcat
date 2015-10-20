@@ -36,7 +36,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class AbstractProcessor extends AbstractProcessorLight implements ActionHook {
 
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(AbstractProcessor.class);
 
     protected Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;

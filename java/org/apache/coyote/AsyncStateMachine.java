@@ -102,8 +102,7 @@ public class AsyncStateMachine {
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(AsyncStateMachine.class);
 
     private static enum AsyncState {
         DISPATCHED   (false, false, false, false, false),

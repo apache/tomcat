@@ -42,8 +42,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class Response {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Response.class);
 
     // ----------------------------------------------------- Class Variables
 
