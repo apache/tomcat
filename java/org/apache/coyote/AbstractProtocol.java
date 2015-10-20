@@ -19,6 +19,8 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -86,7 +88,18 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      */
     private final AbstractEndpoint<S> endpoint;
 
+
     private Handler<S> handler;
+
+
+    private final Set<Processor> waitingProcessors =
+            Collections.newSetFromMap(new ConcurrentHashMap<Processor, Boolean>());
+
+
+    /**
+     * The async timeout thread.
+     */
+    private AsyncTimeout asyncTimeout = null;
 
 
     public AbstractProtocol(AbstractEndpoint<S> endpoint) {
@@ -179,6 +192,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     @Override
     public boolean isSendfileSupported() {
         return endpoint.getUseSendfile();
+    }
+
+
+    public AsyncTimeout getAsyncTimeout() {
+        return asyncTimeout;
     }
 
 
@@ -335,6 +353,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             name.append(port);
         }
         return ObjectName.quote(name.toString());
+    }
+
+
+    public void addWaitingProcessor(Processor processor) {
+        waitingProcessors.add(processor);
+    }
+
+
+    public void removeWaitingProcessor(Processor processor) {
+        waitingProcessors.remove(processor);
     }
 
 
@@ -514,6 +542,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     getName()), ex);
             throw ex;
         }
+
+
+        // Start async timeout thread
+        asyncTimeout = new AsyncTimeout();
+        Thread timeoutThread = new Thread(asyncTimeout, getName() + "-AsyncTimeout");
+        timeoutThread.setPriority(endpoint.getThreadPriority());
+        timeoutThread.setDaemon(true);
+        timeoutThread.start();
     }
 
 
@@ -551,6 +587,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         if(getLog().isInfoEnabled())
             getLog().info(sm.getString("abstractProtocolHandler.stop",
                     getName()));
+
+        asyncTimeout.stop();
+
         try {
             endpoint.stop();
         } catch (Exception ex) {
@@ -648,7 +687,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 return SocketState.CLOSED;
             }
 
-            wrapper.setAsync(false);
             ContainerThreadMarker.set();
 
             try {
@@ -684,6 +722,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
                 // Associate the processor with the connection
                 connections.put(socket, processor);
+                // Make sure an async timeout doesn't fire
+                getProtocol().removeWaitingProcessor(processor);
 
                 SocketState state = SocketState.CLOSED;
                 do {
@@ -719,6 +759,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // depend on type of long poll
                     connections.put(socket, processor);
                     longPoll(wrapper, processor);
+                    if (processor.isAsync()) {
+                        getProtocol().addWaitingProcessor(processor);
+                    }
                 } else if (state == SocketState.OPEN) {
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
@@ -791,11 +834,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
         protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
-            if (processor.isAsync()) {
-                // Async
-                socket.setAsync(true);
-            } else {
-                // This branch is currently only used with HTTP
+            if (!processor.isAsync()) {
+                // This is currently only used with HTTP
                 // Either:
                 //  - this is an upgraded connection
                 //  - the request line/headers have not been completely
@@ -962,6 +1002,55 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             }
             super.clear();
             size.set(0);
+        }
+    }
+
+
+    /**
+     * Async timeout thread
+     */
+    protected class AsyncTimeout implements Runnable {
+
+        private volatile boolean asyncTimeoutRunning = true;
+
+        /**
+         * The background thread that checks async requests and fires the
+         * timeout if there has been no activity.
+         */
+        @Override
+        public void run() {
+
+            // Loop until we receive a shutdown command
+            while (asyncTimeoutRunning) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                long now = System.currentTimeMillis();
+                for (Processor processor : waitingProcessors) {
+                   processor.timeoutAsync(now);
+                }
+
+                // Loop if endpoint is paused
+                while (endpoint.isPaused() && asyncTimeoutRunning) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        // Ignore
+                    }
+                }
+            }
+        }
+
+
+        protected void stop() {
+            asyncTimeoutRunning = false;
+
+            // Timeout any pending async request
+            for (Processor processor : waitingProcessors) {
+                processor.timeoutAsync(-1);
+            }
         }
     }
 }

@@ -742,7 +742,7 @@ public class Http11Processor extends AbstractProcessor {
                 return;
             }
             long timeout = ((Long) param).longValue();
-            socketWrapper.setAsyncTimeout(timeout);
+            setAsyncTimeout(timeout);
             break;
         }
         case ASYNC_DISPATCH: {

@@ -38,13 +38,10 @@ public abstract class SocketWrapperBase<E> {
 
     // Volatile because I/O and setting the timeout values occurs on a different
     // thread to the thread checking the timeout.
-    private volatile long lastAsyncStart = 0;
-    private volatile long asyncTimeout = -1;
     private volatile long readTimeout = -1;
     private volatile long writeTimeout = -1;
 
     private volatile int keepAliveLeft = 100;
-    private volatile boolean async = false;
     private boolean keptAlive = false;
     private volatile boolean upgraded = false;
     private boolean secure = false;
@@ -111,40 +108,6 @@ public abstract class SocketWrapperBase<E> {
         return endpoint;
     }
 
-    public boolean isAsync() { return async; }
-    /**
-     * Sets the async flag for this connection. If this call causes the
-     * connection to transition from non-async to async then the lastAsyncStart
-     * property will be set using the current time. This property is used as the
-     * start time when calculating the async timeout. As per the Servlet spec
-     * the async timeout applies once the dispatch where startAsync() was called
-     * has returned to the container (which is when this method is currently
-     * called).
-     *
-     * @param async The new value of for the async flag
-     */
-    public void setAsync(boolean async) {
-        if (!this.async && async) {
-            lastAsyncStart = System.currentTimeMillis();
-        }
-        this.async = async;
-    }
-    /**
-     * Obtain the time that this connection last transitioned to async
-     * processing.
-     *
-     * @return The time (as returned by {@link System#currentTimeMillis()}) that
-     *         this connection last transitioned to async
-     */
-    public long getLastAsyncStart() {
-       return lastAsyncStart;
-    }
-    public void setAsyncTimeout(long timeout) {
-        asyncTimeout = timeout;
-    }
-    public long getAsyncTimeout() {
-        return asyncTimeout;
-    }
     public boolean isUpgraded() { return upgraded; }
     public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
     public boolean isSecure() { return secure; }
