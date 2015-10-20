@@ -90,8 +90,8 @@ public class TestSlowQueryComparator {
         QueryStats q1 = new QueryStats("abc");
         QueryStats q2 = new QueryStats("def");
         q2.add(0, 100);
-        Assert.assertEquals(-1, queryStatsComparator.compare(q1, q2));
-        Assert.assertEquals(1, queryStatsComparator.compare(q2, q1));
+        Assert.assertEquals(1, queryStatsComparator.compare(q1, q2));
+        Assert.assertEquals(-1, queryStatsComparator.compare(q2, q1));
     }
 
     @Test
