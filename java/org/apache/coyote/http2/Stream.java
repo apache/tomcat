@@ -651,7 +651,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
         private void ensureBuffersExist() {
             if (inBuffer == null) {
-                int size = handler.getRemoteSettings().getInitialWindowSize();
+                // The client must obey Tomcat's window size when sending so
+                // this is the initial window size set by Tomcat that the client
+                // uses (i.e. the local setting is required here).
+                int size = handler.getLocalSettings().getInitialWindowSize();
                 synchronized (this) {
                     if (inBuffer == null) {
                         inBuffer = ByteBuffer.allocate(size);

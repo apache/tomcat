@@ -112,7 +112,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             new AtomicReference<>(ConnectionState.NEW);
     private volatile long pausedNanoTime = Long.MAX_VALUE;
 
+    /**
+     * Remote settings are settings defined by the client and sent to Tomcat
+     * that Tomcat must use when communicating with the client.
+     */
     private final ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote();
+    /**
+     * Local settings are settings defined by Tomcat and sent to the client that
+     * the client must use when communicating with Tomcat.
+     */
     private final ConnectionSettingsLocal localSettings = new ConnectionSettingsLocal();
 
     private HpackDecoder hpackDecoder;
@@ -338,6 +346,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     ConnectionSettingsRemote getRemoteSettings() {
         return remoteSettings;
+    }
+
+
+    ConnectionSettingsLocal getLocalSettings() {
+        return localSettings;
     }
 
 
