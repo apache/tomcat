@@ -515,8 +515,10 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case ASYNC_SETTIMEOUT: {
-            if (param == null) return;
-            long timeout = ((Long)param).longValue();
+            if (param == null) {
+                return;
+            }
+            long timeout = ((Long) param).longValue();
             setAsyncTimeout(timeout);
             break;
         }

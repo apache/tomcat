@@ -738,7 +738,7 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case ASYNC_SETTIMEOUT: {
-            if (param == null || socketWrapper == null) {
+            if (param == null) {
                 return;
             }
             long timeout = ((Long) param).longValue();
