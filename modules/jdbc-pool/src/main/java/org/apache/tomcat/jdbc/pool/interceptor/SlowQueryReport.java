@@ -443,12 +443,22 @@ public class SlowQueryReport extends AbstractQueryReport  {
         }
     }
 
+    /** Compare QueryStats by their lastInvocation value. QueryStats that
+     * have never been updated, have a lastInvocation value of {@code 0}
+     * which should be handled as the newest possible invocation.
+     */
     private static class QueryStatsComparator implements Comparator<QueryStats> {
 
         @Override
         public int compare(QueryStats stats1, QueryStats stats2) {
-            return Long.valueOf(stats1.lastInvocation).compareTo(stats2.lastInvocation);
+            return Long.valueOf(handleZero(stats1.lastInvocation))
+                    .compareTo(handleZero(stats2.lastInvocation));
         }
+
+        private long handleZero(long value) {
+            return value == 0 ? Long.MAX_VALUE : value;
+        }
+
     }
 
 }
