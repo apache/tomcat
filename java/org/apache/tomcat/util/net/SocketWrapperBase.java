@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -97,8 +95,6 @@ public abstract class SocketWrapperBase<E> {
      * The max size of the buffered write buffer
      */
     protected int bufferedWriteSize = 64*1024; //64k default write buffer
-
-    private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
     public SocketWrapperBase(E socket, AbstractEndpoint<E> endpoint) {
         this.socket = socket;
@@ -296,34 +292,6 @@ public abstract class SocketWrapperBase<E> {
             throw new IllegalStateException(sm.getString("socket.closed"));
         }
         return socketBufferHandler.isWriteBufferWritable() && bufferedWrites.size() == 0;
-    }
-
-    public void addDispatch(DispatchType dispatchType) {
-        synchronized (dispatches) {
-            dispatches.add(dispatchType);
-        }
-    }
-    public Iterator<DispatchType> getIteratorAndClearDispatches() {
-        // Note: Logic in AbstractProtocol depends on this method only returning
-        // a non-null value if the iterator is non-empty. i.e. it should never
-        // return an empty iterator.
-        Iterator<DispatchType> result;
-        synchronized (dispatches) {
-            // Synchronized as the generation of the iterator and the clearing
-            // of dispatches needs to be an atomic operation.
-            result = dispatches.iterator();
-            if (result.hasNext()) {
-                dispatches.clear();
-            } else {
-                result = null;
-            }
-        }
-        return result;
-    }
-    public void clearDispatches() {
-        synchronized (dispatches) {
-            dispatches.clear();
-        }
     }
 
 
@@ -587,8 +555,8 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    public void executeNonBlockingDispatches() {
-        endpoint.executeNonBlockingDispatches(this);
+    public void executeNonBlockingDispatches(Iterator<DispatchType> dispatches) {
+        endpoint.executeNonBlockingDispatches(this, dispatches);
     }
 
 

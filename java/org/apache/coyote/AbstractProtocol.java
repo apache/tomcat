@@ -758,7 +758,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     if (dispatches == null || !dispatches.hasNext()) {
                         // Only returns non-null iterator if there are
                         // dispatches to process.
-                        dispatches = wrapper.getIteratorAndClearDispatches();
+                        dispatches = processor.getIteratorAndClearDispatches();
                     }
                 } while (state == SocketState.ASYNC_END ||
                         state == SocketState.UPGRADING ||

@@ -811,7 +811,8 @@ public abstract class AbstractEndpoint<S> {
             SocketStatus socketStatus, boolean dispatch);
 
 
-    public void executeNonBlockingDispatches(SocketWrapperBase<S> socketWrapper) {
+    public void executeNonBlockingDispatches(SocketWrapperBase<S> socketWrapper,
+            Iterator<DispatchType> dispatches) {
         /*
          * This method is called when non-blocking IO is initiated by defining
          * a read and/or write listener in a non-container thread. It is called
@@ -831,8 +832,6 @@ public abstract class AbstractEndpoint<S> {
          * sure that the socket has been added to the waitingRequests queue.
          */
         synchronized (socketWrapper) {
-            Iterator<DispatchType> dispatches = socketWrapper.getIteratorAndClearDispatches();
-
             while (dispatches != null && dispatches.hasNext()) {
                 DispatchType dispatchType = dispatches.next();
                 processSocket(socketWrapper, dispatchType.getSocketStatus(), false);

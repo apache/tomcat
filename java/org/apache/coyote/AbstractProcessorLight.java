@@ -16,6 +16,12 @@
  */
 package org.apache.coyote;
 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import org.apache.tomcat.util.net.DispatchType;
+
 /**
  * This is a light-weight abstract processor implementation that is intended as
  * a basis for all Processor implementations from the light-weight upgrade
@@ -23,4 +29,40 @@ package org.apache.coyote;
  */
 public abstract class AbstractProcessorLight implements Processor {
 
+    private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
+
+
+    @Override
+    public void addDispatch(DispatchType dispatchType) {
+        synchronized (dispatches) {
+            dispatches.add(dispatchType);
+        }
+    }
+
+
+    @Override
+    public Iterator<DispatchType> getIteratorAndClearDispatches() {
+        // Note: Logic in AbstractProtocol depends on this method only returning
+        // a non-null value if the iterator is non-empty. i.e. it should never
+        // return an empty iterator.
+        Iterator<DispatchType> result;
+        synchronized (dispatches) {
+            // Synchronized as the generation of the iterator and the clearing
+            // of dispatches needs to be an atomic operation.
+            result = dispatches.iterator();
+            if (result.hasNext()) {
+                dispatches.clear();
+            } else {
+                result = null;
+            }
+        }
+        return result;
+    }
+
+
+    protected void clearDispatches() {
+        synchronized (dispatches) {
+            dispatches.clear();
+        }
+    }
 }

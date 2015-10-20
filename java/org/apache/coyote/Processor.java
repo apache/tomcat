@@ -18,11 +18,13 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 import java.util.concurrent.Executor;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -96,4 +98,8 @@ public interface Processor {
      * an existing multiplexed connection.
      */
     void pause();
+
+    void addDispatch(DispatchType dispatchType);
+
+    Iterator<DispatchType> getIteratorAndClearDispatches();
 }

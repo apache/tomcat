@@ -483,7 +483,7 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case ASYNC_COMPLETE: {
-            socketWrapper.clearDispatches();
+            clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
             }
@@ -573,15 +573,15 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case DISPATCH_READ: {
-            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
+            addDispatch(DispatchType.NON_BLOCKING_READ);
             break;
         }
         case DISPATCH_WRITE: {
-            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+            addDispatch(DispatchType.NON_BLOCKING_WRITE);
             break;
         }
         case DISPATCH_EXECUTE: {
-            socketWrapper.executeNonBlockingDispatches();
+            socketWrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
             break;
         }
         case CLOSE_NOW: {
