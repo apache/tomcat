@@ -822,7 +822,7 @@ public class AjpProcessor extends AbstractProcessor {
     @Override
     public void recycle() {
         getAdapter().checkRecycled(request, response);
-        asyncStateMachine.recycle();
+        super.recycle();
         request.recycle();
         response.recycle();
         first = true;
@@ -834,7 +834,6 @@ public class AjpProcessor extends AbstractProcessor {
         certificates.recycle();
         swallowResponse = false;
         bytesWritten = 0;
-        resetErrorState();
     }
 
 
