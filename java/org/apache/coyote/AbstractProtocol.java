@@ -698,7 +698,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         if (upgradeProtocol != null) {
                             processor = upgradeProtocol.getProcessor(
                                     wrapper, getProtocol().getAdapter());
-                            connections.put(socket, processor);
                         } else if (negotiatedProtocol.equals("http/1.1")) {
                             // Explicitly negotiated the default protocol.
                             // Obtain a processor below.
