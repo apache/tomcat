@@ -60,8 +60,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class Request {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Request.class);
 
     // Expected maximum typica number of cookies per request.
     private static final int INITIAL_COOKIE_SIZE = 4;
