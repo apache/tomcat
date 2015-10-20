@@ -1794,13 +1794,12 @@ public class Http11Processor extends AbstractProcessor {
     @Override
     public final void recycle() {
         getAdapter().checkRecycled(request, response);
-        asyncStateMachine.recycle();
+        super.recycle();
         inputBuffer.recycle();
         outputBuffer.recycle();
         httpUpgradeHandler = null;
         socketWrapper = null;
         sendfileData = null;
-        resetErrorState();
     }
 
 
@@ -1814,5 +1813,4 @@ public class Http11Processor extends AbstractProcessor {
     public void pause() {
         // NOOP for HTTP
     }
-
 }

@@ -101,11 +101,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
-    protected void resetErrorState() {
-        errorState = ErrorState.NONE;
-    }
-
-
     protected ErrorState getErrorState() {
         return errorState;
     }
@@ -245,6 +240,14 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected void dispatchNonBlockingRead() {
         asyncStateMachine.asyncOperation();
     }
+
+
+    @Override
+    public void recycle() {
+        errorState = ErrorState.NONE;
+        asyncStateMachine.recycle();
+    }
+
 
     /**
      * Flush any pending writes. Used during non-blocking writes to flush any
