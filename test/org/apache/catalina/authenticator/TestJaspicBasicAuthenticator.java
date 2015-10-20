@@ -26,18 +26,9 @@ import java.util.Map;
 
 import javax.security.auth.message.config.AuthConfigFactory;
 
-import org.hamcrest.CoreMatchers;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-
-import org.junit.Test;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.jaspic.JaspicAuthenticator;
 import org.apache.catalina.authenticator.jaspic.provider.TomcatAuthConfigProvider;
-import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -47,6 +38,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.junit.Test;
 
 public class TestJaspicBasicAuthenticator extends TomcatBaseTest {
 
@@ -201,11 +193,4 @@ public class TestJaspicBasicAuthenticator extends TomcatBaseTest {
         return testResponse;
     }
 
-    private static class TesterRequest extends Request {
-
-        @Override
-        public String getRemoteAddr() {
-            return "127.0.0.1";
-        }
-    }
 }
