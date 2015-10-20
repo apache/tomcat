@@ -645,7 +645,7 @@ public class AjpProcessor extends AbstractProcessor {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState process(SocketWrapperBase<?> socket) throws IOException {
+    public SocketState service(SocketWrapperBase<?> socket) throws IOException {
 
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);

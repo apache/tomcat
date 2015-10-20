@@ -204,12 +204,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
-    /**
-     * Process an in-progress request that is not longer in standard HTTP mode.
-     * Uses currently include Servlet 3.0 Async and HTTP upgrade connections.
-     * Further uses may be added in the future. These will typically start as
-     * HTTP requests.
-     */
     @Override
     public final SocketState dispatch(SocketStatus status) {
 

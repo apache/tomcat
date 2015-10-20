@@ -70,7 +70,7 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
 
 
     @Override
-    public final SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException {
+    public final SocketState service(SocketWrapperBase<?> socketWrapper) throws IOException {
         return null;
     }
 

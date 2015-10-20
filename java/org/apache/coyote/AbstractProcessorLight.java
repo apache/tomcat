@@ -16,11 +16,14 @@
  */
 package org.apache.coyote;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
+import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
  * This is a light-weight abstract processor implementation that is intended as
@@ -30,6 +33,13 @@ import org.apache.tomcat.util.net.DispatchType;
 public abstract class AbstractProcessorLight implements Processor {
 
     private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
+
+
+    @Override
+    public SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 
     @Override
