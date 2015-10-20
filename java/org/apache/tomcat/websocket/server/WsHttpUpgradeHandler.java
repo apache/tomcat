@@ -183,7 +183,11 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 return SocketState.CLOSED;
 
         }
-        return SocketState.UPGRADED;
+        if (wsFrame.isOpen()) {
+            return SocketState.UPGRADED;
+        } else {
+            return SocketState.CLOSED;
+        }
     }
 
 
