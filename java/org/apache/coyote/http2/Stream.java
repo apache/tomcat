@@ -540,8 +540,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          * same copies as using two buffers and the behaviour would be less
          * clear.
          *
-         * The buffers are created lazily because 32K per stream quickly adds
-         * up to a lot of memory and most requests do not have bodies.
+         * The buffers are created lazily because they quickly add up to a lot
+         * of memory and most requests do not have bodies.
          */
         // This buffer is used to populate the ByteChunk passed in to the read
         // method
@@ -651,10 +651,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
         private void ensureBuffersExist() {
             if (inBuffer == null) {
+                int size = handler.getRemoteSettings().getInitialWindowSize();
                 synchronized (this) {
                     if (inBuffer == null) {
-                        inBuffer = ByteBuffer.allocate(16 * 1024);
-                        outBuffer = new byte[16 * 1024];
+                        inBuffer = ByteBuffer.allocate(size);
+                        outBuffer = new byte[size];
                     }
                 }
             }
