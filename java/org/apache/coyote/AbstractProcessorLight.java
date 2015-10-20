@@ -97,7 +97,6 @@ public abstract class AbstractProcessorLight implements Processor {
     }
 
 
-    @Override
     public void addDispatch(DispatchType dispatchType) {
         synchronized (dispatches) {
             dispatches.add(dispatchType);
@@ -105,7 +104,6 @@ public abstract class AbstractProcessorLight implements Processor {
     }
 
 
-    @Override
     public Iterator<DispatchType> getIteratorAndClearDispatches() {
         // Note: Logic in AbstractProtocol depends on this method only returning
         // a non-null value if the iterator is non-empty. i.e. it should never
@@ -158,6 +156,8 @@ public abstract class AbstractProcessorLight implements Processor {
     protected abstract SocketState dispatch(SocketStatus status);
 
     protected abstract SocketState asyncPostProcess();
+
+    protected abstract void errorDispatch();
 
     protected abstract Log getLog();
 }

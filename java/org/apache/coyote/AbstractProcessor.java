@@ -168,8 +168,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     /**
      * Obtain the Executor used by the underlying endpoint.
      */
-    @Override
-    public Executor getExecutor() {
+    protected Executor getExecutor() {
         return endpoint.getExecutor();
     }
 

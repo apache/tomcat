@@ -22,7 +22,6 @@ import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
 import org.apache.coyote.ContainerThreadMarker;
-import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -36,7 +35,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
     private static final StringManager sm =
             StringManager.getManager(UpgradeServletInputStream.class);
 
-    private final Processor processor;
+    private final UpgradeProcessorBase processor;
     private final SocketWrapperBase<?> socketWrapper;
 
     private volatile boolean closed = false;
@@ -47,7 +46,8 @@ public class UpgradeServletInputStream extends ServletInputStream {
     private volatile ClassLoader applicationLoader = null;
 
 
-    public UpgradeServletInputStream(Processor processor, SocketWrapperBase<?> socketWrapper) {
+    public UpgradeServletInputStream(UpgradeProcessorBase processor,
+            SocketWrapperBase<?> socketWrapper) {
         this.processor = processor;
         this.socketWrapper = socketWrapper;
     }
