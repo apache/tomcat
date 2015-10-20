@@ -23,12 +23,12 @@ import java.util.concurrent.Executor;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
-import org.apache.coyote.Processor;
+import org.apache.coyote.AbstractProcessorLight;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
-public abstract class UpgradeProcessorBase implements Processor, WebConnection {
+public abstract class UpgradeProcessorBase extends AbstractProcessorLight implements WebConnection {
 
     protected static final int INFINITE_TIMEOUT = -1;
 

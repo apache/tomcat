@@ -35,7 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
  * Provides functionality and attributes common to all supported protocols
  * (currently HTTP and AJP).
  */
-public abstract class AbstractProcessor implements ActionHook, Processor {
+public abstract class AbstractProcessor extends AbstractProcessorLight implements ActionHook {
 
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
