@@ -22,7 +22,6 @@ import java.util.concurrent.Executor;
 
 import javax.servlet.RequestDispatcher;
 
-import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -280,6 +279,4 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      *         current request has completed
      */
     protected abstract SocketState dispatchEndRequest();
-
-    protected abstract Log getLog();
 }

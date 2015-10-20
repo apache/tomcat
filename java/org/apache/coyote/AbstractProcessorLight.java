@@ -22,7 +22,9 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.DispatchType;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -36,9 +38,62 @@ public abstract class AbstractProcessorLight implements Processor {
 
 
     @Override
-    public SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException {
-        // TODO Auto-generated method stub
-        return null;
+    public SocketState process(SocketWrapperBase<?> socketWrapper, SocketStatus status)
+            throws IOException {
+
+        SocketState state = SocketState.CLOSED;
+        Iterator<DispatchType> dispatches = null;
+        do {
+            if (status == SocketStatus.CLOSE_NOW) {
+                errorDispatch();
+                state = SocketState.CLOSED;
+            } else if (dispatches != null) {
+                DispatchType nextDispatch = dispatches.next();
+                state = dispatch(nextDispatch.getSocketStatus());
+            } else if (status == SocketStatus.DISCONNECT) {
+                // Do nothing here, just wait for it to get recycled
+            } else if (isAsync() || isUpgrade()) {
+                state = dispatch(status);
+            } else if (state == SocketState.ASYNC_END) {
+                state = dispatch(status);
+                // TODO: In case this request takes a long time to process
+                //       remove the TBD (socket/processor/something else) from
+                //       the waiting requests now else the async timeout will
+                //       fire
+                if (state == SocketState.OPEN) {
+                    // There may be pipe-lined data to read. If the data
+                    // isn't processed now, execution will exit this
+                    // loop and call release() which will recycle the
+                    // processor (and input buffer) deleting any
+                    // pipe-lined data. To avoid this, process it now.
+                    state = service(socketWrapper);
+                }
+            } else if (status == SocketStatus.OPEN_WRITE) {
+                // Extra write event likely after async, ignore
+                state = SocketState.LONG;
+            } else {
+                state = service(socketWrapper);
+            }
+
+            if (state != SocketState.CLOSED && isAsync()) {
+                state = asyncPostProcess();
+            }
+
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("Socket: [" + socketWrapper +
+                        "], Status in: [" + status +
+                        "], State out: [" + state + "]");
+            }
+
+            if (dispatches == null || !dispatches.hasNext()) {
+                // Only returns non-null iterator if there are
+                // dispatches to process.
+                dispatches = getIteratorAndClearDispatches();
+            }
+        } while (state == SocketState.ASYNC_END ||
+                dispatches != null && state != SocketState.CLOSED);
+
+        return state;
     }
 
 
@@ -75,4 +130,7 @@ public abstract class AbstractProcessorLight implements Processor {
             dispatches.clear();
         }
     }
+
+
+    protected abstract Log getLog();
 }

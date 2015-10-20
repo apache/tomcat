@@ -19,7 +19,6 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,7 +39,6 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
-import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -631,8 +629,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
         @Override
-        public SocketState process(SocketWrapperBase<S> wrapper,
-                SocketStatus status) {
+        public SocketState process(SocketWrapperBase<S> wrapper, SocketStatus status) {
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
                 return SocketState.CLOSED;
@@ -685,52 +682,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 processor.setSslSupport(
                         wrapper.getSslSupport(getProtocol().getClientCertProvider()));
 
-                SocketState state = SocketState.CLOSED;
-                Iterator<DispatchType> dispatches = null;
-                do {
-                    if (status == SocketStatus.CLOSE_NOW) {
-                        processor.errorDispatch();
-                        state = SocketState.CLOSED;
-                    } else if (dispatches != null) {
-                        // Associate the processor with the connection as
-                        // these calls may result in a nested call to process()
-                        connections.put(socket, processor);
-                        DispatchType nextDispatch = dispatches.next();
-                        state = processor.dispatch(nextDispatch.getSocketStatus());
-                    } else if (status == SocketStatus.DISCONNECT) {
-                        // Do nothing here, just wait for it to get recycled
-                    } else if (processor.isAsync() || processor.isUpgrade()) {
-                        state = processor.dispatch(status);
-                    } else if (state == SocketState.ASYNC_END) {
-                        state = processor.dispatch(status);
-                        // release() won't get called so in case this request
-                        // takes a long time to process remove the socket from
-                        // the waiting requests now else the async timeout will
-                        // fire
-                        getProtocol().getEndpoint().removeWaitingRequest(wrapper);
-                        if (state == SocketState.OPEN) {
-                            // There may be pipe-lined data to read. If the data
-                            // isn't processed now, execution will exit this
-                            // loop and call release() which will recycle the
-                            // processor (and input buffer) deleting any
-                            // pipe-lined data. To avoid this, process it now.
-                            state = processor.service(wrapper);
-                        }
-                    } else if (status == SocketStatus.OPEN_WRITE) {
-                        // Extra write event likely after async, ignore
-                        state = SocketState.LONG;
-                    } else {
-                        state = processor.service(wrapper);
-                    }
+                // Associate the processor with the connection
+                connections.put(socket, processor);
 
-                    if (state != SocketState.CLOSED && processor.isAsync()) {
-                        state = processor.asyncPostProcess();
-                    }
+                SocketState state = SocketState.CLOSED;
+                do {
+                    state = processor.process(wrapper, status);
 
                     if (state == SocketState.UPGRADING) {
                         // Get the HTTP upgrade handler
-                        HttpUpgradeHandler httpUpgradeHandler =
-                                processor.getHttpUpgradeHandler();
+                        HttpUpgradeHandler httpUpgradeHandler = processor.getHttpUpgradeHandler();
                         // Retrieve leftover input
                         ByteBuffer leftoverInput = processor.getLeftoverInput();
                         // Release the Http11 processor to be re-used
@@ -750,19 +711,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         // it.
                         httpUpgradeHandler.init((WebConnection) processor);
                     }
-                    if (getLog().isDebugEnabled()) {
-                        getLog().debug("Socket: [" + wrapper +
-                                "], Status in: [" + status +
-                                "], State out: [" + state + "]");
-                    }
-                    if (dispatches == null || !dispatches.hasNext()) {
-                        // Only returns non-null iterator if there are
-                        // dispatches to process.
-                        dispatches = processor.getIteratorAndClearDispatches();
-                    }
-                } while (state == SocketState.ASYNC_END ||
-                        state == SocketState.UPGRADING ||
-                        dispatches != null && state != SocketState.CLOSED);
+                } while ( state == SocketState.UPGRADING);
 
                 if (state == SocketState.LONG) {
                     // In the middle of processing a request/response. Keep the
@@ -823,8 +772,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
-                getLog().error(
-                        sm.getString("abstractConnectionHandler.error"), e);
+                getLog().error(sm.getString("abstractConnectionHandler.error"), e);
             } finally {
                 ContainerThreadMarker.clear();
             }

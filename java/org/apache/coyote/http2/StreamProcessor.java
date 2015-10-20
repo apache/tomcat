@@ -18,7 +18,6 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpUpgradeHandler;
@@ -60,51 +59,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     @Override
     public synchronized void run() {
-        SocketStatus status = SocketStatus.OPEN_READ;
-
         // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
         // socket <-> processor mapping
         ContainerThreadMarker.set();
         SocketState state = SocketState.CLOSED;
         try {
-            Iterator<DispatchType> dispatches = getIteratorAndClearDispatches();
-            do {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("streamProcessor.process.loopstart",
-                            stream.getConnectionId(), stream.getIdentifier(), status, dispatches));
-                }
-                if (status == SocketStatus.CLOSE_NOW) {
-                    setErrorState(ErrorState.CLOSE_NOW, null);
-                    state = SocketState.CLOSED;
-                } else if (dispatches != null) {
-                    DispatchType nextDispatch = dispatches.next();
-                    state = dispatch(nextDispatch.getSocketStatus());
-                } else if (isAsync()) {
-                    state = dispatch(status);
-                } else if (state == SocketState.ASYNC_END) {
-                    state = dispatch(status);
-                } else if (status == SocketStatus.DISCONNECT) {
-                    // Should never happen
-                    throw new IllegalStateException();
-                } else {
-                    state = service((SocketWrapperBase<?>) null);
-                }
-
-                if (state != SocketState.CLOSED && isAsync()) {
-                    state = asyncStateMachine.asyncPostProcess();
-                }
-
-                if (dispatches == null || !dispatches.hasNext()) {
-                    // Only returns non-null iterator if there are
-                    // dispatches to process.
-                    dispatches = getIteratorAndClearDispatches();
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("streamProcessor.process.loopend",
-                            stream.getConnectionId(), stream.getIdentifier(), state, dispatches));
-                }
-            } while (state == SocketState.ASYNC_END ||
-                    dispatches != null && state != SocketState.CLOSED);
+            state = process(socketWrapper, SocketStatus.OPEN_READ);
 
             if (state == SocketState.CLOSED) {
                 if (!getErrorState().isConnectionIoAllowed()) {

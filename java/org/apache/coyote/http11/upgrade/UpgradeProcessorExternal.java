@@ -55,6 +55,12 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     }
 
 
+    @Override
+    protected Log getLog() {
+        return log;
+    }
+
+
     // --------------------------------------------------- AutoCloseable methods
 
     @Override
