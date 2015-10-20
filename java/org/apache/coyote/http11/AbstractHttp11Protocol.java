@@ -627,7 +627,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setRestrictedUserAgents(getRestrictedUserAgents());
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
-        processor.setClientCertProvider(getClientCertProvider());
     }
 
 

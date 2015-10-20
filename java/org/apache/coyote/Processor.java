@@ -69,20 +69,6 @@ public interface Processor {
      */
     void recycle();
 
-    /**
-     * When client certificate information is presented in a form other than
-     * instances of {@link java.security.cert.X509Certificate} it needs to be
-     * converted before it can be used and this property controls which JSSE
-     * provider is used to perform the conversion. For example it is used with
-     * the AJP connectors, the HTTP APR connector and with the
-     * {@link org.apache.catalina.valves.SSLValve}. If not specified, the
-     * default provider will be used.
-     *
-     * @return The name of the JSSE provider to use for certificate
-     *         transformation if required
-     */
-    String getClientCertProvider();
-
     void setSslSupport(SSLSupport sslSupport);
 
     /**
