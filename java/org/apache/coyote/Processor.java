@@ -43,6 +43,8 @@ public interface Processor {
      * not currently being processed.
      *
      * @param socketWrapper The connection to process
+     * @param status The status of the connection that triggered this additional
+     *               processing
      *
      * @return The state the caller should put the socket in when this method
      *         returns
@@ -50,7 +52,7 @@ public interface Processor {
      * @throws IOException If an I/O error occurs during the processing of the
      *         request
      */
-    SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException;
+    SocketState process(SocketWrapperBase<?> socketWrapper, SocketStatus status) throws IOException;
 
     /**
      * Service a 'standard' HTTP request. This method is called for both new
