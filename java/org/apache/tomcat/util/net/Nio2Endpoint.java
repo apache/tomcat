@@ -230,12 +230,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
             initializeConnectionLatch();
             startAcceptorThreads();
-
-            setAsyncTimeout(new AsyncTimeout());
-            Thread timeoutThread = new Thread(getAsyncTimeout(), getName() + "-AsyncTimeout");
-            timeoutThread.setPriority(threadPriority);
-            timeoutThread.setDaemon(true);
-            timeoutThread.start();
         }
     }
 
@@ -251,17 +245,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         }
         if (running) {
             running = false;
-            getAsyncTimeout().stop();
             unlockAccept();
             // Use the executor to avoid binding the main thread if something bad
             // occurs and unbind will also wait for a bit for it to complete
             getExecutor().execute(new Runnable() {
                 @Override
                 public void run() {
-                    // Timeout any pending async request
-                    for (SocketWrapperBase<Nio2Channel> socket : waitingRequests) {
-                        processSocket(socket, SocketStatus.TIMEOUT, false);
-                    }
                     // Then close all active connections if any remain
                     try {
                         handler.closeAll();
@@ -393,7 +382,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
     protected boolean processSocket0(SocketWrapperBase<Nio2Channel> socketWrapper, SocketStatus status, boolean dispatch) {
         try {
-            waitingRequests.remove(socketWrapper);
             SocketProcessor sc = processorCache.pop();
             if (sc == null) {
                 sc = new SocketProcessor(socketWrapper, status);
@@ -1687,10 +1675,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                                 if (!nioChannels.push(socket.getSocket())) {
                                     socket.getSocket().free();
                                 }
-                            }
-                        } else if (state == Handler.SocketState.LONG) {
-                            if (socket.isAsync()) {
-                                waitingRequests.add(socket);
                             }
                         } else if (state == SocketState.UPGRADING) {
                             socket.setKeptAlive(true);

@@ -49,8 +49,19 @@ public interface Processor {
 
     HttpUpgradeHandler getHttpUpgradeHandler();
 
-    boolean isAsync();
     boolean isUpgrade();
+    boolean isAsync();
+
+    /**
+     * Check this processor to see if the async timeout has expired and process
+     * a timeout if that is that case.
+     *
+     * @param now The time (as returned by {@link System#currentTimeMillis()} to
+     *            use as the current time to determine whether the async timeout
+     *            has expired. If negative, the timeout will always be treated
+     *            as if it has expired.
+     */
+    void timeoutAsync(long now);
 
     Request getRequest();
 

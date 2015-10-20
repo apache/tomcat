@@ -95,4 +95,10 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
     public ByteBuffer getLeftoverInput() {
         return null;
     }
+
+
+    @Override
+    public void timeoutAsync(long now) {
+        // NO-OP
+    }
 }
