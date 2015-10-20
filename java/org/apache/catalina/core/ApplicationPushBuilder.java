@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.PushBuilder;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
@@ -120,9 +121,9 @@ public class ApplicationPushBuilder implements PushBuilder {
         addHeader("referer", referer.toString());
 
         // Session
-        ApplicationContext appContext = (ApplicationContext) request.getServletContext();
-        sessionCookieName = SessionConfig.getSessionCookieName(appContext.getContext());
-        sessionPathParameterName = SessionConfig.getSessionUriParamName(appContext.getContext());
+        Context context = catalinaRequest.getContext();
+        sessionCookieName = SessionConfig.getSessionCookieName(context);
+        sessionPathParameterName = SessionConfig.getSessionUriParamName(context);
 
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -143,8 +144,10 @@ public class ApplicationPushBuilder implements PushBuilder {
         }
 
         // Cookies
-        for (Cookie requestCookie : request.getCookies()) {
-            cookies.add(requestCookie);
+        if (request.getCookies() != null) {
+            for (Cookie requestCookie : request.getCookies()) {
+                cookies.add(requestCookie);
+            }
         }
         for (Cookie responseCookie : catalinaRequest.getResponse().getCookies()) {
             if (responseCookie.getMaxAge() < 0) {
