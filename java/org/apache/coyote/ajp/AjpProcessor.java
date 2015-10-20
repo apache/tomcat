@@ -243,6 +243,8 @@ public class AjpProcessor extends AbstractProcessor {
     private long bytesWritten = 0;
 
 
+
+
     // ------------------------------------------------------------ Constructor
 
     public AjpProcessor(int packetSize, AbstractEndpoint<?> endpoint) {
@@ -315,6 +317,19 @@ public class AjpProcessor extends AbstractProcessor {
     private String requiredSecret = null;
     public void setRequiredSecret(String requiredSecret) {
         this.requiredSecret = requiredSecret;
+    }
+
+
+    /**
+     * When client certificate information is presented in a form other than
+     * instances of {@link java.security.cert.X509Certificate} it needs to be
+     * converted before it can be used and this property controls which JSSE
+     * provider is used to perform the conversion.
+     */
+    private String clientCertProvider = null;
+    public String getClientCertProvider() { return clientCertProvider; }
+    public void setClientCertProvider(String clientCertProvider) {
+        this.clientCertProvider = clientCertProvider;
     }
 
 

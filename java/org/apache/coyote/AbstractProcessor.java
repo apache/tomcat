@@ -45,7 +45,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
     protected volatile SSLSupport sslSupport;
-    private String clientCertProvider = null;
 
     /**
      * Error state for the request/response currently being processed.
@@ -138,17 +137,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      */
     public Adapter getAdapter() {
         return adapter;
-    }
-
-
-    @Override
-    public String getClientCertProvider() {
-        return clientCertProvider;
-    }
-
-
-    public void setClientCertProvider(String s) {
-        this.clientCertProvider = s;
     }
 
 

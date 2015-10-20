@@ -369,7 +369,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // is reused
         setSocketWrapper(null);
         setAdapter(null);
-        setClientCertProvider(null);
     }
 
 

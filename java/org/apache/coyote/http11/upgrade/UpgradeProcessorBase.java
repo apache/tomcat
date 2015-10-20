@@ -100,12 +100,6 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
 
 
     @Override
-    public String getClientCertProvider() {
-        return null;
-    }
-
-
-    @Override
     public ByteBuffer getLeftoverInput() {
         return null;
     }
