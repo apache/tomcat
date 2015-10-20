@@ -87,7 +87,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                     // Should never happen
                     throw new IllegalStateException();
                 } else {
-                    state = process((SocketWrapperBase<?>) null);
+                    state = service((SocketWrapperBase<?>) null);
                 }
 
                 if (state != SocketState.CLOSED && isAsync()) {
@@ -432,7 +432,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    public SocketState process(SocketWrapperBase<?> socket) throws IOException {
+    public SocketState service(SocketWrapperBase<?> socket) throws IOException {
         try {
             adapter.service(request, response);
         } catch (Exception e) {

@@ -714,13 +714,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             // loop and call release() which will recycle the
                             // processor (and input buffer) deleting any
                             // pipe-lined data. To avoid this, process it now.
-                            state = processor.process(wrapper);
+                            state = processor.service(wrapper);
                         }
                     } else if (status == SocketStatus.OPEN_WRITE) {
                         // Extra write event likely after async, ignore
                         state = SocketState.LONG;
                     } else {
-                        state = processor.process(wrapper);
+                        state = processor.service(wrapper);
                     }
 
                     if (state != SocketState.CLOSED && processor.isAsync()) {

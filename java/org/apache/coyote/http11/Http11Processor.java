@@ -925,7 +925,7 @@ public class Http11Processor extends AbstractProcessor {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState process(SocketWrapperBase<?> socketWrapper)
+    public SocketState service(SocketWrapperBase<?> socketWrapper)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
