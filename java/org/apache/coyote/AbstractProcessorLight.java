@@ -131,6 +131,33 @@ public abstract class AbstractProcessorLight implements Processor {
         }
     }
 
+    /**
+     * Service a 'standard' HTTP request. This method is called for both new
+     * requests and for requests that have partially read the HTTP request line
+     * or HTTP headers. Once the headers have been fully read this method is not
+     * called again until there is a new HTTP request to process. Note that the
+     * request type may change during processing which may result in one or more
+     * calls to {@link #dispatch(SocketStatus)}.
+     *
+     * @param socketWrapper The connection to process
+     *
+     * @return The state the caller should put the socket in when this method
+     *         returns
+     *
+     * @throws IOException If an I/O error occurs during the processing of the
+     *         request
+     */
+    protected abstract SocketState service(SocketWrapperBase<?> socketWrapper) throws IOException;
+
+    /**
+     * Process an in-progress request that is not longer in standard HTTP mode.
+     * Uses currently include Servlet 3.0 Async and HTTP upgrade connections.
+     * Further uses may be added in the future. These will typically start as
+     * HTTP requests.
+     */
+    protected abstract SocketState dispatch(SocketStatus status);
+
+    protected abstract SocketState asyncPostProcess();
 
     protected abstract Log getLog();
 }
