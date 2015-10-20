@@ -22,6 +22,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 
 import org.apache.coyote.ContainerThreadMarker;
+import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -35,6 +36,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private static final StringManager sm =
             StringManager.getManager(UpgradeServletOutputStream.class);
 
+    private final Processor processor;
     private final SocketWrapperBase<?> socketWrapper;
 
     // Used to ensure that isReady() and onWritePossible() have a consistent
@@ -61,7 +63,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private volatile ClassLoader applicationLoader = null;
 
 
-    public UpgradeServletOutputStream(SocketWrapperBase<?> socketWrapper) {
+    public UpgradeServletOutputStream(Processor processor, SocketWrapperBase<?> socketWrapper) {
+        this.processor = processor;
         this.socketWrapper = socketWrapper;
     }
 
@@ -115,7 +118,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             registered = true;
             // Container is responsible for first call to onDataAvailable().
             if (ContainerThreadMarker.isContainerThread()) {
-                socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+                processor.addDispatch(DispatchType.NON_BLOCKING_WRITE);
             } else {
                 socketWrapper.registerWriteInterest();
             }

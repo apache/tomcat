@@ -731,7 +731,7 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case ASYNC_COMPLETE: {
-            socketWrapper.clearDispatches();
+            clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
             }
@@ -776,17 +776,17 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case DISPATCH_READ: {
-            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
+            addDispatch(DispatchType.NON_BLOCKING_READ);
             break;
         }
         case DISPATCH_WRITE: {
-            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+            addDispatch(DispatchType.NON_BLOCKING_WRITE);
             break;
         }
         case DISPATCH_EXECUTE: {
             SocketWrapperBase<?> wrapper = socketWrapper;
             if (wrapper != null) {
-                wrapper.executeNonBlockingDispatches();
+                wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
             }
             break;
         }

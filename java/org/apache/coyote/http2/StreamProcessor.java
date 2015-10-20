@@ -19,8 +19,6 @@ package org.apache.coyote.http2;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpUpgradeHandler;
@@ -48,7 +46,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     private static final StringManager sm = StringManager.getManager(StreamProcessor.class);
 
     private final Stream stream;
-    private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
     private volatile SSLSupport sslSupport;
 
@@ -374,11 +371,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case DISPATCH_READ: {
-            dispatches.add(DispatchType.NON_BLOCKING_READ);
+            addDispatch(DispatchType.NON_BLOCKING_READ);
             break;
         }
         case DISPATCH_WRITE: {
-            dispatches.add(DispatchType.NON_BLOCKING_WRITE);
+            addDispatch(DispatchType.NON_BLOCKING_WRITE);
             break;
         }
         case DISPATCH_EXECUTE: {
@@ -479,35 +476,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     protected SocketState dispatchEndRequest() {
         return SocketState.CLOSED;
-    }
-
-
-    public void addDispatch(DispatchType dispatchType) {
-        synchronized (dispatches) {
-            dispatches.add(dispatchType);
-        }
-    }
-    public Iterator<DispatchType> getIteratorAndClearDispatches() {
-        // Note: Logic in AbstractProtocol depends on this method only returning
-        // a non-null value if the iterator is non-empty. i.e. it should never
-        // return an empty iterator.
-        Iterator<DispatchType> result;
-        synchronized (dispatches) {
-            // Synchronized as the generation of the iterator and the clearing
-            // of dispatches needs to be an atomic operation.
-            result = dispatches.iterator();
-            if (result.hasNext()) {
-                dispatches.clear();
-            } else {
-                result = null;
-            }
-        }
-        return result;
-    }
-    public void clearDispatches() {
-        synchronized (dispatches) {
-            dispatches.clear();
-        }
     }
 
 
