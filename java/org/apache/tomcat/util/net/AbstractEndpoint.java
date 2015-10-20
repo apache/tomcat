@@ -49,8 +49,7 @@ public abstract class AbstractEndpoint<S> {
 
     // -------------------------------------------------------------- Constants
 
-    protected static final StringManager sm = StringManager.getManager(
-            AbstractEndpoint.class.getPackage().getName());
+    protected static final StringManager sm = StringManager.getManager(AbstractEndpoint.class);
 
     public static interface Handler<S> {
 

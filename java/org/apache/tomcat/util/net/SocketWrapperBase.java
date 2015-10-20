@@ -31,8 +31,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class SocketWrapperBase<E> {
 
-    protected static final StringManager sm = StringManager.getManager(
-            SocketWrapperBase.class.getPackage().getName());
+    protected static final StringManager sm = StringManager.getManager(SocketWrapperBase.class);
 
     private volatile E socket;
     private final AbstractEndpoint<E> endpoint;

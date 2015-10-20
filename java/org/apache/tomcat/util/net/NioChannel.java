@@ -27,7 +27,6 @@ import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- *
  * Base class for a SocketChannel wrapper used by the endpoint.
  * This way, logic for a SSL socket channel remains the same as for
  * a non SSL, making sure we don't need to code for any exception cases.
@@ -36,8 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class NioChannel implements ByteChannel {
 
-    protected static final StringManager sm = StringManager.getManager(
-            NioChannel.class.getPackage().getName());
+    protected static final StringManager sm = StringManager.getManager(NioChannel.class);
 
     protected static ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
