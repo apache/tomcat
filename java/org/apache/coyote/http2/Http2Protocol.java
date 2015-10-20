@@ -72,13 +72,13 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter) {
         UpgradeProcessorInternal processor = new UpgradeProcessorInternal(socketWrapper, null,
-                getInteralUpgradeHandler(adapter, null));
+                getInternalUpgradeHandler(adapter, null));
         return processor;
     }
 
 
     @Override
-    public InternalHttpUpgradeHandler getInteralUpgradeHandler(Adapter adapter,
+    public InternalHttpUpgradeHandler getInternalUpgradeHandler(Adapter adapter,
             Request coyoteRequest) {
         Http2UpgradeHandler result = new Http2UpgradeHandler(adapter, coyoteRequest);
 
