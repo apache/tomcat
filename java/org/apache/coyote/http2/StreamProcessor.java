@@ -305,7 +305,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case ASYNC_SETTIMEOUT: {
-            // TODO
+            if (param == null) {
+                return;
+            }
+            long timeout = ((Long) param).longValue();
+            setAsyncTimeout(timeout);
             break;
         }
         case ASYNC_TIMEOUT: {
