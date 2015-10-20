@@ -18,8 +18,6 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.Executor;
-
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
@@ -62,12 +60,6 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
 
 
     // ---------------------------- Processor methods that are NO-OP for upgrade
-
-    @Override
-    public final Executor getExecutor() {
-        return null;
-    }
-
 
     @Override
     public final SocketState service(SocketWrapperBase<?> socketWrapper) throws IOException {

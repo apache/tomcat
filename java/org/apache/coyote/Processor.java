@@ -18,24 +18,17 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
-import java.util.concurrent.Executor;
-
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
-
 
 /**
  * Common interface for processors of all protocols.
  */
 public interface Processor {
-
-    Executor getExecutor();
 
     /**
      * Process a connection. This is called whenever an event occurs (e.g. more
@@ -55,8 +48,6 @@ public interface Processor {
     SocketState process(SocketWrapperBase<?> socketWrapper, SocketStatus status) throws IOException;
 
     HttpUpgradeHandler getHttpUpgradeHandler();
-
-    void errorDispatch();
 
     boolean isAsync();
     boolean isUpgrade();
@@ -84,8 +75,4 @@ public interface Processor {
      * an existing multiplexed connection.
      */
     void pause();
-
-    void addDispatch(DispatchType dispatchType);
-
-    Iterator<DispatchType> getIteratorAndClearDispatches();
 }

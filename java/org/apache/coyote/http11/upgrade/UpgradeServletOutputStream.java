@@ -22,7 +22,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 
 import org.apache.coyote.ContainerThreadMarker;
-import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -36,7 +35,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private static final StringManager sm =
             StringManager.getManager(UpgradeServletOutputStream.class);
 
-    private final Processor processor;
+    private final UpgradeProcessorBase processor;
     private final SocketWrapperBase<?> socketWrapper;
 
     // Used to ensure that isReady() and onWritePossible() have a consistent
@@ -63,7 +62,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private volatile ClassLoader applicationLoader = null;
 
 
-    public UpgradeServletOutputStream(Processor processor, SocketWrapperBase<?> socketWrapper) {
+    public UpgradeServletOutputStream(UpgradeProcessorBase processor,
+            SocketWrapperBase<?> socketWrapper) {
         this.processor = processor;
         this.socketWrapper = socketWrapper;
     }
