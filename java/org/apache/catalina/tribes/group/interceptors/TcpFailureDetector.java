@@ -146,38 +146,47 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         if ( membership == null ) setupMembership();
         boolean notify = false;
         boolean shutdown = Arrays.equals(member.getCommand(),Member.SHUTDOWN_PAYLOAD);
-        if ( !shutdown )
-            if(log.isInfoEnabled())
-                log.info("Received memberDisappeared["+member+"] message. Will verify.");
-        synchronized (membership) {
-            if (!membership.contains(member)) {
-                if(log.isInfoEnabled())
-                    log.info("Verification complete. Member already disappeared["+member+"]");
-                return;
-            }
-            //check to see if the member really is gone
-            //if the payload is not a shutdown message
-            if (shutdown || !memberAlive(member)) {
-                //not correct, we need to maintain the map
+        if (shutdown) {
+            synchronized (membership) {
+                if (!membership.contains(member)) return;
                 membership.removeMember( (MemberImpl) member);
                 removeSuspects.remove(member);
                 if (member instanceof StaticMember) {
                     addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
                 }
-                notify = true;
-            } else {
-                //add the member as suspect
-                removeSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
             }
-        }
-        if ( notify ) {
-            if(log.isInfoEnabled())
-                log.info("Verification complete. Member disappeared["+member+"]");
             super.memberDisappeared(member);
         } else {
             if(log.isInfoEnabled())
-                log.info("Verification complete. Member still alive["+member+"]");
-
+                log.info("Received memberDisappeared["+member+"] message. Will verify.");
+            synchronized (membership) {
+                if (!membership.contains(member)) {
+                    if(log.isInfoEnabled())
+                        log.info("Verification complete. Member already disappeared["+member+"]");
+                    return;
+                }
+                //check to see if the member really is gone
+                if (!memberAlive(member)) {
+                    //not correct, we need to maintain the map
+                    membership.removeMember( (MemberImpl) member);
+                    removeSuspects.remove(member);
+                    if (member instanceof StaticMember) {
+                        addSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                    }
+                    notify = true;
+                } else {
+                    //add the member as suspect
+                    removeSuspects.put(member, Long.valueOf(System.currentTimeMillis()));
+                }
+            }
+            if ( notify ) {
+                if(log.isInfoEnabled())
+                    log.info("Verification complete. Member disappeared["+member+"]");
+                super.memberDisappeared(member);
+            } else {
+                if(log.isInfoEnabled()) 
+                    log.info("Verification complete. Member still alive["+member+"]");
+            }
         }
     }
 

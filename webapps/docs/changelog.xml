@@ -66,6 +66,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <scode>
+        Distinguish the handling of the shutdown payload and member verification
+        clearly. When handling shutdown payload, verification completion message
+        is not required. (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
