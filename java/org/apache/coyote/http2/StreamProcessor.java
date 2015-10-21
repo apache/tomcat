@@ -325,8 +325,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case NB_READ_INTEREST: {
-            AtomicBoolean result = (AtomicBoolean) param;
-            result.set(stream.getInputBuffer().isReady());
+            stream.getInputBuffer().registerReadInterest();
             break;
         }
         case NB_WRITE_INTEREST: {

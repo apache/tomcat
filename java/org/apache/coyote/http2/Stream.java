@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
@@ -563,6 +562,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 while (inBuffer.position() == 0 && !isInputFinished()) {
                     // Need to block until some data is written
                     try {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("stream.inputBuffer.empty"));
+                        }
                         inBuffer.wait();
                     } catch (InterruptedException e) {
                         // Possible shutdown / rst or similar. Use an
@@ -573,9 +575,14 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 }
 
                 if (inBuffer.position() > 0) {
-                    // Data remains in the in buffer. Copy it to the out buffer.
+                    // Data is available in the inBuffer. Copy it to the
+                    // outBuffer.
                     inBuffer.flip();
                     written = inBuffer.remaining();
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("stream.inputBuffer.copy",
+                                Integer.toString(written)));
+                    }
                     inBuffer.get(outBuffer, 0, written);
                     inBuffer.clear();
                 } else if (isInputFinished()) {
@@ -596,14 +603,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
 
-        boolean isReady() {
+        void registerReadInterest() {
             synchronized (inBuffer) {
-                if (inBuffer.position() == 0) {
-                    readInterest = true;
-                    return false;
-                } else {
-                    return true;
-                }
+                readInterest = true;
             }
         }
 
@@ -623,13 +625,20 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          */
         synchronized boolean onDataAvailable() {
             if (readInterest) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("stream.inputBuffer.dispatch"));
+                }
                 readInterest = false;
                 coyoteRequest.action(ActionCode.DISPATCH_READ, null);
-                if (!ContainerThreadMarker.isContainerThread()) {
-                    coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
-                }
+                // Always need to dispatch since this thread is processing
+                // the incoming connection and streams are processed on their
+                // own.
+                coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
                 return true;
             } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("stream.inputBuffer.signal"));
+                }
                 synchronized (inBuffer) {
                     inBuffer.notifyAll();
                 }
