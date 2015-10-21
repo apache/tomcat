@@ -611,7 +611,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
         synchronized boolean isRequestBodyFullyRead() {
-            return inBuffer.position() == 0 && isInputFinished();
+            return (inBuffer == null || inBuffer.position() == 0) && isInputFinished();
         }
 
 
