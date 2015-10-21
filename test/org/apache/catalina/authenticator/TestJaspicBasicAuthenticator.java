@@ -87,11 +87,12 @@ public class TestJaspicBasicAuthenticator extends TomcatBaseTest {
         lc.setRealmName(REALM);
         ctxt.setLoginConfig(lc);
 
+        JaspicAuthenticator authenticator = new JaspicAuthenticator();
+        ctxt.getPipeline().addValve(authenticator);
         AuthConfigFactory authConfigFactory = AuthConfigFactory.getFactory();
-        TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(ctxt);
+        TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(ctxt, authenticator.getAuthProperties());
         authConfigFactory.registerConfigProvider(provider, JaspicAuthenticator.MESSAGE_LAYER, null,
                 "Tomcat Jaspic");
-        ctxt.getPipeline().addValve(new JaspicAuthenticator());
 
         tomcat.start();
     }

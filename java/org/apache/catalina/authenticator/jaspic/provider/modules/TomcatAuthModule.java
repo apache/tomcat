@@ -57,7 +57,8 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
 
     protected Context context;
 
-    protected boolean cachePrincipalsInSession = true;
+    protected boolean cache = true;
+    protected boolean changeSessionIdOnAuthentication = true;
 
 
     public TomcatAuthModule(Context context) {
@@ -71,11 +72,13 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
     }
 
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public final void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
             CallbackHandler handler, Map options) throws AuthException {
         this.handler = handler;
+        this.cache = (Boolean.parseBoolean((String) options.get("cache")));
+        this.changeSessionIdOnAuthentication = Boolean.parseBoolean((String) options.get("changeSessionIdOnAuthentication"));
         String name = (String) options.get(REALM_NAME);
         if (name != null) {
             this.realmName = name;
@@ -99,9 +102,8 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
      * @param options
      * @throws AuthException
      */
-    @SuppressWarnings("rawtypes")
     public abstract void initializeModule(MessagePolicy requestPolicy,
-            MessagePolicy responsePolicy, CallbackHandler handler, Map options)
+            MessagePolicy responsePolicy, CallbackHandler handler, Map<String, String> options)
             throws AuthException;
 
 

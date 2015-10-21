@@ -17,6 +17,8 @@
 package org.apache.catalina.authenticator.jaspic;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,8 +51,7 @@ public class JaspicAuthenticator extends AuthenticatorBase {
 
     private Subject serviceSubject;
 
-    @SuppressWarnings("rawtypes")
-    private Map authProperties = null;
+    private Map<String, String> authProperties = new HashMap<>();
 
     private JaspicCallbackHandler callbackHandler;
 
@@ -157,4 +158,15 @@ public class JaspicAuthenticator extends AuthenticatorBase {
     protected String getAuthMethod() {
         return context.getLoginConfig().getAuthMethod();
     }
+
+
+    public void setProperty(String key, String value) {
+        this.authProperties.put(key, value);
+    }
+
+
+    public Map<String, String> getAuthProperties() {
+        return Collections.unmodifiableMap(authProperties);
+    }
+
 }

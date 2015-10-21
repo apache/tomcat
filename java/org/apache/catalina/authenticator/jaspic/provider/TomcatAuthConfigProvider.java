@@ -38,8 +38,9 @@ public class TomcatAuthConfigProvider implements AuthConfigProvider {
     private Context context;
 
 
-    public TomcatAuthConfigProvider(Context context) {
+    public TomcatAuthConfigProvider(Context context, Map<String, String> properties) {
         this.context = context;
+        this.providerProperties = properties;
     }
 
 
@@ -62,7 +63,7 @@ public class TomcatAuthConfigProvider implements AuthConfigProvider {
     public synchronized ServerAuthConfig getServerAuthConfig(String layer, String appContext,
             CallbackHandler handler) throws AuthException {
         if (this.serverAuthConfig == null) {
-            this.serverAuthConfig = new TomcatAuthConfig(layer, appContext, handler, context);
+            this.serverAuthConfig = new TomcatAuthConfig(layer, appContext, handler, context, providerProperties);
         }
         return this.serverAuthConfig;
     }

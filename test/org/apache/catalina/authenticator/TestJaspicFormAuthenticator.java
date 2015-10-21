@@ -636,11 +636,12 @@ public class TestJaspicFormAuthenticator extends TomcatBaseTest {
             realm.addUserRole("tomcat", "tomcat");
             ctx.setRealm(realm);
 
+            JaspicAuthenticator jaspicAuthenticator = new JaspicAuthenticator();
+            ctx.getPipeline().addValve(jaspicAuthenticator);
             AuthConfigFactory authConfigFactory = AuthConfigFactory.getFactory();
-            TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(ctx);
+            TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(ctx, jaspicAuthenticator.getAuthProperties());
             authConfigFactory.registerConfigProvider(provider, JaspicAuthenticator.MESSAGE_LAYER,
                     null, "Tomcat Jaspic");
-            ctx.getPipeline().addValve(new JaspicAuthenticator());
 
             tomcat.start();
 
@@ -704,11 +705,12 @@ public class TestJaspicFormAuthenticator extends TomcatBaseTest {
             realm.addUserRole("tomcat", "tomcat");
             ctx.setRealm(realm);
 
+            JaspicAuthenticator authenticator = new JaspicAuthenticator();
+            ctx.getPipeline().addValve(authenticator);
             AuthConfigFactory authConfigFactory = AuthConfigFactory.getFactory();
-            TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(ctx);
+            TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(ctx, authenticator.getAuthProperties());
             authConfigFactory.registerConfigProvider(provider, JaspicAuthenticator.MESSAGE_LAYER,
                     null, "Tomcat Jaspic");
-            ctx.getPipeline().addValve(new JaspicAuthenticator());
 
             tomcat.start();
 
