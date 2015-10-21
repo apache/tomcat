@@ -46,16 +46,18 @@ public class TomcatAuthConfig implements ServerAuthConfig {
     private Context context;
     private LoginConfig loginConfig;
     private Realm realm;
-
+    private Map<String, String> properties;
 
     public TomcatAuthConfig(String layer, String appContext, CallbackHandler callbackHandler,
-            Context context) {
+            Context context, Map<String, String> properties) throws AuthException {
         this.messageLayer = layer;
         this.appContext = appContext;
         this.handler = callbackHandler;
         this.context = context;
+        this.properties = properties;
         this.realm = context.getRealm();
         this.loginConfig = context.getLoginConfig();
+        initializeAuthContext(properties);
     }
 
 
@@ -90,21 +92,31 @@ public class TomcatAuthConfig implements ServerAuthConfig {
 
 
     @Override
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public synchronized ServerAuthContext getAuthContext(String authContextID,
             Subject serviceSubject, Map properties) throws AuthException {
         if (this.tomcatServerAuthContext == null) {
-            this.tomcatServerAuthContext = new TomcatServerAuthContext(handler, getModule(),
-                    getOptions());
+            initializeAuthContext(properties);
         }
         return tomcatServerAuthContext;
     }
 
 
-    private Map<String, String> getOptions() {
-        Map<String, String> options = new HashMap<>();
-        options.put(TomcatAuthModule.REALM_NAME, getRealmName());
-        return options;
+    private void initializeAuthContext(Map<String, String> properties) throws AuthException {
+        TomcatAuthModule module = getModule();
+        module.initialize(null, null, handler, getMergedProperties(properties));
+        this.tomcatServerAuthContext = new TomcatServerAuthContext(module);
+    }
+
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private Map<String, String> getMergedProperties(Map properties) {
+        Map<String, String> mergedProperties = new HashMap<>(this.properties);
+        mergedProperties.put(TomcatAuthModule.REALM_NAME, getRealmName());
+        if (properties != null) {
+            mergedProperties.putAll(properties);
+        }
+        return mergedProperties;
     }
 
 

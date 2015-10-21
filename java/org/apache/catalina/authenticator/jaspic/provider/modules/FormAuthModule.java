@@ -70,8 +70,6 @@ public class FormAuthModule extends TomcatAuthModule {
     private Realm realm;
     private LoginConfig loginConfig;
 
-    private boolean changeSessionIdOnAuthenication = true;
-
 
     public FormAuthModule(Context context) {
         super(context);
@@ -80,10 +78,11 @@ public class FormAuthModule extends TomcatAuthModule {
     }
 
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void initializeModule(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, Map options) throws AuthException {
+                        CallbackHandler handler, Map<String, String> options) throws AuthException {
+        this.characterEncoding = options.get("characterEncoding");
+        this.landingPage = options.get("landingPage");
     }
 
 
@@ -106,7 +105,7 @@ public class FormAuthModule extends TomcatAuthModule {
         Request request = (Request) messageInfo.getRequestMessage();
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
 
-        if (!cachePrincipalsInSession && isUserAuthenicatedBefore(request)) {
+        if (!cache && isUserAuthenticatedBefore(request)) {
             return handleSavedCredentials(clientSubject, request, response);
         }
 
@@ -118,13 +117,14 @@ public class FormAuthModule extends TomcatAuthModule {
         }
 
         if (!isLoginActionRequest(request)) {
-            return handleNoLoginAction(request, response);
+            return handleRedirectToLoginPage(request, response);
         }
 
-        return handleLoginAction(request, response);
+        return handleLoginFormAction(request, response);
     }
 
 
+ // TODO Extract common patterns in processing cached principal and cached credentials
     private AuthStatus handleSavedCredentials(Subject clientSubject, Request request,
             HttpServletResponse response) throws IOException, UnsupportedCallbackException {
         Session session = request.getSessionInternal(true);
@@ -154,7 +154,7 @@ public class FormAuthModule extends TomcatAuthModule {
     }
 
 
-    private boolean isUserAuthenicatedBefore(Request request) {
+    private boolean isUserAuthenticatedBefore(Request request) {
         Session session = request.getSessionInternal(true);
         String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
         String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
@@ -174,7 +174,7 @@ public class FormAuthModule extends TomcatAuthModule {
         // If we're caching principals we no longer need getPrincipal the
         // username
         // and password in the session, so remove them
-        if (cachePrincipalsInSession) {
+        if (cache) {
             session.removeNote(Constants.SESS_USERNAME_NOTE);
             session.removeNote(Constants.SESS_PASSWORD_NOTE);
         }
@@ -201,7 +201,7 @@ public class FormAuthModule extends TomcatAuthModule {
      * @return
      * @throws IOException
      */
-    private AuthStatus handleNoLoginAction(Request request, HttpServletResponse response)
+    private AuthStatus handleRedirectToLoginPage(Request request, HttpServletResponse response)
             throws IOException {
         Session session = request.getSessionInternal(true);
         if (log.isDebugEnabled()) {
@@ -230,7 +230,7 @@ public class FormAuthModule extends TomcatAuthModule {
      * @return
      * @throws IOException
      */
-    private AuthStatus handleLoginAction(Request request, HttpServletResponse response)
+    private AuthStatus handleLoginFormAction(Request request, HttpServletResponse response)
             throws IOException {
 
         request.getResponse().sendAcknowledgement();
@@ -374,7 +374,7 @@ public class FormAuthModule extends TomcatAuthModule {
             return;
         }
 
-        if (getChangeSessionIdOnAuthentication()) {
+        if (changeSessionIdOnAuthentication) {
             Session session = request.getSessionInternal(false);
             if (session != null) {
                 Manager manager = request.getContext().getManager();
@@ -403,11 +403,6 @@ public class FormAuthModule extends TomcatAuthModule {
             // Restore original method so that it is written into access log
             request.getCoyoteRequest().method().setString(oldMethod);
         }
-    }
-
-
-    private boolean getChangeSessionIdOnAuthentication() {
-        return changeSessionIdOnAuthenication ;
     }
 
 
