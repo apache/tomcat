@@ -215,13 +215,12 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     /**
-     * Paths accepting request parameters with nonce information are URLs that
-     * can supply nonces via request parameter 'X-CSRF-Token'. For use cases
-     * when a nonce information cannot be provided via header, one can provide
-     * it via request parameters. If there is a X-CSRF-Token header, it will be
-     * taken with preference over any parameter with the same name in the
-     * request. Request parameters cannot be used to fetch new nonce, only
-     * header.
+     * A comma separated list of URLs that can accept nonces via request
+     * parameter 'X-CSRF-Token'. For use cases when a nonce information cannot
+     * be provided via header, one can provide it via request parameters. If
+     * there is a X-CSRF-Token header, it will be taken with preference over any
+     * parameter with the same name in the request. Request parameters cannot be
+     * used to fetch new nonce, only header.
      *
      * @param pathsList
      *            Comma separated list of URLs to be configured as paths
