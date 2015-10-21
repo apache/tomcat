@@ -38,6 +38,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Security valve which implements JASPIC authentication.
@@ -45,6 +46,7 @@ import org.apache.juli.logging.LogFactory;
 public class JaspicAuthenticator extends AuthenticatorBase {
 
     private static final Log log = LogFactory.getLog(JaspicAuthenticator.class);
+    protected static final StringManager sm = StringManager.getManager(JaspicAuthenticator.class);
 
     private static final String AUTH_TYPE = "JASPIC";
     public static final String MESSAGE_LAYER = "HttpServlet";
