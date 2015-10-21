@@ -17,6 +17,8 @@
 package async;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -38,7 +40,9 @@ public class Async0 extends HttpServlet {
         if (Boolean.TRUE == req.getAttribute("dispatch")) {
             log.info("Received dispatch, completing on the worker thread.");
             log.info("After complete called started:"+req.isAsyncStarted());
-            resp.getWriter().write("Async dispatch worked:+"+System.currentTimeMillis()+"\n");
+            Date date = new Date(System.currentTimeMillis());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+            resp.getWriter().write("Async dispatch worked: " + sdf.format(date) + "\n");
         } else {
             resp.setContentType("text/plain");
             final AsyncContext actx = req.startAsync();

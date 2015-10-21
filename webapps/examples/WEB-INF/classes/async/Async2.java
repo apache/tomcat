@@ -17,6 +17,8 @@
 package async;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -34,7 +36,8 @@ public class Async2 extends HttpServlet {
     private static final Log log = LogFactory.getLog(Async2.class);
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         final AsyncContext actx = req.startAsync();
         actx.setTimeout(30*1000);
         Runnable run = new Runnable() {
@@ -45,7 +48,10 @@ public class Async2 extends HttpServlet {
                     log.info("Putting AsyncThread to sleep");
                     Thread.sleep(2*1000);
                     log.info("Writing data.");
-                    actx.getResponse().getWriter().write("Output from background thread. Time:"+System.currentTimeMillis()+"\n");
+                    Date date = new Date(System.currentTimeMillis());
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+                    actx.getResponse().getWriter().write(
+                            "Output from background thread. Time: " + sdf.format(date) + "\n");
                     actx.complete();
                 }catch (InterruptedException x) {
                     log.error("Async2",x);
