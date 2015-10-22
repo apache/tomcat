@@ -365,7 +365,7 @@
           <code>X-CSRF-Token: Fetch</code></li>
       <li>Cache the returned session id and nonce in order to provide them in
           the subsequent modifying requests to protected resources.</li>
-      <li>Modifying requests can be denied and header 
+      <li>Modifying requests can be denied and header
           <code>X-CSRF-Token: Required</code> will be returned in case of
           invalid or missing nonce, expired session or in case the session
           id is changed by the server.</li>
@@ -408,7 +408,7 @@ HTTP/1.1 200 OK
        Request parameters cannot be used to fetch new nonce, only header can be
        used to request a new nonce.</p>
 
-    <source><![CDATA[<filter>  
+    <source><![CDATA[<filter>
   <filter-name>RestCSRF</filter-name>
   <filter-class>org.apache.catalina.filters.RestCsrfPreventionFilter</filter-class>
   <init-param>
