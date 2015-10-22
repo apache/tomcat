@@ -116,12 +116,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
      * Remote settings are settings defined by the client and sent to Tomcat
      * that Tomcat must use when communicating with the client.
      */
-    private final ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote();
+    private final ConnectionSettingsRemote remoteSettings;
     /**
      * Local settings are settings defined by Tomcat and sent to the client that
      * the client must use when communicating with Tomcat.
      */
-    private final ConnectionSettingsLocal localSettings = new ConnectionSettingsLocal();
+    private final ConnectionSettingsLocal localSettings;
 
     private HpackDecoder hpackDecoder;
     private HpackEncoder hpackEncoder;
@@ -149,6 +149,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         super (STREAM_ID_ZERO);
         this.adapter = adapter;
         this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
+
+        remoteSettings = new ConnectionSettingsRemote(connectionId);
+        localSettings = new ConnectionSettingsLocal(connectionId);
 
         // Initial HTTP request becomes stream 1.
         if (coyoteRequest != null) {

@@ -28,6 +28,8 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
     private final Log log = LogFactory.getLog(ConnectionSettingsBase.class);
     private final StringManager sm = StringManager.getManager(ConnectionSettingsBase.class);
 
+    private final String connectionId;
+
     // Limits
     protected static final int MAX_WINDOW_SIZE = (1 << 31) - 1;
     protected static final int MIN_MAX_FRAME_SIZE = 1 << 14;
@@ -46,7 +48,8 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
     protected Map<Setting,Long> pending = new HashMap<>();
 
 
-    public ConnectionSettingsBase() {
+    public ConnectionSettingsBase(String connectionId) {
+        this.connectionId = connectionId;
         // Set up the defaults
         current.put(Setting.HEADER_TABLE_SIZE,      Long.valueOf(DEFAULT_HEADER_TABLE_SIZE));
         current.put(Setting.ENABLE_PUSH,            Long.valueOf(DEFAULT_ENABLE_PUSH ? 1 : 0));
@@ -59,7 +62,8 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
 
     public void set(Setting setting, long value) throws T {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("connectionSettings.debug", setting, Long.toString(value)));
+            log.debug(sm.getString("connectionSettings.debug",
+                    connectionId, setting, Long.toString(value)));
         }
 
         switch(setting) {
@@ -83,7 +87,8 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
             break;
         case UNKNOWN:
             // Unrecognised. Ignore it.
-            log.warn(sm.getString("connectionSettings.unknown", setting, Long.toString(value)));
+            log.warn(sm.getString("connectionSettings.unknown",
+                    connectionId, setting, Long.toString(value)));
             return;
         }
 
@@ -173,7 +178,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
         // Need to put a sensible limit on this. Start with 16k (default is 4k)
         if (headerTableSize > (16 * 1024)) {
             String msg = sm.getString("connectionSettings.headerTableSizeLimit",
-                    Long.toString(headerTableSize));
+                    connectionId, Long.toString(headerTableSize));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
         }
     }
@@ -184,7 +189,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
         // will never be negative
         if (enablePush > 1) {
             String msg = sm.getString("connectionSettings.enablePushInvalid",
-                    Long.toString(enablePush));
+                    connectionId, Long.toString(enablePush));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
         }
     }
@@ -193,7 +198,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
     private void validateInitialWindowSize(long initialWindowSize) throws T {
         if (initialWindowSize > MAX_WINDOW_SIZE) {
             String msg = sm.getString("connectionSettings.windowSizeTooBig",
-                    Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE));
+                    connectionId, Long.toString(initialWindowSize), Long.toString(MAX_WINDOW_SIZE));
             throwException(msg, Http2Error.FLOW_CONTROL_ERROR);
         }
     }
@@ -202,7 +207,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
     private void validateMaxFrameSize(long maxFrameSize) throws T {
         if (maxFrameSize < MIN_MAX_FRAME_SIZE || maxFrameSize > MAX_MAX_FRAME_SIZE) {
             String msg = sm.getString("connectionSettings.maxFrameSizeInvalid",
-                    Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
+                    connectionId, Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
                     Integer.toString(MAX_MAX_FRAME_SIZE));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
         }
