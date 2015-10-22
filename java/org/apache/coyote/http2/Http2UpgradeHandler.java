@@ -217,7 +217,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             socketWrapper.write(true, settings, 0, settings.length);
             socketWrapper.flush(true);
         } catch (IOException ioe) {
-            throw new IllegalStateException(sm.getString("upgradeHandler.sendPrefaceFail"), ioe);
+            throw new ProtocolException(sm.getString("upgradeHandler.sendPrefaceFail"), ioe);
         }
 
         // Make sure the client has sent a valid connection preface before we
