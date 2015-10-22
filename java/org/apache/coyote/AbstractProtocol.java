@@ -333,6 +333,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      *         for use in an ObjectName.
      */
     public String getName() {
+        return ObjectName.quote(getNameInternal());
+    }
+
+
+    private String getNameInternal() {
         StringBuilder name = new StringBuilder(getNamePrefix());
         name.append('-');
         if (getAddress() != null) {
@@ -352,7 +357,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         } else {
             name.append(port);
         }
-        return ObjectName.quote(name.toString());
+        return name.toString();
     }
 
 
@@ -543,10 +548,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             throw ex;
         }
 
-
         // Start async timeout thread
         asyncTimeout = new AsyncTimeout();
-        Thread timeoutThread = new Thread(asyncTimeout, getName() + "-AsyncTimeout");
+        Thread timeoutThread = new Thread(asyncTimeout, getNameInternal() + "-AsyncTimeout");
         timeoutThread.setPriority(endpoint.getThreadPriority());
         timeoutThread.setDaemon(true);
         timeoutThread.start();
