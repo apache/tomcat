@@ -18,6 +18,7 @@ package org.apache.catalina.authenticator.jaspic.provider.modules;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -29,10 +30,12 @@ import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.callback.CallerPrincipalCallback;
 import javax.security.auth.message.callback.GroupPrincipalCallback;
+import javax.security.auth.message.callback.PasswordValidationCallback;
 import javax.security.auth.message.module.ServerAuthModule;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -123,4 +126,12 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
         GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject, roles);
         handler.handle(new Callback[] { principalCallback, groupCallback });
     }
+
+    protected GenericPrincipal getPrincipal(PasswordValidationCallback passwordCallback) {
+        Iterator<Object> credentials = passwordCallback.getSubject().getPrivateCredentials()
+                .iterator();
+        return (GenericPrincipal) credentials.next();
+    }
+
+
 }

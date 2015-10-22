@@ -402,7 +402,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         };
     }
 
-    private static class DigestInfo {
+    public static class DigestInfo {
 
         private final String opaque;
         private final long nonceValidity;
@@ -608,7 +608,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     }
 
-    private static class NonceInfo {
+    public static class NonceInfo {
         private final long timestamp;
         private final boolean seen[];
         private final int offset;

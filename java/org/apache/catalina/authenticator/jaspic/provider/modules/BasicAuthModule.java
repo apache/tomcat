@@ -18,7 +18,6 @@ package org.apache.catalina.authenticator.jaspic.provider.modules;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -35,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.BasicAuthenticator.BasicCredentials;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 
@@ -53,10 +51,9 @@ public class BasicAuthModule extends TomcatAuthModule {
     }
 
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void initializeModule(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, Map options) throws AuthException {
+            CallbackHandler handler, Map<String, String> options) throws AuthException {
     }
 
 
@@ -111,13 +108,6 @@ public class BasicAuthModule extends TomcatAuthModule {
             throw new AuthException(e.getMessage());
         }
         return AuthStatus.SEND_CONTINUE;
-    }
-
-
-    private GenericPrincipal getPrincipal(PasswordValidationCallback passwordCallback) {
-        Iterator<Object> credentials = passwordCallback.getSubject().getPrivateCredentials()
-                .iterator();
-        return (GenericPrincipal) credentials.next();
     }
 
 
