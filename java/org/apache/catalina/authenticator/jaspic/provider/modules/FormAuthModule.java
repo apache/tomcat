@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
@@ -45,7 +46,6 @@ import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.authenticator.SavedRequest;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -124,7 +124,6 @@ public class FormAuthModule extends TomcatAuthModule {
     }
 
 
- // TODO Extract common patterns in processing cached principal and cached credentials
     private AuthStatus handleSavedCredentials(Subject clientSubject, Request request,
             HttpServletResponse response) throws IOException, UnsupportedCallbackException {
         Session session = request.getSessionInternal(true);
@@ -133,16 +132,20 @@ public class FormAuthModule extends TomcatAuthModule {
         }
 
         String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
-        String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
+        String passwordString = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
+        char[] password = (passwordString != null) ? passwordString.toCharArray() : null;
         if (log.isDebugEnabled()) {
             log.debug("Reauthenticating username '" + username + "'");
         }
 
-        Principal principal = realm.authenticate(username, password);
-        if (principal == null) {
+        PasswordValidationCallback passwordCallback = new PasswordValidationCallback(
+                clientSubject, username, password);
+        handler.handle(new Callback[] { passwordCallback });
+        if (!passwordCallback.getResult()) {
             forwardToErrorPage(request, response);
             return AuthStatus.FAILURE;
         }
+        Principal principal = getPrincipal(passwordCallback);
 
         session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
         if (isMatchingSavedRequest(request)) {
@@ -339,13 +342,6 @@ public class FormAuthModule extends TomcatAuthModule {
     @Override
     public Class<?>[] getSupportedMessageTypes() {
         return supportedMessageTypes;
-    }
-
-
-    private GenericPrincipal getPrincipal(PasswordValidationCallback passwordCallback) {
-        Iterator<Object> credentials = passwordCallback.getSubject().getPrivateCredentials()
-                .iterator();
-        return (GenericPrincipal) credentials.next();
     }
 
 

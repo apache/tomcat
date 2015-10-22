@@ -307,13 +307,13 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     /**
      * This class gets a gss credential via a privileged action.
      */
-    private static class AcceptAction implements PrivilegedExceptionAction<byte[]> {
+    public static class AcceptAction implements PrivilegedExceptionAction<byte[]> {
 
         GSSContext gssContext;
 
         byte[] decoded;
 
-        AcceptAction(GSSContext context, byte[] decodedToken) {
+        public AcceptAction(GSSContext context, byte[] decodedToken) {
             this.gssContext = context;
             this.decoded = decodedToken;
         }
@@ -326,7 +326,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
 
-    private static class AuthenticateAction implements PrivilegedAction<Principal> {
+    public static class AuthenticateAction implements PrivilegedAction<Principal> {
 
         private final Realm realm;
         private final GSSContext gssContext;
@@ -359,7 +359,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
      * This hack works by re-ordering the list of mechTypes in the NegTokenInit
      * token.
      */
-    private static class SpnegoTokenFixer {
+    public static class SpnegoTokenFixer {
 
         public static void fix(byte[] token) {
             SpnegoTokenFixer fixer = new SpnegoTokenFixer(token);
