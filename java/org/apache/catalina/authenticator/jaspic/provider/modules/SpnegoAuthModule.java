@@ -33,7 +33,6 @@ import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
@@ -64,19 +63,10 @@ import org.ietf.jgss.Oid;
 public class SpnegoAuthModule extends TomcatAuthModule {
     private static final Log log = LogFactory.getLog(SpnegoAuthModule.class);
 
-    private Class<?>[] supportedMessageTypes = new Class[] { HttpServletRequest.class,
-            HttpServletResponse.class };
-
     private String loginConfigName = Constants.DEFAULT_LOGIN_MODULE_NAME;
     private boolean storeDelegatedCredential = true;
     private Pattern noKeepAliveUserAgents = null;
     private boolean applyJava8u40Fix = true;
-
-    @Override
-    public Class<?>[] getSupportedMessageTypes() {
-        return supportedMessageTypes;
-    }
-
 
     @Override
     public void initializeModule(MessagePolicy requestPolicy, MessagePolicy responsePolicy,

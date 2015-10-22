@@ -16,32 +16,29 @@
  */
 package org.apache.catalina.authenticator.jaspic.provider.modules;
 
-import java.io.IOException;
-import java.text.MessageFormat;
+import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.util.Map;
 
 import javax.security.auth.Subject;
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
-import javax.security.auth.message.callback.PasswordValidationCallback;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.authenticator.BasicAuthenticator.BasicCredentials;
+import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
-import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.coyote.ActionCode;
 
 /**
  * This class implements JASPIC based HTTP BASIC authentication.
  */
-public class BasicAuthModule extends TomcatAuthModule {
+public class SSLAuthModule extends TomcatAuthModule {
 
-    public BasicAuthModule(Context context) {
+    public SSLAuthModule(Context context) {
         super(context);
     }
 
@@ -61,49 +58,58 @@ public class BasicAuthModule extends TomcatAuthModule {
 
         Request request = (Request) messageInfo.getRequestMessage();
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
-        MessageBytes authorization = request.getCoyoteRequest().getMimeHeaders()
-                .getValue(AUTHORIZATION_HEADER);
-
-        String realmName = getRealmName();
-
-        if (authorization == null) {
-            return sendUnauthorizedError(response, realmName);
-        }
-
-        authorization.toBytes();
-        ByteChunk authorizationBC = authorization.getByteChunk();
-        BasicCredentials credentials = null;
         try {
-            credentials = new BasicCredentials(authorizationBC);
-            String username = credentials.getUsername();
-            char[] password = credentials.getPassword().toCharArray();
+            X509Certificate certs[] = getRequestCertificates(request);
 
-            PasswordValidationCallback passwordCallback = new PasswordValidationCallback(
-                    clientSubject, username, password);
-            handler.handle(new Callback[] { passwordCallback });
-
-            if (!passwordCallback.getResult()) {
-                return sendUnauthorizedError(response, realmName);
+            if ((certs == null) || (certs.length < 1)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                        sm.getString("authenticator.certificates"));
+                return AuthStatus.FAILURE;
             }
-            handlePrincipalCallbacks(clientSubject, getPrincipal(passwordCallback));
+
+            // Authenticate the specified certificate chain
+            Principal principal = context.getRealm().authenticate(certs);
+            if (principal == null) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                        sm.getString("authenticator.unauthorized"));
+                return AuthStatus.FAILURE;
+            }
+            handlePrincipalCallbacks(clientSubject, principal);
             return AuthStatus.SUCCESS;
         } catch (Exception e) {
             throw new AuthException(e.getMessage());
         }
+
     }
 
 
-    private AuthStatus sendUnauthorizedError(HttpServletResponse response, String realmName)
-            throws AuthException {
-        String authHeader = MessageFormat.format("Basic realm=\"{0}\"", realmName);
-        response.setHeader(AUTH_HEADER_NAME, authHeader);
-        try {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-        } catch (IOException e) {
-            throw new AuthException(e.getMessage());
+    /**
+     * Look for the X509 certificate chain in the Request under the key
+     * <code>javax.servlet.request.X509Certificate</code>. If not found, trigger
+     * extracting the certificate chain from the Coyote request.
+     *
+     * @param request   Request to be processed
+     *
+     * @return          The X509 certificate chain if found, <code>null</code>
+     *                  otherwise.
+     */
+    protected X509Certificate[] getRequestCertificates(final Request request)
+            throws IllegalStateException {
+
+        X509Certificate certs[] =
+                (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+
+        if ((certs == null) || (certs.length < 1)) {
+            try {
+                request.getCoyoteRequest().action(ActionCode.REQ_SSL_CERTIFICATE, null);
+                certs = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+            } catch (IllegalStateException ise) {
+                // Request body was too large for save buffer
+                // Return null which will trigger an auth failure
+            }
         }
-        return AuthStatus.SEND_CONTINUE;
-    }
 
+        return certs;
+    }
 
 }

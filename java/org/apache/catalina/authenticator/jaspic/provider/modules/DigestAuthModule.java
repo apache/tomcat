@@ -51,9 +51,6 @@ public class DigestAuthModule extends TomcatAuthModule {
      */
     protected static final String QOP = "auth";
 
-    private Class<?>[] supportedMessageTypes = new Class[] { HttpServletRequest.class,
-            HttpServletResponse.class };
-
     private CallbackHandler handler;
 
     private Realm realm;
@@ -289,25 +286,6 @@ public class DigestAuthModule extends TomcatAuthModule {
             throw new AuthException(e.getMessage());
         }
         return AuthStatus.SEND_CONTINUE;
-    }
-
-
-    @Override
-    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
-            throws AuthException {
-        return null;
-    }
-
-
-    @Override
-    public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
-
-    }
-
-
-    @Override
-    public Class<?>[] getSupportedMessageTypes() {
-        return supportedMessageTypes;
     }
 
 
