@@ -539,12 +539,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public void start() throws Exception {
         if (getLog().isInfoEnabled())
             getLog().info(sm.getString("abstractProtocolHandler.start",
-                    getName()));
+                    getNameInternal()));
         try {
             endpoint.start();
         } catch (Exception ex) {
             getLog().error(sm.getString("abstractProtocolHandler.startError",
-                    getName()), ex);
+                    getNameInternal()), ex);
             throw ex;
         }
 
