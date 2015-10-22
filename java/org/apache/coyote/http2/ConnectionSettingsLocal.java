@@ -34,6 +34,12 @@ public class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgum
 
     private boolean sendInProgress = false;
 
+
+    public ConnectionSettingsLocal(String connectionId) {
+        super(connectionId);
+    }
+
+
     @Override
     protected synchronized void set(Setting setting, Long value) {
         checkSend();

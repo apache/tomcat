@@ -717,7 +717,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         private StringBuffer trace = new StringBuffer();
         private String lastStreamId = "0";
-        private ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote();
+        private ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote("-1");
 
 
         @Override
