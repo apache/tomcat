@@ -35,7 +35,6 @@ import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.callback.PasswordValidationCallback;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
@@ -60,9 +59,6 @@ import org.apache.tomcat.util.http.MimeHeaders;
  */
 public class FormAuthModule extends TomcatAuthModule {
     private static final Log log = LogFactory.getLog(FormAuthModule.class);
-
-    private Class<?>[] supportedMessageTypes = new Class[] { HttpServletRequest.class,
-            HttpServletResponse.class };
 
     private String landingPage;
     private String characterEncoding;
@@ -324,24 +320,6 @@ public class FormAuthModule extends TomcatAuthModule {
         saved.setRequestURI(uri);
         saved.setDecodedRequestURI(uri);
         request.getSessionInternal(true).setNote(Constants.FORM_REQUEST_NOTE, saved);
-    }
-
-
-    @Override
-    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
-            throws AuthException {
-        return null;
-    }
-
-
-    @Override
-    public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
-    }
-
-
-    @Override
-    public Class<?>[] getSupportedMessageTypes() {
-        return supportedMessageTypes;
     }
 
 

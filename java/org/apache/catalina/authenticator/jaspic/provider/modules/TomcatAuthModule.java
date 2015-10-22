@@ -26,15 +26,18 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
+import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.callback.CallerPrincipalCallback;
 import javax.security.auth.message.callback.GroupPrincipalCallback;
 import javax.security.auth.message.callback.PasswordValidationCallback;
 import javax.security.auth.message.module.ServerAuthModule;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
+import org.apache.catalina.connector.Request;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -53,6 +56,9 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(TomcatAuthModule.class);
+
+    private Class<?>[] supportedMessageTypes = new Class[] { Request.class,
+            HttpServletResponse.class };
 
     protected String realmName = DEFAULT_REALM_NAME;
 
@@ -133,5 +139,21 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
         return (GenericPrincipal) credentials.next();
     }
 
+
+    @Override
+    public Class<?>[] getSupportedMessageTypes() {
+        return supportedMessageTypes;
+    }
+
+    @Override
+    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
+            throws AuthException {
+        return null;
+    }
+
+
+    @Override
+    public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
+    }
 
 }
