@@ -616,6 +616,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
         synchronized int available() {
+            if (inBuffer == null) {
+                return 0;
+            }
             return inBuffer.position();
         }
 
