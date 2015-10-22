@@ -209,7 +209,6 @@ public class SecureNio2Channel extends Nio2Channel  {
         SSLEngineResult handshake = null;
 
         while (!handshakeComplete) {
-            log.debug("Handshake status [" + handshakeStatus + "]" );
             switch (handshakeStatus) {
                 case NOT_HANDSHAKING: {
                     //should never happen
@@ -302,7 +301,6 @@ public class SecureNio2Channel extends Nio2Channel  {
                 }
                 default: throw new IllegalStateException(sm.getString("channel.nio.ssl.invalidStatus", handshakeStatus));
             }
-            log.debug("Handshake complete [" + handshakeComplete + "]" );
         }
         //return 0 if we are complete, otherwise recurse to process the task
         return handshakeComplete ? 0 : handshakeInternal(async);
@@ -461,7 +459,6 @@ public class SecureNio2Channel extends Nio2Channel  {
         netOutBuffer.flip();
         //set the status
         handshakeStatus = result.getHandshakeStatus();
-        log.debug("Result [" + result + "]");
         return result;
     }
 
@@ -498,7 +495,6 @@ public class SecureNio2Channel extends Nio2Channel  {
             cont = result.getStatus() == SSLEngineResult.Status.OK &&
                    handshakeStatus == HandshakeStatus.NEED_UNWRAP;
         } while (cont);
-        log.debug("Result [" + result + "]");
         return result;
     }
 
