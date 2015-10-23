@@ -220,7 +220,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             socketWrapper.write(true, settings, 0, settings.length);
             socketWrapper.flush(true);
         } catch (IOException ioe) {
-            throw new ProtocolException(sm.getString("upgradeHandler.sendPrefaceFail"), ioe);
+            String msg = sm.getString("upgradeHandler.sendPrefaceFail", connectionId);
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
+            throw new ProtocolException(msg, ioe);
         }
 
         // Make sure the client has sent a valid connection preface before we
@@ -228,8 +232,14 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         try {
             parser.readConnectionPreface();
         } catch (Http2Exception e) {
-            throw new ProtocolException(
-                    sm.getString("upgradeHandler.invalidPreface", connectionId));
+            String msg = sm.getString("upgradeHandler.invalidPreface", connectionId);
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
+            throw new ProtocolException(msg);
+        }
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("upgradeHandler.prefaceReceived", connectionId));
         }
 
         // Send a ping to get an idea of round trip time as early as possible
