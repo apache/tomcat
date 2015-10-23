@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 
 import org.apache.catalina.Context;
+import org.apache.tomcat.util.scan.JarFactory;
 
 /**
  * A variation of Java's JAR ServiceLoader that respects exclusion rules for
@@ -112,7 +113,7 @@ public class WebappServiceLoader<T> {
                 if (base.endsWith("/")) {
                     url = new URL(base + configFile);
                 } else {
-                    url = new URL("jar:" + base + "!/" + configFile);
+                    url = JarFactory.getJarEntryURL(jarUrl, configFile);
                 }
                 try {
                     parseConfigFile(applicationServicesFound, url);
