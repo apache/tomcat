@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.66 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>58522</bug>: Fixed concurrency issue when iterating web
+        application's resources. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>

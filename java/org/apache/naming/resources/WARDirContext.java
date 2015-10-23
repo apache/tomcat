@@ -760,7 +760,6 @@ public class WARDirContext extends BaseDirContext {
         
         ArrayList<NamingEntry> entries = new ArrayList<NamingEntry>();
         Entry[] children = entry.getChildren();
-        Arrays.sort(children);
         NamingEntry namingEntry = null;
         
         for (int i = 0; i < children.length; i++) {
@@ -811,6 +810,9 @@ public class WARDirContext extends BaseDirContext {
         protected Entry children[] = new Entry[0];
         
         
+        protected volatile boolean childrenSorted = false;
+
+
         // ----------------------------------------------------- Public Methods
         
         
@@ -849,10 +851,19 @@ public class WARDirContext extends BaseDirContext {
                 newChildren[i] = children[i];
             newChildren[children.length] = entry;
             children = newChildren;
+            childrenSorted = false;
         }
 
 
         public Entry[] getChildren() {
+            if (!childrenSorted) {
+                synchronized (children) {
+                    if (!childrenSorted) {
+                        Arrays.sort(children);
+                        childrenSorted = true;
+                    }
+                }
+            }
             return children;
         }
 
