@@ -172,7 +172,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     @Override
     public void init(WebConnection webConnection) {
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.init", connectionId));
+            log.debug(sm.getString("upgradeHandler.init", connectionId, connectionState.get()));
         }
 
         if (!connectionState.compareAndSet(ConnectionState.NEW, ConnectionState.CONNECTED)) {
