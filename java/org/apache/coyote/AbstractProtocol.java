@@ -673,6 +673,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         @Override
         public SocketState process(SocketWrapperBase<S> wrapper, SocketStatus status) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("abstractConnectionHandler.process",
+                        wrapper.getSocket(), status));
+            }
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
                 return SocketState.CLOSED;
