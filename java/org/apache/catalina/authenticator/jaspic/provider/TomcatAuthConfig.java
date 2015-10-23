@@ -31,6 +31,9 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.authenticator.jaspic.provider.modules.BasicAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.DigestAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.FormAuthModule;
+import org.apache.catalina.authenticator.jaspic.provider.modules.NonLoginAuthModule;
+import org.apache.catalina.authenticator.jaspic.provider.modules.SSLAuthModule;
+import org.apache.catalina.authenticator.jaspic.provider.modules.SpnegoAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.TomcatAuthModule;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.res.StringManager;
@@ -123,19 +126,21 @@ public class TomcatAuthConfig implements ServerAuthConfig {
     private TomcatAuthModule getModule() throws AuthException {
         String authMethod = getAuthMethod();
         switch (authMethod) {
-        case "BASIC": {
+        case "BASIC":
             return new BasicAuthModule(context);
-        }
-        case "DIGEST": {
+        case "DIGEST":
             return new DigestAuthModule(context);
-        }
-        case "FORM": {
+        case "FORM":
             return new FormAuthModule(context);
-        }
-        default: {
+        case "NONE":
+            return new NonLoginAuthModule(context);
+        case "SPNEGO":
+            return new SpnegoAuthModule(context);
+        case "CLIENT-CERT":
+            return new SSLAuthModule(context);
+        default:
             throw new AuthException(
                     sm.getString("authenticator.jaspic.unknownAuthType", authMethod));
-        }
         }
     }
 

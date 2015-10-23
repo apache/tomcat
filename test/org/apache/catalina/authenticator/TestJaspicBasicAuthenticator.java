@@ -63,7 +63,7 @@ public class TestJaspicBasicAuthenticator extends TomcatBaseTest {
         super.setUp();
 
         Tomcat tomcat = getTomcatInstance();
-        Context ctxt = tomcat.addContext("/", null);
+        Context ctxt = tomcat.addContext("", null);
 
         // Add protected servlet
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
