@@ -15,19 +15,29 @@
  *  limitations under the License.
  */
 
-package org.apache.tomcat.util.net.jsse.openssl;
+package org.apache.tomcat.util.net.openssl.ciphers;
 
-public enum Authentication {
-    RSA /* RSA auth */,
-    DSS /* DSS auth */,
-    aNULL /* no auth (i.e. use ADH or AECDH) */,
-    DH /* Fixed DH auth (kDHd or kDHr) */,
-    ECDH /* Fixed ECDH auth (kECDHe or kECDHr) */,
-    KRB5 /* KRB5 auth */,
-    ECDSA/* ECDSA auth*/,
-    PSK /* PSK auth */,
-    GOST94 /* GOST R 34.10-94 signature auth */,
-    GOST01 /* GOST R 34.10-2001 */,
-    FZA /* Fortezza */,
-    SRP
+import org.apache.tomcat.util.net.Constants;
+
+enum Protocol {
+
+    SSLv3(Constants.SSL_PROTO_SSLv3),
+    SSLv2(Constants.SSL_PROTO_SSLv2),
+    TLSv1(Constants.SSL_PROTO_SSLv3),
+    TLSv1_2(Constants.SSL_PROTO_TLSv1_2);
+
+    private final String openSSLName;
+
+    private Protocol(String openSSLName) {
+        this.openSSLName = openSSLName;
+    }
+
+    /**
+     * The name returned by OpenSSL in the protocol column when using
+     * <code>openssl ciphers -v</code>. This is currently only used by the unit
+     * tests hence it is package private.
+     */
+    String getOpenSSLName() {
+        return openSSLName;
+    }
 }
