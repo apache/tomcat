@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+ <?xml version="1.0"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -1473,7 +1473,7 @@
             <!-- Exclude the tests known to fail -->
             <exclude name="org/apache/catalina/tribes/test/**" />
             <!-- Exclude the OpenSSL tests unless OpenSSL is available -->
-            <exclude name="org/apache/tomcat/util/net/jsse/openssl/**" unless="${test.openssl.exists}" />
+            <exclude name="org/apache/tomcat/util/net/openssl/ciphers/**" unless="${test.openssl.exists}" />
             <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
             <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
           </fileset>
