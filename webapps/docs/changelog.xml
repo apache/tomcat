@@ -61,6 +61,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>58508</bug>: Escape role names when generating associated MBeans in
+        case the role name contains characters not permitted in an MBean name.
+        (markt)
+      </fix>
+      <fix>
         <bug>58522</bug>: Fixed concurrency issue when iterating web
         application's resources. (violetagg)
       </fix>
