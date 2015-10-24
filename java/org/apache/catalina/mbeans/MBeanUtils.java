@@ -483,16 +483,13 @@ public class MBeanUtils {
      *
      * @exception MalformedObjectNameException if a name cannot be created
      */
-    static ObjectName createObjectName(String domain,
-                                              Role role)
-        throws MalformedObjectNameException {
+    static ObjectName createObjectName(String domain, Role role)
+            throws MalformedObjectNameException {
 
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=Role,rolename=" +
-                              role.getRolename() + ",database=" +
-                              role.getUserDatabase().getId());
-        return (name);
-
+         ObjectName name = new ObjectName(domain + ":type=Role,rolename=" +
+                 ObjectName.quote(role.getRolename()) +
+                 ",database=" + role.getUserDatabase().getId());
+        return name;
     }
 
 
@@ -505,16 +502,13 @@ public class MBeanUtils {
      *
      * @exception MalformedObjectNameException if a name cannot be created
      */
-    static ObjectName createObjectName(String domain,
-                                              User user)
-        throws MalformedObjectNameException {
+    static ObjectName createObjectName(String domain, User user)
+            throws MalformedObjectNameException {
 
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=User,username=" +
-                              ObjectName.quote(user.getUsername())
-                              + ",database=" + user.getUserDatabase().getId());
-        return (name);
-
+        ObjectName name = new ObjectName(domain + ":type=User,username=" +
+                ObjectName.quote(user.getUsername()) +
+                ",database=" + user.getUserDatabase().getId());
+        return name;
     }
 
 
