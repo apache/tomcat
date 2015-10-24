@@ -81,9 +81,6 @@ public class Response
     private static final boolean ENFORCE_ENCODING_IN_GET_WRITER;
 
     static {
-        // Ensure that URL is loaded for SM
-        URL.isSchemeChar('c');
-
         ENFORCE_ENCODING_IN_GET_WRITER = Boolean.valueOf(
                 System.getProperty("org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER",
                         "true")).booleanValue();
@@ -1593,7 +1590,7 @@ public class Response
                 throw iae;
             }
 
-        } else if (leadingSlash || !hasScheme(location)) {
+        } else if (leadingSlash || !URL.hasScheme(location)) {
 
             redirectURLCC.recycle();
 
@@ -1766,22 +1763,6 @@ public class Response
             return false;
         }
         return true;
-    }
-
-    /**
-     * Determine if a URI string has a <code>scheme</code> component.
-     */
-    private boolean hasScheme(String uri) {
-        int len = uri.length();
-        for(int i=0; i < len ; i++) {
-            char c = uri.charAt(i);
-            if(c == ':') {
-                return i > 0;
-            } else if(!URL.isSchemeChar(c)) {
-                return false;
-            }
-        }
-        return false;
     }
 
     /**
