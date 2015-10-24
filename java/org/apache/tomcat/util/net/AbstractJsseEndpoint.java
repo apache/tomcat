@@ -27,8 +27,8 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSessionContext;
 
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
-import org.apache.tomcat.util.net.jsse.openssl.Cipher;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
+import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
 public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 

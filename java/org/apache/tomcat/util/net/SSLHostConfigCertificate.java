@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.tomcat.util.net.AbstractJsseEndpoint.SSLContextWrapper;
-import org.apache.tomcat.util.net.jsse.openssl.Authentication;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 
 
 public class SSLHostConfigCertificate {

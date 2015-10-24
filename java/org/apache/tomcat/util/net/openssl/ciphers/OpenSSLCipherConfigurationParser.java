@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.tomcat.util.net.jsse.openssl;
+package org.apache.tomcat.util.net.openssl.ciphers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
