@@ -1342,9 +1342,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         try {
             checkStateForResourceLoading(className);
         } catch (IllegalStateException ise) {
-            ClassNotFoundException cnfe = new ClassNotFoundException();
-            cnfe.initCause(ise);
-            throw cnfe;
+            throw new ClassNotFoundException(ise.getMessage(), ise);
         }
     }
 
