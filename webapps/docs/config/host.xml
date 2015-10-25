@@ -606,7 +606,7 @@
   ...
   <Listener className="org.apache.catalina.startup.UserConfig"
             directoryName="public_html"
-            homeBase=c:\Homes"
+            homeBase="c:\Homes"
             userClass="org.apache.catalina.startup.HomesUserDatabase"/>
   ...
 </Host>]]></source>
