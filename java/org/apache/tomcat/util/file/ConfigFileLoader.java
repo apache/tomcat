@@ -30,11 +30,12 @@ import java.net.URL;
  */
 public class ConfigFileLoader {
 
+    private static final File CATALINA_BASE_FILE;
     private static final URI CATALINA_BASE_URI;
 
     static {
-        File catalinaBase = new File(System.getProperty("catalina.base"));
-        CATALINA_BASE_URI = catalinaBase.toURI();
+        CATALINA_BASE_FILE = new File(System.getProperty("catalina.base"));
+        CATALINA_BASE_URI = CATALINA_BASE_FILE.toURI();
     }
 
     private ConfigFileLoader() {
@@ -59,17 +60,30 @@ public class ConfigFileLoader {
         // Absolute URIs will be left alone
         // Relative files will be resolved relative to catalina base
         // Absolute files will be converted to URIs
-        URI uri;
-        if (location != null &&
-                (location.length() > 2 && ":\\".equals(location.substring(1, 3)) ||
-                    location.startsWith("\\\\"))) {
-            // This is an absolute file path in Windows or a UNC path
-            File f = new File(location);
-            uri =f.getAbsoluteFile().toURI();
-        } else {
-            // URL, relative path or an absolute path on a non-Windows platforms
+
+        URI uri = null;
+
+        // Location was originally always a file before URI support was added so
+        // try file first.
+
+        // First guess, an absolute file path
+        File f = new File(location);
+        if (!f.isFile()) {
+            // Second guess, a file path relative to CATALINA_BASE
+            if (!f.isAbsolute()) {
+                f = new File(CATALINA_BASE_FILE, location);
+            }
+        }
+        if (f.isFile()) {
+            uri = f.getAbsoluteFile().toURI();
+        }
+
+        if (uri == null) {
+            // Third and final guess, a URI
             uri = CATALINA_BASE_URI.resolve(location);
         }
+
+        // Obtain the input stream we need
         URL url = uri.toURL();
         return url.openConnection().getInputStream();
     }
