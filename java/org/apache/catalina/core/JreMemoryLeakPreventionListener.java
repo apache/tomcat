@@ -27,6 +27,7 @@ import java.sql.DriverManager;
 import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -38,6 +39,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.compat.JreVendor;
 import org.apache.tomcat.util.res.StringManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.ls.DOMImplementationLS;
 
 /**
  * Provide a workaround for known places where the Java Runtime environment can
@@ -423,15 +426,27 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 }
 
                 /*
-                 * Haven't got to the root of what is going on with this leak
-                 * but if a web app is the first to make the calls below the web
-                 * application class loader will be pinned in memory.
+                 * Various leaks related to the use of XML parsing.
                  */
                 if (xmlParsingProtection) {
-                    DocumentBuilderFactory factory =
-                        DocumentBuilderFactory.newInstance();
+                    /*
+                     * Haven't got to the root of what is going on with this
+                     * leak but if a web app is the first to make the following
+                     * two calls the web application class loader will be pinned
+                     * in memory.
+                     */
+                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                     try {
-                        factory.newDocumentBuilder();
+                        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+                        // Bug 58486 identified two additional memory leaks.
+                        // The first is in DOMSerializerImpl.abort
+                        Document document = documentBuilder.newDocument();
+                        document.createElement("dummy");
+                        DOMImplementationLS implementation =
+                                (DOMImplementationLS)document.getImplementation();
+                        implementation.createLSSerializer().writeToString(document);
+                        // The second leak is in DOMNormalizer
+                        document.normalize();
                     } catch (ParserConfigurationException e) {
                         log.error(sm.getString("jreLeakListener.xmlParseFail"),
                                 e);
