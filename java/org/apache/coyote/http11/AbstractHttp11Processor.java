@@ -914,7 +914,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
     }
 
-    abstract void actionInternal(ActionCode actionCode, Object param);
+    protected abstract void actionInternal(ActionCode actionCode, Object param);
 
 
     /**
@@ -1593,7 +1593,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         return connection.equals(Constants.CLOSE);
     }
 
-    abstract boolean prepareSendfile(OutputFilter[] outputFilters);
+    protected abstract boolean prepareSendfile(OutputFilter[] outputFilters);
 
     /**
      * Parse host.

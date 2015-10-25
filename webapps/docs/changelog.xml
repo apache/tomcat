@@ -64,6 +64,10 @@
         <bug>58486</bug>: Protect against two further possible memory leaks
         associated with XML parsing. (markt)
       </add>
+      <scode>
+        <bug>58497</bug>: Make <code>AbstractHttp11Processor</code> easy to
+        extend. (markt)
+      </scode>
       <fix>
         <bug>58508</bug>: Escape role names when generating associated MBeans in
         case the role name contains characters not permitted in an MBean name.
