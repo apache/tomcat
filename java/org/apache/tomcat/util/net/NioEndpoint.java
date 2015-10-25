@@ -1758,11 +1758,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     }
                     if (state == SocketState.CLOSED) {
                         // Close socket and pool
-                        try {
-                            close(ka, socket, key, SocketStatus.ERROR);
-                        } catch ( Exception x ) {
-                            log.error("",x);
-                        }
+                        close(ka, socket, key, SocketStatus.ERROR);
                     }
                 } else if (handshake == -1 ) {
                     close(ka, socket, key, SocketStatus.DISCONNECT);
