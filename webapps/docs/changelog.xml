@@ -692,6 +692,7 @@
         unescaping double quotes in a cookie value does not corrupt original
         value of "cookie" header. This is an opt-in feature, enabled by
         <code>org.apache.tomcat.util.http.ServerCookie.PRESERVE_COOKIE_HEADER</code>
+        or <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
         system property. (kkolinko)
       </fix>
     </changelog>
