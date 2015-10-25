@@ -60,6 +60,10 @@
 <section name="Tomcat 7.0.66 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>58486</bug>: Protect against two further possible memory leaks
+        associated with XML parsing. (markt)
+      </add>
       <fix>
         <bug>58508</bug>: Escape role names when generating associated MBeans in
         case the role name contains characters not permitted in an MBean name.
