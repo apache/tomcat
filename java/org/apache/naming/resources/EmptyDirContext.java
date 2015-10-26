@@ -363,7 +363,7 @@ public class EmptyDirContext implements DirContext {
         return emptyString;
     }
 
-    class EmptyNamingEnumImpl<T> implements NamingEnumeration<T> {
+    static class EmptyNamingEnumImpl<T> implements NamingEnumeration<T> {
 
         Enumeration<T> elements = new Vector<T>().elements();
 
@@ -393,7 +393,7 @@ public class EmptyDirContext implements DirContext {
         }
     }
 
-    class NameParserImpl implements NameParser {
+    static class NameParserImpl implements NameParser {
 
         @Override
         public Name parse(String name) throws NamingException {

@@ -902,7 +902,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private class WsOutputStream extends OutputStream {
+    private static class WsOutputStream extends OutputStream {
 
         private final WsRemoteEndpointImplBase endpoint;
         private final ByteBuffer buffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
