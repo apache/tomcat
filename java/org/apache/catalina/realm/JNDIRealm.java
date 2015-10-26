@@ -2027,11 +2027,11 @@ public class JNDIRealm extends RealmBase {
                 throw ex;
         }
 
-        Set<String> keys = groupMap.keySet();
         if (containerLog.isTraceEnabled()) {
-            containerLog.trace("  Found " + keys.size() + " direct roles");
-            for (String key: keys) {
-                containerLog.trace(  "  Found direct role " + key + " -> " + groupMap.get(key));
+            Set<Entry<String, String>> entries = groupMap.entrySet();
+            containerLog.trace("  Found " + entries.size() + " direct roles");
+            for (Entry<String, String> entry : entries) {
+                containerLog.trace(  "  Found direct role " + entry.getKey() + " -> " + entry.getValue());
             }
         }
 

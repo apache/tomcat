@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 import javax.servlet.DispatcherType;
@@ -897,16 +897,16 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             encoding = "ISO-8859-1";
         RequestUtil.parseParameters(queryParameters, queryParamString,
                 encoding);
-        Iterator<String> keys = parameters.keySet().iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
-            Object value = queryParameters.get(key);
+        for (Entry<String, String[]> entry : parameters.entrySet()) {
+            String entryKey = entry.getKey();
+            String[] entryValue = entry.getValue();
+            Object value = queryParameters.get(entryKey);
             if (value == null) {
-                queryParameters.put(key, parameters.get(key));
+                queryParameters.put(entryKey, entryValue);
                 continue;
             }
             queryParameters.put
-                (key, mergeValues(value, parameters.get(key)));
+                (entryKey, mergeValues(value, entryValue));
         }
         parameters = queryParameters;
 
