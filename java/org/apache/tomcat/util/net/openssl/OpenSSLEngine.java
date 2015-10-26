@@ -571,13 +571,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         int pendingApp = (handshakeFinished || SSL.isInInit(ssl) == 0) ? SSL.pendingReadableBytesInSSL(ssl) : 0;
         int bytesProduced = 0;
         int idx = offset;
+        // Do we have enough room in dsts to write decrypted data?
+        if (capacity < pendingApp) {
+            return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, getHandshakeStatus(), bytesConsumed, 0);
+        }
 
         while (pendingApp > 0) {
-            // Do we have enough room in dsts to write decrypted data?
-            if (capacity < pendingApp) {
-                return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, getHandshakeStatus(), bytesConsumed, 0);
-            }
-
             // Write decrypted data to dsts buffers
             while (idx < endOffset) {
                 ByteBuffer dst = dsts[idx];
@@ -612,6 +611,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (pendingApp == 0) {
                 primingSSLRead();
                 pendingApp = SSL.pendingReadableBytesInSSL(ssl);
+            } else if (capacity == 0) {
+                break;
             }
         }
 

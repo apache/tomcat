@@ -572,14 +572,9 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     private class FutureRead implements Future<Integer> {
         private final ByteBuffer dst;
-        private final Future<Integer> integer;
+        private final Future<Integer> integer = null;
         private FutureRead(ByteBuffer dst) {
             this.dst = dst;
-            if (netInBuffer.position() > 0) {
-                this.integer = null;
-            } else {
-                this.integer = sc.read(netInBuffer);
-            }
         }
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
@@ -837,11 +832,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 handler.failed(exc, attach);
             }
         };
-        if (netInBuffer.position() > 0) {
-            readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
-        } else {
-            sc.read(netInBuffer, timeout, unit, attachment, readCompletionHandler);
-        }
+        readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
     }
 
     @Override
