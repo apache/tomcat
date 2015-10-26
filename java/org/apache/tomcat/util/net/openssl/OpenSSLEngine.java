@@ -545,35 +545,29 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // Write encrypted data to network BIO
-        int bytesConsumed = -1;
+        int written = -1;
         try {
-            int written = writeEncryptedData(src);
-            if (written >= 0) {
-                if (bytesConsumed == -1) {
-                    bytesConsumed = written;
-                } else {
-                    bytesConsumed += written;
-                }
-            }
+            written = writeEncryptedData(src);
         } catch (Exception e) {
             throw new SSLException(e);
         }
-        if (bytesConsumed >= 0) {
-            primingSSLRead();
-        } else {
-            // Reset to 0 as -1 is used to signal that nothing was written and no priming read needs to be done
-            bytesConsumed = 0;
+        // OpenSSL can return 0 or -1 to these calls if nothing was written
+        if (written < 0) {
+            written = 0;
         }
 
         // There won't be any application data until we're done handshaking
         //
         // We first check handshakeFinished to eliminate the overhead of extra JNI call if possible.
-        int pendingApp = (handshakeFinished || SSL.isInInit(ssl) == 0) ? SSL.pendingReadableBytesInSSL(ssl) : 0;
+        int pendingApp = pendingReadableBytesInSSL();
+        if (!handshakeFinished) {
+            pendingApp = 0;
+        }
         int bytesProduced = 0;
         int idx = offset;
         // Do we have enough room in dsts to write decrypted data?
         if (capacity < pendingApp) {
-            return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, getHandshakeStatus(), bytesConsumed, 0);
+            return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, getHandshakeStatus(), written, 0);
         }
 
         while (pendingApp > 0) {
@@ -611,8 +605,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (capacity == 0) {
                 break;
             } else if (pendingApp == 0) {
-                primingSSLRead();
-                pendingApp = SSL.pendingReadableBytesInSSL(ssl);
+                pendingApp = pendingReadableBytesInSSL();
             }
         }
 
@@ -622,15 +615,18 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             closeOutbound();
             closeInbound();
         }
-        if (bytesProduced == 0 && bytesConsumed == 0) {
-            return new SSLEngineResult(SSLEngineResult.Status.BUFFER_UNDERFLOW, getHandshakeStatus(), bytesConsumed, bytesProduced);
+        if (bytesProduced == 0 && written == 0) {
+            return new SSLEngineResult(SSLEngineResult.Status.BUFFER_UNDERFLOW, getHandshakeStatus(), 0, 0);
         } else {
-            return new SSLEngineResult(getEngineStatus(), getHandshakeStatus(), bytesConsumed, bytesProduced);
+            return new SSLEngineResult(getEngineStatus(), getHandshakeStatus(), written, bytesProduced);
         }
     }
 
-    private void primingSSLRead()
+    private int pendingReadableBytesInSSL()
             throws SSLException {
+        // NOTE: Calling a fake read is necessary before calling pendingReadableBytesInSSL because
+        // SSL_pending will return 0 if OpenSSL has not started the current TLS record
+        // See https://www.openssl.org/docs/manmaster/ssl/SSL_pending.html
         int lastPrimingReadResult = SSL.readFromSSL(ssl, EMPTY_ADDR, 0); // priming read
         // check if SSL_read returned <= 0. In this case we need to check the error and see if it was something
         // fatal.
@@ -648,6 +644,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 throw new SSLException(err);
             }
         }
+        return SSL.pendingReadableBytesInSSL(ssl);
     }
 
     @Override
