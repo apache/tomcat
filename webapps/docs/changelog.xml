@@ -88,6 +88,13 @@
         Patch provided by Anthony Whitford. (violetagg)
       </fix>
       <fix>
+        <bug>58541</bug>, <bug>58544</bug>: It is more efficient to call
+        <code>Integer.toString(int)</code> instead of
+        <code>Integer.valueOf(int).toString()</code> when only a string
+        representation of a primitive is needed. Based on a patch provided by
+        Anthony Whitford. (violetagg)
+      </fix>
+      <fix>
         <bug>58545</bug>: In some use cases it is more efficient to use
         <code>Map.entrySet()</code> instead of <code>Map.keySet()</code>
         Based on a patch provided by Anthony Whitford. (violetagg)
