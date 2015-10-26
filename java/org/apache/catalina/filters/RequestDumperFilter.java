@@ -109,7 +109,7 @@ public class RequestDumperFilter extends GenericFilter {
 
         doLog(" characterEncoding", request.getCharacterEncoding());
         doLog("     contentLength",
-                Integer.valueOf(request.getContentLength()).toString());
+                Integer.toString(request.getContentLength()));
         doLog("       contentType", request.getContentType());
 
         if (hRequest == null) {
@@ -187,7 +187,7 @@ public class RequestDumperFilter extends GenericFilter {
         doLog("            scheme", request.getScheme());
         doLog("        serverName", request.getServerName());
         doLog("        serverPort",
-                Integer.valueOf(request.getServerPort()).toString());
+                Integer.toString(request.getServerPort()));
 
         if (hRequest == null) {
             doLog("       servletPath", NON_HTTP_REQ_MSG);
@@ -236,7 +236,7 @@ public class RequestDumperFilter extends GenericFilter {
             doLog("        remoteUser", NON_HTTP_RES_MSG);
         } else {
             doLog("            status",
-                    Integer.valueOf(hResponse.getStatus()).toString());
+                    Integer.toString(hResponse.getStatus()));
         }
 
         doLog("END TIME          ", getTimestamp());

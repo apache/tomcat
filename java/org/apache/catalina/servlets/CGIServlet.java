@@ -1080,7 +1080,7 @@ public final class CGIServlet extends HttpServlet {
              */
             int contentLength = req.getContentLength();
             String sContentLength = (contentLength <= 0 ? "" :
-                (Integer.valueOf(contentLength)).toString());
+                Integer.toString(contentLength));
             envp.put("CONTENT_LENGTH", sContentLength);
 
 
