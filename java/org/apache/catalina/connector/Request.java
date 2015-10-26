@@ -1639,10 +1639,6 @@ public class Request
             return;
         }
 
-        // Ensure that the specified encoding is valid
-        byte buffer[] = new byte[1];
-        buffer[0] = (byte) 'a';
-
         // Confirm that the encoding name is valid
         B2CConverter.getCharset(enc);
 

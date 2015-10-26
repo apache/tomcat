@@ -82,6 +82,11 @@
         <code>o.a.catalina.valves.ExtendedAccessLogValve</code> are made static.
         Patch provided by Anthony Whitford. (violetagg)
       </fix>
+      <fix>
+        <bug>58540</bug>: Removed unused code from
+        <code>o.a.catalina.connector.Request</code>.
+        Patch provided by Anthony Whitford. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
