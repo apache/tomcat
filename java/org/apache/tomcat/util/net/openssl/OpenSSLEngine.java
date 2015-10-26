@@ -608,11 +608,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     idx++;
                 }
             }
-            if (pendingApp == 0) {
+            if (capacity == 0) {
+                break;
+            } else if (pendingApp == 0) {
                 primingSSLRead();
                 pendingApp = SSL.pendingReadableBytesInSSL(ssl);
-            } else if (capacity == 0) {
-                break;
             }
         }
 
