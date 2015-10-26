@@ -442,15 +442,14 @@ class TagFileProcessor {
          */
         void postCheck() throws JasperException {
             // Check that var.name-from-attributes has valid values.
-            Iterator<String> iter = nameFromTable.keySet().iterator();
-            while (iter.hasNext()) {
-                String nameFrom = iter.next();
-                NameEntry nameEntry = nameTable.get(nameFrom);
-                NameEntry nameFromEntry = nameFromTable.get(nameFrom);
+            for (Entry<String, NameEntry> entry : nameFromTable.entrySet()) {
+                String key = entry.getKey();
+                NameEntry nameEntry = nameTable.get(key);
+                NameEntry nameFromEntry = entry.getValue();
                 Node nameFromNode = nameFromEntry.getNode();
                 if (nameEntry == null) {
                     err.jspError(nameFromNode,
-                            "jsp.error.tagfile.nameFrom.noAttribute", nameFrom);
+                            "jsp.error.tagfile.nameFrom.noAttribute", key);
                 } else {
                     Node node = nameEntry.getNode();
                     TagAttributeInfo tagAttr = nameEntry.getTagAttributeInfo();
@@ -459,7 +458,7 @@ class TagFileProcessor {
                             || tagAttr.canBeRequestTime()) {
                         err.jspError(nameFromNode,
                                 "jsp.error.tagfile.nameFrom.badAttribute",
-                                nameFrom, Integer.toString(node.getStart()
+                                key, Integer.toString(node.getStart()
                                         .getLineNumber()));
                     }
                 }
