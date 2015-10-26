@@ -77,6 +77,11 @@
         <bug>58522</bug>: Fixed concurrency issue when iterating web
         application's resources. (violetagg)
       </fix>
+      <fix>
+        <bug>58537</bug>: Some of the inner classes in
+        <code>o.a.catalina.valves.ExtendedAccessLogValve</code> are made static.
+        Patch provided by Anthony Whitford. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
