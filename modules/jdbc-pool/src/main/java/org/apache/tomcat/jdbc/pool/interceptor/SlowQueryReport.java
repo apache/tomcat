@@ -483,7 +483,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
                     handleZero(stats2.lastInvocation));
         }
 
-        private long handleZero(long value) {
+        private static long handleZero(long value) {
             return value == 0 ? Long.MAX_VALUE : value;
         }
 
