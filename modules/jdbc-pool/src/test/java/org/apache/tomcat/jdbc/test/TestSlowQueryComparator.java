@@ -32,9 +32,7 @@ import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport.QueryStats;
 public class TestSlowQueryComparator {
 
     @Test
-    public void testBug58489() throws ClassNotFoundException,
-            InstantiationException, IllegalAccessException,
-            InvocationTargetException {
+    public void testBug58489() throws Exception {
 
         long[] testData = { 0, 0, 0, 1444225382010l, 0, 1444225382011l, 0,
                 1444225382012l, 0, 1444225382056l, 0, 1444225382014l, 0,
@@ -61,20 +59,14 @@ public class TestSlowQueryComparator {
     }
 
     @Test
-    public void testEqualQueryStatsWithNoLastInvocation()
-            throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException {
+    public void testEqualQueryStatsWithNoLastInvocation() throws Exception {
         Comparator<QueryStats> queryStatsComparator = createComparator();
         QueryStats q1 = new QueryStats("abc");
         Assert.assertEquals(0, queryStatsComparator.compare(q1, q1));
     }
 
     @Test
-    public void testEqualQueryStatsWithLastInvocation()
-            throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException {
+    public void testEqualQueryStatsWithLastInvocation() throws Exception {
         Comparator<QueryStats> queryStatsComparator = createComparator();
         QueryStats q1 = new QueryStats("abc");
         q1.add(0, 100);
@@ -82,10 +74,7 @@ public class TestSlowQueryComparator {
     }
 
     @Test
-    public void testQueryStatsOneWithLastInvocation()
-            throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException {
+    public void testQueryStatsOneWithLastInvocation() throws Exception {
         Comparator<QueryStats> queryStatsComparator = createComparator();
         QueryStats q1 = new QueryStats("abc");
         QueryStats q2 = new QueryStats("def");
@@ -95,10 +84,7 @@ public class TestSlowQueryComparator {
     }
 
     @Test
-    public void testQueryStatsBothWithSameLastInvocation()
-            throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException {
+    public void testQueryStatsBothWithSameLastInvocation() throws Exception {
         Comparator<QueryStats> queryStatsComparator = createComparator();
         QueryStats q1 = new QueryStats("abc");
         QueryStats q2 = new QueryStats("def");
@@ -109,10 +95,7 @@ public class TestSlowQueryComparator {
     }
 
     @Test
-    public void testQueryStatsBothWithSomeLastInvocation()
-            throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException {
+    public void testQueryStatsBothWithSomeLastInvocation() throws Exception {
         Comparator<QueryStats> queryStatsComparator = createComparator();
         QueryStats q1 = new QueryStats("abc");
         QueryStats q2 = new QueryStats("abc");
@@ -124,11 +107,12 @@ public class TestSlowQueryComparator {
 
     private Comparator<QueryStats> createComparator()
             throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException, InvocationTargetException {
+            IllegalAccessException, InvocationTargetException,
+            SecurityException, NoSuchMethodException {
         Class<?> comparatorClass = Class
                 .forName("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport$QueryStatsComparator");
         Constructor<?> comparatorConstructor = comparatorClass
-                .getDeclaredConstructors()[1];
+                .getDeclaredConstructor();
         comparatorConstructor.setAccessible(true);
         @SuppressWarnings("unchecked")
         Comparator<QueryStats> queryStatsComparator = (Comparator<QueryStats>) comparatorConstructor
