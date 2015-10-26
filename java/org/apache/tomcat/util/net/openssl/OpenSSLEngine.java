@@ -559,23 +559,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throw new SSLException(e);
         }
         if (bytesConsumed >= 0) {
-            int lastPrimingReadResult = SSL.readFromSSL(ssl, EMPTY_ADDR, 0); // priming read
-            // check if SSL_read returned <= 0. In this case we need to check the error and see if it was something
-            // fatal.
-            if (lastPrimingReadResult <= 0) {
-                // Check for OpenSSL errors caused by the priming read
-                long error = SSL.getLastErrorNumber();
-                if (error != SSL.SSL_ERROR_NONE) {
-                    String err = SSL.getErrorString(error);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(sm.getString("engine.readFromSSLFailed", Long.toString(error),
-                                Integer.toString(lastPrimingReadResult), err));
-                    }
-                    // There was an internal error -- shutdown
-                    shutdown();
-                    throw new SSLException(err);
-                }
-            }
+            primingSSLRead();
         } else {
             // Reset to 0 as -1 is used to signal that nothing was written and no priming read needs to be done
             bytesConsumed = 0;
@@ -586,15 +570,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         // We first check handshakeFinished to eliminate the overhead of extra JNI call if possible.
         int pendingApp = (handshakeFinished || SSL.isInInit(ssl) == 0) ? SSL.pendingReadableBytesInSSL(ssl) : 0;
         int bytesProduced = 0;
+        int idx = offset;
 
-        if (pendingApp > 0) {
+        while (pendingApp > 0) {
             // Do we have enough room in dsts to write decrypted data?
             if (capacity < pendingApp) {
                 return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, getHandshakeStatus(), bytesConsumed, 0);
             }
 
             // Write decrypted data to dsts buffers
-            int idx = offset;
             while (idx < endOffset) {
                 ByteBuffer dst = dsts[idx];
                 if (!dst.hasRemaining()) {
@@ -619,10 +603,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
                 bytesProduced += bytesRead;
                 pendingApp -= bytesRead;
+                capacity -= bytesRead;
 
                 if (!dst.hasRemaining()) {
                     idx++;
                 }
+            }
+            if (pendingApp == 0) {
+                primingSSLRead();
+                pendingApp = SSL.pendingReadableBytesInSSL(ssl);
             }
         }
 
@@ -636,6 +625,27 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return new SSLEngineResult(SSLEngineResult.Status.BUFFER_UNDERFLOW, getHandshakeStatus(), bytesConsumed, bytesProduced);
         } else {
             return new SSLEngineResult(getEngineStatus(), getHandshakeStatus(), bytesConsumed, bytesProduced);
+        }
+    }
+
+    private void primingSSLRead()
+            throws SSLException {
+        int lastPrimingReadResult = SSL.readFromSSL(ssl, EMPTY_ADDR, 0); // priming read
+        // check if SSL_read returned <= 0. In this case we need to check the error and see if it was something
+        // fatal.
+        if (lastPrimingReadResult <= 0) {
+            // Check for OpenSSL errors caused by the priming read
+            long error = SSL.getLastErrorNumber();
+            if (error != SSL.SSL_ERROR_NONE) {
+                String err = SSL.getErrorString(error);
+                if (logger.isDebugEnabled()) {
+                    logger.debug(sm.getString("engine.readFromSSLFailed", Long.toString(error),
+                            Integer.toString(lastPrimingReadResult), err));
+                }
+                // There was an internal error -- shutdown
+                shutdown();
+                throw new SSLException(err);
+            }
         }
     }
 

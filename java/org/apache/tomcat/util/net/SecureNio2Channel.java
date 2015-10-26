@@ -824,16 +824,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
                             }
                         // continue to unwrap as long as the input buffer has stuff
-                        // TODO: unwrap appears only to unwrap one TLS record at
-                        //       a time even if there are multiple TLS records
-                        //       in the input buffer. Therefore multiple calls
-                        //       to unwrap are required to ensure that all TLS
-                        //       records are decrypted and written to dst.
-                        //       This may be a bug in tc-native or something
-                        //       that is better handled at that level. For now
-                        //       the '|| unwrap.getStatus() == Status.OK' is a
-                        //       workaround.
-                        } while ((netInBuffer.position() != 0) || unwrap.getStatus() == Status.OK);
+                        } while (netInBuffer.position() != 0);
                         // If everything is OK, so complete
                         handler.completed(Integer.valueOf(read), attach);
                     } catch (Exception e) {
