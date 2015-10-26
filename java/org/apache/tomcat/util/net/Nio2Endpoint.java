@@ -957,7 +957,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         /**
          * Internal state tracker for scatter/gather operations.
          */
-        private class OperationState<A> {
+        private static class OperationState<A> {
             private final ByteBuffer[] buffers;
             private final int offset;
             private final int length;
