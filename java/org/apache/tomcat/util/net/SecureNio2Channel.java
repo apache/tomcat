@@ -65,6 +65,8 @@ public class SecureNio2Channel extends Nio2Channel  {
     private volatile boolean handshakeComplete;
     private volatile HandshakeStatus handshakeStatus; //gets set by handshake
 
+    private volatile boolean unwrapBeforeRead = false;
+
     protected boolean closed;
     protected boolean closing;
 
@@ -572,9 +574,14 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     private class FutureRead implements Future<Integer> {
         private final ByteBuffer dst;
-        private final Future<Integer> integer = null;
+        private final Future<Integer> integer;
         private FutureRead(ByteBuffer dst) {
             this.dst = dst;
+            if (unwrapBeforeRead || netInBuffer.position() > 0) {
+                this.integer = null;
+            } else {
+                this.integer = sc.read(netInBuffer);
+            }
         }
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
@@ -654,6 +661,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                     throw new ExecutionException(new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus())));
                 }
             } while ((netInBuffer.position() != 0)); //continue to unwrapping as long as the input buffer has stuff
+            if (!dst.hasRemaining()) {
+                unwrapBeforeRead = true;
+            } else {
+                unwrapBeforeRead = false;
+            }
             return Integer.valueOf(read);
         }
     }
@@ -820,6 +832,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                             }
                         // continue to unwrap as long as the input buffer has stuff
                         } while (netInBuffer.position() != 0);
+                        if (!dst.hasRemaining()) {
+                            unwrapBeforeRead = true;
+                        } else {
+                            unwrapBeforeRead = false;
+                        }
                         // If everything is OK, so complete
                         handler.completed(Integer.valueOf(read), attach);
                     } catch (Exception e) {
@@ -832,7 +849,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                 handler.failed(exc, attach);
             }
         };
-        readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
+        if (unwrapBeforeRead || netInBuffer.position() > 0) {
+            readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
+        } else {
+            sc.read(netInBuffer, timeout, unit, attachment, readCompletionHandler);
+        }
     }
 
     @Override
@@ -893,6 +914,16 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
                             }
                         } while ((netInBuffer.position() != 0)); //continue to unwrapping as long as the input buffer has stuff
+                        int capacity = 0;
+                        final int endOffset = offset + length;
+                        for (int i = offset; i < endOffset; i++) {
+                            capacity += dsts[i].remaining();
+                        }
+                        if (capacity == 0) {
+                            unwrapBeforeRead = true;
+                        } else {
+                            unwrapBeforeRead = false;
+                        }
                         // If everything is OK, so complete
                         handler.completed(Long.valueOf(read), attach);
                     } catch (Exception e) {
@@ -905,7 +936,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 handler.failed(exc, attach);
             }
         };
-        if (netInBuffer.position() > 0) {
+        if (unwrapBeforeRead || netInBuffer.position() > 0) {
             readCompletionHandler.completed(Integer.valueOf(netInBuffer.position()), attachment);
         } else {
             sc.read(netInBuffer, timeout, unit, attachment, readCompletionHandler);
