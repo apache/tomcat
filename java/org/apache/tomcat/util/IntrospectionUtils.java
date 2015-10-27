@@ -319,7 +319,7 @@ public final class IntrospectionUtils {
                     if ("java.lang.Integer".equals(paramType.getName())
                             || "int".equals(paramType.getName())) {
                         try {
-                            params[0] = new Integer(value);
+                            params[0] = Integer.valueOf(value);
                         } catch (NumberFormatException ex) {
                             ok = false;
                         }
@@ -327,7 +327,7 @@ public final class IntrospectionUtils {
                     }else if ("java.lang.Long".equals(paramType.getName())
                                 || "long".equals(paramType.getName())) {
                             try {
-                                params[0] = new Long(value);
+                                params[0] = Long.valueOf(value);
                             } catch (NumberFormatException ex) {
                                 ok = false;
                             }
@@ -931,7 +931,7 @@ public final class IntrospectionUtils {
         } else if ("java.lang.Integer".equals(paramType.getName())
                 || "int".equals(paramType.getName())) {
             try {
-                result = new Integer(object);
+                result = Integer.valueOf(object);
             } catch (NumberFormatException ex) {
             }
             // Try a setFoo ( boolean )

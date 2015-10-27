@@ -519,7 +519,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         Object convertValue = value;
         if ("java.lang.Integer".equals(valueType) || "int".equals(valueType)) {
             try {
-                convertValue = new Integer(value);
+                convertValue = Integer.valueOf(value);
             } catch (NumberFormatException ex) {
                 if (isEcho())
                     handleErrorOutput("Unable to convert to integer:" + value);
@@ -527,7 +527,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         } else if ("java.lang.Long".equals(valueType)
                 || "long".equals(valueType)) {
             try {
-                convertValue = new Long(value);
+                convertValue = Long.valueOf(value);
             } catch (NumberFormatException ex) {
                 if (isEcho())
                     handleErrorOutput("Unable to convert to long:" + value);
@@ -538,7 +538,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         } else if ("java.lang.Float".equals(valueType)
                 || "float".equals(valueType)) {
             try {
-                convertValue = new Float(value);
+                convertValue = Float.valueOf(value);
             } catch (NumberFormatException ex) {
                 if (isEcho())
                     handleErrorOutput("Unable to convert to float:" + value);
@@ -546,7 +546,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         } else if ("java.lang.Double".equals(valueType)
                 || "double".equals(valueType)) {
             try {
-                convertValue = new Double(value);
+                convertValue = Double.valueOf(value);
             } catch (NumberFormatException ex) {
                 if (isEcho())
                     handleErrorOutput("Unable to convert to double:" + value);

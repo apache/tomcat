@@ -544,7 +544,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 throw new ExecutionException(sm.getString(
                         "asyncChannelWrapperSecure.tooBig", result), null);
             }
-            return new Integer(result.intValue());
+            return Integer.valueOf(result.intValue());
         }
 
         @Override
@@ -556,7 +556,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                 throw new ExecutionException(sm.getString(
                         "asyncChannelWrapperSecure.tooBig", result), null);
             }
-            return new Integer(result.intValue());
+            return Integer.valueOf(result.intValue());
         }
     }
 

@@ -233,7 +233,7 @@ public class ELSupport {
             return Long.valueOf(number.longValue());
         }
         if (Double.TYPE == type || Double.class.equals(type)) {
-            return new Double(number.doubleValue());
+            return Double.valueOf(number.doubleValue());
         }
         if (Integer.TYPE == type || Integer.class.equals(type)) {
             return Integer.valueOf(number.intValue());
@@ -263,7 +263,7 @@ public class ELSupport {
             return Short.valueOf(number.shortValue());
         }
         if (Float.TYPE == type || Float.class.equals(type)) {
-            return new Float(number.floatValue());
+            return Float.valueOf(number.floatValue());
         }
         if (Number.class.equals(type)) {
             return number;

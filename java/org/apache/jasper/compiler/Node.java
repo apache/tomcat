@@ -2096,7 +2096,7 @@ abstract class Node implements TagConstants {
             if (extraSmap == null) {
                 extraSmap = new ArrayList<Integer>();
             }
-            extraSmap.add(new Integer(srcLine));
+            extraSmap.add(Integer.valueOf(srcLine));
         }
 
         public ArrayList<Integer> getExtraSmap() {

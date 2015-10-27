@@ -129,7 +129,7 @@ public class XercesParser{
 
         if (versionNumber == null){
             versionNumber = getXercesVersion();
-            version = new Float( versionNumber ).floatValue();
+            version = Float.valueOf( versionNumber ).floatValue();
         }
 
         // Note: 2.2 is completely broken (with XML Schema). 

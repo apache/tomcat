@@ -107,7 +107,7 @@ public class BioSender extends AbstractSender {
         closeSocket();
         if (connect) {
             if (log.isDebugEnabled())
-                log.debug(sm.getString("IDataSender.disconnect", getAddress().getHostAddress(), new Integer(getPort()), new Long(0)));
+                log.debug(sm.getString("IDataSender.disconnect", getAddress().getHostAddress(), Integer.valueOf(getPort()), Long.valueOf(0)));
         }
         
     }
@@ -124,7 +124,7 @@ public class BioSender extends AbstractSender {
         } catch (IOException x) {
             SenderState.getSenderState(getDestination()).setSuspect();
             exception = x;
-            if (log.isTraceEnabled()) log.trace(sm.getString("IDataSender.send.again", getAddress().getHostAddress(),new Integer(getPort())),x);
+            if (log.isTraceEnabled()) log.trace(sm.getString("IDataSender.send.again", getAddress().getHostAddress(), Integer.valueOf(getPort())),x);
             while ( getAttempt()<getMaxRetryAttempts() ) {
                 try {
                     setAttempt(getAttempt()+1);
@@ -182,11 +182,11 @@ public class BioSender extends AbstractSender {
            setRequestCount(0);
            setConnectTime(System.currentTimeMillis());
            if (log.isDebugEnabled())
-               log.debug(sm.getString("IDataSender.openSocket", getAddress().getHostAddress(), new Integer(getPort()), new Long(0)));
+               log.debug(sm.getString("IDataSender.openSocket", getAddress().getHostAddress(), Integer.valueOf(getPort()), Long.valueOf(0)));
       } catch (IOException ex1) {
           SenderState.getSenderState(getDestination()).setSuspect();
           if (log.isDebugEnabled())
-              log.debug(sm.getString("IDataSender.openSocket.failure",getAddress().getHostAddress(), new Integer(getPort()),new Long(0)), ex1);
+              log.debug(sm.getString("IDataSender.openSocket.failure",getAddress().getHostAddress(), Integer.valueOf(getPort()), Long.valueOf(0)), ex1);
           throw (ex1);
         }
         
@@ -213,7 +213,7 @@ public class BioSender extends AbstractSender {
             setRequestCount(0);
             setConnected(false);
             if (log.isDebugEnabled())
-                log.debug(sm.getString("IDataSender.closeSocket",getAddress().getHostAddress(), new Integer(getPort()),new Long(0)));
+                log.debug(sm.getString("IDataSender.closeSocket",getAddress().getHostAddress(), Integer.valueOf(getPort()), Long.valueOf(0)));
        }
     }
 
@@ -273,13 +273,13 @@ public class BioSender extends AbstractSender {
                 i = soIn.read();
             }
             if (!ackReceived) {
-                if (i == -1) throw new IOException(sm.getString("IDataSender.ack.eof",getAddress(), new Integer(socket.getLocalPort())));
-                else throw new IOException(sm.getString("IDataSender.ack.wrong",getAddress(), new Integer(socket.getLocalPort())));
+                if (i == -1) throw new IOException(sm.getString("IDataSender.ack.eof",getAddress(), Integer.valueOf(socket.getLocalPort())));
+                else throw new IOException(sm.getString("IDataSender.ack.wrong",getAddress(), Integer.valueOf(socket.getLocalPort())));
             } else if ( failAckReceived && getThrowOnFailedAck()) {
                 throw new RemoteProcessException("Received a failed ack:org.apache.catalina.tribes.transport.Constants.FAIL_ACK_DATA");
             }
         } catch (IOException x) {
-            String errmsg = sm.getString("IDataSender.ack.missing", getAddress(),new Integer(socket.getLocalPort()), new Long(getTimeout()));
+            String errmsg = sm.getString("IDataSender.ack.missing", getAddress(), Integer.valueOf(socket.getLocalPort()), Long.valueOf(getTimeout()));
             if ( SenderState.getSenderState(getDestination()).isReady() ) {
                 SenderState.getSenderState(getDestination()).setSuspect();
                 if ( log.isWarnEnabled() ) log.warn(errmsg, x);

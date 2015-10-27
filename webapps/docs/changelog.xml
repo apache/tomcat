@@ -95,6 +95,11 @@
         Anthony Whitford. (violetagg)
       </fix>
       <fix>
+        <bug>58541</bug>, <bug>58547</bug>: It is more efficient to call
+        <code>valueOf(...)</code> instead of Number constructor. Based on a
+        patch provided by Anthony Whitford. (violetagg)
+      </fix>
+      <fix>
         <bug>58545</bug>: In some use cases it is more efficient to use
         <code>Map.entrySet()</code> instead of <code>Map.keySet()</code>
         Based on a patch provided by Anthony Whitford. (violetagg)

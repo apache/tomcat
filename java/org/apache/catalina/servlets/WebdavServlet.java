@@ -970,14 +970,14 @@ public class WebdavServlet
             }
             if (lockDurationStr.startsWith("Second-")) {
                 lockDuration =
-                    (new Integer(lockDurationStr.substring(7))).intValue();
+                    (Integer.valueOf(lockDurationStr.substring(7))).intValue();
             } else {
                 if (lockDurationStr.equalsIgnoreCase("infinity")) {
                     lockDuration = MAX_TIMEOUT;
                 } else {
                     try {
                         lockDuration =
-                            (new Integer(lockDurationStr)).intValue();
+                            (Integer.valueOf(lockDurationStr)).intValue();
                     } catch (NumberFormatException e) {
                         lockDuration = MAX_TIMEOUT;
                     }
@@ -1762,7 +1762,7 @@ public class WebdavServlet
                 dirContext.createSubcontext(dest);
             } catch (NamingException e) {
                 errorList.put
-                    (dest, new Integer(WebdavStatus.SC_CONFLICT));
+                    (dest, Integer.valueOf(WebdavStatus.SC_CONFLICT));
                 return false;
             }
 
@@ -1783,7 +1783,7 @@ public class WebdavServlet
                 }
             } catch (NamingException e) {
                 errorList.put
-                    (dest, new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                    (dest, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                 return false;
             }
 
@@ -1797,17 +1797,17 @@ public class WebdavServlet
                         // We know the source exists so it must be the
                         // destination dir that can't be found
                         errorList.put(source,
-                                new Integer(WebdavStatus.SC_CONFLICT));
+                                Integer.valueOf(WebdavStatus.SC_CONFLICT));
                     } else {
                         errorList.put(source,
-                                new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                                Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                     }
                     return false;
                 }
             } else {
                 errorList.put
                     (source,
-                     new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                     Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                 return false;
             }
 
@@ -1893,7 +1893,7 @@ public class WebdavServlet
             try {
                 resources.unbind(path);
             } catch (NamingException e) {
-                errorList.put(path, new Integer
+                errorList.put(path, Integer.valueOf
                     (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
             }
 
@@ -1930,7 +1930,7 @@ public class WebdavServlet
 
         // Prevent deletion of special subdirectories
         if (isSpecialPath(path)) {
-            errorList.put(path, new Integer(WebdavStatus.SC_FORBIDDEN));
+            errorList.put(path, Integer.valueOf(WebdavStatus.SC_FORBIDDEN));
             return;
         }
 
@@ -1946,7 +1946,7 @@ public class WebdavServlet
         try {
             enumeration = dirContext.list(path);
         } catch (NamingException e) {
-            errorList.put(path, new Integer
+            errorList.put(path, Integer.valueOf
                 (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
             return;
         }
@@ -1960,7 +1960,7 @@ public class WebdavServlet
 
             if (isLocked(childName, ifHeader + lockTokenHeader)) {
 
-                errorList.put(childName, new Integer(WebdavStatus.SC_LOCKED));
+                errorList.put(childName, Integer.valueOf(WebdavStatus.SC_LOCKED));
 
             } else {
 
@@ -1977,13 +1977,13 @@ public class WebdavServlet
                             // If it's not a collection, then it's an unknown
                             // error
                             errorList.put
-                                (childName, new Integer
+                                (childName, Integer.valueOf
                                     (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                         }
                     }
                 } catch (NamingException e) {
                     errorList.put
-                        (childName, new Integer
+                        (childName, Integer.valueOf
                             (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                 }
             }

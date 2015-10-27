@@ -3414,7 +3414,7 @@ public class Request
                 continue;
             }
 
-            Double key = new Double(-quality);  // Reverse the order
+            Double key = Double.valueOf(-quality);  // Reverse the order
             ArrayList<Locale> values = locales.get(key);
             if (values == null) {
                 values = new ArrayList<Locale>();

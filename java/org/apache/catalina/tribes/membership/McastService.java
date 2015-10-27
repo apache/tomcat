@@ -246,7 +246,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public int getRecoveryCounter(){
         String p = properties.getProperty("recoveryCounter");
         if(p != null){
-            return new Integer(p).intValue();
+            return Integer.valueOf(p).intValue();
         }
         return -1;
     }
@@ -270,7 +270,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public long getRecoverySleepTime(){
         String p = properties.getProperty("recoverySleepTime");
         if(p != null){
-            return new Long(p).longValue();
+            return Long.valueOf(p).longValue();
         }
         return -1;
     }
@@ -297,7 +297,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
     }
     public int getPort() {
         String p = properties.getProperty("mcastPort");
-        return new Integer(p).intValue();
+        return Integer.valueOf(p).intValue();
     }
 
     /**
@@ -324,7 +324,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
 
     public long getFrequency() {
         String p = properties.getProperty("mcastFrequency");
-        return new Long(p).longValue();
+        return Long.valueOf(p).longValue();
     }
 
     public void setMcastDropTime(long time) {
@@ -345,7 +345,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
 
     public long getDropTime() {
         String p = properties.getProperty("memberDropTime");
-        return new Long(p).longValue();
+        return Long.valueOf(p).longValue();
     }
 
     /**
