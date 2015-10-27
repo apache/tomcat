@@ -259,6 +259,17 @@
     <Method name="load" />
     <Bug code="RCN" />
   </Match>
+  <Match>
+    <Or>
+      <Class name="org.apache.el.parser.AstFloatingPoint" />
+      <Class name="org.apache.el.parser.AstNegative" />
+    </Or>
+    <Bug pattern="DM_FP_NUMBER_CTOR" />
+  </Match>
+  <Match>
+    <Class name="org.apache.el.parser.AstInteger" />
+    <Bug pattern="DM_NUMBER_CTOR" />
+  </Match>
 
   <!-- Test code -->
   <Match>
