@@ -3184,7 +3184,7 @@ public class Request implements HttpServletRequest {
 
         for (AcceptLanguage acceptLanguage : acceptLanguages) {
             // Add a new Locale to the list of Locales for this quality level
-            Double key = new Double(-acceptLanguage.getQuality());  // Reverse the order
+            Double key = Double.valueOf(-acceptLanguage.getQuality());  // Reverse the order
             ArrayList<Locale> values = locales.get(key);
             if (values == null) {
                 values = new ArrayList<>();
