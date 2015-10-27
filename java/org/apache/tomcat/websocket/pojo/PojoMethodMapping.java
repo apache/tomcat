@@ -94,7 +94,7 @@ public class PojoMethodMapping {
                         open = method;
                     } else {
                         if (currentClazz == clazzPojo ||
-                                (currentClazz != clazzPojo && !isMethodOverride(open, method))) {
+                                !isMethodOverride(open, method)) {
                             // Duplicate annotation
                             throw new DeploymentException(sm.getString(
                                     "pojoMethodMapping.duplicateAnnotation",
@@ -107,7 +107,7 @@ public class PojoMethodMapping {
                         close = method;
                     } else {
                         if (currentClazz == clazzPojo ||
-                                (currentClazz != clazzPojo && !isMethodOverride(close, method))) {
+                                !isMethodOverride(close, method)) {
                             // Duplicate annotation
                             throw new DeploymentException(sm.getString(
                                     "pojoMethodMapping.duplicateAnnotation",
@@ -120,7 +120,7 @@ public class PojoMethodMapping {
                         error = method;
                     } else {
                         if (currentClazz == clazzPojo ||
-                                (currentClazz != clazzPojo && !isMethodOverride(error, method))) {
+                                !isMethodOverride(error, method)) {
                             // Duplicate annotation
                             throw new DeploymentException(sm.getString(
                                     "pojoMethodMapping.duplicateAnnotation",
@@ -135,8 +135,7 @@ public class PojoMethodMapping {
                         if (messageHandler.targetsSameWebSocketMessageType(otherMessageHandler)) {
                             found = true;
                             if (currentClazz == clazzPojo ||
-                                    (currentClazz != clazzPojo
-                                    && !isMethodOverride(messageHandler.m, otherMessageHandler.m))) {
+                                !isMethodOverride(messageHandler.m, otherMessageHandler.m)) {
                                 // Duplicate annotation
                                 throw new DeploymentException(sm.getString(
                                         "pojoMethodMapping.duplicateAnnotation",

@@ -78,6 +78,12 @@
         application's resources. (violetagg)
       </fix>
       <fix>
+        <bug>58534</bug>: Removed repeated conditional tests in
+        <code>o.a.tomcat.websocket.pojo.PojoMethodMapping</code> and
+        <code>o.a.tomcat.util.net.AprEndpoint</code>
+        Patch provided by Anthony Whitford. (violetagg)
+      </fix>
+      <fix>
         <bug>58537</bug>: Some of the inner classes in
         <code>o.a.catalina.valves.ExtendedAccessLogValve</code> are made static.
         Patch provided by Anthony Whitford. (violetagg)
