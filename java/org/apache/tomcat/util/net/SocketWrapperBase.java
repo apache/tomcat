@@ -662,6 +662,14 @@ public abstract class SocketWrapperBase<E> {
     };
 
     /**
+     * Allows using NIO2 style read/write only for connectors that can
+     * efficiently support it.
+     */
+    public boolean hasAsyncIO() {
+        return false;
+    }
+
+    /**
      * Scatter read. The completion handler will be called once some
      * data has been read or an error occurred. If a CompletionCheck
      * object has been provided, the completion handler will only be

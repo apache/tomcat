@@ -954,6 +954,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             }
         }
 
+        @Override
+        public boolean hasAsyncIO() {
+            return false;
+        }
+
         /**
          * Internal state tracker for scatter/gather operations.
          */
@@ -978,8 +983,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 this.check = check;
                 this.handler = handler;
             }
-            private long nBytes = 0;
-            private CompletionState state = CompletionState.PENDING;
+            private volatile long nBytes = 0;
+            private volatile CompletionState state = CompletionState.PENDING;
         }
 
         private class ScatterReadCompletionHandler<A> implements CompletionHandler<Long, OperationState<A>> {
@@ -1126,6 +1131,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     Nio2Endpoint.endInline();
                 } else {
                     throw new WritePendingException();
+                }
+                if (block && state.state == CompletionState.PENDING && writePending.tryAcquire(timeout, unit)) {
+                    writePending.release();
                 }
             } catch (InterruptedException e) {
                 handler.failed(e, attachment);
