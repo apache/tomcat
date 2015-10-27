@@ -882,14 +882,14 @@ public class WebdavServlet
             }
             if (lockDurationStr.startsWith("Second-")) {
                 lockDuration =
-                    (new Integer(lockDurationStr.substring(7))).intValue();
+                    (Integer.valueOf(lockDurationStr.substring(7))).intValue();
             } else {
                 if (lockDurationStr.equalsIgnoreCase("infinity")) {
                     lockDuration = MAX_TIMEOUT;
                 } else {
                     try {
                         lockDuration =
-                            (new Integer(lockDurationStr)).intValue();
+                            (Integer.valueOf(lockDurationStr)).intValue();
                     } catch (NumberFormatException e) {
                         lockDuration = MAX_TIMEOUT;
                     }
@@ -1640,7 +1640,7 @@ public class WebdavServlet
             if (!resources.mkdir(dest)) {
                 WebResource destResource = resources.getResource(dest);
                 if (!destResource.isDirectory()) {
-                    errorList.put(dest, new Integer(WebdavStatus.SC_CONFLICT));
+                    errorList.put(dest, Integer.valueOf(WebdavStatus.SC_CONFLICT));
                     return false;
                 }
             }
@@ -1667,7 +1667,7 @@ public class WebdavServlet
                     String parent = destResource.getWebappPath().substring(0, lastSlash);
                     WebResource parentResource = resources.getResource(parent);
                     if (!parentResource.isDirectory()) {
-                        errorList.put(source, new Integer(WebdavStatus.SC_CONFLICT));
+                        errorList.put(source, Integer.valueOf(WebdavStatus.SC_CONFLICT));
                         return false;
                     }
                 }
@@ -1675,12 +1675,12 @@ public class WebdavServlet
             if (!resources.write(dest, sourceResource.getInputStream(),
                     false)) {
                 errorList.put(source,
-                        new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                        Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                 return false;
             }
         } else {
             errorList.put(source,
-                    new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                    Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
             return false;
         }
         return true;
@@ -1749,7 +1749,7 @@ public class WebdavServlet
 
             deleteCollection(req, path, errorList);
             if (!resource.delete()) {
-                errorList.put(path, new Integer
+                errorList.put(path, Integer.valueOf
                     (WebdavStatus.SC_INTERNAL_SERVER_ERROR));
             }
 
@@ -1780,7 +1780,7 @@ public class WebdavServlet
 
         // Prevent deletion of special subdirectories
         if (isSpecialPath(path)) {
-            errorList.put(path, new Integer(WebdavStatus.SC_FORBIDDEN));
+            errorList.put(path, Integer.valueOf(WebdavStatus.SC_FORBIDDEN));
             return;
         }
 
@@ -1802,7 +1802,7 @@ public class WebdavServlet
 
             if (isLocked(childName, ifHeader + lockTokenHeader)) {
 
-                errorList.put(childName, new Integer(WebdavStatus.SC_LOCKED));
+                errorList.put(childName, Integer.valueOf(WebdavStatus.SC_LOCKED));
 
             } else {
                 WebResource childResource = resources.getResource(childName);
@@ -1814,7 +1814,7 @@ public class WebdavServlet
                     if (!childResource.isDirectory()) {
                         // If it's not a collection, then it's an unknown
                         // error
-                        errorList.put(childName, new Integer(
+                        errorList.put(childName, Integer.valueOf(
                                 WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                     }
                 }

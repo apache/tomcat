@@ -299,7 +299,7 @@ public abstract class AbstractReplicatedMap<K,V>
     protected void memberAlive(Member member) {
         mapMemberAdded(member);
         synchronized (mapMembers) {
-            mapMembers.put(member, new Long(System.currentTimeMillis()));
+            mapMembers.put(member, Long.valueOf(System.currentTimeMillis()));
         }
     }
 
@@ -735,7 +735,7 @@ public abstract class AbstractReplicatedMap<K,V>
         //select a backup node if we don't have one
         synchronized (mapMembers) {
             if (!mapMembers.containsKey(member) ) {
-                mapMembers.put(member, new Long(System.currentTimeMillis()));
+                mapMembers.put(member, Long.valueOf(System.currentTimeMillis()));
                 memberAdded = true;
             }
         }

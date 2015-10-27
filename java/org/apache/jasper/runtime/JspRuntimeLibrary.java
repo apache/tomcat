@@ -444,12 +444,12 @@ public class JspRuntimeLibrary {
             } else if (t.equals(Integer.class)) {
                 Integer []tmpval = new Integer[values.length];
                 for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] =  new Integer (values[i]);
+                    tmpval[i] =  Integer.valueOf(values[i]);
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Byte.class)) {
                 Byte[] tmpval = new Byte[values.length];
                 for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = new Byte (values[i]);
+                    tmpval[i] = Byte.valueOf(values[i]);
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Boolean.class)) {
                 Boolean[] tmpval = new Boolean[values.length];
@@ -459,22 +459,22 @@ public class JspRuntimeLibrary {
             } else if (t.equals(Short.class)) {
                 Short[] tmpval = new Short[values.length];
                 for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = new Short (values[i]);
+                    tmpval[i] = Short.valueOf(values[i]);
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Long.class)) {
                 Long[] tmpval = new Long[values.length];
                 for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = new Long (values[i]);
+                    tmpval[i] = Long.valueOf(values[i]);
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Double.class)) {
                 Double[] tmpval = new Double[values.length];
                 for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = new Double (values[i]);
+                    tmpval[i] = Double.valueOf(values[i]);
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Float.class)) {
                 Float[] tmpval = new Float[values.length];
                 for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = new Float (values[i]);
+                    tmpval[i] = Float.valueOf(values[i]);
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(Character.class)) {
                 Character[] tmpval = new Character[values.length];

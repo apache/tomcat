@@ -63,7 +63,7 @@ public abstract class ELArithmetic {
 
         @Override
         protected Number mod(Number num0, Number num1) {
-            return new Double(num0.doubleValue() % num1.doubleValue());
+            return Double.valueOf(num0.doubleValue() % num1.doubleValue());
         }
 
         @Override
@@ -132,7 +132,7 @@ public abstract class ELArithmetic {
             } else if (num1 instanceof BigDecimal) {
                 return ((new BigDecimal(num0.doubleValue()).add((BigDecimal) num1)));
             }
-            return new Double(num0.doubleValue() + num1.doubleValue());
+            return Double.valueOf(num0.doubleValue() + num1.doubleValue());
         }
 
         @Override
@@ -141,22 +141,22 @@ public abstract class ELArithmetic {
                 return num;
             if (num instanceof BigInteger)
                 return new BigDecimal((BigInteger) num);
-            return new Double(num.doubleValue());
+            return Double.valueOf(num.doubleValue());
         }
 
         @Override
         protected Number coerce(String str) {
-            return new Double(str);
+            return Double.valueOf(str);
         }
 
         @Override
         protected Number divide(Number num0, Number num1) {
-            return new Double(num0.doubleValue() / num1.doubleValue());
+            return Double.valueOf(num0.doubleValue() / num1.doubleValue());
         }
 
         @Override
         protected Number mod(Number num0, Number num1) {
-            return new Double(num0.doubleValue() % num1.doubleValue());
+            return Double.valueOf(num0.doubleValue() % num1.doubleValue());
         }
 
         @Override
@@ -167,7 +167,7 @@ public abstract class ELArithmetic {
             } else if (num1 instanceof BigDecimal) {
                 return ((new BigDecimal(num0.doubleValue()).subtract((BigDecimal) num1)));
             }
-            return new Double(num0.doubleValue() - num1.doubleValue());
+            return Double.valueOf(num0.doubleValue() - num1.doubleValue());
         }
 
         @Override
@@ -178,7 +178,7 @@ public abstract class ELArithmetic {
             } else if (num1 instanceof BigDecimal) {
                 return ((new BigDecimal(num0.doubleValue()).multiply((BigDecimal) num1)));
             }
-            return new Double(num0.doubleValue() * num1.doubleValue());
+            return Double.valueOf(num0.doubleValue() * num1.doubleValue());
         }
 
         @Override
