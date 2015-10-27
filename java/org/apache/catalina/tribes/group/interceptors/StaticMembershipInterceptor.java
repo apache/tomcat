@@ -20,12 +20,17 @@ import java.util.ArrayList;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
-public class StaticMembershipInterceptor
-    extends ChannelInterceptorBase {
+public class StaticMembershipInterceptor extends ChannelInterceptorBase {
+
+    private static final Log log = LogFactory.getLog(StaticMembershipInterceptor.class);
+
     protected ArrayList<Member> members = new ArrayList<Member>();
     protected Member localMember = null;
 
@@ -119,6 +124,26 @@ public class StaticMembershipInterceptor
         };
         t.start();
         super.start(svc & (~Channel.SND_RX_SEQ) & (~Channel.SND_TX_SEQ));
+
+        // check required interceptors
+        TcpFailureDetector failureDetector = null;
+        TcpPingInterceptor pingInterceptor = null;
+        ChannelInterceptor prev = getPrevious();
+        while (prev != null) {
+            if (prev instanceof TcpFailureDetector ) failureDetector = (TcpFailureDetector) prev;
+            if (prev instanceof TcpPingInterceptor) pingInterceptor = (TcpPingInterceptor) prev;
+            prev = prev.getPrevious();
+        }
+        if (failureDetector == null) {
+            log.warn("There is no TcpFailureDetector. Automatic detection of static members does"
+                    + " not work properly. By defining the StaticMembershipInterceptor under the"
+                    + " TcpFailureDetector, automatic detection of the static members will work.");
+        }
+        if (pingInterceptor == null) {
+            log.warn("There is no TcpPingInterceptor. The health check of static member does"
+                    + " not work properly. By defining the TcpPingInterceptor, the health check of"
+                    + " static member will work.");
+        }
     }
 
 }

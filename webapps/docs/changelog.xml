@@ -116,6 +116,12 @@
         clearly. When handling shutdown payload, verification completion message
         is not required. (kfujino)
       </scode>
+      <fix>
+        When starting the <code>StaticMembershipInterceptor</code>,
+        <code>StaticMembershipInterceptor</code> checks  the required
+        Interceptors. If the required Interceptor does not exist, it issues
+        warning logs. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
