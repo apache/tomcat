@@ -46,7 +46,6 @@ import org.apache.catalina.DistributedManager;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.manager.util.BaseSessionComparator;
-import org.apache.catalina.manager.util.ReverseComparator;
 import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.RequestUtil;
@@ -891,7 +890,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
             if (comparator != null) {
                 orderBy = req.getParameter("order");
                 if ("DESC".equalsIgnoreCase(orderBy)) {
-                    comparator = new ReverseComparator(comparator);
+                    comparator = Collections.reverseOrder(comparator);
                     orderBy = "ASC";
                 } else {
                     orderBy = "DESC";
