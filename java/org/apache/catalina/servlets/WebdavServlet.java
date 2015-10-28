@@ -472,7 +472,7 @@ public class WebdavServlet
 
         Node propNode = null;
 
-        if (req.getContentLength() > 0) {
+        if (req.getContentLengthLong() > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
 
             try {
@@ -716,7 +716,7 @@ public class WebdavServlet
             return;
         }
 
-        if (req.getContentLength() > 0) {
+        if (req.getContentLengthLong() > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
             try {
                 // Document document =
