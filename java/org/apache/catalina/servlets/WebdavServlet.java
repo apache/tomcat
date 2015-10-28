@@ -881,15 +881,13 @@ public class WebdavServlet
                 lockDurationStr = lockDurationStr.substring(0,commaPos);
             }
             if (lockDurationStr.startsWith("Second-")) {
-                lockDuration =
-                    (Integer.valueOf(lockDurationStr.substring(7))).intValue();
+                lockDuration = Integer.parseInt(lockDurationStr.substring(7));
             } else {
                 if (lockDurationStr.equalsIgnoreCase("infinity")) {
                     lockDuration = MAX_TIMEOUT;
                 } else {
                     try {
-                        lockDuration =
-                            (Integer.valueOf(lockDurationStr)).intValue();
+                        lockDuration = Integer.parseInt(lockDurationStr);
                     } catch (NumberFormatException e) {
                         lockDuration = MAX_TIMEOUT;
                     }
