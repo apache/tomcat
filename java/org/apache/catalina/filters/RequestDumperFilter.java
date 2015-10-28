@@ -109,7 +109,7 @@ public class RequestDumperFilter extends GenericFilter {
 
         doLog(" characterEncoding", request.getCharacterEncoding());
         doLog("     contentLength",
-                Integer.toString(request.getContentLength()));
+                Long.toString(request.getContentLengthLong()));
         doLog("       contentType", request.getContentType());
 
         if (hRequest == null) {
