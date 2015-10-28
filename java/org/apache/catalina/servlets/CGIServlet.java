@@ -305,7 +305,7 @@ public final class CGIServlet extends HttpServlet {
             debug = Integer.parseInt(getServletConfig().getInitParameter("debug"));
         cgiPathPrefix = getServletConfig().getInitParameter("cgiPathPrefix");
         boolean passShellEnvironment =
-            Boolean.valueOf(getServletConfig().getInitParameter("passShellEnvironment")).booleanValue();
+            Boolean.parseBoolean(getServletConfig().getInitParameter("passShellEnvironment"));
 
         if (passShellEnvironment) {
             shellEnv.putAll(System.getenv());

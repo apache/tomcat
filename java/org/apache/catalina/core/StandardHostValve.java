@@ -69,8 +69,7 @@ final class StandardHostValve extends ValveBase {
         if (accessSession == null) {
             ACCESS_SESSION = STRICT_SERVLET_COMPLIANCE;
         } else {
-            ACCESS_SESSION =
-                Boolean.valueOf(accessSession).booleanValue();
+            ACCESS_SESSION = Boolean.parseBoolean(accessSession);
         }
     }
 

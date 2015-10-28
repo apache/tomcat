@@ -416,7 +416,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      * is desired or not.
      */
     public void setResolveHosts(String resolveHosts) {
-        this.resolveHosts = Boolean.valueOf(resolveHosts).booleanValue();
+        this.resolveHosts = Boolean.parseBoolean(resolveHosts);
     }
 
     /**
