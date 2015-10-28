@@ -84,6 +84,10 @@
         Patch provided by Anthony Whitford. (violetagg)
       </fix>
       <fix>
+        <bug>58535</bug>: Use <code>Collections.reverseOrder</code>
+        when a reverse ordering is needed. (violetagg)
+      </fix>
+      <fix>
         <bug>58537</bug>: Some of the inner classes in
         <code>o.a.catalina.valves.ExtendedAccessLogValve</code> are made static.
         Patch provided by Anthony Whitford. (violetagg)
