@@ -648,7 +648,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     @Override
     public Runnable getDelegatedTask() {
         // Currently, we do not delegate SSL computation tasks
-        // TODO: in the future, possibly create tasks to do encrypt / decrypt async
         return null;
     }
 
