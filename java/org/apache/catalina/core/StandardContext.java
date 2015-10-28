@@ -4606,12 +4606,10 @@ public class StandardContext extends ContainerBase
 
         // Release all Filter and FilterConfig instances
         synchronized (filterConfigs) {
-            Iterator<String> names = filterConfigs.keySet().iterator();
-            while (names.hasNext()) {
-                String name = names.next();
+            for (Entry<String, ApplicationFilterConfig> entry : filterConfigs.entrySet()) {
                 if (getLogger().isDebugEnabled())
-                    getLogger().debug(" Stopping filter '" + name + "'");
-                ApplicationFilterConfig filterConfig = filterConfigs.get(name);
+                    getLogger().debug(" Stopping filter '" + entry.getKey() + "'");
+                ApplicationFilterConfig filterConfig = entry.getValue();
                 filterConfig.release();
             }
             filterConfigs.clear();

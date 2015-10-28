@@ -329,19 +329,23 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         return getPrincipal(username);
     }
 
-
     /**
-     * Return the Principal associated with the specified username, which
+     * Try to authenticate with the specified username, which
      * matches the digest calculated using the given parameters using the
-     * method described in RFC 2069; otherwise return <code>null</code>.
+     * method described in RFC 2617 (which is a superset of RFC 2069).
      *
      * @param username Username of the Principal to look up
      * @param clientDigest Digest which has been submitted by the client
      * @param nonce Unique (or supposedly unique) token which has been used
      * for this request
+     * @param nc the nonce counter
+     * @param cnonce the client chosen nonce
+     * @param qop the "quality of protection" (<code>nc</code> and <code>cnonce</code>
+     *        will only be used, if <code>qop</code> is not <code>null</code>).
      * @param realm Realm name
      * @param md5a2 Second MD5 digest used to calculate the digest :
      * MD5(Method + ":" + uri)
+     * @return the associated principal, or <code>null</code> if there is none.
      */
     @Override
     public Principal authenticate(String username, String clientDigest,

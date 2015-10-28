@@ -19,7 +19,7 @@ package org.apache.tomcat.util.net;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.tomcat.util.net.jsse.openssl.Cipher;
+import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
 public class TestSSLHostConfig {
 

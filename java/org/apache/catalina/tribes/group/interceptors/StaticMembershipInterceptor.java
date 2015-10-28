@@ -20,12 +20,20 @@ import java.util.ArrayList;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
+import org.apache.catalina.tribes.util.StringManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
-public class StaticMembershipInterceptor
-    extends ChannelInterceptorBase {
+public class StaticMembershipInterceptor extends ChannelInterceptorBase {
+
+    private static final Log log = LogFactory.getLog(StaticMembershipInterceptor.class);
+    protected static final StringManager sm =
+            StringManager.getManager(StaticMembershipInterceptor.class);
+
     protected final ArrayList<Member> members = new ArrayList<>();
     protected Member localMember = null;
 
@@ -119,6 +127,22 @@ public class StaticMembershipInterceptor
         };
         t.start();
         super.start(svc & (~Channel.SND_RX_SEQ) & (~Channel.SND_TX_SEQ));
+
+        // check required interceptors
+        TcpFailureDetector failureDetector = null;
+        TcpPingInterceptor pingInterceptor = null;
+        ChannelInterceptor prev = getPrevious();
+        while (prev != null) {
+            if (prev instanceof TcpFailureDetector ) failureDetector = (TcpFailureDetector) prev;
+            if (prev instanceof TcpPingInterceptor) pingInterceptor = (TcpPingInterceptor) prev;
+            prev = prev.getPrevious();
+        }
+        if (failureDetector == null) {
+            log.warn(sm.getString("staticMembershipInterceptor.no.failureDetector"));
+        }
+        if (pingInterceptor == null) {
+            log.warn(sm.getString("staticMembershipInterceptor.no.pingInterceptor"));
+        }
     }
 
 }

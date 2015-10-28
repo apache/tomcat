@@ -22,12 +22,16 @@ import java.nio.ByteBuffer;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class UpgradeProcessorInternal extends UpgradeProcessorBase {
+
+    private static final Log log = LogFactory.getLog(UpgradeProcessorInternal.class);
 
     private final InternalHttpUpgradeHandler internalHttpUpgradeHandler;
 
@@ -60,6 +64,12 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
     @Override
     public void pause() {
         internalHttpUpgradeHandler.pause();
+    }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
     }
 
 

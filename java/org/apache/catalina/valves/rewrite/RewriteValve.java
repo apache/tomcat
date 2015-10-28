@@ -344,7 +344,7 @@ public class RewriteValve extends ValveBase {
                     // 1. this valve is associated with a context
                     // 2. the url starts with a leading slash
                     // 3. the url isn't absolute
-                    if (context && urlString.charAt(0) == '/' && !hasScheme(urlString)) {
+                    if (context && urlString.charAt(0) == '/' && !URL.hasScheme(urlString)) {
                         urlString.insert(0, request.getContext().getEncodedPath());
                     }
                     response.sendRedirect(urlString.toString());
@@ -734,22 +734,5 @@ public class RewriteValve extends ValveBase {
         } else {
             throw new IllegalArgumentException("Invalid flag in: " + line + " flag: " + flag);
         }
-    }
-
-
-    /**
-     * Determine if a URI string has a <code>scheme</code> component.
-     */
-    protected static boolean hasScheme(StringBuffer uri) {
-        int len = uri.length();
-        for(int i=0; i < len ; i++) {
-            char c = uri.charAt(i);
-            if(c == ':') {
-                return i > 0;
-            } else if(!URL.isSchemeChar(c)) {
-                return false;
-            }
-        }
-        return false;
     }
 }

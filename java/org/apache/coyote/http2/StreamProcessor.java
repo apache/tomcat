@@ -18,9 +18,6 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpUpgradeHandler;
@@ -31,6 +28,7 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
+import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -47,7 +45,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     private static final StringManager sm = StringManager.getManager(StreamProcessor.class);
 
     private final Stream stream;
-    private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
     private volatile SSLSupport sslSupport;
 
@@ -62,51 +59,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     @Override
     public synchronized void run() {
-        SocketStatus status = SocketStatus.OPEN_READ;
-
         // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
         // socket <-> processor mapping
         ContainerThreadMarker.set();
         SocketState state = SocketState.CLOSED;
         try {
-            Iterator<DispatchType> dispatches = getIteratorAndClearDispatches();
-            do {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("streamProcessor.process.loopstart",
-                            stream.getConnectionId(), stream.getIdentifier(), status, dispatches));
-                }
-                if (status == SocketStatus.CLOSE_NOW) {
-                    setErrorState(ErrorState.CLOSE_NOW, null);
-                    state = SocketState.CLOSED;
-                } else if (dispatches != null) {
-                    DispatchType nextDispatch = dispatches.next();
-                    state = dispatch(nextDispatch.getSocketStatus());
-                } else if (isAsync()) {
-                    state = dispatch(status);
-                } else if (state == SocketState.ASYNC_END) {
-                    state = dispatch(status);
-                } else if (status == SocketStatus.DISCONNECT) {
-                    // Should never happen
-                    throw new IllegalStateException();
-                } else {
-                    state = process((SocketWrapperBase<?>) null);
-                }
-
-                if (state != SocketState.CLOSED && isAsync()) {
-                    state = asyncStateMachine.asyncPostProcess();
-                }
-
-                if (dispatches == null || !dispatches.hasNext()) {
-                    // Only returns non-null iterator if there are
-                    // dispatches to process.
-                    dispatches = getIteratorAndClearDispatches();
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("streamProcessor.process.loopend",
-                            stream.getConnectionId(), stream.getIdentifier(), state, dispatches));
-                }
-            } while (state == SocketState.ASYNC_END ||
-                    dispatches != null && state != SocketState.CLOSED);
+            state = process(socketWrapper, SocketStatus.OPEN_READ);
 
             if (state == SocketState.CLOSED) {
                 if (!getErrorState().isConnectionIoAllowed()) {
@@ -347,7 +305,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case ASYNC_SETTIMEOUT: {
-            // TODO
+            if (param == null) {
+                return;
+            }
+            long timeout = ((Long) param).longValue();
+            setAsyncTimeout(timeout);
             break;
         }
         case ASYNC_TIMEOUT: {
@@ -363,8 +325,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case NB_READ_INTEREST: {
-            AtomicBoolean result = (AtomicBoolean) param;
-            result.set(stream.getInputBuffer().isReady());
+            stream.getInputBuffer().registerReadInterest();
             break;
         }
         case NB_WRITE_INTEREST: {
@@ -373,15 +334,26 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case DISPATCH_READ: {
-            dispatches.add(DispatchType.NON_BLOCKING_READ);
+            addDispatch(DispatchType.NON_BLOCKING_READ);
             break;
         }
         case DISPATCH_WRITE: {
-            dispatches.add(DispatchType.NON_BLOCKING_WRITE);
+            addDispatch(DispatchType.NON_BLOCKING_WRITE);
             break;
         }
         case DISPATCH_EXECUTE: {
             socketWrapper.getEndpoint().getExecutor().execute(this);
+            break;
+        }
+
+        // Servlet 4.0 Push requests
+        case PUSH_REQUEST: {
+            try {
+                stream.push((Request) param);
+            } catch (IOException ioe) {
+                response.setErrorException(ioe);
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+            }
             break;
         }
 
@@ -400,7 +372,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // is reused
         setSocketWrapper(null);
         setAdapter(null);
-        setClientCertProvider(null);
     }
 
 
@@ -423,12 +394,13 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    public SocketState process(SocketWrapperBase<?> socket) throws IOException {
+    public SocketState service(SocketWrapperBase<?> socket) throws IOException {
         try {
             adapter.service(request, response);
-        } catch (IOException ioe) {
-            setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
         } catch (Exception e) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("streamProcessor.service.error"), e);
+            }
             setErrorState(ErrorState.CLOSE_NOW, e);
         }
 
@@ -469,35 +441,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     protected SocketState dispatchEndRequest() {
         return SocketState.CLOSED;
-    }
-
-
-    public void addDispatch(DispatchType dispatchType) {
-        synchronized (dispatches) {
-            dispatches.add(dispatchType);
-        }
-    }
-    public Iterator<DispatchType> getIteratorAndClearDispatches() {
-        // Note: Logic in AbstractProtocol depends on this method only returning
-        // a non-null value if the iterator is non-empty. i.e. it should never
-        // return an empty iterator.
-        Iterator<DispatchType> result;
-        synchronized (dispatches) {
-            // Synchronized as the generation of the iterator and the clearing
-            // of dispatches needs to be an atomic operation.
-            result = dispatches.iterator();
-            if (result.hasNext()) {
-                dispatches.clear();
-            } else {
-                result = null;
-            }
-        }
-        return result;
-    }
-    public void clearDispatches() {
-        synchronized (dispatches) {
-            dispatches.clear();
-        }
     }
 
 

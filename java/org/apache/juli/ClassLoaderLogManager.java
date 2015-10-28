@@ -206,7 +206,7 @@ public class ClassLoaderLogManager extends LogManager {
         // Unlike java.util.logging, the default is to not delegate if a list of handlers
         // has been specified for the logger.
         String useParentHandlersString = getProperty(loggerName + ".useParentHandlers");
-        if (Boolean.valueOf(useParentHandlersString).booleanValue()) {
+        if (Boolean.parseBoolean(useParentHandlersString)) {
             logger.setUseParentHandlers(true);
         }
 

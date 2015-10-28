@@ -22,6 +22,11 @@ package org.apache.coyote.http2;
  */
 public class ConnectionSettingsRemote extends ConnectionSettingsBase<ConnectionException> {
 
+    public ConnectionSettingsRemote(String connectionId) {
+        super(connectionId);
+    }
+
+
     @Override
     void throwException(String msg, Http2Error error) throws ConnectionException {
         throw new ConnectionException(msg, error);

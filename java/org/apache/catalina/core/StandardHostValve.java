@@ -69,8 +69,7 @@ final class StandardHostValve extends ValveBase {
         if (accessSession == null) {
             ACCESS_SESSION = STRICT_SERVLET_COMPLIANCE;
         } else {
-            ACCESS_SESSION =
-                Boolean.valueOf(accessSession).booleanValue();
+            ACCESS_SESSION = Boolean.parseBoolean(accessSession);
         }
     }
 
@@ -318,7 +317,7 @@ final class StandardHostValve extends ValveBase {
                 request.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
                         DispatcherType.ERROR);
                 request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
-                        new Integer(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
+                        Integer.valueOf(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
                 request.setAttribute(RequestDispatcher.ERROR_MESSAGE,
                                   throwable.getMessage());
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION,

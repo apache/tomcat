@@ -17,7 +17,6 @@
 package org.apache.catalina.authenticator.jaspic.provider.modules;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.text.MessageFormat;
@@ -36,10 +35,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Realm;
+import org.apache.catalina.authenticator.DigestAuthenticator.DigestInfo;
+import org.apache.catalina.authenticator.DigestAuthenticator.NonceInfo;
+import org.apache.catalina.connector.Request;
 import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.util.security.MD5Encoder;
 
@@ -49,9 +50,6 @@ public class DigestAuthModule extends TomcatAuthModule {
      * Tomcat's DIGEST implementation only supports auth quality of protection.
      */
     protected static final String QOP = "auth";
-
-    private Class<?>[] supportedMessageTypes = new Class[] { HttpServletRequest.class,
-            HttpServletResponse.class };
 
     private CallbackHandler handler;
 
@@ -179,16 +177,30 @@ public class DigestAuthModule extends TomcatAuthModule {
 
 
     @Override
-    @SuppressWarnings("rawtypes")
-    public void initializeModule(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, Map options) throws AuthException {
+    public synchronized void initializeModule(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
+            CallbackHandler handler, Map<String, String> options) throws AuthException {
         this.handler = handler;
-        startInternal();
-    }
-
-
-    protected synchronized void startInternal() {
         this.sessionIdGenerator = new StandardSessionIdGenerator();
+
+        // Get properties from options
+        this.key = options.get("key");
+        String nonceCacheSizeValue = options.get("nonceCacheSize");
+        if (nonceCacheSizeValue != null) {
+            this.nonceCacheSize = Integer.parseInt(nonceCacheSizeValue);
+        }
+        String nonceCountWindowSizeValue = options.get("nonceCountWindowSize");
+        if (nonceCountWindowSizeValue != null) {
+            this.nonceCountWindowSize = Integer.parseInt(nonceCountWindowSizeValue);
+        }
+        String nonceValidityValue = options.get("nonceValidity");
+        if (nonceValidityValue != null) {
+            this.nonceValidity = Long.parseLong(nonceValidityValue);
+        }
+        this.opaque = options.get("opaque");
+        String validateUriValue = options.get("validateUri");
+        if (validateUriValue != null) {
+            this.validateUri = Boolean.parseBoolean(validateUriValue);
+        }
 
         // Generate a random secret key
         if (getKey() == null) {
@@ -231,12 +243,12 @@ public class DigestAuthModule extends TomcatAuthModule {
             Subject serviceSubject) throws AuthException {
 
         Principal principal = null;
-        HttpServletRequest request = (HttpServletRequest) messageInfo.getRequestMessage();
+        Request request = (Request) messageInfo.getRequestMessage();
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
         String authorization = request.getHeader(AUTHORIZATION_HEADER);
 
         DigestInfo digestInfo = new DigestInfo(getOpaque(), getNonceValidity(), getKey(), nonces,
-                isValidateUri(), getRealmName());
+                isValidateUri());
 
         if (authorization == null || !digestInfo.parse(request, authorization)) {
             String nonce = generateNonce(request);
@@ -245,6 +257,7 @@ public class DigestAuthModule extends TomcatAuthModule {
         }
 
         if (digestInfo.validate(request)) {
+            // FIXME: maybe use a custom callback handler instead
             principal = digestInfo.authenticate(realm);
         }
 
@@ -273,25 +286,6 @@ public class DigestAuthModule extends TomcatAuthModule {
             throw new AuthException(e.getMessage());
         }
         return AuthStatus.SEND_CONTINUE;
-    }
-
-
-    @Override
-    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
-            throws AuthException {
-        return null;
-    }
-
-
-    @Override
-    public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
-
-    }
-
-
-    @Override
-    public Class<?>[] getSupportedMessageTypes() {
-        return supportedMessageTypes;
     }
 
 
@@ -391,240 +385,4 @@ public class DigestAuthModule extends TomcatAuthModule {
     }
 
 
-    private static class DigestInfo {
-
-        private final String opaque;
-        private final long nonceValidity;
-        private final String key;
-        private final Map<String, NonceInfo> nonces;
-        private boolean validateUri = true;
-
-        private String userName = null;
-        private String method = null;
-        private String uri = null;
-        private String response = null;
-        private String nonce = null;
-        private String nc = null;
-        private String cnonce = null;
-        private String realmName = null;
-        private String qop = null;
-        private String opaqueReceived = null;
-
-        private boolean nonceStale = false;
-
-        private String contextRealmName;
-
-        public DigestInfo(String opaque, long nonceValidity, String key,
-                Map<String, NonceInfo> nonces, boolean validateUri, String contextRealmName) {
-            this.opaque = opaque;
-            this.nonceValidity = nonceValidity;
-            this.key = key;
-            this.nonces = nonces;
-            this.validateUri = validateUri;
-            this.contextRealmName = contextRealmName;
-        }
-
-        public String getUsername() {
-            return userName;
-        }
-
-        public boolean parse(HttpServletRequest request, String authorization) {
-            // Validate the authorization credentials format
-            if (authorization == null) {
-                return false;
-            }
-
-            Map<String, String> directives;
-            try {
-                directives = Authorization.parseAuthorizationDigest(
-                        new StringReader(authorization));
-            } catch (IOException e) {
-                return false;
-            }
-
-            if (directives == null) {
-                return false;
-            }
-
-            method = request.getMethod();
-            userName = directives.get("username");
-            realmName = directives.get("realm");
-            nonce = directives.get("nonce");
-            nc = directives.get("nc");
-            cnonce = directives.get("cnonce");
-            qop = directives.get("qop");
-            uri = directives.get("uri");
-            response = directives.get("response");
-            opaqueReceived = directives.get("opaque");
-
-            return true;
-        }
-
-        public boolean validate(HttpServletRequest request) {
-            if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null)
-                    || (response == null)) {
-                return false;
-            }
-
-            // Validate the URI - should match the request line sent by client
-            if (validateUri) {
-                String uriQuery;
-                String query = request.getQueryString();
-                if (query == null) {
-                    uriQuery = request.getRequestURI();
-                } else {
-                    uriQuery = request.getRequestURI() + "?" + query;
-                }
-                if (!uri.equals(uriQuery)) {
-                    // Some clients (older Android) use an absolute URI for
-                    // DIGEST but a relative URI in the request line.
-                    // request. 2.3.5 < fixed Android version <= 4.0.3
-                    String host = request.getHeader("host");
-                    String scheme = request.getScheme();
-                    if (host != null && !uriQuery.startsWith(scheme)) {
-                        StringBuilder absolute = new StringBuilder();
-                        absolute.append(scheme);
-                        absolute.append("://");
-                        absolute.append(host);
-                        absolute.append(uriQuery);
-                        if (!uri.equals(absolute.toString())) {
-                            return false;
-                        }
-                    } else {
-                        return false;
-                    }
-                }
-            }
-
-            // Validate the Realm name
-            if (!contextRealmName.equals(realmName)) {
-                return false;
-            }
-
-            // Validate the opaque string
-            if (!opaque.equals(opaqueReceived)) {
-                return false;
-            }
-
-            // Validate nonce
-            int i = nonce.indexOf(":");
-            if (i < 0 || (i + 1) == nonce.length()) {
-                return false;
-            }
-            long nonceTime;
-            try {
-                nonceTime = Long.parseLong(nonce.substring(0, i));
-            } catch (NumberFormatException nfe) {
-                return false;
-            }
-            String md5clientIpTimeKey = nonce.substring(i + 1);
-            long currentTime = System.currentTimeMillis();
-            if ((currentTime - nonceTime) > nonceValidity) {
-                nonceStale = true;
-                synchronized (nonces) {
-                    nonces.remove(nonce);
-                }
-            }
-            String serverIpTimeKey = request.getRemoteAddr() + ":" + nonceTime + ":" + key;
-            byte[] buffer = ConcurrentMessageDigest.digestMD5(serverIpTimeKey
-                    .getBytes(StandardCharsets.ISO_8859_1));
-            String md5ServerIpTimeKey = MD5Encoder.encode(buffer);
-            if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
-                return false;
-            }
-
-            // Validate qop
-            if (qop != null && !QOP.equals(qop)) {
-                return false;
-            }
-
-            // Validate cnonce and nc
-            // Check if presence of nc and Cnonce is consistent with presence of
-            // qop
-            if (qop == null) {
-                if (cnonce != null || nc != null) {
-                    return false;
-                }
-            } else {
-                if (cnonce == null || nc == null) {
-                    return false;
-                }
-                // RFC 2617 says nc must be 8 digits long. Older Android clients
-                // use 6. 2.3.5 < fixed Android version <= 4.0.3
-                if (nc.length() < 6 || nc.length() > 8) {
-                    return false;
-                }
-                long count;
-                try {
-                    count = Long.parseLong(nc, 16);
-                } catch (NumberFormatException nfe) {
-                    return false;
-                }
-                NonceInfo info;
-                synchronized (nonces) {
-                    info = nonces.get(nonce);
-                }
-                if (info == null) {
-                    // Nonce is valid but not in cache. It must have dropped out
-                    // of the cache - force a re-authentication
-                    nonceStale = true;
-                } else {
-                    if (!info.nonceCountValid(count)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        public boolean isNonceStale() {
-            return nonceStale;
-        }
-
-        public Principal authenticate(Realm realm) {
-            // Second MD5 digest used to calculate the digest :
-            // MD5(Method + ":" + uri)
-            String a2 = method + ":" + uri;
-
-            byte[] buffer = ConcurrentMessageDigest.digestMD5(a2
-                    .getBytes(StandardCharsets.ISO_8859_1));
-            String md5a2 = MD5Encoder.encode(buffer);
-
-            return realm.authenticate(userName, response, nonce, nc, cnonce, qop, realmName, md5a2);
-        }
-
-    }
-
-
-    private static class NonceInfo {
-        private final long timestamp;
-        private final boolean seen[];
-        private final int offset;
-        private int count = 0;
-
-        public NonceInfo(long currentTime, int seenWindowSize) {
-            this.timestamp = currentTime;
-            seen = new boolean[seenWindowSize];
-            offset = seenWindowSize / 2;
-        }
-
-        public synchronized boolean nonceCountValid(long nonceCount) {
-            if ((count - offset) >= nonceCount || (nonceCount > count - offset + seen.length)) {
-                return false;
-            }
-            int checkIndex = (int) ((nonceCount + offset) % seen.length);
-            if (seen[checkIndex]) {
-                return false;
-            } else {
-                seen[checkIndex] = true;
-                seen[count % seen.length] = false;
-                count++;
-                return true;
-            }
-        }
-
-        public long getTimestamp() {
-            return timestamp;
-        }
-    }
 }

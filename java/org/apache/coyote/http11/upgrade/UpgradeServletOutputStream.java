@@ -35,6 +35,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private static final StringManager sm =
             StringManager.getManager(UpgradeServletOutputStream.class);
 
+    private final UpgradeProcessorBase processor;
     private final SocketWrapperBase<?> socketWrapper;
 
     // Used to ensure that isReady() and onWritePossible() have a consistent
@@ -61,7 +62,9 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private volatile ClassLoader applicationLoader = null;
 
 
-    public UpgradeServletOutputStream(SocketWrapperBase<?> socketWrapper) {
+    public UpgradeServletOutputStream(UpgradeProcessorBase processor,
+            SocketWrapperBase<?> socketWrapper) {
+        this.processor = processor;
         this.socketWrapper = socketWrapper;
     }
 
@@ -115,7 +118,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             registered = true;
             // Container is responsible for first call to onDataAvailable().
             if (ContainerThreadMarker.isContainerThread()) {
-                socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+                processor.addDispatch(DispatchType.NON_BLOCKING_WRITE);
             } else {
                 socketWrapper.registerWriteInterest();
             }

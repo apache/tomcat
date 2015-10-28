@@ -1068,45 +1068,31 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         NioSocketWrapper ka = (NioSocketWrapper) key.attachment();
                         if ( ka == null ) {
                             cancelledKey(key); //we don't support any keys without attachments
+                        } else if (close) {
+                            key.interestOps(0);
+                            ka.interestOps(0); //avoid duplicate stop calls
+                            processKey(key,ka);
                         } else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
                                   (ka.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
-                            if (close) {
-                                key.interestOps(0);
-                                ka.interestOps(0); //avoid duplicate stop calls
-                                processKey(key,ka);
-                            } else {
-                                boolean isTimedOut = false;
-                                // Check for read timeout
-                                if ((ka.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
-                                    long delta = now - ka.getLastRead();
-                                    long timeout = ka.getReadTimeout();
-                                    isTimedOut = timeout > 0 && delta > timeout;
-                                }
-                                // Check for write timeout
-                                if (!isTimedOut && (ka.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
-                                    long delta = now - ka.getLastWrite();
-                                    long timeout = ka.getWriteTimeout();
-                                    isTimedOut = timeout > 0 && delta > timeout;
-                                }
-                                if (isTimedOut) {
-                                    key.interestOps(0);
-                                    ka.interestOps(0); //avoid duplicate timeout calls
-                                    cancelledKey(key);
-                                }
+                            boolean isTimedOut = false;
+                            // Check for read timeout
+                            if ((ka.interestOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+                                long delta = now - ka.getLastRead();
+                                long timeout = ka.getReadTimeout();
+                                isTimedOut = timeout > 0 && delta > timeout;
                             }
-                        } else if (ka.isAsync()) {
-                            if (close) {
-                                key.interestOps(0);
-                                ka.interestOps(0); //avoid duplicate stop calls
-                                processKey(key,ka);
-                            } else if (ka.getAsyncTimeout() > 0) {
-                                if ((now - ka.getLastAsyncStart()) > ka.getAsyncTimeout()) {
-                                    // Prevent subsequent timeouts if the timeout event takes a while to process
-                                    ka.setAsyncTimeout(0);
-                                    processSocket(ka, SocketStatus.TIMEOUT, true);
-                                }
+                            // Check for write timeout
+                            if (!isTimedOut && (ka.interestOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                                long delta = now - ka.getLastWrite();
+                                long timeout = ka.getWriteTimeout();
+                                isTimedOut = timeout > 0 && delta > timeout;
                             }
-                        }//end if
+                            if (isTimedOut) {
+                                key.interestOps(0);
+                                ka.interestOps(0); //avoid duplicate timeout calls
+                                cancelledKey(key);
+                            }
+                        }
                     }catch ( CancelledKeyException ckx ) {
                         cancelledKey(key);
                     }

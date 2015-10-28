@@ -76,7 +76,7 @@ public interface UpgradeProtocol {
      *
      * @return An instance of the HTTP upgrade handler for this protocol
      */
-    public InternalHttpUpgradeHandler getInteralUpgradeHandler(Adapter adapter, Request request);
+    public InternalHttpUpgradeHandler getInternalUpgradeHandler(Adapter adapter, Request request);
 
 
     /**

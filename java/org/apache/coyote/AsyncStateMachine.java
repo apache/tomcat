@@ -102,8 +102,7 @@ public class AsyncStateMachine {
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(AsyncStateMachine.class);
 
     private static enum AsyncState {
         DISPATCHED   (false, false, false, false, false),
@@ -155,12 +154,13 @@ public class AsyncStateMachine {
 
 
     private volatile AsyncState state = AsyncState.DISPATCHED;
+    private volatile long lastAsyncStart = 0;
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
-    private final Processor processor;
+    private final AbstractProcessor processor;
 
 
-    public AsyncStateMachine(Processor processor) {
+    public AsyncStateMachine(AbstractProcessor processor) {
         this.processor = processor;
     }
 
@@ -189,10 +189,22 @@ public class AsyncStateMachine {
         return state.isCompleting();
     }
 
+    /**
+     * Obtain the time that this connection last transitioned to async
+     * processing.
+     *
+     * @return The time (as returned by {@link System#currentTimeMillis()}) that
+     *         this connection last transitioned to async
+     */
+    public long getLastAsyncStart() {
+        return lastAsyncStart;
+    }
+
     public synchronized void asyncStart(AsyncContextCallback asyncCtxt) {
         if (state == AsyncState.DISPATCHED) {
             state = AsyncState.STARTING;
             this.asyncCtxt = asyncCtxt;
+            lastAsyncStart = System.currentTimeMillis();
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",

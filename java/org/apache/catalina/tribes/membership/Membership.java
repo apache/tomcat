@@ -326,7 +326,7 @@ public class Membership implements Cloneable {
          * @param maxtime The time threshold
          *
          * @return <code>true</code> if the member has expired, otherwise
-         *         <code>false</false>
+         *         <code>false</code>
          */
         public boolean hasExpired(long maxtime) {
             long delta = System.currentTimeMillis() - lastHeardFrom;

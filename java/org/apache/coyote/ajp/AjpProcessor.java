@@ -243,6 +243,8 @@ public class AjpProcessor extends AbstractProcessor {
     private long bytesWritten = 0;
 
 
+
+
     // ------------------------------------------------------------ Constructor
 
     public AjpProcessor(int packetSize, AbstractEndpoint<?> endpoint) {
@@ -315,6 +317,19 @@ public class AjpProcessor extends AbstractProcessor {
     private String requiredSecret = null;
     public void setRequiredSecret(String requiredSecret) {
         this.requiredSecret = requiredSecret;
+    }
+
+
+    /**
+     * When client certificate information is presented in a form other than
+     * instances of {@link java.security.cert.X509Certificate} it needs to be
+     * converted before it can be used and this property controls which JSSE
+     * provider is used to perform the conversion.
+     */
+    private String clientCertProvider = null;
+    public String getClientCertProvider() { return clientCertProvider; }
+    public void setClientCertProvider(String clientCertProvider) {
+        this.clientCertProvider = clientCertProvider;
     }
 
 
@@ -483,7 +498,7 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case ASYNC_COMPLETE: {
-            socketWrapper.clearDispatches();
+            clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
             }
@@ -500,9 +515,11 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case ASYNC_SETTIMEOUT: {
-            if (param == null) return;
-            long timeout = ((Long)param).longValue();
-            socketWrapper.setAsyncTimeout(timeout);
+            if (param == null) {
+                return;
+            }
+            long timeout = ((Long) param).longValue();
+            setAsyncTimeout(timeout);
             break;
         }
         case ASYNC_TIMEOUT: {
@@ -573,15 +590,15 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case DISPATCH_READ: {
-            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
+            addDispatch(DispatchType.NON_BLOCKING_READ);
             break;
         }
         case DISPATCH_WRITE: {
-            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+            addDispatch(DispatchType.NON_BLOCKING_WRITE);
             break;
         }
         case DISPATCH_EXECUTE: {
-            socketWrapper.executeNonBlockingDispatches();
+            socketWrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
             break;
         }
         case CLOSE_NOW: {
@@ -593,6 +610,13 @@ public class AjpProcessor extends AbstractProcessor {
         case END_REQUEST: {
             // NO-OP for AJP
             break;
+        }
+
+        // Servlet 4.0 Push requests
+        case PUSH_REQUEST: {
+            // HTTP2 connections only. Unsupported for AJP.
+            throw new UnsupportedOperationException(
+                    sm.getString("ajpprocessor.pushrequest.notsupported"));
         }
         }
     }
@@ -638,7 +662,7 @@ public class AjpProcessor extends AbstractProcessor {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState process(SocketWrapperBase<?> socket) throws IOException {
+    public SocketState service(SocketWrapperBase<?> socket) throws IOException {
 
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
@@ -800,7 +824,7 @@ public class AjpProcessor extends AbstractProcessor {
     @Override
     public void recycle() {
         getAdapter().checkRecycled(request, response);
-        asyncStateMachine.recycle();
+        super.recycle();
         request.recycle();
         response.recycle();
         first = true;
@@ -812,7 +836,6 @@ public class AjpProcessor extends AbstractProcessor {
         certificates.recycle();
         swallowResponse = false;
         bytesWritten = 0;
-        resetErrorState();
     }
 
 

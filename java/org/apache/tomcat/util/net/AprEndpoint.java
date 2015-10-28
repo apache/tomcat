@@ -598,13 +598,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             }
 
             startAcceptorThreads();
-
-            // Start async timeout thread
-            setAsyncTimeout(new AsyncTimeout());
-            Thread timeoutThread = new Thread(getAsyncTimeout(), getName() + "-AsyncTimeout");
-            timeoutThread.setPriority(threadPriority);
-            timeoutThread.setDaemon(true);
-            timeoutThread.start();
         }
     }
 
@@ -629,7 +622,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Ignore
                 }
             }
-            getAsyncTimeout().stop();
             for (AbstractEndpoint.Acceptor acceptor : acceptors) {
                 long waitLeft = 10000;
                 while (waitLeft > 0 &&
@@ -874,7 +866,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // result of calling AsyncContext.dispatch() from a non-container
             // thread
             synchronized (socket) {
-                waitingRequests.remove(socket);
                 SocketProcessor proc = new SocketProcessor(socket, status);
                 Executor executor = getExecutor();
                 if (dispatch && executor != null) {
@@ -1063,7 +1054,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     // ---------------------------------------------- SocketTimeouts Inner Class
 
-    public class SocketTimeouts {
+    public static class SocketTimeouts {
         protected int size;
 
         protected long[] sockets;
@@ -1124,7 +1115,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     // -------------------------------------------------- SocketList Inner Class
 
-    public class SocketList {
+    public static class SocketList {
         protected volatile int size;
         protected int pos;
 
@@ -1724,45 +1715,38 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                 if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                         || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
                                         || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
-                                    if (wrapper.isAsync() || wrapper.isUpgraded()) {
-                                        // Must be using non-blocking IO for the socket to be in the
-                                        // poller during async processing. Need to trigger error
-                                        // handling. Poller may return error codes plus the flags it
-                                        // was waiting for or it may just return an error code. We
-                                        // could return ASYNC_[WRITE|READ]_ERROR here but if we do,
-                                        // there will be no exception associated with the error in
-                                        // application code. By signalling read/write is possible, a
-                                        // read/write will be attempted, fail and that will trigger
-                                        // an exception the application will see.
-                                        // Check the return flags first, followed by what the socket
-                                        // was registered for
-                                        if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
-                                            // Error probably occurred during a non-blocking read
-                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
-                                                // Close socket and clear pool
-                                                closeSocket(desc[n*2+1]);
-                                            }
-                                        } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
-                                            // Error probably occurred during a non-blocking write
-                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
-                                                // Close socket and clear pool
-                                                closeSocket(desc[n*2+1]);
-                                            }
-                                        } else if ((wrapper.pollerFlags & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
-                                            // Can't tell what was happening when the error occurred but the
-                                            // socket is registered for non-blocking read so use that
-                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
-                                                // Close socket and clear pool
-                                                closeSocket(desc[n*2+1]);
-                                            }
-                                        } else if ((wrapper.pollerFlags & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
-                                            // Can't tell what was happening when the error occurred but the
-                                            // socket is registered for non-blocking write so use that
-                                            if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
-                                                // Close socket and clear pool
-                                                closeSocket(desc[n*2+1]);
-                                            }
-                                        } else {
+                                    // Need to trigger error handling. Poller may return error
+                                    // codes plus the flags it was waiting for or it may just
+                                    // return an error code. We could handle the error here but
+                                    // if we do, there will be no exception associated with the
+                                    // error in application code. By signalling read/write is
+                                    // possible, a read/write will be attempted, fail and that
+                                    // will trigger an exception the application will see.
+                                    // Check the return flags first, followed by what the socket
+                                    // was registered for
+                                    if ((desc[n*2] & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
+                                        // Error probably occurred during a non-blocking read
+                                        if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
+                                            // Close socket and clear pool
+                                            closeSocket(desc[n*2+1]);
+                                        }
+                                    } else if ((desc[n*2] & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
+                                        // Error probably occurred during a non-blocking write
+                                        if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
+                                            // Close socket and clear pool
+                                            closeSocket(desc[n*2+1]);
+                                        }
+                                    } else if ((wrapper.pollerFlags & Poll.APR_POLLIN) == Poll.APR_POLLIN) {
+                                        // Can't tell what was happening when the error occurred but the
+                                        // socket is registered for non-blocking read so use that
+                                        if (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ)) {
+                                            // Close socket and clear pool
+                                            closeSocket(desc[n*2+1]);
+                                        }
+                                    } else if ((wrapper.pollerFlags & Poll.APR_POLLOUT) == Poll.APR_POLLOUT) {
+                                        // Can't tell what was happening when the error occurred but the
+                                        // socket is registered for non-blocking write so use that
+                                        if (!processSocket(desc[n*2+1], SocketStatus.OPEN_WRITE)) {
                                             // Close socket and clear pool
                                             closeSocket(desc[n*2+1]);
                                         }
@@ -2060,7 +2044,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             if (rv == Status.APR_SUCCESS) {
                 sendfileCount--;
             }
-            sendfileData.remove(new Long(data.socket));
+            sendfileData.remove(Long.valueOf(data.socket));
         }
 
         /**
@@ -2108,7 +2092,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                 SendfileData data = addS.get(i);
                                 int rv = Poll.add(sendfilePollset, data.socket, Poll.APR_POLLOUT);
                                 if (rv == Status.APR_SUCCESS) {
-                                    sendfileData.put(new Long(data.socket), data);
+                                    sendfileData.put(Long.valueOf(data.socket), data);
                                     sendfileCount++;
                                 } else {
                                     getLog().warn(sm.getString(
@@ -2130,7 +2114,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         for (int n = 0; n < rv; n++) {
                             // Get the sendfile state
                             SendfileData state =
-                                sendfileData.get(new Long(desc[n*2+1]));
+                                sendfileData.get(Long.valueOf(desc[n*2+1]));
                             // Problem events
                             if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                     || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)) {
@@ -2202,7 +2186,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         if (rv > 0) {
                             for (int n = 0; n < rv; n++) {
                                 // Get the sendfile state
-                                SendfileData state = sendfileData.get(new Long(desc[n]));
+                                SendfileData state = sendfileData.get(Long.valueOf(desc[n]));
                                 // Close socket and clear pool
                                 remove(state);
                                 // Destroy file descriptor pool, which should close the file
@@ -2272,10 +2256,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         // Close socket and pool
                         closeSocket(socket.getSocket().longValue());
                         socket = null;
-                    } else if (state == Handler.SocketState.LONG) {
-                        if (socket.isAsync()) {
-                            waitingRequests.add(socket);
-                        }
                     }
                 }
             }
@@ -2317,10 +2297,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     closeSocket(socket.getSocket().longValue());
-                } else if (state == Handler.SocketState.LONG) {
-                    if (socket.isAsync()) {
-                        waitingRequests.add(socket);
-                    }
                 } else if (state == Handler.SocketState.ASYNC_END) {
                     SocketProcessor proc = new SocketProcessor(socket,
                             SocketStatus.OPEN_READ);
@@ -2440,10 +2416,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Set the current settings for this socket
                     setBlockingStatus(block);
                     if (block) {
-                        Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, 0);
                         Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
                     } else {
-                        Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, 1);
                         Socket.timeoutSet(getSocket().longValue(), 0);
                     }
                     // Downgrade the lock
@@ -2551,6 +2525,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
                     }
                     doWriteInternal();
+                    return;
                 }
             } finally {
                 readLock.unlock();
@@ -2561,10 +2536,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 // Set the current settings for this socket
                 setBlockingStatus(block);
                 if (block) {
-                    Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, 0);
                     Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
                 } else {
-                    Socket.optSet(getSocket().longValue(), Socket.APR_SO_NONBLOCK, 1);
                     Socket.timeoutSet(getSocket().longValue(), 0);
                 }
 

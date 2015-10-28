@@ -59,13 +59,13 @@ public interface Loader {
 
 
     /**
-     * Return the Java class loader to be used by this Container.
+     * @return the Java class loader to be used by this Container.
      */
     public ClassLoader getClassLoader();
 
 
     /**
-     * Return the Context with which this Loader has been associated.
+     * @return the Context with which this Loader has been associated.
      */
     public Context getContext();
 
@@ -79,7 +79,7 @@ public interface Loader {
 
 
     /**
-     * Return the "follow standard delegation model" flag used to configure
+     * @return the "follow standard delegation model" flag used to configure
      * our ClassLoader.
      */
     public boolean getDelegate();
@@ -95,7 +95,7 @@ public interface Loader {
 
 
     /**
-     * Return the reloadable flag for this Loader.
+     * @return the reloadable flag for this Loader.
      */
     public boolean getReloadable();
 
@@ -119,6 +119,9 @@ public interface Loader {
     /**
      * Has the internal repository associated with this Loader been modified,
      * such that the loaded classes should be reloaded?
+     *
+     * @return <code>true</code> when the repository has been modified,
+     *         <code>false</code> otherwise
      */
     public boolean modified();
 

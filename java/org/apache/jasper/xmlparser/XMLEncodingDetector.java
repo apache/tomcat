@@ -1013,7 +1013,7 @@ public class XMLEncodingDetector {
      * @author Neil Graham, IBM
      * @author Glenn Marcy, IBM
      */
-    private final class RewindableInputStream extends InputStream {
+    private static final class RewindableInputStream extends InputStream {
 
         private InputStream fInputStream;
         private byte[] fData;

@@ -258,7 +258,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
-    protected class RequestHeaderElement implements AccessLogElement {
+    protected static class RequestHeaderElement implements AccessLogElement {
         private final String header;
 
         public RequestHeaderElement(String header) {
@@ -271,7 +271,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
-    protected class ResponseHeaderElement implements AccessLogElement {
+    protected static class ResponseHeaderElement implements AccessLogElement {
         private final String header;
 
         public ResponseHeaderElement(String header) {
@@ -285,7 +285,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
-    protected class ServletContextElement implements AccessLogElement {
+    protected static class ServletContextElement implements AccessLogElement {
         private final String attribute;
 
         public ServletContextElement(String attribute) {
@@ -299,7 +299,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
-    protected class CookieElement implements AccessLogElement {
+    protected static class CookieElement implements AccessLogElement {
         private final String name;
 
         public CookieElement(String name) {
@@ -320,7 +320,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     /**
      * write a specific response header - x-O(xxx)
      */
-    protected class ResponseAllHeaderElement implements AccessLogElement {
+    protected static class ResponseAllHeaderElement implements AccessLogElement {
         private final String header;
 
         public ResponseAllHeaderElement(String header) {
@@ -351,7 +351,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
-    protected class RequestAttributeElement implements AccessLogElement {
+    protected static class RequestAttributeElement implements AccessLogElement {
         private final String attribute;
 
         public RequestAttributeElement(String attribute) {
@@ -365,7 +365,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
-    protected class SessionAttributeElement implements AccessLogElement {
+    protected static class SessionAttributeElement implements AccessLogElement {
         private final String attribute;
 
         public SessionAttributeElement(String attribute) {
@@ -384,7 +384,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
     }
 
-    protected class RequestParameterElement implements AccessLogElement {
+    protected static class RequestParameterElement implements AccessLogElement {
         private final String parameter;
 
         public RequestParameterElement(String parameter) {

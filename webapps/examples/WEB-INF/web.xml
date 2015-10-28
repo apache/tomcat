@@ -379,6 +379,16 @@
       <url-pattern>/servlets/nonblocking/numberwriter</url-pattern>
     </servlet-mapping>
 
+    <!-- Server Push examples -->
+    <servlet>
+      <servlet-name>simpleimagepush</servlet-name>
+      <servlet-class>http2.SimpleImagePush</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>simpleimagepush</servlet-name>
+      <url-pattern>/servlets/serverpush/simpleimage</url-pattern>
+    </servlet-mapping>
+
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.xhtml</welcome-file>

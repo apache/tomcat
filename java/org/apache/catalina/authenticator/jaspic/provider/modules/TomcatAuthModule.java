@@ -18,22 +18,27 @@ package org.apache.catalina.authenticator.jaspic.provider.modules;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
+import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.callback.CallerPrincipalCallback;
 import javax.security.auth.message.callback.GroupPrincipalCallback;
+import javax.security.auth.message.callback.PasswordValidationCallback;
 import javax.security.auth.message.module.ServerAuthModule;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -52,13 +57,17 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
      */
     protected static final StringManager sm = StringManager.getManager(TomcatAuthModule.class);
 
-    protected String realmName;
+    private Class<?>[] supportedMessageTypes = new Class[] { Request.class,
+            HttpServletResponse.class };
+
+    protected String realmName = DEFAULT_REALM_NAME;
 
     protected CallbackHandler handler;
 
     protected Context context;
 
-    protected boolean cachePrincipalsInSession = true;
+    protected boolean cache = true;
+    protected boolean changeSessionIdOnAuthentication = true;
 
 
     public TomcatAuthModule(Context context) {
@@ -72,18 +81,23 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
     }
 
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public final void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
             CallbackHandler handler, Map options) throws AuthException {
         this.handler = handler;
-        this.realmName = (String) options.get(REALM_NAME);
+        this.cache = (Boolean.parseBoolean((String) options.get("cache")));
+        this.changeSessionIdOnAuthentication = Boolean.parseBoolean((String) options.get("changeSessionIdOnAuthentication"));
+        String name = (String) options.get(REALM_NAME);
+        if (name != null) {
+            this.realmName = name;
+        }
         initializeModule(requestPolicy, responsePolicy, handler, options);
     }
 
 
     public String getRealmName() {
-        return Optional.ofNullable(realmName).orElse(DEFAULT_REALM_NAME);
+        return realmName;
     }
 
 
@@ -97,9 +111,8 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
      * @param options
      * @throws AuthException
      */
-    @SuppressWarnings("rawtypes")
     public abstract void initializeModule(MessagePolicy requestPolicy,
-            MessagePolicy responsePolicy, CallbackHandler handler, Map options)
+            MessagePolicy responsePolicy, CallbackHandler handler, Map<String, String> options)
             throws AuthException;
 
 
@@ -119,4 +132,28 @@ public abstract class TomcatAuthModule implements ServerAuthModule {
         GroupPrincipalCallback groupCallback = new GroupPrincipalCallback(clientSubject, roles);
         handler.handle(new Callback[] { principalCallback, groupCallback });
     }
+
+    protected GenericPrincipal getPrincipal(PasswordValidationCallback passwordCallback) {
+        Iterator<Object> credentials = passwordCallback.getSubject().getPrivateCredentials()
+                .iterator();
+        return (GenericPrincipal) credentials.next();
+    }
+
+
+    @Override
+    public Class<?>[] getSupportedMessageTypes() {
+        return supportedMessageTypes;
+    }
+
+    @Override
+    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
+            throws AuthException {
+        return null;
+    }
+
+
+    @Override
+    public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
+    }
+
 }

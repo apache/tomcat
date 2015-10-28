@@ -95,7 +95,7 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
 
         ra = ref.get("readonly");
         if (ra != null) {
-            database.setReadonly(Boolean.valueOf(ra.getContent().toString()).booleanValue());
+            database.setReadonly(Boolean.parseBoolean(ra.getContent().toString()));
         }
 
         // Return the configured database instance

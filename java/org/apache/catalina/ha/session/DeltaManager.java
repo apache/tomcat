@@ -983,6 +983,7 @@ public class DeltaManager extends ClusterManagerBase{
       */
      public ClusterMessage requestCompleted(String sessionId, boolean expires) {
         DeltaSession session = null;
+        SessionMessage msg = null;
         try {
             session = (DeltaSession) findSession(sessionId);
             if (session == null) {
@@ -992,67 +993,16 @@ public class DeltaManager extends ClusterManagerBase{
             }
             DeltaRequest deltaRequest = session.getDeltaRequest();
             session.lock();
-            SessionMessage msg = null;
-            boolean isDeltaRequest = false ;
-            synchronized(deltaRequest) {
-                isDeltaRequest = deltaRequest.getSize() > 0 ;
-                if (isDeltaRequest) {
-                    counterSend_EVT_SESSION_DELTA++;
-                    byte[] data = serializeDeltaRequest(session,deltaRequest);
-                    msg = new SessionMessageImpl(getName(),
-                                                 SessionMessage.EVT_SESSION_DELTA,
-                                                 data,
-                                                 sessionId,
-                                                 sessionId + "-" + System.currentTimeMillis());
-                    session.resetDeltaRequest();
-                }
+            if (deltaRequest.getSize() > 0) {
+                counterSend_EVT_SESSION_DELTA++;
+                byte[] data = serializeDeltaRequest(session,deltaRequest);
+                msg = new SessionMessageImpl(getName(),
+                                             SessionMessage.EVT_SESSION_DELTA,
+                                             data,
+                                             sessionId,
+                                             sessionId + "-" + System.currentTimeMillis());
+                session.resetDeltaRequest();
             }
-            if(!isDeltaRequest) {
-                if(!expires && !session.isPrimarySession()) {
-                    counterSend_EVT_SESSION_ACCESSED++;
-                    msg = new SessionMessageImpl(getName(),
-                                                 SessionMessage.EVT_SESSION_ACCESSED,
-                                                 null,
-                                                 sessionId,
-                                                 sessionId + "-" + System.currentTimeMillis());
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("deltaManager.createMessage.accessChangePrimary",
-                                getName(), sessionId));
-                    }
-                }
-            } else { // log only outside synch block!
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("deltaManager.createMessage.delta",
-                            getName(), sessionId));
-                }
-            }
-            if (!expires)
-                session.setPrimarySession(true);
-            //check to see if we need to send out an access message
-            if (!expires && (msg == null)) {
-                long replDelta = System.currentTimeMillis() - session.getLastTimeReplicated();
-                if (session.getMaxInactiveInterval() >=0 &&
-                        replDelta > (session.getMaxInactiveInterval() * 1000L)) {
-                    counterSend_EVT_SESSION_ACCESSED++;
-                    msg = new SessionMessageImpl(getName(),
-                                                 SessionMessage.EVT_SESSION_ACCESSED,
-                                                 null,
-                                                 sessionId,
-                                                 sessionId + "-" + System.currentTimeMillis());
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("deltaManager.createMessage.access",
-                                getName(),sessionId));
-                    }
-                }
-
-            }
-
-            //update last replicated time
-            if (msg != null){
-               session.setLastTimeReplicated(System.currentTimeMillis());
-               msg.setTimestamp(session.getLastTimeReplicated());
-            }
-            return msg;
         } catch (IOException x) {
             log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest",
                     sessionId), x);
@@ -1060,7 +1010,49 @@ public class DeltaManager extends ClusterManagerBase{
         } finally {
             if (session!=null) session.unlock();
         }
+        if(msg == null) {
+            if(!expires && !session.isPrimarySession()) {
+                counterSend_EVT_SESSION_ACCESSED++;
+                msg = new SessionMessageImpl(getName(),
+                                             SessionMessage.EVT_SESSION_ACCESSED,
+                                             null,
+                                             sessionId,
+                                             sessionId + "-" + System.currentTimeMillis());
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("deltaManager.createMessage.accessChangePrimary",
+                            getName(), sessionId));
+                }
+            }
+        } else { // log only outside synch block!
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("deltaManager.createMessage.delta", getName(), sessionId));
+            }
+        }
+        if (!expires) session.setPrimarySession(true);
+        //check to see if we need to send out an access message
+        if (!expires && (msg == null)) {
+            long replDelta = System.currentTimeMillis() - session.getLastTimeReplicated();
+            if (session.getMaxInactiveInterval() >=0 &&
+                    replDelta > (session.getMaxInactiveInterval() * 1000L)) {
+                counterSend_EVT_SESSION_ACCESSED++;
+                msg = new SessionMessageImpl(getName(),
+                                             SessionMessage.EVT_SESSION_ACCESSED,
+                                             null,
+                                             sessionId,
+                                             sessionId + "-" + System.currentTimeMillis());
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("deltaManager.createMessage.access",
+                            getName(),sessionId));
+                }
+            }
+        }
 
+        //update last replicated time
+        if (msg != null) {
+           session.setLastTimeReplicated(System.currentTimeMillis());
+           msg.setTimestamp(session.getLastTimeReplicated());
+        }
+        return msg;
     }
     /**
      * Reset manager statistics

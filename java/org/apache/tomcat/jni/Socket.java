@@ -379,7 +379,7 @@ public class Socket {
      * @param buf The buffer to store the data in.
      * @param offset Offset in the byte buffer.
      * @param nbytes The number of bytes to read (-1) for full array.
-     * @return If >= 0, the return value is the number of bytes read. Note a
+     * @return If &ge; 0, the return value is the number of bytes read. Note a
      *         non-blocking read with no data current available will return
      *         {@link Status#EAGAIN} and EOF will return {@link Status#APR_EOF}.
      */
@@ -388,8 +388,8 @@ public class Socket {
     /**
      * Read data from a network using internally set ByteBuffer.
      *
-     * @return If > 0, the return value is the number of bytes read. If == 0,
-     *         the return value indicates EOF and if < 0 the return value is the
+     * @return If &gt; 0, the return value is the number of bytes read. If == 0,
+     *         the return value indicates EOF and if &lt; 0 the return value is the
      *         error code. Note a non-blocking read with no data current
      *         available will return {@link Status#EAGAIN} not zero.
      */

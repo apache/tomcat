@@ -14,30 +14,41 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+package org.apache.catalina.core;
 
-package org.apache.tomcat.util.net.jsse.openssl;
+import org.junit.Assert;
+import org.junit.Test;
 
-import org.apache.tomcat.util.net.Constants;
+public class TestApplicationPushBuilder {
 
-enum Protocol {
-
-    SSLv3(Constants.SSL_PROTO_SSLv3),
-    SSLv2(Constants.SSL_PROTO_SSLv2),
-    TLSv1(Constants.SSL_PROTO_SSLv3),
-    TLSv1_2(Constants.SSL_PROTO_TLSv1_2);
-
-    private final String openSSLName;
-
-    private Protocol(String openSSLName) {
-        this.openSSLName = openSSLName;
+    @Test
+    public void test01() {
+        doTest("foo", "utf-8", "foo");
     }
 
-    /**
-     * The name returned by OpenSSL in the protocol column when using
-     * <code>openssl ciphers -v</code>. This is currently only used by the unit
-     * tests hence it is package private.
-     */
-    String getOpenSSLName() {
-        return openSSLName;
+    @Test
+    public void test02() {
+        doTest("/foo", "utf-8", "/foo");
+    }
+
+    @Test
+    public void test03() {
+        doTest("%20foo", "utf-8", " foo");
+    }
+
+    @Test
+    public void test04() {
+        doTest("fo%20o", "utf-8", "fo o");
+    }
+
+    @Test
+    public void test05() {
+        doTest("foo%20", "utf-8", "foo ");
+    }
+
+
+    private void doTest(String input, String charset, String expected) {
+        String result = ApplicationPushBuilder.decode(input, charset);
+        Assert.assertEquals(expected, result);
     }
 }

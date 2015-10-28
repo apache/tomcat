@@ -70,4 +70,11 @@ public class WsFrameServer extends WsFrameBase {
         // Overridden to make it visible to other classes in this package
         return super.getTransformation();
     }
+
+
+    @Override
+    protected boolean isOpen() {
+        // Overridden to make it visible to other classes in this package
+        return super.isOpen();
+    }
 }

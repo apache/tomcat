@@ -310,6 +310,161 @@
 
 </section>
 
+<section name="CSRF Prevention Filter for REST APIs">
+
+  <subsection name="Introduction">
+
+    <p>This filter provides basic CSRF protection for REST APIs. The CSRF
+    protection is applied only for modifying HTTP requests (different from GET,
+    HEAD, OPTIONS) to protected resources. It is based on a custom header
+    <code>X-CSRF-Token</code> that provides a valid nonce.</p>
+
+    <p>CSRF protection mechanism for REST APIs consists of the following steps:
+      <ul>
+        <li>Client asks for a valid nonce. This is performed with a
+            non-modifying "Fetch" request to protected resource.</li>
+        <li>Server responds with a valid nonce mapped to the current user
+            session.</li>
+        <li>Client provides this nonce in the subsequent modifying requests in
+            the frame of the same user session.</li>
+        <li>Server rejects all modifying requests to protected resources that
+            do not contain a valid nonce.</li>
+      </ul>
+    </p>
+
+  </subsection>
+
+  <subsection name="Basic configuration sample">
+
+    <p>On the server side</p>
+
+    <ul>
+      <li>All CSRF protected REST APIs should be protected with an authentication
+          mechanism.</li>
+      <li>Protect modifying REST APIs with this filter.</li>
+      <li>Provide at least one non-modifying operation.</li>
+    </ul>
+      <source><![CDATA[<filter>
+  <filter-name>RestCSRF</filter-name>
+  <filter-class>org.apache.catalina.filters.RestCsrfPreventionFilter</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>RestCSRF</filter-name>
+  <!-- Modifying operations -->
+  <url-pattern>/resources/removeResource</url-pattern>
+  <url-pattern>/resources/addResource</url-pattern>
+  <!-- Non-modifying operations -->
+  <url-pattern>/resources/listResources</url-pattern>
+</filter-mapping>]]></source>
+
+    <p>On the client side</p>
+
+    <ul>
+      <li>Make a non-modifying "Fetch" request in order to obtain a valid nonce.
+          This can be done with sending additional header
+          <code>X-CSRF-Token: Fetch</code></li>
+      <li>Cache the returned session id and nonce in order to provide them in
+          the subsequent modifying requests to protected resources.</li>
+      <li>Modifying requests can be denied and header
+          <code>X-CSRF-Token: Required</code> will be returned in case of
+          invalid or missing nonce, expired session or in case the session
+          id is changed by the server.</li>
+    </ul>
+      <source><![CDATA[Client Request:
+GET /rest/resources/listResources HTTP/1.1
+X-CSRF-Token: Fetch
+Authorization: Basic ...
+Host: localhost:8080
+...
+
+Server Response:
+HTTP/1.1 200 OK
+Set-Cookie: JSESSIONID=...; Path=/rest; HttpOnly
+X-CSRF-Token: ...
+...
+
+Client Request:
+POST /rest/resources/addResource HTTP/1.1
+Cookie: JSESSIONID=...
+X-CSRF-Token: ...
+Authorization: Basic ...
+Host: localhost:8080
+...
+
+Server Response:
+HTTP/1.1 200 OK
+...]]></source>
+
+  </subsection>
+
+  <subsection name="RestCsrfPreventionFilter and HttpServletRequest parameters">
+
+    <p>When the client is not able to insert custom headers in its calls to
+       REST APIs there is additional capability to configure URLs for which a
+       valid nonce will be accepted as a request parameter.</p>
+
+    <p>Note: If there is a <code>X-CSRF-Token</code> header, it will be taken
+       with preference over any parameter with the same name in the request.
+       Request parameters cannot be used to fetch new nonce, only header can be
+       used to request a new nonce.</p>
+
+    <source><![CDATA[<filter>
+  <filter-name>RestCSRF</filter-name>
+  <filter-class>org.apache.catalina.filters.RestCsrfPreventionFilter</filter-class>
+  <init-param>
+    <param-name>pathsAcceptingParams</param-name>
+    <param-value>/resources/removeResource,/resources/addResource</param-value>
+  </init-param>
+</filter>
+<filter-mapping>
+  <filter-name>RestCSRF</filter-name>
+  <url-pattern>/resources/*</url-pattern>
+</filter-mapping>]]></source>
+
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the CSRF Prevention Filter for REST APIs is
+    <strong><code>org.apache.catalina.filters.RestCsrfPreventionFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The CSRF Prevention Filter for REST APIs supports the following
+    initialisation parameters:</p>
+
+    <attributes>
+
+      <attribute name="denyStatus" required="false">
+        <p>HTTP response status code that is used when rejecting denied
+        request. The default value is <code>403</code>.</p>
+      </attribute>
+
+      <attribute name="pathsAcceptingParams" required="false">
+        <p>A comma separated list of URLs that can accept nonces via request
+        parameter <code>X-CSRF-Token</code>. For use cases when a nonce information cannot
+        be provided via header, one can provide it via request parameters. If
+        there is a <code>X-CSRF-Token</code> header, it will be taken with preference over
+        any parameter with the same name in the request. Request parameters
+        cannot be used to fetch new nonce, only header can be used to request a
+        new nonce.</p>
+      </attribute>
+
+      <attribute name="randomClass" required="false">
+        <p>The name of the class to use to generate nonces. The class must be an
+        instance of <code>java.util.Random</code>. If not set, the default value
+        of <code>java.security.SecureRandom</code> will be used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
 <section name="Expires Filter">
 
   <subsection name="Introduction">

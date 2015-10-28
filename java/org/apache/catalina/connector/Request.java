@@ -407,20 +407,14 @@ public class Request implements HttpServletRequest {
     protected Boolean asyncSupported = null;
 
 
-    /**
-     * Path parameters
-     */
-    protected final Map<String,String> pathParameters = new HashMap<>();
-
     // --------------------------------------------------------- Public Methods
 
-
     protected void addPathParameter(String name, String value) {
-        pathParameters.put(name, value);
+        coyoteRequest.addPathParameter(name, value);
     }
 
     protected String getPathParameter(String name) {
-        return pathParameters.get(name);
+        return coyoteRequest.getPathParameter(name);
     }
 
     public void setAsyncSupported(boolean asyncSupported) {
@@ -513,8 +507,6 @@ public class Request implements HttpServletRequest {
             asyncContext.recycle();
         }
         asyncContext = null;
-
-        pathParameters.clear();
     }
 
 
@@ -1543,10 +1535,6 @@ public class Request implements HttpServletRequest {
         if (usingReader) {
             return;
         }
-
-        // Ensure that the specified encoding is valid
-        byte buffer[] = new byte[1];
-        buffer[0] = (byte) 'a';
 
         // Confirm that the encoding name is valid
         B2CConverter.getCharset(enc);
@@ -3196,7 +3184,7 @@ public class Request implements HttpServletRequest {
 
         for (AcceptLanguage acceptLanguage : acceptLanguages) {
             // Add a new Locale to the list of Locales for this quality level
-            Double key = new Double(-acceptLanguage.getQuality());  // Reverse the order
+            Double key = Double.valueOf(-acceptLanguage.getQuality());  // Reverse the order
             ArrayList<Locale> values = locales.get(key);
             if (values == null) {
                 values = new ArrayList<>();

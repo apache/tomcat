@@ -81,12 +81,9 @@ public class Response
     private static final boolean ENFORCE_ENCODING_IN_GET_WRITER;
 
     static {
-        // Ensure that URL is loaded for SM
-        URL.isSchemeChar('c');
-
-        ENFORCE_ENCODING_IN_GET_WRITER = Boolean.valueOf(
+        ENFORCE_ENCODING_IN_GET_WRITER = Boolean.parseBoolean(
                 System.getProperty("org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER",
-                        "true")).booleanValue();
+                        "true"));
     }
 
     public Response() {
@@ -250,6 +247,12 @@ public class Response
     protected final CharChunk redirectURLCC = new CharChunk();
 
 
+    /*
+     * Not strictly required but it makes generating HTTP/2 push requests a lot
+     * easier if these are retained until the response is recycled.
+     */
+    private final List<Cookie> cookies = new ArrayList<>();
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -259,6 +262,7 @@ public class Response
      */
     public void recycle() {
 
+        cookies.clear();
         outputBuffer.recycle();
         usingOutputStream = false;
         usingWriter = false;
@@ -284,6 +288,11 @@ public class Response
             writer.recycle();
         }
 
+    }
+
+
+    public List<Cookie> getCookies() {
+        return cookies;
     }
 
 
@@ -893,6 +902,8 @@ public class Response
         if (included || isCommitted()) {
             return;
         }
+
+        cookies.add(cookie);
 
         String header = generateCookieString(cookie);
         //if we reached here, no exception, cookie is valid
@@ -1579,7 +1590,7 @@ public class Response
                 throw iae;
             }
 
-        } else if (leadingSlash || !hasScheme(location)) {
+        } else if (leadingSlash || !URL.hasScheme(location)) {
 
             redirectURLCC.recycle();
 
@@ -1752,22 +1763,6 @@ public class Response
             return false;
         }
         return true;
-    }
-
-    /**
-     * Determine if a URI string has a <code>scheme</code> component.
-     */
-    private boolean hasScheme(String uri) {
-        int len = uri.length();
-        for(int i=0; i < len ; i++) {
-            char c = uri.charAt(i);
-            if(c == ':') {
-                return i > 0;
-            } else if(!URL.isSchemeChar(c)) {
-                return false;
-            }
-        }
-        return false;
     }
 
     /**

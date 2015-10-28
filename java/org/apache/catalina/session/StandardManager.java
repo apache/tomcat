@@ -391,7 +391,7 @@ public class StandardManager extends ManagerBase {
                 log.debug("Unloading " + sessions.size() + " sessions");
             try {
                 // oos can't be null here
-                oos.writeObject(new Integer(sessions.size()));
+                oos.writeObject(Integer.valueOf(sessions.size()));
                 Iterator<Session> elements = sessions.values().iterator();
                 while (elements.hasNext()) {
                     StandardSession session =

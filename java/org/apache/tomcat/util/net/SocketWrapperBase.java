@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -33,21 +31,17 @@ import org.apache.tomcat.util.res.StringManager;
 
 public abstract class SocketWrapperBase<E> {
 
-    protected static final StringManager sm = StringManager.getManager(
-            SocketWrapperBase.class.getPackage().getName());
+    protected static final StringManager sm = StringManager.getManager(SocketWrapperBase.class);
 
     private volatile E socket;
     private final AbstractEndpoint<E> endpoint;
 
     // Volatile because I/O and setting the timeout values occurs on a different
     // thread to the thread checking the timeout.
-    private volatile long lastAsyncStart = 0;
-    private volatile long asyncTimeout = -1;
     private volatile long readTimeout = -1;
     private volatile long writeTimeout = -1;
 
     private volatile int keepAliveLeft = 100;
-    private volatile boolean async = false;
     private boolean keptAlive = false;
     private volatile boolean upgraded = false;
     private boolean secure = false;
@@ -98,8 +92,6 @@ public abstract class SocketWrapperBase<E> {
      */
     protected int bufferedWriteSize = 64*1024; //64k default write buffer
 
-    private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
-
     public SocketWrapperBase(E socket, AbstractEndpoint<E> endpoint) {
         this.socket = socket;
         this.endpoint = endpoint;
@@ -116,40 +108,6 @@ public abstract class SocketWrapperBase<E> {
         return endpoint;
     }
 
-    public boolean isAsync() { return async; }
-    /**
-     * Sets the async flag for this connection. If this call causes the
-     * connection to transition from non-async to async then the lastAsyncStart
-     * property will be set using the current time. This property is used as the
-     * start time when calculating the async timeout. As per the Servlet spec
-     * the async timeout applies once the dispatch where startAsync() was called
-     * has returned to the container (which is when this method is currently
-     * called).
-     *
-     * @param async The new value of for the async flag
-     */
-    public void setAsync(boolean async) {
-        if (!this.async && async) {
-            lastAsyncStart = System.currentTimeMillis();
-        }
-        this.async = async;
-    }
-    /**
-     * Obtain the time that this connection last transitioned to async
-     * processing.
-     *
-     * @return The time (as returned by {@link System#currentTimeMillis()}) that
-     *         this connection last transitioned to async
-     */
-    public long getLastAsyncStart() {
-       return lastAsyncStart;
-    }
-    public void setAsyncTimeout(long timeout) {
-        asyncTimeout = timeout;
-    }
-    public long getAsyncTimeout() {
-        return asyncTimeout;
-    }
     public boolean isUpgraded() { return upgraded; }
     public void setUpgraded(boolean upgraded) { this.upgraded = upgraded; }
     public boolean isSecure() { return secure; }
@@ -296,34 +254,6 @@ public abstract class SocketWrapperBase<E> {
             throw new IllegalStateException(sm.getString("socket.closed"));
         }
         return socketBufferHandler.isWriteBufferWritable() && bufferedWrites.size() == 0;
-    }
-
-    public void addDispatch(DispatchType dispatchType) {
-        synchronized (dispatches) {
-            dispatches.add(dispatchType);
-        }
-    }
-    public Iterator<DispatchType> getIteratorAndClearDispatches() {
-        // Note: Logic in AbstractProtocol depends on this method only returning
-        // a non-null value if the iterator is non-empty. i.e. it should never
-        // return an empty iterator.
-        Iterator<DispatchType> result;
-        synchronized (dispatches) {
-            // Synchronized as the generation of the iterator and the clearing
-            // of dispatches needs to be an atomic operation.
-            result = dispatches.iterator();
-            if (result.hasNext()) {
-                dispatches.clear();
-            } else {
-                result = null;
-            }
-        }
-        return result;
-    }
-    public void clearDispatches() {
-        synchronized (dispatches) {
-            dispatches.clear();
-        }
     }
 
 
@@ -587,8 +517,29 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    public void executeNonBlockingDispatches() {
-        endpoint.executeNonBlockingDispatches(this);
+    public synchronized void executeNonBlockingDispatches(Iterator<DispatchType> dispatches) {
+        /*
+         * This method is called when non-blocking IO is initiated by defining
+         * a read and/or write listener in a non-container thread. It is called
+         * once the non-container thread completes so that the first calls to
+         * onWritePossible() and/or onDataAvailable() as appropriate are made by
+         * the container.
+         *
+         * Processing the dispatches requires (for APR/native at least)
+         * that the socket has been added to the waitingRequests queue. This may
+         * not have occurred by the time that the non-container thread completes
+         * triggering the call to this method. Therefore, the coded syncs on the
+         * SocketWrapper as the container thread that initiated this
+         * non-container thread holds a lock on the SocketWrapper. The container
+         * thread will add the socket to the waitingRequests queue before
+         * releasing the lock on the socketWrapper. Therefore, by obtaining the
+         * lock on socketWrapper before processing the dispatches, we can be
+         * sure that the socket has been added to the waitingRequests queue.
+         */
+        while (dispatches != null && dispatches.hasNext()) {
+            DispatchType dispatchType = dispatches.next();
+            processSocket(dispatchType.getSocketStatus(), false);
+        }
     }
 
 
@@ -709,6 +660,14 @@ public abstract class SocketWrapperBase<E> {
             return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE : CompletionHandlerCall.NONE;
         }
     };
+
+    /**
+     * Allows using NIO2 style read/write only for connectors that can
+     * efficiently support it.
+     */
+    public boolean hasAsyncIO() {
+        return false;
+    }
 
     /**
      * Scatter read. The completion handler will be called once some

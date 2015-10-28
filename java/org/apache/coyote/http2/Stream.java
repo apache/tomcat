@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
@@ -145,6 +144,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private synchronized int reserveWindowSize(int reservation, boolean block) throws IOException {
         long windowSize = getWindowSize();
         while (windowSize < 1) {
+            if (!canWrite()) {
+                throw new IOException(sm.getString("stream.notWritable", getConnectionId(),
+                        getIdentifier()));
+            }
             try {
                 if (block) {
                     wait();
@@ -314,13 +317,33 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void sendRst() {
+    /**
+     * Marks the stream as reset. This method will not change the stream state
+     * if:
+     * <ul>
+     * <li>The stream is already reset</li>
+     * <li>The stream is already closed</li>
+     *
+     * @throws IllegalStateException If the stream is in a state that does not
+     *         permit resets
+     */
+    void sendReset() {
         state.sendReset();
+    }
+
+
+    void sentPushPromise() {
+        state.sentPushPromise();
     }
 
 
     boolean isActive() {
         return state.isActive();
+    }
+
+
+    boolean canWrite() {
+        return state.canWrite();
     }
 
 
@@ -342,18 +365,29 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     void close(Http2Exception http2Exception) {
         if (http2Exception instanceof StreamException) {
             try {
-                handler.closeStream((StreamException) http2Exception);
-            } catch (ConnectionException ce) {
-                handler.closeConnection(ce);
+                handler.resetStream((StreamException) http2Exception);
             } catch (IOException ioe) {
-                // TODO i18n
-                ConnectionException ce = new ConnectionException("", Http2Error.PROTOCOL_ERROR);
+                ConnectionException ce = new ConnectionException(
+                        sm.getString("stream.reset.fail"), Http2Error.PROTOCOL_ERROR);
                 ce.initCause(ioe);
                 handler.closeConnection(ce);
             }
         } else {
             handler.closeConnection(http2Exception);
         }
+    }
+
+
+    void push(Request request) throws IOException {
+        // Set the special HTTP/2 headers
+        request.getMimeHeaders().addValue(":method").duplicate(request.method());
+        request.getMimeHeaders().addValue(":scheme").duplicate(request.scheme());
+        // TODO: Query string
+        request.getMimeHeaders().addValue(":path").duplicate(request.decodedURI());
+        // TODO: Handle default ports
+        request.getMimeHeaders().addValue(":authority").setString(
+                request.serverName().getString() + ":" + request.getServerPort());
+        handler.push(request, this);
     }
 
 
@@ -505,8 +539,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          * same copies as using two buffers and the behaviour would be less
          * clear.
          *
-         * The buffers are created lazily because 32K per stream quickly adds
-         * up to a lot of memory and most requests do not have bodies.
+         * The buffers are created lazily because they quickly add up to a lot
+         * of memory and most requests do not have bodies.
          */
         // This buffer is used to populate the ByteChunk passed in to the read
         // method
@@ -528,6 +562,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 while (inBuffer.position() == 0 && !isInputFinished()) {
                     // Need to block until some data is written
                     try {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("stream.inputBuffer.empty"));
+                        }
                         inBuffer.wait();
                     } catch (InterruptedException e) {
                         // Possible shutdown / rst or similar. Use an
@@ -538,9 +575,14 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 }
 
                 if (inBuffer.position() > 0) {
-                    // Data remains in the in buffer. Copy it to the out buffer.
+                    // Data is available in the inBuffer. Copy it to the
+                    // outBuffer.
                     inBuffer.flip();
                     written = inBuffer.remaining();
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("stream.inputBuffer.copy",
+                                Integer.toString(written)));
+                    }
                     inBuffer.get(outBuffer, 0, written);
                     inBuffer.clear();
                 } else if (isInputFinished()) {
@@ -555,30 +597,28 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
             // Increment client-side flow control windows by the number of bytes
             // read
-            handler.writeWindowUpdate(Stream.this, written);
+            handler.writeWindowUpdate(Stream.this, written, true);
 
             return written;
         }
 
 
-        boolean isReady() {
+        void registerReadInterest() {
             synchronized (inBuffer) {
-                if (inBuffer.position() == 0) {
-                    readInterest = true;
-                    return false;
-                } else {
-                    return true;
-                }
+                readInterest = true;
             }
         }
 
 
         synchronized boolean isRequestBodyFullyRead() {
-            return inBuffer.position() == 0 && isInputFinished();
+            return (inBuffer == null || inBuffer.position() == 0) && isInputFinished();
         }
 
 
         synchronized int available() {
+            if (inBuffer == null) {
+                return 0;
+            }
             return inBuffer.position();
         }
 
@@ -588,13 +628,20 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          */
         synchronized boolean onDataAvailable() {
             if (readInterest) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("stream.inputBuffer.dispatch"));
+                }
                 readInterest = false;
                 coyoteRequest.action(ActionCode.DISPATCH_READ, null);
-                if (!ContainerThreadMarker.isContainerThread()) {
-                    coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
-                }
+                // Always need to dispatch since this thread is processing
+                // the incoming connection and streams are processed on their
+                // own.
+                coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
                 return true;
             } else {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("stream.inputBuffer.signal"));
+                }
                 synchronized (inBuffer) {
                     inBuffer.notifyAll();
                 }
@@ -616,10 +663,14 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
         private void ensureBuffersExist() {
             if (inBuffer == null) {
+                // The client must obey Tomcat's window size when sending so
+                // this is the initial window size set by Tomcat that the client
+                // uses (i.e. the local setting is required here).
+                int size = handler.getLocalSettings().getInitialWindowSize();
                 synchronized (this) {
                     if (inBuffer == null) {
-                        inBuffer = ByteBuffer.allocate(16 * 1024);
-                        outBuffer = new byte[16 * 1024];
+                        inBuffer = ByteBuffer.allocate(size);
+                        outBuffer = new byte[size];
                     }
                 }
             }

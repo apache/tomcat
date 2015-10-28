@@ -22,7 +22,6 @@ import java.util.concurrent.Executor;
 
 import javax.servlet.RequestDispatcher;
 
-import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -35,18 +34,18 @@ import org.apache.tomcat.util.res.StringManager;
  * Provides functionality and attributes common to all supported protocols
  * (currently HTTP and AJP).
  */
-public abstract class AbstractProcessor implements ActionHook, Processor {
+public abstract class AbstractProcessor extends AbstractProcessorLight implements ActionHook {
 
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(AbstractProcessor.class);
 
     protected Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;
+    private volatile long asyncTimeout = -1;
     protected final AbstractEndpoint<?> endpoint;
     protected final Request request;
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
     protected volatile SSLSupport sslSupport;
-    private String clientCertProvider = null;
 
     /**
      * Error state for the request/response currently being processed.
@@ -103,11 +102,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     }
 
 
-    protected void resetErrorState() {
-        errorState = ErrorState.NONE;
-    }
-
-
     protected ErrorState getErrorState() {
         return errorState;
     }
@@ -142,17 +136,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     }
 
 
-    @Override
-    public String getClientCertProvider() {
-        return clientCertProvider;
-    }
-
-
-    public void setClientCertProvider(String s) {
-        this.clientCertProvider = s;
-    }
-
-
     /**
      * Set the socket wrapper being used.
      */
@@ -181,8 +164,7 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     /**
      * Obtain the Executor used by the underlying endpoint.
      */
-    @Override
-    public Executor getExecutor() {
+    protected Executor getExecutor() {
         return endpoint.getExecutor();
     }
 
@@ -204,12 +186,6 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
     }
 
 
-    /**
-     * Process an in-progress request that is not longer in standard HTTP mode.
-     * Uses currently include Servlet 3.0 Async and HTTP upgrade connections.
-     * Further uses may be added in the future. These will typically start as
-     * HTTP requests.
-     */
     @Override
     public final SocketState dispatch(SocketStatus status) {
 
@@ -266,6 +242,47 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
         asyncStateMachine.asyncOperation();
     }
 
+
+    @Override
+    public void timeoutAsync(long now) {
+        if (now < 0) {
+            doTimeoutAsync();
+        } else {
+            long asyncTimeout = getAsyncTimeout();
+            if (asyncTimeout > 0) {
+                long asyncStart = asyncStateMachine.getLastAsyncStart();
+                if ((now - asyncStart) > asyncTimeout) {
+                    doTimeoutAsync();
+                }
+            }
+        }
+    }
+
+
+    private void doTimeoutAsync() {
+        // Avoid multiple timeouts
+        setAsyncTimeout(-1);
+        socketWrapper.processSocket(SocketStatus.TIMEOUT, true);
+    }
+
+
+    public void setAsyncTimeout(long timeout) {
+        asyncTimeout = timeout;
+    }
+
+
+    public long getAsyncTimeout() {
+        return asyncTimeout;
+    }
+
+
+    @Override
+    public void recycle() {
+        errorState = ErrorState.NONE;
+        asyncStateMachine.recycle();
+    }
+
+
     /**
      * Flush any pending writes. Used during non-blocking writes to flush any
      * remaining data from a previous incomplete write.
@@ -286,6 +303,4 @@ public abstract class AbstractProcessor implements ActionHook, Processor {
      *         current request has completed
      */
     protected abstract SocketState dispatchEndRequest();
-
-    protected abstract Log getLog();
 }

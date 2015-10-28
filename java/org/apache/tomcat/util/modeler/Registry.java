@@ -310,7 +310,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             ids.put( domain, id);
         }
         int code=id[0]++;
-        domainTable.put( name, new Integer( code ));
+        domainTable.put( name, Integer.valueOf( code ));
         return code;
     }
 
@@ -511,10 +511,10 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             }
         } else if( "java.lang.Integer".equals( type ) ||
                 "int".equals( type )) {
-            objValue=new Integer( value );
+            objValue=Integer.valueOf( value );
         } else if( "java.lang.Long".equals( type ) ||
                 "long".equals( type )) {
-            objValue=new Long( value );
+            objValue=Long.valueOf( value );
         } else if( "java.lang.Boolean".equals( type ) ||
                 "boolean".equals( type )) {
             objValue=Boolean.valueOf( value );

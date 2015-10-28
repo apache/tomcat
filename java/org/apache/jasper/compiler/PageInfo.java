@@ -455,8 +455,8 @@ class PageInfo {
             }
             try {
                 @SuppressWarnings("null") // value can't be null here
-                Integer k = new Integer(value.substring(0, value.length()-2));
-                buffer = k.intValue() * 1024;
+                int k = Integer.parseInt(value.substring(0, value.length()-2));
+                buffer = k * 1024;
             } catch (NumberFormatException e) {
                 if (n == null) {
                     err.jspError("jsp.error.page.invalid.buffer");

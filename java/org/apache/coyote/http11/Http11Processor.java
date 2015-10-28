@@ -731,18 +731,18 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case ASYNC_COMPLETE: {
-            socketWrapper.clearDispatches();
+            clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
             }
             break;
         }
         case ASYNC_SETTIMEOUT: {
-            if (param == null || socketWrapper == null) {
+            if (param == null) {
                 return;
             }
             long timeout = ((Long) param).longValue();
-            socketWrapper.setAsyncTimeout(timeout);
+            setAsyncTimeout(timeout);
             break;
         }
         case ASYNC_DISPATCH: {
@@ -776,17 +776,17 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case DISPATCH_READ: {
-            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
+            addDispatch(DispatchType.NON_BLOCKING_READ);
             break;
         }
         case DISPATCH_WRITE: {
-            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_WRITE);
+            addDispatch(DispatchType.NON_BLOCKING_WRITE);
             break;
         }
         case DISPATCH_EXECUTE: {
             SocketWrapperBase<?> wrapper = socketWrapper;
             if (wrapper != null) {
-                wrapper.executeNonBlockingDispatches();
+                wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
             }
             break;
         }
@@ -904,6 +904,13 @@ public class Http11Processor extends AbstractProcessor {
             endRequest();
             break;
         }
+
+        // Servlet 4.0 Push requests
+        case PUSH_REQUEST: {
+            // HTTP2 connections only. Unsupported for AJP.
+            throw new UnsupportedOperationException(
+                    sm.getString("http11processor.pushrequest.notsupported"));
+        }
         }
     }
 
@@ -918,7 +925,7 @@ public class Http11Processor extends AbstractProcessor {
      * @throws IOException error during an I/O operation
      */
     @Override
-    public SocketState process(SocketWrapperBase<?> socketWrapper)
+    public SocketState service(SocketWrapperBase<?> socketWrapper)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
@@ -1011,7 +1018,7 @@ public class Http11Processor extends AbstractProcessor {
                         // point.
 
                         InternalHttpUpgradeHandler upgradeHandler =
-                                upgradeProtocol.getInteralUpgradeHandler(
+                                upgradeProtocol.getInternalUpgradeHandler(
                                         getAdapter(), cloneRequest(request));
                         action(ActionCode.UPGRADE, upgradeHandler);
                         return SocketState.UPGRADING;
@@ -1787,13 +1794,12 @@ public class Http11Processor extends AbstractProcessor {
     @Override
     public final void recycle() {
         getAdapter().checkRecycled(request, response);
-        asyncStateMachine.recycle();
+        super.recycle();
         inputBuffer.recycle();
         outputBuffer.recycle();
         httpUpgradeHandler = null;
         socketWrapper = null;
         sendfileData = null;
-        resetErrorState();
     }
 
 
@@ -1807,5 +1813,4 @@ public class Http11Processor extends AbstractProcessor {
     public void pause() {
         // NOOP for HTTP
     }
-
 }

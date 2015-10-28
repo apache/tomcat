@@ -356,6 +356,7 @@
   <patternset id="files.tomcat-util">
     <include name="org/apache/tomcat/util/buf/**" />
     <include name="org/apache/tomcat/util/codec/**" />
+    <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/compat/**" />
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/res/**" />
@@ -363,7 +364,6 @@
     <include name="org/apache/tomcat/util/threads/**" />
     <include name="org/apache/tomcat/util/*" />
     <exclude name="org/apache/tomcat/util/bcel" />
-    <exclude name="org/apache/tomcat/util/collections" />
     <exclude name="org/apache/tomcat/util/descriptor" />
     <exclude name="org/apache/tomcat/util/digester" />
     <exclude name="org/apache/tomcat/util/http" />
@@ -416,7 +416,6 @@
     <include name="org/apache/coyote/**" />
     <!-- Remaining tomcat-util packages -->
     <include name="org/apache/tomcat/util/bcel/**" />
-    <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/http/**" />
     <include name="org/apache/tomcat/util/log/**" />
     <include name="org/apache/tomcat/util/modeler/**" />
@@ -1474,7 +1473,7 @@
             <!-- Exclude the tests known to fail -->
             <exclude name="org/apache/catalina/tribes/test/**" />
             <!-- Exclude the OpenSSL tests unless OpenSSL is available -->
-            <exclude name="org/apache/tomcat/util/net/jsse/openssl/**" unless="${test.openssl.exists}" />
+            <exclude name="org/apache/tomcat/util/net/openssl/ciphers/**" unless="${test.openssl.exists}" />
             <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
             <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
           </fileset>

@@ -80,10 +80,10 @@ class Parser implements TagConstants {
     /* System property that controls if the strict white space rules are
      * applied.
      */
-    private static final boolean STRICT_WHITESPACE = Boolean.valueOf(
+    private static final boolean STRICT_WHITESPACE = Boolean.parseBoolean(
             System.getProperty(
                     "org.apache.jasper.compiler.Parser.STRICT_WHITESPACE",
-                    "true")).booleanValue();
+                    "true"));
     /**
      * The constructor
      */

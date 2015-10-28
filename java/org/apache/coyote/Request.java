@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
@@ -59,8 +60,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class Request {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Request.class);
 
     // Expected maximum typica number of cookies per request.
     private static final int INITIAL_COOKIE_SIZE = 4;
@@ -96,6 +96,12 @@ public final class Request {
     private final MessageBytes localAddrMB = MessageBytes.newInstance();
 
     private final MimeHeaders headers = new MimeHeaders();
+
+
+    /**
+     * Path parameters
+     */
+    private final Map<String,String> pathParameters = new HashMap<>();
 
     /**
      * Notes.
@@ -399,6 +405,15 @@ public final class Request {
     }
 
 
+    public void addPathParameter(String name, String value) {
+        pathParameters.put(name, value);
+    }
+
+    public String getPathParameter(String name) {
+        return pathParameters.get(name);
+    }
+
+
     // -------------------- Other attributes --------------------
     // We can use notes for most - need to discuss what is of general interest
 
@@ -551,6 +566,7 @@ public final class Request {
 
         serverCookies.recycle();
         parameters.recycle();
+        pathParameters.clear();
 
         uriMB.recycle();
         decodedUriMB.recycle();

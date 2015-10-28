@@ -220,7 +220,7 @@ public interface HttpServletRequest extends ServletRequest {
      * Each call to this method will return a new instance, independent of any
      * previous instance obtained.
      *
-     * @return A builder than can be used to generate push requests based on
+     * @return A builder that can be used to generate push requests based on
      *         this request.
      *
      * @since Servlet 4.0

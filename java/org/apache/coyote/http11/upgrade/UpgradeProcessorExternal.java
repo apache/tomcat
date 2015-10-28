@@ -43,8 +43,8 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
             HttpUpgradeHandler httpUpgradeHandler) {
         super(wrapper, leftOverInput, httpUpgradeHandler);
-        this.upgradeServletInputStream = new UpgradeServletInputStream(wrapper);
-        this.upgradeServletOutputStream = new UpgradeServletOutputStream(wrapper);
+        this.upgradeServletInputStream = new UpgradeServletInputStream(this, wrapper);
+        this.upgradeServletOutputStream = new UpgradeServletOutputStream(this, wrapper);
 
         wrapper.unRead(leftOverInput);
         /*
@@ -52,6 +52,12 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
          */
         wrapper.setReadTimeout(INFINITE_TIMEOUT);
         wrapper.setWriteTimeout(INFINITE_TIMEOUT);
+    }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
     }
 
 

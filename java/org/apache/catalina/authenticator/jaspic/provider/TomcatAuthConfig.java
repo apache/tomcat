@@ -31,6 +31,9 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.authenticator.jaspic.provider.modules.BasicAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.DigestAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.FormAuthModule;
+import org.apache.catalina.authenticator.jaspic.provider.modules.NonLoginAuthModule;
+import org.apache.catalina.authenticator.jaspic.provider.modules.SSLAuthModule;
+import org.apache.catalina.authenticator.jaspic.provider.modules.SpnegoAuthModule;
 import org.apache.catalina.authenticator.jaspic.provider.modules.TomcatAuthModule;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.res.StringManager;
@@ -46,16 +49,18 @@ public class TomcatAuthConfig implements ServerAuthConfig {
     private Context context;
     private LoginConfig loginConfig;
     private Realm realm;
-
+    private Map<String, String> properties;
 
     public TomcatAuthConfig(String layer, String appContext, CallbackHandler callbackHandler,
-            Context context) {
+            Context context, Map<String, String> properties) throws AuthException {
         this.messageLayer = layer;
         this.appContext = appContext;
         this.handler = callbackHandler;
         this.context = context;
+        this.properties = properties;
         this.realm = context.getRealm();
         this.loginConfig = context.getLoginConfig();
+        initializeAuthContext(properties);
     }
 
 
@@ -90,40 +95,52 @@ public class TomcatAuthConfig implements ServerAuthConfig {
 
 
     @Override
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public synchronized ServerAuthContext getAuthContext(String authContextID,
             Subject serviceSubject, Map properties) throws AuthException {
         if (this.tomcatServerAuthContext == null) {
-            this.tomcatServerAuthContext = new TomcatServerAuthContext(handler, getModule(),
-                    getOptions());
+            initializeAuthContext(properties);
         }
         return tomcatServerAuthContext;
     }
 
 
-    private Map<String, String> getOptions() {
-        Map<String, String> options = new HashMap<>();
-        options.put(TomcatAuthModule.REALM_NAME, getRealmName());
-        return options;
+    private void initializeAuthContext(Map<String, String> properties) throws AuthException {
+        TomcatAuthModule module = getModule();
+        module.initialize(null, null, handler, getMergedProperties(properties));
+        this.tomcatServerAuthContext = new TomcatServerAuthContext(module);
+    }
+
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private Map<String, String> getMergedProperties(Map properties) {
+        Map<String, String> mergedProperties = new HashMap<>(this.properties);
+        mergedProperties.put(TomcatAuthModule.REALM_NAME, getRealmName());
+        if (properties != null) {
+            mergedProperties.putAll(properties);
+        }
+        return mergedProperties;
     }
 
 
     private TomcatAuthModule getModule() throws AuthException {
         String authMethod = getAuthMethod();
         switch (authMethod) {
-        case "BASIC": {
+        case "BASIC":
             return new BasicAuthModule(context);
-        }
-        case "DIGEST": {
+        case "DIGEST":
             return new DigestAuthModule(context);
-        }
-        case "FORM": {
+        case "FORM":
             return new FormAuthModule(context);
-        }
-        default: {
+        case "NONE":
+            return new NonLoginAuthModule(context);
+        case "SPNEGO":
+            return new SpnegoAuthModule(context);
+        case "CLIENT-CERT":
+            return new SSLAuthModule(context);
+        default:
             throw new AuthException(
                     sm.getString("authenticator.jaspic.unknownAuthType", authMethod));
-        }
         }
     }
 

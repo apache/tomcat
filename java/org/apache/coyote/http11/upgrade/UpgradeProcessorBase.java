@@ -18,17 +18,16 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.Executor;
 
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
-import org.apache.coyote.Processor;
+import org.apache.coyote.AbstractProcessorLight;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
-public abstract class UpgradeProcessorBase implements Processor, WebConnection {
+public abstract class UpgradeProcessorBase extends AbstractProcessorLight implements WebConnection {
 
     protected static final int INFINITE_TIMEOUT = -1;
 
@@ -64,13 +63,7 @@ public abstract class UpgradeProcessorBase implements Processor, WebConnection {
     // ---------------------------- Processor methods that are NO-OP for upgrade
 
     @Override
-    public final Executor getExecutor() {
-        return null;
-    }
-
-
-    @Override
-    public final SocketState process(SocketWrapperBase<?> socketWrapper) throws IOException {
+    public final SocketState service(SocketWrapperBase<?> socketWrapper) throws IOException {
         return null;
     }
 
@@ -100,13 +93,13 @@ public abstract class UpgradeProcessorBase implements Processor, WebConnection {
 
 
     @Override
-    public String getClientCertProvider() {
+    public ByteBuffer getLeftoverInput() {
         return null;
     }
 
 
     @Override
-    public ByteBuffer getLeftoverInput() {
-        return null;
+    public void timeoutAsync(long now) {
+        // NO-OP
     }
 }

@@ -35,6 +35,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
     private static final StringManager sm =
             StringManager.getManager(UpgradeServletInputStream.class);
 
+    private final UpgradeProcessorBase processor;
     private final SocketWrapperBase<?> socketWrapper;
 
     private volatile boolean closed = false;
@@ -45,7 +46,9 @@ public class UpgradeServletInputStream extends ServletInputStream {
     private volatile ClassLoader applicationLoader = null;
 
 
-    public UpgradeServletInputStream(SocketWrapperBase<?> socketWrapper) {
+    public UpgradeServletInputStream(UpgradeProcessorBase processor,
+            SocketWrapperBase<?> socketWrapper) {
+        this.processor = processor;
         this.socketWrapper = socketWrapper;
     }
 
@@ -101,7 +104,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
         // Container is responsible for first call to onDataAvailable().
         if (ContainerThreadMarker.isContainerThread()) {
-            socketWrapper.addDispatch(DispatchType.NON_BLOCKING_READ);
+            processor.addDispatch(DispatchType.NON_BLOCKING_READ);
         } else {
             socketWrapper.registerReadInterest();
         }

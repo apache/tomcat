@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.HandshakeRequest;
 
-import org.apache.tomcat.websocket.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 
 /**
  * Represents the request that this session was opened under.
@@ -76,10 +76,10 @@ public class WsHandshakeRequest implements HandshakeRequest {
                     Collections.unmodifiableList(
                             Arrays.asList(entry.getValue())));
         }
-        for (String pathName : pathParams.keySet()) {
-            newParameters.put(pathName,
+        for (Entry<String,String> entry : pathParams.entrySet()) {
+            newParameters.put(entry.getKey(),
                     Collections.unmodifiableList(
-                            Arrays.asList(pathParams.get(pathName))));
+                            Arrays.asList(entry.getValue())));
         }
         parameterMap = Collections.unmodifiableMap(newParameters);
 

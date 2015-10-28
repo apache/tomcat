@@ -20,12 +20,9 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -50,8 +47,7 @@ public abstract class AbstractEndpoint<S> {
 
     // -------------------------------------------------------------- Constants
 
-    protected static final StringManager sm = StringManager.getManager(
-            AbstractEndpoint.class.getPackage().getName());
+    protected static final StringManager sm = StringManager.getManager(AbstractEndpoint.class);
 
     public static interface Handler<S> {
 
@@ -136,61 +132,7 @@ public abstract class AbstractEndpoint<S> {
     private static final int MAX_ERROR_DELAY = 1600;
 
 
-    /**
-     * Async timeout thread
-     */
-    protected class AsyncTimeout implements Runnable {
-
-        private volatile boolean asyncTimeoutRunning = true;
-
-        /**
-         * The background thread that checks async requests and fires the
-         * timeout if there has been no activity.
-         */
-        @Override
-        public void run() {
-
-            // Loop until we receive a shutdown command
-            while (asyncTimeoutRunning) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // Ignore
-                }
-                long now = System.currentTimeMillis();
-                for (SocketWrapperBase<S> socket : waitingRequests) {
-                    long asyncTimeout = socket.getAsyncTimeout();
-                    if (asyncTimeout > 0) {
-                        long asyncStart = socket.getLastAsyncStart();
-                        if ((now - asyncStart) > asyncTimeout) {
-                            // Avoid multiple timeouts
-                            socket.setAsyncTimeout(-1);
-                            processSocket(socket, SocketStatus.TIMEOUT, true);
-                        }
-                    }
-                }
-
-                // Loop if endpoint is paused
-                while (paused && asyncTimeoutRunning) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
-                }
-
-            }
-        }
-
-
-        protected void stop() {
-            asyncTimeoutRunning = false;
-        }
-    }
-
-
     // ----------------------------------------------------------------- Fields
-
 
     /**
      * Running state of the endpoint.
@@ -811,35 +753,6 @@ public abstract class AbstractEndpoint<S> {
             SocketStatus socketStatus, boolean dispatch);
 
 
-    public void executeNonBlockingDispatches(SocketWrapperBase<S> socketWrapper) {
-        /*
-         * This method is called when non-blocking IO is initiated by defining
-         * a read and/or write listener in a non-container thread. It is called
-         * once the non-container thread completes so that the first calls to
-         * onWritePossible() and/or onDataAvailable() as appropriate are made by
-         * the container.
-         *
-         * Processing the dispatches requires (for APR/native at least)
-         * that the socket has been added to the waitingRequests queue. This may
-         * not have occurred by the time that the non-container thread completes
-         * triggering the call to this method. Therefore, the coded syncs on the
-         * SocketWrapper as the container thread that initiated this
-         * non-container thread holds a lock on the SocketWrapper. The container
-         * thread will add the socket to the waitingRequests queue before
-         * releasing the lock on the socketWrapper. Therefore, by obtaining the
-         * lock on socketWrapper before processing the dispatches, we can be
-         * sure that the socket has been added to the waitingRequests queue.
-         */
-        synchronized (socketWrapper) {
-            Iterator<DispatchType> dispatches = socketWrapper.getIteratorAndClearDispatches();
-
-            while (dispatches != null && dispatches.hasNext()) {
-                DispatchType dispatchType = dispatches.next();
-                processSocket(socketWrapper, dispatchType.getSocketStatus(), false);
-            }
-        }
-    }
-
     // ------------------------------------------------------- Lifecycle methods
 
     /*
@@ -993,25 +906,6 @@ public abstract class AbstractEndpoint<S> {
         } else {
             return MAX_ERROR_DELAY;
         }
-
-    }
-
-
-    protected final Set<SocketWrapperBase<S>> waitingRequests = Collections
-            .newSetFromMap(new ConcurrentHashMap<SocketWrapperBase<S>, Boolean>());
-    public void removeWaitingRequest(SocketWrapperBase<S> socketWrapper) {
-        waitingRequests.remove(socketWrapper);
-    }
-
-    /**
-     * The async timeout thread.
-     */
-    private AsyncTimeout asyncTimeout = null;
-    public AsyncTimeout getAsyncTimeout() {
-        return asyncTimeout;
-    }
-    public void setAsyncTimeout(AsyncTimeout asyncTimeout) {
-        this.asyncTimeout = asyncTimeout;
     }
 }
 

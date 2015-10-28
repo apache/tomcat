@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
@@ -34,7 +35,6 @@ import javax.security.auth.message.MessagePolicy;
 import javax.security.auth.message.callback.PasswordValidationCallback;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
@@ -45,7 +45,6 @@ import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.authenticator.SavedRequest;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -61,16 +60,11 @@ import org.apache.tomcat.util.http.MimeHeaders;
 public class FormAuthModule extends TomcatAuthModule {
     private static final Log log = LogFactory.getLog(FormAuthModule.class);
 
-    private Class<?>[] supportedMessageTypes = new Class[] { HttpServletRequest.class,
-            HttpServletResponse.class };
-
     private String landingPage;
     private String characterEncoding;
 
     private Realm realm;
     private LoginConfig loginConfig;
-
-    private boolean changeSessionIdOnAuthenication = true;
 
 
     public FormAuthModule(Context context) {
@@ -80,10 +74,11 @@ public class FormAuthModule extends TomcatAuthModule {
     }
 
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void initializeModule(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, Map options) throws AuthException {
+                        CallbackHandler handler, Map<String, String> options) throws AuthException {
+        this.characterEncoding = options.get("characterEncoding");
+        this.landingPage = options.get("landingPage");
     }
 
 
@@ -106,7 +101,7 @@ public class FormAuthModule extends TomcatAuthModule {
         Request request = (Request) messageInfo.getRequestMessage();
         HttpServletResponse response = (HttpServletResponse) messageInfo.getResponseMessage();
 
-        if (!cachePrincipalsInSession && isUserAuthenicatedBefore(request)) {
+        if (!cache && isUserAuthenticatedBefore(request)) {
             return handleSavedCredentials(clientSubject, request, response);
         }
 
@@ -118,10 +113,10 @@ public class FormAuthModule extends TomcatAuthModule {
         }
 
         if (!isLoginActionRequest(request)) {
-            return handleNoLoginAction(request, response);
+            return handleRedirectToLoginPage(request, response);
         }
 
-        return handleLoginAction(request, response);
+        return handleLoginFormAction(request, response);
     }
 
 
@@ -133,16 +128,20 @@ public class FormAuthModule extends TomcatAuthModule {
         }
 
         String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
-        String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
+        String passwordString = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
+        char[] password = (passwordString != null) ? passwordString.toCharArray() : null;
         if (log.isDebugEnabled()) {
             log.debug("Reauthenticating username '" + username + "'");
         }
 
-        Principal principal = realm.authenticate(username, password);
-        if (principal == null) {
+        PasswordValidationCallback passwordCallback = new PasswordValidationCallback(
+                clientSubject, username, password);
+        handler.handle(new Callback[] { passwordCallback });
+        if (!passwordCallback.getResult()) {
             forwardToErrorPage(request, response);
             return AuthStatus.FAILURE;
         }
+        Principal principal = getPrincipal(passwordCallback);
 
         session.setNote(Constants.FORM_PRINCIPAL_NOTE, principal);
         if (isMatchingSavedRequest(request)) {
@@ -154,7 +153,7 @@ public class FormAuthModule extends TomcatAuthModule {
     }
 
 
-    private boolean isUserAuthenicatedBefore(Request request) {
+    private boolean isUserAuthenticatedBefore(Request request) {
         Session session = request.getSessionInternal(true);
         String username = (String) session.getNote(Constants.SESS_USERNAME_NOTE);
         String password = (String) session.getNote(Constants.SESS_PASSWORD_NOTE);
@@ -174,7 +173,7 @@ public class FormAuthModule extends TomcatAuthModule {
         // If we're caching principals we no longer need getPrincipal the
         // username
         // and password in the session, so remove them
-        if (cachePrincipalsInSession) {
+        if (cache) {
             session.removeNote(Constants.SESS_USERNAME_NOTE);
             session.removeNote(Constants.SESS_PASSWORD_NOTE);
         }
@@ -201,7 +200,7 @@ public class FormAuthModule extends TomcatAuthModule {
      * @return
      * @throws IOException
      */
-    private AuthStatus handleNoLoginAction(Request request, HttpServletResponse response)
+    private AuthStatus handleRedirectToLoginPage(Request request, HttpServletResponse response)
             throws IOException {
         Session session = request.getSessionInternal(true);
         if (log.isDebugEnabled()) {
@@ -230,7 +229,7 @@ public class FormAuthModule extends TomcatAuthModule {
      * @return
      * @throws IOException
      */
-    private AuthStatus handleLoginAction(Request request, HttpServletResponse response)
+    private AuthStatus handleLoginFormAction(Request request, HttpServletResponse response)
             throws IOException {
 
         request.getResponse().sendAcknowledgement();
@@ -324,31 +323,6 @@ public class FormAuthModule extends TomcatAuthModule {
     }
 
 
-    @Override
-    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
-            throws AuthException {
-        return null;
-    }
-
-
-    @Override
-    public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
-    }
-
-
-    @Override
-    public Class<?>[] getSupportedMessageTypes() {
-        return supportedMessageTypes;
-    }
-
-
-    private GenericPrincipal getPrincipal(PasswordValidationCallback passwordCallback) {
-        Iterator<Object> credentials = passwordCallback.getSubject().getPrivateCredentials()
-                .iterator();
-        return (GenericPrincipal) credentials.next();
-    }
-
-
     /**
      * Called to forward to the login page
      *
@@ -374,7 +348,7 @@ public class FormAuthModule extends TomcatAuthModule {
             return;
         }
 
-        if (getChangeSessionIdOnAuthentication()) {
+        if (changeSessionIdOnAuthentication) {
             Session session = request.getSessionInternal(false);
             if (session != null) {
                 Manager manager = request.getContext().getManager();
@@ -403,11 +377,6 @@ public class FormAuthModule extends TomcatAuthModule {
             // Restore original method so that it is written into access log
             request.getCoyoteRequest().method().setString(oldMethod);
         }
-    }
-
-
-    private boolean getChangeSessionIdOnAuthentication() {
-        return changeSessionIdOnAuthenication ;
     }
 
 

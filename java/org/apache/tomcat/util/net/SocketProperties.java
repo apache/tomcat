@@ -136,7 +136,7 @@ public class SocketProperties {
     /**
      * SO_TIMEOUT option. default is 20000.
      */
-    protected Integer soTimeout = new Integer(20000);
+    protected Integer soTimeout = Integer.valueOf(20000);
 
     /**
      * Performance preferences according to

@@ -117,7 +117,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
      * as per RFC 2617 section 2, and the Base64 encoded credentials as
      * per RFC 2045 section 6.8.
      */
-    protected static class BasicCredentials {
+    public static class BasicCredentials {
 
         // the only authentication method supported by this parser
         // note: we include single white space as its delimiter
