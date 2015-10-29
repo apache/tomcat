@@ -145,6 +145,12 @@
         <bug>58489</bug>: Correct QueryStatsComparator to hold up the
         general contract for Comparator. (fschumacher)
       </fix>
+      <fix>
+        When creating a <code>QueryStats</code> object, ensure that
+        <code>maxQueries</code> is checked. If <code>maxQueries</code> is a
+        value less than or equal to 0, <code>QueryStats</code> are never
+        created. (kfujino)
+      </fix>
     </changelog>
   </subsection>
 </section>

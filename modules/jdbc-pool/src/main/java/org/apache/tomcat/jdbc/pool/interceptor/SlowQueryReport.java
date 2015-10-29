@@ -139,14 +139,18 @@ public class SlowQueryReport extends AbstractQueryReport  {
 
     @Override
     public void prepareStatement(String sql, long time) {
-        QueryStats qs = getQueryStats(sql);
-        if (qs != null) qs.prepare(time);
+        if (this.maxQueries > 0 ) {
+            QueryStats qs = getQueryStats(sql);
+            if (qs != null) qs.prepare(time);
+        }
     }
 
     @Override
     public void prepareCall(String sql, long time) {
-        QueryStats qs = getQueryStats(sql);
-        if (qs != null) qs.prepare(time);
+        if (this.maxQueries > 0 ) {
+            QueryStats qs = getQueryStats(sql);
+            if (qs != null) qs.prepare(time);
+        }
     }
 
     /**

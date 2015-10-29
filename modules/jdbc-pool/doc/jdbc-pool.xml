@@ -668,6 +668,7 @@
       </attribute>
       <attribute name="maxQueries" required="false">
         <p>(int as String) The maximum number of queries to keep track of in order to preserve memory space.
+           A value less than or equal to 0 will disable this feature.
            The default value is <code>1000</code>.
         </p>
       </attribute>
