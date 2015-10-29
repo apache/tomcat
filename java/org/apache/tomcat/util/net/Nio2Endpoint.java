@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -1151,10 +1152,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         private int fillReadBuffer(boolean block) throws IOException {
             socketBufferHandler.configureReadBufferForWrite();
             int nRead = 0;
+            Future<Integer> integer = null;
             if (block) {
                 try {
-                    nRead = getSocket().read(socketBufferHandler.getReadBuffer()).get(
-                            getNio2ReadTimeout(), TimeUnit.MILLISECONDS).intValue();
+                    integer = getSocket().read(socketBufferHandler.getReadBuffer());
+                    nRead = integer.get(getNio2ReadTimeout(), TimeUnit.MILLISECONDS).intValue();
                     // Blocking read so need to release here since there will
                     // not be a callback to a completion handler.
                     readPending.release();
@@ -1167,8 +1169,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 } catch (InterruptedException e) {
                     throw new IOException(e);
                 } catch (TimeoutException e) {
-                    SocketTimeoutException ex = new SocketTimeoutException();
-                    throw ex;
+                    if (integer != null) {
+                        integer.cancel(true);
+                    }
+                    throw new SocketTimeoutException();
                 }
             } else {
                 Nio2Endpoint.startInline();
@@ -1226,11 +1230,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
          */
         @Override
         protected void doWriteInternal(boolean block) throws IOException {
+            Future<Integer> integer = null;
             try {
                 socketBufferHandler.configureWriteBufferForRead();
                 do {
-                    if (getSocket().write(socketBufferHandler.getWriteBuffer()).get(
-                            getNio2WriteTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
+                    integer = getSocket().write(socketBufferHandler.getWriteBuffer());
+                    if (integer.get(getNio2WriteTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
                         throw new EOFException(sm.getString("iob.failedwrite"));
                     }
                 } while (socketBufferHandler.getWriteBuffer().hasRemaining());
@@ -1243,6 +1248,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             } catch (InterruptedException e) {
                 throw new IOException(e);
             } catch (TimeoutException e) {
+                if (integer != null) {
+                    integer.cancel(true);
+                }
                 throw new SocketTimeoutException();
             }
         }
@@ -1253,7 +1261,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             if (getError() != null) {
                 throw getError();
             }
-
 
             // Before doing a blocking flush, make sure that any pending non
             // blocking write has completed.
