@@ -112,7 +112,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         chain.doFilter(request, response);
     }
 
-    private static abstract class RestCsrfPreventionStrategy {
+    private abstract static class RestCsrfPreventionStrategy {
 
         abstract boolean apply(HttpServletRequest request,
                 HttpServletResponse response) throws IOException;
