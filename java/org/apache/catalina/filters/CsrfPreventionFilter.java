@@ -92,15 +92,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
             boolean skipNonceCheck = false;
 
-            if (Constants.METHOD_GET.equals(req.getMethod())) {
-                String path = req.getServletPath();
-                if (req.getPathInfo() != null) {
-                    path = path + req.getPathInfo();
-                }
-
-                if (entryPoints.contains(path)) {
-                    skipNonceCheck = true;
-                }
+            if (Constants.METHOD_GET.equals(req.getMethod())
+                    && entryPoints.contains(getRequestedPath(req))) {
+                skipNonceCheck = true;
             }
 
             HttpSession session = req.getSession(false);
