@@ -123,7 +123,6 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
-        // TODO Auto-generated method stub
         super.reset(parent, con);
         if (parent!=null) {
             poolName = parent.getName();
