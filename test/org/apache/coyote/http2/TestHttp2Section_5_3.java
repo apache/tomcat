@@ -19,9 +19,6 @@ package org.apache.coyote.http2;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-
 /**
  * Unit tests for Section 5.3 of
  * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
@@ -33,8 +30,6 @@ import org.apache.juli.logging.LogFactory;
  * found in {@link TestAbstractStream}.
  */
 public class TestHttp2Section_5_3 extends Http2TestBase {
-
-    Log log = LogFactory.getLog(TestHttp2Section_5_3.class);
 
     // Section 5.3.1
 
