@@ -114,6 +114,10 @@
         <code>Map.entrySet()</code> instead of <code>Map.keySet()</code>
         Based on a patch provided by Anthony Whitford. (violetagg)
       </fix>
+      <add>
+        Add a new RestCsrfPreventionFilter that provides basic CSRF protection
+        for REST APIs. (violetagg)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
