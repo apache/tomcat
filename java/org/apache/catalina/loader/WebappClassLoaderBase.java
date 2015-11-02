@@ -466,7 +466,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * The system class loader.
+     * @deprecated Unused. Always null. Will be removed in 8.0.x.
      */
+    @Deprecated
     protected ClassLoader system = null;
 
 
