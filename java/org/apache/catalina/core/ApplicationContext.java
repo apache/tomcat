@@ -101,8 +101,7 @@ public class ApplicationContext
         if (requireSlash == null) {
             GET_RESOURCE_REQUIRE_SLASH = STRICT_SERVLET_COMPLIANCE;
         } else {
-            GET_RESOURCE_REQUIRE_SLASH =
-                Boolean.valueOf(requireSlash).booleanValue();
+            GET_RESOURCE_REQUIRE_SLASH = Boolean.parseBoolean(requireSlash);
         }
     }
 

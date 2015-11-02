@@ -76,8 +76,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         if (wrapSameObject == null) {
             WRAP_SAME_OBJECT = STRICT_SERVLET_COMPLIANCE;
         } else {
-            WRAP_SAME_OBJECT =
-                Boolean.valueOf(wrapSameObject).booleanValue();
+            WRAP_SAME_OBJECT = Boolean.parseBoolean(wrapSameObject);
         }
     }
 

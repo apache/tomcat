@@ -275,7 +275,7 @@ public class JspUtil {
 
     /**
      * Convert a String value to 'boolean'. Besides the standard conversions
-     * done by Boolean.valueOf(s).booleanValue(), the value "yes" (ignore case)
+     * done by Boolean.parseBoolean(s), the value "yes" (ignore case)
      * is also converted to 'true'. If 's' is null, then 'false' is returned.
      *
      * @param s
@@ -288,7 +288,7 @@ public class JspUtil {
             if (s.equalsIgnoreCase("yes")) {
                 b = true;
             } else {
-                b = Boolean.valueOf(s).booleanValue();
+                b = Boolean.parseBoolean(s);
             }
         }
         return b;

@@ -492,7 +492,7 @@ public class JspRuntimeLibrary {
             } else if (t.equals(boolean.class)) {
                 boolean[] tmpval = new boolean[values.length];
                 for (int i = 0 ; i < values.length; i++)
-                    tmpval[i] = (Boolean.valueOf(values[i])).booleanValue();
+                    tmpval[i] = Boolean.parseBoolean(values[i]);
                 method.invoke (bean, new Object[] {tmpval});
             } else if (t.equals(short.class)) {
                 short[] tmpval = new short[values.length];

@@ -90,10 +90,10 @@ class Generator {
      * used in jsp:getProperty action to be previously "introduced"
      * to the JSP processor (see JSP.5.3) is enforced.
      */ 
-    private static final boolean STRICT_GET_PROPERTY = Boolean.valueOf(
+    private static final boolean STRICT_GET_PROPERTY = Boolean.parseBoolean(
             System.getProperty(
                     "org.apache.jasper.compiler.Generator.STRICT_GET_PROPERTY",
-                    "true")).booleanValue();
+                    "true"));
 
     private final ServletWriter out;
 

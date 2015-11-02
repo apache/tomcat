@@ -86,9 +86,9 @@ public class Response
         // Ensure that URL is loaded for SM
         URL.isSchemeChar('c');
 
-        ENFORCE_ENCODING_IN_GET_WRITER = Boolean.valueOf(
+        ENFORCE_ENCODING_IN_GET_WRITER = Boolean.parseBoolean(
                 System.getProperty("org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER",
-                        "true")).booleanValue();
+                        "true"));
     }
 
     public Response() {

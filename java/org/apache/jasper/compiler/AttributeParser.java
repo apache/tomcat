@@ -29,10 +29,10 @@ package org.apache.jasper.compiler;
 public class AttributeParser {
 
     /* System property that controls if the strict quoting rules are applied. */ 
-    private static final boolean STRICT_QUOTE_ESCAPING = Boolean.valueOf(
+    private static final boolean STRICT_QUOTE_ESCAPING = Boolean.parseBoolean(
             System.getProperty(
                     "org.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING",
-                    "true")).booleanValue();
+                    "true"));
 
     /**
      * Parses the provided input String as a JSP attribute and returns an

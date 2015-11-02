@@ -319,17 +319,17 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_TESTONBORROW);
         if (value != null) {
-            poolProperties.setTestOnBorrow(Boolean.valueOf(value).booleanValue());
+            poolProperties.setTestOnBorrow(Boolean.parseBoolean(value));
         }
 
         value = properties.getProperty(PROP_TESTONRETURN);
         if (value != null) {
-            poolProperties.setTestOnReturn(Boolean.valueOf(value).booleanValue());
+            poolProperties.setTestOnReturn(Boolean.parseBoolean(value));
         }
 
         value = properties.getProperty(PROP_TESTONCONNECT);
         if (value != null) {
-            poolProperties.setTestOnConnect(Boolean.valueOf(value).booleanValue());
+            poolProperties.setTestOnConnect(Boolean.parseBoolean(value));
         }
 
         value = properties.getProperty(PROP_TIMEBETWEENEVICTIONRUNSMILLIS);
@@ -349,7 +349,7 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_TESTWHILEIDLE);
         if (value != null) {
-            poolProperties.setTestWhileIdle(Boolean.valueOf(value).booleanValue());
+            poolProperties.setTestWhileIdle(Boolean.parseBoolean(value));
         }
 
         value = properties.getProperty(PROP_PASSWORD);
@@ -389,12 +389,12 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED);
         if (value != null) {
-            poolProperties.setAccessToUnderlyingConnectionAllowed(Boolean.valueOf(value).booleanValue());
+            poolProperties.setAccessToUnderlyingConnectionAllowed(Boolean.parseBoolean(value));
         }
 
         value = properties.getProperty(PROP_REMOVEABANDONED);
         if (value != null) {
-            poolProperties.setRemoveAbandoned(Boolean.valueOf(value).booleanValue());
+            poolProperties.setRemoveAbandoned(Boolean.parseBoolean(value));
         }
 
         value = properties.getProperty(PROP_REMOVEABANDONEDTIMEOUT);
@@ -404,7 +404,7 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_LOGABANDONED);
         if (value != null) {
-            poolProperties.setLogAbandoned(Boolean.valueOf(value).booleanValue());
+            poolProperties.setLogAbandoned(Boolean.parseBoolean(value));
         }
 
         value = properties.getProperty(PROP_POOLPREPAREDSTATEMENTS);

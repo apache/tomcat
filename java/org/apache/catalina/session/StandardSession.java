@@ -97,8 +97,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         if (activityCheck == null) {
             ACTIVITY_CHECK = STRICT_SERVLET_COMPLIANCE;
         } else {
-            ACTIVITY_CHECK =
-                Boolean.valueOf(activityCheck).booleanValue();
+            ACTIVITY_CHECK = Boolean.parseBoolean(activityCheck);
         }
 
         String lastAccessAtStart = System.getProperty(
@@ -106,8 +105,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
         if (lastAccessAtStart == null) {
             LAST_ACCESS_AT_START = STRICT_SERVLET_COMPLIANCE;
         } else {
-            LAST_ACCESS_AT_START =
-                Boolean.valueOf(lastAccessAtStart).booleanValue();
+            LAST_ACCESS_AT_START = Boolean.parseBoolean(lastAccessAtStart);
         }
     }
 
