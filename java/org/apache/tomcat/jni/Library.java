@@ -172,7 +172,7 @@ public final class Library {
      *
      * @throws Exception if a problem occurred during initialization
      */
-    public synchronized static boolean initialize(String libraryName) throws Exception {
+    public static synchronized boolean initialize(String libraryName) throws Exception {
         if (_instance == null) {
             if (libraryName == null)
                 _instance = new Library();
