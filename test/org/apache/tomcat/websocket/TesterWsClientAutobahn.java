@@ -112,7 +112,7 @@ public class TesterWsClientAutobahn {
         @OnMessage
         public void onMessage(String msg) {
             latch.countDown();
-            caseCount = Integer.valueOf(msg).intValue();
+            caseCount = Integer.parseInt(msg);
         }
 
 

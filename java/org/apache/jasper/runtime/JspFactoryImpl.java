@@ -47,7 +47,7 @@ public class JspFactoryImpl extends JspFactory {
     private static final boolean USE_POOL = 
         Boolean.parseBoolean(System.getProperty("org.apache.jasper.runtime.JspFactoryImpl.USE_POOL", "true"));
     private static final int POOL_SIZE = 
-        Integer.valueOf(System.getProperty("org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE", "8")).intValue();
+        Integer.parseInt(System.getProperty("org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE", "8"));
 
     private ThreadLocal<PageContextPool> localPool = new ThreadLocal<PageContextPool>();
 

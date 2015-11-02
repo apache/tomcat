@@ -111,7 +111,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             } else if (name.equals("REQUEST-SERVER-NAME")) {
                 ajpClient.setServerName(value);
             } else if (name.equals("REQUEST-SERVER-PORT")) {
-                ajpClient.setServerPort(Integer.valueOf(value).intValue());
+                ajpClient.setServerPort(Integer.parseInt(value));
             } else if (name.equals("REQUEST-IS-SECURE")) {
                 ajpClient.setSsl(Boolean.parseBoolean(value));
             } else if (name.equals("REQUEST-LOCAL-ADDR")) {
