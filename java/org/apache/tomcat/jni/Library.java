@@ -32,7 +32,7 @@ public final class Library {
      */
     private static Library _instance = null;
 
-    private Library() throws Throwable {
+    private Library() throws Exception {
         boolean loaded = false;
         String path = System.getProperty("java.library.path");
         String [] paths = path.split(File.pathSeparator);
@@ -45,7 +45,7 @@ public final class Library {
                 throw t;
             } catch (VirtualMachineError t) {
                 // Don't use a Java 7 multiple exception catch so we can keep
-                // the JNI code identical between Tomcat 6/7/8
+                // the JNI code identical between Tomcat 6/7/8/9
                 throw t;
             } catch (Throwable t) {
                 String name = System.mapLibraryName(NAMES[i]);
@@ -166,10 +166,13 @@ public final class Library {
      * Setup any APR internal data structures.  This MUST be the first function
      * called for any APR library.
      * @param libraryName the name of the library to load
+     *
+     * @return {@code true} if the native code was initialized successfully
+     *         otherwise {@code false}
+     *
+     * @throws Exception if a problem occurred during initialization
      */
-    public static boolean initialize(String libraryName)
-        throws Throwable
-    {
+    public synchronized static boolean initialize(String libraryName) throws Exception {
         if (_instance == null) {
             if (libraryName == null)
                 _instance = new Library();
