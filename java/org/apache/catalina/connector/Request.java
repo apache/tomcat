@@ -2892,6 +2892,10 @@ public class Request implements HttpServletRequest {
 
         cookiesConverted = true;
 
+        if (getContext() == null) {
+            return;
+        }
+
         parseCookies();
 
         ServerCookies serverCookies = coyoteRequest.getCookies();
