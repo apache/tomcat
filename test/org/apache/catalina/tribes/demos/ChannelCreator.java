@@ -130,7 +130,7 @@ public class ChannelCreator {
                 System.out.println("Setting MessageDispatchInterceptor.maxQueueSize="+asyncsize);
             } else if ("-static".equals(args[i])) {
                 String d = args[++i];
-                String h = d.substring(0,d.indexOf(":"));
+                String h = d.substring(0,d.indexOf(':'));
                 String p = d.substring(h.length()+1);
                 Member m = new MemberImpl(h,Integer.parseInt(p),2000);
                 staticMembers.add(m);

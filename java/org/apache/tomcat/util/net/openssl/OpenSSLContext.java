@@ -296,7 +296,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // List the ciphers that the client is permitted to negotiate
             String ciphers = sslHostConfig.getCiphers();
-            if (!("ALL".equals(ciphers)) && ciphers.indexOf(":") == -1) {
+            if (!("ALL".equals(ciphers)) && ciphers.indexOf(':') == -1) {
                 StringTokenizer tok = new StringTokenizer(ciphers, ",");
                 this.ciphers = new ArrayList<>();
                 while (tok.hasMoreTokens()) {

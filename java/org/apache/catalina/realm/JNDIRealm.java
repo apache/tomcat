@@ -2599,12 +2599,12 @@ public class JNDIRealm extends RealmBase {
                 // strings: (|(something)(somethingelse))
                 while ( (userPatternString.charAt(startParenLoc + 1) == '|') ||
                         (startParenLoc != 0 && userPatternString.charAt(startParenLoc - 1) == '\\') ) {
-                    startParenLoc = userPatternString.indexOf("(", startParenLoc+1);
+                    startParenLoc = userPatternString.indexOf('(', startParenLoc+1);
                 }
-                endParenLoc = userPatternString.indexOf(")", startParenLoc+1);
+                endParenLoc = userPatternString.indexOf(')', startParenLoc+1);
                 // weed out escaped end-parens
                 while (userPatternString.charAt(endParenLoc - 1) == '\\') {
-                    endParenLoc = userPatternString.indexOf(")", endParenLoc+1);
+                    endParenLoc = userPatternString.indexOf(')', endParenLoc+1);
                 }
                 String nextPathPart = userPatternString.substring
                     (startParenLoc+1, endParenLoc);

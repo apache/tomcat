@@ -72,9 +72,9 @@ public class MBeanDumper {
                     if (! attrs[i].isReadable()) continue;
                     String attName=attrs[i].getName();
                     if ("modelerType".equals(attName)) continue;
-                    if (attName.indexOf("=") >=0 ||
-                            attName.indexOf(":") >=0 ||
-                            attName.indexOf(" ") >=0 ) {
+                    if (attName.indexOf('=') >=0 ||
+                            attName.indexOf(':') >=0 ||
+                            attName.indexOf(' ') >=0 ) {
                         continue;
                     }
 

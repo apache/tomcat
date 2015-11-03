@@ -315,7 +315,7 @@ public class TestJaspicDigestAuthenticator extends TomcatBaseTest {
         String authHeader = authHeaders.iterator().next();
 
         int start = authHeader.indexOf("nonce=\"") + 7;
-        int end = authHeader.indexOf("\"", start);
+        int end = authHeader.indexOf('\'', start);
         return authHeader.substring(start, end);
     }
 
@@ -326,7 +326,7 @@ public class TestJaspicDigestAuthenticator extends TomcatBaseTest {
         String authHeader = authHeaders.iterator().next();
 
         int start = authHeader.indexOf("opaque=\"") + 8;
-        int end = authHeader.indexOf("\"", start);
+        int end = authHeader.indexOf('\'', start);
         return authHeader.substring(start, end);
     }
 
