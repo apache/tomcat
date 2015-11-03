@@ -50,6 +50,10 @@ test.threads=1
 # Note the Cobertura code coverage tool is GPLv2 licensed
 test.cobertura=false
 
+# Some platforms (e.g. OSX El Capitan) require IPv4 to be the default for the
+# multicast tests to work
+#java.net.preferIPv4Stack=true
+
 # Location of GPG executable (used only for releases)
 gpg.exec=/path/to/gpg
 
