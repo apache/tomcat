@@ -102,10 +102,11 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
     public static void release(ClassLoader classLoader) {
         Iterator<URLStreamHandlerFactory> iter = instance.userFactories.iterator();
         while (iter.hasNext()) {
-            ClassLoader factoryLoader = iter.next().getClass().getClassLoader();
+            URLStreamHandlerFactory candidate = iter.next();
+            ClassLoader factoryLoader = candidate.getClass().getClassLoader();
             while (factoryLoader != null) {
                 if (classLoader.equals(factoryLoader)) {
-                    iter.remove();
+                    instance.userFactories.remove(candidate); 
                     break;
                 }
                 factoryLoader = factoryLoader.getParent();
