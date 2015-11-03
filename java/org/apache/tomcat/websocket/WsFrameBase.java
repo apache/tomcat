@@ -469,7 +469,7 @@ public abstract class WsFrameBase {
                             CloseCodes.TOO_BIG,
                             sm.getString("wsFrame.textMessageTooBig")));
                 }
-            } else if (cr.isUnderflow() & !last) {
+            } else if (cr.isUnderflow() && !last) {
                 // End of frame and possible message as well.
 
                 if (continuationExpected) {
