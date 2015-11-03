@@ -253,7 +253,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             return (false);            // part of some other name or value
         }
         int limit = queryString.length();
-        int ampersand = queryString.indexOf("&");
+        int ampersand = queryString.indexOf('&');
         if (ampersand > 0) {
             limit = ampersand;
         }

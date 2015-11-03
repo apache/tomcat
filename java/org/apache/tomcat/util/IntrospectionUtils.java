@@ -488,14 +488,14 @@ public final class IntrospectionUtils {
      */
     public static String replaceProperties(String value,
             Hashtable<Object,Object> staticProp, PropertySource dynamicProp[]) {
-        if (value.indexOf("$") < 0) {
+        if (value.indexOf('$') < 0) {
             return value;
         }
         StringBuilder sb = new StringBuilder();
         int prev = 0;
         // assert value!=nil
         int pos;
-        while ((pos = value.indexOf("$", prev)) >= 0) {
+        while ((pos = value.indexOf('$', prev)) >= 0) {
             if (pos > 0) {
                 sb.append(value.substring(prev, pos));
             }

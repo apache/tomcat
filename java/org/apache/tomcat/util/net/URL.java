@@ -665,7 +665,7 @@ public final class URL implements Serializable {
 
         // Parse the authority section
         if (spec.indexOf("//", start) == start) {
-            int pathStart = spec.indexOf("/", start + 2);
+            int pathStart = spec.indexOf('/', start + 2);
             if ((pathStart >= 0) && (pathStart < limit)) {
                 authority = spec.substring(start + 2, pathStart);
                 start = pathStart;
@@ -708,7 +708,7 @@ public final class URL implements Serializable {
         }
 
         // Parse the path section
-        if (spec.indexOf("/", start) == start) {     // Absolute path
+        if (spec.indexOf('/', start) == start) {     // Absolute path
             path = spec.substring(start, limit);
             if (query != null)
                 file = path + "?" + query;

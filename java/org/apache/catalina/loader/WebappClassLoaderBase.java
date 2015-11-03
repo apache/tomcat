@@ -2307,7 +2307,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         Field field = fields[i];
                         int mods = field.getModifiers();
                         if (field.getType().isPrimitive()
-                                || (field.getName().indexOf("$") != -1)) {
+                                || (field.getName().indexOf('$') != -1)) {
                             continue;
                         }
                         if (Modifier.isStatic(mods)) {
@@ -2355,7 +2355,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             Field field = fields[i];
             int mods = field.getModifiers();
             if (field.getType().isPrimitive()
-                    || (field.getName().indexOf("$") != -1)) {
+                    || (field.getName().indexOf('$') != -1)) {
                 continue;
             }
             try {

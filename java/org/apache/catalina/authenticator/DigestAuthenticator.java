@@ -622,7 +622,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
 
             // Validate nonce
-            int i = nonce.indexOf(":");
+            int i = nonce.indexOf(':');
             if (i < 0 || (i + 1) == nonce.length()) {
                 return false;
             }
