@@ -474,8 +474,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 //always add the trap interceptor to the mix
                 definitions[0] = new InterceptorDefinition(TrapException.class);
                 for (int i=0; i<interceptorValues.length; i++) {
-                    int propIndex = interceptorValues[i].indexOf("(");
-                    int endIndex = interceptorValues[i].indexOf(")");
+                    int propIndex = interceptorValues[i].indexOf('(');
+                    int endIndex = interceptorValues[i].indexOf(')');
                     if (propIndex<0 || endIndex<0 || endIndex <= propIndex) {
                         definitions[i+1] = new InterceptorDefinition(interceptorValues[i].trim());
                     } else {
@@ -484,7 +484,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                         String propsAsString = interceptorValues[i].substring(propIndex+1, endIndex);
                         String[] props = propsAsString.split(",");
                         for (int j=0; j<props.length; j++) {
-                            int pidx = props[j].indexOf("=");
+                            int pidx = props[j].indexOf('=');
                             String propName = props[j].substring(0,pidx).trim();
                             String propValue = props[j].substring(pidx+1).trim();
                             definitions[i+1].addProperty(new InterceptorProperty(propName,propValue));
@@ -957,7 +957,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         @SuppressWarnings("unchecked")
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
             if (clazz==null) {
-                if (getClassName().indexOf(".")<0) {
+                if (getClassName().indexOf('.')<0) {
                     if (log.isDebugEnabled()) {
                         log.debug("Loading interceptor class:"+PoolConfiguration.PKG_PREFIX+getClassName());
                     }

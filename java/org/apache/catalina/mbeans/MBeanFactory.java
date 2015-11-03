@@ -110,7 +110,7 @@ public class MBeanFactory {
         if ((j2eeType!=null) && (j2eeType.equals("WebModule"))) {
             String name = pname.getKeyProperty("name");
             name = name.substring(2);
-            int i = name.indexOf("/");
+            int i = name.indexOf('/');
             String hostName = name.substring(0,i);
             String path = name.substring(i);
             Container host = engine.findChild(hostName);
@@ -743,7 +743,7 @@ public class MBeanFactory {
         Engine engine = (Engine) service.getContainer();
         String name = oname.getKeyProperty("name");
         name = name.substring(2);
-        int i = name.indexOf("/");
+        int i = name.indexOf('/');
         String hostName = name.substring(0,i);
         String path = name.substring(i);
         ObjectName deployer = new ObjectName(domain+":type=Deployer,host="+

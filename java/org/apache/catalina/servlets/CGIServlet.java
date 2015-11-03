@@ -788,7 +788,7 @@ public final class CGIServlet extends HttpServlet {
                 } else {
                     qs = req.getQueryString();
                 }
-                if (qs != null && qs.indexOf("=") == -1) {
+                if (qs != null && qs.indexOf('=') == -1) {
                     StringTokenizer qsTokens = new StringTokenizer(qs, "+");
                     while ( qsTokens.hasMoreTokens() ) {
                         cmdLineParameters.add(URLDecoder.decode(qsTokens.nextToken(),
@@ -1683,11 +1683,11 @@ public final class CGIServlet extends HttpServlet {
                             }
                             if (line.startsWith("HTTP")) {
                                 skipBody = setStatus(response, getSCFromHttpStatusLine(line));
-                            } else if (line.indexOf(":") >= 0) {
+                            } else if (line.indexOf(':') >= 0) {
                                 String header =
-                                    line.substring(0, line.indexOf(":")).trim();
+                                    line.substring(0, line.indexOf(':')).trim();
                                 String value =
-                                    line.substring(line.indexOf(":") + 1).trim();
+                                    line.substring(line.indexOf(':') + 1).trim();
                                 if (header.equalsIgnoreCase("status")) {
                                     skipBody = setStatus(response, getSCFromCGIStatusHeader(value));
                                 } else {
