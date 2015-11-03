@@ -382,7 +382,8 @@ public class ApplicationContext
 
     @Override
     public String getRealPath(String path) {
-        return context.getRealPath(path);
+        String validatedPath = validateResourcePath(path, true);
+        return context.getRealPath(validatedPath);
     }
 
 
@@ -473,7 +474,7 @@ public class ApplicationContext
     @Override
     public URL getResource(String path) throws MalformedURLException {
 
-        String validatedPath = validateResourcePath(path);
+        String validatedPath = validateResourcePath(path, false);
 
         if (validatedPath == null) {
             throw new MalformedURLException(
@@ -492,7 +493,7 @@ public class ApplicationContext
     @Override
     public InputStream getResourceAsStream(String path) {
 
-        String validatedPath = validateResourcePath(path);
+        String validatedPath = validateResourcePath(path, false);
 
         if (validatedPath == null) {
             return null;
@@ -511,9 +512,13 @@ public class ApplicationContext
      * Returns null if the input path is not valid or a path that will be
      * acceptable to resoucres.getResource().
      */
-    private String validateResourcePath(String path) {
+    private String validateResourcePath(String path, boolean allowEmptyPath) {
         if (path == null) {
             return null;
+        }
+
+        if (path.length() == 0 && allowEmptyPath) {
+            return path;
         }
 
         if (!path.startsWith("/")) {
