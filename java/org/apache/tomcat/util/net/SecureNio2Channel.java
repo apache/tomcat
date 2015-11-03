@@ -574,7 +574,7 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     private class FutureRead implements Future<Integer> {
         private final ByteBuffer dst;
-        private final Future<Integer> integer;
+        private Future<Integer> integer;
         private FutureRead(ByteBuffer dst) {
             this.dst = dst;
             if (unwrapBeforeRead || netInBuffer.position() > 0) {
@@ -597,7 +597,12 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
         @Override
         public Integer get() throws InterruptedException, ExecutionException {
-            return (integer == null) ? unwrap(netInBuffer.position(), -1, TimeUnit.MILLISECONDS) : unwrap(integer.get().intValue(), -1, TimeUnit.MILLISECONDS);
+            try {
+                return (integer == null) ? unwrap(netInBuffer.position(), -1, TimeUnit.MILLISECONDS) : unwrap(integer.get().intValue(), -1, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                // Cannot happen: no timeout
+                throw new ExecutionException(e);
+            }
         }
         @Override
         public Integer get(long timeout, TimeUnit unit)
@@ -605,7 +610,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                 TimeoutException {
             return (integer == null) ? unwrap(netInBuffer.position(), timeout, unit) : unwrap(integer.get(timeout, unit).intValue(), timeout, unit);
         }
-        private Integer unwrap(int nRead, long timeout, TimeUnit unit) throws ExecutionException {
+        private Integer unwrap(int nRead, long timeout, TimeUnit unit) throws ExecutionException, TimeoutException, InterruptedException {
             //are we in the middle of closing or closed?
             if (closing || closed)
                 return Integer.valueOf(-1);
@@ -637,14 +642,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                     //if we need more network data, then bail out for now.
                     if (unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
                         if (read == 0) {
-                            try {
-                                if (timeout > 0) {
-                                    return unwrap(sc.read(netInBuffer).get(timeout, unit).intValue(), timeout, unit);
-                                } else {
-                                    return unwrap(sc.read(netInBuffer).get().intValue(), -1, TimeUnit.MILLISECONDS);
-                                }
-                            } catch (InterruptedException | TimeoutException e) {
-                                throw new ExecutionException(e);
+                            integer = sc.read(netInBuffer);
+                            if (timeout > 0) {
+                                return unwrap(integer.get(timeout, unit).intValue(), timeout, unit);
+                            } else {
+                                return unwrap(integer.get().intValue(), -1, TimeUnit.MILLISECONDS);
                             }
                         } else {
                             break;

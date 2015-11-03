@@ -224,7 +224,7 @@ public class InputBuffer extends Reader
             available = cb.getLength();
         }
         if (available == 0) {
-            coyoteRequest.action(ActionCode.AVAILABLE, null);
+            coyoteRequest.action(ActionCode.AVAILABLE, Boolean.valueOf(coyoteRequest.getReadListener() != null));
             available = (coyoteRequest.getAvailable() > 0) ? 1 : 0;
         }
         return available;
@@ -269,7 +269,7 @@ public class InputBuffer extends Reader
 
     public boolean isReady() {
         if (coyoteRequest.getReadListener() == null) {
-            throw new IllegalStateException("not in non blocking mode.");
+            throw new IllegalStateException(sm.getString("inputBuffer.requiresNonBlocking"));
         }
         if (isFinished()) {
             // If this is a non-container thread, need to trigger a read

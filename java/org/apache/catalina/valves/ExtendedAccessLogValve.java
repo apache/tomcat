@@ -813,7 +813,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 @Override
                 public void addElement(CharArrayWriter buf, Date date,
                         Request request, Response response, long time) {
-                    buf.append(wrap("" + request.getContentLength()));
+                    buf.append(wrap("" + request.getContentLengthLong()));
                 }
             };
         } else if ("characterEncoding".equals(parameter)) {

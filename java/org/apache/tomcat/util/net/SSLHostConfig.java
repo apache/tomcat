@@ -107,7 +107,7 @@ public class SSLHostConfig {
     }
 
 
-    public Object getOpenSslContext() {
+    public Long getOpenSslContext() {
         return openSslContext;
     }
 

@@ -365,13 +365,15 @@ public class JDBCRealm
 
 
     /**
-     * Return the Principal associated with the specified username and
-     * credentials, if there is one; otherwise return <code>null</code>.
+     * Attempt to authenticate the user with the provided credentials.
      *
      * @param dbConnection The database connection to be used
      * @param username Username of the Principal to look up
-     * @param credentials Password or other credentials to use in
-     *  authenticating this username
+     * @param credentials Password or other credentials to use in authenticating
+     *                    this username
+     *
+     * @return Return the Principal associated with the specified username and
+     *         credentials, if there is one; otherwise return <code>null</code>.
      */
     public synchronized Principal authenticate(Connection dbConnection,
                                                String username,
@@ -386,7 +388,7 @@ public class JDBCRealm
         // Look up the user's credentials
         String dbCredentials = getPassword(username);
 
-        if (credentials == null || dbCredentials == null) {
+        if (dbCredentials == null) {
             if (containerLog.isTraceEnabled())
                 containerLog.trace(sm.getString("jdbcRealm.authenticateFailure",
                                                 username));

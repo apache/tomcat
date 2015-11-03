@@ -494,7 +494,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             out.println("REQUEST-CHARACTER-ENCODING: " +
                         request.getCharacterEncoding());
             out.println("REQUEST-CONTENT-LENGTH: " +
-                        request.getContentLength());
+                        request.getContentLengthLong());
             out.println("REQUEST-CONTENT-TYPE: " + request.getContentType());
             out.println("REQUEST-LOCALE: " + request.getLocale());
 
