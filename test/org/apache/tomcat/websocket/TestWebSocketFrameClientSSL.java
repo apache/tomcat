@@ -103,7 +103,8 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
         //      connector.
         Assume.assumeFalse(
                 "Skip this test on BIO. TODO: investigate options to make it pass with HTTP BIO connector",
-                getTomcatInstance().getConnector().getProtocol().equals("HTTP/1.1"));
+                getTomcatInstance().getConnector().getProtocolHandlerClassName().equals(
+                        "org.apache.coyote.http11.Http11Protocol"));
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
