@@ -279,6 +279,17 @@ public class CombinedRealm extends RealmBase {
         super.destroyInternal();
     }
 
+    /**
+     * Delegate the backgroundProcess call to all sub-realms.
+     */
+    @Override
+    public void backgroundProcess() {
+        super.backgroundProcess();
+
+        for (Realm r : realms) {
+            r.backgroundProcess();
+        }
+    }
 
     /**
      * Return the Principal associated with the specified chain of X509

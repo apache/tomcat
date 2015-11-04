@@ -118,6 +118,10 @@
         Add a new RestCsrfPreventionFilter that provides basic CSRF protection
         for REST APIs. (violetagg)
       </add>
+      <fix>
+        <bug>58582</bug>: Combined realm should perform background processing
+        on its sub-realms. Based upon a patch provided by Aidan. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
