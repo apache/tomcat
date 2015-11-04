@@ -46,7 +46,7 @@ test.cobertura=false
 
 # Some platforms (e.g. OSX El Capitan) require IPv4 to be the default for the
 # multicast tests to work
-#java.net.preferIPv4Stack=true
+java.net.preferIPv4Stack=false
 
 # Location of Java7 JDK
 #java.7.home=/path/to/java7/jdk
