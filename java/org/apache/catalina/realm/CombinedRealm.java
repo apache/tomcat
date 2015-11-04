@@ -296,12 +296,12 @@ public class CombinedRealm extends RealmBase {
      * Delegate the backgroundProcess call to all sub-realms.
      */
     @Override
-    public void backgroundProcess()
-    {
+    public void backgroundProcess() {
         super.backgroundProcess();
 
-        for( Realm r: realms )
+        for (Realm r : realms) {
             r.backgroundProcess();
+        }
     }
 
     /**
