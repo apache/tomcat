@@ -64,6 +64,7 @@ import javax.websocket.WebSocketContainer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
@@ -96,6 +97,15 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private int backgroundProcessCount = 0;
     private int processPeriod = Constants.DEFAULT_PROCESS_PERIOD;
 
+    private InstanceManager instanceManager;
+
+    InstanceManager getInstanceManager() {
+        return instanceManager;
+    }
+
+    protected void setInstanceManager(InstanceManager instanceManager) {
+        this.instanceManager = instanceManager;
+    }
 
     @Override
     public Session connectToServer(Object pojo, URI path)
