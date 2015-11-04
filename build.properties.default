@@ -44,6 +44,10 @@ test.accesslog=false
 # Note the Cobertura code coverage tool is GPLv2 licensed
 test.cobertura=false
 
+# Some platforms (e.g. OSX El Capitan) require IPv4 to be the default for the
+# multicast tests to work
+#java.net.preferIPv4Stack=true
+
 # Location of Java7 JDK
 #java.7.home=/path/to/java7/jdk
 
