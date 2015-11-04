@@ -171,7 +171,8 @@ public class TesterServletContext implements ServletContext {
 
     @Override
     public Object getAttribute(String name) {
-        throw new RuntimeException("Not implemented");
+        // Used by websockets
+        return null;
     }
 
     @Override
