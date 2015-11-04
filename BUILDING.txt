@@ -416,6 +416,11 @@ For example:
   Apache License v1.1. See http://cobertura.sf.net for details. Using it
   during Tomcat build is optional and is off by default.
 
+ 6. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
+    be the default for the multicast tests to work. This is configured by
+    the following property:
+
+        java.net.preferIPv4Stack=true
 
 (8) Source code checks
 
