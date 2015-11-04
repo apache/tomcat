@@ -414,6 +414,11 @@ For example:
 
         test.relaxTiming=true
 
+ 8. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
+    be the default for the multicast tests to work. This is configured by
+    the following property:
+
+        java.net.preferIPv4Stack=true
 
 (8) Source code checks
 
