@@ -29,7 +29,6 @@ import javax.security.auth.message.config.AuthConfigFactory;
 import javax.security.auth.message.config.AuthConfigProvider;
 import javax.security.auth.message.config.ServerAuthConfig;
 import javax.security.auth.message.config.ServerAuthContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.LifecycleException;
@@ -122,18 +121,6 @@ public class JaspicAuthenticator extends AuthenticatorBase {
         }
 
         return principals.iterator().next();
-    }
-
-
-    @Override
-    public void login(String userName, String password, Request request) throws ServletException {
-        throw new IllegalStateException("not implemented yet!");
-    }
-
-
-    @Override
-    public void logout(Request request) {
-        throw new IllegalStateException("not implemented yet!");
     }
 
 
