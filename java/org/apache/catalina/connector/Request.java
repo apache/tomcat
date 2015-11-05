@@ -1843,7 +1843,6 @@ public class Request implements HttpServletRequest {
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {
-
         T handler;
         try {
             // Do not go through the instance manager for internal Tomcat classes since they don't need injection
