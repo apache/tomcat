@@ -47,6 +47,7 @@ import javax.websocket.WebSocketContainer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -156,6 +157,15 @@ public class WsSession implements Session {
 
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
+
+        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
+        if (instanceManager != null) {
+            try {
+                instanceManager.newInstance(localEndpoint);
+            } catch (Exception e) {
+                throw new DeploymentException(sm.getString("wsSession.instanceNew"), e);
+            }
+        }
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("wsSession.created", id));
@@ -494,11 +504,15 @@ public class WsSession implements Session {
     private void fireEndpointOnClose(CloseReason closeReason) {
 
         // Fire the onClose event
+        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
             localEndpoint.onClose(this, closeReason);
+            if (instanceManager != null) {
+                instanceManager.destroyInstance(localEndpoint);
+            }
         } catch (Throwable throwable) {
             ExceptionUtils.handleThrowable(throwable);
             localEndpoint.onError(this, throwable);

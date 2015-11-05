@@ -137,6 +137,7 @@
       <!-- The Servlet 3.1 API replacement classes are in this package -->
       <allow pkg="org.apache.coyote.http11.upgrade"/>
       <allow pkg="org.apache.juli"/>
+      <allow pkg="org.apache.tomcat"/>
       <allow pkg="org.apache.tomcat.util"/>
       <!-- Ideally want to remove this -->
       <allow pkg="org.apache.tomcat.websocket.pojo"/>

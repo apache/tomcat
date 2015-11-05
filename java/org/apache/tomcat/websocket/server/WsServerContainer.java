@@ -51,6 +51,7 @@ import javax.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
 import org.apache.tomcat.websocket.WsWebSocketContainer;
@@ -98,6 +99,7 @@ public class WsServerContainer extends WsWebSocketContainer
     WsServerContainer(ServletContext servletContext) {
 
         this.servletContext = servletContext;
+        setInstanceManager((InstanceManager) servletContext.getAttribute(InstanceManager.class.getName()));
 
         // Configure servlet context wide defaults
         String value = servletContext.getInitParameter(
