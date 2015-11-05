@@ -135,9 +135,7 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_DUMP_SMAP = "-dumpsmap";
     protected static final String SWITCH_VALIDATE_TLD = "-validateTld";
     protected static final String SWITCH_VALIDATE_XML = "-validateXml";
-    protected static final String SWITCH_BLOCK_EXTERNAL = "-blockExternal";
     protected static final String SWITCH_NO_BLOCK_EXTERNAL = "-no-blockExternal";
-    protected static final String SWITCH_STRICT_QUOTE_ESCAPING = "-strictQuoteEscaping";
     protected static final String SWITCH_NO_STRICT_QUOTE_ESCAPING = "-no-strictQuoteEscaping";
     protected static final String SHOW_SUCCESS ="-s";
     protected static final String LIST_ERRORS = "-l";
