@@ -200,18 +200,10 @@ public final class EmbeddedServletOptions implements Options {
     private int jspIdleTimeout = -1;
 
     /**
-     * System property that controls if the strict quoting rules are applied
-     * when parsing attribute values that use scriptlet expressions (<%=...%>).
-     */
-    private static final boolean STRICT_QUOTE_ESCAPING_DEFAULT= Boolean.parseBoolean(
-            System.getProperty(
-                    "org.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING",
-                    "true"));
-    /**
      * Should JSP.1.6 be applied strictly to attributes defined using scriptlet
      * expressions?
      */
-    private boolean strictQuoteEscaping = STRICT_QUOTE_ESCAPING_DEFAULT;
+    private boolean strictQuoteEscaping = true;
 
     public String getProperty(String name ) {
         return settings.getProperty( name );
@@ -768,8 +760,7 @@ public final class EmbeddedServletOptions implements Options {
                 this.strictQuoteEscaping = false;
             } else {
                 if (log.isWarnEnabled()) {
-                    log.warn(Localizer.getMessage("jsp.warning.strictQuoteEscaping",
-                            Boolean.toString(STRICT_QUOTE_ESCAPING_DEFAULT)));
+                    log.warn(Localizer.getMessage("jsp.warning.strictQuoteEscaping"));
                 }
             }
         }

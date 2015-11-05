@@ -246,9 +246,6 @@
   <!--                       attribute values, should the rules in JSP.1.6  -->
   <!--                       for the escaping of quote characters be        -->
   <!--                       strictly applied? [true]                       -->
-  <!--                       The default can be changed with the            -->
-  <!--                       org.apache.jasper.compiler.Parser.             -->
-  <!--                       STRICT_QUOTE_ESCAPING system property.         -->
 
     <servlet>
         <servlet-name>jsp</servlet-name>

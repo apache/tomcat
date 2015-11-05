@@ -138,13 +138,6 @@
       will be used.</p>
     </property>
 
-    <property name="org.apache.jasper.compiler. Parser.STRICT_QUOTE_ESCAPING">
-      <p><strong>Deprecated</strong>. Configures the default setting for the
-      <code>strictQuoteEscaping</code> JSP initialisation paramater.</p>
-      <p>If not specified, the specification compliant default of
-      <code>true</code> will be used.</p>
-    </property>
-
     <property name="org.apache.jasper.compiler. Parser.STRICT_WHITESPACE">
       <p>If <code>false</code> the requirements for whitespace before an
       attribute name will be relaxed so that the lack of whitespace will not

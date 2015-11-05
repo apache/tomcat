@@ -201,9 +201,7 @@ default <code>false</code>.</li>
 <li><strong>strictQuoteEscaping</strong> - When scriptlet expressions are used
 for attribute values, should the rules in JSP.1.6 for the escaping of quote
 characters be strictly applied? <code>true</code> or <code>false</code>, default
-<code>true</code> which can be changed with the
-<code>org.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING</code> system
-property.</li>
+<code>true</code>.</li>
 </ul>
 
 <p>The Java compiler from Eclipse JDT in included as the default compiler. It is
