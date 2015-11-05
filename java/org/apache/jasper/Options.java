@@ -237,4 +237,10 @@ public interface Options {
      *         the JSP specification should be applied to scriplet expression.
      */
     public boolean getStrictQuoteEscaping();
+
+    /**
+     * @return {@code true} if EL expressions used within attributes should have
+     *         the quoting rules in JSP.1.6 applied to the expression.
+     */
+    public boolean getQuoteAttributeEL();
 }

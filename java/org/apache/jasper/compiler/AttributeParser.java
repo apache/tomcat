@@ -41,15 +41,16 @@ public class AttributeParser {
      *                      Are deferred expressions treated as literals?
      * @param strict        Should the rules of JSP.1.6 for escpaing quotes be
      *                      strictly applied?
+     * @param quoteAttributeEL
      * @return              An unquoted JSP attribute that, if it contains
      *                      expression language can be safely passed to the EL
      *                      processor without fear of ambiguity.
      */
     public static String getUnquoted(String input, char quote,
             boolean isELIgnored, boolean isDeferredSyntaxAllowedAsLiteral,
-            boolean strict) {
+            boolean strict, boolean quoteAttributeEL) {
         return (new AttributeParser(input, quote, isELIgnored,
-                isDeferredSyntaxAllowedAsLiteral, strict)).getUnquoted();
+                isDeferredSyntaxAllowedAsLiteral, strict, quoteAttributeEL)).getUnquoted();
     }
 
     /* The quoted input string. */
@@ -69,6 +70,8 @@ public class AttributeParser {
      * JSP.1.6.
      */
     private final boolean strict;
+
+    private final boolean quoteAttributeEL;
 
     /* The type ($ or #) of expression. Literals have a type of null. */
     private final char type;
@@ -94,13 +97,14 @@ public class AttributeParser {
      */
     private AttributeParser(String input, char quote,
             boolean isELIgnored, boolean isDeferredSyntaxAllowedAsLiteral,
-            boolean strict) {
+            boolean strict, boolean quoteAttributeEL) {
         this.input = input;
         this.quote = quote;
         this.isELIgnored = isELIgnored;
         this.isDeferredSyntaxAllowedAsLiteral =
             isDeferredSyntaxAllowedAsLiteral;
         this.strict = strict;
+        this.quoteAttributeEL = quoteAttributeEL;
         this.type = getType(input);
         this.size = input.length();
         result = new StringBuilder(size);
@@ -189,7 +193,12 @@ public class AttributeParser {
         boolean insideLiteral = false;
         char literalQuote = 0;
         while (i < size && !endEL) {
-            char ch = input.charAt(i++);
+            char ch;
+            if (quoteAttributeEL) {
+                ch = nextChar();
+            } else {
+                ch = input.charAt(i++);
+            }
             if (ch == '\'' || ch == '\"') {
                 if (insideLiteral) {
                     if (literalQuote == ch) {
@@ -203,7 +212,11 @@ public class AttributeParser {
             } else if (ch == '\\') {
                 result.append(ch);
                 if (insideLiteral && size < i) {
-                    ch = input.charAt(i++);
+                    if (quoteAttributeEL) {
+                        ch = nextChar();
+                    } else {
+                        ch = input.charAt(i++);
+                    }
                     result.append(ch);
                 }
             } else if (ch == '}') {

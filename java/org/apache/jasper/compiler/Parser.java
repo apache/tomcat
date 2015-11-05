@@ -264,8 +264,11 @@ class Parser implements TagConstants {
      * ('%>"' | TRANSLATION_ERROR)
      */
     private String parseAttributeValue(String qName, String watch, boolean ignoreEL) throws JasperException {
+        boolean quoteAttributeEL = ctxt.getOptions().getQuoteAttributeEL();
         Mark start = reader.mark();
-        Mark stop = reader.skipUntilIgnoreEsc(watch, ignoreEL);
+        // In terms of finding the end of the value, quoting EL is equivalent to
+        // ignoring it.
+        Mark stop = reader.skipUntilIgnoreEsc(watch, ignoreEL || quoteAttributeEL);
         if (stop == null) {
             err.jspError(start, "jsp.error.attribute.unterminated", qName);
         }
@@ -282,7 +285,8 @@ class Parser implements TagConstants {
             ret = AttributeParser.getUnquoted(reader.getText(start, stop),
                     quote, isElIgnored,
                     pageInfo.isDeferredSyntaxAllowedAsLiteral(),
-                    ctxt.getOptions().getStrictQuoteEscaping());
+                    ctxt.getOptions().getStrictQuoteEscaping(),
+                    quoteAttributeEL);
         } catch (IllegalArgumentException iae) {
             err.jspError(start, iae.getMessage());
         }
