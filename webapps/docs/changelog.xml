@@ -5542,7 +5542,7 @@
         returns to the container). (markt)
       </fix>
       <fix>
-        <bug>53863</bug>: Ensure the the implicit servlets (JSP and default) are
+        <bug>53863</bug>: Ensure that the implicit servlets (JSP and default) are
         marked as override-able when using embedded mode. (markt)
       </fix>
       <fix>
@@ -7297,7 +7297,7 @@
         RemoteAddrValve via JMX are thread-safe. (markt)
       </fix>
       <fix>
-        Ensure the the memory leak protection for the HttpClient keep-alive
+        Ensure that the memory leak protection for the HttpClient keep-alive
         always operates even if the thread has already stopped. (markt)
       </fix>
       <scode>
@@ -8156,7 +8156,7 @@
         (kkolinko)
       </update>
       <add>
-        Add information to the security page of the the documentation web
+        Add information to the security page of the documentation web
         application for the ciphers attribute of the Connector element. (markt)
       </add>
     </changelog>
@@ -9006,7 +9006,7 @@
       </add>
       <fix>
         <bug>51099</bug>: Correctly implement non-default login configurations
-        (configured via the loginConfigName attribute) for the the SPNEGO
+        (configured via the loginConfigName attribute) for the SPNEGO
         authenticator. (fhanik/markt)
       </fix>
       <add>
