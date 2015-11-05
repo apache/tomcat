@@ -19,8 +19,6 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.servlet.http.HttpUpgradeHandler;
-
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -48,7 +46,7 @@ public interface Processor {
      */
     SocketState process(SocketWrapperBase<?> socketWrapper, SocketStatus status) throws IOException;
 
-    HttpUpgradeHandler getHttpUpgradeHandler();
+    UpgradeToken getUpgradeToken();
 
     boolean isUpgrade();
     boolean isAsync();

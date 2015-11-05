@@ -48,6 +48,7 @@ import javax.websocket.WebSocketContainer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -181,6 +182,9 @@ public class WsSession implements Session {
         this.id = Long.toHexString(ids.getAndIncrement());
 
         InstanceManager instanceManager = webSocketContainer.getInstanceManager();
+        if (instanceManager == null) {
+            instanceManager = InstanceManagerBindings.get(applicationClassLoader);
+        }
         if (instanceManager != null) {
             try {
                 instanceManager.newInstance(localEndpoint);
@@ -535,6 +539,9 @@ public class WsSession implements Session {
         t.setContextClassLoader(applicationClassLoader);
         try {
             localEndpoint.onClose(this, closeReason);
+            if (instanceManager == null) {
+                instanceManager = InstanceManagerBindings.get(applicationClassLoader);
+            }
             if (instanceManager != null) {
                 instanceManager.destroyInstance(localEndpoint);
             }

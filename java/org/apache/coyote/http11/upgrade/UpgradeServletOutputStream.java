@@ -59,7 +59,6 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     // Guarded by registeredLock
     private boolean registered = false;
 
-    private volatile ClassLoader applicationLoader = null;
 
 
     public UpgradeServletOutputStream(UpgradeProcessorBase processor,
@@ -125,7 +124,6 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         }
 
         this.listener = listener;
-        this.applicationLoader = Thread.currentThread().getContextClassLoader();
     }
 
 
@@ -250,7 +248,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             Thread thread = Thread.currentThread();
             ClassLoader originalClassLoader = thread.getContextClassLoader();
             try {
-                thread.setContextClassLoader(applicationLoader);
+                thread.setContextClassLoader(processor.getUpgradeToken().getApplicationClassLoader());
                 listener.onWritePossible();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
@@ -269,7 +267,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         Thread thread = Thread.currentThread();
         ClassLoader originalClassLoader = thread.getContextClassLoader();
         try {
-            thread.setContextClassLoader(applicationLoader);
+            thread.setContextClassLoader(processor.getUpgradeToken().getApplicationClassLoader());
             listener.onError(t);
         } catch (Throwable t2) {
             ExceptionUtils.handleThrowable(t2);

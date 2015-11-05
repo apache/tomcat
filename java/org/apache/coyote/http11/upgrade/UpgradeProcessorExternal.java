@@ -21,8 +21,8 @@ import java.nio.ByteBuffer;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpUpgradeHandler;
 
+import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
@@ -41,8 +41,8 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
 
 
     public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
-            HttpUpgradeHandler httpUpgradeHandler) {
-        super(wrapper, leftOverInput, httpUpgradeHandler);
+            UpgradeToken upgradeToken) {
+        super(wrapper, leftOverInput, upgradeToken);
         this.upgradeServletInputStream = new UpgradeServletInputStream(this, wrapper);
         this.upgradeServletOutputStream = new UpgradeServletOutputStream(this, wrapper);
 
