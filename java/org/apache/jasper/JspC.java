@@ -107,15 +107,6 @@ public class JspC extends Task implements Options {
     // Logger
     private static final Log log = LogFactory.getLog(JspC.class);
 
-    /**
-     * System property that controls if the strict quoting rules are applied
-     * when parsing attribute values that use scriptlet expressions (<%=...%>).
-     */
-    private static final boolean STRICT_QUOTE_ESCAPING_DEFAULT= Boolean.parseBoolean(
-            System.getProperty(
-                    "org.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING",
-                    "true"));
-
     protected static final String SWITCH_VERBOSE = "-v";
     protected static final String SWITCH_HELP = "-help";
     protected static final String SWITCH_OUTPUT_DIR = "-d";
@@ -181,7 +172,7 @@ public class JspC extends Task implements Options {
     protected boolean validateTld;
     protected boolean validateXml;
     protected boolean blockExternal = true;
-    protected boolean strictQuoteEscaping = STRICT_QUOTE_ESCAPING_DEFAULT;
+    protected boolean strictQuoteEscaping = true;
     protected boolean xpoweredBy;
     protected boolean mappedFile = false;
     protected boolean poolingEnabled = true;
