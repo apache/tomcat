@@ -107,6 +107,15 @@ public class JspC extends Task implements Options {
     // Logger
     private static final Log log = LogFactory.getLog(JspC.class);
 
+    /**
+     * System property that controls if the strict quoting rules are applied
+     * when parsing attribute values that use scriptlet expressions (<%=...%>).
+     */
+    private static final boolean STRICT_QUOTE_ESCAPING_DEFAULT= Boolean.parseBoolean(
+            System.getProperty(
+                    "org.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING",
+                    "true"));
+
     protected static final String SWITCH_VERBOSE = "-v";
     protected static final String SWITCH_HELP = "-help";
     protected static final String SWITCH_OUTPUT_DIR = "-d";
@@ -137,6 +146,8 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_VALIDATE_XML = "-validateXml";
     protected static final String SWITCH_BLOCK_EXTERNAL = "-blockExternal";
     protected static final String SWITCH_NO_BLOCK_EXTERNAL = "-no-blockExternal";
+    protected static final String SWITCH_STRICT_QUOTE_ESCAPING = "-strictQuoteEscaping";
+    protected static final String SWITCH_NO_STRICT_QUOTE_ESCAPING = "-no-strictQuoteEscaping";
     protected static final String SHOW_SUCCESS ="-s";
     protected static final String LIST_ERRORS = "-l";
     protected static final int INC_WEBXML = 10;
@@ -170,6 +181,7 @@ public class JspC extends Task implements Options {
     protected boolean validateTld;
     protected boolean validateXml;
     protected boolean blockExternal = true;
+    protected boolean strictQuoteEscaping = STRICT_QUOTE_ESCAPING_DEFAULT;
     protected boolean xpoweredBy;
     protected boolean mappedFile = false;
     protected boolean poolingEnabled = true;
@@ -891,6 +903,15 @@ public class JspC extends Task implements Options {
 
     public boolean isBlockExternal() {
         return blockExternal;
+    }
+
+    public void setStrictQuoteEscaping( boolean b ) {
+        this.strictQuoteEscaping = b;
+    }
+
+    @Override
+    public boolean getStrictQuoteEscaping() {
+        return strictQuoteEscaping;
     }
 
     public void setListErrors( boolean b ) {
