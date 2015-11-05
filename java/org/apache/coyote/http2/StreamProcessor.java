@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.http.HttpUpgradeHandler;
-
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
@@ -29,6 +27,7 @@ import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.Request;
+import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -445,7 +444,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    public HttpUpgradeHandler getHttpUpgradeHandler() {
+    public UpgradeToken getUpgradeToken() {
         // Should never happen
         throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));
     }

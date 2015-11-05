@@ -19,11 +19,11 @@ package org.apache.coyote.http11.upgrade;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.AbstractProcessorLight;
 import org.apache.coyote.Request;
+import org.apache.coyote.UpgradeToken;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
@@ -31,11 +31,11 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
 
     protected static final int INFINITE_TIMEOUT = -1;
 
-    private final HttpUpgradeHandler httpUpgradeHandler;
+    private final UpgradeToken upgradeToken;
 
     public UpgradeProcessorBase(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
-            HttpUpgradeHandler httpUpgradeHandler) {
-        this.httpUpgradeHandler = httpUpgradeHandler;
+            UpgradeToken upgradeToken) {
+        this.upgradeToken = upgradeToken;
         wrapper.unRead(leftOverInput);
     }
 
@@ -49,8 +49,8 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
 
 
     @Override
-    public HttpUpgradeHandler getHttpUpgradeHandler() {
-        return httpUpgradeHandler;
+    public UpgradeToken getUpgradeToken() {
+        return upgradeToken;
     }
 
 

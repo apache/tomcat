@@ -43,7 +43,6 @@ public class UpgradeServletInputStream extends ServletInputStream {
     // Start in blocking-mode
     private volatile Boolean ready = Boolean.TRUE;
     private volatile ReadListener listener = null;
-    private volatile ClassLoader applicationLoader = null;
 
 
     public UpgradeServletInputStream(UpgradeProcessorBase processor,
@@ -110,7 +109,6 @@ public class UpgradeServletInputStream extends ServletInputStream {
         }
 
         this.listener = listener;
-        this.applicationLoader = Thread.currentThread().getContextClassLoader();
         // Switching to non-blocking. Don't know if data is available.
         ready = null;
     }
@@ -211,7 +209,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         Thread thread = Thread.currentThread();
         ClassLoader originalClassLoader = thread.getContextClassLoader();
         try {
-            thread.setContextClassLoader(applicationLoader);
+            thread.setContextClassLoader(processor.getUpgradeToken().getApplicationClassLoader());
             if (!eof) {
                 listener.onDataAvailable();
             }
@@ -234,7 +232,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
         Thread thread = Thread.currentThread();
         ClassLoader originalClassLoader = thread.getContextClassLoader();
         try {
-            thread.setContextClassLoader(applicationLoader);
+            thread.setContextClassLoader(processor.getUpgradeToken().getApplicationClassLoader());
             listener.onError(t);
         } catch (Throwable t2) {
             ExceptionUtils.handleThrowable(t2);

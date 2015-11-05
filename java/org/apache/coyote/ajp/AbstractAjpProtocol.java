@@ -18,10 +18,9 @@ package org.apache.coyote.ajp;
 
 import java.nio.ByteBuffer;
 
-import javax.servlet.http.HttpUpgradeHandler;
-
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.UpgradeProtocol;
+import org.apache.coyote.UpgradeToken;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -188,7 +187,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
         @Override
         protected AjpProcessor createUpgradeProcessor(SocketWrapperBase<?> socket,
-                ByteBuffer leftoverInput, HttpUpgradeHandler httpUpgradeHandler) {
+                ByteBuffer leftoverInput, UpgradeToken upgradeToken) {
             // TODO should fail - throw IOE
             return null;
         }

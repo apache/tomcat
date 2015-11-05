@@ -80,6 +80,8 @@ import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.UpgradeToken;
+import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -1844,12 +1846,18 @@ public class Request implements HttpServletRequest {
 
         T handler;
         try {
-            handler = (T) getContext().getInstanceManager().newInstance(httpUpgradeHandlerClass);
+            // Do not go through the instance manager for internal Tomcat classes since they don't need injection
+            if (InternalHttpUpgradeHandler.class.isAssignableFrom(httpUpgradeHandlerClass)) {
+                handler = (T) httpUpgradeHandlerClass.newInstance();
+            } else {
+                handler = (T) getContext().getInstanceManager().newInstance(httpUpgradeHandlerClass);
+            }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NamingException e) {
             throw new ServletException(e);
         }
+        UpgradeToken upgradeToken = new UpgradeToken(handler, getContext().getLoader().getClassLoader());
 
-        coyoteRequest.action(ActionCode.UPGRADE, handler);
+        coyoteRequest.action(ActionCode.UPGRADE, upgradeToken);
 
         // Output required by RFC2616. Protocol specific headers should have
         // already been set.

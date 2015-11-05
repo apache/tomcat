@@ -22,8 +22,10 @@ import java.nio.ByteBuffer;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 
+import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -36,9 +38,9 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
     private final InternalHttpUpgradeHandler internalHttpUpgradeHandler;
 
     public UpgradeProcessorInternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
-            InternalHttpUpgradeHandler internalHttpUpgradeHandler) {
-        super(wrapper, leftOverInput, internalHttpUpgradeHandler);
-        this.internalHttpUpgradeHandler = internalHttpUpgradeHandler;
+            UpgradeToken upgradeToken) {
+        super(wrapper, leftOverInput, upgradeToken);
+        this.internalHttpUpgradeHandler = (InternalHttpUpgradeHandler) upgradeToken.getHttpUpgradeHandler();
         /*
          * Leave timeouts in the hands of the upgraded protocol.
          */
@@ -77,7 +79,12 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
 
     @Override
     public void close() throws Exception {
-        internalHttpUpgradeHandler.destroy();
+        try {
+            internalHttpUpgradeHandler.destroy();
+        } finally {
+            InstanceManagerBindings.get(getUpgradeToken().getApplicationClassLoader())
+                .destroyInstance(internalHttpUpgradeHandler);
+        }
     }
 
 
