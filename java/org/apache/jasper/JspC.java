@@ -385,12 +385,8 @@ public class JspC extends Task implements Options {
                 setValidateTld(true);
             } else if (tok.equals(SWITCH_VALIDATE_XML)) {
                 setValidateXml(true);
-            } else if (tok.equals(SWITCH_BLOCK_EXTERNAL)) {
-                setBlockExternal(true);
             } else if (tok.equals(SWITCH_NO_BLOCK_EXTERNAL)) {
                 setBlockExternal(false);
-            } else if (tok.equals(SWITCH_STRICT_QUOTE_ESCAPING)) {
-                setStrictQuoteEscaping(true);
             } else if (tok.equals(SWITCH_NO_STRICT_QUOTE_ESCAPING)) {
                 setStrictQuoteEscaping(false);
             } else {
