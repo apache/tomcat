@@ -389,6 +389,10 @@ public class JspC extends Task implements Options {
                 setBlockExternal(true);
             } else if (tok.equals(SWITCH_NO_BLOCK_EXTERNAL)) {
                 setBlockExternal(false);
+            } else if (tok.equals(SWITCH_STRICT_QUOTE_ESCAPING)) {
+                setStrictQuoteEscaping(true);
+            } else if (tok.equals(SWITCH_NO_STRICT_QUOTE_ESCAPING)) {
+                setStrictQuoteEscaping(false);
             } else {
                 if (tok.startsWith("-")) {
                     throw new JasperException("Unrecognized option: " + tok +
