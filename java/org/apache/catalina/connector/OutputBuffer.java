@@ -558,7 +558,7 @@ public class OutputBuffer extends Writer
             enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
         }
 
-        final Charset charset = B2CConverter.getCharset(enc);
+        final Charset charset = getCharset(enc);
         SynchronizedStack<C2BConverter> stack = encoders.get(charset);
         if (stack == null) {
             stack = new SynchronizedStack<>();
@@ -569,6 +569,30 @@ public class OutputBuffer extends Writer
 
         if (conv == null) {
             conv = createConverter(charset);
+        }
+    }
+
+
+    private static Charset getCharset(String encoding) throws IOException {
+        if (Globals.IS_SECURITY_ENABLED) {
+            try {
+                return AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<Charset>() {
+                            @Override
+                            public Charset run() throws IOException {
+                                return B2CConverter.getCharset(encoding);
+                            }
+                        });
+            } catch (PrivilegedActionException ex) {
+                Exception e = ex.getException();
+                if (e instanceof IOException) {
+                    throw (IOException) e;
+                } else {
+                    throw new IOException(ex);
+                }
+            }
+        } else {
+            return B2CConverter.getCharset(encoding);
         }
     }
 

@@ -18,6 +18,9 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Iterator;
 
 import org.apache.coyote.ActionCode;
@@ -387,9 +390,35 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         // TODO: Handle default ports
         request.getMimeHeaders().addValue(":authority").setString(
                 request.serverName().getString() + ":" + request.getServerPort());
-        handler.push(request, this);
+        push (handler, request, this);
     }
 
+
+    private static void push(Http2UpgradeHandler handler, Request request, Stream stream)
+            throws IOException {
+        if (org.apache.coyote.Constants.IS_SECURITY_ENABLED) {
+            try {
+                AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<Void>() {
+                            @Override
+                            public Void run() throws IOException {
+                                handler.push(request, stream);
+                                return null;
+                            }
+                        });
+            } catch (PrivilegedActionException ex) {
+                Exception e = ex.getException();
+                if (e instanceof IOException) {
+                    throw (IOException) e;
+                } else {
+                    throw new IOException(ex);
+                }
+            }
+
+        } else {
+            handler.push(request, stream);
+        }
+    }
 
     class StreamOutputBuffer implements OutputBuffer {
 
