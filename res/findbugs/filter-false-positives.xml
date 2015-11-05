@@ -369,12 +369,6 @@
     <Bug code="VO" />
   </Match>
   <Match>
-    <!-- Wait is in AprSocket -->
-    <Class name="org.apache.tomcat.jni.socket.AprSocketContext$AprPoller" />
-    <Method name="run"/>
-    <Bug code="NN" />
-  </Match>
-  <Match>
     <Class name="org.apache.tomcat.util.IntrospectionUtils" />
     <Method name="findMethod"/>
     <Bug code="NP" />

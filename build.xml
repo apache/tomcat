@@ -1542,8 +1542,6 @@
         <exclude name="**/OneLineFormatter*.class"/>
         <exclude name="**/DateFormatCache.class"/>
         <exclude name="**/DateFormatCache*.class"/>
-        <!-- This class cannot be instrumented when tcnative library is not in java.library.path -->
-        <exclude name="**/jni/socket/AprSocket.class"/>
       </fileset>
       <auxClasspath path="${jdt.jar}" />
     </cobertura-instrument>
