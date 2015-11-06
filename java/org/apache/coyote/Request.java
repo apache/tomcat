@@ -225,11 +225,11 @@ public final class Request {
     }
 
     /**
-     * Return the buffer holding the server name, if
-     * any. Use isNull() to check if there is no value
-     * set.
-     * This is the "virtual host", derived from the
-     * Host: header.
+     * Get the "virtual host", derived from the Host: header associated with
+     * this request.
+     *
+     * @return The buffer holding the server name, if any. Use isNull() to check
+     *         if there is no value set.
      */
     public MessageBytes serverName() {
         return serverNameMB;
@@ -280,6 +280,10 @@ public final class Request {
 
     /**
      * Get the character encoding used for this request.
+     *
+     * @return The value set via {@link #setCharacterEncoding(String)} or if no
+     *         call has been made to that method try to obtain if from the
+     *         content type.
      */
     public String getCharacterEncoding() {
 
@@ -483,11 +487,18 @@ public final class Request {
     /**
      * Read data from the input buffer and put it into a byte chunk.
      *
-     * The buffer is owned by the protocol implementation - it will be reused on the next read.
-     * The Adapter must either process the data in place or copy it to a separate buffer if it needs
-     * to hold it. In most cases this is done during byte-&gt;char conversions or via InputStream. Unlike
-     * InputStream, this interface allows the app to process data in place, without copy.
+     * The buffer is owned by the protocol implementation - it will be reused on
+     * the next read. The Adapter must either process the data in place or copy
+     * it to a separate buffer if it needs to hold it. In most cases this is
+     * done during byte-&gt;char conversions or via InputStream. Unlike
+     * InputStream, this interface allows the app to process data in place,
+     * without copy.
      *
+     * @param chunk The destination to which to copy the data
+     *
+     * @return The number of bytes copied
+     *
+     * @throws IOException If an I/O error occurs during the copy
      */
     public int doRead(ByteChunk chunk) throws IOException {
         int n = inputBuffer.doRead(chunk);
@@ -522,10 +533,6 @@ public final class Request {
      * be faster than ThreadLocal for very frequent operations.
      *
      *  Example use:
-     *   Jk:
-     *     HandlerRequest.HOSTBUFFER = 10 CharChunk, buffer for Host decoding
-     *     WorkerEnv: SSL_CERT_NOTE=16 - MessageBytes containing the cert
-     *
      *   Catalina CoyoteAdapter:
      *      ADAPTER_NOTES = 1 - stores the HttpServletRequest object ( req/res)
      *
@@ -534,6 +541,9 @@ public final class Request {
      *   for connector use.
      *
      *   17-31 range is not allocated or used.
+     *
+     * @param pos Index to use to store the note
+     * @param value The value to store at that index
      */
     public final void setNote(int pos, Object value) {
         notes[pos] = value;
