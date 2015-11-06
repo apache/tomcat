@@ -57,7 +57,7 @@ public class JdkLoggerFormatter extends Formatter {
 
 
         if( name.indexOf('.') >= 0 )
-            name = name.substring(name.lastIndexOf(".") + 1);
+            name = name.substring(name.lastIndexOf('.') + 1);
 
         // Use a string buffer for better performance
         StringBuilder buf = new StringBuilder();
