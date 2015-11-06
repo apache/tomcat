@@ -208,7 +208,7 @@ should the rules for quoting of attributes described in JSP.1.6 be applied to
 the expression? <code>true</code> or <code>false</code>, default
 <code>true</code>.</li>
 </ul>
-  
+
 <p>The Java compiler from Eclipse JDT in included as the default compiler. It is
 an advanced Java compiler which will load all dependencies from the Tomcat class
 loader, which will help tremendously when compiling on large installations with
