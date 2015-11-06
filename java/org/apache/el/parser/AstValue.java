@@ -47,23 +47,24 @@ public final class AstValue extends SimpleNode {
     protected static final boolean COERCE_TO_ZERO;
     
     static {
+        String coerceToZeroStr;
         if (IS_SECURITY_ENABLED) {
-            COERCE_TO_ZERO = AccessController.doPrivileged(
-                    new PrivilegedAction<Boolean>(){
+            coerceToZeroStr = AccessController.doPrivileged(
+                    new PrivilegedAction<String>(){
                         @Override
-                        public Boolean run() {
-                            return Boolean.valueOf(System.getProperty(
+                        public String run() {
+                            return System.getProperty(
                                     "org.apache.el.parser.COERCE_TO_ZERO",
-                                    "true"));
+                                    "true");
                         }
-
                     }
-            ).booleanValue();
+            );
         } else {
-            COERCE_TO_ZERO = Boolean.valueOf(System.getProperty(
+            coerceToZeroStr = System.getProperty(
                     "org.apache.el.parser.COERCE_TO_ZERO",
-                    "true")).booleanValue();
+                    "true");
         }
+        COERCE_TO_ZERO = Boolean.parseBoolean(coerceToZeroStr);
     }
 
     protected static class Target {

@@ -85,25 +85,24 @@ public final class CookieSupport {
     private static final boolean[] HTTP_SEPARATOR_FLAGS = new boolean[128];
 
     static {
-        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
+        STRICT_SERVLET_COMPLIANCE = Boolean.parseBoolean(System.getProperty(
                 "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
-                "false")).booleanValue();
+                "false"));
 
-        ALLOW_EQUALS_IN_VALUE = Boolean.valueOf(System.getProperty(
+        ALLOW_EQUALS_IN_VALUE = Boolean.parseBoolean(System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.ALLOW_EQUALS_IN_VALUE",
-                "false")).booleanValue();
+                "false"));
 
-        ALLOW_HTTP_SEPARATORS_IN_V0 = Boolean.valueOf(System.getProperty(
+        ALLOW_HTTP_SEPARATORS_IN_V0 = Boolean.parseBoolean(System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.ALLOW_HTTP_SEPARATORS_IN_V0",
-                "false")).booleanValue();
+                "false"));
 
         String alwaysAddExpires = System.getProperty(
         "org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES");
         if (alwaysAddExpires == null) {
             ALWAYS_ADD_EXPIRES = !STRICT_SERVLET_COMPLIANCE;
         } else {
-            ALWAYS_ADD_EXPIRES =
-                Boolean.valueOf(alwaysAddExpires).booleanValue();
+            ALWAYS_ADD_EXPIRES = Boolean.parseBoolean(alwaysAddExpires);
         }
 
         String preserveCookieHeader = System.getProperty(
@@ -111,8 +110,7 @@ public final class CookieSupport {
         if (preserveCookieHeader == null) {
             PRESERVE_COOKIE_HEADER = STRICT_SERVLET_COMPLIANCE;
         } else {
-            PRESERVE_COOKIE_HEADER =
-                Boolean.valueOf(preserveCookieHeader).booleanValue();
+            PRESERVE_COOKIE_HEADER = Boolean.parseBoolean(preserveCookieHeader);
         }
 
         String  fwdSlashIsSeparator = System.getProperty(
@@ -120,13 +118,12 @@ public final class CookieSupport {
         if (fwdSlashIsSeparator == null) {
             FWD_SLASH_IS_SEPARATOR = STRICT_SERVLET_COMPLIANCE;
         } else {
-            FWD_SLASH_IS_SEPARATOR =
-                Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
+            FWD_SLASH_IS_SEPARATOR = Boolean.parseBoolean(fwdSlashIsSeparator);
         }
 
-        ALLOW_NAME_ONLY = Boolean.valueOf(System.getProperty(
+        ALLOW_NAME_ONLY = Boolean.parseBoolean(System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.ALLOW_NAME_ONLY",
-                "false")).booleanValue();
+                "false"));
 
 
         /*

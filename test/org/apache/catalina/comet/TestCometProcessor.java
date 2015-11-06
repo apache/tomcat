@@ -479,12 +479,12 @@ public class TestCometProcessor extends TomcatBaseTest {
 
         @Override
         public void init() throws ServletException {
-            failOnBegin = Boolean.valueOf(getServletConfig().getInitParameter(
-                    FAIL_ON_BEGIN)).booleanValue();
-            failOnRead = Boolean.valueOf(getServletConfig().getInitParameter(
-                    FAIL_ON_READ)).booleanValue();
-            failOnEnd = Boolean.valueOf(getServletConfig().getInitParameter(
-                    FAIL_ON_END)).booleanValue();
+            failOnBegin = Boolean.parseBoolean(getServletConfig().getInitParameter(
+                    FAIL_ON_BEGIN));
+            failOnRead = Boolean.parseBoolean(getServletConfig().getInitParameter(
+                    FAIL_ON_READ));
+            failOnEnd = Boolean.parseBoolean(getServletConfig().getInitParameter(
+                    FAIL_ON_END));
         }
 
 

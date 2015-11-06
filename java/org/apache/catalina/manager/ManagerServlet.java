@@ -165,8 +165,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         if (lastAccessAtStart == null) {
             LAST_ACCESS_AT_START = Globals.STRICT_SERVLET_COMPLIANCE;
         } else {
-            LAST_ACCESS_AT_START =
-                Boolean.valueOf(lastAccessAtStart).booleanValue();
+            LAST_ACCESS_AT_START = Boolean.parseBoolean(lastAccessAtStart);
         }
     }
 

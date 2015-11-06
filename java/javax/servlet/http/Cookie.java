@@ -386,18 +386,17 @@ public class Cookie implements Cloneable, Serializable {
     private static final boolean STRICT_NAMING;
 
     static {
-        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(
+        STRICT_SERVLET_COMPLIANCE = Boolean.parseBoolean(
                 System.getProperty(
                         "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
-                        "false")).booleanValue();
+                        "false"));
 
         String fwdSlashIsSeparator = System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
         if (fwdSlashIsSeparator == null) {
             FWD_SLASH_IS_SEPARATOR = STRICT_SERVLET_COMPLIANCE;
         } else {
-            FWD_SLASH_IS_SEPARATOR =
-                    Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
+            FWD_SLASH_IS_SEPARATOR = Boolean.parseBoolean(fwdSlashIsSeparator);
         }
 
         if (FWD_SLASH_IS_SEPARATOR) {
@@ -411,7 +410,7 @@ public class Cookie implements Cloneable, Serializable {
         if (strictNaming == null) {
             STRICT_NAMING = STRICT_SERVLET_COMPLIANCE;
         } else {
-            STRICT_NAMING = Boolean.valueOf(strictNaming).booleanValue();
+            STRICT_NAMING = Boolean.parseBoolean(strictNaming);
         }
 
     }
