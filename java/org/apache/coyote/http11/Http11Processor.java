@@ -316,6 +316,9 @@ public class Http11Processor extends AbstractProcessor {
      * Set compressible mime-type list (this method is best when used with
      * a large number of connectors, where it would be better to have all of
      * them referenced a single array).
+     *
+     * @param compressableMimeTypes MIME types for which compression should be
+     *                              enabled
      */
     public void setCompressableMimeTypes(String[] compressableMimeTypes) {
         this.compressableMimeTypes = compressableMimeTypes;
@@ -324,6 +327,8 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Return compression level.
+     *
+     * @return The current compression level in string form (off/on/force)
      */
     public String getCompression() {
         switch (compressionLevel) {
@@ -361,7 +366,9 @@ public class Http11Processor extends AbstractProcessor {
      * Set restricted user agent list (which will downgrade the connector
      * to HTTP/1.0 mode). Regular expression as supported by {@link Pattern}.
      *
-     * ie: "gorilla|desesplorer|tigrus"
+     * @param restrictedUserAgents The regular expression as supported by
+     *                             {@link Pattern} for the user agents e.g.
+     *                             "gorilla|desesplorer|tigrus"
      */
     public void setRestrictedUserAgents(String restrictedUserAgents) {
         if (restrictedUserAgents == null ||
