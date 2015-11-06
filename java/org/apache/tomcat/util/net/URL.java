@@ -140,7 +140,7 @@ public final class URL implements Serializable {
                     host = context.getHost();
                     port = context.getPort();
                     file = context.getFile();
-                    int question = file.lastIndexOf("?");
+                    int question = file.lastIndexOf('?');
                     if (question < 0)
                         path = file;
                     else

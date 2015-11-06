@@ -110,7 +110,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                      */
                     String suffix = path.endsWith(TAG_FILE_SUFFIX) ?
                             TAG_FILE_SUFFIX : TAGX_FILE_SUFFIX; 
-                    String tagName = path.substring(path.lastIndexOf("/") + 1);
+                    String tagName = path.substring(path.lastIndexOf('/') + 1);
                     tagName = tagName.substring(0,
                             tagName.lastIndexOf(suffix));
                     tagFileMap.put(tagName, path);

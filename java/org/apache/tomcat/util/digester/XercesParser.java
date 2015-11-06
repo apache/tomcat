@@ -105,7 +105,7 @@ public class XercesParser{
                 versionClass.getMethod("getVersion", (Class[]) null); 
             String version = (String)method.invoke(null, (Object[]) null);
             versionNumber = version.substring( "Xerces-J".length() , 
-                                               version.lastIndexOf(".") ); 
+                                               version.lastIndexOf('.') ); 
         } catch (Exception ex){
             // Do nothing.
         }

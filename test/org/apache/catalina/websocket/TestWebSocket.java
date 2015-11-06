@@ -252,7 +252,7 @@ public class TestWebSocket extends TomcatBaseTest {
         String responseHeaderLine = client.reader.readLine();
         while (!responseHeaderLine.equals("")) {
             if(responseHeaderLine.startsWith("Sec-WebSocket-Accept: ")) {
-                accept = responseHeaderLine.substring(responseHeaderLine.indexOf(":")+2);
+                accept = responseHeaderLine.substring(responseHeaderLine.indexOf(':')+2);
                 break;
             }
             responseHeaderLine = client.reader.readLine();

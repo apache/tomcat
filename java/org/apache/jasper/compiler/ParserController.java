@@ -541,7 +541,7 @@ class ParserController implements TagConstants {
         fileName = isAbsolute ? fileName 
                 : baseDirStack.peek() + fileName;
         String baseDir = 
-            fileName.substring(0, fileName.lastIndexOf("/") + 1);
+            fileName.substring(0, fileName.lastIndexOf('/') + 1);
         baseDirStack.push(baseDir);
         return fileName;
     }
