@@ -119,6 +119,11 @@
         for REST APIs. (violetagg)
       </add>
       <fix>
+        <bug>58581</bug>: If a custom error page fails, fall back to the
+        standard error page rather than throwing an NPE. Based on a patch by
+        Huxing Zhang. (markt)
+      </fix>
+      <fix>
         <bug>58582</bug>: Combined realm should perform background processing
         on its sub-realms. Based upon a patch provided by Aidan. (kkolinko)
       </fix>
