@@ -25,7 +25,6 @@ import javax.servlet.ServletOutputStream;
 import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -79,12 +78,7 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
 
     @Override
     public void close() throws Exception {
-        try {
-            internalHttpUpgradeHandler.destroy();
-        } finally {
-            InstanceManagerBindings.get(getUpgradeToken().getApplicationClassLoader())
-                .destroyInstance(internalHttpUpgradeHandler);
-        }
+        internalHttpUpgradeHandler.destroy();
     }
 
 
