@@ -84,6 +84,7 @@ import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -1844,17 +1845,20 @@ public class Request implements HttpServletRequest {
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {
         T handler;
+        InstanceManager instanceManager = null;
         try {
             // Do not go through the instance manager for internal Tomcat classes since they don't need injection
             if (InternalHttpUpgradeHandler.class.isAssignableFrom(httpUpgradeHandlerClass)) {
                 handler = (T) httpUpgradeHandlerClass.newInstance();
             } else {
-                handler = (T) getContext().getInstanceManager().newInstance(httpUpgradeHandlerClass);
+                instanceManager = getContext().getInstanceManager();
+                handler = (T) instanceManager.newInstance(httpUpgradeHandlerClass);
             }
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NamingException e) {
             throw new ServletException(e);
         }
-        UpgradeToken upgradeToken = new UpgradeToken(handler, getContext().getLoader().getClassLoader());
+        UpgradeToken upgradeToken = new UpgradeToken(handler,
+                getContext().getLoader().getClassLoader(), instanceManager);
 
         coyoteRequest.action(ActionCode.UPGRADE, upgradeToken);
 

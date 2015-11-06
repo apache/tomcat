@@ -19,6 +19,8 @@ package org.apache.coyote;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
+import org.apache.tomcat.InstanceManager;
+
 /**
  * Token used during the upgrade process.
  */
@@ -26,11 +28,13 @@ public final class UpgradeToken {
 
     private final ClassLoader applicationClassLoader;
     private final HttpUpgradeHandler httpUpgradeHandler;
+    private final InstanceManager instanceManager;
 
     public UpgradeToken(HttpUpgradeHandler httpUpgradeHandler,
-            ClassLoader applicationClassLoader) {
+            ClassLoader applicationClassLoader, InstanceManager instanceManager) {
         this.applicationClassLoader = applicationClassLoader;
         this.httpUpgradeHandler = httpUpgradeHandler;
+        this.instanceManager = instanceManager;
     }
 
     public final ClassLoader getApplicationClassLoader() {
@@ -39,6 +43,10 @@ public final class UpgradeToken {
 
     public final HttpUpgradeHandler getHttpUpgradeHandler() {
         return httpUpgradeHandler;
+    }
+
+    public final InstanceManager getInstanceManager() {
+        return instanceManager;
     }
 
 }

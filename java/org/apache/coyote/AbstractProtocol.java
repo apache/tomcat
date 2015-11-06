@@ -35,9 +35,8 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
-import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.juli.logging.Log;
-import org.apache.tomcat.InstanceManagerBindings;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
@@ -759,7 +758,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         // This cast should be safe. If it fails the error
                         // handling for the surrounding try/catch will deal with
                         // it.
-                        if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
+                        if (upgradeToken.getInstanceManager() == null) {
                             httpUpgradeHandler.init((WebConnection) processor);
                         } else {
                             Thread thread = Thread.currentThread();
@@ -811,7 +810,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     if (processor.isUpgrade()) {
                         UpgradeToken upgradeToken = processor.getUpgradeToken();
                         HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
-                        if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
+                        InstanceManager instanceManager = upgradeToken.getInstanceManager();
+                        if (instanceManager == null) {
                             httpUpgradeHandler.destroy();
                         } else {
                             Thread thread = Thread.currentThread();
@@ -820,8 +820,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             try {
                                 thread.setContextClassLoader(upgradeToken.getApplicationClassLoader());
                                 httpUpgradeHandler.destroy();
-                                InstanceManagerBindings.get(upgradeToken.getApplicationClassLoader())
-                                    .destroyInstance(httpUpgradeHandler);
+                                instanceManager.destroyInstance(httpUpgradeHandler);
                             } finally {
                                 thread.setContextClassLoader(originalClassLoader);
                             }
