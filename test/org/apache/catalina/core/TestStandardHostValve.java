@@ -133,8 +133,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            int error =
-                    Integer.valueOf(req.getParameter("errorCode")).intValue();
+            int error = Integer.parseInt(req.getParameter("errorCode"));
             resp.sendError(error);
         }
     }
