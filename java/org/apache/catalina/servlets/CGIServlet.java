@@ -1166,7 +1166,7 @@ public final class CGIServlet extends HttpServlet {
 
             // create directories
             String dirPath = destPath.toString().substring(
-                    0,destPath.toString().lastIndexOf("/"));
+                    0,destPath.toString().lastIndexOf('/'));
             File dir = new File(dirPath);
             if (!dir.mkdirs() && !dir.isDirectory()) {
                 if (debug >= 2) {
