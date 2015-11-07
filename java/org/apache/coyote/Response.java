@@ -395,7 +395,7 @@ public final class Response {
     /**
      * Return the content language.
      *
-     * @return The language code foe the language currently associated with this
+     * @return The language code for the language currently associated with this
      *         response
      */
     public String getContentLanguage() {
