@@ -44,7 +44,7 @@ public class Annotations {
 
 
     /**
-     * returns the array of annotation entries in this annotation
+     * @return the array of annotation entries in this annotation
      */
     public AnnotationEntry[] getAnnotationEntries() {
         return annotation_table;

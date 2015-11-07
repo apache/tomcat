@@ -71,8 +71,8 @@ public final class ClassParser {
      * is performed by the java interpreter).
      *
      * @return Class object representing the parsed class file
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException If an I/O occurs reading the byte code
+     * @throws  ClassFormatException If the byte code is invalid
      */
     public JavaClass parse() throws IOException, ClassFormatException {
         /****************** Read headers ********************************/
