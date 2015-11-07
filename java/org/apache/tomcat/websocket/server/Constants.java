@@ -31,8 +31,6 @@ public class Constants {
     // Executor configuration
     public static final String EXECUTOR_CORE_SIZE_INIT_PARAM =
             "org.apache.tomcat.websocket.executorCoreSize";
-    public static final String EXECUTOR_MAX_SIZE_INIT_PARAM =
-            "org.apache.tomcat.websocket.executorMaxSize";
     public static final String EXECUTOR_KEEPALIVETIME_SECONDS_INIT_PARAM =
             "org.apache.tomcat.websocket.executorKeepAliveTimeSeconds";
 
