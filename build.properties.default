@@ -50,6 +50,9 @@ test.threads=1
 # Note the Cobertura code coverage tool is GPLv2 licensed
 test.cobertura=false
 
+# Note the FindBugs is LGPL licensed
+execute.findbugs=false
+
 # Some platforms (e.g. OSX El Capitan) require IPv4 to be the default for the
 # multicast tests to work
 java.net.preferIPv4Stack=false
@@ -226,3 +229,10 @@ cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
 cobertura.lib=${cobertura.home}/lib
 cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.1.1-bin.tar.gz
+
+# ----- Findbugs -----
+findbugs.version=3.0.1
+findbugs.home=${base.path}/findbugs-${findbugs.version}
+findbugs.lib=${findbugs.home}/lib
+findbugs.jar=${findbugs.lib}/findbugs-ant.jar
+findbugs.loc=${base-sf.loc}/project/findbugs/findbugs/${findbugs.version}/findbugs-${findbugs.version}.tar.gz

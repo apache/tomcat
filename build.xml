@@ -180,6 +180,11 @@
   <property name="tomcat.classes.cobertura" value="${tomcat.classes}-cobertura"/>
   <property name="cobertura.report.format" value="html"/>
 
+  <!-- FindBugs settings -->
+  <property name="findbugs.out" value="${tomcat.output}/findbugs"/>
+  <property name="findbugs.report.format" value="html"/>
+  <property name="findbugs.report.level" value="low"/>
+
   <!-- Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721 -->
   <available file="/dev/urandom" property="test.jvmarg.egd" value="-Djava.security.egd=file:/dev/./urandom"/>
   <property name="test.jvmarg.egd" value="" />
@@ -1564,6 +1569,32 @@
                       format="${cobertura.report.format}"/>
   </target>
 
+  <target name="findbugs"
+          if="${execute.findbugs}"
+          depends="compile,download-findbugs">
+
+    <path id="findbugs.classpath">
+      <fileset file="${findbugs.jar}" />
+    </path>
+
+    <taskdef classpathref="findbugs.classpath" name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+
+    <mkdir dir="${findbugs.out}" />
+
+    <findbugs home="${findbugs.home}"
+              output="${findbugs.report.format}"
+              outputFile="${findbugs.out}/findbugs-report.${findbugs.report.format}"
+              reportLevel="${findbugs.report.level}"
+              excludeFilter="res/findbugs/filter-false-positives.xml" >
+      <sourcePath path="${basedir}/java" />
+      <class location="${tomcat.classes}" />
+      <auxClasspath>
+        <fileset file="${jdt.jar}" />
+        <fileset file="${ant.core.lib}" />
+      </auxClasspath>
+    </findbugs>
+  </target>
+
   <target name="extras-prepare" >
     <mkdir dir="${tomcat.extras}"/>
     <mkdir dir="${tomcat.extras.sources}"/>
@@ -2857,6 +2888,17 @@ skip.installer property in build.properties" />
     <antcall target="downloadgz">
       <param name="sourcefile" value="${cobertura.loc}"/>
       <param name="destfile" value="${cobertura.jar}"/>
+    </antcall>
+
+  </target>
+
+  <target name="download-findbugs"
+          if="${execute.findbugs}"
+          description="Download FindBugs" >
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${findbugs.loc}"/>
+      <param name="destfile" value="${findbugs.jar}"/>
     </antcall>
 
   </target>

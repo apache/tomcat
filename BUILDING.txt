@@ -420,6 +420,18 @@ For example:
 
         java.net.preferIPv4Stack=true
 
+ 9. Optional support is provided for FindBugs. It can be enabled using the
+    following property:
+
+        execute.findbugs=true
+
+    The report file by default is written to
+
+        output/findbugs
+
+* NOTE: Findbugs is licensed under LGPL. Using Findbugs during Tomcat build is
+  optional and is off by default.
+
 (8) Source code checks
 
 (8.1) Checkstyle
