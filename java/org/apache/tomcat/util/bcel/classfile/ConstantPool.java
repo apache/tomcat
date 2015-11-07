@@ -94,7 +94,7 @@ public class ConstantPool {
      * @param  tag Tag of expected constant, i.e., its type
      * @return Constant value
      * @see    Constant
-     * @throws  ClassFormatException
+     * @throws  ClassFormatException If the constant is not of the expected type
      */
     public Constant getConstant( int index, byte tag ) throws ClassFormatException {
         Constant c;
