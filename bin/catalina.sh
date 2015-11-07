@@ -87,6 +87,8 @@
 #   LOGGING_MANAGER (Optional) Override Tomcat's logging manager
 #                   Example (all one line)
 #                   LOGGING_MANAGER="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
+#
+#   UMASK           (Optional) Override Tomcat's default UMASK of 0027
 # -----------------------------------------------------------------------------
 
 # OS specific support.  $var _must_ be set to either true or false.
@@ -235,6 +237,12 @@ fi
 if [ -z "$LOGGING_MANAGER" ]; then
   LOGGING_MANAGER="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
 fi
+
+# Set UMASK unless it has been overridden
+if [ -z "$UMASK" ]; then
+    UMASK="0027"
+fi
+umask $UMASK
 
 # Uncomment the following line to make the umask available when using the
 # org.apache.catalina.security.SecurityListener

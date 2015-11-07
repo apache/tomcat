@@ -2508,26 +2508,10 @@ skip.installer property in build.properties" />
 
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}.tar.gz">
-      <tarfileset dir="${tomcat.dist}" mode="755" prefix="${final.name}">
-        <include name="bin/catalina.sh" />
-        <include name="bin/configtest.sh" />
-        <include name="bin/daemon.sh" />
-        <include name="bin/digest.sh" />
-        <include name="bin/jasper.sh" />
-        <include name="bin/jspc.sh" />
-        <include name="bin/setclasspath.sh" />
-        <include name="bin/startup.sh" />
-        <include name="bin/shutdown.sh" />
-        <include name="bin/tool-wrapper.sh" />
-        <include name="bin/tool-wrapper-using-launcher.sh" />
-        <include name="bin/shutdown-using-launcher.sh" />
-        <include name="bin/startup-using-launcher.sh" />
-        <include name="bin/version.sh" />
-      </tarfileset>
-      <tarfileset dir="${tomcat.dist}" mode="600" prefix="${final.name}">
+      <tarfileset dir="${tomcat.dist}" dirmode="700" filemode="600" prefix="${final.name}">
         <include name="conf/**" />
       </tarfileset>
-      <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
+      <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="640" prefix="${final.name}">
         <include name="bin/**" />
         <include name="lib/**" />
         <include name="logs/**" />
@@ -2561,6 +2545,24 @@ skip.installer property in build.properties" />
         <exclude name="bin/i64/"/>
         <exclude name="bin/*.exe"/>
         <exclude name="bin/*.dll"/>
+      </tarfileset>
+      <!-- These need to be added after the bin directory is added else the  -->
+      <!-- bin diretcory will pick up the wrong permissions.                 -->
+      <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="750" prefix="${final.name}">
+        <include name="bin/catalina.sh" />
+        <include name="bin/configtest.sh" />
+        <include name="bin/daemon.sh" />
+        <include name="bin/digest.sh" />
+        <include name="bin/jasper.sh" />
+        <include name="bin/jspc.sh" />
+        <include name="bin/setclasspath.sh" />
+        <include name="bin/startup.sh" />
+        <include name="bin/shutdown.sh" />
+        <include name="bin/tool-wrapper.sh" />
+        <include name="bin/tool-wrapper-using-launcher.sh" />
+        <include name="bin/shutdown-using-launcher.sh" />
+        <include name="bin/startup-using-launcher.sh" />
+        <include name="bin/version.sh" />
       </tarfileset>
     </tar>
 

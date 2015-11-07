@@ -58,6 +58,13 @@
       <update>
         Remove support for Comet. (markt)
       </update>
+      <update>
+        Tighten up the default file permissions for the <code>.tar.gz</code>
+        distribution so no files or directories are world readable by default.
+        Configure Tomcat to run with a default umask of <code>0027</code> which
+        may be overridden by setting <code>UMASK</code> in
+        <code>setenv.sh</code>. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Catalina">
