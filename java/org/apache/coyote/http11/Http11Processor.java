@@ -381,9 +381,11 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Set the maximum number of Keep-Alive requests to honor.
-     * This is to safeguard from DoS attacks.  Setting to a negative
-     * value disables the check.
+     * Set the maximum number of Keep-Alive requests to allow.
+     * This is to safeguard from DoS attacks. Setting to a negative
+     * value disables the limit.
+     *
+     * @param mkar The new maximum number of Keep-Alive requests allowed
      */
     public void setMaxKeepAliveRequests(int mkar) {
         maxKeepAliveRequests = mkar;
@@ -391,7 +393,10 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Return the number of Keep-Alive requests that we will honor.
+     * Get the maximum number of Keep-Alive requests allowed. A negative value
+     * means there is no limit.
+     *
+     * @return the number of Keep-Alive requests that we will allow.
      */
     public int getMaxKeepAliveRequests() {
         return maxKeepAliveRequests;
@@ -400,6 +405,11 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Set the maximum size of a POST which will be buffered in SSL mode.
+     * When a POST is received where the security constraints require a client
+     * certificate, the POST body needs to be buffered while an SSL handshake
+     * takes place to obtain the certificate.
+     *
+     * @param msps The maximum size POST body to buffer in bytes
      */
     public void setMaxSavePostSize(int msps) {
         maxSavePostSize = msps;
@@ -408,6 +418,8 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Return the maximum size of a POST which will be buffered in SSL mode.
+     *
+     * @return The size in bytes
      */
     public int getMaxSavePostSize() {
         return maxSavePostSize;
@@ -415,7 +427,11 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Set the flag to control upload time-outs.
+     * Set the flag to control whether a separate connection timeout is used
+     * during upload of a request body.
+     *
+     * @param isDisabled {@code true} if the separate upload timeout should be
+     *                   disabled
      */
     public void setDisableUploadTimeout(boolean isDisabled) {
         disableUploadTimeout = isDisabled;
@@ -423,6 +439,8 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Get the flag that controls upload time-outs.
+     *
+     * @return {@code true} if the separate upload timeout is disabled
      */
     public boolean getDisableUploadTimeout() {
         return disableUploadTimeout;
@@ -430,6 +448,8 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Set the upload timeout.
+     *
+     * @param timeout Upload timeout in milliseconds
      */
     public void setConnectionUploadTimeout(int timeout) {
         connectionUploadTimeout = timeout ;
@@ -437,6 +457,8 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Get the upload timeout.
+     *
+     * @return Upload timeout in milliseconds
      */
     public int getConnectionUploadTimeout() {
         return connectionUploadTimeout;
@@ -445,9 +467,11 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * Set the server header name.
+     *
+     * @param server The new value to use for the server header
      */
-    public void setServer( String server ) {
-        if (server==null || server.equals("")) {
+    public void setServer(String server) {
+        if (server == null || server.equals("")) {
             this.server = null;
         } else {
             this.server = server;
