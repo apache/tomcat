@@ -500,18 +500,7 @@ public class Request
         notes.clear();
         cookies = null;
 
-        if (session != null) {
-            try {
-                session.endAccess();
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                log.warn(sm.getString("coyoteRequest.sessionEndAccessFail"), t);
-            }
-        }
-        session = null;
-        requestedSessionCookie = false;
-        requestedSessionId = null;
-        requestedSessionURL = false;
+        recycleSessionInfo();
 
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
             parameterMap = new ParameterMap<String, String[]>();
@@ -559,11 +548,24 @@ public class Request
     }
 
 
-    /**
-     * Clear cached encoders (to save memory for Comet requests).
-     */
-    public boolean read()
-        throws IOException {
+    protected void recycleSessionInfo() {
+        if (session != null) {
+            try {
+                session.endAccess();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.warn(sm.getString("coyoteRequest.sessionEndAccessFail"), t);
+            }
+        }
+        session = null;
+        requestedSessionCookie = false;
+        requestedSessionId = null;
+        requestedSessionURL = false;
+        requestedSessionSSL = false;
+    }
+
+
+    public boolean read() throws IOException {
         return (inputBuffer.realReadBytes(null, 0, 0) > 0);
     }
 

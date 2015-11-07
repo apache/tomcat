@@ -127,6 +127,10 @@
         <bug>58582</bug>: Combined realm should perform background processing
         on its sub-realms. Based upon a patch provided by Aidan. (kkolinko)
       </fix>
+      <fix>
+        Handle the unlikely case where different versions of a web application
+        are deployed with different session settings. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

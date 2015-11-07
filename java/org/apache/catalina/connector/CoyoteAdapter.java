@@ -781,6 +781,9 @@ public class CoyoteAdapter implements Adapter {
                                 // Reset mapping
                                 request.getMappingData().recycle();
                                 mapRequired = true;
+                                // Recycle session info in case the correct
+                                // context is configured with different settings
+                                request.recycleSessionInfo();
                             }
                             break;
                         }
