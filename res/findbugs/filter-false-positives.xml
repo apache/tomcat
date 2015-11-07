@@ -544,30 +544,26 @@
 
   <!-- Generated code -->
   <Match>
-    <Class name="org.apache.el.parser.ELParserTokenManager" />
-  </Match>
-  <Match>
-    <Class name="org.apache.el.parser.TokenMgrError" />
-  </Match>
-  <Match>
-    <Class name="org.apache.el.parser.ParseException" />
+    <Or>
+      <Class name="org.apache.el.parser.AstFloatingPoint" />
+      <Class name="org.apache.el.parser.AstFunction" />
+      <Class name="org.apache.el.parser.AstInteger" />
+      <Class name="org.apache.el.parser.AstNegative" />
+      <Class name="org.apache.el.parser.AstValue" />
+      <Class name="org.apache.el.parser.ELParser" />
+      <Class name="org.apache.el.parser.ELParserConstants" />
+      <Class name="org.apache.el.parser.ELParserTokenManager" />
+      <Class name="org.apache.el.parser.ELParserTreeConstants" />
+      <Class name="org.apache.el.parser.ParseException" />
+      <Class name="org.apache.el.parser.SimpleCharStream" />
+      <Class name="org.apache.el.parser.TokenMgrError" />
+    </Or>
   </Match>
   <Match>
     <!-- fCurrentEntity may be null after endEntity() call -->
     <Class name="org.apache.jasper.xmlparser.XMLEncodingDetector" />
     <Method name="load" />
     <Bug code="RCN" />
-  </Match>
-  <Match>
-    <Or>
-      <Class name="org.apache.el.parser.AstFloatingPoint" />
-      <Class name="org.apache.el.parser.AstNegative" />
-    </Or>
-    <Bug pattern="DM_FP_NUMBER_CTOR" />
-  </Match>
-  <Match>
-    <Class name="org.apache.el.parser.AstInteger" />
-    <Bug pattern="DM_NUMBER_CTOR" />
   </Match>
 
 
