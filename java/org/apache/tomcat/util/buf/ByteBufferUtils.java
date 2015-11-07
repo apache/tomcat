@@ -45,20 +45,6 @@ public class ByteBufferUtils {
 
 
     /**
-     * Default byte buffer expansion. Doubles current size. Buffers are assumed
-     * to be in 'write to' mode since there would be no need to expand a buffer
-     * while it was in 'read from' mode.
-     *
-     * @param in Buffer to expand
-     * @return   The expanded buffer with any data from the input buffer copied
-     *           in to it
-     */
-    public static ByteBuffer expand(ByteBuffer in) {
-        return expand(in, in.capacity() * 2);
-    }
-
-
-    /**
      * Expands buffer to the given size unless it is already as big or bigger.
      * Buffers are assumed to be in 'write to' mode since there would be no need
      * to expand a buffer while it was in 'read from' mode.
