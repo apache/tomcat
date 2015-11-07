@@ -349,7 +349,7 @@ public class Http11Processor extends AbstractProcessor {
      * @param sArray the StringArray
      * @param value string
      */
-    private boolean startsWithStringArray(String sArray[], String value) {
+    private static boolean startsWithStringArray(String sArray[], String value) {
         if (value == null) {
             return false;
         }
@@ -1570,7 +1570,7 @@ public class Http11Processor extends AbstractProcessor {
 
     }
 
-    private boolean isConnectionClose(MimeHeaders headers) {
+    private static boolean isConnectionClose(MimeHeaders headers) {
         MessageBytes connection = headers.getValue(Constants.CONNECTION);
         if (connection == null) {
             return false;
