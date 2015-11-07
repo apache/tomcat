@@ -757,9 +757,11 @@ public class CoyoteAdapter implements Adapter {
                                 // Reset mapping
                                 request.getMappingData().recycle();
                                 mapRequired = true;
-                                // Recycle cookies in case correct context is
-                                // configured with different settings
+                                // Recycle cookies and session info in case the
+                                // correct context is configured with different
+                                // settings
                                 req.getCookies().recycle();
+                                request.recycleSessionInfo();
                             }
                             break;
                         }
