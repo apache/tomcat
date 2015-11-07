@@ -62,6 +62,9 @@ public interface Processor {
      */
     void timeoutAsync(long now);
 
+    /**
+     * @return The request associated with this processor.
+     */
     Request getRequest();
 
     /**
@@ -70,6 +73,11 @@ public interface Processor {
      */
     void recycle();
 
+    /**
+     * Set the SSL information for this HTTP connection.
+     *
+     * @param sslSupport The SSL support object to use for this connection
+     */
     void setSslSupport(SSLSupport sslSupport);
 
     /**

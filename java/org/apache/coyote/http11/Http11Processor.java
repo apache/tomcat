@@ -635,12 +635,6 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
-    /**
-     * Send an action to the connector.
-     *
-     * @param actionCode Type of the action
-     * @param param Action parameter
-     */
     @Override
     public final void action(ActionCode actionCode, Object param) {
         switch (actionCode) {
@@ -946,15 +940,6 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
-    /**
-     * Process pipelined HTTP requests using the specified input and output
-     * streams.
-     *
-     * @param socketWrapper Socket from which the HTTP requests will be read
-     *               and the HTTP responses will be written.
-     *
-     * @throws IOException error during an I/O operation
-     */
     @Override
     public SocketState service(SocketWrapperBase<?> socketWrapper)
         throws IOException {

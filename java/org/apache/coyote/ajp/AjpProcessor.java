@@ -335,13 +335,6 @@ public class AjpProcessor extends AbstractProcessor {
 
     // --------------------------------------------------------- Public Methods
 
-
-    /**
-     * Send an action to the connector.
-     *
-     * @param actionCode Type of the action
-     * @param param Action parameter
-     */
     @Override
     public final void action(ActionCode actionCode, Object param) {
         switch (actionCode) {
@@ -655,12 +648,6 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    /**
-     * Process pipelined HTTP requests using the specified input and output
-     * streams.
-     *
-     * @throws IOException error during an I/O operation
-     */
     @Override
     public SocketState service(SocketWrapperBase<?> socket) throws IOException {
 
