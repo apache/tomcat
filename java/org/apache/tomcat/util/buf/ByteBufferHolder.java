@@ -52,13 +52,4 @@ public class ByteBufferHolder {
             return false;
         }
     }
-
-
-    public boolean hasData() {
-        if (flipped.get()) {
-            return buf.remaining()>0;
-        } else {
-            return buf.position()>0;
-        }
-    }
 }

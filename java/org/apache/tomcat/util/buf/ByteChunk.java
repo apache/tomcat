@@ -142,16 +142,11 @@ public final class ByteChunk implements Cloneable, Serializable {
      * Resets the message buff to an uninitialized state.
      */
     public void recycle() {
-        //        buff = null;
         charset=null;
         start=0;
         end=0;
         isSet=false;
         hasHashCode = false;
-    }
-
-    public void reset() {
-        buff=null;
     }
 
     // -------------------- Setup --------------------

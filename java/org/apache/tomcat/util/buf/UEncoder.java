@@ -56,35 +56,15 @@ public final class UEncoder {
     private ByteChunk bb=null;
     private CharChunk cb=null;
     private CharChunk output=null;
-    private final boolean readOnlySafeChars;
-
-    public UEncoder() {
-        this.safeChars = initialSafeChars();
-        readOnlySafeChars = false;
-    }
 
     /**
      * Create a UEncoder with an unmodifiable safe character set.
-     * <p>
-     * Calls to {@link UEncoder#addSafeCharacter(char) addSafeCharacter(char)}
-     * on instances created by this constructor will throw an
-     * {@link IllegalStateException}.
      *
-     * @param safeCharsSet
-     *            safe characters for this encoder
+     * @param safeCharsSet safe characters for this encoder
      */
     public UEncoder(SafeCharsSet safeCharsSet) {
         this.safeChars = safeCharsSet.getSafeChars();
-        readOnlySafeChars = true;
     }
-
-    public void addSafeCharacter( char c ) {
-        if (readOnlySafeChars) {
-            throw new IllegalStateException("UEncoders safeChararacters are read only");
-        }
-        safeChars.set( c );
-    }
-
 
    /**
     * URL Encode string, using a specified encoding.

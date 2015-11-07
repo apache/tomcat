@@ -251,7 +251,6 @@ public class TestJaspicDigestAuthenticator extends TomcatBaseTest {
         // Third request should succeed if we increment nc
         auth.clear();
         bc.recycle();
-        bc.reset();
         auth.add(buildDigestResponse(user, pwd, digestUri, realm,
                 getNonce(respHeaders), getOpaque(respHeaders), nc2, cnonce,
                 qop));
