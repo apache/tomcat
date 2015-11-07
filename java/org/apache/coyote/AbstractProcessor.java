@@ -107,9 +107,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
-    /**
-     * The request associated with this processor.
-     */
     @Override
     public Request getRequest() {
         return request;
@@ -152,9 +149,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
-    /**
-     * Set the SSL information for this HTTP connection.
-     */
     @Override
     public final void setSslSupport(SSLSupport sslSupport) {
         this.sslSupport = sslSupport;

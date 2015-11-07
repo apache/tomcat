@@ -35,7 +35,6 @@ package org.apache.coyote;
  */
 public interface ActionHook {
 
-
     /**
      * Send an action to the connector.
      *
@@ -43,6 +42,4 @@ public interface ActionHook {
      * @param param Action parameter
      */
     public void action(ActionCode actionCode, Object param);
-
-
 }

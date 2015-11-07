@@ -129,13 +129,14 @@ public abstract class AbstractProcessorLight implements Processor {
         }
     }
 
+
     /**
      * Service a 'standard' HTTP request. This method is called for both new
      * requests and for requests that have partially read the HTTP request line
      * or HTTP headers. Once the headers have been fully read this method is not
      * called again until there is a new HTTP request to process. Note that the
      * request type may change during processing which may result in one or more
-     * calls to {@link #dispatch(SocketStatus)}.
+     * calls to {@link #dispatch(SocketStatus)}. Requests may be pipe-lined.
      *
      * @param socketWrapper The connection to process
      *
