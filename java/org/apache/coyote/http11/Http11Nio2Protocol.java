@@ -69,12 +69,5 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         protected Log getLog() {
             return log;
         }
-
-        @Override
-        public void closeAll() {
-            for (Nio2Channel channel : connections.keySet()) {
-                ((Nio2Endpoint) getProtocol().getEndpoint()).closeSocket(channel.getSocket());
-            }
-        }
     }
 }

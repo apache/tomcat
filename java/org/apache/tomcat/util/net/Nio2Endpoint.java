@@ -254,7 +254,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 public void run() {
                     // Then close all active connections if any remain
                     try {
-                        handler.closeAll();
+                        for (Nio2Channel channel : handler.getOpenSockets()) {
+                            closeSocket(channel.getSocket());
+                        }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                     } finally {
@@ -1596,7 +1598,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler<Nio2Channel> {
-        public void closeAll();
     }
 
     public static void startInline() {
