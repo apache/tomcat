@@ -142,10 +142,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     /**
      * Handling of accepted sockets.
      */
-    private Handler handler = null;
-    public void setHandler(Handler handler ) { this.handler = handler; }
+    private Handler<NioChannel> handler = null;
+    public void setHandler(Handler<NioChannel> handler ) { this.handler = handler; }
     @Override
-    public Handler getHandler() { return handler; }
+    public Handler<NioChannel> getHandler() { return handler; }
 
 
     /**
@@ -1455,18 +1455,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     }
 
 
-    // ------------------------------------------------ Handler Inner Interface
-
-    /**
-     * Bare bones interface used for socket processing. Per thread data is to be
-     * stored in the ThreadWithAttributes extra folders, or alternately in
-     * thread local fields.
-     */
-    public interface Handler extends AbstractEndpoint.Handler<NioChannel> {
-    }
-
-
     // ---------------------------------------------- SocketProcessor Inner Class
+
     /**
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool.

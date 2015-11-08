@@ -109,10 +109,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     /**
      * Handling of accepted sockets.
      */
-    private Handler handler = null;
-    public void setHandler(Handler handler ) { this.handler = handler; }
+    private Handler<Nio2Channel> handler = null;
+    public void setHandler(Handler<Nio2Channel> handler ) { this.handler = handler; }
     @Override
-    public Handler getHandler() { return handler; }
+    public Handler<Nio2Channel> getHandler() { return handler; }
 
 
     public void setSocketProperties(SocketProperties socketProperties) {
@@ -1589,16 +1589,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         }
     }
 
-
-    // ------------------------------------------------ Handler Inner Interface
-
-    /**
-     * Bare bones interface used for socket processing. Per thread data is to be
-     * stored in the ThreadWithAttributes extra folders, or alternately in
-     * thread local fields.
-     */
-    public interface Handler extends AbstractEndpoint.Handler<Nio2Channel> {
-    }
 
     public static void startInline() {
         inlineCompletion.set(Boolean.TRUE);

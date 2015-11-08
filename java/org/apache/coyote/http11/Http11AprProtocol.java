@@ -35,7 +35,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
 
     public Http11AprProtocol() {
         super(new AprEndpoint());
-        Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
+        Http11ConnectionHandler<Long> cHandler = new Http11ConnectionHandler<>(this);
         setHandler(cHandler);
         ((AprEndpoint) getEndpoint()).setHandler(cHandler);
     }
@@ -69,22 +69,6 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
             return ("https-apr");
         } else {
             return ("http-apr");
-        }
-    }
-
-
-    // --------------------  Connection handler --------------------
-
-    protected static class Http11ConnectionHandler
-            extends AbstractHttp11ConnectionHandler<Long> {
-
-        Http11ConnectionHandler(Http11AprProtocol proto) {
-            super(proto);
-        }
-
-        @Override
-        protected Log getLog() {
-            return log;
         }
     }
 }

@@ -20,7 +20,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioEndpoint.Handler;
 
 /**
  * This the NIO based protocol handler implementation for AJP.
@@ -37,7 +36,7 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
     public AjpNioProtocol() {
         super(new NioEndpoint());
-        AjpConnectionHandler cHandler = new AjpConnectionHandler(this);
+        AjpConnectionHandler<NioChannel> cHandler = new AjpConnectionHandler<>(this);
         setHandler(cHandler);
         ((NioEndpoint) getEndpoint()).setHandler(cHandler);
     }
@@ -48,22 +47,5 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
     @Override
     protected String getNamePrefix() {
         return ("ajp-nio");
-    }
-
-
-    // --------------------------------------  AjpConnectionHandler Inner Class
-
-    protected static class AjpConnectionHandler
-            extends AbstractAjpConnectionHandler<NioChannel>
-            implements Handler {
-
-        public AjpConnectionHandler(AjpNioProtocol proto) {
-            super(proto);
-        }
-
-        @Override
-        protected Log getLog() {
-            return log;
-        }
     }
 }
