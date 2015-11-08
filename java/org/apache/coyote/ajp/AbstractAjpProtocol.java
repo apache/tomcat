@@ -48,6 +48,9 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         // AJP does not use Send File
         getEndpoint().setUseSendfile(false);
+        AjpConnectionHandler<S> cHandler = new AjpConnectionHandler<>(this);
+        setHandler(cHandler);
+        getEndpoint().setHandler(cHandler);
     }
 
 

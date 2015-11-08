@@ -36,9 +36,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
     public AjpNioProtocol() {
         super(new NioEndpoint());
-        AjpConnectionHandler<NioChannel> cHandler = new AjpConnectionHandler<>(this);
-        setHandler(cHandler);
-        ((NioEndpoint) getEndpoint()).setHandler(cHandler);
     }
 
 

@@ -44,9 +44,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
     public AjpAprProtocol() {
         super(new AprEndpoint());
-        AjpConnectionHandler<Long> cHandler = new AjpConnectionHandler<>(this);
-        setHandler(cHandler);
-        ((AprEndpoint) getEndpoint()).setHandler(cHandler);
     }
 
 
