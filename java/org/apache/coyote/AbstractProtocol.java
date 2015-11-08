@@ -882,6 +882,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
 
+        @Override
+        public Set<S> getOpenSockets() {
+            return connections.keySet();
+        }
+
+
         /**
          * Expected to be used by the handler once the processor is no longer
          * required.
