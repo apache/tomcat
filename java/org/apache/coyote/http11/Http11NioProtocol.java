@@ -16,10 +16,6 @@
  */
 package org.apache.coyote.http11;
 
-import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-
-import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
@@ -104,32 +100,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
         @Override
         protected Log getLog() {
             return log;
-        }
-
-
-        /**
-         * Expected to be used by the Poller to release resources on socket
-         * close, errors etc.
-         */
-        @Override
-        public void release(SocketChannel socket) {
-            if (log.isDebugEnabled())
-                log.debug("Iterating through our connections to release a socket channel:"+socket);
-            boolean released = false;
-            Iterator<java.util.Map.Entry<NioChannel, Processor>> it = connections.entrySet().iterator();
-            while (it.hasNext()) {
-                java.util.Map.Entry<NioChannel, Processor> entry = it.next();
-                if (entry.getKey().getIOChannel()==socket) {
-                    it.remove();
-                    Processor result = entry.getValue();
-                    result.recycle();
-                    unregister(result);
-                    released = true;
-                    break;
-                }
-            }
-            if (log.isDebugEnabled())
-                log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
         }
     }
 }

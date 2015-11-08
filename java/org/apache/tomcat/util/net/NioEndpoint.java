@@ -771,8 +771,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             try {
                 if ( key == null ) return null;//nothing to do
                 ka = (NioSocketWrapper) key.attach(null);
-                if (ka!=null) handler.release(ka);
-                else handler.release((SocketChannel)key.channel());
+                if (ka != null) {
+                    // If attachment is non-null then there may be a current
+                    // connection with an associated processor.
+                    handler.release(ka);
+                }
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) {
                     try {
@@ -1460,7 +1463,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
      * thread local fields.
      */
     public interface Handler extends AbstractEndpoint.Handler<NioChannel> {
-        public void release(SocketChannel socket);
     }
 
 
