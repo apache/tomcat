@@ -18,10 +18,7 @@ package org.apache.tomcat.util.net.openssl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
@@ -38,7 +35,6 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
@@ -114,9 +110,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             = AtomicIntegerFieldUpdater.newUpdater(OpenSSLContext.class, "aprPoolDestroyed");
     static final CertificateFactory X509_CERT_FACTORY;
 
-	private static final String BEGIN_KEY = "-----BEGIN RSA PRIVATE KEY-----\n";
+    private static final String BEGIN_KEY = "-----BEGIN RSA PRIVATE KEY-----\n";
 
-	private static final Object END_KEY = "\n-----END RSA PRIVATE KEY-----";
+    private static final Object END_KEY = "\n-----END RSA PRIVATE KEY-----";
     private boolean initialized = false;
 
     static {
@@ -330,14 +326,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setCipherSuite(ctx, ciphers);
             // Load Server key and certificate
             if (certificate.getCertificateFile() != null) {
-            	
-            	SSLContext.setCertificate(ctx,
+
+                SSLContext.setCertificate(ctx,
                         SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
                         SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
                         certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
-            	
+
                 // Support Client Certificates
-                
+
                 SSLContext.setCACertificate(ctx,
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
@@ -354,10 +350,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 X509Certificate certificate = keyManager.getCertificateChain(alias)[0];
                 PrivateKey key = keyManager.getPrivateKey(alias);
                 StringBuilder sb = new StringBuilder(BEGIN_KEY);
-                sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));       
+                sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
                 sb.append(END_KEY);
                 SSLContext.setCertificateRaw(ctx, certificate.getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
-                
+
             }
             // Client certificate verification
             int value = 0;
@@ -413,40 +409,40 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     String getJSSEAlias(SSLHostConfig sslHostConfig, X509KeyManager keyManager) {
-    	String alias = null;
-    	// TODO make sure we get the right one...
+        String alias = null;
+        // TODO make sure we get the right one...
         if (certificate.getCertificateKeyAlias() != null)
-        	alias = certificate.getCertificateKeyAlias();
+            alias = certificate.getCertificateKeyAlias();
         return alias;
     }
     /**
       * get the JSSE key manager for the keystore
-      * @throws KeyStoreException 
-      * @throws NoSuchAlgorithmException 
-      * @throws UnrecoverableKeyException 
-      * @throws IOException 
-      * @throws CertificateException 
+      * @throws KeyStoreException
+      * @throws NoSuchAlgorithmException
+      * @throws UnrecoverableKeyException
+      * @throws IOException
+      * @throws CertificateException
       *
       */
     static X509KeyManager getJSSEKeyManager(SSLHostConfig sslHostConfig) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, CertificateException, IOException {
-    	String keystoretype = null;
-    	String keystoreprovider = null;
-    	String keystorefile = null;
-    	String password = null;
-    	// TODO make sure we get the right one...
+        String keystoretype = null;
+        String keystoreprovider = null;
+        String keystorefile = null;
+        String password = null;
+        // TODO make sure we get the right one...
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             if (certificate.getCertificateKeystoreFile() != null)
-            	keystorefile = certificate.getCertificateKeystoreFile();
-        	if (certificate.getCertificateKeystorePassword() != null)
-        		password = certificate.getCertificateKeystorePassword();
-        	if (certificate.getCertificateKeystoreType() != null)
-        		keystoretype = certificate.getCertificateKeystoreType();
+                keystorefile = certificate.getCertificateKeystoreFile();
+            if (certificate.getCertificateKeystorePassword() != null)
+                password = certificate.getCertificateKeystorePassword();
+            if (certificate.getCertificateKeystoreType() != null)
+                keystoretype = certificate.getCertificateKeystoreType();
             if (certificate.getCertificateKeystoreProvider() != null)
-            	keystoreprovider = certificate.getCertificateKeystoreProvider();
+                keystoreprovider = certificate.getCertificateKeystoreProvider();
         }
         KeyStore ks = KeyStore.getInstance(keystoretype);
         InputStream stream = ConfigFileLoader.getInputStream(keystorefile);
-		ks.load(stream, password.toCharArray());
+        ks.load(stream, password.toCharArray());
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(keystoreprovider);
         kmf.init(ks, password.toCharArray());
         KeyManager[] kms = kmf.getKeyManagers();

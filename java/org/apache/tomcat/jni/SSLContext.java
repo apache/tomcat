@@ -509,7 +509,7 @@ public final class SSLContext {
      * @return {@code true} if success, {@code false} otherwise.
      */
     public static native boolean setSessionIdContext(long ctx, byte[] sidCtx);
-    
+
     /**
      * Set CertificateRaw
      * <br>
@@ -517,7 +517,7 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      * @param cert Byte array with the certificate in DER encoding.
      * @param key Byte array with the Private Key file in PEM format.
-     * @param idx Certificate index SSL_AIDX_RSA or SSL_AIDX_DSA.
+     * @param sslAidxRsa Certificate index SSL_AIDX_RSA or SSL_AIDX_DSA.
      */
-	public static native boolean setCertificateRaw(long ctx, byte[] cert, byte[] key, int sslAidxRsa);
+    public static native boolean setCertificateRaw(long ctx, byte[] cert, byte[] key, int sslAidxRsa);
 }
