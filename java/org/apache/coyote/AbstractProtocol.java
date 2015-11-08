@@ -657,8 +657,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     // ------------------------------------------- Connection handler base class
 
-    protected static class ConnectionHandler<S>
-            implements AbstractEndpoint.Handler<S> {
+    protected static class ConnectionHandler<S> implements AbstractEndpoint.Handler<S> {
 
         private final AbstractProtocol<S> proto;
 
