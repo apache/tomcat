@@ -72,7 +72,7 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm = StringManager.getManager(Http11AprProtocol.class);
+    private static final StringManager sm = StringManager.getManager(Http11Processor.class);
 
 
     private final UserDataHelper userDataHelper;
