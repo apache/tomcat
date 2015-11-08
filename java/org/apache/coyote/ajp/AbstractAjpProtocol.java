@@ -19,6 +19,7 @@ package org.apache.coyote.ajp;
 import java.nio.ByteBuffer;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -155,14 +156,18 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
-    protected void configureProcessor(AjpProcessor processor) {
+    @Override
+    protected Processor createProcessor() {
+        AjpProcessor processor = new AjpProcessor(getPacketSize(), getEndpoint());
         processor.setAdapter(getAdapter());
         processor.setTomcatAuthentication(getTomcatAuthentication());
         processor.setTomcatAuthorization(getTomcatAuthorization());
         processor.setRequiredSecret(requiredSecret);
         processor.setKeepAliveTimeout(getKeepAliveTimeout());
         processor.setClientCertProvider(getClientCertProvider());
+        return processor;
     }
+
 
     protected static class AjpConnectionHandler<S>
             extends AbstractConnectionHandler<S,AjpProcessor> {
@@ -176,15 +181,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         @Override
         protected AbstractAjpProtocol<S> getProtocol() {
             return proto;
-        }
-
-
-        @Override
-        protected AjpProcessor createProcessor() {
-            AjpProcessor processor = new AjpProcessor(proto.getPacketSize(), proto.getEndpoint());
-            proto.configureProcessor(processor);
-            register(processor);
-            return processor;
         }
 
 
