@@ -667,8 +667,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         protected final ConcurrentHashMap<S,Processor> connections =
                 new ConcurrentHashMap<>();
 
-        protected final RecycledProcessors<S> recycledProcessors =
-                new RecycledProcessors<>(this);
+        protected final RecycledProcessors recycledProcessors = new RecycledProcessors(this);
 
         public ConnectionHandler(AbstractProtocol<S> proto) {
             this.proto = proto;
@@ -1014,12 +1013,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
     }
 
-    protected static class RecycledProcessors<S> extends SynchronizedStack<Processor> {
+    protected static class RecycledProcessors extends SynchronizedStack<Processor> {
 
-        private final transient ConnectionHandler<S> handler;
+        private final transient ConnectionHandler<?> handler;
         protected final AtomicInteger size = new AtomicInteger(0);
 
-        public RecycledProcessors(ConnectionHandler<S> handler) {
+        public RecycledProcessors(ConnectionHandler<?> handler) {
             this.handler = handler;
         }
 
