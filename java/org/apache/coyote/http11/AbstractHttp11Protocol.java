@@ -38,6 +38,7 @@ import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -631,13 +632,13 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    protected abstract static class AbstractHttp11ConnectionHandler<S>
+    protected static class Http11ConnectionHandler<S>
             extends AbstractConnectionHandler<S,Http11Processor> {
 
         private final AbstractHttp11Protocol<S> proto;
 
 
-        protected AbstractHttp11ConnectionHandler(AbstractHttp11Protocol<S> proto) {
+        protected Http11ConnectionHandler(AbstractHttp11Protocol<S> proto) {
             this.proto = proto;
         }
 
@@ -671,6 +672,12 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
             } else {
                 return new UpgradeProcessorExternal(socket, leftoverInput, upgradeToken);
             }
+        }
+
+
+        @Override
+        protected Log getLog() {
+            return proto.getLog();
         }
     }
 }

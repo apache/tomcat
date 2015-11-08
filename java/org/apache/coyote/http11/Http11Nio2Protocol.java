@@ -20,7 +20,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
-import org.apache.tomcat.util.net.Nio2Endpoint.Handler;
 
 
 /**
@@ -33,7 +32,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
 
     public Http11Nio2Protocol() {
         super(new Nio2Endpoint());
-        Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
+        Http11ConnectionHandler<Nio2Channel> cHandler = new Http11ConnectionHandler<>(this);
         setHandler(cHandler);
         ((Nio2Endpoint) getEndpoint()).setHandler(cHandler);
     }
@@ -51,23 +50,6 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
             return ("https-nio2");
         } else {
             return ("http-nio2");
-        }
-    }
-
-
-    // --------------------  Connection handler --------------------
-
-    protected static class Http11ConnectionHandler
-            extends AbstractHttp11ConnectionHandler<Nio2Channel>
-            implements Handler {
-
-        Http11ConnectionHandler(Http11Nio2Protocol proto) {
-            super(proto);
-        }
-
-        @Override
-        protected Log getLog() {
-            return log;
         }
     }
 }

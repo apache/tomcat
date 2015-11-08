@@ -44,7 +44,7 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
     public AjpAprProtocol() {
         super(new AprEndpoint());
-        AjpConnectionHandler cHandler = new AjpConnectionHandler(this);
+        AjpConnectionHandler<Long> cHandler = new AjpConnectionHandler<>(this);
         setHandler(cHandler);
         ((AprEndpoint) getEndpoint()).setHandler(cHandler);
     }
@@ -61,21 +61,5 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
     @Override
     protected String getNamePrefix() {
         return ("ajp-apr");
-    }
-
-
-    // --------------------------------------  AjpConnectionHandler Inner Class
-
-    protected static class AjpConnectionHandler
-            extends AbstractAjpConnectionHandler<Long> {
-
-        public AjpConnectionHandler(AjpAprProtocol proto) {
-            super(proto);
-        }
-
-        @Override
-        protected Log getLog() {
-            return log;
-        }
     }
 }

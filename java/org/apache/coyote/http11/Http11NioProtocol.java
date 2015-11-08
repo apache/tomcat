@@ -20,7 +20,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioEndpoint.Handler;
 
 
 /**
@@ -38,7 +37,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
 
     public Http11NioProtocol() {
         super(new NioEndpoint());
-        Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
+        Http11ConnectionHandler<NioChannel> cHandler = new Http11ConnectionHandler<>(this);
         setHandler(cHandler);
         ((NioEndpoint) getEndpoint()).setHandler(cHandler);
     }
@@ -83,23 +82,6 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
             return ("https-nio");
         } else {
             return ("http-nio");
-        }
-    }
-
-
-    // --------------------  Connection handler --------------------
-
-    protected static class Http11ConnectionHandler
-            extends AbstractHttp11ConnectionHandler<NioChannel>
-            implements Handler {
-
-        Http11ConnectionHandler(Http11NioProtocol proto) {
-            super(proto);
-        }
-
-        @Override
-        protected Log getLog() {
-            return log;
         }
     }
 }
