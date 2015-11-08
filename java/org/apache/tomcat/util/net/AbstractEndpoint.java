@@ -533,6 +533,15 @@ public abstract class AbstractEndpoint<S> {
         return (negotiableProtocols.size() > 0);
     }
 
+
+    /**
+     * Handling of accepted sockets.
+     */
+    private Handler<S> handler = null;
+    public void setHandler(Handler<S> handler ) { this.handler = handler; }
+    public Handler<S> getHandler() { return handler; }
+
+
     /**
      * Attributes provide a way for configuration to be passed to sub-components
      * without the {@link org.apache.coyote.ProtocolHandler} being aware of the
@@ -848,9 +857,6 @@ public abstract class AbstractEndpoint<S> {
             bindState = BindState.UNBOUND;
         }
     }
-
-
-    protected abstract Handler<S> getHandler();
 
     protected abstract Log getLog();
 

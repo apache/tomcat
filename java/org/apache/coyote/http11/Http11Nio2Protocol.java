@@ -34,7 +34,7 @@ public class Http11Nio2Protocol extends AbstractHttp11JsseProtocol<Nio2Channel> 
         super(new Nio2Endpoint());
         Http11ConnectionHandler<Nio2Channel> cHandler = new Http11ConnectionHandler<>(this);
         setHandler(cHandler);
-        ((Nio2Endpoint) getEndpoint()).setHandler(cHandler);
+        getEndpoint().setHandler(cHandler);
     }
 
 

@@ -134,15 +134,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     /**
-     * Handling of accepted sockets.
-     */
-    protected Handler<Long> handler = null;
-    public void setHandler(Handler<Long> handler ) { this.handler = handler; }
-    @Override
-    public Handler<Long> getHandler() { return handler; }
-
-
-    /**
      * Poll interval, in microseconds. The smaller the value, the more CPU the poller
      * will use, but the more responsive to activity it will be.
      */
@@ -617,7 +608,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
                 try {
                     socketWrapper.close();
-                    handler.release(socketWrapper);
+                    getHandler().release(socketWrapper);
                 } catch (IOException e) {
                     // Ignore
                 }
@@ -701,7 +692,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             rootPool = 0;
         }
 
-        handler.recycle();
+        getHandler().recycle();
     }
 
 
@@ -2250,7 +2241,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         return;
                     }
                     // Process the request from this socket
-                    Handler.SocketState state = handler.process(socket,
+                    Handler.SocketState state = getHandler().process(socket,
                             SocketStatus.OPEN_READ);
                     if (state == Handler.SocketState.CLOSED) {
                         // Close socket and pool
@@ -2293,7 +2284,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Closed in another thread
                     return;
                 }
-                SocketState state = handler.process(socket, status);
+                SocketState state = getHandler().process(socket, status);
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     closeSocket(socket.getSocket().longValue());

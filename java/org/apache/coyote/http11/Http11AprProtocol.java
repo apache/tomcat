@@ -37,7 +37,7 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
         super(new AprEndpoint());
         Http11ConnectionHandler<Long> cHandler = new Http11ConnectionHandler<>(this);
         setHandler(cHandler);
-        ((AprEndpoint) getEndpoint()).setHandler(cHandler);
+        getEndpoint().setHandler(cHandler);
     }
 
 
