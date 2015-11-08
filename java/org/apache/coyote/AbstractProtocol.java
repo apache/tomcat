@@ -657,8 +657,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     // ------------------------------------------- Connection handler base class
 
-    protected abstract static class AbstractConnectionHandler<S,P extends Processor>
+    protected static class ConnectionHandler<S,P extends Processor>
             implements AbstractEndpoint.Handler<S> {
+
+        private final AbstractProtocol<S> proto;
 
         protected final RequestGroupInfo global = new RequestGroupInfo();
         protected final AtomicLong registerCount = new AtomicLong(0);
@@ -669,7 +671,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         protected final RecycledProcessors<P,S> recycledProcessors =
                 new RecycledProcessors<>(this);
 
-        protected abstract AbstractProtocol<S> getProtocol();
+        public ConnectionHandler(AbstractProtocol<S> proto) {
+            this.proto = proto;
+        }
+
+        protected AbstractProtocol<S> getProtocol() {
+            return proto;
+        }
 
         protected Log getLog() {
             return getProtocol().getLog();
@@ -1010,10 +1018,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     protected static class RecycledProcessors<P extends Processor, S>
             extends SynchronizedStack<Processor> {
 
-        private final transient AbstractConnectionHandler<S,P> handler;
+        private final transient ConnectionHandler<S,P> handler;
         protected final AtomicInteger size = new AtomicInteger(0);
 
-        public RecycledProcessors(AbstractConnectionHandler<S,P> handler) {
+        public RecycledProcessors(ConnectionHandler<S,P> handler) {
             this.handler = handler;
         }
 

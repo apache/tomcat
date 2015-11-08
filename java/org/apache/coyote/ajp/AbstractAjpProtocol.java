@@ -48,7 +48,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         // AJP does not use Send File
         getEndpoint().setUseSendfile(false);
-        AjpConnectionHandler<S> cHandler = new AjpConnectionHandler<>(this);
+        ConnectionHandler<S,AjpProcessor> cHandler = new ConnectionHandler<>(this);
         setHandler(cHandler);
         getEndpoint().setHandler(cHandler);
     }
@@ -174,21 +174,5 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
             ByteBuffer leftoverInput, UpgradeToken upgradeToken) {
         // TODO should fail - throw IOE
         return null;
-    }
-
-
-    protected static class AjpConnectionHandler<S>
-            extends AbstractConnectionHandler<S,AjpProcessor> {
-
-        private final AbstractAjpProtocol<S> proto;
-
-        public AjpConnectionHandler(AbstractAjpProtocol<S> proto) {
-            this.proto = proto;
-        }
-
-        @Override
-        protected AbstractAjpProtocol<S> getProtocol() {
-            return proto;
-        }
     }
 }

@@ -52,7 +52,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public AbstractHttp11Protocol(AbstractEndpoint<S> endpoint) {
         super(endpoint);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
-        Http11ConnectionHandler<S> cHandler = new Http11ConnectionHandler<>(this);
+        ConnectionHandler<S,Http11Processor> cHandler = new ConnectionHandler<>(this);
         setHandler(cHandler);
         getEndpoint().setHandler(cHandler);
     }
@@ -648,24 +648,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
             return new UpgradeProcessorInternal(socket, leftoverInput, upgradeToken);
         } else {
             return new UpgradeProcessorExternal(socket, leftoverInput, upgradeToken);
-        }
-    }
-
-
-    protected static class Http11ConnectionHandler<S>
-            extends AbstractConnectionHandler<S,Http11Processor> {
-
-        private final AbstractHttp11Protocol<S> proto;
-
-
-        protected Http11ConnectionHandler(AbstractHttp11Protocol<S> proto) {
-            this.proto = proto;
-        }
-
-
-        @Override
-        protected AbstractHttp11Protocol<S> getProtocol() {
-            return proto;
         }
     }
 }
