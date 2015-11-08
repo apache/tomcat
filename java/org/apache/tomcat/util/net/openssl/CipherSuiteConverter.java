@@ -182,9 +182,11 @@ public final class CipherSuiteConverter {
         p2j.put("TLS", "TLS_" + javaCipherSuiteSuffix);
         o2j.put(openSslCipherSuite, p2j);
 
+        /* TODO the log looks broken...
         if (logger.isDebugEnabled()) {
             logger.debug(sm.getString("converter.mapping", javaCipherSuite, openSslCipherSuite));
         }
+        */
 
         return openSslCipherSuite;
     }
@@ -313,10 +315,12 @@ public final class CipherSuiteConverter {
         j2o.putIfAbsent(javaCipherSuiteTls, openSslCipherSuite);
         j2o.putIfAbsent(javaCipherSuiteSsl, openSslCipherSuite);
 
+        /* TODO the log looks broken...
         if (logger.isDebugEnabled()) {
             logger.debug(sm.getString("converter.mapping", javaCipherSuiteTls, openSslCipherSuite));
             logger.debug(sm.getString("converter.mapping", javaCipherSuiteSsl, openSslCipherSuite));
         }
+        */
 
         return p2j;
     }

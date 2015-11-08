@@ -28,7 +28,7 @@ public class SSLHostConfigCertificate {
     public static final Type DEFAULT_TYPE = Type.UNDEFINED;
 
     static final String DEFAULT_KEYSTORE_PROVIDER =
-            System.getProperty("javax.net.ssl.keyStoreProvider");
+            System.getProperty("javax.net.ssl.keyStoreProvider", "SunX509");
     static final String DEFAULT_KEYSTORE_TYPE =
             System.getProperty("javax.net.ssl.keyStoreType", "JKS");
 
@@ -43,7 +43,7 @@ public class SSLHostConfigCertificate {
     private String certificateKeyPassword = null;
 
     // JSSE
-    private String certificateKeyAlias;
+    private String certificateKeyAlias = "tomcat";
     private String certificateKeystorePassword = "changeit";
     private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;

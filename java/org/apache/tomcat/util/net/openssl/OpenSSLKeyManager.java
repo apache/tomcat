@@ -36,10 +36,10 @@ public class OpenSSLKeyManager implements KeyManager{
 
     OpenSSLKeyManager(String certChainFile, String keyFile) {
         if (certChainFile == null) {
-            throw new IllegalArgumentException(sm.getString("keyManager.nullCertificateChain"));
+            return;
         }
         if (keyFile == null) {
-            throw new IllegalArgumentException(sm.getString("keyManager.nullPrivateKey"));
+            return;
         }
         this.certificateChain = new File(certChainFile);
         this.privateKey = new File(keyFile);
