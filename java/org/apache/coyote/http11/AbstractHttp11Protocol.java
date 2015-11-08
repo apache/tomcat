@@ -618,8 +618,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     // ------------------------------------------------------------- Common code
 
-    // Common configuration required for all new HTTP11 processors
-    protected void configureProcessor(Http11Processor processor) {
+    @Override
+    protected Processor createProcessor() {
+        Http11Processor processor = new Http11Processor(getMaxHttpHeaderSize(), getEndpoint(),
+                getMaxTrailerSize(), allowedTrailerHeaders, getMaxExtensionSize(),
+                getMaxSwallowSize(), httpUpgradeProtocols);
         processor.setAdapter(getAdapter());
         processor.setMaxKeepAliveRequests(getMaxKeepAliveRequests());
         processor.setConnectionUploadTimeout(getConnectionUploadTimeout());
@@ -631,6 +634,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setRestrictedUserAgents(getRestrictedUserAgents());
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
+        return processor;
     }
 
 
@@ -648,18 +652,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         @Override
         protected AbstractHttp11Protocol<S> getProtocol() {
             return proto;
-        }
-
-
-        @Override
-        public Http11Processor createProcessor() {
-            Http11Processor processor = new Http11Processor(
-                    proto.getMaxHttpHeaderSize(), proto.getEndpoint(), proto.getMaxTrailerSize(),
-                    proto.allowedTrailerHeaders, proto.getMaxExtensionSize(),
-                    proto.getMaxSwallowSize(), proto.httpUpgradeProtocols);
-            proto.configureProcessor(processor);
-            register(processor);
-            return processor;
         }
 
 

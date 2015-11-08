@@ -419,6 +419,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     protected abstract UpgradeProtocol getNegotiatedProtocol(String name);
 
 
+    /**
+     * Create and configure a new Processor instance for the current protocol
+     * implementation.
+     *
+     * @return A fully configured Processor instance that is ready to use
+     */
+    protected abstract Processor createProcessor();
+
+
     // ----------------------------------------------------- JMX related methods
 
     protected String domain;
@@ -722,7 +731,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     processor = recycledProcessors.pop();
                 }
                 if (processor == null) {
-                    processor = createProcessor();
+                    processor = getProtocol().createProcessor();
+                    register(processor);
                 }
 
                 processor.setSslSupport(
@@ -867,8 +877,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             return SocketState.CLOSED;
         }
 
-        protected abstract P createProcessor();
-
 
         protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
             if (!processor.isAsync()) {
@@ -930,7 +938,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 UpgradeToken upgradeToken) throws IOException;
 
 
-        protected void register(AbstractProcessor processor) {
+        protected void register(Processor processor) {
             if (getProtocol().getDomain() != null) {
                 synchronized (this) {
                     try {
