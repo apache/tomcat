@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
-import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -194,11 +193,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
                 ByteBuffer leftoverInput, UpgradeToken upgradeToken) {
             // TODO should fail - throw IOE
             return null;
-        }
-
-        @Override
-        protected Log getLog() {
-            return proto.getLog();
         }
     }
 }

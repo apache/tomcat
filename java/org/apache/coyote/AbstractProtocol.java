@@ -646,8 +646,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     protected abstract static class AbstractConnectionHandler<S,P extends Processor>
             implements AbstractEndpoint.Handler<S> {
 
-        protected abstract Log getLog();
-
         protected final RequestGroupInfo global = new RequestGroupInfo();
         protected final AtomicLong registerCount = new AtomicLong(0);
 
@@ -657,9 +655,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         protected final RecycledProcessors<P,S> recycledProcessors =
                 new RecycledProcessors<>(this);
 
-
         protected abstract AbstractProtocol<S> getProtocol();
 
+        protected Log getLog() {
+            return getProtocol().getLog();
+        }
 
         @Override
         public Object getGlobal() {
