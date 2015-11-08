@@ -428,6 +428,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     protected abstract Processor createProcessor();
 
 
+    protected abstract Processor createUpgradeProcessor(
+            SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
+            UpgradeToken upgradeToken) throws IOException;
+
+
     // ----------------------------------------------------- JMX related methods
 
     protected String domain;
@@ -756,7 +761,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         // Release the Http11 processor to be re-used
                         release(wrapper, processor, false);
                         // Create the upgrade processor
-                        processor = createUpgradeProcessor(
+                        processor = getProtocol().createUpgradeProcessor(
                                 wrapper, leftoverInput, upgradeToken);
                         // Mark the connection as upgraded
                         wrapper.setUpgraded(true);
@@ -931,11 +936,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 }
             }
         }
-
-
-        protected abstract Processor createUpgradeProcessor(
-                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
-                UpgradeToken upgradeToken) throws IOException;
 
 
         protected void register(Processor processor) {

@@ -638,6 +638,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    @Override
+    protected Processor createUpgradeProcessor(
+            SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
+            UpgradeToken upgradeToken)
+            throws IOException {
+        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
+        if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
+            return new UpgradeProcessorInternal(socket, leftoverInput, upgradeToken);
+        } else {
+            return new UpgradeProcessorExternal(socket, leftoverInput, upgradeToken);
+        }
+    }
+
+
     protected static class Http11ConnectionHandler<S>
             extends AbstractConnectionHandler<S,Http11Processor> {
 
@@ -652,20 +666,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         @Override
         protected AbstractHttp11Protocol<S> getProtocol() {
             return proto;
-        }
-
-
-        @Override
-        protected Processor createUpgradeProcessor(
-                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
-                UpgradeToken upgradeToken)
-                throws IOException {
-            HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
-            if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
-                return new UpgradeProcessorInternal(socket, leftoverInput, upgradeToken);
-            } else {
-                return new UpgradeProcessorExternal(socket, leftoverInput, upgradeToken);
-            }
         }
     }
 }

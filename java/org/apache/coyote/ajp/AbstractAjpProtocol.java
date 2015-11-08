@@ -169,6 +169,14 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
+    @Override
+    protected Processor createUpgradeProcessor(SocketWrapperBase<?> socket,
+            ByteBuffer leftoverInput, UpgradeToken upgradeToken) {
+        // TODO should fail - throw IOE
+        return null;
+    }
+
+
     protected static class AjpConnectionHandler<S>
             extends AbstractConnectionHandler<S,AjpProcessor> {
 
@@ -181,14 +189,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         @Override
         protected AbstractAjpProtocol<S> getProtocol() {
             return proto;
-        }
-
-
-        @Override
-        protected AjpProcessor createUpgradeProcessor(SocketWrapperBase<?> socket,
-                ByteBuffer leftoverInput, UpgradeToken upgradeToken) {
-            // TODO should fail - throw IOE
-            return null;
         }
     }
 }
