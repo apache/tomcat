@@ -657,7 +657,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     // ------------------------------------------- Connection handler base class
 
-    protected static class ConnectionHandler<S,P extends Processor>
+    protected static class ConnectionHandler<S>
             implements AbstractEndpoint.Handler<S> {
 
         private final AbstractProtocol<S> proto;
@@ -668,7 +668,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         protected final ConcurrentHashMap<S,Processor> connections =
                 new ConcurrentHashMap<>();
 
-        protected final RecycledProcessors<P,S> recycledProcessors =
+        protected final RecycledProcessors<S> recycledProcessors =
                 new RecycledProcessors<>(this);
 
         public ConnectionHandler(AbstractProtocol<S> proto) {
@@ -1015,13 +1015,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
     }
 
-    protected static class RecycledProcessors<P extends Processor, S>
-            extends SynchronizedStack<Processor> {
+    protected static class RecycledProcessors<S> extends SynchronizedStack<Processor> {
 
-        private final transient ConnectionHandler<S,P> handler;
+        private final transient ConnectionHandler<S> handler;
         protected final AtomicInteger size = new AtomicInteger(0);
 
-        public RecycledProcessors(ConnectionHandler<S,P> handler) {
+        public RecycledProcessors(ConnectionHandler<S> handler) {
             this.handler = handler;
         }
 
