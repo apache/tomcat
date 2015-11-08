@@ -56,4 +56,17 @@ public interface SessionIdGenerator {
      */
     public String generateSessionId(String route);
 
+    /**
+     * Determine, based on implementation specific rules which may be as strict
+     * or as relaxed as the implementor wishes, if the provided session ID is
+     * valid. This may be used when generating sessions with user provided
+     * session IDs to ensure that they are suitable or if a new ID needs to be
+     * generated.
+     *
+     * @param sessionId The proposed session ID to test
+     *
+     * @return {@code true} if the proposed session ID is acceptable, otherwise
+     *         {@code false}
+     */
+    public boolean validateSessionId(String sessionId);
 }
