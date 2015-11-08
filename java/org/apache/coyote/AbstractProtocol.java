@@ -660,11 +660,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     protected static class ConnectionHandler<S> implements AbstractEndpoint.Handler<S> {
 
         private final AbstractProtocol<S> proto;
-
-        protected final RequestGroupInfo global = new RequestGroupInfo();
-        protected final AtomicLong registerCount = new AtomicLong(0);
-        protected final ConcurrentHashMap<S,Processor> connections = new ConcurrentHashMap<>();
-        protected final RecycledProcessors recycledProcessors = new RecycledProcessors(this);
+        private final RequestGroupInfo global = new RequestGroupInfo();
+        private final AtomicLong registerCount = new AtomicLong(0);
+        private final ConcurrentHashMap<S,Processor> connections = new ConcurrentHashMap<>();
+        private final RecycledProcessors recycledProcessors = new RecycledProcessors(this);
 
         public ConnectionHandler(AbstractProtocol<S> proto) {
             this.proto = proto;
