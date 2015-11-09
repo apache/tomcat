@@ -443,7 +443,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         KeyStore ks = KeyStore.getInstance(keystoretype);
         InputStream stream = ConfigFileLoader.getInputStream(keystorefile);
         ks.load(stream, password.toCharArray());
-        KeyManagerFactory kmf = KeyManagerFactory.getInstance(keystoreprovider);
+        KeyManagerFactory kmf;
+        if (keystoreprovider != null)
+            kmf = KeyManagerFactory.getInstance(keystoreprovider);
+        else
+        	kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(ks, password.toCharArray());
         KeyManager[] kms = kmf.getKeyManagers();
         if (kms == null) {
