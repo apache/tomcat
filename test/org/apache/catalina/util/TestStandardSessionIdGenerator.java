@@ -71,7 +71,7 @@ public class TestStandardSessionIdGenerator {
     }
 
     @Test
-    public void testValidateWithJvmRouteWithPerid() {
+    public void testValidateWithJvmRouteWithPeriod() {
         Assert.assertTrue(generator.validateSessionId(VALID + ".g.h.i"));
     }
 
