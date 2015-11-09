@@ -28,7 +28,7 @@ public class SSLHostConfigCertificate {
     public static final Type DEFAULT_TYPE = Type.UNDEFINED;
 
     static final String DEFAULT_KEYSTORE_PROVIDER =
-            System.getProperty("javax.net.ssl.keyStoreProvider", "SunX509");
+            System.getProperty("javax.net.ssl.keyStoreProvider");
     static final String DEFAULT_KEYSTORE_TYPE =
             System.getProperty("javax.net.ssl.keyStoreType", "JKS");
 
