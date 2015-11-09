@@ -105,6 +105,11 @@
         <code>org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER</code> is no
         longer used and has been removed. (markt)
       </fix>
+      <update>
+        The minimum required Tomcat Native version has been increased to 1.2.2.
+        The 1.2.x branch includes ALPN and SNI support which are required for
+        HTTP/2. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">
