@@ -607,7 +607,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             getLog().info(sm.getString("abstractProtocolHandler.stop",
                     getName()));
 
-        asyncTimeout.stop();
+        if (asyncTimeout != null) {
+            asyncTimeout.stop();
+        }
 
         try {
             endpoint.stop();
