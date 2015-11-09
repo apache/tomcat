@@ -349,11 +349,6 @@ public class CallMethodRule extends Rule {
 
             parameters = new Object[1];
             parameters[0] = bodyText;
-            if (paramTypes.length == 0) {
-                paramTypes = new Class[1];
-                paramTypes[0] = String.class;
-            }
-
         }
 
         // Construct the parameter values array we will need

@@ -387,10 +387,6 @@ public class ChunkedInputFilter implements InputFilter {
         }
 
         remaining = result;
-        if (remaining < 0) {
-            return false;
-        }
-
         return true;
     }
 
