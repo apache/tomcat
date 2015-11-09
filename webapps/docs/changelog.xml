@@ -65,6 +65,10 @@
         may be overridden by setting <code>UMASK</code> in
         <code>setenv.sh</code>. (markt)
       </update>
+      <update>
+        Remove native code (Windows Service Wrapper, APR/native connector)
+        support for Windows Itanium. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Catalina">
