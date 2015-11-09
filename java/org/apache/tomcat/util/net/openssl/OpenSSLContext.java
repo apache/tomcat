@@ -447,7 +447,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         if (keystoreprovider != null)
             kmf = KeyManagerFactory.getInstance(keystoreprovider);
         else
-        	kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(ks, password.toCharArray());
         KeyManager[] kms = kmf.getKeyManagers();
         if (kms == null) {
