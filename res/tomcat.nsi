@@ -211,8 +211,6 @@ Section "Core" SecTomcatCore
     File /oname=$TomcatServiceFileName bin\tomcat@VERSION_MAJOR@.exe
   ${ElseIf} $Arch == "x64"
     File /oname=$TomcatServiceFileName bin\x64\tomcat@VERSION_MAJOR@.exe
-  ${ElseIf} $Arch == "i64"
-    File /oname=$TomcatServiceFileName bin\i64\tomcat@VERSION_MAJOR@.exe
   ${EndIf}
 
   FileOpen $ServiceInstallLog "$INSTDIR\logs\service-install.log" a
@@ -264,8 +262,6 @@ Section "Native" SecTomcatNative
     File bin\tcnative-1.dll
   ${ElseIf} $Arch == "x64"
     File /oname=tcnative-1.dll bin\x64\tcnative-1.dll
-  ${ElseIf} $Arch == "i64"
-    File /oname=tcnative-1.dll bin\i64\tcnative-1.dll
   ${EndIf}
 
   ClearErrors
