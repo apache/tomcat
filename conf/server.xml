@@ -100,7 +100,7 @@
         <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
         <SSLHostConfig honorCipherOrder="false" >
             <Certificate certificateKeyFile="conf/localhost-rsa-key.pem"
-                         certificateFile="conf/localhost-rsa-cert.pem"
+                         certificateFile="conf/localhost-rsa-chain.pem"
                          type="RSA" />
         </SSLHostConfig>
     </Connector>
