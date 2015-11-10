@@ -814,8 +814,24 @@ public class StandardContext extends ContainerBase
 
     private CookieProcessor cookieProcessor;
 
+    private boolean validateClientProvidedNewSessionId = true;
 
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public void setValidateClientProvidedNewSessionId(boolean validateClientProvidedNewSessionId) {
+        this.validateClientProvidedNewSessionId = validateClientProvidedNewSessionId;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default value for this implementation is {@code true}.
+     */
+    @Override
+    public boolean getValidateClientProvidedNewSessionId() {
+        return validateClientProvidedNewSessionId;
+    }
 
     @Override
     public void setCookieProcessor(CookieProcessor cookieProcessor) {

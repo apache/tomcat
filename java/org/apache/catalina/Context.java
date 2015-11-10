@@ -1680,4 +1680,32 @@ public interface Context extends Container {
      * for this Context.
      */
     public CookieProcessor getCookieProcessor();
+
+    /**
+     * When a client provides the ID for a new session, should that ID be
+     * validated? The only use case for using a client provided session ID is to
+     * have a common session ID across multiple web applications. Therefore,
+     * any client provided session ID should already exist in another web
+     * application. If this check is enabled, the client provided session ID
+     * will only be used if the session ID exists in at least one other web
+     * application for the current host. Note that the following additional
+     * tests are always applied, irrespective of this setting:
+     * <ul>
+     * <li>The session ID is provided by a cookie</li>
+     * <li>The session cookie has a path of {@code /}</li>
+     * </ul>
+     *
+     * @param validateClientProvidedNewSessionId
+     *          {@code true} if validation should be applied
+     */
+    public void setValidateClientProvidedNewSessionId(boolean validateClientProvidedNewSessionId);
+
+    /**
+     * Will client provided session IDs be validated (see {@link
+     * #setValidateClientProvidedNewSessionId(boolean)}) before use?
+     *
+     * @return {@code true} if validation will be applied. Otherwise, {@code
+     *         false}
+     */
+    public boolean getValidateClientProvidedNewSessionId();
 }
