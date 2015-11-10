@@ -651,7 +651,8 @@ public final class URL implements Serializable {
      *
      * @param c The character to test
      *
-     * @return {@code true} if a the character is allowed, otherwise {@false}
+     * @return {@code true} if a the character is allowed, otherwise {code
+     *         @false}
      */
     private static boolean isSchemeChar(char c) {
         return Character.isLetterOrDigit(c) ||
@@ -664,7 +665,7 @@ public final class URL implements Serializable {
      *
      * @param uri The URI to test
      *
-     * @return {@code true} if a scheme is present, otherwise {@false}
+     * @return {@code true} if a scheme is present, otherwise {code @false}
      */
     public static boolean hasScheme(CharSequence uri) {
         int len = uri.length();

@@ -58,7 +58,7 @@ public class SystemLogHandler extends PrintStream {
 
 
     /**
-     * Thread <-> CaptureLog associations.
+     * Thread &lt;-&gt; CaptureLog associations.
      */
     private static final ThreadLocal<Stack<CaptureLog>> logs = new ThreadLocal<>();
 
