@@ -703,4 +703,12 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     public String getContainerSciFilter() { return null; }
+
+    @Override
+    public void setValidateClientProvidedNewSessionId(boolean validateClientProvidedNewSessionId) {
+        //NO-OP
+    }
+
+    @Override
+    public boolean getValidateClientProvidedNewSessionId() { return false; }
 }

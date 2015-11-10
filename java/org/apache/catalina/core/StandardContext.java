@@ -909,8 +909,27 @@ public class StandardContext extends ContainerBase
 
     private Boolean failCtxIfServletStartFails;
 
+    private boolean validateClientProvidedNewSessionId = true;
 
+    
     // ----------------------------------------------------- Context Properties
+    
+    @Override
+    public void setValidateClientProvidedNewSessionId(boolean validateClientProvidedNewSessionId) {
+        this.validateClientProvidedNewSessionId = validateClientProvidedNewSessionId;
+    }
+
+    
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default value for this implementation is {@code true}.
+     */
+    @Override
+    public boolean getValidateClientProvidedNewSessionId() {
+        return validateClientProvidedNewSessionId;
+    }
+
     
     @Override
     public void setContainerSciFilter(String containerSciFilter) {

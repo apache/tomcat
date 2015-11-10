@@ -131,6 +131,12 @@
         Handle the unlikely case where different versions of a web application
         are deployed with different session settings. (markt)
       </fix>
+      <add>
+        Add a new Context option, enabled by default, that enables an additional
+        check that a client provided session ID is in use in at least one other
+        web application before allowing it to be used as the ID for a new
+        session in the current web application. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
