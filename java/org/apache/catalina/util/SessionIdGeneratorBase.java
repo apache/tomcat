@@ -244,18 +244,6 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase
     }
 
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The base implementation performs no validation and treats all proposed
-     * session IDs as valid.
-     */
-    @Override
-    public boolean validateSessionId(String sessionId) {
-        return true;
-    }
-
-
     @Override
     protected void initInternal() throws LifecycleException {
         // NO-OP

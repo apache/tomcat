@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.util;
 
-import org.apache.tomcat.util.buf.HexUtils;
-
 public class StandardSessionIdGenerator extends SessionIdGeneratorBase {
 
     @Override
@@ -61,41 +59,5 @@ public class StandardSessionIdGenerator extends SessionIdGeneratorBase {
         }
 
         return buffer.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This implementation performs the following checks:
-     * <ul>
-     * <li>The characters up to the first period (if any) are valid hex
-     *     digits</li>
-     * <li>There are at least enough hex digits to represent the specified
-     *     session ID length</li>
-     * <li>Anything after the first period is not validated since that is
-     *     assumed to be a JVM route and we can't easily determine valid
-     *     values</li>
-     * </ul>
-     */
-    @Override
-    public boolean validateSessionId(String sessionId) {
-        if (sessionId == null) {
-            return false;
-        }
-        int len = sessionId.indexOf('.');
-        if (len == -1) {
-            len = sessionId.length();
-        }
-        // Session ID length is in bytes and 2 hex digits are required for each
-        // byte
-        if (len < getSessionIdLength() * 2) {
-            return false;
-        }
-        for (int i = 0; i < len; i++) {
-            if (HexUtils.getDec(sessionId.charAt(i)) == -1) {
-                return false;
-            }
-        }
-        return true;
     }
 }

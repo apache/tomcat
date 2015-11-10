@@ -131,10 +131,6 @@
         Handle the unlikely case where different versions of a web application
         are deployed with different session settings. (markt)
       </fix>
-      <add>
-        Add the ability to validate client provided session IDs and implement
-        basic validation for the Standard session ID generator. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
