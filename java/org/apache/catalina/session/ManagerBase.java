@@ -627,7 +627,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         session.setCreationTime(System.currentTimeMillis());
         session.setMaxInactiveInterval(this.maxInactiveInterval);
         String id = sessionId;
-        if (id == null || !sessionIdGenerator.validateSessionId(id)) {
+        if (id == null) {
             id = generateSessionId();
         }
         session.setId(id);
