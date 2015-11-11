@@ -931,6 +931,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private void pruneClosedStreams() {
         // Only prune every 10 new streams
         if (newStreamsSinceLastPrune < 9) {
+            // Not atomic. Increments may be lost. Not a problem.
             newStreamsSinceLastPrune++;
             return;
         }
