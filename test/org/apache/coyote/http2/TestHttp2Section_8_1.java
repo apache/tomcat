@@ -55,6 +55,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
         Assert.assertEquals("3-HeadersStart\n" +
                 "3-Header-[:status]-[101]\n" +
+                "3-Header-[date]-["+ DEFAULT_DATE + "]\n" +
                 "3-HeadersEnd\n",
                 output.getTrace());
         output.clearTrace();
@@ -71,6 +72,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
                 "3-WindowSize-[256]\n" +
                 "3-HeadersStart\n" +
                 "3-Header-[:status]-[200]\n" +
+                "3-Header-[date]-["+ DEFAULT_DATE + "]\n" +
                 "3-HeadersEnd\n" +
                 "3-Body-256\n" +
                 "3-EndOfStream\n",

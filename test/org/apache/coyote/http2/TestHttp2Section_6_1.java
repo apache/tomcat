@@ -35,13 +35,14 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         sendSimplePostRequest(3, null);
         readSimplePostResponse(false);
 
-        Assert.assertEquals("0-WindowSize-[128]\n"
-                + "3-WindowSize-[128]\n"
-                + "3-HeadersStart\n"
-                + "3-Header-[:status]-[200]\n"
-                + "3-HeadersEnd\n"
-                + "3-Body-128\n"
-                + "3-EndOfStream\n", output.getTrace());
+        Assert.assertEquals("0-WindowSize-[128]\n" +
+                "3-WindowSize-[128]\n" +
+                "3-HeadersStart\n" +
+                "3-Header-[:status]-[200]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
+                "3-HeadersEnd\n" +
+                "3-Body-128\n" +
+                "3-EndOfStream\n", output.getTrace());
     }
 
 
@@ -63,13 +64,14 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         Assert.assertTrue(trace, trace.contains(paddingWindowUpdate));
         trace = trace.replace(paddingWindowUpdate, "");
 
-        Assert.assertEquals("0-WindowSize-[119]\n"
-                + "3-WindowSize-[119]\n"
-                + "3-HeadersStart\n"
-                + "3-Header-[:status]-[200]\n"
-                + "3-HeadersEnd\n"
-                + "3-Body-119\n"
-                + "3-EndOfStream\n", trace);
+        Assert.assertEquals("0-WindowSize-[119]\n" +
+                "3-WindowSize-[119]\n" +
+                "3-HeadersStart\n" +
+                "3-Header-[:status]-[200]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
+                "3-HeadersEnd\n" +
+                "3-Body-119\n" +
+                "3-EndOfStream\n", trace);
     }
 
 
@@ -154,12 +156,13 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         // Since padding is zero length, response looks like there is none.
         readSimplePostResponse(false);
 
-        Assert.assertEquals("0-WindowSize-[127]\n"
-                + "3-WindowSize-[127]\n"
-                + "3-HeadersStart\n"
-                + "3-Header-[:status]-[200]\n"
-                + "3-HeadersEnd\n"
-                + "3-Body-127\n"
-                + "3-EndOfStream\n", output.getTrace());
+        Assert.assertEquals("0-WindowSize-[127]\n" +
+                "3-WindowSize-[127]\n" +
+                "3-HeadersStart\n" +
+                "3-Header-[:status]-[200]\n" +
+                "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
+                "3-HeadersEnd\n" +
+                "3-Body-127\n" +
+                "3-EndOfStream\n", output.getTrace());
     }
 }
