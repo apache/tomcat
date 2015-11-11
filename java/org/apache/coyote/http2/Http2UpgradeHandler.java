@@ -47,6 +47,7 @@ import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -485,9 +486,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
                     stream.getIdentifier()));
         }
-        MimeHeaders headers = coyoteResponse.getMimeHeaders();
-        // Add the pseudo header for status
-        headers.addValue(":status").setString(Integer.toString(coyoteResponse.getStatus()));
+
+        prepareHeaders(coyoteResponse);
+
         // This ensures the Stream processing thread has control of the socket.
         synchronized (socketWrapper) {
             byte[] header = new byte[9];
@@ -522,6 +523,32 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     handleAppInitiatedIOException(ioe);
                 }
             }
+        }
+    }
+
+
+    private void prepareHeaders(Response coyoteResponse) {
+        MimeHeaders headers = coyoteResponse.getMimeHeaders();
+        int statusCode = coyoteResponse.getStatus();
+
+        // Add the pseudo header for status
+        headers.addValue(":status").setString(Integer.toString(statusCode));
+
+        // Check to see if a response body is present
+        if (!(statusCode < 200 || statusCode == 205 || statusCode == 304)) {
+            String contentType = coyoteResponse.getContentType();
+            if (contentType != null) {
+                headers.setValue("content-type").setString(contentType);
+            }
+            String contentLanguage = coyoteResponse.getContentLanguage();
+            if (contentLanguage != null) {
+                headers.setValue("content-language").setString(contentLanguage);
+            }
+        }
+
+        // Add date header unless the application has already set one
+        if (headers.getValue("date") == null) {
+            headers.setValue("date").setString(FastHttpDateFormat.getCurrentDate());
         }
     }
 
