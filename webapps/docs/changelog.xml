@@ -58,6 +58,12 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.66 (violetagg)">
+  <subsection name="General">
+    <changelog>
+      <bug>58596</bug>: Clarify the description in RUNNING.txt of how
+      environment variables are used. (markt)
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
