@@ -55,7 +55,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     // Nothing special about this date apart from it being the date I ran the
     // test that demonstrated that most HTTP/2 tests were failing because the
     // response now included a date header
-    private static final String DEFAULT_DATE = "Wed, 11 Nov 2015 19:18:42 GMT";
+    protected static final String DEFAULT_DATE = "Wed, 11 Nov 2015 19:18:42 GMT";
 
     static final String DEFAULT_CONNECTION_HEADER_VALUE = "Upgrade, HTTP2-Settings";
     private static final byte[] EMPTY_SETTINGS_FRAME =
@@ -888,6 +888,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             // Generate an empty response
+            resp.setContentType("application/octet-stream");
             resp.setContentLength(0);
             resp.flushBuffer();
         }
