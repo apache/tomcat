@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.util.bcel.classfile.ClassParser;
@@ -38,6 +39,8 @@ public class TesterPerformance {
     public void testClassParserPerformance() throws IOException {
         File libDir = new File(JAR_LOCATION);
         String[] libs = libDir.list();
+
+        Assert.assertNotNull(libs);
 
         Set<URL> jarURLs = new HashSet<>();
 

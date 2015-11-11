@@ -889,15 +889,11 @@ public class JDBCStore extends StoreBase {
             try {
                 Class<?> clazz = Class.forName(driverName);
                 driver = (Driver) clazz.newInstance();
-            } catch (ClassNotFoundException ex) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
-                        ex.toString()));
-            } catch (InstantiationException ex) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
-                        ex.toString()));
-            } catch (IllegalAccessException ex) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
-                        ex.toString()));
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                manager.getContext().getLogger().error(
+                        sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
+                        e.toString()));
+                throw new SQLException(e);
             }
         }
 
