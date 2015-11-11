@@ -17,9 +17,9 @@
 package org.apache.catalina.users;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -34,6 +34,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.AbstractObjectCreationFactory;
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
@@ -394,52 +395,44 @@ public class MemoryUserDatabase implements UserDatabase {
                 groups.clear();
                 roles.clear();
 
-                // Construct a reader for the XML input file (if it exists)
-                File file = new File(pathname);
-                if (!file.isAbsolute()) {
-                    file = new File(System.getProperty(Globals.CATALINA_BASE_PROP),
-                                    pathname);
-                }
-                if (!file.exists()) {
-                    log.error(sm.getString("memoryUserDatabase.fileNotFound",
-                            file.getAbsolutePath()));
-                    return;
-                }
+                String pathName = getPathname();
+                InputStream is = null;
 
-                // Construct a digester to read the XML input file
-                Digester digester = new Digester();
                 try {
-                    digester.setFeature(
-                            "http://apache.org/xml/features/allow-java-encodings",
-                            true);
-                } catch (Exception e) {
-                    log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
-                }
-                digester.addFactoryCreate
-                    ("tomcat-users/group",
-                     new MemoryGroupCreationFactory(this), true);
-                digester.addFactoryCreate
-                    ("tomcat-users/role",
-                     new MemoryRoleCreationFactory(this), true);
-                digester.addFactoryCreate
-                    ("tomcat-users/user",
-                     new MemoryUserCreationFactory(this), true);
+                    is = ConfigFileLoader.getInputStream(pathName);
 
-                // Parse the XML input file to load this database
-                FileInputStream fis = null;
-                try {
-                    fis =  new FileInputStream(file);
-                    digester.parse(fis);
+                    // Construct a digester to read the XML input file
+                    Digester digester = new Digester();
+                    try {
+                        digester.setFeature(
+                                "http://apache.org/xml/features/allow-java-encodings",
+                                true);
+                    } catch (Exception e) {
+                        log.warn(sm.getString("memoryUserDatabase.xmlFeatureEncoding"), e);
+                    }
+                    digester.addFactoryCreate
+                            ("tomcat-users/group",
+                                    new MemoryGroupCreationFactory(this), true);
+                    digester.addFactoryCreate
+                            ("tomcat-users/role",
+                                    new MemoryRoleCreationFactory(this), true);
+                    digester.addFactoryCreate
+                            ("tomcat-users/user",
+                                    new MemoryUserCreationFactory(this), true);
+
+                    // Parse the XML input to load this database
+                    digester.parse(is);
+                } catch (IOException ioe) {
+                    log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
                 } finally {
-                    if (fis != null) {
+                    if (is != null) {
                         try {
-                            fis.close();
+                            is.close();
                         } catch (IOException ioe) {
                             // Ignore
                         }
                     }
                 }
-
             }
         }
 

@@ -471,8 +471,9 @@ public class MyBean2 {
           pathname="conf/tomcat-users.xml"
           readonly="false" />]]></source>
 
-    <p>The <code>pathname</code> attribute can be absolute or relative. If
-    relative, it is relative to <code>$CATALINA_BASE</code>.</p>
+    <p>The <code>pathname</code> attribute can be a URL, an absolute path or a
+    relative path. If relative, it is relative to <code>$CATALINA_BASE</code>.
+    </p>
 
     <p>The <code>readonly</code> attribute is optional and defaults to
     <code>true</code> if not supplied. If the XML is writeable then it will be

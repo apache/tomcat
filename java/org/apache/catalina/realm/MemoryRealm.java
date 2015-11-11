@@ -19,17 +19,18 @@
 package org.apache.catalina.realm;
 
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.file.ConfigFileLoader;
 
 
 /**
@@ -282,30 +283,42 @@ public class MemoryRealm  extends RealmBase {
     @Override
     protected void startInternal() throws LifecycleException {
 
-        // Validate the existence of our database file
-        File file = new File(pathname);
-        if (!file.isAbsolute())
-            file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
-        if (!file.exists() || !file.canRead())
-            throw new LifecycleException
-                (sm.getString("memoryRealm.loadExist",
-                              file.getAbsolutePath()));
+        String pathName = getPathname();
+        InputStream is = null;
 
-        // Load the contents of the database file
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("memoryRealm.loadPath",
-                             file.getAbsolutePath()));
-        Digester digester = getDigester();
         try {
-            synchronized (digester) {
-                digester.push(this);
-                digester.parse(file);
+            is = ConfigFileLoader.getInputStream(pathName);
+
+            // Load the contents of the database file
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("memoryRealm.loadPath", pathName));
             }
-        } catch (Exception e) {
-            throw new LifecycleException
-                (sm.getString("memoryRealm.readXml"), e);
+
+            Digester digester = getDigester();
+            try {
+                synchronized (digester) {
+                    digester.push(this);
+                    digester.parse(is);
+                }
+            } catch (Exception e) {
+                throw new LifecycleException
+                        (sm.getString("memoryRealm.readXml"), e);
+            } finally {
+                digester.reset();
+            }
+
+        } catch (IOException ioe) {
+            throw new LifecycleException(sm.getString("memoryRealm.loadExist",
+                            pathName), ioe);
+
         } finally {
-            digester.reset();
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
         }
 
         super.startInternal();

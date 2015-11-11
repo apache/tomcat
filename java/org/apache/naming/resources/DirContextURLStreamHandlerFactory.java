@@ -23,8 +23,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Factory for Stream handlers to a JNDI directory context that also supports
- * users specifying additional stream handler.
+ * Factory for Stream handlers to a JNDI directory context,
+ * or for Stream handlers to a classpath url,
+ * which also supports users specifying additional stream handler.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
@@ -64,6 +65,8 @@ public class DirContextURLStreamHandlerFactory
     public URLStreamHandler createURLStreamHandler(String protocol) {
         if (protocol.equals("jndi")) {
             return new DirContextURLStreamHandler();
+        } else if (protocol.equals("classpath")) {
+            return new ClasspathURLStreamHandler();
         } else {
             for (URLStreamHandlerFactory factory : userFactories) {
                 URLStreamHandler handler =

@@ -60,6 +60,12 @@
 <section name="Tomcat 7.0.66 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>56777</bug>: Allow file based configuration resources (user
+        database, certificate revocation lists, keystores and trust stores) to
+        be configured using URLs as well as files. Back-port provided by Huxing
+        Zhang. (markt/violetagg)
+      </fix>
       <add>
         <bug>58486</bug>: Protect against two further possible memory leaks
         associated with XML parsing. (markt)

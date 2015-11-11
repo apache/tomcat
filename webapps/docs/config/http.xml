@@ -1019,7 +1019,8 @@
     <attribute name="crlFile" required="false">
       <p>The certificate revocation list to be used to verify client
       certificates. If not defined, client certificates will not be checked
-      against a certificate revocation list.</p>
+      against a certificate revocation list. The file may be specified using a
+      URL, an absolute path or a relative (to CATAINA_BASE) path.</p>
     </attribute>
 
     <attribute name="keyAlias" required="false">
@@ -1044,7 +1045,8 @@
       the file "<code>.keystore</code>" in the operating system home
       directory of the user that is running Tomcat. If your
       <code>keystoreType</code> doesn't need a file use <code>""</code>
-      (empty string) for this parameter.</p>
+      (empty string) for this parameter. The file may be specified using a
+      URL, an absolute path or a relative (to CATAINA_BASE) path.</p>
     </attribute>
 
     <attribute name="keystorePass" required="false">
@@ -1138,7 +1140,8 @@
       <p>The trust store file to use to validate client certificates. The
       default is the value of the <code>javax.net.ssl.trustStore</code> system
       property. If neither this attribute nor the default system property is
-      set, no trust store will be configured.</p>
+      set, no trust store will be configured. The file may be specified using a
+      URL, an absolute path or a relative (to CATAINA_BASE) path.</p>
     </attribute>
 
     <attribute name="truststorePass" required="false">
