@@ -48,7 +48,7 @@
   Note: Until the first 9.0.x release, the only entries that should appear in
         the changelog are those are relate only to 9.0.x.
  -->
-<section name="Tomcat 9.0.0">
+<section name="Tomcat 9.0.0.M1">
   <subsection name="General">
     <changelog>
       <add>
