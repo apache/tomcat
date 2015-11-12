@@ -97,7 +97,13 @@ By default there is no value, which results in the web application root
 directory being used as the search path. The recommended value is
 <code>WEB-INF/cgi</code></li>
 <li><strong>debug</strong> - Debugging detail level for messages logged
-by this servlet. Default is <code>0</code>.</li>
+by this servlet. Useful values range from 0 to 5 where 0 means no logging and 5
+means maximum logging. Values of 10 or more mean maximum logging plus debug info
+added to the HTTP response. If an error occurs and debug is 10 or more the
+standard error page mechanism will be disabled and a response body with debug
+information will be produced. The debug page is not considered secure and should
+not be enabled for production systems. Note that any value of 10 or more has the
+same effect as a value of 10. Default is <code>0</code>.</li>
 <li><strong>executable</strong> - The of the executable to be used to
 run the script. You may explicitly set this parameter to be an empty string
 if your script is itself executable (e.g. an exe file). Default is
