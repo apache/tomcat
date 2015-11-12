@@ -42,7 +42,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private static final Response ACK_RESPONSE = new Response();
 
     static {
-        ACK_RESPONSE.setStatus(101);
+        ACK_RESPONSE.setStatus(100);
     }
 
     private volatile int weight = Constants.DEFAULT_WEIGHT;
@@ -85,6 +85,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         this.coyoteRequest.setSendfile(false);
         this.coyoteResponse.setOutputBuffer(outputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
+        this.coyoteRequest.protocol().setString("HTTP/2.0");
     }
 
 
