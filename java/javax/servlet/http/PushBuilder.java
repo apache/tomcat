@@ -29,8 +29,8 @@ import java.util.Set;
  * <li>Conditional, range, expectation, authorization and referer headers will
  *     be removed.</li>
  * <li>Cookies added to the associated response will be added to the push
- *     request unless maxAge <= 0 in which case any request cookie with the same
- *     name will be removed.</li>
+ *     request unless maxAge &lt;= 0 in which case any request cookie with the
+ *     same name will be removed.</li>
  * <li>The referer header will be set to
  *     {@link HttpServletRequest#getRequestURL()} plus, if present, the query
  *     string from {@link HttpServletRequest#getQueryString()}.
