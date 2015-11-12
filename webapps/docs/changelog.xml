@@ -160,6 +160,11 @@
         Add support for DIGEST authentication to the JNDIRealm. Based on a patch
         by Alexis Hassler. (markt)
       </add>
+      <fix>
+        <bug>58603</bug>: Ensure that
+        <code>HttpServletRequest.getRequestURL()</code> returns the correct
+        value when using the <code>RemoteIpFilter</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
