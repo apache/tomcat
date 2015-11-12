@@ -22,7 +22,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
-import org.apache.tomcat.util.res.StringManager;
+import org.apache.naming.StringManager;
 
 public class ClasspathURLStreamHandler extends URLStreamHandler {
 
