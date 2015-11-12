@@ -95,8 +95,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     private static final String HTTP2_SETTINGS_HEADER = "HTTP2-Settings";
-    private static final byte[] HTTP2_UPGRADE_ACK = ("HTTP/1.1 101 Switching Protocols\r\n" +
-                "Connection: Upgrade\r\nUpgrade: h2c\r\n\r\n").getBytes(StandardCharsets.ISO_8859_1);
 
     private static final HeaderSink HEADER_SINK = new HeaderSink();
 
@@ -192,10 +190,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // The initial HTTP/1.1 request is available as Stream 1.
 
             try {
-                // Acknowledge the upgrade request
-                socketWrapper.write(true, HTTP2_UPGRADE_ACK, 0, HTTP2_UPGRADE_ACK.length);
-                socketWrapper.flush(true);
-
                 // Process the initial settings frame
                 stream = getStream(1, true);
                 String base64Settings = stream.getCoyoteRequest().getHeader(HTTP2_SETTINGS_HEADER);
@@ -209,7 +203,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
                     remoteSettings.set(Setting.valueOf(id), value);
                 }
-            } catch (Http2Exception | IOException ioe) {
+            } catch (Http2Exception e) {
                 throw new ProtocolException(
                         sm.getString("upgradeHandler.upgrade.fail", connectionId));
             }
