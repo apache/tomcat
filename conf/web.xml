@@ -340,7 +340,12 @@
   <!--                        Recommended value: WEB-INF/cgi                -->
   <!--                                                                      -->
   <!--   debug                Debugging detail level for messages logged    -->
-  <!--                        by this servlet.  [0]                         -->
+  <!--                        by this servlet. If set to 10 or more the     -->
+  <!--                        standard error page mechanism will be         -->
+  <!--                        disabled and a debug page shown instead. The  -->
+  <!--                        debug page is not considered secure and       -->
+  <!--                        should not be enabled for production systems. -->
+  <!--                        [0]                                           -->
   <!--                                                                      -->
   <!--   executable           Name of the executable used to run the        -->
   <!--                        script. [perl]                                -->
