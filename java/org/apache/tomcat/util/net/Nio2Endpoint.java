@@ -1165,9 +1165,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 } catch (InterruptedException e) {
                     throw new IOException(e);
                 } catch (TimeoutException e) {
-                    if (integer != null) {
-                        integer.cancel(true);
-                    }
+                    integer.cancel(true);
                     throw new SocketTimeoutException();
                 }
             } else {
@@ -1244,9 +1242,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             } catch (InterruptedException e) {
                 throw new IOException(e);
             } catch (TimeoutException e) {
-                if (integer != null) {
-                    integer.cancel(true);
-                }
+                integer.cancel(true);
                 throw new SocketTimeoutException();
             }
         }
