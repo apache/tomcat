@@ -197,6 +197,24 @@ hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
 hamcrest.jar=${hamcrest.home}/hamcrest-core-${hamcrest.version}.jar
 hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest-core/${hamcrest.version}/hamcrest-core-${hamcrest.version}.jar
 
+# ----- EasyMock, version 3.2 or later -----
+easymock.version=3.2
+easymock.home=${base.path}/easymock-${easymock.version}
+easymock.loc=${base-sf.loc}/easymock/easymock-${easymock.version}.zip
+easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
+
+# ----- cglib, used by EasyMock, version 2.2 or later -----
+cglib.version=2.2.3
+cglib.home=${base.path}/cglib-${cglib.version}
+cglib.loc=${base-sf.loc}/cglib/cglib-nodep-${cglib.version}.jar
+cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
+
+# ----- objenesis, used by EasyMock, version 1.2 or later -----
+objenesis.version=1.2
+objenesis.home=${base.path}/objenesis-${objenesis.version}
+objenesis.loc=https://objenesis.googlecode.com/files/objenesis-${objenesis.version}-bin.zip
+objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
+
 # ----- Checkstyle, version 6.0 or later -----
 checkstyle.version=6.1.1
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}

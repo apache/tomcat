@@ -202,6 +202,9 @@
     <pathelement location="${test.classes}"/>
     <pathelement location="${junit.jar}"/>
     <pathelement location="${hamcrest.jar}"/>
+    <pathelement location="${easymock.jar}"/>
+    <pathelement location="${cglib.jar}"/>
+    <pathelement location="${objenesis.jar}"/>
     <path refid="compile.classpath" />
     <path refid="tomcat.classpath" />
   </path>
@@ -2711,6 +2714,24 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile" value="${hamcrest.loc}"/>
       <param name="destfile" value="${hamcrest.jar}"/>
       <param name="destdir" value="${hamcrest.home}"/>
+    </antcall>
+
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${easymock.loc}"/>
+      <param name="destfile" value="${easymock.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${cglib.loc}"/>
+      <param name="destfile" value="${cglib.jar}"/>
+      <param name="destdir" value="${cglib.home}"/>
+    </antcall>
+
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${objenesis.loc}"/>
+      <param name="destfile" value="${objenesis.jar}"/>
+      <param name="destdir" value="${base.path}"/>
     </antcall>
 
   </target>
