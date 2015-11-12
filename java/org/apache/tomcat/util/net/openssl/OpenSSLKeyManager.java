@@ -20,11 +20,7 @@ import java.io.File;
 
 import javax.net.ssl.KeyManager;
 
-import org.apache.tomcat.util.res.StringManager;
-
 public class OpenSSLKeyManager implements KeyManager{
-
-    private static final StringManager sm = StringManager.getManager(OpenSSLKeyManager.class);
 
     private File certificateChain;
     public File getCertificateChain() { return certificateChain; }
@@ -44,5 +40,4 @@ public class OpenSSLKeyManager implements KeyManager{
         this.certificateChain = new File(certChainFile);
         this.privateKey = new File(keyFile);
     }
-
 }

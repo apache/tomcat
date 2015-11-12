@@ -981,6 +981,7 @@ public class DeltaManager extends ClusterManagerBase{
      *            whether this method has been called during session expiration
      * @return a SessionMessage to be sent,
      */
+    @SuppressWarnings("null") // session can't be null when it is used
     public ClusterMessage requestCompleted(String sessionId, boolean expires) {
         DeltaSession session = null;
         SessionMessage msg = null;
