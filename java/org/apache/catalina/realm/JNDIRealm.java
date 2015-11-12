@@ -2206,8 +2206,23 @@ public class JNDIRealm extends RealmBase {
      */
     @Override
     protected String getPassword(String username) {
+        String userPassword = getUserPassword();
+        if (userPassword == null || userPassword.isEmpty()) {
+            return null;
+        }
 
-        return (null);
+        try {
+            User user = getUser(open(), username, null);
+             if (user == null) {
+                // User should be found...
+                return null;
+            } else {
+                // ... and have a password
+                return user.getPassword();
+            }
+        } catch (NamingException e) {
+            return null;
+        }
 
     }
 
