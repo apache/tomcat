@@ -465,6 +465,10 @@ server.info=Apache Tomcat/7.0.x
     script will still report the version number.
     </p>
 
+    <p>The CGI Servlet is disabled by default. If enabled, the debug
+    initialisation parameter should not be set to <code>10</code> or higher on a
+    production system because the debug page is not secure.</p>
+ 
     <p><a href="config/filter.html">FailedRequestFilter</a>
     can be configured and used to reject requests that had errors during
     request parameter parsing. Without the filter the default behaviour is
