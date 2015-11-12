@@ -450,15 +450,27 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         if (!responseHeaders[0].startsWith("HTTP/1.1 101")) {
             return false;
         }
-        // TODO: There may be other headers.
-        if (!responseHeaders[1].equals("Connection: Upgrade")) {
+
+        if (!validateHeader(responseHeaders, "Connection: Upgrade")) {
             return false;
         }
-        if (!responseHeaders[2].startsWith("Upgrade: h2c")) {
+        if (!validateHeader(responseHeaders, "Upgrade: h2c")) {
             return false;
         }
 
         return true;
+    }
+
+
+    private boolean validateHeader(String[] responseHeaders, String header) {
+        boolean found = false;
+        for (String responseHeader : responseHeaders) {
+            if (responseHeader.equalsIgnoreCase(header)) {
+                found = true;
+                break;
+            }
+        }
+        return found;
     }
 
 
