@@ -395,8 +395,9 @@ public interface Context extends Container {
 
 
     /**
-     * Return the document root for this Context.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
+     * Obtain the document root for this Context.
+     *
+     * @return An absolute pathname, a relative pathname, or a URL.
      */
     public String getDocBase();
 
@@ -411,13 +412,18 @@ public interface Context extends Container {
 
 
     /**
-     * Return the URL encoded context path, using UTF-8.
+     * Return the URL encoded context path
+     *
+     * @return The URL encoded (with UTF-8) context path
      */
     public String getEncodedPath();
 
 
     /**
-     * Return the boolean on the annotations parsing.
+     * Determine if annotations parsing is currently disabled
+     *
+     * @return {@code true} if annotation parsing is disabled for this web
+     *         application
      */
     public boolean getIgnoreAnnotations();
 
