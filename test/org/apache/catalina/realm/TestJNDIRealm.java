@@ -18,7 +18,6 @@ package org.apache.catalina.realm;
 
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 
 import javax.naming.NamingEnumeration;
@@ -62,7 +61,7 @@ public class TestJNDIRealm {
     @Test
     public void testAuthenticateWithoutUserPassword() throws Exception {
         // GIVEN
-        JNDIRealm realm = buildRealm(PASSWORD);
+        JNDIRealm realm = buildRealm(PASSWORD, null);
 
         // WHEN
         String expectedResponse =
@@ -77,7 +76,7 @@ public class TestJNDIRealm {
     @Test
     public void testAuthenticateWithUserPassword() throws Exception {
         // GIVEN
-        JNDIRealm realm = buildRealm(PASSWORD);
+        JNDIRealm realm = buildRealm(PASSWORD, null);
         realm.setUserPassword(USER_PASSWORD_ATTR);
 
         // WHEN
@@ -92,10 +91,9 @@ public class TestJNDIRealm {
     }
 
     @Test
-    public void testAuthenticateWithUserPasswordAndCredentialHandler() throws Exception {
+    public void testAuthenticateWithUserPasswordAndDigest() throws Exception {
         // GIVEN
-        JNDIRealm realm = buildRealm(ha1());
-        realm.setCredentialHandler(buildCredentialHandler());
+        JNDIRealm realm = buildRealm(ha1(), "MD5");
         realm.setUserPassword(USER_PASSWORD_ATTR);
 
         // WHEN
@@ -110,12 +108,13 @@ public class TestJNDIRealm {
     }
 
 
-    private JNDIRealm buildRealm(String password) throws javax.naming.NamingException,
+    private JNDIRealm buildRealm(String password, String digest) throws javax.naming.NamingException,
             NoSuchFieldException, IllegalAccessException, LifecycleException {
         Context context = new TesterContext();
         JNDIRealm realm = new JNDIRealm();
         realm.setContainer(context);
         realm.setUserSearch("");
+        realm.setDigest(digest);
 
         Field field = JNDIRealm.class.getDeclaredField("context");
         field.setAccessible(true);
@@ -124,13 +123,6 @@ public class TestJNDIRealm {
         realm.start();
 
         return realm;
-    }
-
-    private MessageDigestCredentialHandler buildCredentialHandler()
-            throws NoSuchAlgorithmException {
-        MessageDigestCredentialHandler credentialHandler = new MessageDigestCredentialHandler();
-        credentialHandler.setAlgorithm(ALGORITHM);
-        return credentialHandler;
     }
 
     private NamingEnumeration<SearchResult> mockSearchResults(String password)
