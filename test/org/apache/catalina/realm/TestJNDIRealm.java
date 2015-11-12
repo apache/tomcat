@@ -1,4 +1,37 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.catalina.realm;
+
+import java.lang.reflect.Field;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -6,20 +39,6 @@ import org.apache.catalina.core.TesterContext;
 import org.apache.naming.NameParserImpl;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.easymock.EasyMock;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.*;
-import java.lang.reflect.Field;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-
-import static org.easymock.EasyMock.*;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
 
 public class TestJNDIRealm {
 
@@ -52,7 +71,7 @@ public class TestJNDIRealm {
                 realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
 
         // THEN
-        assertThat(principal, is(nullValue()));
+        Assert.assertNull(principal);
     }
 
     @Test
@@ -68,8 +87,8 @@ public class TestJNDIRealm {
                 realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
 
         // THEN
-        assertThat(principal, is(instanceOf(GenericPrincipal.class)));
-        assertThat( ((GenericPrincipal)principal).getPassword(), equalTo(PASSWORD));
+        Assert.assertTrue(principal instanceof GenericPrincipal);
+        Assert.assertEquals(PASSWORD, ((GenericPrincipal)principal).getPassword());
     }
 
     @Test
@@ -86,8 +105,8 @@ public class TestJNDIRealm {
                 realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
 
         // THEN
-        assertThat(principal, is(instanceOf(GenericPrincipal.class)));
-        assertThat( ((GenericPrincipal)principal).getPassword(), equalTo(ha1()));
+        Assert.assertTrue(principal instanceof GenericPrincipal);
+        Assert.assertEquals(ha1(), ((GenericPrincipal)principal).getPassword());
     }
 
 
@@ -117,13 +136,14 @@ public class TestJNDIRealm {
     private NamingEnumeration<SearchResult> mockSearchResults(String password)
             throws NamingException {
         @SuppressWarnings("unchecked")
-        NamingEnumeration<SearchResult> searchResults = createNiceMock(NamingEnumeration.class);
-        expect(Boolean.valueOf(searchResults.hasMore()))
+        NamingEnumeration<SearchResult> searchResults =
+        EasyMock.createNiceMock(NamingEnumeration.class);
+        EasyMock.expect(Boolean.valueOf(searchResults.hasMore()))
                 .andReturn(Boolean.TRUE)
                 .andReturn(Boolean.FALSE)
                 .andReturn(Boolean.TRUE)
                 .andReturn(Boolean.FALSE);
-        expect(searchResults.next())
+        EasyMock.expect(searchResults.next())
                 .andReturn(new SearchResult("ANY RESULT", "",
                         new BasicAttributes(USER_PASSWORD_ATTR, password)))
                 .times(2);
@@ -133,13 +153,14 @@ public class TestJNDIRealm {
 
     private DirContext mockDirContext(NamingEnumeration<SearchResult> namingEnumeration)
             throws NamingException {
-        DirContext dirContext = createNiceMock(InitialDirContext.class);
-        expect(dirContext.search(anyString(), anyString(), anyObject(SearchControls.class)))
+        DirContext dirContext = EasyMock.createNiceMock(InitialDirContext.class);
+        EasyMock.expect(dirContext.search(EasyMock.anyString(), EasyMock.anyString(),
+                        EasyMock.anyObject(SearchControls.class)))
                 .andReturn(namingEnumeration)
                 .times(2);
-        expect(dirContext.getNameParser(""))
+        EasyMock.expect(dirContext.getNameParser(""))
                 .andReturn(new NameParserImpl()).times(2);
-        expect(dirContext.getNameInNamespace())
+        EasyMock.expect(dirContext.getNameInNamespace())
                 .andReturn("ANY NAME")
                 .times(2);
         EasyMock.replay(dirContext);
