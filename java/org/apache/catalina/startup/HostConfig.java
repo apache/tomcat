@@ -1487,9 +1487,6 @@ public class HostConfig
                 if (resource.exists()) {
                     continue;
                 }
-                if (lastModified == 0L) {
-                    continue;
-                }
                 // Undeploy application
                 undeploy(app);
                 deleteRedeployResources(app, resources, i, true);

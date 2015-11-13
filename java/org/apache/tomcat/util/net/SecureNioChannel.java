@@ -223,11 +223,10 @@ public class SecureNioChannel extends NioChannel  {
                     break;
                 }
                 default: throw new IllegalStateException("Invalid handshake status:"+handshakeStatus);
-            }//switch
-        }//while
-        //return 0 if we are complete, otherwise reregister for any activity that
-        //would cause this method to be called again.
-        return handshakeComplete?0:(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+            }
+        }
+        // Handshake is complete if this point is reached
+        return 0;
     }
 
     /**

@@ -79,8 +79,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
                 HTTP_TOKEN_CHAR[i] = false;
             } else if (i == ' ') {
                 HTTP_TOKEN_CHAR[i] = false;
-            } else if (i == '\t') {
-                HTTP_TOKEN_CHAR[i] = false;
             } else {
                 HTTP_TOKEN_CHAR[i] = true;
             }
