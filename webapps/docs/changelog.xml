@@ -114,6 +114,9 @@
         The 1.2.x branch includes ALPN and SNI support which are required for
         HTTP/2. (markt)
       </update>
+      <add>
+        Add support for HTTP/2 including server push. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
