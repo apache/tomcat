@@ -131,6 +131,9 @@ public final class HomesUserDatabase
         if (!homeBaseDir.exists() || !homeBaseDir.isDirectory())
             return;
         String homeBaseFiles[] = homeBaseDir.list();
+        if (homeBaseFiles == null) {
+            return;
+        }
 
         for (int i = 0; i < homeBaseFiles.length; i++) {
             File homeDir = new File(homeBaseDir, homeBaseFiles[i]);
@@ -138,9 +141,5 @@ public final class HomesUserDatabase
                 continue;
             homes.put(homeBaseFiles[i], homeDir.toString());
         }
-
-
     }
-
-
 }

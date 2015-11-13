@@ -1524,26 +1524,28 @@ public class JspC extends Task implements Options {
             File lib = new File(webappBase, "/WEB-INF/lib");
             if (lib.exists() && lib.isDirectory()) {
                 String[] libs = lib.list();
-                for (int i = 0; i < libs.length; i++) {
-                    if( libs[i].length() <5 ) continue;
-                    String ext=libs[i].substring( libs[i].length() - 4 );
-                    if (! ".jar".equalsIgnoreCase(ext)) {
-                        if (".tld".equalsIgnoreCase(ext)) {
-                            log.warn("TLD files should not be placed in "
-                                     + "/WEB-INF/lib");
+                if (libs != null) {
+                    for (int i = 0; i < libs.length; i++) {
+                        if( libs[i].length() <5 ) continue;
+                        String ext=libs[i].substring( libs[i].length() - 4 );
+                        if (! ".jar".equalsIgnoreCase(ext)) {
+                            if (".tld".equalsIgnoreCase(ext)) {
+                                log.warn("TLD files should not be placed in "
+                                         + "/WEB-INF/lib");
+                            }
+                            continue;
                         }
-                        continue;
-                    }
-                    try {
-                        File libFile = new File(lib, libs[i]);
-                        classPath = classPath + File.pathSeparator
-                            + libFile.getAbsolutePath();
-                        urls.add(libFile.getAbsoluteFile().toURI().toURL());
-                    } catch (IOException ioe) {
-                        // failing a toCanonicalPath on a file that
-                        // exists() should be a JVM regression test,
-                        // therefore we have permission to freak out
-                        throw new RuntimeException(ioe.toString());
+                        try {
+                            File libFile = new File(lib, libs[i]);
+                            classPath = classPath + File.pathSeparator
+                                + libFile.getAbsolutePath();
+                            urls.add(libFile.getAbsoluteFile().toURI().toURL());
+                        } catch (IOException ioe) {
+                            // failing a toCanonicalPath on a file that
+                            // exists() should be a JVM regression test,
+                            // therefore we have permission to freak out
+                            throw new RuntimeException(ioe.toString());
+                        }
                     }
                 }
             }

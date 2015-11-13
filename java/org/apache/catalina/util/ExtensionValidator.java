@@ -433,6 +433,9 @@ public final class ExtensionValidator {
                     continue;
                 }
                 File[] files = targetDir.listFiles();
+                if (files == null) {
+                    continue;
+                }
                 for (int i = 0; i < files.length; i++) {
                     if (files[i].getName().toLowerCase(Locale.ENGLISH).endsWith(".jar") &&
                             files[i].isFile()) {

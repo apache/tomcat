@@ -943,12 +943,15 @@ public class JDBCStore extends StoreBase {
             } catch (ClassNotFoundException ex) {
                 manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
                         ex.toString()));
+                throw new SQLException(ex);
             } catch (InstantiationException ex) {
                 manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
                         ex.toString()));
+                throw new SQLException(ex);
             } catch (IllegalAccessException ex) {
                 manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
                         ex.toString()));
+                throw new SQLException(ex);
             }
         }
 
