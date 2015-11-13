@@ -24,8 +24,10 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -125,6 +127,13 @@ import org.apache.catalina.realm.RealmBase;
  * @author Costin Manolache
  */
 public class Tomcat {
+    // Some logging implementations use weak references for loggers so there is
+    // the possibility that logging configuration could be lost if GC runs just
+    // after Loggers are configured but before they are used. The purpose of
+    // this Sety is to retain strong references to explicitly configured loggers
+    // so that configuration is not lost.
+    private final Set<Logger> pinnedLoggers = new HashSet<Logger>();
+
     // Single engine, service, server, connector - few cases need more,
     // they can use server.xml
     protected Server server;
@@ -679,16 +688,20 @@ public class Tomcat {
      */
     public void setSilent(boolean silent) {
         for (String s : silences) {
+            Logger logger = Logger.getLogger(s);
+            pinnedLoggers.add(logger);
             if (silent) {
-                Logger.getLogger(s).setLevel(Level.WARNING);
+                logger.setLevel(Level.WARNING);
             } else {
-                Logger.getLogger(s).setLevel(Level.INFO);
+                logger.setLevel(Level.INFO);
             }
         }
     }
     
     private void silence(Host host, String ctx) {
-        Logger.getLogger(getLoggerName(host, ctx)).setLevel(Level.WARNING);
+        Logger logger = Logger.getLogger(getLoggerName(host, ctx));
+        pinnedLoggers.add(logger);
+        logger.setLevel(Level.WARNING);
     }
 
     private String getLoggerName(Host host, String ctx) {
