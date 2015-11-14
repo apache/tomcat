@@ -23,7 +23,7 @@ enum Protocol {
 
     SSLv3(Constants.SSL_PROTO_SSLv3),
     SSLv2(Constants.SSL_PROTO_SSLv2),
-    TLSv1(Constants.SSL_PROTO_TLSv1),
+    TLSv1(Constants.SSL_PROTO_TLSv1_0),
     TLSv1_2(Constants.SSL_PROTO_TLSv1_2);
 
     private final String openSSLName;
