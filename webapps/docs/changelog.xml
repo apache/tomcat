@@ -167,6 +167,10 @@
         <code>HttpServletRequest.getRequestURL()</code> returns the correct
         value when using the <code>RemoteIpFilter</code>. (markt)
       </fix>
+      <fix>
+        Ensure that in an embedded Tomcat the logging configuration is
+        not lost during garbage collection. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
