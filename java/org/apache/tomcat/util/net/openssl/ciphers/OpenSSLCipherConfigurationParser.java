@@ -446,9 +446,9 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(eFZA, filterByEncryption(allCiphers, Collections.singleton(Encryption.FZA)));
         addListAlias(FZA, filter(allCiphers, null, Collections.singleton(KeyExchange.FZA), Collections.singleton(Authentication.FZA), Collections.singleton(Encryption.FZA), null, null));
         addListAlias(Constants.SSL_PROTO_TLSv1_2, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1_2)));
-        addListAlias(Constants.SSL_PROTO_TLSv1_1, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv3)));
-        addListAlias(Constants.SSL_PROTO_TLSv1, filterByProtocol(allCiphers, new HashSet<>(Arrays.asList(Protocol.TLSv1, Protocol.SSLv3))));
-        aliases.put(Constants.SSL_PROTO_SSLv3, aliases.get(Constants.SSL_PROTO_TLSv1));
+        addListAlias(Constants.SSL_PROTO_TLSv1_0, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1)));
+        addListAlias(Constants.SSL_PROTO_SSLv3, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv3)));
+        aliases.put(Constants.SSL_PROTO_TLSv1, aliases.get(Constants.SSL_PROTO_SSLv3));
         addListAlias(Constants.SSL_PROTO_SSLv2, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv2)));
         addListAlias(DH, filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd, KeyExchange.EDH))));
         Set<Cipher> adh = filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EDH));
