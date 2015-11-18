@@ -75,11 +75,14 @@ public class MapperListener extends LifecycleMBeanBase
      */
     private final String domain = null;
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Create mapper listener.
+     *
+     * @param mapper  The mapper instance this listener will update
+     * @param service The service this listener is associated with
      */
     public MapperListener(Mapper mapper, Service service) {
         this.mapper = mapper;
