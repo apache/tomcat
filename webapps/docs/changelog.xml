@@ -179,6 +179,10 @@
         Optimize the session lock range in DeltaManager.requestCompleted.
         (kfujino)
       </fix>
+      <fix>
+        Enable an explicit configuration of local member in the static cluster
+        membership. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
