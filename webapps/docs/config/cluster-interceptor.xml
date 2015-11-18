@@ -229,7 +229,7 @@
        2. Hostnames like &quot;tomcat01.mydomain.com&quot; or &quot;tomcat01&quot; as long as they resolve correctly<br/>
        3. byte array in string form, for example {216,123,12,3}<br/>
      </attribute>
-     <attribute name="domain" required="true">
+     <attribute name="domain" required="false">
        The logical cluster domain for that this static member listens for cluster messages.
        Two different type of values are possible:<br/>
        1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes

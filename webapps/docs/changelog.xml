@@ -214,6 +214,10 @@
         page is not considered secure and should not be used in production.
         (markt)
       </add>
+      <fix>
+        The <code>domain</code> attribute of <code>StaticMember</code> is not
+        required but optional. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
