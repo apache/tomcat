@@ -514,9 +514,10 @@ public final class Mapper {
     /**
      * Remove a wrapper from an existing context.
      *
-     * @param hostName Virtual host name this wrapper belongs to
+     * @param hostName    Virtual host name this wrapper belongs to
      * @param contextPath Context path this wrapper belongs to
-     * @param path Wrapper mapping
+     * @param version     Context version this wrapper belongs to
+     * @param path        Wrapper mapping
      */
     public void removeWrapper(String hostName, String contextPath,
             String version, String path) {
@@ -597,36 +598,36 @@ public final class Mapper {
     /**
      * Add a welcome file to the given context.
      *
-     * @param hostName
-     * @param contextPath
-     * @param welcomeFile
+     * @param hostName    The host where the given context can be found
+     * @param contextPath The path of the given context
+     * @param version     The version of the given context
+     * @param welcomeFile The welcome file to add
      */
-    public void addWelcomeFile(String hostName, String contextPath,
-            String version, String welcomeFile) {
-        ContextVersion contextVersion = findContextVersion(hostName,
-                contextPath, version, false);
+    public void addWelcomeFile(String hostName, String contextPath, String version,
+            String welcomeFile) {
+        ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null) {
             return;
         }
         int len = contextVersion.welcomeResources.length + 1;
         String[] newWelcomeResources = new String[len];
-        System.arraycopy(contextVersion.welcomeResources, 0,
-                newWelcomeResources, 0, len - 1);
+        System.arraycopy(contextVersion.welcomeResources, 0, newWelcomeResources, 0, len - 1);
         newWelcomeResources[len - 1] = welcomeFile;
         contextVersion.welcomeResources = newWelcomeResources;
     }
 
+
     /**
      * Remove a welcome file from the given context.
      *
-     * @param hostName
-     * @param contextPath
-     * @param welcomeFile
+     * @param hostName    The host where the given context can be found
+     * @param contextPath The path of the given context
+     * @param version     The version of the given context
+     * @param welcomeFile The welcome file to remove
      */
     public void removeWelcomeFile(String hostName, String contextPath,
             String version, String welcomeFile) {
-        ContextVersion contextVersion = findContextVersion(hostName,
-                contextPath, version, false);
+        ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null || contextVersion.isPaused()) {
             return;
         }
@@ -640,8 +641,7 @@ public final class Mapper {
         if (match > -1) {
             int len = contextVersion.welcomeResources.length - 1;
             String[] newWelcomeResources = new String[len];
-            System.arraycopy(contextVersion.welcomeResources, 0,
-                    newWelcomeResources, 0, match);
+            System.arraycopy(contextVersion.welcomeResources, 0, newWelcomeResources, 0, match);
             if (match < len) {
                 System.arraycopy(contextVersion.welcomeResources, match + 1,
                         newWelcomeResources, match, len - match);
@@ -650,27 +650,29 @@ public final class Mapper {
         }
     }
 
+
     /**
      * Clear the welcome files for the given context.
      *
-     * @param hostName
-     * @param contextPath
+     * @param hostName    The host where the context to be cleared can be found
+     * @param contextPath The path of the context to be cleared
+     * @param version     The version of the context to be cleared
      */
-    public void clearWelcomeFiles(String hostName, String contextPath,
-            String version) {
-        ContextVersion contextVersion = findContextVersion(hostName,
-                contextPath, version, false);
+    public void clearWelcomeFiles(String hostName, String contextPath, String version) {
+        ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null) {
             return;
         }
         contextVersion.welcomeResources = new String[0];
     }
 
+
     /**
      * Map the specified host name and URI, mutating the given mapping data.
      *
      * @param host Virtual host name
      * @param uri URI
+     * @param version The version, if any, included in the request to be mapped
      * @param mappingData This structure will contain the result of the mapping
      *                    operation
      * @throws IOException if the buffers are too small to hold the results of
@@ -686,7 +688,6 @@ public final class Mapper {
         uri.toChars();
         internalMap(host.getCharChunk(), uri.getCharChunk(), version,
                 mappingData);
-
     }
 
 
@@ -710,12 +711,10 @@ public final class Mapper {
         CharChunk uricc = uri.getCharChunk();
         uricc.setLimit(-1);
         internalMapWrapper(contextVersion, uricc, mappingData);
-
     }
 
 
     // -------------------------------------------------------- Private Methods
-
 
     /**
      * Map the specified URI.
@@ -1545,6 +1544,9 @@ public final class Mapper {
 
         /**
          * Constructor used for the primary Host
+         *
+         * @param name The name of the virtual host
+         * @param host The host
          */
         public MappedHost(String name, Host host) {
             super(name, host);
@@ -1555,6 +1557,9 @@ public final class Mapper {
 
         /**
          * Constructor used for an Alias
+         *
+         * @param alias    The alias of the virtual host
+         * @param realHost The host the alias points to
          */
         public MappedHost(String alias, MappedHost realHost) {
             super(alias, realHost.object);
