@@ -883,7 +883,8 @@ public final class Mapper {
             }
         }
 
-        if(mappingData.wrapper == null && noServletPath) {
+        if(mappingData.wrapper == null && noServletPath &&
+                mappingData.context.getMapperContextRootRedirectEnabled()) {
             // The path is empty, redirect to "/"
             mappingData.redirectPath.setChars
                 (path.getBuffer(), pathOffset, pathEnd-pathOffset);
@@ -1001,9 +1002,9 @@ public final class Mapper {
             char[] buf = path.getBuffer();
             if (contextVersion.resources != null && buf[pathEnd -1 ] != '/') {
                 String pathStr = path.toString();
-                WebResource file =
-                        contextVersion.resources.getResource(pathStr);
-                if (file != null && file.isDirectory()) {
+                WebResource file = contextVersion.resources.getResource(pathStr);
+                if (file != null && file.isDirectory() &&
+                        mappingData.context.getMapperDirectoryRedirectEnabled()) {
                     // Note: this mutates the path: do not do any processing
                     // after this (since we set the redirectPath, there
                     // shouldn't be any)
@@ -1020,7 +1021,6 @@ public final class Mapper {
 
         path.setOffset(pathOffset);
         path.setEnd(pathEnd);
-
     }
 
 
