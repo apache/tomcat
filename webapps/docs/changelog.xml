@@ -171,6 +171,16 @@
         Ensure that in an embedded Tomcat the logging configuration is
         not lost during garbage collection. (violetagg)
       </fix>
+      <add>
+        Move the functionality that provides redirects for context roots and
+        directories where a trailing <code>/</code> is added from the Mapper to
+        the <code>DefaultServlet</code>. This enables such requests to be
+        processed by any configured Valves and Filters before the redirect is
+        made. This behaviour is configurable via the
+        <code>mapperContextRootRedirectEnabled</code> and
+        <code>mapperDirectoryRedirectEnabled</code> attributes of the Context
+        which may be used to restore the previous behaviour. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">

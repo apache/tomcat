@@ -1227,4 +1227,20 @@ public class TesterContext implements Context {
 
     @Override
     public boolean getValidateClientProvidedNewSessionId() { return false; }
+
+    @Override
+    public void setMapperContextRootRedirectEnabled(boolean mapperContextRootRedirectEnabled) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getMapperContextRootRedirectEnabled() { return false; }
+
+    @Override
+    public void setMapperDirectoryRedirectEnabled(boolean mapperDirectoryRedirectEnabled) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getMapperDirectoryRedirectEnabled() { return false; }
 }

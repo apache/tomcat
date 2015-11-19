@@ -631,8 +631,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             String method) throws IOException {
 
         URL url = new URL(path);
-        HttpURLConnection connection =
-            (HttpURLConnection) url.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setUseCaches(false);
         connection.setReadTimeout(readTimeout);
         connection.setRequestMethod(method);

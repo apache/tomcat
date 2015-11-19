@@ -221,6 +221,14 @@
                description="The object used for mapping"
                type="java.lang.Object"/>
       
+    <attribute name="mapperContextRootRedirectEnabled"
+               description="Should the Mapper be used for context root redirects"
+               type="boolean" />
+
+    <attribute name="mapperDirectoryRedirectEnabled"
+               description="Should the Mapper be used for directory redirects"
+               type="boolean" />
+
     <attribute name="namingContextListener"
                description="Associated naming context listener."
                type="org.apache.catalina.core.NamingContextListener" />

@@ -862,6 +862,17 @@ public class DefaultServlet
 
         if (cacheEntry.context != null) {
 
+            if (!path.endsWith("/")) {
+                StringBuilder location = new StringBuilder(request.getRequestURI());
+                location.append('/');
+                if (request.getQueryString() != null) {
+                    location.append('?');
+                    location.append(request.getQueryString());
+                }
+                response.sendRedirect(response.encodeRedirectURL(location.toString()));
+                return;
+            }
+
             // Skip directory listings if we have been configured to
             // suppress them
             if (!listings) {

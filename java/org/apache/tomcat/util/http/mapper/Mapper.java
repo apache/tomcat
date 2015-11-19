@@ -248,7 +248,8 @@ public final class Mapper {
      * @param context Context object
      * @param welcomeResources Welcome files defined for this context
      * @param resources Static resources of the context
-     * @deprecated Use {@link #addContextVersion(String, Object, String, String, Object, String[], javax.naming.Context, Collection)}
+     * @deprecated Use {@link #addContextVersion(String, Object, String, String, Object, String[],
+     *             javax.naming.Context, Collection, boolean, boolean)}
      */
     @Deprecated
     public void addContextVersion(String hostName, Object host, String path,
@@ -258,6 +259,7 @@ public final class Mapper {
                 welcomeResources, resources, null);
     }
 
+    
     /**
      * Add a new Context to an existing Host.
      *
@@ -269,10 +271,36 @@ public final class Mapper {
      * @param welcomeResources Welcome files defined for this context
      * @param resources Static resources of the context
      * @param wrappers Information on wrapper mappings
+     * @deprecated Use {@link #addContextVersion(String, Object, String, String, Object, String[],
+     *             javax.naming.Context, Collection, boolean, boolean)}
      */
+    @Deprecated
     public void addContextVersion(String hostName, Object host, String path,
             String version, Object context, String[] welcomeResources,
             javax.naming.Context resources, Collection<WrapperMappingInfo> wrappers) {
+        addContextVersion(hostName, host, path, version, context, welcomeResources, resources,
+                wrappers, false, false);
+    }
+    
+    
+    /**
+     * Add a new Context to an existing Host.
+     *
+     * @param hostName Virtual host name this context belongs to
+     * @param host Host object
+     * @param path Context path
+     * @param version Context version
+     * @param context Context object
+     * @param welcomeResources Welcome files defined for this context
+     * @param resources Static resources of the context
+     * @param wrappers Information on wrapper mappings
+     * @param mapperContextRootRedirectEnabled Mapper does context root redirects
+     * @param mapperDirectoryRedirectEnabled Mapper does directory redirects
+     */
+    public void addContextVersion(String hostName, Object host, String path,
+            String version, Object context, String[] welcomeResources,
+            javax.naming.Context resources, Collection<WrapperMappingInfo> wrappers,
+            boolean mapperContextRootRedirectEnabled, boolean mapperDirectoryRedirectEnabled) {
 
         Host mappedHost = exactFind(hosts, hostName);
         if (mappedHost == null) {
@@ -294,6 +322,9 @@ public final class Mapper {
             newContextVersion.slashCount = slashCount;
             newContextVersion.welcomeResources = welcomeResources;
             newContextVersion.resources = resources;
+            newContextVersion.mapperContextRootRedirectEnabled = mapperContextRootRedirectEnabled;
+            newContextVersion.mapperDirectoryRedirectEnabled = mapperDirectoryRedirectEnabled;
+            
             if (wrappers != null) {
                 addWrappers(newContextVersion, wrappers);
             }
@@ -904,7 +935,8 @@ public final class Mapper {
             }
         }
 
-        if(mappingData.wrapper == null && noServletPath) {
+        if(mappingData.wrapper == null && noServletPath &&
+                contextVersion.mapperContextRootRedirectEnabled) {
             // The path is empty, redirect to "/"
             mappingData.redirectPath.setChars
                 (path.getBuffer(), pathOffset, pathEnd-pathOffset);
@@ -1032,7 +1064,8 @@ public final class Mapper {
                 } catch(NamingException nex) {
                     // Swallow, since someone else handles the 404
                 }
-                if (file != null && file instanceof DirContext) {
+                if (file != null && file instanceof DirContext &&
+                        contextVersion.mapperDirectoryRedirectEnabled) {
                     // Note: this mutates the path: do not do any processing
                     // after this (since we set the redirectPath, there
                     // shouldn't be any)
@@ -1049,7 +1082,6 @@ public final class Mapper {
 
         path.setOffset(pathOffset);
         path.setEnd(pathEnd);
-
     }
 
 
@@ -1684,6 +1716,8 @@ public final class Mapper {
         public Wrapper[] wildcardWrappers = new Wrapper[0];
         public Wrapper[] extensionWrappers = new Wrapper[0];
         public int nesting = 0;
+        public boolean mapperContextRootRedirectEnabled = false;
+        public boolean mapperDirectoryRedirectEnabled = false;
         private volatile boolean paused;
 
         public ContextVersion() {
