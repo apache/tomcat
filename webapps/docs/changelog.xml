@@ -44,11 +44,7 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<!--
-  Note: Until the first 9.0.x release, the only entries that should appear in
-        the changelog are those are relate only to 9.0.x.
- -->
-<section name="Tomcat 9.0.0.M1">
+<section name="Tomcat 9.0.0.M1" rtext="2015-11-17">
   <subsection name="General">
     <changelog>
       <add>
