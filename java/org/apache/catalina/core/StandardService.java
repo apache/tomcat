@@ -105,8 +105,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     /**
      * Mapper listener.
      */
-    protected final MapperListener mapperListener =
-            new MapperListener(mapper, this);
+    protected final MapperListener mapperListener = new MapperListener(this);
 
 
     // ------------------------------------------------------------- Properties
