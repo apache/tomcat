@@ -1714,4 +1714,44 @@ public interface Context extends Container {
      *         false}
      */
     public boolean getValidateClientProvidedNewSessionId();
+
+    /**
+     * If enabled, requests for a web application context root will be
+     * redirected (adding a trailing slash) by the Mapper. This is more
+     * efficient but has the side effect of confirming that the context path is
+     * valid.
+     *
+     * @param mapperContextRootRedirectEnabled Should the redirects be enabled?
+     */
+    public void setMapperContextRootRedirectEnabled(boolean mapperContextRootRedirectEnabled);
+
+    /**
+     * Determines if requests for a web application context root will be
+     * redirected (adding a trailing slash) by the Mapper. This is more
+     * efficient but has the side effect of confirming that the context path is
+     * valid.
+     *
+     * @return {@code true} if the Mapper level redirect is enabled for this
+     *         Context.
+     */
+    public boolean getMapperContextRootRedirectEnabled();
+
+    /**
+     * If enabled, requests for a directory will be redirected (adding a
+     * trailing slash) by the Mapper. This is more efficient but has the
+     * side effect of confirming that the directory is valid.
+     *
+     * @param mapperDirectoryRedirectEnabled Should the redirects be enabled?
+     */
+    public void setMapperDirectoryRedirectEnabled(boolean mapperDirectoryRedirectEnabled);
+
+    /**
+     * Determines if requests for a directory will be redirected (adding a
+     * trailing slash) by the Mapper. This is more efficient but has the
+     * side effect of confirming that the directory is valid.
+     *
+     * @return {@code true} if the Mapper level redirect is enabled for this
+     *         Context.
+     */
+    public boolean getMapperDirectoryRedirectEnabled();
 }

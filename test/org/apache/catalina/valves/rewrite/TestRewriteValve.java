@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -75,6 +76,8 @@ public class TestRewriteValve extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
         ctx.addServletMapping("/a/%255A", "snoop");
         ctx.addServletMapping("/c/*", "snoop");
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMapping("/", "default");
 
         tomcat.start();
 
