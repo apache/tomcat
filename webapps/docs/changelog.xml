@@ -44,6 +44,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
+<section name="Tomcat 9.0.0.M2">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Refactor creation of <code>MapperListener</code> to ensure that the
+        <code>Mapper</code> used is the <code>Mapper</code> associated with the
+        <code>Service</code> for which the listener was created. (markt)
+      </scode>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 9.0.0.M1" rtext="2015-11-17">
   <subsection name="General">
     <changelog>

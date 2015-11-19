@@ -81,12 +81,11 @@ public class MapperListener extends LifecycleMBeanBase
     /**
      * Create mapper listener.
      *
-     * @param mapper  The mapper instance this listener will update
      * @param service The service this listener is associated with
      */
-    public MapperListener(Mapper mapper, Service service) {
-        this.mapper = mapper;
+    public MapperListener(Service service) {
         this.service = service;
+        this.mapper = service.getMapper();
     }
 
 
