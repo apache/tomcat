@@ -332,8 +332,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
                         certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
 
-                // Support Client Certificates
+                // Set certificate chain file
+                SSLContext.setCertificateChainFile(ctx,
+                        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
 
+                // Support Client Certificates
                 SSLContext.setCACertificate(ctx,
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));

@@ -488,6 +488,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                             SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
                             SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
                             certificate.getCertificateKeyPassword(), idx++);
+                    // Set certificate chain file
+                    SSLContext.setCertificateChainFile(ctx,
+                            SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
                 }
                 // Support Client Certificates
                 SSLContext.setCACertificate(ctx,

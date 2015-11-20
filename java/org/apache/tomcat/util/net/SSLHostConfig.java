@@ -525,6 +525,12 @@ public class SSLHostConfig {
     // TODO: These certificate setters can be removed once it is no longer
     // necessary to support the old configuration attributes (Tomcat 10?).
 
+    public void setCertificateChainFile(String certificateChainFile) {
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateChainFile(certificateChainFile);
+    }
+
+
     public void setCertificateFile(String certificateFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateFile(certificateFile);
