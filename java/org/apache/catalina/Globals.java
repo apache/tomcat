@@ -271,4 +271,12 @@ public final class Globals {
      */
     public static final String JASPER_XML_BLOCK_EXTERNAL_INIT_PARAM =
             "org.apache.jasper.XML_BLOCK_EXTERNAL";
+
+    /**
+     * Name of the ServletContext attribute under which we store the context
+     * Realm's CredentialHandler (if both the Realm and the CredentialHandler
+     * exist).
+     */
+    public static final String CREDENTIAL_HANDLER
+            = "org.apache.catalina.CredentialHandler";
 }

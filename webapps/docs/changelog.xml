@@ -74,6 +74,12 @@
         Correctly notify the MapperListener associated with a Service if the
         Engine for that Service is changed. (markt)
       </fix>
+      <add>
+        Make a web application's CredentialHandler available through a context
+        attribute. This allows a web application to use the same algorithm
+        for validating or generating new stored credentials from cleartext
+        ones. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
