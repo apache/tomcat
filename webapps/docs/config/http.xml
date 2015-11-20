@@ -1266,6 +1266,8 @@
       the server certificate used. The format is
       PEM-encoded. Relative paths will be resolved against
       <code>$CATALINA_BASE</code>.</p>
+      <p>The certificate chain used for Tomcat should not include the server
+      certificate as its first element.</p>
       <p>Note that when using more than one certificate for different types,
       they all must use the same certificate chain.</p>
     </attribute>
