@@ -70,6 +70,10 @@
         <bug>58629</bug>: Allow an embedded Tomcat instance to start when the
         <code>Service</code> has no <code>Engine</code> configured. (markt)
       </fix>
+      <fix>
+        Correctly notify the MapperListener associated with a Service if the
+        Engine for that Service is changed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
