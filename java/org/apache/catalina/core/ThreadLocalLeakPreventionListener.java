@@ -127,7 +127,7 @@ public class ThreadLocalLeakPreventionListener implements LifecycleListener,
 
     private void registerListenersForServer(Server server) {
         for (Service service : server.findServices()) {
-            Engine engine = (Engine) service.getContainer();
+            Engine engine = service.getContainer();
             engine.addContainerListener(this);
             registerListenersForEngine(engine);
         }

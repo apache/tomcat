@@ -89,13 +89,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     protected final ArrayList<Executor> executors = new ArrayList<>();
 
-    /**
-     * The Container associated with this Service.
-     *
-     * @deprecated Will be made private in 9.0.x
-     */
-    @Deprecated
-    protected Container container = null;
+    private Engine engine = null;
 
     private ClassLoader parentClassLoader = null;
 
@@ -119,51 +113,39 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Return the <code>Container</code> that handles requests for all
-     * <code>Connectors</code> associated with this Service.
-     */
     @Override
-    public Container getContainer() {
-
-        return (this.container);
-
-    }
-
-
-    @Override
-    public void setContainer(Container container) {
-        setContainer((Engine) container);
+    public Engine getContainer() {
+        return (this.engine);
     }
 
 
     @Override
     public void setContainer(Engine engine) {
-        Container oldContainer = this.container;
-        if (oldContainer instanceof Engine) {
-            ((Engine) oldContainer).setService(null);
+        Engine oldEngine = this.engine;
+        if (oldEngine != null) {
+            oldEngine.setService(null);
         }
-        this.container = engine;
-        if (this.container instanceof Engine) {
-            ((Engine) this.container).setService(this);
+        this.engine = engine;
+        if (this.engine != null) {
+            this.engine.setService(this);
         }
-        if (getState().isAvailable() && (this.container != null)) {
+        if (getState().isAvailable() && (this.engine != null)) {
             try {
-                this.container.start();
+                this.engine.start();
             } catch (LifecycleException e) {
                 // Ignore
             }
         }
-        if (getState().isAvailable() && (oldContainer != null)) {
+        if (getState().isAvailable() && (oldEngine != null)) {
             try {
-                oldContainer.stop();
+                oldEngine.stop();
             } catch (LifecycleException e) {
                 // Ignore
             }
         }
 
         // Report this property change to interested listeners
-        support.firePropertyChange("container", oldContainer, this.container);
+        support.firePropertyChange("container", oldEngine, this.engine);
 
     }
 
@@ -437,9 +419,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         setState(LifecycleState.STARTING);
 
         // Start our defined Container first
-        if (container != null) {
-            synchronized (container) {
-                container.start();
+        if (engine != null) {
+            synchronized (engine) {
+                engine.start();
             }
         }
 
@@ -499,9 +481,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         setState(LifecycleState.STOPPING);
 
         // Stop our defined Container second
-        if (container != null) {
-            synchronized (container) {
-                container.stop();
+        if (engine != null) {
+            synchronized (engine) {
+                engine.stop();
             }
         }
 
@@ -548,8 +530,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         super.initInternal();
 
-        if (container != null) {
-            container.init();
+        if (engine != null) {
+            engine.init();
         }
 
         // Initialize any Executors
@@ -602,8 +584,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             executor.destroy();
         }
 
-        if (container != null) {
-            container.destroy();
+        if (engine != null) {
+            engine.destroy();
         }
 
         super.destroyInternal();
