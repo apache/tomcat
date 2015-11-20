@@ -66,6 +66,10 @@
         Refactor <code>Service.getContainer()</code> to return an
         <code>Engine</code> rather than a <code>Container</code>. (markt)
       </scode>
+      <fix>
+        <bug>58629</bug>: Allow an embedded Tomcat instance to start when the
+        <code>Service</code> has no <code>Engine</code> configured. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -96,12 +96,13 @@ public class MapperListener extends LifecycleMBeanBase
 
         setState(LifecycleState.STARTING);
 
-        // Find any components that have already been initialized since the
-        // MBean listener won't be notified as those components will have
-        // already registered their MBeans
+        Engine engine = service.getContainer();
+        if (engine == null) {
+            return;
+        }
+
         findDefaultHost();
 
-        Engine engine = service.getContainer();
         addListeners(engine);
 
         Container[] conHosts = engine.findChildren();
@@ -120,6 +121,9 @@ public class MapperListener extends LifecycleMBeanBase
         setState(LifecycleState.STOPPING);
 
         Engine engine = service.getContainer();
+        if (engine == null) {
+            return;
+        }
         removeListeners(engine);
     }
 
