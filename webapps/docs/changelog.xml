@@ -62,6 +62,10 @@
         <code>mapperDirectoryRedirectEnabled</code> attributes of the Context
         which may be used to restore the previous behaviour. (markt)
       </add>
+      <scode>
+        Refactor <code>Service.getContainer()</code> to return an
+        <code>Engine</code> rather than a <code>Container</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
