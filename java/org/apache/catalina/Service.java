@@ -37,11 +37,13 @@ public interface Service extends Lifecycle {
 
     // ------------------------------------------------------------- Properties
 
-
     /**
      * @return the <code>Container</code> that handles requests for all
      * <code>Connectors</code> associated with this Service.
+     *
+     * @deprecated Return value will be narrowed to Engine in Tomcat 9.
      */
+    @Deprecated
     public Container getContainer();
 
     /**
@@ -49,8 +51,20 @@ public interface Service extends Lifecycle {
      * <code>Connectors</code> associated with this Service.
      *
      * @param container The new Container
+     *
+     * @deprecated Use {@link #setContainer(Engine)} Will be removed in Tomcat
+     *             9.
      */
+    @Deprecated
     public void setContainer(Container container);
+
+    /**
+     * Set the <code>Engine</code> that handles requests for all
+     * <code>Connectors</code> associated with this Service.
+     *
+     * @param engine The new Engine
+     */
+    public void setContainer(Engine engine);
 
     /**
      * @return the name of this Service.

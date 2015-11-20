@@ -91,7 +91,10 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     /**
      * The Container associated with this Service.
+     *
+     * @deprecated Will be made private in 9.0.x
      */
+    @Deprecated
     protected Container container = null;
 
     private ClassLoader parentClassLoader = null;
@@ -128,20 +131,19 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     }
 
 
-    /**
-     * Set the <code>Container</code> that handles requests for all
-     * <code>Connectors</code> associated with this Service.
-     *
-     * @param container The new Container
-     */
     @Override
     public void setContainer(Container container) {
+        setContainer((Engine) container);
+    }
 
+
+    @Override
+    public void setContainer(Engine engine) {
         Container oldContainer = this.container;
         if (oldContainer instanceof Engine) {
             ((Engine) oldContainer).setService(null);
         }
-        this.container = container;
+        this.container = engine;
         if (this.container instanceof Engine) {
             ((Engine) this.container).setService(this);
         }
