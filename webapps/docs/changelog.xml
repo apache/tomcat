@@ -64,6 +64,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>58621</bug>: The certificate chain cannot be set using the main
+        certificate attribute, so restore the certificate chain property. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M1" rtext="2015-11-17">
   <subsection name="General">
