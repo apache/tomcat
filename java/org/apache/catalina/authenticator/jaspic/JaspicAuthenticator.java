@@ -50,6 +50,7 @@ public class JaspicAuthenticator extends AuthenticatorBase {
     private static final String AUTH_TYPE = "JASPIC";
     public static final String MESSAGE_LAYER = "HttpServlet";
 
+    private String appContext;
     private Subject serviceSubject;
 
     private Map<String, String> authProperties = new HashMap<>();
@@ -61,6 +62,7 @@ public class JaspicAuthenticator extends AuthenticatorBase {
         super.startInternal();
         serviceSubject = new Subject();
         callbackHandler = getJaspicCallbackHandler();
+        appContext = context.getServletContext().getVirtualServerName() + " " + context.getServletContext().getContextPath();
     }
 
 
@@ -73,7 +75,6 @@ public class JaspicAuthenticator extends AuthenticatorBase {
         MessageInfoImpl messageInfo = new MessageInfoImpl(request, response, true);
 
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
-        String appContext = getAppContextId(request);
 
         AuthConfigProvider configProvider = factory.getConfigProvider(MESSAGE_LAYER, appContext,
                 null);
@@ -133,11 +134,6 @@ public class JaspicAuthenticator extends AuthenticatorBase {
     }
 
 
-    private String getAppContextId(Request request) {
-        return request.getServletContext().getVirtualServerName() + " " + request.getContextPath();
-    }
-
-
     private JaspicCallbackHandler getJaspicCallbackHandler() {
         return new JaspicCallbackHandler(container.getRealm());
     }
@@ -156,6 +152,10 @@ public class JaspicAuthenticator extends AuthenticatorBase {
 
     public Map<String, String> getAuthProperties() {
         return Collections.unmodifiableMap(authProperties);
+    }
+
+    public String getAppContext() {
+        return appContext;
     }
 
 }
