@@ -115,7 +115,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     @Override
     public Engine getContainer() {
-        return (this.engine);
+        return engine;
     }
 
 
@@ -146,7 +146,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
         // Report this property change to interested listeners
         support.firePropertyChange("container", oldEngine, this.engine);
-
     }
 
 
@@ -155,9 +154,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public String getName() {
-
-        return (this.name);
-
+        return name;
     }
 
 
@@ -168,9 +165,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public void setName(String name) {
-
         this.name = name;
-
     }
 
 
@@ -179,9 +174,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public Server getServer() {
-
-        return (this.server);
-
+        return this.server;
     }
 
 
@@ -192,14 +185,11 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public void setServer(Server server) {
-
         this.server = server;
-
     }
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Add a new Connector to the set of defined Connectors, and associate it
@@ -233,6 +223,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
     }
 
+
     public ObjectName[] getConnectorNames() {
         ObjectName results[] = new ObjectName[connectors.length];
         for (int i=0; i<results.length; i++) {
@@ -248,9 +239,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * @param listener The listener to add
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-
         support.addPropertyChangeListener(listener);
-
     }
 
 
@@ -259,9 +248,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public Connector[] findConnectors() {
-
         return connectors;
-
     }
 
 
@@ -306,7 +293,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             // Report this property change to interested listeners
             support.firePropertyChange("connector", connector, null);
         }
-
     }
 
 
@@ -316,9 +302,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * @param listener The listener to remove
      */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-
         support.removePropertyChangeListener(listener);
-
     }
 
 
@@ -327,12 +311,10 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("StandardService[");
         sb.append(getName());
         sb.append("]");
         return (sb.toString());
-
     }
 
 
@@ -345,15 +327,17 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         synchronized (executors) {
             if (!executors.contains(ex)) {
                 executors.add(ex);
-                if (getState().isAvailable())
+                if (getState().isAvailable()) {
                     try {
                         ex.start();
                     } catch (LifecycleException x) {
                         log.error("Executor.start", x);
                     }
+                }
             }
         }
     }
+
 
     /**
      * Retrieves all executors
@@ -367,6 +351,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             return arr;
         }
     }
+
 
     /**
      * Retrieves executor by name, null if not found
@@ -384,6 +369,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         return null;
     }
 
+
     /**
      * Removes an executor from the service
      * @param ex Executor
@@ -400,7 +386,6 @@ public class StandardService extends LifecycleMBeanBase implements Service {
             }
         }
     }
-
 
 
     /**
@@ -561,6 +546,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
     }
 
+
     @Override
     protected void destroyInternal() throws LifecycleException {
         mapperListener.destroy();
@@ -572,8 +558,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                     connector.destroy();
                 } catch (Exception e) {
                     log.error(sm.getString(
-                            "standardService.connector.destroyFailed",
-                            connector), e);
+                            "standardService.connector.destroyFailed", connector), e);
                 }
             }
         }
@@ -590,18 +575,20 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         super.destroyInternal();
     }
 
+
     /**
      * Return the parent class loader for this component.
      */
     @Override
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null)
-            return (parentClassLoader);
+            return parentClassLoader;
         if (server != null) {
-            return (server.getParentClassLoader());
+            return server.getParentClassLoader();
         }
-        return (ClassLoader.getSystemClassLoader());
+        return ClassLoader.getSystemClassLoader();
     }
+
 
     /**
      * Set the parent class loader for this server.
@@ -615,6 +602,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         support.firePropertyChange("parentClassLoader", oldParentClassLoader,
                                    this.parentClassLoader);
     }
+
 
     @Override
     protected String getDomainInternal() {
@@ -635,6 +623,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // default
         return domain;
     }
+
 
     @Override
     public final String getObjectNameKeyProperties() {
