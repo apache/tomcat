@@ -1260,6 +1260,14 @@
       be concatenated to the certificate file.</p>
     </attribute>
 
+    <attribute name="certificateChainFile" required="false">
+      <p>OpenSSL only.</p>
+      <p>Name of the file that contains the certificate chain associated with
+      the server certificate used. The format is
+      PEM-encoded. Relative paths will be resolved against
+      <code>$CATALINA_BASE</code>.</p>
+    </attribute>
+
     <attribute name="certificateKeyAlias" required="false">
       <p>JSSE only.</p>
       <p>The alias used for the server key and certificate in the keystore. If
