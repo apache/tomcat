@@ -156,11 +156,6 @@ public class JDBCStore extends StoreBase {
     protected PreparedStatement preparedSizeSql = null;
 
     /**
-     * Variable to hold the <code>keys()</code> prepared statement.
-     */
-    protected PreparedStatement preparedKeysSql = null;
-
-    /**
      * Variable to hold the <code>save()</code> prepared statement.
      */
     protected PreparedStatement preparedSaveSql = null;
@@ -458,17 +453,28 @@ public class JDBCStore extends StoreBase {
 
     // --------------------------------------------------------- Public Methods
 
+    @Override
+    public String[] expiredKeys() throws IOException {
+        return keys(true);
+    }
+
+    @Override
+    public String[] keys() throws IOException {
+        return keys(false);
+    }
+
     /**
      * Return an array containing the session identifiers of all Sessions
      * currently saved in this Store.  If there are no such Sessions, a
      * zero-length array is returned.
      *
+     * @param expiredOnly flag, whether only keys of expired sessions should
+     *        be returned
      * @return array containing the list of session IDs
      *
      * @exception IOException if an input/output error occurred
      */
-    @Override
-    public String[] keys() throws IOException {
+    private String[] keys(boolean expiredOnly) throws IOException {
         String keys[] = null;
         synchronized (this) {
             int numberOfTries = 2;
@@ -479,24 +485,29 @@ public class JDBCStore extends StoreBase {
                     return new String[0];
                 }
                 try {
-                    if (preparedKeysSql == null) {
-                        String keysSql = "SELECT " + sessionIdCol + " FROM "
-                                + sessionTable + " WHERE " + sessionAppCol
-                                + " = ?";
-                        preparedKeysSql = _conn.prepareStatement(keysSql);
-                    }
 
-                    preparedKeysSql.setString(1, getName());
-                    try (ResultSet rst = preparedKeysSql.executeQuery()) {
-                        ArrayList<String> tmpkeys = new ArrayList<>();
-                        if (rst != null) {
-                            while (rst.next()) {
-                                tmpkeys.add(rst.getString(1));
-                            }
+                    String keysSql = "SELECT " + sessionIdCol + " FROM "
+                            + sessionTable + " WHERE " + sessionAppCol + " = ?";
+                    if (expiredOnly) {
+                        keysSql += " AND (" + sessionLastAccessedCol + " + "
+                                + sessionMaxInactiveCol + " * 1000 < ?)";
+                    }
+                    try (PreparedStatement preparedKeysSql = _conn.prepareStatement(keysSql)) {
+                        preparedKeysSql.setString(1, getName());
+                        if (expiredOnly) {
+                            preparedKeysSql.setLong(2, System.currentTimeMillis());
                         }
-                        keys = tmpkeys.toArray(new String[tmpkeys.size()]);
-                        // Break out after the finally block
-                        numberOfTries = 0;
+                        try (ResultSet rst = preparedKeysSql.executeQuery()) {
+                            ArrayList<String> tmpkeys = new ArrayList<>();
+                            if (rst != null) {
+                                while (rst.next()) {
+                                    tmpkeys.add(rst.getString(1));
+                                }
+                            }
+                            keys = tmpkeys.toArray(new String[tmpkeys.size()]);
+                            // Break out after the finally block
+                            numberOfTries = 0;
+                        }
                     }
                 } catch (SQLException e) {
                     manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
@@ -932,13 +943,6 @@ public class JDBCStore extends StoreBase {
             ExceptionUtils.handleThrowable(f);
         }
         this.preparedSizeSql = null;
-
-        try {
-            preparedKeysSql.close();
-        } catch (Throwable f) {
-            ExceptionUtils.handleThrowable(f);
-        }
-        this.preparedKeysSql = null;
 
         try {
             preparedSaveSql.close();
