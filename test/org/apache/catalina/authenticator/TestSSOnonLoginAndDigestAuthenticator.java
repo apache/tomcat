@@ -483,7 +483,7 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
     protected void addCookies(Map<String,List<String>> reqHeaders) {
 
         if ((cookies != null) && (cookies.size() > 0)) {
-            reqHeaders.put(BROWSER_COOKIES + ":", cookies);
+            reqHeaders.put(BROWSER_COOKIES, cookies);
         }
     }
 }
