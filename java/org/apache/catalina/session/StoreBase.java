@@ -65,7 +65,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      * @return the name for this Store, used for logging.
      */
     public String getStoreName() {
-        return(storeName);
+        return storeName;
     }
 
 
@@ -86,7 +86,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      */
     @Override
     public Manager getManager() {
-        return(this.manager);
+        return this.manager;
     }
 
 
