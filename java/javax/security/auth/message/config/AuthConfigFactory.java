@@ -49,17 +49,6 @@ public abstract class AuthConfigFactory {
             "org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl";
 
     private static AuthConfigFactory factory;
-    private static ClassLoader contextClassLoader;
-
-    static {
-        // TODO: This looks like a memory leak waiting to happen
-        contextClassLoader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
-            @Override
-            public ClassLoader run() {
-                return Thread.currentThread().getContextClassLoader();
-            }
-        });
-    }
 
     public AuthConfigFactory() {
     }
@@ -77,8 +66,11 @@ public abstract class AuthConfigFactory {
                 @Override
                 public AuthConfigFactory run() throws ClassNotFoundException,
                         InstantiationException, IllegalAccessException {
-                    // TODO Review this
-                    Class<?> clazz = Class.forName(className, true, contextClassLoader);
+                    // Load this class with the same class loader as used for
+                    // this class. Note that the Thread context class loader
+                    // should not be used since that would trigger a memory leak
+                    // in container environments.
+                    Class<?> clazz = Class.forName(className);
                     return (AuthConfigFactory) clazz.newInstance();
                 }
             });
