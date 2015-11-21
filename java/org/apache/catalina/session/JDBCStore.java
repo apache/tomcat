@@ -989,7 +989,7 @@ public class JDBCStore extends StoreBase {
 
     /**
      * Release the connection, if it
-     * is associated with a connection poorel.
+     * is associated with a connection pool.
      *
      * @param conn The connection to be released
      */
