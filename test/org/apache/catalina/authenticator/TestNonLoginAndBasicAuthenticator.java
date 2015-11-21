@@ -412,7 +412,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 new HashMap<String,List<String>>();
 
         if (useCookie && (cookies != null)) {
-            reqHeaders.put(CLIENT_COOKIE_HEADER + ":", cookies);
+            reqHeaders.put(CLIENT_COOKIE_HEADER, cookies);
         }
 
         ByteChunk bc = new ByteChunk();
@@ -437,7 +437,7 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 new HashMap<String, List<String>>();
 
         if (useCookie && (cookies != null)) {
-            reqHeaders.put(CLIENT_COOKIE_HEADER + ":", cookies);
+            reqHeaders.put(CLIENT_COOKIE_HEADER, cookies);
         }
         else {
             if (credentials != null) {
