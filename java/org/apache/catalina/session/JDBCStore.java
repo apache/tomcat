@@ -211,7 +211,7 @@ public class JDBCStore extends StoreBase {
      * @return the thread name for this Store.
      */
     public String getThreadName() {
-        return (threadName);
+        return threadName;
     }
 
     /**
@@ -219,7 +219,7 @@ public class JDBCStore extends StoreBase {
      */
     @Override
     public String getStoreName() {
-        return (storeName);
+        return storeName;
     }
 
     /**
@@ -240,7 +240,7 @@ public class JDBCStore extends StoreBase {
      * @return the driver for this Store.
      */
     public String getDriverName() {
-        return (this.driverName);
+        return this.driverName;
     }
 
     /**
@@ -292,7 +292,7 @@ public class JDBCStore extends StoreBase {
      * @return the Connection URL for this Store.
      */
     public String getConnectionURL() {
-        return (this.connectionURL);
+        return this.connectionURL;
     }
 
     /**
@@ -312,7 +312,7 @@ public class JDBCStore extends StoreBase {
      * @return the table for this Store.
      */
     public String getSessionTable() {
-        return (this.sessionTable);
+        return this.sessionTable;
     }
 
     /**
@@ -332,7 +332,7 @@ public class JDBCStore extends StoreBase {
      * @return the web application name column for the table.
      */
     public String getSessionAppCol() {
-        return (this.sessionAppCol);
+        return this.sessionAppCol;
     }
 
     /**
@@ -352,7 +352,7 @@ public class JDBCStore extends StoreBase {
      * @return the Id column for the table.
      */
     public String getSessionIdCol() {
-        return (this.sessionIdCol);
+        return this.sessionIdCol;
     }
 
     /**
@@ -372,7 +372,7 @@ public class JDBCStore extends StoreBase {
      * @return the data column for the table
      */
     public String getSessionDataCol() {
-        return (this.sessionDataCol);
+        return this.sessionDataCol;
     }
 
     /**
@@ -392,7 +392,7 @@ public class JDBCStore extends StoreBase {
      * @return the {@code Is Valid} column
      */
     public String getSessionValidCol() {
-        return (this.sessionValidCol);
+        return this.sessionValidCol;
     }
 
     /**
@@ -412,7 +412,7 @@ public class JDBCStore extends StoreBase {
      * @return the {@code Max Inactive} column
      */
     public String getSessionMaxInactiveCol() {
-        return (this.sessionMaxInactiveCol);
+        return this.sessionMaxInactiveCol;
     }
 
     /**
@@ -432,7 +432,7 @@ public class JDBCStore extends StoreBase {
      * @return the {@code Last Accessed} column
      */
     public String getSessionLastAccessedCol() {
-        return (this.sessionLastAccessedCol);
+        return this.sessionLastAccessedCol;
     }
 
     /**
@@ -476,7 +476,7 @@ public class JDBCStore extends StoreBase {
 
                 Connection _conn = getConnection();
                 if (_conn == null) {
-                    return (new String[0]);
+                    return new String[0];
                 }
                 try {
                     if (preparedKeysSql == null) {
@@ -532,7 +532,7 @@ public class JDBCStore extends StoreBase {
                 Connection _conn = getConnection();
 
                 if (_conn == null) {
-                    return (size);
+                    return size;
                 }
 
                 try {
@@ -587,7 +587,7 @@ public class JDBCStore extends StoreBase {
             while (numberOfTries > 0) {
                 Connection _conn = getConnection();
                 if (_conn == null) {
-                    return (null);
+                    return null;
                 }
 
                 ClassLoader oldThreadContextCL = Thread.currentThread().getContextClassLoader();
@@ -653,7 +653,7 @@ public class JDBCStore extends StoreBase {
             }
         }
 
-        return (_session);
+        return _session;
     }
 
     /**
@@ -870,7 +870,7 @@ public class JDBCStore extends StoreBase {
 
         // Do nothing if there is a database connection already open
         if (dbConnection != null)
-            return (dbConnection);
+            return dbConnection;
 
         if (dataSourceName != null && dataSource == null) {
             Context initCtx;
@@ -910,7 +910,7 @@ public class JDBCStore extends StoreBase {
             props.put("password", connectionPassword);
         dbConnection = driver.connect(connectionURL, props);
         dbConnection.setAutoCommit(true);
-        return (dbConnection);
+        return dbConnection;
 
     }
 
@@ -989,7 +989,7 @@ public class JDBCStore extends StoreBase {
 
     /**
      * Release the connection, if it
-     * is associated with a connection pool.
+     * is associated with a connection poorel.
      *
      * @param conn The connection to be released
      */
