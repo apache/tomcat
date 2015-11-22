@@ -125,8 +125,6 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         support.removePropertyChangeListener(listener);
     }
 
-    // --------------------------------------------------------- Protected Methods
-
     /**
      * Called by our background reaper thread to check if Sessions
      * saved in our store are subject of being expired. If so expire
@@ -196,6 +194,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         }
     }
 
+    // --------------------------------------------------------- Protected Methods
 
     @Override
     protected void initInternal() {
