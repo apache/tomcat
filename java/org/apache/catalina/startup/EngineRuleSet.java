@@ -93,7 +93,7 @@ public class EngineRuleSet extends RuleSetBase {
                           "engineConfigClass"));
         digester.addSetNext(prefix + "Engine",
                             "setContainer",
-                            "org.apache.catalina.Container");
+                            "org.apache.catalina.Engine");
 
         //Cluster configuration start
         digester.addObjectCreate(prefix + "Engine/Cluster",
