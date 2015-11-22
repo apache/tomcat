@@ -29,8 +29,8 @@ import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Abstract implementation of the Store interface to
- * support most of the functionality required by a Store.
+ * Abstract implementation of the {@link Store} interface to
+ * support most of the functionality required by a {@link Store}.
  *
  * @author Bip Thelin
  */
@@ -59,14 +59,14 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
-     * The Manager with which this JDBCStore is associated.
+     * The Manager with which this Store is associated.
      */
     protected Manager manager;
 
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the info for this Store.
+     * @return the info for this Store.
      */
     @Override
     public String getInfo() {
@@ -75,7 +75,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
 
 
     /**
-     * Return the name for this Store, used for logging.
+     * @return the name for this Store, used for logging.
      */
     public String getStoreName() {
         return(storeName);
@@ -95,7 +95,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     }
 
     /**
-     * Return the Manager with which the Store is associated.
+     * @return the Manager with which the Store is associated.
      */
     @Override
     public Manager getManager() {
@@ -108,7 +108,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     /**
      * Add a property change listener to this component.
      *
-     * @param listener a value of type 'PropertyChangeListener'
+     * @param listener a value of type {@link PropertyChangeListener}
      */
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -238,7 +238,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     
     
     /**
-     * Return a String rendering of this object.
+     * @return a String rendering of this object.
      */
     @Override
     public String toString() {
