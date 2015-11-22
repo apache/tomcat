@@ -95,6 +95,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Correct evaluation of system property <code>org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader</code>.
+        It was basically ignored before. Reported by coverity scan. (fschumacher)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M1" rtext="2015-11-17">
   <subsection name="General">
