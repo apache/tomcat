@@ -367,7 +367,7 @@ public class Catalina {
                             "addUpgradeProtocol",
                             "org.apache.coyote.UpgradeProtocol");
 
-// Add RuleSets for nested elements
+        // Add RuleSets for nested elements
         digester.addRuleSet(new NamingRuleSet("Server/GlobalNamingResources/"));
         digester.addRuleSet(new EngineRuleSet("Server/Service/"));
         digester.addRuleSet(new HostRuleSet("Server/Service/Engine/"));
