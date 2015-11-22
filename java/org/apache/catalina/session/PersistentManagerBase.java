@@ -313,7 +313,7 @@ public abstract class PersistentManagerBase extends ManagerBase
     @Override
     public String getInfo() {
 
-        return (info);
+        return info;
 
     }
 
@@ -342,7 +342,7 @@ public abstract class PersistentManagerBase extends ManagerBase
     @Override
     public String getName() {
 
-        return (name);
+        return name;
 
     }
 
@@ -366,7 +366,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     public Store getStore() {
 
-        return (this.store);
+        return this.store;
 
     }
 
@@ -517,11 +517,11 @@ public abstract class PersistentManagerBase extends ManagerBase
             }
         }
         if (session != null)
-            return (session);
+            return session;
 
         // See if the Session is in the Store
         session = swapIn(id);
-        return (session);
+        return session;
 
     }
 
@@ -798,7 +798,7 @@ public abstract class PersistentManagerBase extends ManagerBase
             sessionSwapInLocks.remove(id);
         }
 
-        return (session);
+        return session;
 
     }
 
