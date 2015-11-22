@@ -229,7 +229,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     @Override
     public boolean isAccessReplicate() {
         long replDelta = System.currentTimeMillis() - getLastTimeReplicated();
-        if (maxInactiveInterval >=0 && replDelta > (maxInactiveInterval * 1000)) {
+        if (maxInactiveInterval >=0 && replDelta > (maxInactiveInterval * 1000L)) {
             return true;
         }
         return false;

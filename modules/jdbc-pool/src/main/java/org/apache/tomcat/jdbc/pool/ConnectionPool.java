@@ -964,7 +964,7 @@ public class ConnectionPool {
                         busy.remove(con);
                         abandon(con);
                         setToNull = true;
-                    } else if (sto > 0 && (now - time) > (sto*1000)) {
+                    } else if (sto > 0 && (now - time) > (sto * 1000L)) {
                         suspect(con);
                     } else {
                         //do nothing
