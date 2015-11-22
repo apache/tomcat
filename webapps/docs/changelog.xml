@@ -58,6 +58,7 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.66 (violetagg)">
+</section>
   <subsection name="General">
     <changelog>
       <update>
@@ -198,6 +199,10 @@
         Enable an explicit configuration of local member in the static cluster
         membership. (kfujino)
       </fix>
+      <fix>
+        Fix potential integer overflow in <code>DeltaSession</code>.
+        Reported by coverity scan. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
@@ -246,6 +251,10 @@
         <code>maxQueries</code> is checked. If <code>maxQueries</code> is a
         value less than or equal to 0, <code>QueryStats</code> are never
         created. (kfujino)
+      </fix>
+      <fix>
+        Fix potential integer overflow in <code>ConnectionPool</code> and
+        <code>PooledConnection</code>. Reported by coverity scan. (fschumacher)
       </fix>
     </changelog>
   </subsection>
