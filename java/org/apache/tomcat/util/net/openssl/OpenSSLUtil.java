@@ -16,11 +16,15 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.KeyStore;
 import java.util.List;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -54,10 +58,40 @@ public class OpenSSLUtil implements SSLUtil {
         return managers;
     }
 
+    /* In fact we can use the JSSE one for the moment */
     @Override
     public TrustManager[] getTrustManagers() throws Exception {
-        return null;
+    	String storefile = System.getProperty("java.home") + "/lib/security/cacerts";
+        String password = "changeit";
+        String type = "jks";
+        String provider = null;
+        if (sslHostConfig.getTruststoreFile() != null) {
+        	storefile = sslHostConfig.getTruststoreFile();
+        }
+        if (sslHostConfig.getTruststorePassword() != null) {
+        	password = sslHostConfig.getTruststorePassword();
+        }
+        if (sslHostConfig.getTruststoreType() != null) {
+        	type = sslHostConfig.getTruststoreType();
+        }
+        if (sslHostConfig.getTruststoreProvider() != null) {
+        	provider = sslHostConfig.getTruststoreProvider();
+        }
+
+        TrustManagerFactory factory;
+        if (provider == null)
+    	    factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        else
+        	factory = TrustManagerFactory.getInstance(provider);
+        
+    	KeyStore keystore = KeyStore.getInstance(type);
+    	InputStream stream = new FileInputStream(storefile);
+    	keystore.load(stream, password.toCharArray());
+		factory.init(keystore);
+    	TrustManager[] managers = factory.getTrustManagers();
+        return managers;
     }
+    
 
     @Override
     public void configureSessionContext(SSLSessionContext sslSessionContext) {
