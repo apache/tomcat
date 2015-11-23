@@ -61,37 +61,37 @@ public class OpenSSLUtil implements SSLUtil {
     /* In fact we can use the JSSE one for the moment */
     @Override
     public TrustManager[] getTrustManagers() throws Exception {
-    	String storefile = System.getProperty("java.home") + "/lib/security/cacerts";
+        String storefile = System.getProperty("java.home") + "/lib/security/cacerts";
         String password = "changeit";
         String type = "jks";
         String provider = null;
         if (sslHostConfig.getTruststoreFile() != null) {
-        	storefile = sslHostConfig.getTruststoreFile();
+            storefile = sslHostConfig.getTruststoreFile();
         }
         if (sslHostConfig.getTruststorePassword() != null) {
-        	password = sslHostConfig.getTruststorePassword();
+            password = sslHostConfig.getTruststorePassword();
         }
         if (sslHostConfig.getTruststoreType() != null) {
-        	type = sslHostConfig.getTruststoreType();
+            type = sslHostConfig.getTruststoreType();
         }
         if (sslHostConfig.getTruststoreProvider() != null) {
-        	provider = sslHostConfig.getTruststoreProvider();
+            provider = sslHostConfig.getTruststoreProvider();
         }
 
         TrustManagerFactory factory;
         if (provider == null)
-    	    factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         else
-        	factory = TrustManagerFactory.getInstance(provider);
-        
-    	KeyStore keystore = KeyStore.getInstance(type);
-    	InputStream stream = new FileInputStream(storefile);
-    	keystore.load(stream, password.toCharArray());
-		factory.init(keystore);
-    	TrustManager[] managers = factory.getTrustManagers();
+            factory = TrustManagerFactory.getInstance(provider);
+
+        KeyStore keystore = KeyStore.getInstance(type);
+        InputStream stream = new FileInputStream(storefile);
+        keystore.load(stream, password.toCharArray());
+        factory.init(keystore);
+        TrustManager[] managers = factory.getTrustManagers();
         return managers;
     }
-    
+
 
     @Override
     public void configureSessionContext(SSLSessionContext sslSessionContext) {
