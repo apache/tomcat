@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -190,51 +192,80 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             throws DeploymentException {
 
         boolean secure = false;
+        ByteBuffer proxyConnect = null;
+        URI proxyPath;
 
+        // Validate scheme (and build proxyPath)
         String scheme = path.getScheme();
-        if (!("ws".equalsIgnoreCase(scheme) ||
-                "wss".equalsIgnoreCase(scheme))) {
+        if ("ws".equalsIgnoreCase(scheme)) {
+            proxyPath = URI.create("http" + path.toString().substring(2));
+        } else if ("wss".equalsIgnoreCase(scheme)) {
+            proxyPath = URI.create("https" + path.toString().substring(3));
+        } else {
             throw new DeploymentException(sm.getString(
                     "wsWebSocketContainer.pathWrongScheme", scheme));
         }
+
+        // Validate host
         String host = path.getHost();
         if (host == null) {
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.pathNoHost"));
         }
         int port = path.getPort();
+
+        SocketAddress sa = null;
+
+        // Check to see if a proxy is configured. Javadoc indicates return value
+        // will never be null
+        List<Proxy> proxies = ProxySelector.getDefault().select(proxyPath);
+        Proxy selectedProxy = null;
+        for (Proxy proxy : proxies) {
+            if (proxy.type().equals(Proxy.Type.HTTP)) {
+                sa = proxy.address();
+                if (sa instanceof InetSocketAddress) {
+                    InetSocketAddress inet = (InetSocketAddress) sa;
+                    if (inet.isUnresolved()) {
+                        sa = new InetSocketAddress(inet.getHostName(), inet.getPort());
+                    }
+                }
+                selectedProxy = proxy;
+                break;
+            }
+        }
+
+        // If sa is null, no proxy is configured so need to create sa
+        if (sa == null) {
+            if (port == -1) {
+                if ("ws".equalsIgnoreCase(scheme)) {
+                    sa = new InetSocketAddress(host, 80);
+                } else {
+                    // Must be wss due to scheme validation above
+                    sa = new InetSocketAddress(host, 443);
+                    secure = true;
+                }
+            } else {
+                if ("wss".equalsIgnoreCase(scheme)) {
+                    secure = true;
+                }
+                sa = new InetSocketAddress(host, port);
+            }
+        } else {
+            proxyConnect = createProxyRequest(host, port);
+        }
+
+        // Create the initial HTTP request to open the WebSocket connection
         Map<String,List<String>> reqHeaders = createRequestHeaders(host, port,
                 clientEndpointConfiguration.getPreferredSubprotocols(),
                 clientEndpointConfiguration.getExtensions());
         clientEndpointConfiguration.getConfigurator().
                 beforeRequest(reqHeaders);
-
-        SocketAddress sa;
-        if (port == -1) {
-            if ("ws".equalsIgnoreCase(scheme)) {
-                sa = new InetSocketAddress(host, 80);
-            } else if ("wss".equalsIgnoreCase(scheme)) {
-                sa = new InetSocketAddress(host, 443);
-                secure = true;
-            } else {
-                throw new DeploymentException(
-                        sm.getString("wsWebSocketContainer.invalidScheme"));
-            }
-        } else {
-            if ("wss".equalsIgnoreCase(scheme)) {
-                secure = true;
-            }
-            sa = new InetSocketAddress(host, port);
-        }
-
-        // Origin header
         if (Constants.DEFAULT_ORIGIN_HEADER_VALUE != null &&
                 !reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
             List<String> originValues = new ArrayList<>(1);
             originValues.add(Constants.DEFAULT_ORIGIN_HEADER_VALUE);
             reqHeaders.put(Constants.ORIGIN_HEADER_NAME, originValues);
         }
-
         ByteBuffer request = createRequest(path, reqHeaders);
 
         AsynchronousSocketChannel socketChannel;
@@ -245,17 +276,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     "wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
         }
 
-        Future<Void> fConnect = socketChannel.connect(sa);
-
-        AsyncChannelWrapper channel;
-        if (secure) {
-            SSLEngine sslEngine = createSSLEngine(
-                    clientEndpointConfiguration.getUserProperties());
-            channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
-        } else {
-            channel = new AsyncChannelWrapperNonSecure(socketChannel);
-        }
-
         // Get the connection timeout
         long timeout = Constants.IO_TIMEOUT_MS_DEFAULT;
         String timeoutValue = (String) clientEndpointConfiguration.getUserProperties().get(
@@ -264,11 +284,50 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             timeout = Long.valueOf(timeoutValue).intValue();
         }
 
-        ByteBuffer response;
+        // Set-up
+        // Same size as the WsFrame input buffer
+        ByteBuffer response = ByteBuffer.allocate(maxBinaryMessageBufferSize);
         String subProtocol;
         boolean success = false;
         List<Extension> extensionsAgreed = new ArrayList<>();
         Transformation transformation = null;
+
+        // Open the connection
+        Future<Void> fConnect = socketChannel.connect(sa);
+        AsyncChannelWrapper channel = null;
+
+        if (proxyConnect != null) {
+            try {
+                fConnect.get(timeout, TimeUnit.MILLISECONDS);
+                // Proxy CONNECT is clear text
+                channel = new AsyncChannelWrapperNonSecure(socketChannel);
+                writeRequest(channel, proxyConnect, timeout);
+                HttpResponse httpResponse = processResponse(response, channel, timeout);
+                if (httpResponse.getStatus() != 200) {
+                    throw new DeploymentException(sm.getString(
+                            "wsWebSocketContainer.proxyConnectFail", selectedProxy,
+                            Integer.toString(httpResponse.getStatus())));
+                }
+            } catch (TimeoutException | InterruptedException | ExecutionException |
+                    EOFException e) {
+                channel.close();
+                throw new DeploymentException(
+                        sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
+            }
+        }
+
+        if (secure) {
+            // Regardless of whether a non-secure wrapper was created for a
+            // proxy CONNECT, need to use TLS from this point on so wrap the
+            // original AsynchronousSocketChannel
+            SSLEngine sslEngine = createSSLEngine(
+                    clientEndpointConfiguration.getUserProperties());
+            channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
+        } else if (channel == null) {
+            // Only need to wrap as this point if it wasn't wrapped to process a
+            // proxy CONNECT
+            channel = new AsyncChannelWrapperNonSecure(socketChannel);
+        }
 
         try {
             fConnect.get(timeout, TimeUnit.MILLISECONDS);
@@ -276,24 +335,16 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             Future<Void> fHandshake = channel.handshake();
             fHandshake.get(timeout, TimeUnit.MILLISECONDS);
 
-            int toWrite = request.limit();
+            writeRequest(channel, request, timeout);
 
-            Future<Integer> fWrite = channel.write(request);
-            Integer thisWrite = fWrite.get(timeout, TimeUnit.MILLISECONDS);
-            toWrite -= thisWrite.intValue();
-
-            while (toWrite > 0) {
-                fWrite = channel.write(request);
-                thisWrite = fWrite.get(timeout, TimeUnit.MILLISECONDS);
-                toWrite -= thisWrite.intValue();
+            HttpResponse httpResponse = processResponse(response, channel, timeout);
+            // TODO: Handle redirects
+            if (httpResponse.status != 101) {
+                throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
+                        Integer.toString(httpResponse.status)));
             }
-            // Same size as the WsFrame input buffer
-            response = ByteBuffer.allocate(maxBinaryMessageBufferSize);
-
-            HandshakeResponse handshakeResponse =
-                    processResponse(response, channel, timeout);
-            clientEndpointConfiguration.getConfigurator().
-                    afterResponse(handshakeResponse);
+            HandshakeResponse handshakeResponse = httpResponse.getHandshakeResponse();
+            clientEndpointConfiguration.getConfigurator().afterResponse(handshakeResponse);
 
             // Sub-protocol
             List<String> protocolHeaders = handshakeResponse.getHeaders().get(
@@ -379,6 +430,43 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
+    private static void writeRequest(AsyncChannelWrapper channel, ByteBuffer request,
+            long timeout) throws TimeoutException, InterruptedException, ExecutionException {
+        int toWrite = request.limit();
+
+        Future<Integer> fWrite = channel.write(request);
+        Integer thisWrite = fWrite.get(timeout, TimeUnit.MILLISECONDS);
+        toWrite -= thisWrite.intValue();
+
+        while (toWrite > 0) {
+            fWrite = channel.write(request);
+            thisWrite = fWrite.get(timeout, TimeUnit.MILLISECONDS);
+            toWrite -= thisWrite.intValue();
+        }
+    }
+
+
+    private static ByteBuffer createProxyRequest(String host, int port) {
+        StringBuilder request = new StringBuilder();
+        request.append("CONNECT ");
+        request.append(host);
+        if (port != -1) {
+            request.append(':');
+            request.append(port);
+        }
+        request.append(" HTTP/1.1\r\nProxy-Connection: keep-alive\r\nConnection: keepalive\r\nHost: ");
+        request.append(host);
+        if (port != -1) {
+            request.append(':');
+            request.append(port);
+        }
+        request.append("\r\n\r\n");
+
+        byte[] bytes = request.toString().getBytes(StandardCharsets.ISO_8859_1);
+        return ByteBuffer.wrap(bytes);
+    }
+
+
     protected void registerSession(Endpoint endpoint, WsSession wsSession) {
 
         if (!wsSession.isOpen()) {
@@ -429,7 +517,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         return result;
     }
 
-    private Map<String,List<String>> createRequestHeaders(String host,
+    private static Map<String,List<String>> createRequestHeaders(String host,
             int port, List<String> subProtocols, List<Extension> extensions) {
 
         Map<String,List<String>> headers = new HashMap<>();
@@ -479,7 +567,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private List<String> generateExtensionHeaders(List<Extension> extensions) {
+    private static List<String> generateExtensionHeaders(List<Extension> extensions) {
         List<String> result = new ArrayList<>(extensions.size());
         for (Extension extension : extensions) {
             StringBuilder header = new StringBuilder();
@@ -499,14 +587,14 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private String generateWsKeyValue() {
+    private static String generateWsKeyValue() {
         byte[] keyBytes = new byte[16];
         random.nextBytes(keyBytes);
         return Base64.encodeBase64String(keyBytes);
     }
 
 
-    private ByteBuffer createRequest(URI uri, Map<String,List<String>> reqHeaders) {
+    private static ByteBuffer createRequest(URI uri, Map<String,List<String>> reqHeaders) {
         ByteBuffer result = ByteBuffer.allocate(4 * 1024);
 
         // Request line
@@ -539,7 +627,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private void addHeader(ByteBuffer result, String key, List<String> values) {
+    private static void addHeader(ByteBuffer result, String key, List<String> values) {
         StringBuilder sb = new StringBuilder();
 
         Iterator<String> iter = values.iterator();
@@ -566,13 +654,14 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
      * @throws DeploymentException
      * @throws TimeoutException
      */
-    private HandshakeResponse processResponse(ByteBuffer response,
+    private HttpResponse processResponse(ByteBuffer response,
             AsyncChannelWrapper channel, long timeout) throws InterruptedException,
             ExecutionException, DeploymentException, EOFException,
             TimeoutException {
 
         Map<String,List<String>> headers = new CaseInsensitiveKeyMap<>();
 
+        int status = 0;
         boolean readStatus = false;
         boolean readHeaders = false;
         String line = null;
@@ -599,7 +688,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     if (readStatus) {
                         parseHeaders(line, headers);
                     } else {
-                        parseStatus(line);
+                        status = parseStatus(line);
                         readStatus = true;
                     }
                     line = null;
@@ -607,14 +696,22 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             }
         }
 
-        return new WsHandshakeResponse(headers);
+        return new HttpResponse(status, new WsHandshakeResponse(headers));
     }
 
 
-    private void parseStatus(String line) throws DeploymentException {
-        // This client only understands HTTP 1.1
+    private int parseStatus(String line) throws DeploymentException {
+        // This client only understands HTTP 1.
         // RFC2616 is case specific
-        if (!line.startsWith("HTTP/1.1 101")) {
+        String[] parts = line.trim().split(" ");
+        // CONNECT for proxy may return a 1.0 response
+        if (parts.length < 2 || !("HTTP/1.0".equals(parts[0]) || "HTTP/1.1".equals(parts[0]))) {
+            throw new DeploymentException(sm.getString(
+                    "wsWebSocketContainer.invalidStatus", line));
+        }
+        try {
+            return Integer.parseInt(parts[1]);
+        } catch (NumberFormatException nfe) {
             throw new DeploymentException(sm.getString(
                     "wsWebSocketContainer.invalidStatus", line));
         }
@@ -864,5 +961,26 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     @Override
     public int getProcessPeriod() {
         return processPeriod;
+    }
+
+
+    private static class HttpResponse {
+        private final int status;
+        private final HandshakeResponse handshakeResponse;
+
+        public HttpResponse(int status, HandshakeResponse handshakeResponse) {
+            this.status = status;
+            this.handshakeResponse = handshakeResponse;
+        }
+
+
+        public int getStatus() {
+            return status;
+        }
+
+
+        public HandshakeResponse getHandshakeResponse() {
+            return handshakeResponse;
+        }
     }
 }
