@@ -102,7 +102,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("ws://localhost:" + getPort() +
+                new URI("ws://" + getHostName() + ":" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
@@ -134,7 +134,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
                 ContainerProvider.getWebSocketContainer();
         wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("ftp://localhost:" + getPort() +
+                new URI("ftp://" + getHostName() + ":" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
     }
 
@@ -242,7 +242,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                        new URI("ws://localhost:" + getPort() +
+                        new URI("ws://" + getHostName() + ":" + getPort() +
                                 TesterEchoServer.Config.PATH_BASIC));
         BasicHandler<?> handler;
         CountDownLatch latch = new CountDownLatch(1);
@@ -335,7 +335,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("ws://localhost:" + getPort() + BlockingConfig.PATH));
+                new URI("ws://" + getHostName() + ":" + getPort() + BlockingConfig.PATH));
 
         if (!setTimeoutOnContainer) {
             wsSession.getAsyncRemote().setSendTimeout(TIMEOUT_MS);
@@ -417,7 +417,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("ws://localhost:" + getPort() +
+                new URI("ws://" + getHostName() + ":" + getPort() +
                         ConstantTxConfig.PATH));
 
         wsSession.addMessageHandler(new BlockingBinaryHandler());
@@ -755,7 +755,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
             Endpoint endpoint, String path) throws Exception {
         return wsContainer.connectToServer(endpoint,
                 ClientEndpointConfig.Builder.create().build(),
-                new URI("ws://localhost:" + getPort() + path));
+                new URI("ws://" + getHostName() + ":" + getPort() + path));
     }
 
     public static final class EndpointA extends Endpoint {
@@ -803,7 +803,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
-                new URI("wss://localhost:" + getPort() +
+                new URI("wss://" + getHostName() + ":" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
@@ -947,7 +947,7 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientConfig,
-                new URI("ws://localhost:" + getPort() +
+                new URI("ws://" + getHostName() + ":" + getPort() +
                         TesterEchoServer.Config.PATH_ASYNC));
         CountDownLatch latch = new CountDownLatch(count);
         BasicText handler = new BasicText(latch, msg);
@@ -961,5 +961,13 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Assert.assertTrue(latchResult);
 
         ((WsWebSocketContainer) wsContainer).destroy();
+    }
+
+
+    /*
+     * Make this possible to override so sub-class can more easily test proxy
+     */
+    protected String getHostName() {
+        return "localhost";
     }
 }
