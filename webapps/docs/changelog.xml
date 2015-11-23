@@ -112,6 +112,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        <bug>55006</bug>: The WebSocket client now honors the
+        <code>java.net.java.net.ProxySelector</code> configuration (using the
+        HTTP type) when establishing WebSocket connections to servers. Based on
+        a patch by Niki Dokovski. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
