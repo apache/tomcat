@@ -245,16 +245,14 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         }
 
         if (fire) {
-            Thread thread = Thread.currentThread();
-            ClassLoader originalClassLoader = thread.getContextClassLoader();
+            ClassLoader oldCL = processor.getUpgradeToken().getContextBind().bind(false, null);
             try {
-                thread.setContextClassLoader(processor.getUpgradeToken().getApplicationClassLoader());
                 listener.onWritePossible();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 onError(t);
             } finally {
-                thread.setContextClassLoader(originalClassLoader);
+                processor.getUpgradeToken().getContextBind().unbind(false, oldCL);
             }
         }
     }
@@ -264,16 +262,14 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         if (listener == null) {
             return;
         }
-        Thread thread = Thread.currentThread();
-        ClassLoader originalClassLoader = thread.getContextClassLoader();
+        ClassLoader oldCL = processor.getUpgradeToken().getContextBind().bind(false, null);
         try {
-            thread.setContextClassLoader(processor.getUpgradeToken().getApplicationClassLoader());
             listener.onError(t);
         } catch (Throwable t2) {
             ExceptionUtils.handleThrowable(t2);
             log.warn(sm.getString("upgrade.sos.onErrorFail"), t2);
         } finally {
-            thread.setContextClassLoader(originalClassLoader);
+            processor.getUpgradeToken().getContextBind().unbind(false, oldCL);
         }
         try {
             close();

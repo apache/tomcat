@@ -73,7 +73,7 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter) {
         UpgradeProcessorInternal processor = new UpgradeProcessorInternal(socketWrapper, null,
-                new UpgradeToken(getInternalUpgradeHandler(adapter, null), Http2Protocol.class.getClassLoader(), null));
+                new UpgradeToken(getInternalUpgradeHandler(adapter, null), null, null));
         return processor;
     }
 

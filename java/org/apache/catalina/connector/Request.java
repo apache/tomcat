@@ -1865,7 +1865,7 @@ public class Request implements HttpServletRequest {
             throw new ServletException(e);
         }
         UpgradeToken upgradeToken = new UpgradeToken(handler,
-                getContext().getLoader().getClassLoader(), instanceManager);
+                getContext(), instanceManager);
 
         coyoteRequest.action(ActionCode.UPGRADE, upgradeToken);
 
