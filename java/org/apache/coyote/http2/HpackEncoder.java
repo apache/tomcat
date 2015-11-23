@@ -26,12 +26,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Encoder for HPACK frames.
  */
 public class HpackEncoder {
+
+    private static final Log log = LogFactory.getLog(HpackEncoder.class);
+    private static final StringManager sm = StringManager.getManager(HpackEncoder.class);
 
     public static final HpackHeaderFunction DEFAULT_HEADER_FUNCTION = new HpackHeaderFunction() {
         @Override
@@ -141,19 +147,24 @@ public class HpackEncoder {
                 }
             }
             if (!skip) {
-
-                    int required = 11 + headerName.length(); //we use 11 to make sure we have enough room for the variable length integers
-
                     String val = headers.getValue(it).toString();
+
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("hpackEncoder.encodeHeader", headerName, val));
+                    }
                     TableEntry tableEntry = findInTable(headerName, val);
 
-                    required += (1 + val.length());
+                    // We use 11 to make sure we have enough room for the
+                    // variable length integers
+                    int required = 11 + headerName.length() + 1 + val.length();
 
                     if (target.remaining() < required) {
                         this.headersIterator = it;
                         return State.UNDERFLOW;
                     }
-                    boolean canIndex = hpackHeaderFunction.shouldUseIndexing(headerName, val) && (headerName.length() + val.length() + 32) < maxTableSize; //only index if it will fit
+                    // Only index if it will fit
+                    boolean canIndex = hpackHeaderFunction.shouldUseIndexing(headerName, val) &&
+                            (headerName.length() + val.length() + 32) < maxTableSize;
                     if (tableEntry == null && canIndex) {
                         //add the entry to the dynamic table
                         target.put((byte) (1 << 6));

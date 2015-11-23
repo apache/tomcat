@@ -551,7 +551,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
-                    stream.getIdentifier()));
+                    stream.getIdentifier(), Integer.toString(pushedStreamId)));
         }
         // This ensures the Stream processing thread has control of the socket.
         synchronized (socketWrapper) {
