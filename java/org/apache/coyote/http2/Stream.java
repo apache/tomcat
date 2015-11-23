@@ -388,9 +388,17 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         request.getMimeHeaders().addValue(":scheme").duplicate(request.scheme());
         // TODO: Query string
         request.getMimeHeaders().addValue(":path").duplicate(request.decodedURI());
-        // TODO: Handle default ports
-        request.getMimeHeaders().addValue(":authority").setString(
-                request.serverName().getString() + ":" + request.getServerPort());
+
+        // Authority needs to include the port only if a non-standard port is
+        // being used.
+        if (!(request.scheme().equals("http") && request.getServerPort() == 80) &&
+                !(request.scheme().equals("https") && request.getServerPort() == 443)) {
+            request.getMimeHeaders().addValue(":authority").setString(
+                    request.serverName().getString() + ":" + request.getServerPort());
+        } else {
+            request.getMimeHeaders().addValue(":authority").duplicate(request.serverName());
+        }
+
         push(handler, request, this);
     }
 
