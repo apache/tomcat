@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.session;
 
 import java.io.IOException;
@@ -42,8 +40,8 @@ import org.apache.juli.logging.LogFactory;
  * persistence, even if only for  restarts.
  * <p>
  * <b>IMPLEMENTATION NOTE</b>:  Correct behavior of session storing and
- * reloading depends upon external calls to the {@link LifecycleBase#start() start()}
- * and {@link LifecycleBase#stop() stop()} methods of this class
+ * reloading depends upon external calls to the {@link Lifecycle#start() start()}
+ * and {@link Lifecycle#stop() stop()} methods of this class
  * at the correct times.
  *
  * @author Craig R. McClanahan
@@ -281,7 +279,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      * it can be swapped out of memory due to maxActiveSession. Set it to {@code -1}
      * if it can be swapped out at any time.
      *
-     * @param int time in seconds before a possible swap out
+     * @param min time in seconds before a possible swap out
      */
     public void setMinIdleSwap(int min) {
 
@@ -352,7 +350,7 @@ public abstract class PersistentManagerBase extends ManagerBase
 
     /**
      * Indicates whether sessions are saved when the Manager is shut down
-     * properly. This requires the {@link Manager#unload() unload()} method to be called.
+     * properly. This requires the {@link #unload()} method to be called.
      *
      * @return {@code true}, when sessions should be saved on restart,
      * {code false} otherwise
