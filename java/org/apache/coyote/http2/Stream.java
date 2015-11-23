@@ -391,7 +391,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         // TODO: Handle default ports
         request.getMimeHeaders().addValue(":authority").setString(
                 request.serverName().getString() + ":" + request.getServerPort());
-        push (handler, request, this);
+        push(handler, request, this);
     }
 
 
