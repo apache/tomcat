@@ -93,6 +93,11 @@
         <bug>58621</bug>: The certificate chain cannot be set using the main
         certificate attribute, so restore the certificate chain property. (remm)
       </fix>
+      <fix>
+        Allow a new SSL config type where a connector can use either JSSE or
+        OpenSSL. Both could be allowed, but it would likely create support
+        issues. This type is used by the OpenSSL implementation for NIOx. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
