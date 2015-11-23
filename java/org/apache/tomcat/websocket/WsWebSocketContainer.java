@@ -186,6 +186,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
+    @SuppressWarnings("resource") // socketChannel is closed
     @Override
     public Session connectToServer(Endpoint endpoint,
             ClientEndpointConfig clientEndpointConfiguration, URI path)
@@ -310,7 +311,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 }
             } catch (TimeoutException | InterruptedException | ExecutionException |
                     EOFException e) {
-                channel.close();
+                if (channel != null) {
+                    channel.close();
+                }
                 throw new DeploymentException(
                         sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
             }
