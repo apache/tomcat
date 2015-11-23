@@ -16,7 +16,7 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.List;
@@ -26,6 +26,7 @@ import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
@@ -64,7 +65,7 @@ public class OpenSSLUtil implements SSLUtil {
         String storefile = System.getProperty("java.home") + "/lib/security/cacerts";
         String password = "changeit";
         String type = "jks";
-        String provider = null;
+        String algorithm = null;
         if (sslHostConfig.getTruststoreFile() != null) {
             storefile = sslHostConfig.getTruststoreFile();
         }
@@ -74,19 +75,33 @@ public class OpenSSLUtil implements SSLUtil {
         if (sslHostConfig.getTruststoreType() != null) {
             type = sslHostConfig.getTruststoreType();
         }
-        if (sslHostConfig.getTruststoreProvider() != null) {
-            provider = sslHostConfig.getTruststoreProvider();
+        if (sslHostConfig.getTruststoreAlgorithm() != null) {
+        	algorithm = sslHostConfig.getTruststoreAlgorithm();
         }
 
         TrustManagerFactory factory;
-        if (provider == null)
+        if (algorithm == null)
             factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         else
-            factory = TrustManagerFactory.getInstance(provider);
+            factory = TrustManagerFactory.getInstance(algorithm);
 
         KeyStore keystore = KeyStore.getInstance(type);
-        InputStream stream = new FileInputStream(storefile);
-        keystore.load(stream, password.toCharArray());
+        InputStream stream = null;
+        try {
+        	stream = ConfigFileLoader.getInputStream(storefile);
+        	keystore.load(stream, password.toCharArray());
+        } catch (Exception ex) {
+        	throw ex;
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ioe) {
+                    // Do nothing
+                }
+            }
+        }
+        
         factory.init(keystore);
         TrustManager[] managers = factory.getTrustManagers();
         return managers;
