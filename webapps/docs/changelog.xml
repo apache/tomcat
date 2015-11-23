@@ -98,6 +98,10 @@
         OpenSSL. Both could be allowed, but it would likely create support
         issues. This type is used by the OpenSSL implementation for NIOx. (remm)
       </fix>
+      <fix>
+        Improve upgrade context classloader handling by using Context.bind and
+        unbind. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

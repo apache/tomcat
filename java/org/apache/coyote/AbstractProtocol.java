@@ -780,14 +780,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         if (upgradeToken.getInstanceManager() == null) {
                             httpUpgradeHandler.init((WebConnection) processor);
                         } else {
-                            Thread thread = Thread.currentThread();
-                            // Set context class loader environment for user class call
-                            ClassLoader originalClassLoader = thread.getContextClassLoader();
+                            ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
                             try {
-                                thread.setContextClassLoader(upgradeToken.getApplicationClassLoader());
                                 httpUpgradeHandler.init((WebConnection) processor);
                             } finally {
-                                thread.setContextClassLoader(originalClassLoader);
+                                upgradeToken.getContextBind().unbind(false, oldCL);
                             }
                         }
                     }
@@ -833,15 +830,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         if (instanceManager == null) {
                             httpUpgradeHandler.destroy();
                         } else {
-                            Thread thread = Thread.currentThread();
-                            // Set context class loader environment for user class call
-                            ClassLoader originalClassLoader = thread.getContextClassLoader();
+                            ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
                             try {
-                                thread.setContextClassLoader(upgradeToken.getApplicationClassLoader());
                                 httpUpgradeHandler.destroy();
                                 instanceManager.destroyInstance(httpUpgradeHandler);
                             } finally {
-                                thread.setContextClassLoader(originalClassLoader);
+                                upgradeToken.getContextBind().unbind(false, oldCL);
                             }
                         }
                     } else {

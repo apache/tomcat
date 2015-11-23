@@ -19,6 +19,7 @@ package org.apache.coyote;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
+import org.apache.tomcat.ContextBind;
 import org.apache.tomcat.InstanceManager;
 
 /**
@@ -26,19 +27,19 @@ import org.apache.tomcat.InstanceManager;
  */
 public final class UpgradeToken {
 
-    private final ClassLoader applicationClassLoader;
+    private final ContextBind contextBind;
     private final HttpUpgradeHandler httpUpgradeHandler;
     private final InstanceManager instanceManager;
 
     public UpgradeToken(HttpUpgradeHandler httpUpgradeHandler,
-            ClassLoader applicationClassLoader, InstanceManager instanceManager) {
-        this.applicationClassLoader = applicationClassLoader;
+            ContextBind contextBind, InstanceManager instanceManager) {
+        this.contextBind = contextBind;
         this.httpUpgradeHandler = httpUpgradeHandler;
         this.instanceManager = instanceManager;
     }
 
-    public final ClassLoader getApplicationClassLoader() {
-        return applicationClassLoader;
+    public final ContextBind getContextBind() {
+        return contextBind;
     }
 
     public final HttpUpgradeHandler getHttpUpgradeHandler() {
