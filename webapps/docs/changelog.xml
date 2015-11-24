@@ -107,6 +107,10 @@
   <subsection name="Cluster">
     <changelog>
       <fix>
+        Enable an explicit configuration of local member in the static cluster
+        membership. (kfujino)
+      </fix>
+      <fix>
         Fix potential integer overflow in <code>DeltaSession</code>.
         Reported by coverity scan. (fschumacher)
       </fix>
