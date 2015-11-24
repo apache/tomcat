@@ -217,6 +217,15 @@
         Interceptors. If the required Interceptor does not exist, it issues
         warning logs. (kfujino)
       </fix>
+      <fix>
+        Ensure that the static member is registered to the add suspect list even
+        if the static member that is registered to the remove suspect list has
+        disappeared. (kfujino)
+      </fix>
+      <fix>
+        Correct the warnnig log of when the member that is not registered in the
+        membership is detected. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

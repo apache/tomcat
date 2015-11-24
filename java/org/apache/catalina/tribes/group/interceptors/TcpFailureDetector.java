@@ -265,7 +265,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             if (membership.memberAlive( (MemberImpl) members[i])) {
                 //we don't have this one in our membership, check to see if he/she is alive
                 if (memberAlive(members[i])) {
-                    log.warn("Member added, even though we werent notified:" + members[i]);
+                    log.warn("Member added, even though we weren't notified:" + members[i]);
                     super.memberAdded(members[i]);
                 } else {
                     membership.removeMember( (MemberImpl) members[i]);
@@ -280,6 +280,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             MemberImpl m = keys[i];
             if (membership.getMember(m) != null && (!memberAlive(m))) {
                 membership.removeMember(m);
+                if (m instanceof StaticMember) {
+                    addSuspects.put(m, Long.valueOf(System.currentTimeMillis()));
+                }
                 super.memberDisappeared(m);
                 removeSuspects.remove(m);
                 if(log.isInfoEnabled())
