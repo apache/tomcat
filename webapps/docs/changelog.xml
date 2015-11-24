@@ -126,6 +126,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Ensure that the static member is registered to the add suspect list even
+        if the static member that is registered to the remove suspect list has
+        disappeared. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
