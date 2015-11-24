@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
 import java.util.List;
@@ -86,20 +85,8 @@ public class OpenSSLUtil implements SSLUtil {
             factory = TrustManagerFactory.getInstance(algorithm);
 
         KeyStore keystore = KeyStore.getInstance(type);
-        InputStream stream = null;
-        try {
-        	stream = ConfigFileLoader.getInputStream(storefile);
+        try (InputStream stream = ConfigFileLoader.getInputStream(storefile)) {
         	keystore.load(stream, password.toCharArray());
-        } catch (Exception ex) {
-        	throw ex;
-        } finally {
-            if (stream != null) {
-                try {
-                    stream.close();
-                } catch (IOException ioe) {
-                    // Do nothing
-                }
-            }
         }
         
         factory.init(keystore);
