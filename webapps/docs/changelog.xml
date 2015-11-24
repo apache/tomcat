@@ -124,6 +124,10 @@
         HTTP type) when establishing WebSocket connections to servers. Based on
         a patch by Niki Dokovski. (markt)
       </add>
+      <fix>
+        <bug>58624</bug>: Correct a potential deadlock if the WebSocket
+        connection is closed when a message write is in progress. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
