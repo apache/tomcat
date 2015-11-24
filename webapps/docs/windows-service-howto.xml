@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -33,66 +33,67 @@
 <toc/>
 </section>
 
-<section name="Tomcat7 service application">
+<section name="Tomcat service application">
 <p>
-    <b>Tomcat7</b> is a service application for running Tomcat7 as NT service.
+    <b>Tomcat<version-major/></b> is a service application for running Tomcat
+    <version-major/> as a Windows service.
 </p>
 </section>
-<section name="Tomcat7w monitor application">
+<section name="Tomcat monitor application">
 <p>
-    <b>Tomcat7w</b> is a GUI application for monitoring and configuring Tomcat
-    services.
+    <b>Tomcat<version-major/>w</b> is a GUI application for monitoring and
+    configuring Tomcat services.
 </p>
     <p>The available command line options are:</p>
-<p>
-    <table>
-    <tr><th>//ES//</th>
+
+    <table class="defaultTable">
+    <tr><td><b>//ES//</b></td>
         <td>Edit service configuration</td>
         <td>This is the default operation. It is called if the no option is
             provided but the executable is renamed to <b>servicenameW.exe</b></td>
     </tr>
-    <tr><th>//MS//</th>
+    <tr><td><b>//MS//</b></td>
         <td>Monitor service</td>
         <td>Put the icon in the system tray</td>
     </tr>
     </table>
-</p>
+
 </section>
 <section name="Command line arguments">
 <p>
     Each command line directive is in the form of <b>//XX//ServiceName</b>
 </p>
     <p>The available command line options are:</p>
-<p>
-    <table>
-    <tr><th>//TS//</th>
+
+    <table class="defaultTable">
+    <tr><td><b>//TS//</b></td>
         <td>Run the service as console application</td>
         <td>This is the default operation. It is called if the no option is
             provided. The ServiceName is the name of the executable without
-            exe suffix, meaning Tomcat7</td>
+            exe suffix, meaning Tomcat<version-major/></td>
     </tr>
-    <tr><th>//RS//</th>
+    <tr><td><b>//RS//</b></td>
         <td>Run the service</td>
         <td>Called only from ServiceManager</td>
     </tr>
-    <tr><th>//SS//</th>
+    <tr><td><b>//SS//</b></td>
         <td>Stop the service</td>
         <td></td>
     </tr>
-    <tr><th>//US//</th>
+    <tr><td><b>//US//</b></td>
         <td>Update service parameters</td>
         <td></td>
     </tr>
-    <tr><th>//IS//</th>
+    <tr><td><b>//IS//</b></td>
         <td>Install service</td>
         <td></td>
     </tr>
-    <tr><th>//DS//</th>
+    <tr><td><b>//DS//</b></td>
         <td>Delete service</td>
         <td>Stops the service if running</td>
     </tr>
     </table>
-</p>
+
 </section>
 <section name="Command line parameters">
 <p>
@@ -101,15 +102,14 @@
     be appended to the existing option.
     If the environment variable with the same name as command line parameter but
     prefixed with <code>PR_</code> exists it will take precedence.
-    For example:
+    For example:</p>
 <source>set PR_CLASSPATH=xx.jar</source>
-</p>
-<p>is equivalent to providing
+
+<p>is equivalent to providing</p>
 <source>--Classpath=xx.jar</source>
-</p>
 <p> as command line parameter.</p>
-<p>
-    <table>
+
+    <table class="defaultTable">
     <tr>
     <th>ParameterName</th>
     <th>Default</th>
@@ -325,7 +325,7 @@
         created in the <b>LogPath</b> directory</td>
     </tr>
     </table>
-</p>
+
 </section>
 <section name="Installing services">
 <p>
@@ -346,88 +346,72 @@ globally in OS, or launch the program that sets them with elevated privileges
 prompt for the current directory from the Explorer
 by clicking on the "File" menu bar). See issue <bug>56143</bug> for details.
 </p>
-<p>
-<source>
-Install the service named 'Tomcat7'
-C:\> service.bat install
-</source>
-</p>
+
+<source>Install the service named 'Tomcat<version-major/>'
+C:\> service.bat install</source>
+
 <p>There is a 2nd optional parameter that lets you specify the name of the
 service, as displayed in Windows services.</p>
+
+<source>Install the service named 'MyService'
+C:\> service.bat install MyService</source>
+
 <p>
-<source>
-Install the service named 'MyService'
-C:\> service.bat install MyService
-</source>
-</p>
-<p>
-If using tomcat7.exe, you need to use the <b>//IS//</b> parameter.</p>
-<p>
-<source>
-Install the service named 'Tomcat7'
-C:\> tomcat7 //IS//Tomcat7 --DisplayName="Apache Tomcat 7" \
-C:\> --Install="C:\Program Files\Tomcat\bin\tomcat7.exe" --Jvm=auto \
-C:\> --StartMode=jvm --StopMode=jvm \
-C:\> --StartClass=org.apache.catalina.startup.Bootstrap --StartParams=start \
-C:\> --StopClass=org.apache.catalina.startup.Bootstrap --StopParams=stop
-</source>
-</p>
+If using tomcat<version-major/>.exe, you need to use the <b>//IS//</b> parameter.</p>
+
+<source>Install the service named 'Tomcat<version-major/>'
+C:\> tomcat<version-major/> //IS//Tomcat<version-major/> --DisplayName="Apache Tomcat <version-major/>" ^
+     --Install="C:\Program Files\Tomcat\bin\tomcat<version-major/>.exe" --Jvm=auto ^
+     --StartMode=jvm --StopMode=jvm ^
+     --StartClass=org.apache.catalina.startup.Bootstrap --StartParams=start ^
+     --StopClass=org.apache.catalina.startup.Bootstrap --StopParams=stop</source>
+
 </section>
 <section name="Updating services">
 <p>
 To update the service parameters, you need to use the <b>//US//</b> parameter.
 </p>
-<p>
-<source>
-Update the service named 'Tomcat7'
-C:\> tomcat7 //US//Tomcat7 --Description="Apache Tomcat Server - http://tomcat.apache.org/ " \
-C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar
-</source>
-</p>
+
+<source>Update the service named 'Tomcat<version-major/>'
+C:\> tomcat<version-major/> //US//Tomcat<version-major/> --Description="Apache Tomcat Server - http://tomcat.apache.org/ " ^
+     --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
+
 <p>If you gave the service an optional name, you need to specify it like this:
 </p>
-<p>
-<source>
-Update the service named 'MyService'
-C:\> tomcat7 //US//MyService --Description="Apache Tomcat Server - http://tomcat.apache.org/ " \
-C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar
-</source>
-</p>
+
+<source>Update the service named 'MyService'
+C:\> tomcat<version-major/> //US//MyService --Description="Apache Tomcat Server - http://tomcat.apache.org/ " ^
+     --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
+
 </section>
 <section name="Removing services">
 <p>
 To remove the service, you need to use the <b>//DS//</b> parameter.<br/>
 If the service is running it will be stopped and then deleted.</p>
-<p>
-<source>
-Remove the service named 'Tomcat7'
-C:\> tomcat7 //DS//Tomcat7
-</source>
-</p>
+
+<source>Remove the service named 'Tomcat<version-major/>'
+C:\> tomcat<version-major/> //DS//Tomcat<version-major/></source>
+
 <p>If you gave the service an optional name, you need to specify it like this:
 </p>
-<p>
-<source>
-Remove the service named 'MyService'
-C:\> tomcat7 //DS//MyService
-</source>
-</p>
+
+<source>Remove the service named 'MyService'
+C:\> tomcat<version-major/> //DS//MyService</source>
+
 </section>
 <section name="Debugging services">
 <p>
 To run the service in console mode, you need to use the <b>//TS//</b> parameter.
 The service shutdown can be initiated by pressing <b>CTRL+C</b> or
 <b>CTRL+BREAK</b>.
-If you rename the tomcat7.exe to testservice.exe then you can just execute the
+If you rename the tomcat<version-major/>.exe to testservice.exe then you can just execute the
 testservice.exe and this command mode will be executed by default.</p>
-<p>
-<source>
-Run the service named 'Tomcat7' in console mode
-C:\> tomcat7 //TS//Tomcat7 [additional arguments]
+
+<source>Run the service named 'Tomcat<version-major/>' in console mode
+C:\> tomcat<version-major/> //TS//Tomcat<version-major/> [additional arguments]
 Or simply execute:
-C:\> tomcat7
-</source>
-</p>
+C:\> tomcat<version-major/></source>
+
 </section>
 <section name="Multiple Instances">
 <p>
@@ -457,32 +441,28 @@ from CATALINA_HOME\conf.</p>
 <p>
 You must edit CATALINA_BASE\conf\server.xml to specify a unique IP/port for the
 instance to listen on. Find the line that contains
-<pre>&lt;Connector port="8080" ...</pre> and add an address attribute and/or
+<code>&lt;Connector port="8080" ...</code> and add an address attribute and/or
 update the port number so as to specify a unique IP/port combination.</p>
 <p>
 To install an instance, first set the CATALINA_HOME environment variable to the
 name of the Tomcat installation directory. Then create a second environment
 variable CATALINA_BASE and point this to the instance folder. Then run "service
 install" command specifying a service name.</p>
+
+<source>set CATALINA_HOME=c:\tomcat_<version-major/>
+set CATALINA_BASE=c:\tomcat_<version-major/>\instances\instance1
+service install instance1</source>
+
 <p>
-<source>
-set CATALINA_HOME=c:\tomcat_7
-set CATALINA_BASE=c:\tomcat_7\instances\instance1
-service install instance1
-</source>
-</p>
-<p>
-To modify the service settings, you can run <b>tomcat7w //ES//instance1</b>.
+To modify the service settings, you can run <b>tomcat<version-major/>w //ES//instance1</b>.
 </p>
 <p>
 For additional instances, create additional instance folder, update the
 CATALINA_BASE environment variable, and run the service install again.</p>
-<p>
-<source>
-set CATALINA_BASE=c:\tomcat_7\instances\instance2
-service install instance2
-</source>
-</p>
+
+<source>set CATALINA_BASE=c:\tomcat_<version-major/>\instances\instance2
+service install instance2</source>
+
 </section>
 </body>
 </document>
