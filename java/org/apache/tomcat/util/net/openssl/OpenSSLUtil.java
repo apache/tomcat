@@ -75,7 +75,7 @@ public class OpenSSLUtil implements SSLUtil {
             type = sslHostConfig.getTruststoreType();
         }
         if (sslHostConfig.getTruststoreAlgorithm() != null) {
-        	algorithm = sslHostConfig.getTruststoreAlgorithm();
+            algorithm = sslHostConfig.getTruststoreAlgorithm();
         }
 
         TrustManagerFactory factory;
@@ -86,9 +86,9 @@ public class OpenSSLUtil implements SSLUtil {
 
         KeyStore keystore = KeyStore.getInstance(type);
         try (InputStream stream = ConfigFileLoader.getInputStream(storefile)) {
-        	keystore.load(stream, password.toCharArray());
+            keystore.load(stream, password.toCharArray());
         }
-        
+
         factory.init(keystore);
         TrustManager[] managers = factory.getTrustManagers();
         return managers;
