@@ -360,11 +360,11 @@ C:\> service.bat install MyService</source>
 If using tomcat<version-major/>.exe, you need to use the <b>//IS//</b> parameter.</p>
 
 <source>Install the service named 'Tomcat<version-major/>'
-C:\> tomcat<version-major/> //IS//Tomcat<version-major/> --DisplayName="Apache Tomcat <version-major/>" \
-C:\> --Install="C:\Program Files\Tomcat\bin\tomcat<version-major/>.exe" --Jvm=auto \
-C:\> --StartMode=jvm --StopMode=jvm \
-C:\> --StartClass=org.apache.catalina.startup.Bootstrap --StartParams=start \
-C:\> --StopClass=org.apache.catalina.startup.Bootstrap --StopParams=stop</source>
+C:\> tomcat<version-major/> //IS//Tomcat<version-major/> --DisplayName="Apache Tomcat <version-major/>" ^
+     --Install="C:\Program Files\Tomcat\bin\tomcat<version-major/>.exe" --Jvm=auto ^
+     --StartMode=jvm --StopMode=jvm ^
+     --StartClass=org.apache.catalina.startup.Bootstrap --StartParams=start ^
+     --StopClass=org.apache.catalina.startup.Bootstrap --StopParams=stop</source>
 
 </section>
 <section name="Updating services">
@@ -373,15 +373,15 @@ To update the service parameters, you need to use the <b>//US//</b> parameter.
 </p>
 
 <source>Update the service named 'Tomcat<version-major/>'
-C:\> tomcat<version-major/> //US//Tomcat<version-major/> --Description="Apache Tomcat Server - http://tomcat.apache.org/ " \
-C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
+C:\> tomcat<version-major/> //US//Tomcat<version-major/> --Description="Apache Tomcat Server - http://tomcat.apache.org/ " ^
+     --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
 
 <p>If you gave the service an optional name, you need to specify it like this:
 </p>
 
 <source>Update the service named 'MyService'
-C:\> tomcat<version-major/> //US//MyService --Description="Apache Tomcat Server - http://tomcat.apache.org/ " \
-C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
+C:\> tomcat<version-major/> //US//MyService --Description="Apache Tomcat Server - http://tomcat.apache.org/ " ^
+     --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
 
 </section>
 <section name="Removing services">
