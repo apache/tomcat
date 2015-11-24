@@ -289,15 +289,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         long timeout = timeoutExpiry - System.currentTimeMillis();
-        synchronized (messagePartLock) {
-            try {
-                if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
-                    throw new SocketTimeoutException();
-                }
-            } catch (InterruptedException e) {
-                // TODO i18n
-                throw new IOException(e);
+        try {
+            if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
+                throw new SocketTimeoutException();
             }
+        } catch (InterruptedException e) {
+            // TODO i18n
+            throw new IOException(e);
         }
 
         for (MessagePart mp : messageParts) {
