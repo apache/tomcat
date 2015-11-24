@@ -133,10 +133,6 @@
         if the static member that is registered to the remove suspect list has
         disappeared. (kfujino)
       </fix>
-      <fix>
-        Correct the warnnig log of when the member that is not registered in the
-        membership is detected. (kfujino)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
