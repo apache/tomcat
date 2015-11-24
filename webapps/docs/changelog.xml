@@ -126,6 +126,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <fix>
+        <bug>58631</bug>: Correct the continuation character use in the Windows
+        Service How-To page of the documenation web application. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>
