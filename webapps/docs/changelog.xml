@@ -88,7 +88,7 @@
       <fix>
         <bug>58635</bug>: Enable break points to be set within agent code when
         running Tomcat with a Java agent. Based on a patch by Huxing Zhang.
-        (markt) 
+        (markt)
       </fix>
     </changelog>
   </subsection>
