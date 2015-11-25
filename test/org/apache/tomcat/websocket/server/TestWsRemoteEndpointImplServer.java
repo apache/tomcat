@@ -48,6 +48,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.pojo.TesterUtil.SimpleClient;
 
+@Ignore // This test requires manual intervention to create breakpoints etc.
 public class TestWsRemoteEndpointImplServer extends TomcatBaseTest {
 
     /*
@@ -68,7 +69,6 @@ public class TestWsRemoteEndpointImplServer extends TomcatBaseTest {
      * the call to sendObject(). If the issue is fixed, the thread at breakpoint
      * B will continue past sendObject() and terminate with a TimeoutException.
      */
-    @Ignore // This test requires manual intervention to create breakpoints etc.
     @Test
     public void testClientDropsConnection() throws Exception {
         Tomcat tomcat = getTomcatInstance();
