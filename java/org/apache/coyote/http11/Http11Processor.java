@@ -1003,10 +1003,10 @@ public class Http11Processor extends AbstractProcessor {
                             message += sm.getString("http11processor.fallToDebug");
                             //$FALL-THROUGH$
                         case INFO:
-                            log.info(message);
+                            log.info(message, t);
                             break;
                         case DEBUG:
-                            log.debug(message);
+                            log.debug(message, t);
                     }
                 }
                 // 400 - Bad Request
