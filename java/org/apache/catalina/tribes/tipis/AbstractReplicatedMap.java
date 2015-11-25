@@ -739,6 +739,10 @@ public abstract class AbstractReplicatedMap<K,V>
         boolean memberAdded = false;
         //select a backup node if we don't have one
         Member mapMember = getChannel().getMember(member);
+        if (mapMember == null) {
+            log.warn("Notified member is not registered in the membership:" + member);
+            return;
+        }
         synchronized (mapMembers) {
             if (!mapMembers.containsKey(mapMember) ) {
                 mapMembers.put(mapMember, Long.valueOf(System.currentTimeMillis()));
