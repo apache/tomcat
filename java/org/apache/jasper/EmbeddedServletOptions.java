@@ -205,7 +205,11 @@ public final class EmbeddedServletOptions implements Options {
      */
     private boolean strictQuoteEscaping = true;
 
-    private boolean quoteAttributeEL = false;
+    /**
+     * When EL is used in JSP attribute values, should the rules for quoting of
+     * attributes described in JSP.1.6 be applied to the expression?
+     */
+    private boolean quoteAttributeEL = true;
 
     public String getProperty(String name ) {
         return settings.getProperty( name );

@@ -138,6 +138,7 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_NO_BLOCK_EXTERNAL = "-no-blockExternal";
     protected static final String SWITCH_NO_STRICT_QUOTE_ESCAPING = "-no-strictQuoteEscaping";
     protected static final String SWITCH_QUOTE_ATTRIBUTE_EL = "-quoteAttributeEL";
+    protected static final String SWITCH_NO_QUOTE_ATTRIBUTE_EL = "-no-quoteAttributeEL";
     protected static final String SHOW_SUCCESS ="-s";
     protected static final String LIST_ERRORS = "-l";
     protected static final int INC_WEBXML = 10;
@@ -172,7 +173,7 @@ public class JspC extends Task implements Options {
     protected boolean validateXml;
     protected boolean blockExternal = true;
     protected boolean strictQuoteEscaping = true;
-    protected boolean quoteAttributeEL = false;
+    protected boolean quoteAttributeEL = true;
     protected boolean xpoweredBy;
     protected boolean mappedFile = false;
     protected boolean poolingEnabled = true;
@@ -391,6 +392,8 @@ public class JspC extends Task implements Options {
                 setStrictQuoteEscaping(false);
             } else if (tok.equals(SWITCH_QUOTE_ATTRIBUTE_EL)) {
                 setQuoteAttributeEL(true);
+            } else if (tok.equals(SWITCH_NO_QUOTE_ATTRIBUTE_EL)) {
+                setQuoteAttributeEL(false);
             } else {
                 if (tok.startsWith("-")) {
                     throw new JasperException("Unrecognized option: " + tok +
