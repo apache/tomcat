@@ -264,7 +264,7 @@ if [ "$1" = "jpda" ] ; then
   if [ -z "$JPDA_OPTS" ]; then
     JPDA_OPTS="-agentlib:jdwp=transport=$JPDA_TRANSPORT,address=$JPDA_ADDRESS,server=y,suspend=$JPDA_SUSPEND"
   fi
-  CATALINA_OPTS="$CATALINA_OPTS $JPDA_OPTS"
+  CATALINA_OPTS="$JPDA_OPTS $CATALINA_OPTS"
   shift
 fi
 

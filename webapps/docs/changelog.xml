@@ -186,6 +186,11 @@
         <code>mapperDirectoryRedirectEnabled</code> attributes of the Context
         which may be used to restore the previous behaviour. (markt)
       </add>
+      <fix>
+        <bug>58635</bug>: Enable break points to be set within agent code when
+        running Tomcat with a Java agent. Based on a patch by Huxing Zhang.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
