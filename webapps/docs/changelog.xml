@@ -244,6 +244,11 @@
         HTTP type) when establishing WebSocket connections to servers. Based on
         a patch by Niki Dokovski. (markt)
       </add>
+      <fix>
+        <bug>58624</bug>: Correct a thread safety issue that meant that blocking
+        message writes could block indefinitely if the WebSocket connection was
+        closed while a message write was in progress. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
