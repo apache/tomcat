@@ -28,12 +28,12 @@
     <p>07-${"hello \"world"}</p>
 
     <tags:echo echo="08-${'hello world'}" />
-    <tags:echo echo="09-${'hello \'world'}" />
-    <tags:echo echo="10-${'hello "world'}" />
-    <tags:echo echo="11-${'hello \"world'}" />
+    <tags:echo echo="09-${'hello \\'world'}" />
+    <tags:echo echo="10-${'hello \"world'}" />
+    <tags:echo echo="11-${'hello \\\"world'}" />
     <tags:echo echo='12-${"hello world"}' />
-    <tags:echo echo='13-${"hello 'world"}' />
-    <tags:echo echo='14-${"hello \'world"}' />
-    <tags:echo echo='15-${"hello \"world"}' />
+    <tags:echo echo='13-${"hello \'world"}' />
+    <tags:echo echo='14-${"hello \\\'world"}' />
+    <tags:echo echo='15-${"hello \\"world"}' />
   </body>
 </html>

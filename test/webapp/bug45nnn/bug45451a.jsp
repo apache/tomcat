@@ -19,6 +19,8 @@
   <head><title>Bug 45451 test case</title></head>
   <body>
     <tags:echo echo="00-\\\'${'hello world'}\\\'" />
-    <tags:echo echo='01-\\\'${"hello world"}\\\'' />
+    <tags:echo echo="01-\\\'${\"hello world\"}\\\'" />
+    <tags:echo echo='02-\\\'${\'hello world\'}\\\'' />
+    <tags:echo echo='03-\\\'${"hello world"}\\\'' />
   </body>
 </html>

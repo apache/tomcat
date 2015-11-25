@@ -104,6 +104,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>57136#c25</bug>: Change default value of
+        <code>quoteAttributeEL</code> setting in Jasper to be <code>true</code>
+        for better compatibility with other implementations and older versions
+        of Tomcat. Add command line option <code>-no-quoteAttributeEL</code> in
+        JspC. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>

@@ -39,9 +39,10 @@ public class AttributeParser {
      *                      where the JSP attribute is defined.
      * @param isDeferredSyntaxAllowedAsLiteral
      *                      Are deferred expressions treated as literals?
-     * @param strict        Should the rules of JSP.1.6 for escpaing quotes be
-     *                      strictly applied?
-     * @param quoteAttributeEL
+     * @param strict        Should the rules of JSP.1.6 for escaping of quotes
+     *                      be strictly applied?
+     * @param quoteAttributeEL Should the rules of JSP.1.6 for escaping in
+     *                      attributes be applied to EL in attribute values?
      * @return              An unquoted JSP attribute that, if it contains
      *                      expression language can be safely passed to the EL
      *                      processor without fear of ambiguity.
