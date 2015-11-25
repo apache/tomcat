@@ -188,6 +188,22 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>57136#c25</bug>: Implement a setting that controls what quoting
+        rule is used when parsing EL expressions in attributes on a JSP page
+        (chapter JSP.1.6 of specification). The setting name is
+        <code>quoteAttributeEL</code> and it is configured as initialisation
+        parameter of JSP Servlet (per web application configuration is possible)
+        and as a command line option for JspC. The default value was changed to
+        <code>true</code>, which restores behaviour implemented in
+        Tomcat 7.0.64. It means that attribute quoting is applied on top of EL
+        quoting. This provides better compatibility with older versions of
+        Tomcat and other implementations. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>

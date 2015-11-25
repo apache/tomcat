@@ -157,6 +157,8 @@ public class TestELInJsp extends TomcatBaseTest {
         // Warning: JSP attribute escaping != Java String escaping
         assertEcho(result, "00-\\'hello world\\'");
         assertEcho(result, "01-\\'hello world\\'");
+        assertEcho(result, "02-\\'hello world\\'");
+        assertEcho(result, "03-\\'hello world\\'");
 
         res = getUrl("http://localhost:" + getPort() + "/test/bug45nnn/bug45451b.jsp");
         result = res.toString();

@@ -234,10 +234,10 @@
   <!--   xpoweredBy          Determines whether X-Powered-By response       -->
   <!--                       header is added by generated servlet.  [false] -->
   <!--                                                                      -->
-  <!--   quoteAttributeEL    When EL is used in JSP attribute values should -->
-  <!--                       the rules for quoting of attributes described  -->
-  <!--                       in JSP.1.6 be applied to the expression?       -->
-  <!--                       [false]                                        -->
+  <!--   quoteAttributeEL    When EL is used in an attribute value on a     -->
+  <!--                       JSP page should the rules for quoting of       -->
+  <!--                       attributes described in JSP.1.6 be applied to  -->
+  <!--                       the expression? [true]                         -->
 
     <servlet>
         <servlet-name>jsp</servlet-name>
