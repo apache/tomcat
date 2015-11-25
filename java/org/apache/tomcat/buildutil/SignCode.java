@@ -349,6 +349,9 @@ public class SignCode extends Task {
     private static String getApplicationString(List<String> fileNames, List<File> files)
             throws IOException {
         // 16 MB should be more than enough for Tomcat
+        // TODO: Refactoring this entire class so it uses streaming rather than
+        //       buffering the entire set of files in memory would make it more
+        //       widely useful.
         ByteArrayOutputStream baos = new ByteArrayOutputStream(16 * 1024 * 1024);
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {
             byte[] buf = new byte[32 * 1024];
