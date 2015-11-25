@@ -150,7 +150,7 @@
     <changelog>
       <fix>
         <bug>58631</bug>: Correct the continuation character use in the Windows
-        Service How-To page of the documenation web application. (markt)
+        Service How-To page of the documentation web application. (markt)
       </fix>
     </changelog>
   </subsection>
