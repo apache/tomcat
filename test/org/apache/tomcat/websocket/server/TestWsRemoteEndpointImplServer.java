@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +100,7 @@ public class TestWsRemoteEndpointImplServer extends TomcatBaseTest {
             ServerContainer sc = (ServerContainer) sce.getServletContext().getAttribute(
                     Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
 
-            List<Class<? extends Encoder>> encoders = new ArrayList<>();
+            List<Class<? extends Encoder>> encoders = new ArrayList<Class<? extends Encoder>>();
             encoders.add(Bug58624Encoder.class);
             ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(
                     Bug58624Endpoint.class, PATH).encoders(encoders).build();
@@ -152,7 +151,7 @@ public class TestWsRemoteEndpointImplServer extends TomcatBaseTest {
             try {
                 // Breakpoint B required on following line
                 session.getBasicRemote().sendObject("test");
-            } catch (IOException | EncodeException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
