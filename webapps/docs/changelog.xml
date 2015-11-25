@@ -517,7 +517,7 @@
         <bug>58192</bug>: Correct a regression in the previous fix for
         <bug>58023</bug>. Ensure that classes are associated with their manifest
         even if the class file is first read (and cached) without the manifest.
-        (markt) 
+        (markt)
       </fix>
       <fix>
         Fix thread safety issue in the <code>AsyncContext</code> implementation
