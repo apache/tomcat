@@ -244,7 +244,7 @@
         disappeared. (kfujino)
       </fix>
       <fix>
-        Correct the warnnig log of when the member that is not registered in the
+        Correct the warning log of when the member that is not registered in the
         membership is detected. (kfujino)
       </fix>
       <fix>
@@ -285,7 +285,7 @@
       </fix>
       <fix>
         <bug>58631</bug>: Correct the continuation character use in the Windows
-        Service How-To page of the documenation web application. (markt)
+        Service How-To page of the documentation web application. (markt)
       </fix>
     </changelog>
   </subsection>
