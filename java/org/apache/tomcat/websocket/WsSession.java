@@ -647,7 +647,24 @@ public class WsSession implements Session {
      * {@link FutureToSendHandler} completes.
      */
     protected void registerFuture(FutureToSendHandler f2sh) {
-        futures.put(f2sh, f2sh);
+        boolean fail = false;
+        synchronized (stateLock) {
+            // If the session has already been closed the any registered futures
+            // will have been processed so the failure result for this future
+            // needs to be set here.
+            if (state == State.OPEN) {
+                futures.put(f2sh, f2sh);
+            } else {
+                // Construct the exception outside of the sync block
+                fail = true;
+            }
+        }
+
+        if (fail) {
+            IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
+            SendResult sr = new SendResult(ioe);
+            f2sh.onResult(sr);
+        }
     }
 
 
