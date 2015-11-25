@@ -738,9 +738,10 @@ public abstract class AbstractReplicatedMap<K,V>
         if ( member.equals(getChannel().getLocalMember(false)) ) return;
         boolean memberAdded = false;
         //select a backup node if we don't have one
+        Member mapMember = getChannel().getMember(member);
         synchronized (mapMembers) {
-            if (!mapMembers.containsKey(member) ) {
-                mapMembers.put(member, Long.valueOf(System.currentTimeMillis()));
+            if (!mapMembers.containsKey(mapMember) ) {
+                mapMembers.put(mapMember, Long.valueOf(System.currentTimeMillis()));
                 memberAdded = true;
             }
         }
