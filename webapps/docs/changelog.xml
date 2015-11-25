@@ -145,6 +145,11 @@
         if the static member that is registered to the remove suspect list has
         disappeared. (kfujino)
       </fix>
+      <fix>
+        When using a static cluster, add the members that have been cached in
+        the membership service to the map members list in order to ensure that
+        the map member is a static member. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
