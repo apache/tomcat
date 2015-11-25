@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -369,18 +370,41 @@ public class TestELInJsp extends TomcatBaseTest {
     }
 
     @Test
-    public void testELMisc() throws Exception {
+    public void testELMiscNoQuoteAttributeEL() throws Exception {
+        doTestELMisc(false);
+    }
+
+    @Test
+    public void testELMiscWithQuoteAttributeEL() throws Exception {
+        doTestELMisc(true);
+    }
+
+    private void doTestELMisc(boolean quoteAttributeEL) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir =
-            new File("test/webapp-3.0");
-        // app dir is relative to server home
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        // Create the context (don't use addWebapp as we want to modify the
+        // JSP Servlet settings).
+        File appDir = new File("test/webapp-3.0");
+        StandardContext ctxt = (StandardContext) tomcat.addContext(
+                null, "/test", appDir.getAbsolutePath());
+
+        // Configure the defaults and then tweak the JSP servlet settings
+        // Note: Min value for maxLoadedJsps is 2
+        Tomcat.initWebappDefaults(ctxt);
+        Wrapper w = (Wrapper) ctxt.findChild("jsp");
+
+        String jspName;
+        if (quoteAttributeEL) {
+            jspName = "/test/el-misc-with-quote-attribute-el.jsp";
+            w.addInitParameter("quoteAttributeEL", "true");
+        } else {
+            jspName = "/test/el-misc-no-quote-attribute-el.jsp";
+            w.addInitParameter("quoteAttributeEL", "false");
+        }
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/el-misc.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + jspName);
         String result = res.toString();
         assertEcho(result, "00-\\\\\\\"${'hello world'}");
         assertEcho(result, "01-\\\\\\\"\\${'hello world'}");

@@ -233,4 +233,10 @@ public interface Options {
      * If unset or less or equal than 0, no jsps are unloaded.
      */
     public int getJspIdleTimeout();
+
+    /**
+     * @return {@code true} if EL expressions used within attributes should have
+     *         the quoting rules in JSP.1.6 applied to the expression.
+     */
+    public boolean getQuoteAttributeEL();
 }

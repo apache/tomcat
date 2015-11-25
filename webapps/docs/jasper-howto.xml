@@ -197,6 +197,11 @@ actions or directives be trimmed ?, default <code>false</code>.</li>
 <li><strong>xpoweredBy</strong> - Determines whether X-Powered-By response
 header is added by generated servlet. <code>true</code> or <code>false</code>,
 default <code>false</code>.</li>
+
+<li><strong>quoteAttributeEL</strong> - When EL is used in JSP attribute values,
+should the rules for quoting of attributes described in JSP.1.6 be applied to
+the expression? <code>true</code> or <code>false</code>, default
+<code>false</code>.</li>
 </ul>
 
 
