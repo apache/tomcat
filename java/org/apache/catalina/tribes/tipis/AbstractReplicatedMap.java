@@ -734,6 +734,10 @@ public abstract class AbstractReplicatedMap<K,V>
         boolean memberAdded = false;
         //select a backup node if we don't have one
         Member mapMember = getChannel().getMember(member);
+        if (mapMember == null) {
+            log.warn(sm.getString("abstractReplicatedMap.mapMemberAdded.nullMember", member));
+            return;
+        }
         synchronized (mapMembers) {
             if (!mapMembers.containsKey(mapMember) ) {
                 mapMembers.put(mapMember, Long.valueOf(System.currentTimeMillis()));
