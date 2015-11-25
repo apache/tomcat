@@ -740,6 +740,8 @@ public abstract class AbstractReplicatedMap<K,V>
         }
         synchronized (mapMembers) {
             if (!mapMembers.containsKey(mapMember) ) {
+                if (log.isInfoEnabled())
+                    log.info(sm.getString("abstractReplicatedMap.mapMemberAdded.added", mapMember));
                 mapMembers.put(mapMember, Long.valueOf(System.currentTimeMillis()));
                 memberAdded = true;
             }
