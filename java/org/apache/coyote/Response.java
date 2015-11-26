@@ -626,8 +626,7 @@ public final class Response {
 
     public boolean isReady() {
         if (listener == null) {
-            // TODO i18n
-            throw new IllegalStateException("not in non blocking mode.");
+            throw new IllegalStateException(sm.getString("response.notNonBlocking"));
         }
         // Assume write is not possible
         boolean ready = false;
