@@ -56,10 +56,6 @@ public abstract class AbstractProcessorLight implements Processor {
                 state = dispatch(status);
             } else if (state == SocketState.ASYNC_END) {
                 state = dispatch(status);
-                // TODO: In case this request takes a long time to process
-                //       remove the TBD (socket/processor/something else) from
-                //       the waiting requests now else the async timeout will
-                //       fire
                 if (state == SocketState.OPEN) {
                     // There may be pipe-lined data to read. If the data
                     // isn't processed now, execution will exit this
