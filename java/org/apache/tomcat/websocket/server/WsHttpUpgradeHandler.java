@@ -163,8 +163,8 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 wsRemoteEndpointServer.onWritePossible(false);
                 break;
             case STOP:
-                // TODO i18n
-                CloseReason cr = new CloseReason(CloseCodes.GOING_AWAY, "");
+                CloseReason cr = new CloseReason(CloseCodes.GOING_AWAY,
+                        sm.getString("wsHttpUpgradeHandler.serverStop"));
                 try {
                     wsSession.close(cr);
                 } catch (IOException ioe) {

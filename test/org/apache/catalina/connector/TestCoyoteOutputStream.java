@@ -218,7 +218,8 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
             @Override
             public void onError(Throwable throwable) {
-                // TODO Auto-generated method stub
+                // Not expected.
+                throwable.printStackTrace();
             }
         }
     }

@@ -294,8 +294,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 throw new SocketTimeoutException();
             }
         } catch (InterruptedException e) {
-            // TODO i18n
-            throw new IOException(e);
+            throw new IOException(sm.getString("wsRemoteEndpoint.sendInterupt"), e);
         }
 
         for (MessagePart mp : messageParts) {
