@@ -107,6 +107,10 @@
         Improve upgrade context classloader handling by using Context.bind and
         unbind. (remm)
       </fix>
+      <fix>
+        Improve OpenSSL keystore/truststore configuration by using the code
+        from the JSSE implementation. (remm, jfclere)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
