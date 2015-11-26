@@ -72,8 +72,6 @@ import org.apache.tomcat.util.res.StringManager;
  *     a TLS enabled Connector element in server.xml to enable HTTP/2 support.
  *     </li>
  * </ul>
- *
- * TODO: Review cookie parsing
  */
 public class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler,
         Input, Output {
