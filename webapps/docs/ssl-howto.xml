@@ -303,8 +303,9 @@ loaded or not, use one of the following:</p>
 
 <p>Tomcat also provides a SSL engine that directly uses OpenSSL. If the APR library
 is installed (as for using the APR connector), using the sslImplementationName attribute
-allows enabling it. In that case, the configuration must not use the JSSE attributes, but
-all the attributes that are defined for the APR connector.</p>
+allows enabling it. In that case, the configuration can use either the JSSE attributes or
+the OpenSSL attributes (as used for the APR connector), but must not mix attributes from
+both types in the same SSLHostConfig or Connector element.</p>
 <source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO implementation and OpenSSL -->
 <Connector protocol="org.apache.coyote.http11.Http11NioProtocol" port="8443"
            sslImplementationName="org.apache.tomcat.util.net.openssl.OpenSSLImplementation"
