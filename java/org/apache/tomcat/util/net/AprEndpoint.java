@@ -2291,10 +2291,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     closeSocket(socket.getSocket().longValue());
-                } else if (state == Handler.SocketState.ASYNC_END) {
-                    SocketProcessor proc = new SocketProcessor(socket,
-                            SocketStatus.OPEN_READ);
-                    getExecutor().execute(proc);
                 }
             }
         }
