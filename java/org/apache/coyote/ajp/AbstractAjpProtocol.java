@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.ajp;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.coyote.AbstractProtocol;
@@ -171,8 +172,8 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
     @Override
     protected Processor createUpgradeProcessor(SocketWrapperBase<?> socket,
-            ByteBuffer leftoverInput, UpgradeToken upgradeToken) {
-        // TODO should fail - throw IOE
-        return null;
+            ByteBuffer leftoverInput, UpgradeToken upgradeToken) throws IOException {
+        throw new IOException(sm.getString("ajpprotocol.noUpgradeHandler",
+                upgradeToken.getHttpUpgradeHandler().getClass().getName()));
     }
 }
