@@ -386,8 +386,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         // Set the special HTTP/2 headers
         request.getMimeHeaders().addValue(":method").duplicate(request.method());
         request.getMimeHeaders().addValue(":scheme").duplicate(request.scheme());
-        // TODO: Query string
-        request.getMimeHeaders().addValue(":path").duplicate(request.decodedURI());
+        StringBuilder path = new StringBuilder(request.requestURI().toString());
+        if (!request.queryString().isNull()) {
+            path.append('?');
+            path.append(request.queryString().toString());
+        }
+        request.getMimeHeaders().addValue(":path").setString(path.toString());
 
         // Authority needs to include the port only if a non-standard port is
         // being used.
