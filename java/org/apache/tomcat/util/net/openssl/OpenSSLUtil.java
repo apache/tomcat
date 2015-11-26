@@ -16,25 +16,23 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
-import java.io.InputStream;
-import java.security.KeyStore;
 import java.util.List;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
 
-import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtil;
+import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 
 public class OpenSSLUtil implements SSLUtil {
 
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
+    private final JSSESocketFactory jsseUtil;
 
     private String[] enabledProtocols = null;
     private String[] enabledCiphers = null;
@@ -42,6 +40,13 @@ public class OpenSSLUtil implements SSLUtil {
     public OpenSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
         this.sslHostConfig = sslHostConfig;
         this.certificate = certificate;
+        if (certificate.getCertificateFile() == null) {
+            // Using JSSE configuration for keystore and truststore
+            jsseUtil = new JSSESocketFactory(sslHostConfig, certificate);
+        } else {
+            // Use OpenSSL configuration for certificates
+            jsseUtil = null;
+        }
     }
 
     @Override
@@ -51,49 +56,26 @@ public class OpenSSLUtil implements SSLUtil {
 
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
-        KeyManager[] managers = {
-                new OpenSSLKeyManager(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
-                        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()))
-                };
-        return managers;
+        if (jsseUtil != null) {
+            return jsseUtil.getKeyManagers();
+        } else {
+            // Return something although it is not actually used
+            KeyManager[] managers = {
+                    new OpenSSLKeyManager(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
+                            SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()))
+            };
+            return managers;
+        }
     }
 
-    /* In fact we can use the JSSE one for the moment */
     @Override
     public TrustManager[] getTrustManagers() throws Exception {
-        String storefile = System.getProperty("java.home") + "/lib/security/cacerts";
-        String password = "changeit";
-        String type = "jks";
-        String algorithm = null;
-        if (sslHostConfig.getTruststoreFile() != null) {
-            storefile = sslHostConfig.getTruststoreFile();
+        if (jsseUtil != null) {
+            return jsseUtil.getTrustManagers();
+        } else {
+            return null;
         }
-        if (sslHostConfig.getTruststorePassword() != null) {
-            password = sslHostConfig.getTruststorePassword();
-        }
-        if (sslHostConfig.getTruststoreType() != null) {
-            type = sslHostConfig.getTruststoreType();
-        }
-        if (sslHostConfig.getTruststoreAlgorithm() != null) {
-            algorithm = sslHostConfig.getTruststoreAlgorithm();
-        }
-
-        TrustManagerFactory factory;
-        if (algorithm == null)
-            factory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        else
-            factory = TrustManagerFactory.getInstance(algorithm);
-
-        KeyStore keystore = KeyStore.getInstance(type);
-        try (InputStream stream = ConfigFileLoader.getInputStream(storefile)) {
-            keystore.load(stream, password.toCharArray());
-        }
-
-        factory.init(keystore);
-        TrustManager[] managers = factory.getTrustManagers();
-        return managers;
     }
-
 
     @Override
     public void configureSessionContext(SSLSessionContext sslSessionContext) {
