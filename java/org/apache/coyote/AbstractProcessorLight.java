@@ -54,6 +54,16 @@ public abstract class AbstractProcessorLight implements Processor {
                 // Do nothing here, just wait for it to get recycled
             } else if (isAsync() || isUpgrade()) {
                 state = dispatch(status);
+            } else if (state == SocketState.ASYNC_END) {
+                state = dispatch(status);
+                if (state == SocketState.OPEN) {
+                    // There may be pipe-lined data to read. If the data
+                    // isn't processed now, execution will exit this
+                    // loop and call release() which will recycle the
+                    // processor (and input buffer) deleting any
+                    // pipe-lined data. To avoid this, process it now.
+                    state = service(socketWrapper);
+                }
             } else if (status == SocketStatus.OPEN_WRITE) {
                 // Extra write event likely after async, ignore
                 state = SocketState.LONG;
@@ -63,18 +73,6 @@ public abstract class AbstractProcessorLight implements Processor {
 
             if (state != SocketState.CLOSED && isAsync()) {
                 state = asyncPostProcess();
-                if (state != SocketState.LONG) {
-                    // Async has ended.
-                    state = dispatch(status);
-                    if (state == SocketState.OPEN) {
-                        // There may be pipe-lined data to read. If the data
-                        // isn't processed now, execution will exit this
-                        // loop and call release() which will recycle the
-                        // processor (and input buffer) deleting any
-                        // pipe-lined data. To avoid this, process it now.
-                        state = service(socketWrapper);
-                    }
-                }
             }
 
             if (getLog().isDebugEnabled()) {
@@ -88,7 +86,8 @@ public abstract class AbstractProcessorLight implements Processor {
                 // dispatches to process.
                 dispatches = getIteratorAndClearDispatches();
             }
-        } while (dispatches != null && state != SocketState.CLOSED);
+        } while (state == SocketState.ASYNC_END ||
+                dispatches != null && state != SocketState.CLOSED);
 
         return state;
     }
