@@ -16,36 +16,19 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
-import javax.crypto.Cipher;
-import javax.crypto.EncryptedPrivateKeyInfo;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLParameters;
@@ -61,11 +44,11 @@ import org.apache.tomcat.jni.CertificateVerifier;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLContext;
-import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -326,16 +309,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setCipherSuite(ctx, ciphers);
             // Load Server key and certificate
             if (certificate.getCertificateFile() != null) {
-
+                // Set certificate
                 SSLContext.setCertificate(ctx,
                         SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
                         SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
                         certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
-
                 // Set certificate chain file
                 SSLContext.setCertificateChainFile(ctx,
                         SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
-
                 // Support Client Certificates
                 SSLContext.setCACertificate(ctx,
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
@@ -347,16 +328,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         SSLHostConfig.adjustRelativePath(
                                 sslHostConfig.getCertificateRevocationListPath()));
             } else {
-                /* Try use keystore */
-                X509KeyManager keyManager = getJSSEKeyManager(sslHostConfig);
-                String alias = getJSSEAlias(sslHostConfig, keyManager);
+                X509KeyManager keyManager = chooseKeyManager(kms);
+                String alias = certificate.getCertificateKeyAlias();
                 X509Certificate certificate = keyManager.getCertificateChain(alias)[0];
                 PrivateKey key = keyManager.getPrivateKey(alias);
                 StringBuilder sb = new StringBuilder(BEGIN_KEY);
                 sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
                 sb.append(END_KEY);
                 SSLContext.setCertificateRaw(ctx, certificate.getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
-
             }
             // Client certificate verification
             int value = 0;
@@ -411,64 +390,16 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    String getJSSEAlias(SSLHostConfig sslHostConfig, X509KeyManager keyManager) {
-        String alias = null;
-        // TODO make sure we get the right one...
-        if (certificate.getCertificateKeyAlias() != null)
-            alias = certificate.getCertificateKeyAlias();
-        return alias;
-    }
-    /**
-      * get the JSSE key manager for the keystore
-      * @throws KeyStoreException
-      * @throws NoSuchAlgorithmException
-      * @throws UnrecoverableKeyException
-      * @throws IOException
-      * @throws CertificateException
-      *
-      */
-    static X509KeyManager getJSSEKeyManager(SSLHostConfig sslHostConfig) throws KeyStoreException, UnrecoverableKeyException, NoSuchAlgorithmException, CertificateException, IOException {
-        String keystoretype = null;
-        String keystoreprovider = null;
-        String keystorefile = null;
-        String password = null;
-        // TODO make sure we get the right one...
-        for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
-            if (certificate.getCertificateKeystoreFile() != null)
-                keystorefile = certificate.getCertificateKeystoreFile();
-            if (certificate.getCertificateKeystorePassword() != null)
-                password = certificate.getCertificateKeystorePassword();
-            if (certificate.getCertificateKeystoreType() != null)
-                keystoretype = certificate.getCertificateKeystoreType();
-            if (certificate.getCertificateKeystoreProvider() != null)
-                keystoreprovider = certificate.getCertificateKeystoreProvider();
-        }
-        KeyStore ks = KeyStore.getInstance(keystoretype);
-        InputStream stream = ConfigFileLoader.getInputStream(keystorefile);
-        ks.load(stream, password.toCharArray());
-        KeyManagerFactory kmf;
-        if (keystoreprovider != null)
-            kmf = KeyManagerFactory.getInstance(keystoreprovider);
-        else
-            kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(ks, password.toCharArray());
-        KeyManager[] kms = kmf.getKeyManagers();
-        if (kms == null) {
-            return null;
-        }
-        return (X509KeyManager) kms[0];
-    }
-
-    static OpenSSLKeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
+    private static JSSEKeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
         for (KeyManager manager : managers) {
-            if (manager instanceof OpenSSLKeyManager) {
-                return (OpenSSLKeyManager) manager;
+            if (manager instanceof JSSEKeyManager) {
+                return (JSSEKeyManager) manager;
             }
         }
         throw new IllegalStateException(sm.getString("openssl.keyManagerMissing"));
     }
 
-    static X509TrustManager chooseTrustManager(TrustManager[] managers) {
+    private static X509TrustManager chooseTrustManager(TrustManager[] managers) {
         for (TrustManager m : managers) {
             if (m instanceof X509TrustManager) {
                 return (X509TrustManager) m;
@@ -504,46 +435,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public SSLParameters getSupportedSSLParameters() {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Generates a key specification for an (encrypted) private key.
-     *
-     * @param password characters, if {@code null} or empty an unencrypted key
-     * is assumed
-     * @param key bytes of the DER encoded private key
-     *
-     * @return a key specification
-     *
-     * @throws IOException if parsing {@code key} fails
-     * @throws NoSuchAlgorithmException if the algorithm used to encrypt
-     * {@code key} is unknown
-     * @throws NoSuchPaddingException if the padding scheme specified in the
-     * decryption algorithm is unknown
-     * @throws InvalidKeySpecException if the decryption key based on
-     * {@code password} cannot be generated
-     * @throws InvalidKeyException if the decryption key based on
-     * {@code password} cannot be used to decrypt {@code key}
-     * @throws InvalidAlgorithmParameterException if decryption algorithm
-     * parameters are somehow faulty
-     */
-    protected static PKCS8EncodedKeySpec generateKeySpec(char[] password, byte[] key)
-            throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException,
-            InvalidKeyException, InvalidAlgorithmParameterException {
-
-        if (password == null || password.length == 0) {
-            return new PKCS8EncodedKeySpec(key);
-        }
-
-        EncryptedPrivateKeyInfo encryptedPrivateKeyInfo = new EncryptedPrivateKeyInfo(key);
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(encryptedPrivateKeyInfo.getAlgName());
-        PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
-        SecretKey pbeKey = keyFactory.generateSecret(pbeKeySpec);
-
-        Cipher cipher = Cipher.getInstance(encryptedPrivateKeyInfo.getAlgName());
-        cipher.init(Cipher.DECRYPT_MODE, pbeKey, encryptedPrivateKeyInfo.getAlgParameters());
-
-        return encryptedPrivateKeyInfo.getKeySpec(cipher);
     }
 
     @Override
