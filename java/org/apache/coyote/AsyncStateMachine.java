@@ -61,27 +61,27 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * |   |                          |                    \|/                                        |
  * |   |                   error()|                     |                                         |
  * |   |                          |     |--|timeout()   |                                         |
- * |   |           postProcess()  |     | \|/           |  postProcess()                          |
+ * |   |              post()      |     | \|/           |     post()                              |
  * |   |         |---------------»DISPATCHED«---------- | --------------COMPLETING«-----|         |
  * |   |         |               /|\  |                 |                 | /|\         |         |
  * |   |         |    |---»-------|   |                 |                 |--|          |         |
  * |   |         ^    |               |startAsync()     |               timeout()       |         |
  * |   |         |    |               |                 |                               |         |
- * |  \|/        |    |  complete()  \|/  postProcess() |                               |         |
+ * |  \|/        |    |  complete()  \|/     post()     |                               |         |
  * | MUST_COMPLETE-«- | ----«------STARTING--»--------- | -------------|                ^         |
  * |  /|\    /|\      |               |                 |              |     complete() |         |
- * |   |      |       |               |                 | postProcess()|     /----------|         |
+ * |   |      |       |               |                 |    post()    |     /----------|         |
  * |   |      |       ^               |dispatch()       |    |-----|   |    /                     |
  * |   |      |       |               |                 |    |     |   |   /                      |
- * |   |      |       |              \|/                |    |    \|/ \|/ /    postProcess()      |
+ * |   |      |       |              \|/                |    |    \|/ \|/ /       post()          |
  * |   |      |       |         MUST_DISPATCH-----«-----|    |--«--STARTED«---------«---------|   |
  * |   |      |       |              /|\   |                      / |   |                     |   |
- * |   |      |       |               |    |postProcess()        /  |   |                     ^   |
+ * |   |      |       |               |    |post()               /  |   |                     ^   |
  * ^   |      ^       |               |    |dispatched()        /   |   |asyncOperation()     |   |
  * |   |      |       ^               |    |                   /    |   |                     |   |
  * |   |      |       |               |    |    |-------------/     |   |»-READ_WRITE_OP--»---|   |
  * |   |      |       |               |    |    |    dispatch()     |            |  |  |          |
- * |   |      |       |postProcess()  |    |    |          timeout()|            |  |  |   error()|
+ * |   |      |       |post()         |    |    |          timeout()|            |  |  |   error()|
  * |   |      |       |dispatched()   |   \|/  \|/                  |  dispatch()|  |  |-»--------|
  * |   |      |       |---«---------- | ---DISPATCHING«-----«------ | ------«----|  |
  * |   |      |                       |     |    ^                  |               |
