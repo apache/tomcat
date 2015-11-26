@@ -111,6 +111,12 @@
     <Bug code="IS" />
   </Match>
   <Match>
+  <!-- The header value is safe  -->
+    <Class name="org.apache.catalina.servlets.DefaultServlet" />
+    <Method name="serveResource" />
+    <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
+  </Match>
+  <Match>
     <!-- Non-constant strings are configuration settings rather than client
          supplied -->
     <Class name="org.apache.catalina.session.JDBCStore" />
