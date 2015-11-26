@@ -1382,9 +1382,11 @@
       Tomcat also bundles a special SSL implementation for JSSE that is backed
       by OpenSSL. To enable it, the native library should be enabled as if
       intending to use the APR connector, the value of this attribute should be
-      <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>,
-      and the SSL attributes configuration used should be the one from the APR
-      connector.</p>
+      <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>.
+      In that case, the attributes from either from either JSSE and OpenSSL
+      configuration styles can be used, as long as the two types are not mixed
+      (for example, it is not allowed to define use of a Java keystore and
+      specify a separate pem private key using the OpenSSL attribute).</p>
     </attribute>
 
   </attributes>
