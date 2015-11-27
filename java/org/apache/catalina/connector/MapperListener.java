@@ -384,7 +384,8 @@ public class MapperListener extends LifecycleMBeanBase
 
         mapper.addContextVersion(host.getName(), host, contextPath,
                 context.getWebappVersion(), context, welcomeFiles, resources,
-                wrappers);
+                wrappers, context.getMapperContextRootRedirectEnabled(),
+                context.getMapperDirectoryRedirectEnabled());
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerContext",
