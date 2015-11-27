@@ -350,11 +350,11 @@ public class DefaultServlet extends HttpServlet {
         }
 
         StringBuilder result = new StringBuilder();
-        if (servletPath != null) {
+        if (servletPath.length() > 0) {
             result.append(servletPath);
-            if (pathInfo != null) {
-                result.append(pathInfo);
-            }
+        }
+        if (pathInfo != null) {
+            result.append(pathInfo);
         }
         if (result.length() == 0) {
             result.append('/');
