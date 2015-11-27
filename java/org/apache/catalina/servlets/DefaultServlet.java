@@ -331,6 +331,10 @@ public class DefaultServlet extends HttpServlet {
      * @param request The servlet request we are processing
      */
     protected String getRelativePath(HttpServletRequest request) {
+        return getRelativePath(request, false);
+    }
+
+    protected String getRelativePath(HttpServletRequest request, boolean allowEmptyPath) {
         // IMPORTANT: DefaultServlet can be mapped to '/' or '/path/*' but always
         // serves resources from the web app root with context rooted paths.
         // i.e. it cannot be used to mount the web app root under a sub-path
@@ -356,7 +360,7 @@ public class DefaultServlet extends HttpServlet {
         if (pathInfo != null) {
             result.append(pathInfo);
         }
-        if (result.length() == 0) {
+        if (result.length() == 0 && !allowEmptyPath) {
             result.append('/');
         }
 
@@ -686,7 +690,8 @@ public class DefaultServlet extends HttpServlet {
         boolean serveContent = content;
 
         // Identify the requested resource path
-        String path = getRelativePath(request);
+        String path = getRelativePath(request, true);
+
         if (debug > 0) {
             if (serveContent)
                 log("DefaultServlet.serveResource:  Serving resource '" +
@@ -694,6 +699,12 @@ public class DefaultServlet extends HttpServlet {
             else
                 log("DefaultServlet.serveResource:  Serving resource '" +
                     path + "' headers only");
+        }
+
+        if (path.length() == 0) {
+            // Context root redirect
+            doDirectoryRedirect(request, response);
+            return;
         }
 
         WebResource resource = resources.getResource(path);
@@ -811,13 +822,7 @@ public class DefaultServlet extends HttpServlet {
 
         if (resource.isDirectory()) {
             if (!path.endsWith("/")) {
-                StringBuilder location = new StringBuilder(request.getRequestURI());
-                location.append('/');
-                if (request.getQueryString() != null) {
-                    location.append('?');
-                    location.append(request.getQueryString());
-                }
-                response.sendRedirect(response.encodeRedirectURL(location.toString()));
+                doDirectoryRedirect(request, response);
                 return;
             }
 
@@ -1026,6 +1031,16 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
+    private void doDirectoryRedirect(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        StringBuilder location = new StringBuilder(request.getRequestURI());
+        location.append('/');
+        if (request.getQueryString() != null) {
+            location.append('?');
+            location.append(request.getQueryString());
+        }
+        response.sendRedirect(response.encodeRedirectURL(location.toString()));
+    }
 
     /**
      * Parse the content-range header.
