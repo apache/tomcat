@@ -58,6 +58,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.67 (violetagg)">
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>58658</bug>: Correct a regression in 7.0.66 that prevented Tomcat
+        from starting on Java 6 unless the WebSocket JARs (that require Java 7)
+        were removed. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.66 (violetagg)">
   <subsection name="General">

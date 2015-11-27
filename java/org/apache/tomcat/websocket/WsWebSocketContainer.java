@@ -350,8 +350,7 @@ public class WsWebSocketContainer
                             "wsWebSocketContainer.proxyConnectFail", selectedProxy,
                             Integer.toString(httpResponse.getStatus())));
                 }
-            } catch (TimeoutException | InterruptedException | ExecutionException |
-                    EOFException e) {
+            } catch (Exception e) {
                 if (channel != null) {
                     channel.close();
                 }
