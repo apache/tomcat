@@ -879,8 +879,10 @@ public final class Mapper {
         if(mappingData.wrapper == null && noServletPath &&
                 mappingData.context.getMapperContextRootRedirectEnabled()) {
             // The path is empty, redirect to "/"
+            path.append('/');
+            pathEnd = path.getEnd();
             mappingData.redirectPath.setChars
-                (path.getBuffer(), pathOffset, pathEnd-pathOffset);
+                (path.getBuffer(), pathOffset, pathEnd - pathOffset);
             path.setEnd(pathEnd - 1);
             return;
         }
