@@ -375,6 +375,11 @@ public class WebdavServlet
      */
     @Override
     protected String getRelativePath(HttpServletRequest request) {
+        return getRelativePath(request, false);
+    }
+
+    @Override
+    protected String getRelativePath(HttpServletRequest request, boolean allowEmptyPath) {
         String pathInfo;
 
         if (request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI) != null) {
