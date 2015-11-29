@@ -40,8 +40,8 @@ import org.apache.juli.logging.LogFactory;
  * persistence, even if only for  restarts.
  * <p>
  * <b>IMPLEMENTATION NOTE</b>:  Correct behavior of session storing and
- * reloading depends upon external calls to the {@link Lifecycle#start() start()}
- * and {@link Lifecycle#stop() stop()} methods of this class
+ * reloading depends upon external calls to the {@link Lifecycle#start()}
+ * and {@link Lifecycle#stop()} methods of this class
  * at the correct times.
  *
  * @author Craig R. McClanahan
