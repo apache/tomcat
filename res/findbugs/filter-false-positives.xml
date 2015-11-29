@@ -89,6 +89,12 @@
     <Bug code="IS" />
   </Match>
   <Match>
+  <!-- The header value is safe  -->
+    <Class name="org.apache.catalina.servlets.DefaultServlet" />
+    <Method name="serveResource" />
+    <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
+  </Match>
+  <Match>
     <!-- We can live with the threading issue. See code comment for details. -->
     <Class name="org.apache.catalina.session.ManagerBase" />
     <Method name="generateSessionId" />
