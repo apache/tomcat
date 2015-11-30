@@ -25,7 +25,6 @@ import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
 
-
 public class TestWebappServiceLoader extends TomcatBaseTest {
     @Test
     public void testWebapp() throws Exception {

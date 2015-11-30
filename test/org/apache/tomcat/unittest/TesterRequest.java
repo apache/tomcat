@@ -14,16 +14,51 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.catalina.connector;
+package org.apache.tomcat.unittest;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.ServletContext;
+import javax.servlet.SessionTrackingMode;
+
+import org.apache.catalina.Context;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.session.StandardSession;
 
 public class TesterRequest extends Request {
+
+    private final TesterContext context;
+    private final TesterServletContext servletContext;
+
+
+    public TesterRequest() {
+        this(false);
+    }
+
+
+    public TesterRequest(boolean withSession) {
+        context = new TesterContext();
+        servletContext = new TesterServletContext();
+        context.setServletContext(servletContext);
+        if (withSession) {
+            Set<SessionTrackingMode> modes = new HashSet<>();
+            modes.add(SessionTrackingMode.URL);
+            modes.add(SessionTrackingMode.COOKIE);
+            servletContext.setSessionTrackingModes(modes);
+            session = new StandardSession(null);
+            session.setId("1234", false);
+            session.setValid(true);
+        }
+    }
+
+
     @Override
     public String getScheme() {
         return "http";
@@ -39,10 +74,30 @@ public class TesterRequest extends Request {
         return 8080;
     }
 
+
     @Override
-    public String getDecodedRequestURI() {
+    public String getRequestURI() {
         return "/level1/level2/foo.html";
     }
+
+    @Override
+    public String getDecodedRequestURI() {
+        // Decoding not required
+        return getRequestURI();
+    }
+
+
+    @Override
+    public Context getContext() {
+        return context;
+    }
+
+
+    @Override
+    public ServletContext getServletContext() {
+        return servletContext;
+    }
+
 
     private String method;
     public void setMethod(String method) {
@@ -53,11 +108,11 @@ public class TesterRequest extends Request {
         return method;
     }
 
-    private final Map<String,List<String>> headers = new HashMap<String, List<String>>();
-    protected void addHeader(String name, String value) {
+    private final Map<String,List<String>> headers = new HashMap<>();
+    public void addHeader(String name, String value) {
         List<String> values = headers.get(name);
         if (values == null) {
-            values = new ArrayList<String>();
+            values = new ArrayList<>();
             headers.put(name, values);
         }
         values.add(value);
@@ -72,6 +127,10 @@ public class TesterRequest extends Request {
     }
     @Override
     public Enumeration<String> getHeaders(String name) {
+        List<String> values = headers.get(name);
+        if (values == null || values.size() == 0) {
+            return Collections.emptyEnumeration();
+        }
         return Collections.enumeration(headers.get(name));
     }
 

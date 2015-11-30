@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.core;
+package org.apache.tomcat.unittest;
 
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -50,6 +50,7 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.core.ApplicationServletRegistration;
 import org.apache.catalina.deploy.ApplicationListener;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
@@ -560,9 +561,13 @@ public class TesterContext implements Context {
         // NO-OP
     }
 
+    private ServletContext servletContext;
     @Override
     public ServletContext getServletContext() {
-        return null;
+        return servletContext;
+    }
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
     @Override

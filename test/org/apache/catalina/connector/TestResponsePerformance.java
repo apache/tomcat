@@ -21,7 +21,13 @@ import java.net.URI;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
-public class TestResponsePerformance {
+import org.apache.catalina.startup.LoggingBaseTest;
+import org.apache.tomcat.unittest.TesterRequest;
+
+public class TestResponsePerformance extends LoggingBaseTest {
+
+    private final int ITERATIONS = 100000;
+
     @Test
     public void testToAbsolutePerformance() throws Exception {
         Request req = new TesterRequest();
@@ -29,13 +35,13 @@ public class TestResponsePerformance {
         resp.setRequest(req);
 
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < ITERATIONS; i++) {
             resp.toAbsolute("bar.html");
         }
         long homebrew = System.currentTimeMillis() - start;
 
         start = System.currentTimeMillis();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < ITERATIONS; i++) {
             URI base = URI.create(
                     "http://localhost:8080/level1/level2/foo.html");
             base.resolve(URI.create("bar.html")).toASCIIString();

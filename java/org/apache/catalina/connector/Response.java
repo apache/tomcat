@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -1378,10 +1379,8 @@ public class Response
      */
     @Override
     public void sendRedirect(String location) throws IOException {
-
         if (isCommitted()) {
-            throw new IllegalStateException
-                (sm.getString("coyoteResponse.sendRedirect.ise"));
+            throw new IllegalStateException(sm.getString("coyoteResponse.sendRedirect.ise"));
         }
 
         // Ignore any call from an included servlet
@@ -1394,13 +1393,13 @@ public class Response
 
         // Generate a temporary redirect to the specified location
         try {
-            String absolute = toAbsolute(location);
+            String locationUri = URI.create(location).toASCIIString();
             setStatus(SC_FOUND);
-            setHeader("Location", absolute);
+            setHeader("Location", locationUri);
             if (getContext().getSendRedirectBody()) {
                 PrintWriter writer = getWriter();
                 writer.print(sm.getString("coyoteResponse.sendRedirect.note",
-                        RequestUtil.filter(absolute)));
+                        RequestUtil.filter(locationUri)));
                 flushBuffer();
             }
         } catch (IllegalArgumentException e) {
