@@ -21,6 +21,8 @@ import java.util.Enumeration;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
+import org.apache.tomcat.unittest.TesterServletContext;
+
 public class TesterFilterConfigs {
     public static final String HTTPS_WWW_APACHE_ORG = "https://www.apache.org";
     public static final String HTTP_TOMCAT_APACHE_ORG =

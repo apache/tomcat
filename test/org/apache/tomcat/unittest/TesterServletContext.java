@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.filters;
+package org.apache.tomcat.unittest;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
