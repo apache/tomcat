@@ -707,10 +707,6 @@ public class Response
     }
 
 
-
-    /**
-     * TODO SERVLET 3.1
-     */
     @Override
     public void setContentLengthLong(long length) {
         if (isCommitted()) {
@@ -723,7 +719,6 @@ public class Response
         }
 
         getCoyoteResponse().setContentLength(length);
-
     }
 
 
