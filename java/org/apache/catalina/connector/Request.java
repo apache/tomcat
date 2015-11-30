@@ -2969,6 +2969,7 @@ public class Request
     protected Session doGetSession(boolean create) {
 
         // There cannot be a session if no context has been assigned yet
+        Context context = getContext();
         if (context == null) {
             return (null);
         }
@@ -2982,13 +2983,9 @@ public class Request
         }
 
         // Return the requested session if it exists and is valid
-        Manager manager = null;
-        if (context != null) {
-            manager = context.getManager();
-        }
-        if (manager == null)
-         {
-            return (null);      // Sessions are not supported
+        Manager manager = context.getManager();
+        if (manager == null) {
+            return null;        // Sessions are not supported
         }
         if (requestedSessionId != null) {
             try {
