@@ -71,6 +71,10 @@
         from JDBCStore, that are old enough, to be expired. Based on a patch
         by Tom Anderson. (fschumacher)
       </fix>
+      <add>
+        <bug>56917</bug>: As per RFC7231 (HTTP/1.1) allow redirects to use
+        relative UIRs. (markt)
+      </add>
       <fix>
         <bug>58629</bug>: Allow an embedded Tomcat instance to start when the
         <code>Service</code> has no <code>Engine</code> configured. (markt)
