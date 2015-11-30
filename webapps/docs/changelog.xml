@@ -60,6 +60,10 @@
 <section name="Tomcat 7.0.67 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>56917</bug>: As per RFC7231 (HTTP/1.1) allow redirects to use
+        relative UIRs. (markt)
+      </add>
       <fix>
         <bug>58660</bug>: Correct a regression in 7.0.66 caused by the change
         that moved the redirection for context roots from the Mapper to the
