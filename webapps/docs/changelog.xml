@@ -65,6 +65,10 @@
         that moved the redirection for context roots from the Mapper to the
         Default Servlet. (markt)
       </fix>
+      <fix>
+        Fixed potential NPE in <code>HostConfig</code> while deploying an
+        application. Issue reported by coverity scan. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
