@@ -27,9 +27,9 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.filters.TesterServletContext;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScannerCallback;
+import org.apache.tomcat.unittest.TesterServletContext;
 
 public class TestStandardJarScanner {
 
