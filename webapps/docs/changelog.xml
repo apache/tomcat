@@ -58,6 +58,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.67 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>58660</bug>: Correct a regression in 8.0.29 caused by the change
+        that moved the redirection for context roots from the Mapper to the
+        Default Servlet. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

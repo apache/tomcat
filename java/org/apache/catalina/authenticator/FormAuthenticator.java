@@ -236,6 +236,20 @@ public class FormAuthenticator
 
         // No -- Save this request and redirect to the form login page
         if (!loginAction) {
+            // If this request was to the root of the context without a trailing
+            // '/', need to redirect to add it else the submit of the login form
+            // may not go to the correct web application
+            if (request.getServletPath().length() == 0 && request.getPathInfo() == null) {
+                StringBuilder location = new StringBuilder(requestURI);
+                location.append('/');
+                if (request.getQueryString() != null) {
+                    location.append('?');
+                    location.append(request.getQueryString());
+                }
+                response.sendRedirect(response.encodeRedirectURL(location.toString()));
+                return false;
+            }
+
             session = request.getSessionInternal(true);
             if (log.isDebugEnabled()) {
                 log.debug("Save request in session '" + session.getIdInternal() + "'");
