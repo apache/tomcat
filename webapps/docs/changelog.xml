@@ -98,6 +98,17 @@
         Fixed potential NPE in <code>HostConfig</code> while deploying an
         application. Issue reported by coverity scan. (violetagg)
       </fix>
+      <fix>
+        <bug>58655</bug>: Fix an <code> IllegalStateException</code> when
+        calling <code>HttpServletResponse.sendRedirect()</code> with the
+        <code>RemoteIpFilter</code>. This was caused by trying to correctly
+        generate the absolute URI for the redirect. With the fix for
+        <bug>56917</bug>, redirects may now be relative making the
+        <code>sendRedirect()</code> implementation for the
+        <code>RemoteIpFilter</code> much simpler. This also addresses issues
+        where the redirect may not have behaved as expected when redirecting
+        from http to https to from https to http. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
