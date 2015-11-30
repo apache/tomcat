@@ -266,7 +266,8 @@ public class TesterServletContext implements ServletContext {
         return sessionCookieConfig;
     }
 
-    private final Set<SessionTrackingMode> sessionTrackingModes = new HashSet<>();
+    private final Set<SessionTrackingMode> sessionTrackingModes =
+            new HashSet<SessionTrackingMode>();
     @Override
     public void setSessionTrackingModes(
             Set<SessionTrackingMode> sessionTrackingModes) {

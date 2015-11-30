@@ -48,7 +48,7 @@ public class TesterRequest extends Request {
         servletContext = new TesterServletContext();
         context.setServletContext(servletContext);
         if (withSession) {
-            Set<SessionTrackingMode> modes = new HashSet<>();
+            Set<SessionTrackingMode> modes = new HashSet<SessionTrackingMode>();
             modes.add(SessionTrackingMode.URL);
             modes.add(SessionTrackingMode.COOKIE);
             servletContext.setSessionTrackingModes(modes);
@@ -108,11 +108,11 @@ public class TesterRequest extends Request {
         return method;
     }
 
-    private final Map<String,List<String>> headers = new HashMap<>();
+    private final Map<String,List<String>> headers = new HashMap<String,List<String>>();
     public void addHeader(String name, String value) {
         List<String> values = headers.get(name);
         if (values == null) {
-            values = new ArrayList<>();
+            values = new ArrayList<String>();
             headers.put(name, values);
         }
         values.add(value);
@@ -129,7 +129,7 @@ public class TesterRequest extends Request {
     public Enumeration<String> getHeaders(String name) {
         List<String> values = headers.get(name);
         if (values == null || values.size() == 0) {
-            return Collections.emptyEnumeration();
+            values = Collections.emptyList();
         }
         return Collections.enumeration(headers.get(name));
     }
