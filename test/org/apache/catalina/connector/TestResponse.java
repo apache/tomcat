@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
@@ -360,7 +361,219 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
+    private void doTestEncodeURL(String location, String expected) {
+        Request req = new TesterRequest(true);
+        req.setRequestedSessionId("1234");
+        req.setRequestedSessionURL(true);
+        Response resp = new Response();
+        resp.setRequest(req);
+
+        String result = resp.encodeURL(location);
+        Assert.assertEquals(expected, result);
+    }
+
+
     @Test
+    public void testEncodeURL01() throws Exception {
+        doTestEncodeURL("./bar.html", "./bar.html;jsessionid=1234");
+    }
+
+
+    @Test
+    public void testEncodeURL02() throws Exception {
+        doTestEncodeURL(".", ".;jsessionid=1234");
+    }
+
+
+    @Test
+    public void testEncodeURL03() throws Exception {
+        doTestEncodeURL("..", "..;jsessionid=1234");
+    }
+
+
+    @Test
+    public void testEncodeURL04() throws Exception {
+        doTestEncodeURL(".././..", ".././..;jsessionid=1234");
+    }
+
+
+    public void testEncodeURL05() throws Exception {
+        doTestEncodeURL("../../..", "../../..");
+    }
+
+
+    @Test
+    public void testEncodeURL06() throws Exception {
+        doTestEncodeURL("bar.html", "bar.html;jsessionid=1234");
+    }
+
+
+    @Test
+    public void testEncodeURL07() throws Exception {
+        doTestEncodeURL("bar.html?x=/../", "bar.html;jsessionid=1234?x=/../");
+    }
+
+
+    @Test
+    public void testEncodeURL08() throws Exception {
+        doTestEncodeURL("bar.html?x=/../../", "bar.html;jsessionid=1234?x=/../../");
+    }
+
+
+    @Test
+    public void testEncodeURL09() throws Exception {
+        doTestEncodeURL("./.?x=/../../", "./.;jsessionid=1234?x=/../../");
+    }
+
+
+    @Test
+    public void testEncodeURL10() throws Exception {
+        doTestEncodeURL("./..?x=/../../", "./..;jsessionid=1234?x=/../../");
+    }
+
+
+    @Test
+    public void testEncodeURL11() throws Exception {
+        doTestEncodeURL("./..?x=/../..", "./..;jsessionid=1234?x=/../..");
+    }
+
+
+    @Test
+    public void testEncodeURL12() throws Exception {
+        doTestEncodeURL("bar.html#/../", "bar.html;jsessionid=1234#/../");
+    }
+
+
+    @Test
+    public void testEncodeURL13() throws Exception {
+        doTestEncodeURL("bar.html#/../../", "bar.html;jsessionid=1234#/../../");
+    }
+
+
+    @Test
+    public void testEncodeURL14() throws Exception {
+        doTestEncodeURL("./.#/../../", "./.;jsessionid=1234#/../../");
+    }
+
+
+    @Test
+    public void testEncodeURL15() throws Exception {
+        doTestEncodeURL("./..#/../../", "./..;jsessionid=1234#/../../");
+    }
+
+
+    @Test
+    public void testEncodeURL16() throws Exception {
+        doTestEncodeURL("./..#/../..", "./..;jsessionid=1234#/../..");
+    }
+
+
+    private void doTestEncodeRedirectURL(String location, String expected) {
+        Request req = new TesterRequest(true);
+        req.setRequestedSessionId("1234");
+        req.setRequestedSessionURL(true);
+        Response resp = new Response();
+        resp.setRequest(req);
+
+        String result = resp.encodeRedirectURL(location);
+        Assert.assertEquals(expected, result);
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL01() throws Exception {
+        doTestEncodeRedirectURL("./bar.html", "./bar.html;jsessionid=1234");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL02() throws Exception {
+        doTestEncodeRedirectURL(".", ".;jsessionid=1234");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL03() throws Exception {
+        doTestEncodeRedirectURL("..", "..;jsessionid=1234");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL04() throws Exception {
+        doTestEncodeRedirectURL(".././..", ".././..;jsessionid=1234");
+    }
+
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testEncodeRedirectURL05() throws Exception {
+        doTestEncodeRedirectURL("../../..", "throws IAE");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL06() throws Exception {
+        doTestEncodeRedirectURL("bar.html", "bar.html;jsessionid=1234");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL07() throws Exception {
+        doTestEncodeRedirectURL("bar.html?x=/../", "bar.html;jsessionid=1234?x=/../");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL08() throws Exception {
+        doTestEncodeRedirectURL("bar.html?x=/../../", "bar.html;jsessionid=1234?x=/../../");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL09() throws Exception {
+        doTestEncodeRedirectURL("./.?x=/../../", "./.;jsessionid=1234?x=/../../");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL10() throws Exception {
+        doTestEncodeRedirectURL("./..?x=/../../", "./..;jsessionid=1234?x=/../../");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL11() throws Exception {
+        doTestEncodeRedirectURL("./..?x=/../..", "./..;jsessionid=1234?x=/../..");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL12() throws Exception {
+        doTestEncodeRedirectURL("bar.html#/../", "bar.html;jsessionid=1234#/../");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL13() throws Exception {
+        doTestEncodeRedirectURL("bar.html#/../../", "bar.html;jsessionid=1234#/../../");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL14() throws Exception {
+        doTestEncodeRedirectURL("./.#/../../", "./.;jsessionid=1234#/../../");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL15() throws Exception {
+        doTestEncodeRedirectURL("./..#/../../", "./..;jsessionid=1234#/../../");
+    }
+
+
+    @Test
+    public void testEncodeRedirectURL16() throws Exception {
+        doTestEncodeURL("./..#/../..", "./..;jsessionid=1234#/../..");
+    }    @Test
     public void testBug53469a() throws Exception {
         Request req = new TesterRequest();
         Response resp = new Response();

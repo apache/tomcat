@@ -49,10 +49,10 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.TesterResponse;
-import org.apache.catalina.core.TesterContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterContext;
+import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 

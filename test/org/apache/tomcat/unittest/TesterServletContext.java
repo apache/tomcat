@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EventListener;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,7 +39,6 @@ import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.core.ApplicationFilterRegistration;
-import org.apache.catalina.core.TesterContext;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 
 public class TesterServletContext implements ServletContext {
@@ -278,15 +278,18 @@ public class TesterServletContext implements ServletContext {
         throw new RuntimeException("Not implemented");
     }
 
+    private SessionCookieConfig sessionCookieConfig = new TesterSessionCookieConfig();
     @Override
     public SessionCookieConfig getSessionCookieConfig() {
-        throw new RuntimeException("Not implemented");
+        return sessionCookieConfig;
     }
 
+    private final Set<SessionTrackingMode> sessionTrackingModes = new HashSet<>();
     @Override
     public void setSessionTrackingModes(
             Set<SessionTrackingMode> sessionTrackingModes) {
-        throw new RuntimeException("Not implemented");
+        this.sessionTrackingModes.clear();
+        this.sessionTrackingModes.addAll(sessionTrackingModes);
     }
 
     @Override
@@ -296,7 +299,7 @@ public class TesterServletContext implements ServletContext {
 
     @Override
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
-        throw new RuntimeException("Not implemented");
+        return sessionTrackingModes;
     }
 
     @Override
