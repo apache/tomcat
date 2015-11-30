@@ -668,7 +668,7 @@ public class TestRealmBase {
         // Set up the mock request and response
         TesterRequest request = new TesterRequest();
         Response response = new TesterResponse();
-        Context context = new TesterContext();
+        Context context = request.getContext();
         context.addSecurityRole(ROLE1);
         context.addSecurityRole(ROLE2);
         request.getMappingData().context = context;
