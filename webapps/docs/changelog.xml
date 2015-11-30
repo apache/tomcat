@@ -61,7 +61,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        <bug>58660</bug>: Correct a regression in 8.0.29 caused by the change
+        <bug>58660</bug>: Correct a regression in 7.0.66 caused by the change
         that moved the redirection for context roots from the Mapper to the
         Default Servlet. (markt)
       </fix>
