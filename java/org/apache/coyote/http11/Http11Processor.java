@@ -783,7 +783,7 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case AVAILABLE: {
-            request.setAvailable(inputBuffer.available(param == Boolean.TRUE));
+            request.setAvailable(inputBuffer.available(Boolean.TRUE.equals(param)));
             break;
         }
         case NB_WRITE_INTEREST: {
