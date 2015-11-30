@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -1266,6 +1267,7 @@ public class Response
         sendRedirect(location, SC_FOUND);
     }
 
+
     /**
      * Internal method that allows a redirect to be sent with a status other
      * than {@link HttpServletResponse#SC_FOUND} (302). No attempt is made to
@@ -1273,8 +1275,7 @@ public class Response
      */
     public void sendRedirect(String location, int status) throws IOException {
         if (isCommitted()) {
-            throw new IllegalStateException
-                (sm.getString("coyoteResponse.sendRedirect.ise"));
+            throw new IllegalStateException(sm.getString("coyoteResponse.sendRedirect.ise"));
         }
 
         // Ignore any call from an included servlet
@@ -1287,13 +1288,13 @@ public class Response
 
         // Generate a temporary redirect to the specified location
         try {
-            String absolute = toAbsolute(location);
+            String locationUri = URI.create(location).toASCIIString();
             setStatus(status);
-            setHeader("Location", absolute);
+            setHeader("Location", locationUri);
             if (getContext().getSendRedirectBody()) {
                 PrintWriter writer = getWriter();
                 writer.print(sm.getString("coyoteResponse.sendRedirect.note",
-                        RequestUtil.filter(absolute)));
+                        RequestUtil.filter(locationUri)));
                 flushBuffer();
             }
         } catch (IllegalArgumentException e) {

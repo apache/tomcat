@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.core;
+package org.apache.tomcat.unittest;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -588,9 +588,13 @@ public class TesterContext implements Context {
         // NO-OP
     }
 
+    private ServletContext servletContext;
     @Override
     public ServletContext getServletContext() {
-        return null;
+        return servletContext;
+    }
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
     }
 
     @Override

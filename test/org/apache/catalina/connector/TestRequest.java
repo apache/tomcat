@@ -52,6 +52,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;

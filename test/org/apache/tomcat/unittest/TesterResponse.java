@@ -14,9 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.catalina.connector;
+package org.apache.tomcat.unittest;
 
 import java.io.IOException;
+
+import org.apache.catalina.connector.Response;
 
 /**
  * Minimal changes to Response to enable tests that use this class to operate

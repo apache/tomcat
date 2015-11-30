@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.LoggingBaseTest;
+import org.apache.tomcat.unittest.TesterRequest;
 
 public class TestResponsePerformance extends LoggingBaseTest {
 

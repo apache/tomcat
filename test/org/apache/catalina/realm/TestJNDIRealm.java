@@ -35,8 +35,8 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.core.TesterContext;
 import org.apache.naming.NameParserImpl;
+import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.util.security.MD5Encoder;
 import org.easymock.EasyMock;
 
