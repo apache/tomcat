@@ -98,7 +98,7 @@ public class WsOutbound {
                 }
                 if (text == null) {
                     text = Boolean.FALSE;
-                } else if (text == Boolean.TRUE) {
+                } else if (Boolean.TRUE.equals(text)) {
                     // Flush the character data
                     flush();
                     text = Boolean.FALSE;
@@ -141,7 +141,7 @@ public class WsOutbound {
         
                 if (text == null) {
                     text = Boolean.TRUE;
-                } else if (text == Boolean.FALSE) {
+                } else if (Boolean.FALSE.equals(text)) {
                     // Flush the binary data
                     flush();
                     text = Boolean.TRUE;

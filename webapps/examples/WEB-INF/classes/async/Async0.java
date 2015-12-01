@@ -35,7 +35,7 @@ public class Async0 extends HttpServlet {
 
     @Override
     protected void service(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-        if (Boolean.TRUE == req.getAttribute("dispatch")) {
+        if (Boolean.TRUE.equals(req.getAttribute("dispatch"))) {
             log.info("Received dispatch, completing on the worker thread.");
             log.info("After complete called started:"+req.isAsyncStarted());
             resp.getWriter().write("Async dispatch worked:+"+System.currentTimeMillis()+"\n");

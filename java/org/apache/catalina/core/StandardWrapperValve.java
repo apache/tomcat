@@ -164,8 +164,8 @@ final class StandardWrapperValve
 
         // Identify if the request is Comet related now that the servlet has been allocated
         boolean comet = false;
-        if (servlet instanceof CometProcessor && request.getAttribute(
-                Globals.COMET_SUPPORTED_ATTR) == Boolean.TRUE) {
+        if (servlet instanceof CometProcessor && Boolean.TRUE.equals(request.getAttribute(
+                Globals.COMET_SUPPORTED_ATTR))) {
             comet = true;
             request.setComet(true);
         }
