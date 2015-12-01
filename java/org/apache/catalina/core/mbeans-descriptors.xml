@@ -339,6 +339,10 @@
                is="true"
                type="boolean"/>
 
+    <attribute name="useRelativeRedirects"
+               description="When generating location headers for 302 responses, should a relative URI be used?"
+               type="boolean"/>
+
     <attribute name="webappVersion"
                description="The version of this web application - used in parallel deployment to differentiate different versions of the same web application"
                type="java.lang.String"
