@@ -63,16 +63,6 @@ public abstract class SocketWrapperBase<E> {
     private final Lock blockingStatusReadLock;
     private final WriteLock blockingStatusWriteLock;
 
-    /*
-     * In normal servlet processing only one thread is allowed to access the
-     * socket at a time. That is controlled by a lock on the socket for both
-     * read and writes). When HTTP upgrade is used, one read thread and one
-     * write thread are allowed to access the socket concurrently. In this case
-     * the lock on the socket is used for reads and the lock below is used for
-     * writes.
-     */
-    private final Object writeThreadLock = new Object();
-
     /**
      * The buffers used for communicating with the socket.
      */
@@ -217,7 +207,6 @@ public abstract class SocketWrapperBase<E> {
     public WriteLock getBlockingStatusWriteLock() {
         return blockingStatusWriteLock;
     }
-    public Object getWriteThreadLock() { return writeThreadLock; }
     public SocketBufferHandler getSocketBufferHandler() { return socketBufferHandler; }
     public abstract boolean isReadPending();
     public abstract boolean isWritePending();
