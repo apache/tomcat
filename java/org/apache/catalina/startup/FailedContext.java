@@ -785,4 +785,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     public boolean getMapperDirectoryRedirectEnabled() { return false; }
+
+    @Override
+    public void setUseRelativeRedirects(boolean useRelativeRedirects) { /* NO-OP */ }
+    @Override
+    public boolean getUseRelativeRedirects() { return true; }
 }
