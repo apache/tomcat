@@ -1288,7 +1288,14 @@ public class Response
 
         // Generate a temporary redirect to the specified location
         try {
-            String locationUri = URI.create(location).toASCIIString();
+            String locationUri;
+            // Relative redirects require HTTP/1.1
+            if (getRequest().getCoyoteRequest().getSupportsRelativeRedirects() &&
+                    getContext().getUseRelativeRedirects()) {
+                locationUri = URI.create(location).toASCIIString();
+            } else {
+                locationUri = toAbsolute(location);
+            }
             setStatus(status);
             setHeader("Location", locationUri);
             if (getContext().getSendRedirectBody()) {

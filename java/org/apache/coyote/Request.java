@@ -471,6 +471,13 @@ public final class Request {
         return result.get();
     }
 
+    public boolean getSupportsRelativeRedirects() {
+        if (protocol().equals("") || protocol().equals("HTTP/1.0")) {
+            return false;
+        }
+        return true;
+    }
+
 
     // -------------------- Input Buffer --------------------
 

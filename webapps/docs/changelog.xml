@@ -72,8 +72,10 @@
         by Tom Anderson. (fschumacher)
       </fix>
       <add>
-        <bug>56917</bug>: As per RFC7231 (HTTP/1.1) allow redirects to use
-        relative UIRs. (markt)
+        <bug>56917</bug>: As per RFC7231 (HTTP/1.1), allow HTTP/1.1 and later
+        redirects to use relative URIs. This is controlled by a new attribute
+        <code>useRelativeRedirects</code> on the <strong>Context</strong> and
+        defaults to <code>true</code>. (markt)
       </add>
       <fix>
         <bug>58629</bug>: Allow an embedded Tomcat instance to start when the
