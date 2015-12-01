@@ -216,7 +216,7 @@ public class CoyoteAdapter implements Adapter {
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                         writeListener.onError(t);
-                        throw t;
+                        success = false;
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
@@ -238,7 +238,7 @@ public class CoyoteAdapter implements Adapter {
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                         readListener.onError(t);
-                        throw t;
+                        success = false;
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
