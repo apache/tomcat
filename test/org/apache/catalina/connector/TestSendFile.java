@@ -123,7 +123,7 @@ public class TestSendFile extends TomcatBaseTest{
             resp.setContentType("'application/octet-stream");
             resp.setCharacterEncoding("ISO-8859-1");
             resp.setContentLengthLong(f.length());
-            if (req.getAttribute(Globals.SENDFILE_SUPPORTED_ATTR) == Boolean.TRUE) {
+            if (Boolean.TRUE.equals(req.getAttribute(Globals.SENDFILE_SUPPORTED_ATTR))) {
                 req.setAttribute(Globals.SENDFILE_FILENAME_ATTR, f.getAbsolutePath());
                 req.setAttribute(Globals.SENDFILE_FILE_START_ATTR, new Long(0));
                 req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, new Long(f.length()));

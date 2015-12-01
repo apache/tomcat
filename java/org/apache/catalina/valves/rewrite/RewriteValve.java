@@ -263,7 +263,7 @@ public class RewriteValve extends ValveBase {
             return;
         }
 
-        if (invoked.get() == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(invoked.get())) {
             try {
                 getNext().invoke(request, response);
             } finally {
