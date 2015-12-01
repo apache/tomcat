@@ -292,6 +292,8 @@
           <a href="context.html">Context</a> element.</li>
       <li>The <code>tldValidation</code> attribute of any
           <a href="context.html">Context</a> element.</li>
+      <li>The <code>useRelativeRedirects</code> attribute of any
+          <a href="context.html">Context</a> element.</li>
       <li>The <code>xmlNamespaceAware</code> attribute of any
           <a href="context.html">Context</a> element.</li>
       <li>The <code>xmlValidation</code> attribute of any
