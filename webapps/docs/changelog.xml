@@ -111,6 +111,11 @@
         where the redirect may not have behaved as expected when redirecting
         from http to https to from https to http. (markt)
       </fix>
+      <fix>
+        <bug>58657</bug>: Exceptions in a Servlet 3.1 <code>ReadListener</code>
+        or <code>WriteListener</code> do not need to be immediately fatal to the
+        connection. Allow an error response to be written. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
