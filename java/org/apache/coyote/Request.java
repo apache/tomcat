@@ -404,8 +404,15 @@ public final class Request {
         this.available = available;
     }
 
-    // -------------------- Input Buffer --------------------
+    public boolean getSupportsRelativeRedirects() {
+        if (protocol().equals("") || protocol().equals("HTTP/1.0")) {
+            return false;
+        }
+        return true;
+    }
 
+
+    // -------------------- Input Buffer --------------------
 
     public InputBuffer getInputBuffer() {
         return inputBuffer;

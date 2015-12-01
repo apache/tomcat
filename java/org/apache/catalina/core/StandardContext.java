@@ -911,13 +911,32 @@ public class StandardContext extends ContainerBase
 
     private boolean validateClientProvidedNewSessionId = true;
 
-    boolean mapperContextRootRedirectEnabled = false;
+    private boolean mapperContextRootRedirectEnabled = false;
 
-    boolean mapperDirectoryRedirectEnabled = false;
+    private boolean mapperDirectoryRedirectEnabled = false;
+
+    private boolean useRelativeRedirects = true;
 
 
     // ----------------------------------------------------- Context Properties
     
+    @Override
+    public void setUseRelativeRedirects(boolean useRelativeRedirects) {
+        this.useRelativeRedirects = useRelativeRedirects;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default value for this implementation is {@code true}.
+     */
+    @Override
+    public boolean getUseRelativeRedirects() {
+        return useRelativeRedirects;
+    }
+
+
     @Override
     public void setMapperContextRootRedirectEnabled(boolean mapperContextRootRedirectEnabled) {
         this.mapperContextRootRedirectEnabled = mapperContextRootRedirectEnabled;
