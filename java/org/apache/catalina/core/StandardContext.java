@@ -821,7 +821,7 @@ public class StandardContext extends ContainerBase
 
     private boolean mapperDirectoryRedirectEnabled = false;
 
-    private boolean useRelativeRedirects = true;
+    private boolean useRelativeRedirects = !Globals.STRICT_SERVLET_COMPLIANCE;
 
 
     // ----------------------------------------------------- Context Properties

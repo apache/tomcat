@@ -562,7 +562,11 @@
         creates. Absolute redirects should work with reverse proxies that change
         the context path but may cause issues with the
         <code>org.apache.catalina.filters.RemoteIpFilter</code> if the filter is
-         changing the scheme and/or port. Defaults to <code>true</code>.
+         changing the scheme and/or port. If the
+        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        <a href="systemprops.html">system property</a> is set to
+        <code>true</code>, the default value of this attribute will be
+        <code>false</code>, else the default value will be <code>true</code>.
         </p>
       </attribute>
 
