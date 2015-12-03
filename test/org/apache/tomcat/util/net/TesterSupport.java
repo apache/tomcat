@@ -38,6 +38,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.SSLAuthenticator;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -58,6 +60,14 @@ public final class TesterSupport {
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
         if (protocol.indexOf("Apr") == -1) {
             Connector connector = tomcat.getConnector();
+            String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
+            if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)) {
+                StandardServer server = (StandardServer) tomcat.getServer();
+                AprLifecycleListener listener = new AprLifecycleListener();
+                listener.setSSLRandomSeed("/dev/urandom");
+                server.addLifecycleListener(listener);
+                tomcat.getConnector().setAttribute("sslImplementationName", sslImplementation);
+            }
             connector.setProperty("sslProtocol", "tls");
             File keystoreFile =
                 new File("test/org/apache/tomcat/util/net/" + keystore);
