@@ -1455,6 +1455,7 @@
         <sysproperty key="tomcat.test.reports" value="${test.reports}" />
         <sysproperty key="tomcat.test.openssl.path" value="${test.openssl.path}" />
         <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
+        <sysproperty key="tomcat.test.sslImplementation" value="${test.sslImplementation}" />
         <!-- File for Cobertura to write coverage results to -->
         <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
 

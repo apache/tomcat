@@ -445,6 +445,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 SSLContext.free(ctx);
             }
         }
-        destroyPools();
+        //FIXME: this causes crashes in the testsuite
+        //destroyPools();
     }
 }
