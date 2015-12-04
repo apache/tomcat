@@ -514,77 +514,81 @@ public class Catalina {
         InputStream inputStream = null;
         File file = null;
         try {
-            file = configFile();
-            inputStream = new FileInputStream(file);
-            inputSource = new InputSource(file.toURI().toURL().toString());
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("catalina.configFail", file), e);
-            }
-        }
-        if (inputStream == null) {
             try {
-                inputStream = getClass().getClassLoader()
-                    .getResourceAsStream(getConfigFile());
-                inputSource = new InputSource
+                file = configFile();
+                inputStream = new FileInputStream(file);
+                inputSource = new InputSource(file.toURI().toURL().toString());
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("catalina.configFail", file), e);
+                }
+            }
+            if (inputStream == null) {
+                try {
+                    inputStream = getClass().getClassLoader()
+                        .getResourceAsStream(getConfigFile());
+                    inputSource = new InputSource
+                        (getClass().getClassLoader()
+                         .getResource(getConfigFile()).toString());
+                } catch (Exception e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("catalina.configFail",
+                                getConfigFile()), e);
+                    }
+                }
+            }
+
+            // This should be included in catalina.jar
+            // Alternative: don't bother with xml, just create it manually.
+            if (inputStream == null) {
+                try {
+                    inputStream = getClass().getClassLoader()
+                            .getResourceAsStream("server-embed.xml");
+                    inputSource = new InputSource
                     (getClass().getClassLoader()
-                     .getResource(getConfigFile()).toString());
-            } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("catalina.configFail",
-                            getConfigFile()), e);
+                            .getResource("server-embed.xml").toString());
+                } catch (Exception e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("catalina.configFail",
+                                "server-embed.xml"), e);
+                    }
                 }
             }
-        }
 
-        // This should be included in catalina.jar
-        // Alternative: don't bother with xml, just create it manually.
-        if (inputStream == null) {
+
+            if (inputStream == null || inputSource == null) {
+                if  (file == null) {
+                    log.warn(sm.getString("catalina.configFail",
+                            getConfigFile() + "] or [server-embed.xml]"));
+                } else {
+                    log.warn(sm.getString("catalina.configFail",
+                            file.getAbsolutePath()));
+                    if (file.exists() && !file.canRead()) {
+                        log.warn("Permissions incorrect, read permission is not allowed on the file.");
+                    }
+                }
+                return;
+            }
+
             try {
-                inputStream = getClass().getClassLoader()
-                        .getResourceAsStream("server-embed.xml");
-                inputSource = new InputSource
-                (getClass().getClassLoader()
-                        .getResource("server-embed.xml").toString());
+                inputSource.setByteStream(inputStream);
+                digester.push(this);
+                digester.parse(inputSource);
+            } catch (SAXParseException spe) {
+                log.warn("Catalina.start using " + getConfigFile() + ": " +
+                        spe.getMessage());
+                return;
             } catch (Exception e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("catalina.configFail",
-                            "server-embed.xml"), e);
-                }
+                log.warn("Catalina.start using " + getConfigFile() + ": " , e);
+                return;
             }
-        }
-
-
-        if (inputStream == null || inputSource == null) {
-            if  (file == null) {
-                log.warn(sm.getString("catalina.configFail",
-                        getConfigFile() + "] or [server-embed.xml]"));
-            } else {
-                log.warn(sm.getString("catalina.configFail",
-                        file.getAbsolutePath()));
-                if (file.exists() && !file.canRead()) {
-                    log.warn("Permissions incorrect, read permission is not allowed on the file.");
-                }
-            }
-            return;
-        }
-
-        try {
-            inputSource.setByteStream(inputStream);
-            digester.push(this);
-            digester.parse(inputSource);
-        } catch (SAXParseException spe) {
-            log.warn("Catalina.start using " + getConfigFile() + ": " +
-                    spe.getMessage());
-            return;
-        } catch (Exception e) {
-            log.warn("Catalina.start using " + getConfigFile() + ": " , e);
-            return;
         } finally {
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                // Ignore
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
             }
         }
 
