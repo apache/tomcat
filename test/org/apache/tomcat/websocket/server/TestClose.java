@@ -43,12 +43,16 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Test the behavior of closing websockets under various conditions.
  */
 @Ignore // Only because they don't pass at the moment.
 public class TestClose extends TomcatBaseTest {
+
+    private static Log log = LogFactory.getLog(TestClose.class);
 
     // These are static because it is simpler than trying to inject them into
     // the endpoint
@@ -259,12 +263,12 @@ public class TestClose extends TomcatBaseTest {
 
         @OnOpen
         public void onOpen() {
-            System.out.println("Session opened");
+            log.info("Session opened");
         }
 
         @OnMessage
         public void onMessage(Session session, String message) {
-            System.out.println("Message received: " + message);
+            log.info("Message received: " + message);
             events.onMessageCalled.countDown();
             awaitLatch(events.onMessageWait, "onMessageWait not triggered");
 
@@ -279,14 +283,14 @@ public class TestClose extends TomcatBaseTest {
 
         @OnError
         public void onError(Throwable t) {
-            System.out.println("onError: " + t.getMessage());
+            log.info("onError: " + t.getMessage());
             events.onErrorThrowable = t;
             events.onErrorCalled.countDown();
         }
 
         @OnClose
         public void onClose(CloseReason cr) {
-            System.out.println("onClose: " + cr);
+            log.info("onClose: " + cr);
             events.closeReason = cr;
             events.onCloseCalled.countDown();
         }
