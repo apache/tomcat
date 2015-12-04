@@ -65,7 +65,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static final Certificate[] EMPTY_CERTIFICATES = new Certificate[0];
     private static final SSLException ENGINE_CLOSED = new SSLException(sm.getString("engine.engineClosed"));
-    private static final SSLException RENEGOTIATION_UNSUPPORTED = new SSLException(sm.getString("engine.renegociationUnsupported"));
     private static final SSLException ENCRYPTED_PACKET_OVERSIZED = new SSLException(sm.getString("engine.oversizedPacket"));
 
     private static final Set<String> AVAILABLE_CIPHER_SUITES;
@@ -103,7 +102,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     static {
         ENGINE_CLOSED.setStackTrace(new StackTraceElement[0]);
-        RENEGOTIATION_UNSUPPORTED.setStackTrace(new StackTraceElement[0]);
         ENCRYPTED_PACKET_OVERSIZED.setStackTrace(new StackTraceElement[0]);
         DESTROYED_UPDATER = AtomicIntegerFieldUpdater.newUpdater(OpenSSLEngine.class, "destroyed");
     }
@@ -889,13 +887,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         int code = SSL.renegotiate(ssl);
         if (code <= 0) {
             checkLastError();
-        } else {
-            handshakeFinished = false;
-            peerCerts = null;
-            x509PeerCerts = null;
         }
-        code = SSL.doHandshake(ssl);
-        if (code <= 0) {
+        handshakeFinished = false;
+        peerCerts = null;
+        x509PeerCerts = null;
+        int code2 = SSL.doHandshake(ssl);
+        if (code2 <= 0) {
             checkLastError();
         }
     }
@@ -1226,7 +1223,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         @Override
         public Certificate[] getLocalCertificates() {
-            // FIXME: Not currently exposed by the native API
+            // FIXME (if possible): Not available in the OpenSSL API
             return EMPTY_CERTIFICATES;
         }
 
