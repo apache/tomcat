@@ -50,8 +50,8 @@ import org.apache.catalina.startup.TomcatBaseTest;
 @Ignore // Only because they don't pass at the moment.
 public class TestClose extends TomcatBaseTest {
 
-    // TODO: These are static because I'm not sure how to inject them to the
-    // endpoint
+    // These are static because it is simpler than trying to inject them into
+    // the endpoint
     private static volatile Events events;
 
 
