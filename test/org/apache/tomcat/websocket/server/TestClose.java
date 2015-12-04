@@ -159,7 +159,7 @@ public class TestClose extends TomcatBaseTest {
         client.sendCloseFrame(CloseCodes.GOING_AWAY);
         client.forceCloseSocket();
 
-        //TODO: Why CLOSED_ABNORMALLY when above is GOING_AWAY?
+        // WebSocket 1.1, section 2.1.5 requires this to be CLOSED_ABNORMALLY
         awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
     }
 
