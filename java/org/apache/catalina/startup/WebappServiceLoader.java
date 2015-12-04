@@ -160,10 +160,11 @@ public class WebappServiceLoader<T> {
     private void parseConfigFile(LinkedHashSet<String> servicesFound, URL url)
             throws IOException {
         InputStream is = null;
+        BufferedReader reader = null;
         try {
             is = url.openStream();
             InputStreamReader in = new InputStreamReader(is, UTF8);
-            BufferedReader reader = new BufferedReader(in);
+            reader = new BufferedReader(in);
             String line;
             while ((line = reader.readLine()) != null) {
                 int i = line.indexOf('#');
@@ -177,6 +178,9 @@ public class WebappServiceLoader<T> {
                 servicesFound.add(line);
             }
         } finally {
+            if (reader != null) {
+                reader.close();
+            }
             if (is != null) {
                 is.close();
             }
