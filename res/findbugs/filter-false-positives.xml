@@ -113,6 +113,15 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- The stream is closed in WebXmlParser.parseWebXml -->
+    <Class name="org.apache.catalina.startup.ContextConfig" />
+    <Or>
+      <Method name="getContextWebXmlSource" />
+      <Method name="getWebXmlSource" />
+    </Or>
+    <Bug code="OBL" />
+  </Match>
+  <Match>
     <!-- Sleep is short, needs to keep lock -->
     <Class name="org.apache.catalina.startup.HostConfig" />
     <Method name="checkResources" />
@@ -154,6 +163,12 @@
     <Class name="org.apache.jasper.JspC"/>
     <Method name="setValidateXml"/>
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <!-- Use of == is deliberate -->
+    <Class name="org.apache.jasper.compiler.Parser"/>
+    <Method name="parseBody"/>
+    <Bug code="ES"/>
   </Match>
   <Match>
     <!-- Simpler to catch Exception than to create dummy implementations of the
