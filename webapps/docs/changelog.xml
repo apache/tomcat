@@ -182,6 +182,11 @@
         <bug>58631</bug>: Correct the continuation character use in the Windows
         Service How-To page of the documentation web application. (markt)
       </fix>
+      <fix>
+        Correct the SSL documentation for deprecated attributes to point to the
+        correct, new location for attributes related to individual certificates.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

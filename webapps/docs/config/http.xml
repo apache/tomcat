@@ -1427,38 +1427,46 @@
 
     <attribute name="keyAlias" required="false">
       <p>This is an alias for the <code>certificateKeyAlias</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="keyPass" required="false">
       <p>This is an alias for the <code>certificateKeyPassword</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="keystoreFile" required="false">
       <p>This is an alias for the <code>certificateKeystoreFile</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="keystorePass" required="false">
       <p>This is an alias for the <code>certificateKeystorePassword</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      attribute of the first
+      <a href="#SSL_Support_-_Certificate">Certificate</a> element nested in the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="keystoreProvider" required="false">
       <p>This is an alias for the <code>certificateKeystoreProvider</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      attribute of the first
+      <a href="#SSL_Support_-_Certificate">Certificate</a> element nested in the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="keystoreType" required="false">
       <p>This is an alias for the <code>certificateKeystoreType</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="sessionCacheSize" required="false">
@@ -1581,13 +1589,15 @@
 
     <attribute name="SSLCertificateFile" required="true">
       <p>This is an alias for the <code>certificateFile</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      first <a href="#SSL_Support_-_Certificate">Certificate</a> element nested
+      in the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
       element.</p>
     </attribute>
 
     <attribute name="SSLCertificateKeyFile" required="false">
-      <p>This is an alias for the <code>certificateKeyFile</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      <p>This is an alias for the <code>certificateKeyFile</code> attribute of the
+      first <a href="#SSL_Support_-_Certificate">Certificate</a> element nested
+      in the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
       element.</p>
     </attribute>
 
@@ -1610,8 +1620,9 @@
 
     <attribute name="SSLPassword" required="false">
       <p>This is an alias for the <code>certificateKeyPassword</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="SSLProtocol" required="false">
