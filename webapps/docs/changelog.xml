@@ -97,6 +97,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <add>
+        Add a description of the default value of
+        <code>heartbeatSleeptime</code> attribute and <code>optionCheck</code>
+        attribute in the cluster channel docs. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.66 (violetagg)" rtext="not released">
   <subsection name="General">
