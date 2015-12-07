@@ -109,12 +109,13 @@
 
       <attribute name="heartbeatSleeptime" required="false">
         If heartbeat == true, specifies the interval of heartbeat thread in milliseconds.
+        The default is 5000 (5 seconds).
       </attribute>
 
       <attribute name="optionCheck" required="false">
         If set to true, the GroupChannel will check the option flags that each
         interceptor is using. Reports an error if two interceptor share the same
-        flag.
+        flag. The default is false.
       </attribute>
 
     </attributes>
