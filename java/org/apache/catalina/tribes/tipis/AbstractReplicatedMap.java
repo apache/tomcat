@@ -341,9 +341,9 @@ public abstract class AbstractReplicatedMap<K,V>
         if (this.rpcChannel != null) {
             this.rpcChannel.breakdown();
         }
-        try {broadcast(MapMessage.MSG_STOP,false); }catch ( Exception ignore){}
-        //cleanup
         if (this.channel != null) {
+            try {broadcast(MapMessage.MSG_STOP,false); }catch ( Exception ignore){}
+            //cleanup
             this.channel.removeChannelListener(this);
             this.channel.removeMembershipListener(this);
         }

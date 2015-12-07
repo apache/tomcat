@@ -106,6 +106,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Fix potential NPE in <code>AbstractReplicatedMap.breakdown()</code>.
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.66 (violetagg)" rtext="not released">
   <subsection name="General">
