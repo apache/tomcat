@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -1267,6 +1268,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 }
             } else {
                 nRead = channel.read(socketBufferHandler.getReadBuffer());
+                if (nRead == -1) {
+                    throw new EOFException();
+                }
             }
             return nRead;
         }

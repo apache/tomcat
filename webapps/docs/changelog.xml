@@ -137,6 +137,10 @@
         Improve OpenSSL keystore/truststore configuration by using the code
         from the JSSE implementation. (remm, jfclere)
       </fix>
+      <fix>
+        Fix a potential loop when a client drops the connection unexpectedly.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
