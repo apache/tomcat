@@ -41,7 +41,7 @@ public final class Cookies {
 
     private static final UserDataHelper userDataLog = new UserDataHelper(log);
 
-    protected static final StringManager sm =
+    static final StringManager sm =
             StringManager.getManager("org.apache.tomcat.util.http");
 
     // expected average number of cookies per request

@@ -84,7 +84,7 @@ public final class ClientAbortException extends IOException {
      * @deprecated Use {@link Throwable#getMessage()}
      */
     @Deprecated
-    protected String message = null;
+    String message = null;
 
 
     /**
@@ -92,6 +92,6 @@ public final class ClientAbortException extends IOException {
      * @deprecated Use {@link Throwable#getCause()}
      */
     @Deprecated
-    protected Throwable throwable = null;
+    Throwable throwable = null;
 
 }

@@ -638,10 +638,10 @@ public class ClassLoaderLogManager extends LogManager {
     protected static final class LogNode {
         Logger logger;
 
-        protected final Map<String, LogNode> children = 
+        final Map<String, LogNode> children = 
             new HashMap<String, LogNode>();
 
-        protected final LogNode parent;
+        final LogNode parent;
 
         LogNode(final LogNode parent, final Logger logger) {
             this.parent = parent;

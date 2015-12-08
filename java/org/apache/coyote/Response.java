@@ -51,37 +51,37 @@ public final class Response {
     /**
      * Status code.
      */
-    protected int status = 200;
+    int status = 200;
 
 
     /**
      * Status message.
      */
-    protected String message = null;
+    String message = null;
 
 
     /**
      * Response headers.
      */
-    protected MimeHeaders headers = new MimeHeaders();
+    MimeHeaders headers = new MimeHeaders();
 
 
     /**
      * Associated output buffer.
      */
-    protected OutputBuffer outputBuffer;
+    OutputBuffer outputBuffer;
 
 
     /**
      * Notes.
      */
-    protected Object notes[] = new Object[Constants.MAX_NOTES];
+    Object notes[] = new Object[Constants.MAX_NOTES];
 
 
     /**
      * Committed flag.
      */
-    protected boolean commited = false;
+    boolean commited = false;
 
 
     /**
@@ -93,10 +93,10 @@ public final class Response {
     /**
      * HTTP specific fields.
      */
-    protected String contentType = null;
-    protected String contentLanguage = null;
-    protected String characterEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
-    protected long contentLength = -1;
+    String contentType = null;
+    String contentLanguage = null;
+    String characterEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
+    long contentLength = -1;
     private Locale locale = DEFAULT_LOCALE;
 
     // General informations
@@ -106,14 +106,14 @@ public final class Response {
     /**
      * Holds request error exception.
      */
-    protected Exception errorException = null;
+    Exception errorException = null;
 
     /**
      * Has the charset been explicitly set.
      */
-    protected boolean charsetSet = false;
+    boolean charsetSet = false;
 
-    protected Request req;
+    Request req;
 
     // ------------------------------------------------------------- Properties
 

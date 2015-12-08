@@ -46,7 +46,7 @@ public final class Parameters {
 
     private static final UserDataHelper maxParamCountLog = new UserDataHelper(log);
 
-    protected static final StringManager sm =
+    static final StringManager sm =
         StringManager.getManager("org.apache.tomcat.util.http");
 
     private final Map<String,ArrayList<String>> paramHashValues =

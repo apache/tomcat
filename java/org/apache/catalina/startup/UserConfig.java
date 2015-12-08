@@ -101,12 +101,12 @@ public final class UserConfig
     /**
      * A regular expression defining user who deployment is allowed.
      */
-    protected Pattern allow = null;
+    Pattern allow = null;
 
     /**
      * A regular expression defining user who deployment is denied.
      */
-    protected Pattern deny = null;
+    Pattern deny = null;
 
     // ------------------------------------------------------------- Properties
 

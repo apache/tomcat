@@ -60,9 +60,9 @@ final class StandardHostValve extends ValveBase {
 
     private static final Log log = LogFactory.getLog(StandardHostValve.class);
 
-    protected static final boolean STRICT_SERVLET_COMPLIANCE;
+    static final boolean STRICT_SERVLET_COMPLIANCE;
 
-    protected static final boolean ACCESS_SESSION;
+    static final boolean ACCESS_SESSION;
 
     static {
         STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;

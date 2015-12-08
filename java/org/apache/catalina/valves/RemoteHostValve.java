@@ -52,7 +52,7 @@ public final class RemoteHostValve
      * compared in the filtering method. The port will be appended
      * using a ";" as a separator.
      */
-    protected volatile boolean addConnectorPort = false;
+    volatile boolean addConnectorPort = false;
 
 
     // ------------------------------------------------------------- Properties

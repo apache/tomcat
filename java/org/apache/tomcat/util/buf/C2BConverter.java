@@ -28,14 +28,14 @@ import java.nio.charset.CodingErrorAction;
  */
 public final class C2BConverter {
 
-    protected CharsetEncoder encoder = null;
-    protected ByteBuffer bb = null;
-    protected CharBuffer cb = null;
+    CharsetEncoder encoder = null;
+    ByteBuffer bb = null;
+    CharBuffer cb = null;
 
     /**
      * Leftover buffer used for multi-characters characters.
      */
-    protected CharBuffer leftovers = null;
+    CharBuffer leftovers = null;
 
     public C2BConverter(String encoding) throws IOException {
         encoder = B2CConverter.getCharset(encoding).newEncoder();
