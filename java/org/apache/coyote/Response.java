@@ -57,52 +57,52 @@ public final class Response {
     /**
      * Status code.
      */
-    protected int status = 200;
+    int status = 200;
 
 
     /**
      * Status message.
      */
-    protected String message = null;
+    String message = null;
 
 
     /**
      * Response headers.
      */
-    protected final MimeHeaders headers = new MimeHeaders();
+    final MimeHeaders headers = new MimeHeaders();
 
 
     /**
      * Associated output buffer.
      */
-    protected OutputBuffer outputBuffer;
+    OutputBuffer outputBuffer;
 
 
     /**
      * Notes.
      */
-    protected final Object notes[] = new Object[Constants.MAX_NOTES];
+    final Object notes[] = new Object[Constants.MAX_NOTES];
 
 
     /**
      * Committed flag.
      */
-    protected volatile boolean commited = false;
+    volatile boolean commited = false;
 
 
     /**
      * Action hook.
      */
-    protected volatile ActionHook hook;
+    volatile ActionHook hook;
 
 
     /**
      * HTTP specific fields.
      */
-    protected String contentType = null;
-    protected String contentLanguage = null;
-    protected String characterEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
-    protected long contentLength = -1;
+    String contentType = null;
+    String contentLanguage = null;
+    String characterEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
+    long contentLength = -1;
     private Locale locale = DEFAULT_LOCALE;
 
     // General informations
@@ -112,14 +112,14 @@ public final class Response {
     /**
      * Holds request error exception.
      */
-    protected Exception errorException = null;
+    Exception errorException = null;
 
     /**
      * Has the charset been explicitly set.
      */
-    protected boolean charsetSet = false;
+    boolean charsetSet = false;
 
-    protected Request req;
+    Request req;
 
     // ------------------------------------------------------------- Properties
 
@@ -570,7 +570,7 @@ public final class Response {
      * easily reachable from the CoyoteOutputStream and the Processor which both
      * need access to state.
      */
-    protected volatile WriteListener listener;
+    volatile WriteListener listener;
     private boolean fireListener = false;
     private boolean registeredForWrite = false;
     private final Object nonBlockingStateLock = new Object();

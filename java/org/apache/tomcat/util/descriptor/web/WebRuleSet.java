@@ -703,7 +703,7 @@ public class WebRuleSet extends RuleSetBase {
  * only 1 time within the web.xml
  */
 final class SetLoginConfig extends Rule {
-    protected boolean isLoginConfigSet = false;
+    boolean isLoginConfigSet = false;
     public SetLoginConfig() {
         // NO-OP
     }
@@ -726,7 +726,7 @@ final class SetLoginConfig extends Rule {
  * only 1 time within the web.xml
  */
 final class SetJspConfig extends Rule {
-    protected boolean isJspConfigSet = false;
+    boolean isJspConfigSet = false;
     public SetJspConfig() {
         // NO-OP
     }
@@ -749,7 +749,7 @@ final class SetJspConfig extends Rule {
  * only 1 time within the web.xml
  */
 final class SetSessionConfig extends Rule {
-    protected boolean isSessionConfigSet = false;
+    boolean isSessionConfigSet = false;
     public SetSessionConfig() {
         // NO-OP
     }
@@ -946,7 +946,7 @@ final class CallParamMultiRule extends CallParamRule {
  */
 final class CallMethodMultiRule extends CallMethodRule {
 
-    protected final int multiParamIndex;
+    final int multiParamIndex;
 
     public CallMethodMultiRule(String methodName, int paramCount, int multiParamIndex) {
         super(methodName, paramCount);
@@ -1103,7 +1103,7 @@ final class VersionRule extends Rule {
  */
 final class NameRule extends Rule {
 
-    protected boolean isNameSet = false;
+    boolean isNameSet = false;
 
     public NameRule() {
         // NO-OP
@@ -1134,7 +1134,7 @@ final class NameRule extends Rule {
  */
 final class AbsoluteOrderingRule extends Rule {
 
-    protected boolean isAbsoluteOrderingSet = false;
+    boolean isAbsoluteOrderingSet = false;
     private final boolean fragment;
 
     public AbsoluteOrderingRule(boolean fragment) {
@@ -1168,7 +1168,7 @@ final class AbsoluteOrderingRule extends Rule {
  */
 final class RelativeOrderingRule extends Rule {
 
-    protected boolean isRelativeOrderingSet = false;
+    boolean isRelativeOrderingSet = false;
     private final boolean fragment;
 
     public RelativeOrderingRule(boolean fragment) {

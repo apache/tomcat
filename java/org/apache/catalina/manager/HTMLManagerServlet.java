@@ -78,16 +78,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final long serialVersionUID = 1L;
 
-    protected static final URLEncoder URL_ENCODER;
-    protected static final String APPLICATION_MESSAGE = "message";
-    protected static final String APPLICATION_ERROR = "error";
+    static final URLEncoder URL_ENCODER;
+    static final String APPLICATION_MESSAGE = "message";
+    static final String APPLICATION_ERROR = "error";
 
-    protected static final String sessionsListJspPath  =
-            "/WEB-INF/jsp/sessionsList.jsp";
-    protected static final String sessionDetailJspPath =
-            "/WEB-INF/jsp/sessionDetail.jsp";
-    protected static final String connectorCiphersJspPath =
-            "/WEB-INF/jsp/connectorCiphers.jsp";
+    static final String sessionsListJspPath = "/WEB-INF/jsp/sessionsList.jsp";
+    static final String sessionDetailJspPath = "/WEB-INF/jsp/sessionDetail.jsp";
+    static final String connectorCiphersJspPath = "/WEB-INF/jsp/connectorCiphers.jsp";
 
     static {
         URL_ENCODER = new URLEncoder();

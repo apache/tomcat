@@ -147,7 +147,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * The property change support for this component.
      */
-    protected final PropertyChangeSupport support = new PropertyChangeSupport(this);
+    final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     private volatile boolean stopAwait = false;
 

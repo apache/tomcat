@@ -152,7 +152,7 @@ public final class Request {
 
     private boolean sendfile = true;
 
-    protected volatile ReadListener listener;
+    volatile ReadListener listener;
 
     public ReadListener getReadListener() {
         return listener;

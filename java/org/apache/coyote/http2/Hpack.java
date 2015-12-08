@@ -22,7 +22,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 final class Hpack {
 
-    protected static final StringManager sm = StringManager.getManager(Hpack.class);
+    static final StringManager sm = StringManager.getManager(Hpack.class);
 
     private static final byte LOWER_DIFF = 'a' - 'A';
     static final int DEFAULT_TABLE_SIZE = 4096;

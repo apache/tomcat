@@ -40,7 +40,7 @@ public final class PersistentManager extends PersistentManagerBase {
     /**
      * The descriptive name of this Manager implementation (for logging).
      */
-    protected static final String name = "PersistentManager";
+    static final String name = "PersistentManager";
 
 
     // ------------------------------------------------------------- Properties
