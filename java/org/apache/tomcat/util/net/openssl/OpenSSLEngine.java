@@ -111,7 +111,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final int MAX_CIPHERTEXT_LENGTH = MAX_COMPRESSED_LENGTH + 1024;
 
     // Protocols
-    protected static final int VERIFY_DEPTH = 10;
+    static final int VERIFY_DEPTH = 10;
 
     private static final String[] SUPPORTED_PROTOCOLS = {
         Constants.SSL_PROTO_SSLv2Hello,

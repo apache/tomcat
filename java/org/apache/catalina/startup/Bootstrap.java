@@ -133,9 +133,9 @@ public final class Bootstrap {
     private Object catalinaDaemon = null;
 
 
-    protected ClassLoader commonLoader = null;
-    protected ClassLoader catalinaLoader = null;
-    protected ClassLoader sharedLoader = null;
+    ClassLoader commonLoader = null;
+    ClassLoader catalinaLoader = null;
+    ClassLoader sharedLoader = null;
 
 
     // -------------------------------------------------------- Private Methods

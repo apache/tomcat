@@ -30,7 +30,7 @@ import org.apache.catalina.tribes.util.Arrays;
 public final class UniqueId implements Serializable{
     private static final long serialVersionUID = 1L;
 
-    protected final byte[] id;
+    final byte[] id;
 
     public UniqueId() {
         this(null);

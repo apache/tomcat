@@ -59,7 +59,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
     private static final long serialVersionUID = 1L;
 
-    protected static final StringManager sm =
+    static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
     private static final Log log = LogFactory.getLog(ApplicationFilterConfig.class);
