@@ -1066,11 +1066,6 @@ public class StandardWrapper extends ContainerBase
      */
     public synchronized Servlet loadServlet() throws ServletException {
 
-        if (unloading) {
-            throw new ServletException(
-                    sm.getString("standardWrapper.unloading", getName()));
-        }
-
         // Nothing to do if we already have an instance or an instance pool
         if (!singleThreadModel && (instance != null))
             return instance;
