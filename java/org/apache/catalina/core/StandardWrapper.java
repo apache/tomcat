@@ -1464,6 +1464,7 @@ public class StandardWrapper extends ContainerBase
 
         // Deregister the destroyed instance
         instance = null;
+        instanceInitialized = false;
 
         if (isJspServlet && jspMonitorON != null ) {
             Registry.getRegistry(null, null).unregisterComponent(jspMonitorON);
