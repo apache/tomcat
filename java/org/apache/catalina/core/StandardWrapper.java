@@ -814,12 +814,14 @@ public class StandardWrapper extends ContainerBase
                             if (log.isDebugEnabled())
                                 log.debug("Allocating non-STM instance");
 
+                            // Note: We don't know if the Servlet implements
+                            // SingleThreadModel until we have loaded it.
                             instance = loadServlet();
+                            newInstance = true;
                             if (!singleThreadModel) {
                                 // For non-STM, increment here to prevent a race
                                 // condition with unload. Bug 43683, test case
                                 // #3
-                                newInstance = true;
                                 countAllocated.incrementAndGet();
                             }
                         } catch (ServletException e) {
