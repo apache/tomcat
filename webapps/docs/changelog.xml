@@ -116,6 +116,11 @@
         or <code>WriteListener</code> do not need to be immediately fatal to the
         connection. Allow an error response to be written. (markt)
       </fix>
+      <fix>
+        Correct implementation of
+        <code>validateClientProvidedNewSessionId</code> so client provided
+        session IDs may be rejected if validation is enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
