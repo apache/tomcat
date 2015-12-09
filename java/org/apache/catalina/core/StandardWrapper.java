@@ -806,7 +806,7 @@ public class StandardWrapper extends ContainerBase
         // If not SingleThreadedModel, return the same instance every time
         if (!singleThreadModel) {
             // Load and initialize our instance if necessary
-            if (instance == null) {
+            if (instance == null || !instanceInitialized) {
                 synchronized (this) {
                     if (instance == null) {
                         try {
@@ -831,11 +831,10 @@ public class StandardWrapper extends ContainerBase
                             throw new ServletException(sm.getString("standardWrapper.allocate"), e);
                         }
                     }
+                    if (!instanceInitialized) {
+                        initServlet(instance);
+                    }
                 }
-            }
-
-            if (!instanceInitialized) {
-                initServlet(instance);
             }
 
             if (singleThreadModel) {
