@@ -65,6 +65,11 @@
         <code>validateClientProvidedNewSessionId</code> so client provided
         session IDs may be rejected if validation is enabled. (markt)
       </fix>
+      <fix>
+        <bug>58701</bug>: Reset the <code>instanceInitialized</code> field in
+        <code>StandardWrapper</code> when unloading a Servlet so that a new
+        instance may be correctly initialized. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
