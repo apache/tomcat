@@ -58,6 +58,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.68 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct implementation of
+        <code>validateClientProvidedNewSessionId</code> so client provided
+        session IDs may be rejected if validation is enabled. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.67 (violetagg)">
   <subsection name="Catalina">

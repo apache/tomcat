@@ -3026,7 +3026,7 @@ public class Request
              * multiple web applications on the same host. Typically this is
              * used by Portlet implementations. It only works if sessions are
              * tracked via cookies. The cookie must have a path of "/" else it
-             * won't be provided to for requests to all web applications.
+             * won't be provided for requests to all web applications.
              *
              * Any session ID provided by the client should be for a session
              * that already exists somewhere on the host. Check if the context
@@ -3051,7 +3051,6 @@ public class Request
                 if (!found) {
                     sessionId = null;
                 }
-                sessionId = getRequestedSessionId();
             }
         } else {
             sessionId = null;
