@@ -391,7 +391,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             initialized = true;
         } catch (Exception e) {
             log.warn(sm.getString("openssl.errorSSLCtxInit"), e);
-            destroyPools();
+            destroy();
         }
     }
 
