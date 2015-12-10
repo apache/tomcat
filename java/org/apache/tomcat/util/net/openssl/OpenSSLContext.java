@@ -166,15 +166,20 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             throw new SSLException(sm.getString("openssl.errorSSLCtxInit"), e);
         } finally {
             if (!success) {
-                destroyPools();
+                destroy();
             }
         }
     }
 
-    private void destroyPools() {
+    public synchronized void destroy() {
         // Guard against multiple destroyPools() calls triggered by construction exception and finalize() later
-        if (aprPool != 0 && DESTROY_UPDATER.compareAndSet(this, 0, 1)) {
-            Pool.destroy(aprPool);
+        if (DESTROY_UPDATER.compareAndSet(this, 0, 1)) {
+            if (ctx != 0) {
+                SSLContext.free(ctx);
+            }
+            if (aprPool != 0) {
+                Pool.destroy(aprPool);
+            }
         }
     }
 
@@ -437,15 +442,4 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    protected final void finalize() throws Throwable {
-        super.finalize();
-        synchronized (OpenSSLContext.class) {
-            if (ctx != 0) {
-                SSLContext.free(ctx);
-            }
-        }
-        //FIXME: this causes crashes in the testsuite
-        //destroyPools();
-    }
 }
