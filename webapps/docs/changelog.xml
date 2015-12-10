@@ -143,14 +143,18 @@
         Improve upgrade context classloader handling by using Context.bind and
         unbind. (remm)
       </fix>
-      <fix>
+      <add>
         Improve OpenSSL keystore/truststore configuration by using the code
         from the JSSE implementation. (remm, jfclere)
-      </fix>
+      </add>
       <fix>
         Fix a potential loop when a client drops the connection unexpectedly.
         (markt)
       </fix>
+      <add>
+        OpenSSL renegotiation support for client certificate authentication.
+        (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

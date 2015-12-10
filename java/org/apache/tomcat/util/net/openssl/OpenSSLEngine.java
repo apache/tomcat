@@ -167,6 +167,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private boolean isInboundDone;
     private boolean isOutboundDone;
     private boolean engineClosed;
+    private boolean needCertificate;
 
     private final boolean clientMode;
     private final String fallbackApplicationProtocol;
@@ -883,10 +884,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    private void renegotiate() throws SSLException {
+    private synchronized void renegotiate() throws SSLException {
         int code = SSL.renegotiate(ssl);
         if (code <= 0) {
             checkLastError();
+        }
+        if (clientAuth == ClientAuthMode.REQUIRE) {
+            needCertificate = true;
         }
         handshakeFinished = false;
         peerCerts = null;
@@ -901,9 +905,16 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         long error = SSL.getLastErrorNumber();
         if (error != SSL.SSL_ERROR_NONE) {
             String err = SSL.getErrorString(error);
-            // There was an internal error -- shutdown
-            shutdown();
-            throw new SSLException(err);
+            if (logger.isDebugEnabled()) {
+                logger.debug(sm.getString("engine.openSSLError", error, err));
+            }
+            // It is possible the error occurs during a rehandshake, so consider it done
+            // but delay an error
+            if (needCertificate) {
+                needCertificate = false;
+            } else {
+                throw new SSLException(err);
+            }
         }
     }
 
@@ -926,6 +937,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // There is pending data in the network BIO -- call wrap
             if (SSL.pendingWrittenBytesInBIO(networkBIO) != 0) {
                 return SSLEngineResult.HandshakeStatus.NEED_WRAP;
+            }
+
+            if (needCertificate && getPeerCertificate() == null) {
+                return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
             }
 
             // No pending data to be sent to the peer
@@ -1063,6 +1078,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         return false;
     }
 
+    private byte[] getPeerCertificate() {
+        byte[] result = SSL.getPeerCertificate(ssl);
+        if (result != null) {
+            needCertificate = false;
+        }
+        return result;
+    }
+
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
@@ -1189,7 +1212,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     // We use SSL_get_peer_certificate to get it in this case and add it to our array later.
                     //
                     // See https://www.openssl.org/docs/ssl/SSL_get_peer_cert_chain.html
-                    clientCert = SSL.getPeerCertificate(ssl);
+                    clientCert = getPeerCertificate();
                 } else {
                     clientCert = null;
                 }
