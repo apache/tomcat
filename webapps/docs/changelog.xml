@@ -155,6 +155,9 @@
         OpenSSL renegotiation support for client certificate authentication.
         (remm)
       </add>
+      <fix>
+        Fix NIO connector renegotiation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

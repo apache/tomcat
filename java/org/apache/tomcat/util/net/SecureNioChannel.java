@@ -338,12 +338,14 @@ public class SecureNioChannel extends NioChannel  {
         if (!getBufHandler().isReadBufferEmpty()) throw new IOException(sm.getString("channel.nio.ssl.appInputNotEmpty"));
         if (!getBufHandler().isWriteBufferEmpty()) throw new IOException(sm.getString("channel.nio.ssl.appOutputNotEmpty"));
         handshakeComplete = false;
-        boolean isReadable = true;
-        boolean isWriteable = true;
+        boolean isReadable = false;
+        boolean isWriteable = false;
         boolean handshaking = true;
         Selector selector = null;
         SelectionKey key = null;
         try {
+            sslEngine.beginHandshake();
+            handshakeStatus = sslEngine.getHandshakeStatus();
             while (handshaking) {
                 int hsStatus = this.handshake(isReadable, isWriteable);
                 switch (hsStatus) {
