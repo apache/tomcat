@@ -144,8 +144,23 @@ public final class TesterSupport {
             // Disabled by default in 1.1.20 windows binary (2010-07-27)
             return false;
         }
+
+        return true;
+    }
+
+    protected static boolean isClientRenegotiationSupported(Tomcat tomcat) {
+        String protocol = tomcat.getConnector().getProtocolHandlerClassName();
+        if (protocol.contains("Apr")) {
+            // Disabled by default in 1.1.20 windows binary (2010-07-27)
+            return false;
+        }
         if (protocol.contains("NioProtocol") || (protocol.contains("Nio2Protocol") && isMacOs())) {
             // Doesn't work on all platforms - see BZ 56448.
+            return false;
+        }
+        String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
+        if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)) {
+            // Assume custom SSL is not supporting this
             return false;
         }
 

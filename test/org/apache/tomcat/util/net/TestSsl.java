@@ -95,7 +95,7 @@ public class TestSsl extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
-                TesterSupport.isRenegotiationSupported(getTomcatInstance()));
+                TesterSupport.isClientRenegotiationSupported(getTomcatInstance()));
 
         Context root = tomcat.addContext("", TEMP_DIR);
         Wrapper w =
