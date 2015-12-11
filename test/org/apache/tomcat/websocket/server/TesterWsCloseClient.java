@@ -66,8 +66,9 @@ public class TesterWsCloseClient {
     private void readUpgradeResponse() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(
                 socket.getInputStream()));
-        while (!in.readLine().isEmpty()) {
-
+        String line = in.readLine();
+        while (line != null && !line.isEmpty()) {
+            line = in.readLine();
         }
     }
 
@@ -78,7 +79,7 @@ public class TesterWsCloseClient {
         socket.close();
     }
 
-    /**
+    /*
      * Send a TCP RST instead of a TCP closing handshake
      */
     public void forceCloseSocket() throws IOException {
