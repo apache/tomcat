@@ -18,12 +18,18 @@ package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SocketWrapperBase;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsFrameBase;
 import org.apache.tomcat.websocket.WsSession;
 
 public class WsFrameServer extends WsFrameBase {
+
+    private static final Log log = LogFactory.getLog(WsFrameServer.class);
+    private static final StringManager sm = StringManager.getManager(WsFrameServer.class);
 
     private final SocketWrapperBase<?> socketWrapper;
 
@@ -42,12 +48,18 @@ public class WsFrameServer extends WsFrameBase {
      *                     data
      */
     public void onDataAvailable() throws IOException {
+        if (log.isDebugEnabled()) {
+            log.debug("wsFrameServer.onDataAvailable");
+        }
         while (isOpen() && socketWrapper.isReadyForRead()) {
             // Fill up the input buffer with as much data as we can
             int read = socketWrapper.read(
                     false, inputBuffer, writePos, inputBuffer.length - writePos);
             if (read <= 0) {
                 return;
+            }
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("wsFrameServer.bytesRead", Integer.toString(read)));
             }
             writePos += read;
             processInputBuffer();
@@ -73,5 +85,11 @@ public class WsFrameServer extends WsFrameBase {
     protected boolean isOpen() {
         // Overridden to make it visible to other classes in this package
         return super.isOpen();
+    }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
     }
 }
