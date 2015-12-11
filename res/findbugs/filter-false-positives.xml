@@ -113,7 +113,7 @@
   <Match>
   <!-- The header value is safe  -->
     <Class name="org.apache.catalina.servlets.DefaultServlet" />
-    <Method name="serveResource" />
+    <Method name="doDirectoryRedirect" />
     <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
   </Match>
   <Match>
@@ -768,15 +768,6 @@
     <Bug pattern="XSS_REQUEST_PARAMETER_TO_SERVLET_WRITER"/>
   </Match>
   <Match>
-    <!-- Return value of latch is intentionally ignored -->
-    <Or>
-      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
-      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClientSSL"/>
-    </Or>
-    <Method name="testConnectToServerEndpoint"/>
-    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
-  </Match>
-  <Match>
     <Class name="org.apache.tomcat.util.net.TestSsl" />
     <Or>
       <Method name="testRenegotiateFail" />
@@ -799,6 +790,21 @@
       <Bug pattern="WA_NOT_IN_LOOP" />
       <Bug pattern="UW_UNCOND_WAIT " />
     </Or>
+  </Match>
+  <Match>
+    <!-- Return value of latch is intentionally ignored -->
+    <Or>
+      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
+      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClientSSL"/>
+    </Or>
+    <Method name="testConnectToServerEndpoint"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestClose" />
+    <Method name="setUp" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
     <!-- Code is deliberately unused -->
