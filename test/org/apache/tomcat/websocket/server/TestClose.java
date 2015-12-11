@@ -273,7 +273,7 @@ public class TestClose extends TomcatBaseTest {
 
         @OnError
         public void onError(Throwable t) {
-            log.info("onError: " + t.getMessage());
+            log.info("onError", t);
             events.onErrorThrowable = t;
             events.onErrorCalled.countDown();
         }
