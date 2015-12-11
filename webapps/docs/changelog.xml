@@ -126,6 +126,12 @@
         <code>StandardWrapper</code> when unloading a Servlet so that a new
         instance may be correctly initialized. (markt)
       </fix>
+      <update>
+        Add a new flag <code>aprPreferred</code> to the Apr listener. if set to
+        <code>false</code>, when using the connector defaults, it will use
+        NIO + OpenSSL if tomcat-native is available, rather than the APR
+        connector. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
