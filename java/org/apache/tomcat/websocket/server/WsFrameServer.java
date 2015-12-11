@@ -26,7 +26,6 @@ import org.apache.tomcat.websocket.WsSession;
 public class WsFrameServer extends WsFrameBase {
 
     private final SocketWrapperBase<?> socketWrapper;
-    private final Object connectionReadLock = new Object();
 
 
     public WsFrameServer(SocketWrapperBase<?> socketWrapper, WsSession wsSession,
@@ -43,17 +42,15 @@ public class WsFrameServer extends WsFrameBase {
      *                     data
      */
     public void onDataAvailable() throws IOException {
-        synchronized (connectionReadLock) {
-            while (isOpen() && socketWrapper.isReadyForRead()) {
-                // Fill up the input buffer with as much data as we can
-                int read = socketWrapper.read(
-                        false, inputBuffer, writePos, inputBuffer.length - writePos);
-                if (read <= 0) {
-                    return;
-                }
-                writePos += read;
-                processInputBuffer();
+        while (isOpen() && socketWrapper.isReadyForRead()) {
+            // Fill up the input buffer with as much data as we can
+            int read = socketWrapper.read(
+                    false, inputBuffer, writePos, inputBuffer.length - writePos);
+            if (read <= 0) {
+                return;
             }
+            writePos += read;
+            processInputBuffer();
         }
     }
 
