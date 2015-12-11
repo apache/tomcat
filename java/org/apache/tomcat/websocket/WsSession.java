@@ -520,8 +520,8 @@ public class WsSession implements Session {
                 if (state == State.OPEN) {
                     state = State.OUTPUT_CLOSED;
                     sendCloseMessage(closeReason);
+                    fireEndpointOnClose(closeReason);
                 }
-                fireEndpointOnClose(closeReason);
                 state = State.CLOSED;
 
                 // Close the socket
