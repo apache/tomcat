@@ -33,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
@@ -254,7 +256,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 f2sh.get(timeout, TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException e) {
-            throw new IOException(e);
+            handleSendFailure(e);
         } catch (ExecutionException e) {
             throw new IOException(e);
         } catch (TimeoutException e) {
@@ -278,7 +280,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 f2sh.get(timeout, TimeUnit.MILLISECONDS);
             }
         } catch (InterruptedException e) {
-            throw new IOException(e);
+            handleSendFailure(e);
         } catch (ExecutionException e) {
             throw new IOException(e);
         } catch (TimeoutException e) {
@@ -522,19 +524,42 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         Future<Void> f = sendObjectByFuture(obj);
         try {
             f.get();
-        } catch (InterruptedException e) {
-            throw new IOException(e);
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
-            } else if (cause instanceof EncodeException) {
-                throw (EncodeException) cause;
-            } else {
-                throw new IOException(e);
-            }
+        } catch (InterruptedException | ExecutionException e) {
+            handleSendFailureWithEncode(e);
         }
     }
+
+
+    private void handleSendFailure(Throwable t) throws IOException {
+        try {
+            handleSendFailureWithEncode(t);
+        } catch (EncodeException e) {
+            // Should never happen. But in case it does...
+            throw new IOException(e);
+        }
+    }
+
+
+    private void handleSendFailureWithEncode(Throwable t) throws IOException, EncodeException {
+        // First, unwrap any execution exception
+        if (t instanceof ExecutionException) {
+            t = t.getCause();
+        }
+
+        // Close the session
+        wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, t.getMessage()),
+                new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()));
+
+        // Rethrow the exception
+        if (t instanceof EncodeException) {
+            throw (EncodeException) t;
+        }
+        if (t instanceof IOException) {
+            throw (IOException) t;
+        }
+        throw new IOException(t);
+    }
+
 
     public Future<Void> sendObjectByFuture(Object obj) {
         FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);

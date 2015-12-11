@@ -30,6 +30,7 @@ import javax.websocket.Extension;
 import javax.websocket.MessageHandler;
 import javax.websocket.PongMessage;
 
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Utf8Decoder;
 import org.apache.tomcat.util.res.StringManager;
@@ -220,11 +221,16 @@ public abstract class WsFrameBase {
         }
         payloadLength = b & 0x7F;
         state = State.PARTIAL_HEADER;
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("wsFrame.partialHeaderComplete", Boolean.toString(fin),
+                    Integer.toString(rsv), Integer.toString(opCode), Long.toString(payloadLength)));
+        }
         return true;
     }
 
 
     protected abstract boolean isMasked();
+    protected abstract Log getLog();
 
 
     /**

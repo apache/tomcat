@@ -72,6 +72,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>57489</bug>: Ensure <code>onClose()</code> is called when a
+        WebSocket connection is closed even if the sending of the close message
+        fails. Includes test cases by Barry Coughlan. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.67 (violetagg)" rtext="released 2015-12-10">
   <subsection name="Catalina">

@@ -159,6 +159,8 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
 
 
     private void onError(Throwable throwable) {
+        wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, throwable.getMessage()),
+                new CloseReason(CloseCodes.CLOSED_ABNORMALLY, throwable.getMessage()));
         // Need to call onError using the web application's class loader
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();

@@ -105,6 +105,12 @@ public class WsFrameClient extends WsFrameBase {
     }
 
 
+    @Override
+    protected Log getLog() {
+        return log;
+    }
+
+
     private class WsFrameClientCompletionHandler
             implements CompletionHandler<Integer,Void> {
 
