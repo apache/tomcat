@@ -17,6 +17,8 @@
 package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -90,10 +92,19 @@ public class TestClose extends TomcatBaseTest {
     }
 
 
-    public static void awaitOnClose(CloseCode code) {
+    public static void awaitOnClose(CloseCode... codes) {
+        Set<CloseCode> set = new HashSet<>();
+        for (CloseCode code : codes) {
+            set.add(code);
+        }
+        awaitOnClose(set);
+    }
+
+
+    public static void awaitOnClose(Set<CloseCode> codes) {
         awaitLatch(events.onCloseCalled, "onClose not called");
-        Assert.assertEquals(code.getCode(), events.closeReason.getCloseCode()
-                .getCode());
+        CloseCode received = events.closeReason.getCloseCode();
+        Assert.assertTrue("Rx: " + received, codes.contains(received));
     }
 
 
@@ -159,8 +170,14 @@ public class TestClose extends TomcatBaseTest {
         client.sendCloseFrame(CloseCodes.GOING_AWAY);
         client.forceCloseSocket();
 
-        // WebSocket 1.1, section 2.1.5 requires this to be CLOSED_ABNORMALLY
-        awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
+        // WebSocket 1.1, section 2.1.5 requires this to be CLOSED_ABNORMALLY if
+        // the container initiates the close and the close close from the client
+        // if the client initiates it. When the client resets the TCP connection
+        // after sending the close, different operating systems react different
+        // ways. Some present the close message then drop the connection, some
+        // just drop the connection. Therefore, this test has to handle both
+        // close codes.
+        awaitOnClose(CloseCodes.CLOSED_ABNORMALLY, CloseCodes.GOING_AWAY);
     }
 
 
