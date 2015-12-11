@@ -464,8 +464,7 @@ public class WsSession implements Session {
      * Need internal close method as spec requires that the local endpoint
      * receives a 1006 on timeout.
      */
-    private void doClose(CloseReason closeReasonMessage,
-            CloseReason closeReasonLocal) {
+    protected void doClose(CloseReason closeReasonMessage, CloseReason closeReasonLocal) {
         // Double-checked locking. OK because state is volatile
         if (state != State.OPEN) {
             return;
@@ -519,6 +518,7 @@ public class WsSession implements Session {
                     fireEndpointOnError(e);
                 }
                 if (state == State.OPEN) {
+                    state = State.OUTPUT_CLOSED;
                     sendCloseMessage(closeReason);
                 }
                 fireEndpointOnClose(closeReason);
