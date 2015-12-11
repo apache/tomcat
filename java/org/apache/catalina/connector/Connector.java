@@ -33,10 +33,12 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.UpgradeProtocol;
+import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -540,12 +542,12 @@ public class Connector extends LifecycleMBeanBase  {
     public String getProtocol() {
 
         if (("org.apache.coyote.http11.Http11NioProtocol".equals
-            (getProtocolHandlerClassName()) && !AprLifecycleListener.isAprAvailable())
+            (getProtocolHandlerClassName()) && (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.isAprPreferred()))
             || "org.apache.coyote.http11.Http11AprProtocol".equals
             (getProtocolHandlerClassName())) {
             return "HTTP/1.1";
         } else if (("org.apache.coyote.ajp.AjpNioProtocol".equals
-                   (getProtocolHandlerClassName()) && !AprLifecycleListener.isAprAvailable())
+                   (getProtocolHandlerClassName()) && (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.isAprPreferred()))
                    || "org.apache.coyote.ajp.AjpAprProtocol".equals
                    (getProtocolHandlerClassName())) {
             return "AJP/1.3";
@@ -562,7 +564,7 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setProtocol(String protocol) {
 
-        if (AprLifecycleListener.isAprAvailable()) {
+        if (AprLifecycleListener.isAprAvailable() && AprLifecycleListener.isAprPreferred()) {
             if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
                     ("org.apache.coyote.http11.Http11AprProtocol");
@@ -972,6 +974,14 @@ public class Connector extends LifecycleMBeanBase  {
             throw new LifecycleException(
                     sm.getString("coyoteConnector.protocolHandlerNoApr",
                             getProtocolHandlerClassName()));
+        }
+        if (AprLifecycleListener.isAprAvailable() && !AprLifecycleListener.isAprPreferred()
+                && protocolHandler instanceof AbstractHttp11JsseProtocol) {
+            AbstractHttp11JsseProtocol<?> jsseProtocolHandler = (AbstractHttp11JsseProtocol<?>) protocolHandler;
+            if (jsseProtocolHandler.getSslImplementationName() == null) {
+                // OpenSSL is compatible with the JSSE configuration, so use it if APR is available
+                jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.IMPLEMENTATION_NAME);
+            }
         }
 
         try {
