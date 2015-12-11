@@ -215,23 +215,6 @@ public class TestClose extends TomcatBaseTest {
 
 
     @Test
-    public void testWsCloseThenTcpResetInOnMessage() throws Exception {
-        startServer(TestEndpointConfig.class);
-
-        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
-        client.httpUpgrade(BaseEndpointConfig.PATH);
-        client.sendMessage("Test");
-        awaitLatch(events.onMessageCalled, "onMessage not called");
-
-        client.sendCloseFrame(CloseCodes.NORMAL_CLOSURE);
-        client.closeSocket();
-        events.onMessageWait.countDown();
-
-        awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
-    }
-
-
-    @Test
     public void testTcpCloseWhenOnMessageSends() throws Exception {
         events.onMessageSends = true;
         testTcpCloseInOnMessage();
@@ -255,7 +238,18 @@ public class TestClose extends TomcatBaseTest {
     @Test
     public void testWsCloseThenTcpResetWhenOnMessageSends() throws Exception {
         events.onMessageSends = true;
-        testWsCloseThenTcpResetInOnMessage();
+        startServer(TestEndpointConfig.class);
+
+        TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
+        client.httpUpgrade(BaseEndpointConfig.PATH);
+        client.sendMessage("Test");
+        awaitLatch(events.onMessageCalled, "onMessage not called");
+
+        client.sendCloseFrame(CloseCodes.NORMAL_CLOSURE);
+        client.closeSocket();
+        events.onMessageWait.countDown();
+
+        awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
     }
 
 
