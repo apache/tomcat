@@ -20,9 +20,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 import javax.websocket.CloseReason.CloseCode;
+
+import org.apache.tomcat.util.buf.B2CConverter;
 
 /**
  * A client for testing Websocket behavior that differs from standard client
@@ -47,12 +48,12 @@ public class TesterWsCloseClient {
 
     public void httpUpgrade(String path) throws IOException {
         String req = createUpgradeRequest(path);
-        write(req.getBytes(StandardCharsets.UTF_8));
+        write(req.getBytes(B2CConverter.UTF_8));
         readUpgradeResponse();
     }
 
     public void sendMessage(String text) throws IOException {
-        write(createFrame(true, 1, text.getBytes(StandardCharsets.UTF_8)));
+        write(createFrame(true, 1, text.getBytes(B2CConverter.UTF_8)));
     }
 
     public void sendCloseFrame(CloseCode closeCode) throws IOException {
