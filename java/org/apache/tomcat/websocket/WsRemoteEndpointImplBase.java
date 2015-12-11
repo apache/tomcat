@@ -524,7 +524,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         Future<Void> f = sendObjectByFuture(obj);
         try {
             f.get();
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            handleSendFailureWithEncode(e);
+        } catch (ExecutionException e) {
             handleSendFailureWithEncode(e);
         }
     }
