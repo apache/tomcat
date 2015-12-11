@@ -1706,8 +1706,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                 }
                                 wrapper.pollerFlags = wrapper.pollerFlags & ~((int) desc[n*2]);
                                 // Check for failed sockets and hand this socket off to a worker
-                                if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
-                                        || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
+                                if ((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP) {
+                                    if (!processSocket(desc[n*2+1], SocketStatus.DISCONNECT)) {
+                                        // Close socket and clear pool
+                                        closeSocket(desc[n*2+1]);
+                                    }
+                                } else if(((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
                                         || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
                                     // Need to trigger error handling. Poller may return error
                                     // codes plus the flags it was waiting for or it may just
