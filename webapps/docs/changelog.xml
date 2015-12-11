@@ -195,6 +195,11 @@
         <bug>58624</bug>: Correct a potential deadlock if the WebSocket
         connection is closed when a message write is in progress. (markt)
       </fix>
+      <fix>
+        <bug>57489</bug>: Ensure <code>onClose()</code> is called when a
+        WebSocket connection is closed even if the sending of the close message
+        fails. Includes test cases by Barry Coughlan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
