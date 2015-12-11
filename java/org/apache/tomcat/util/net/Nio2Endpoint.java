@@ -1657,7 +1657,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                             log.debug(sm.getString("endpoint.err.handshake"), x);
                         }
                     }
-                    if (handshake == 0) {
+                    if (handshake == 0 || status == SocketStatus.ERROR) {
                         SocketState state = SocketState.OPEN;
                         // Process the request from this socket
                         if (status == null) {
