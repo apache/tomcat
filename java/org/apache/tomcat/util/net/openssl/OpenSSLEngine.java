@@ -908,8 +908,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (logger.isDebugEnabled()) {
                 logger.debug(sm.getString("engine.openSSLError", error, err));
             }
-            // It is possible the error occurs during a rehandshake, so consider it done
-            // but delay an error
+            // Many errors can occur during handshake and need to be reported
             if (!handshakeFinished) {
                 sendHandshakeError = true;
             } else {
