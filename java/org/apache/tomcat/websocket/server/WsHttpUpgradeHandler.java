@@ -174,11 +174,15 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                     close(cr);
                 }
                 break;
+            case ERROR:
+                String msg = sm.getString("wsHttpUpgradeHandler.closeOnError");
+                wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+                //$FALL-THROUGH$
             case ASYNC_READ_ERROR:
             case ASYNC_WRITE_ERROR:
             case CLOSE_NOW:
             case DISCONNECT:
-            case ERROR:
             case TIMEOUT:
                 return SocketState.CLOSED;
 
