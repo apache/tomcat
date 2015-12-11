@@ -348,6 +348,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         serverSock.socket().close();
         serverSock.close();
         serverSock = null;
+        destroySsl();
         super.unbind();
         releaseCaches();
         selectorPool.close();

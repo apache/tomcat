@@ -37,7 +37,6 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     private SSLImplementation sslImplementation = null;
 
-
     public String getSslImplementationName() {
         return sslImplementationName;
     }
@@ -98,6 +97,21 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         }
     }
 
+
+    protected void destroySsl() throws Exception {
+        if (isSSLEnabled()) {
+            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+                    if (certificate.getSslContextWrapper() != null) {
+                        SSLContext sslContext = certificate.getSslContextWrapper().getSSLContext();
+                        if (sslContext != null) {
+                            sslContext.destroy();
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
