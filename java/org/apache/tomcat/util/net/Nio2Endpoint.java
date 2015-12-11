@@ -275,6 +275,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         // Close server socket
         serverSock.close();
         serverSock = null;
+        destroySsl();
         super.unbind();
         // Unlike other connectors, the thread pool is tied to the server socket
         shutdownExecutor();
