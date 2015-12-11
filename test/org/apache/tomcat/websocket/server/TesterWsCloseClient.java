@@ -109,8 +109,8 @@ public class TesterWsCloseClient {
 
     private static byte[] createFrame(boolean fin, int opCode, byte[] payload) {
         byte[] frame = new byte[6 + payload.length];
-        frame[0] = (byte) (opCode + (fin ? 1 << 7 : 0));
-        frame[1] += 0b10000000 + payload.length;
+        frame[0] = (byte) (opCode | (fin ? 1 << 7 : 0));
+        frame[1] = (byte) (0x80 | payload.length);
 
         frame[2] = maskingKey[0];
         frame[3] = maskingKey[1];
