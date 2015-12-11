@@ -151,6 +151,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      */
     private int accepted;
     private boolean handshakeFinished;
+    private int currentHandshake;
     private boolean receivedShutdown;
     private volatile int destroyed;
 
@@ -167,7 +168,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private boolean isInboundDone;
     private boolean isOutboundDone;
     private boolean engineClosed;
-    private boolean needCertificate;
+    private boolean sendHandshakeError = false;
 
     private final boolean clientMode;
     private final String fallbackApplicationProtocol;
@@ -867,6 +868,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void handshake() throws SSLException {
+        currentHandshake = SSL.getHandshakeCount(ssl);
         int code = SSL.doHandshake(ssl);
         if (code <= 0) {
             checkLastError();
@@ -889,12 +891,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (code <= 0) {
             checkLastError();
         }
-        if (clientAuth == ClientAuthMode.REQUIRE) {
-            needCertificate = true;
-        }
         handshakeFinished = false;
         peerCerts = null;
         x509PeerCerts = null;
+        currentHandshake = SSL.getHandshakeCount(ssl);
         int code2 = SSL.doHandshake(ssl);
         if (code2 <= 0) {
             checkLastError();
@@ -910,8 +910,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             // It is possible the error occurs during a rehandshake, so consider it done
             // but delay an error
-            if (needCertificate) {
-                needCertificate = false;
+            if (!handshakeFinished) {
+                sendHandshakeError = true;
             } else {
                 throw new SSLException(err);
             }
@@ -934,18 +934,21 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         // Check if we are in the initial handshake phase
         if (!handshakeFinished) {
-            // There is pending data in the network BIO -- call wrap
-            if (SSL.pendingWrittenBytesInBIO(networkBIO) != 0) {
-                return SSLEngineResult.HandshakeStatus.NEED_WRAP;
-            }
 
-            if (needCertificate && getPeerCertificate() == null) {
-                return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+            // There is pending data in the network BIO -- call wrap
+            if (sendHandshakeError || SSL.pendingWrittenBytesInBIO(networkBIO) != 0) {
+                if (sendHandshakeError) {
+                    // After a last wrap, consider it is going to be done
+                    sendHandshakeError = false;
+                    currentHandshake++;
+                }
+                return SSLEngineResult.HandshakeStatus.NEED_WRAP;
             }
 
             // No pending data to be sent to the peer
             // Check to see if we have finished handshaking
-            if (SSL.isInInit(ssl) == 0) {
+            int handshakeCount = SSL.getHandshakeCount(ssl);
+            if (handshakeCount != currentHandshake) {
                 if (alpn) {
                     selectedProtocol = SSL.getAlpnSelected(ssl);
                     if (selectedProtocol == null) {
@@ -1078,14 +1081,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         return false;
     }
 
-    private byte[] getPeerCertificate() {
-        byte[] result = SSL.getPeerCertificate(ssl);
-        if (result != null) {
-            needCertificate = false;
-        }
-        return result;
-    }
-
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
@@ -1212,7 +1207,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     // We use SSL_get_peer_certificate to get it in this case and add it to our array later.
                     //
                     // See https://www.openssl.org/docs/ssl/SSL_get_peer_cert_chain.html
-                    clientCert = getPeerCertificate();
+                    clientCert = SSL.getPeerCertificate(ssl);
                 } else {
                     clientCert = null;
                 }

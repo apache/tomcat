@@ -357,6 +357,11 @@ public final class SSL {
      */
     public static native boolean hasOp(int op);
 
+    /**
+     * Return the handshake completed count.
+     */
+    public static native int getHandshakeCount(long ssl);
+
     /*
      * Begin Twitter API additions
      */
