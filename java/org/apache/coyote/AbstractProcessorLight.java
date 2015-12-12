@@ -50,7 +50,7 @@ public abstract class AbstractProcessorLight implements Processor {
             } else if (dispatches != null) {
                 DispatchType nextDispatch = dispatches.next();
                 state = dispatch(nextDispatch.getSocketStatus());
-            } else if (status == SocketStatus.DISCONNECT && !isUpgrade()) {
+            } else if (status == SocketStatus.DISCONNECT) {
                 // Do nothing here, just wait for it to get recycled
             } else if (isAsync() || isUpgrade() || state == SocketState.ASYNC_END) {
                 state = dispatch(status);
