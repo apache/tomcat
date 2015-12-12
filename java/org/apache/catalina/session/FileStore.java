@@ -149,12 +149,14 @@ public final class FileStore extends StoreBase {
 
         // Figure out which files are sessions
         int keycount = 0;
-        for (int i = 0; i < files.length; i++) {
-            if (files[i].endsWith(FILE_EXT)) {
-                keycount++;
+        if (files != null) {
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].endsWith(FILE_EXT)) {
+                    keycount++;
+                }
             }
         }
-        return (keycount);
+        return keycount;
 
     }
 

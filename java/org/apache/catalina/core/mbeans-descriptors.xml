@@ -177,6 +177,14 @@
                description="Associated manager."
                type="org.apache.catalina.Manager" />
 
+    <attribute name="mapperContextRootRedirectEnabled"
+               description="Should the Mapper be used for context root redirects"
+               type="boolean" />
+
+    <attribute name="mapperDirectoryRedirectEnabled"
+               description="Should the Mapper be used for directory redirects"
+               type="boolean" />
+
     <attribute name="namingContextListener"
                description="Associated naming context listener."
                type="org.apache.catalina.core.NamingContextListener" />
@@ -329,6 +337,10 @@
     <attribute name="useNaming"
                description="Create a JNDI naming context for this application?"
                is="true"
+               type="boolean"/>
+
+    <attribute name="useRelativeRedirects"
+               description="When generating location headers for 302 responses, should a relative URI be used?"
                type="boolean"/>
 
     <attribute name="webappVersion"

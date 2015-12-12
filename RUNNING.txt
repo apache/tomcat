@@ -67,16 +67,14 @@ create your own from the Tomcat source code, as described in
 
 (3) Configure Environment Variables
 
-Tomcat is a Java application and does not use environment variables. The
-variables are used by the Tomcat startup scripts. The scripts use the variables
-to prepare the command that starts Tomcat.
+Tomcat is a Java application and does not use environment variables directly.
+Environment variables are used by the Tomcat startup scripts. The scripts use
+the environment variables to prepare the command that starts Tomcat.
 
 (3.1) Set CATALINA_HOME (required) and CATALINA_BASE (optional)
 
 The CATALINA_HOME environment variable should be set to the location of the
 root directory of the "binary" distribution of Tomcat.
-
-An example was given in (2.2) above.
 
 The Tomcat startup scripts have some logic to set this variable
 automatically if it is absent, based on the location of the startup script

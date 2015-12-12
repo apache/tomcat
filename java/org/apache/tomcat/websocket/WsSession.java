@@ -47,6 +47,8 @@ import javax.websocket.WebSocketContainer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -178,6 +180,18 @@ public class WsSession implements Session {
 
         this.userProperties.putAll(endpointConfig.getUserProperties());
         this.id = Long.toHexString(ids.getAndIncrement());
+
+        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
+        if (instanceManager == null) {
+            instanceManager = InstanceManagerBindings.get(applicationClassLoader);
+        }
+        if (instanceManager != null) {
+            try {
+                instanceManager.newInstance(localEndpoint);
+            } catch (Exception e) {
+                throw new DeploymentException(sm.getString("wsSession.instanceNew"), e);
+            }
+        }
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("wsSession.created", id));
@@ -450,8 +464,7 @@ public class WsSession implements Session {
      * Need internal close method as spec requires that the local endpoint
      * receives a 1006 on timeout.
      */
-    private void doClose(CloseReason closeReasonMessage,
-            CloseReason closeReasonLocal) {
+    public void doClose(CloseReason closeReasonMessage, CloseReason closeReasonLocal) {
         // Double-checked locking. OK because state is volatile
         if (state != State.OPEN) {
             return;
@@ -505,9 +518,10 @@ public class WsSession implements Session {
                     fireEndpointOnError(e);
                 }
                 if (state == State.OPEN) {
+                    state = State.OUTPUT_CLOSED;
                     sendCloseMessage(closeReason);
+                    fireEndpointOnClose(closeReason);
                 }
-                fireEndpointOnClose(closeReason);
                 state = State.CLOSED;
 
                 // Close the socket
@@ -519,11 +533,18 @@ public class WsSession implements Session {
     private void fireEndpointOnClose(CloseReason closeReason) {
 
         // Fire the onClose event
+        InstanceManager instanceManager = webSocketContainer.getInstanceManager();
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
             localEndpoint.onClose(this, closeReason);
+            if (instanceManager == null) {
+                instanceManager = InstanceManagerBindings.get(applicationClassLoader);
+            }
+            if (instanceManager != null) {
+                instanceManager.destroyInstance(localEndpoint);
+            }
         } catch (Throwable throwable) {
             ExceptionUtils.handleThrowable(throwable);
             localEndpoint.onError(this, throwable);
@@ -626,7 +647,24 @@ public class WsSession implements Session {
      * {@link FutureToSendHandler} completes.
      */
     protected void registerFuture(FutureToSendHandler f2sh) {
-        futures.put(f2sh, f2sh);
+        boolean fail = false;
+        synchronized (stateLock) {
+            // If the session has already been closed the any registered futures
+            // will have been processed so the failure result for this future
+            // needs to be set here.
+            if (state == State.OPEN) {
+                futures.put(f2sh, f2sh);
+            } else {
+                // Construct the exception outside of the sync block
+                fail = true;
+            }
+        }
+
+        if (fail) {
+            IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
+            SendResult sr = new SendResult(ioe);
+            f2sh.onResult(sr);
+        }
     }
 
 

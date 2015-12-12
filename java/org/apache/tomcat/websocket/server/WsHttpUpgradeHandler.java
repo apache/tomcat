@@ -163,8 +163,8 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 wsRemoteEndpointServer.onWritePossible(false);
                 break;
             case STOP:
-                // TODO i18n
-                CloseReason cr = new CloseReason(CloseCodes.GOING_AWAY, "");
+                CloseReason cr = new CloseReason(CloseCodes.GOING_AWAY,
+                        sm.getString("wsHttpUpgradeHandler.serverStop"));
                 try {
                     wsSession.close(cr);
                 } catch (IOException ioe) {
@@ -174,11 +174,15 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                     close(cr);
                 }
                 break;
+            case DISCONNECT:
+            case ERROR:
+                String msg = sm.getString("wsHttpUpgradeHandler.closeOnError");
+                wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+                //$FALL-THROUGH$
             case ASYNC_READ_ERROR:
             case ASYNC_WRITE_ERROR:
             case CLOSE_NOW:
-            case DISCONNECT:
-            case ERROR:
             case TIMEOUT:
                 return SocketState.CLOSED;
 

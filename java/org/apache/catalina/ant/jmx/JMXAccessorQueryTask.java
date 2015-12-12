@@ -162,8 +162,8 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                     if (!attrs[i].isReadable())
                         continue;
                     String attName = attrs[i].getName();
-                    if (attName.indexOf("=") >= 0 || attName.indexOf(":") >= 0
-                            || attName.indexOf(" ") >= 0) {
+                    if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0
+                            || attName.indexOf(' ') >= 0) {
                         continue;
                     }
 

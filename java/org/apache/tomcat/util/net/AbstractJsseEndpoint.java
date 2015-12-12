@@ -37,7 +37,6 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     private SSLImplementation sslImplementation = null;
 
-
     public String getSslImplementationName() {
         return sslImplementationName;
     }
@@ -68,7 +67,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         // TODO: Add configuration to allow the OpenSSLImplementation to optionally use the JSSE configuration
         // (it should still default to OpenSSL style since it is the most logical and straightforward)
         if (OpenSSLImplementation.IMPLEMENTATION_NAME.equals(sslImplementationName)) {
-            return SSLHostConfig.Type.OPENSSL;
+            return SSLHostConfig.Type.EITHER;
         } else {
             return SSLHostConfig.Type.JSSE;
         }
@@ -98,6 +97,21 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         }
     }
 
+
+    protected void destroySsl() throws Exception {
+        if (isSSLEnabled()) {
+            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+                    if (certificate.getSslContextWrapper() != null) {
+                        SSLContext sslContext = certificate.getSslContextWrapper().getSSLContext();
+                        if (sslContext != null) {
+                            sslContext.destroy();
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);

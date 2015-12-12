@@ -24,7 +24,7 @@ public class ClassLoaderUtil {
     private static final Log log = LogFactory.getLog(ClassLoaderUtil.class);
 
     private static final boolean onlyAttemptFirstLoader =
-        Boolean.getBoolean(System.getProperty("org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader", "false"));
+        Boolean.parseBoolean(System.getProperty("org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader", "false"));
 
     public static Class<?> loadClass(String className, ClassLoader... classLoaders) throws ClassNotFoundException {
         ClassNotFoundException last = null;

@@ -797,44 +797,44 @@ public class StandardWrapper extends ContainerBase
     public Servlet allocate() throws ServletException {
 
         // If we are currently unloading this servlet, throw an exception
-        if (unloading)
-            throw new ServletException
-              (sm.getString("standardWrapper.unloading", getName()));
+        if (unloading) {
+            throw new ServletException(sm.getString("standardWrapper.unloading", getName()));
+        }
 
         boolean newInstance = false;
 
         // If not SingleThreadedModel, return the same instance every time
         if (!singleThreadModel) {
-
             // Load and initialize our instance if necessary
-            if (instance == null) {
+            if (instance == null || !instanceInitialized) {
                 synchronized (this) {
                     if (instance == null) {
                         try {
-                            if (log.isDebugEnabled())
+                            if (log.isDebugEnabled()) {
                                 log.debug("Allocating non-STM instance");
+                            }
 
+                            // Note: We don't know if the Servlet implements
+                            // SingleThreadModel until we have loaded it.
                             instance = loadServlet();
+                            newInstance = true;
                             if (!singleThreadModel) {
                                 // For non-STM, increment here to prevent a race
                                 // condition with unload. Bug 43683, test case
                                 // #3
-                                newInstance = true;
                                 countAllocated.incrementAndGet();
                             }
                         } catch (ServletException e) {
                             throw e;
                         } catch (Throwable e) {
                             ExceptionUtils.handleThrowable(e);
-                            throw new ServletException
-                                (sm.getString("standardWrapper.allocate"), e);
+                            throw new ServletException(sm.getString("standardWrapper.allocate"), e);
                         }
                     }
+                    if (!instanceInitialized) {
+                        initServlet(instance);
+                    }
                 }
-            }
-
-            if (!instanceInitialized) {
-                initServlet(instance);
             }
 
             if (singleThreadModel) {
@@ -847,19 +847,19 @@ public class StandardWrapper extends ContainerBase
                     }
                 }
             } else {
-                if (log.isTraceEnabled())
+                if (log.isTraceEnabled()) {
                     log.trace("  Returning non-STM instance");
+                }
                 // For new instances, count will have been incremented at the
                 // time of creation
                 if (!newInstance) {
                     countAllocated.incrementAndGet();
                 }
-                return (instance);
+                return instance;
             }
         }
 
         synchronized (instancePool) {
-
             while (countAllocated.get() >= nInstances) {
                 // Allocate a new instance if possible, or else wait
                 if (nInstances < maxInstances) {
@@ -870,8 +870,7 @@ public class StandardWrapper extends ContainerBase
                         throw e;
                     } catch (Throwable e) {
                         ExceptionUtils.handleThrowable(e);
-                        throw new ServletException
-                            (sm.getString("standardWrapper.allocate"), e);
+                        throw new ServletException(sm.getString("standardWrapper.allocate"), e);
                     }
                 } else {
                     try {
@@ -881,13 +880,12 @@ public class StandardWrapper extends ContainerBase
                     }
                 }
             }
-            if (log.isTraceEnabled())
+            if (log.isTraceEnabled()) {
                 log.trace("  Returning allocated STM instance");
+            }
             countAllocated.incrementAndGet();
             return instancePool.pop();
-
         }
-
     }
 
 
@@ -1065,11 +1063,6 @@ public class StandardWrapper extends ContainerBase
      * at server startup time.
      */
     public synchronized Servlet loadServlet() throws ServletException {
-
-        if (unloading) {
-            throw new ServletException(
-                    sm.getString("standardWrapper.unloading", getName()));
-        }
 
         // Nothing to do if we already have an instance or an instance pool
         if (!singleThreadModel && (instance != null))
@@ -1471,6 +1464,7 @@ public class StandardWrapper extends ContainerBase
 
         // Deregister the destroyed instance
         instance = null;
+        instanceInitialized = false;
 
         if (isJspServlet && jspMonitorON != null ) {
             Registry.getRegistry(null, null).unregisterComponent(jspMonitorON);

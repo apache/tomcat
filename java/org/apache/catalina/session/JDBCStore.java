@@ -46,9 +46,10 @@ import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
- * Implementation of the <code>Store</code> interface that stores
- * serialized session objects in a database.  Sessions that are
- * saved are still subject to being expired based on inactivity.
+ * Implementation of the {@link org.apache.catalina.Store Store}
+ * interface that stores serialized session objects in a database.
+ * Sessions that are saved are still subject to being expired
+ * based on inactivity.
  *
  * @author Bip Thelin
  */
@@ -133,7 +134,7 @@ public class JDBCStore extends StoreBase {
     protected String sessionDataCol = "data";
 
     /**
-     * Is Valid column to use.
+     * {@code Is Valid} column to use.
      */
     protected String sessionValidCol = "valid";
 
@@ -153,11 +154,6 @@ public class JDBCStore extends StoreBase {
      * Variable to hold the <code>getSize()</code> prepared statement.
      */
     protected PreparedStatement preparedSizeSql = null;
-
-    /**
-     * Variable to hold the <code>keys()</code> prepared statement.
-     */
-    protected PreparedStatement preparedKeysSql = null;
 
     /**
      * Variable to hold the <code>save()</code> prepared statement.
@@ -182,7 +178,7 @@ public class JDBCStore extends StoreBase {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the name for this instance (built from container name)
+     * @return the name for this instance (built from container name)
      */
     public String getName() {
         if (name == null) {
@@ -207,18 +203,18 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the thread name for this Store.
+     * @return the thread name for this Store.
      */
     public String getThreadName() {
-        return (threadName);
+        return threadName;
     }
 
     /**
-     * Return the name for this Store, used for logging.
+     * @return the name for this Store, used for logging.
      */
     @Override
     public String getStoreName() {
-        return (storeName);
+        return storeName;
     }
 
     /**
@@ -236,15 +232,14 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the driver for this Store.
+     * @return the driver for this Store.
      */
     public String getDriverName() {
-        return (this.driverName);
+        return this.driverName;
     }
 
     /**
-     * Return the username to use to connect to the database.
-     *
+     * @return the username to use to connect to the database.
      */
     public String getConnectionName() {
         return connectionName;
@@ -260,8 +255,7 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the password to use to connect to the database.
-     *
+     * @return the password to use to connect to the database.
      */
     public String getConnectionPassword() {
         return connectionPassword;
@@ -290,10 +284,10 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the Connection URL for this Store.
+     * @return the Connection URL for this Store.
      */
     public String getConnectionURL() {
-        return (this.connectionURL);
+        return this.connectionURL;
     }
 
     /**
@@ -310,10 +304,10 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the table for this Store.
+     * @return the table for this Store.
      */
     public String getSessionTable() {
-        return (this.sessionTable);
+        return this.sessionTable;
     }
 
     /**
@@ -330,10 +324,10 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the web application name column for the table.
+     * @return the web application name column for the table.
      */
     public String getSessionAppCol() {
-        return (this.sessionAppCol);
+        return this.sessionAppCol;
     }
 
     /**
@@ -350,10 +344,10 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the Id column for the table.
+     * @return the Id column for the table.
      */
     public String getSessionIdCol() {
-        return (this.sessionIdCol);
+        return this.sessionIdCol;
     }
 
     /**
@@ -370,14 +364,14 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the data column for the table
+     * @return the data column for the table
      */
     public String getSessionDataCol() {
-        return (this.sessionDataCol);
+        return this.sessionDataCol;
     }
 
     /**
-     * Set the Is Valid column for the table
+     * Set the {@code Is Valid} column for the table
      *
      * @param sessionValidCol The column name
      */
@@ -390,14 +384,14 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the Is Valid column
+     * @return the {@code Is Valid} column
      */
     public String getSessionValidCol() {
-        return (this.sessionValidCol);
+        return this.sessionValidCol;
     }
 
     /**
-     * Set the Max Inactive column for the table
+     * Set the {@code Max Inactive} column for the table
      *
      * @param sessionMaxInactiveCol The column name
      */
@@ -410,14 +404,14 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the Max Inactive column
+     * @return the {@code Max Inactive} column
      */
     public String getSessionMaxInactiveCol() {
-        return (this.sessionMaxInactiveCol);
+        return this.sessionMaxInactiveCol;
     }
 
     /**
-     * Set the Last Accessed column for the table
+     * Set the {@code Last Accessed} column for the table
      *
      * @param sessionLastAccessedCol The column name
      */
@@ -430,10 +424,10 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the Last Accessed column
+     * @return the {@code Last Accessed} column
      */
     public String getSessionLastAccessedCol() {
-        return (this.sessionLastAccessedCol);
+        return this.sessionLastAccessedCol;
     }
 
     /**
@@ -451,7 +445,7 @@ public class JDBCStore extends StoreBase {
     }
 
     /**
-     * Return the name of the JNDI DataSource-factory
+     * @return the name of the JNDI DataSource-factory
      */
     public String getDataSourceName() {
         return this.dataSourceName;
@@ -459,15 +453,28 @@ public class JDBCStore extends StoreBase {
 
     // --------------------------------------------------------- Public Methods
 
+    @Override
+    public String[] expiredKeys() throws IOException {
+        return keys(true);
+    }
+
+    @Override
+    public String[] keys() throws IOException {
+        return keys(false);
+    }
+
     /**
      * Return an array containing the session identifiers of all Sessions
      * currently saved in this Store.  If there are no such Sessions, a
      * zero-length array is returned.
      *
+     * @param expiredOnly flag, whether only keys of expired sessions should
+     *        be returned
+     * @return array containing the list of session IDs
+     *
      * @exception IOException if an input/output error occurred
      */
-    @Override
-    public String[] keys() throws IOException {
+    private String[] keys(boolean expiredOnly) throws IOException {
         String keys[] = null;
         synchronized (this) {
             int numberOfTries = 2;
@@ -475,27 +482,32 @@ public class JDBCStore extends StoreBase {
 
                 Connection _conn = getConnection();
                 if (_conn == null) {
-                    return (new String[0]);
+                    return new String[0];
                 }
                 try {
-                    if (preparedKeysSql == null) {
-                        String keysSql = "SELECT " + sessionIdCol + " FROM "
-                                + sessionTable + " WHERE " + sessionAppCol
-                                + " = ?";
-                        preparedKeysSql = _conn.prepareStatement(keysSql);
-                    }
 
-                    preparedKeysSql.setString(1, getName());
-                    try (ResultSet rst = preparedKeysSql.executeQuery()) {
-                        ArrayList<String> tmpkeys = new ArrayList<>();
-                        if (rst != null) {
-                            while (rst.next()) {
-                                tmpkeys.add(rst.getString(1));
-                            }
+                    String keysSql = "SELECT " + sessionIdCol + " FROM "
+                            + sessionTable + " WHERE " + sessionAppCol + " = ?";
+                    if (expiredOnly) {
+                        keysSql += " AND (" + sessionLastAccessedCol + " + "
+                                + sessionMaxInactiveCol + " * 1000 < ?)";
+                    }
+                    try (PreparedStatement preparedKeysSql = _conn.prepareStatement(keysSql)) {
+                        preparedKeysSql.setString(1, getName());
+                        if (expiredOnly) {
+                            preparedKeysSql.setLong(2, System.currentTimeMillis());
                         }
-                        keys = tmpkeys.toArray(new String[tmpkeys.size()]);
-                        // Break out after the finally block
-                        numberOfTries = 0;
+                        try (ResultSet rst = preparedKeysSql.executeQuery()) {
+                            ArrayList<String> tmpkeys = new ArrayList<>();
+                            if (rst != null) {
+                                while (rst.next()) {
+                                    tmpkeys.add(rst.getString(1));
+                                }
+                            }
+                            keys = tmpkeys.toArray(new String[tmpkeys.size()]);
+                            // Break out after the finally block
+                            numberOfTries = 0;
+                        }
                     }
                 } catch (SQLException e) {
                     manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
@@ -517,6 +529,8 @@ public class JDBCStore extends StoreBase {
      * currently saved in this Store.  If there are no Sessions,
      * <code>0</code> is returned.
      *
+     * @return the count of all sessions currently saved in this Store
+     *
      * @exception IOException if an input/output error occurred
      */
     @Override
@@ -529,7 +543,7 @@ public class JDBCStore extends StoreBase {
                 Connection _conn = getConnection();
 
                 if (_conn == null) {
-                    return (size);
+                    return size;
                 }
 
                 try {
@@ -584,7 +598,7 @@ public class JDBCStore extends StoreBase {
             while (numberOfTries > 0) {
                 Connection _conn = getConnection();
                 if (_conn == null) {
-                    return (null);
+                    return null;
                 }
 
                 ClassLoader oldThreadContextCL = Thread.currentThread().getContextClassLoader();
@@ -650,7 +664,7 @@ public class JDBCStore extends StoreBase {
             }
         }
 
-        return (_session);
+        return _session;
     }
 
     /**
@@ -857,7 +871,9 @@ public class JDBCStore extends StoreBase {
 
     /**
      * Open (if necessary) and return a database connection for use by
-     * this Realm.
+     * this Store.
+     *
+     * @return database connection ready to use
      *
      * @exception SQLException if a database error occurs
      */
@@ -865,7 +881,7 @@ public class JDBCStore extends StoreBase {
 
         // Do nothing if there is a database connection already open
         if (dbConnection != null)
-            return (dbConnection);
+            return dbConnection;
 
         if (dataSourceName != null && dataSource == null) {
             Context initCtx;
@@ -889,15 +905,11 @@ public class JDBCStore extends StoreBase {
             try {
                 Class<?> clazz = Class.forName(driverName);
                 driver = (Driver) clazz.newInstance();
-            } catch (ClassNotFoundException ex) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
-                        ex.toString()));
-            } catch (InstantiationException ex) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
-                        ex.toString()));
-            } catch (IllegalAccessException ex) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
-                        ex.toString()));
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                manager.getContext().getLogger().error(
+                        sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
+                        e.toString()));
+                throw new SQLException(e);
             }
         }
 
@@ -909,7 +921,7 @@ public class JDBCStore extends StoreBase {
             props.put("password", connectionPassword);
         dbConnection = driver.connect(connectionURL, props);
         dbConnection.setAutoCommit(true);
-        return (dbConnection);
+        return dbConnection;
 
     }
 
@@ -931,13 +943,6 @@ public class JDBCStore extends StoreBase {
             ExceptionUtils.handleThrowable(f);
         }
         this.preparedSizeSql = null;
-
-        try {
-            preparedKeysSql.close();
-        } catch (Throwable f) {
-            ExceptionUtils.handleThrowable(f);
-        }
-        this.preparedKeysSql = null;
 
         try {
             preparedSaveSql.close();

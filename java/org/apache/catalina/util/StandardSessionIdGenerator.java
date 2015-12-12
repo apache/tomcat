@@ -60,5 +60,4 @@ public class StandardSessionIdGenerator extends SessionIdGeneratorBase {
 
         return buffer.toString();
     }
-
 }

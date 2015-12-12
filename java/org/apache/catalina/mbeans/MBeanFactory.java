@@ -110,7 +110,7 @@ public class MBeanFactory {
         if ((j2eeType!=null) && (j2eeType.equals("WebModule"))) {
             String name = pname.getKeyProperty("name");
             name = name.substring(2);
-            int i = name.indexOf("/");
+            int i = name.indexOf('/');
             String hostName = name.substring(0,i);
             String path = name.substring(i);
             Container host = engine.findChild(hostName);
@@ -469,7 +469,7 @@ public class MBeanFactory {
         } else {
             log.warn("Deployer not found for "+pname.getKeyProperty("host"));
             Service service = getService(pname);
-            Engine engine = (Engine) service.getContainer();
+            Engine engine = service.getContainer();
             Host host = (Host) engine.findChild(pname.getKeyProperty("host"));
             host.addChild(context);
         }
@@ -517,7 +517,7 @@ public class MBeanFactory {
         // Add the new instance to its parent component
         ObjectName pname = new ObjectName(parent);
         Service service = getService(pname);
-        Engine engine = (Engine) service.getContainer();
+        Engine engine = service.getContainer();
         engine.addChild(host);
 
         // Return the corresponding MBean name
@@ -740,10 +740,10 @@ public class MBeanFactory {
         String domain = oname.getDomain();
         StandardService service = (StandardService) getService(oname);
 
-        Engine engine = (Engine) service.getContainer();
+        Engine engine = service.getContainer();
         String name = oname.getKeyProperty("name");
         name = name.substring(2);
-        int i = name.indexOf("/");
+        int i = name.indexOf('/');
         String hostName = name.substring(0,i);
         String path = name.substring(i);
         ObjectName deployer = new ObjectName(domain+":type=Deployer,host="+
@@ -790,7 +790,7 @@ public class MBeanFactory {
         ObjectName oname = new ObjectName(name);
         String hostName = oname.getKeyProperty("host");
         Service service = getService(oname);
-        Engine engine = (Engine) service.getContainer();
+        Engine engine = service.getContainer();
         Host host = (Host) engine.findChild(hostName);
 
         // Remove this component from its parent component

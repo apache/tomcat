@@ -70,6 +70,9 @@ public final class SecurityClassLoad {
              "ApplicationDispatcher$PrivilegedInclude");
         loader.loadClass
             (basePackage +
+             "ApplicationPushBuilder");
+        loader.loadClass
+            (basePackage +
             "AsyncContextImpl");
         loader.loadClass
             (basePackage +
@@ -167,6 +170,7 @@ public final class SecurityClassLoad {
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(basePackage + "Constants");
         clazz.newInstance();
+        loader.loadClass(basePackage + "http2.Stream$1");
     }
 
 
@@ -232,6 +236,9 @@ public final class SecurityClassLoad {
              "OutputBuffer$1");
         loader.loadClass
             (basePackage +
+             "OutputBuffer$2");
+        loader.loadClass
+            (basePackage +
              "CoyoteInputStream$1");
         loader.loadClass
             (basePackage +
@@ -268,10 +275,17 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.buf.StringCache");
         loader.loadClass(basePackage + "util.buf.StringCache$ByteEntry");
         loader.loadClass(basePackage + "util.buf.StringCache$CharEntry");
+        // collections
+        loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap");
+        loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntryImpl");
+        loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntryIterator");
+        loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntrySet");
+        loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$Key");
         // http
+        loader.loadClass(basePackage + "util.http.CookieProcessor");
+        loader.loadClass(basePackage + "util.http.NamesEnumerator");
         // Make sure system property is read at this point
-        Class<?> clazz = loader.loadClass(
-                basePackage + "util.http.FastHttpDateFormat");
+        Class<?> clazz = loader.loadClass(basePackage + "util.http.FastHttpDateFormat");
         clazz.newInstance();
         loader.loadClass(basePackage + "util.http.parser.HttpParser");
         loader.loadClass(basePackage + "util.http.parser.MediaType");

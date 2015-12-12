@@ -50,22 +50,16 @@ public abstract class AbstractProcessorLight implements Processor {
             } else if (dispatches != null) {
                 DispatchType nextDispatch = dispatches.next();
                 state = dispatch(nextDispatch.getSocketStatus());
-            } else if (status == SocketStatus.DISCONNECT) {
+            } else if (status == SocketStatus.DISCONNECT && !isUpgrade()) {
                 // Do nothing here, just wait for it to get recycled
-            } else if (isAsync() || isUpgrade()) {
+            } else if (isAsync() || isUpgrade() || state == SocketState.ASYNC_END) {
                 state = dispatch(status);
-            } else if (state == SocketState.ASYNC_END) {
-                state = dispatch(status);
-                // TODO: In case this request takes a long time to process
-                //       remove the TBD (socket/processor/something else) from
-                //       the waiting requests now else the async timeout will
-                //       fire
                 if (state == SocketState.OPEN) {
-                    // There may be pipe-lined data to read. If the data
-                    // isn't processed now, execution will exit this
-                    // loop and call release() which will recycle the
-                    // processor (and input buffer) deleting any
-                    // pipe-lined data. To avoid this, process it now.
+                    // There may be pipe-lined data to read. If the data isn't
+                    // processed now, execution will exit this loop and call
+                    // release() which will recycle the processor (and input
+                    // buffer) deleting any pipe-lined data. To avoid this,
+                    // process it now.
                     state = service(socketWrapper);
                 }
             } else if (status == SocketStatus.OPEN_WRITE) {
@@ -129,13 +123,14 @@ public abstract class AbstractProcessorLight implements Processor {
         }
     }
 
+
     /**
      * Service a 'standard' HTTP request. This method is called for both new
      * requests and for requests that have partially read the HTTP request line
      * or HTTP headers. Once the headers have been fully read this method is not
      * called again until there is a new HTTP request to process. Note that the
      * request type may change during processing which may result in one or more
-     * calls to {@link #dispatch(SocketStatus)}.
+     * calls to {@link #dispatch(SocketStatus)}. Requests may be pipe-lined.
      *
      * @param socketWrapper The connection to process
      *

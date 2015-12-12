@@ -458,11 +458,7 @@ public class ContextConfig implements LifecycleListener {
         AuthConfigFactory authConfigFactory = AuthConfigFactory.getFactory();
         TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(context, authenticator.getAuthProperties());
         authConfigFactory.registerConfigProvider(provider, JaspicAuthenticator.MESSAGE_LAYER,
-                getJaspicAppContext(), "Tomcat Jaspic");
-    }
-
-    private String getJaspicAppContext() {
-        return context.getServletContext().getVirtualServerName() + " " + context.getPath();
+                authenticator.getAppContext(), "Apache Tomcat JASPIC");
     }
 
     /**
@@ -1230,10 +1226,8 @@ public class ContextConfig implements LifecycleListener {
             // Spec does not define an order.
             // Use ordered JARs followed by remaining JARs
             Set<WebXml> resourceJars = new LinkedHashSet<>();
-            if (orderedFragments != null) {
-                for (WebXml fragment : orderedFragments) {
-                    resourceJars.add(fragment);
-                }
+            for (WebXml fragment : orderedFragments) {
+                resourceJars.add(fragment);
             }
             for (WebXml fragment : fragments.values()) {
                 if (!resourceJars.contains(fragment)) {
@@ -1788,44 +1782,47 @@ public class ContextConfig implements LifecycleListener {
 
         // Open the application web.xml file, if it exists
         ServletContext servletContext = context.getServletContext();
-        if (servletContext != null) {
-            altDDName = (String)servletContext.getAttribute(Globals.ALT_DD_ATTR);
-            if (altDDName != null) {
-                try {
-                    stream = new FileInputStream(altDDName);
-                    url = new File(altDDName).toURI().toURL();
-                } catch (FileNotFoundException e) {
-                    log.error(sm.getString("contextConfig.altDDNotFound",
-                                           altDDName));
-                } catch (MalformedURLException e) {
-                    log.error(sm.getString("contextConfig.applicationUrl"));
+        try {
+            if (servletContext != null) {
+                altDDName = (String)servletContext.getAttribute(Globals.ALT_DD_ATTR);
+                if (altDDName != null) {
+                    try {
+                        stream = new FileInputStream(altDDName);
+                        url = new File(altDDName).toURI().toURL();
+                    } catch (FileNotFoundException e) {
+                        log.error(sm.getString("contextConfig.altDDNotFound",
+                                               altDDName));
+                    } catch (MalformedURLException e) {
+                        log.error(sm.getString("contextConfig.applicationUrl"));
+                    }
+                }
+                else {
+                    stream = servletContext.getResourceAsStream
+                        (Constants.ApplicationWebXml);
+                    try {
+                        url = servletContext.getResource(
+                                Constants.ApplicationWebXml);
+                    } catch (MalformedURLException e) {
+                        log.error(sm.getString("contextConfig.applicationUrl"));
+                    }
                 }
             }
-            else {
-                stream = servletContext.getResourceAsStream
-                    (Constants.ApplicationWebXml);
-                try {
-                    url = servletContext.getResource(
-                            Constants.ApplicationWebXml);
-                } catch (MalformedURLException e) {
-                    log.error(sm.getString("contextConfig.applicationUrl"));
+            if (stream == null || url == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("contextConfig.applicationMissing") + " " + context);
                 }
+            } else {
+                source = new InputSource(url.toExternalForm());
+                source.setByteStream(stream);
             }
-        }
-        if (stream == null || url == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("contextConfig.applicationMissing") + " " + context);
-            }
-            if (stream != null) {
+        } finally {
+            if (source == null && stream != null) {
                 try {
                     stream.close();
                 } catch (IOException e) {
                     // Ignore
                 }
             }
-        } else {
-            source = new InputSource(url.toExternalForm());
-            source.setByteStream(stream);
         }
 
         return source;
@@ -1867,6 +1864,14 @@ public class ContextConfig implements LifecycleListener {
         } catch (Exception e) {
             log.error(sm.getString(
                     "contextConfig.defaultError", filename, file), e);
+        } finally {
+            if (source == null && stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // Ignore
+                }
+            }
         }
 
         return source;

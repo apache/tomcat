@@ -58,6 +58,7 @@ public class SSLHostConfig {
     }
 
     private Type configType = null;
+    private Type currentConfigType = null;
     private Map<Type,Set<String>> configuredProperties = new HashMap<>();
 
     private String hostName = DEFAULT_SSL_HOST_NAME;
@@ -119,7 +120,13 @@ public class SSLHostConfig {
 
     public void setConfigType(Type configType) {
         this.configType = configType;
-        configuredProperties.remove(configType);
+        if (configType == Type.EITHER) {
+            if (configuredProperties.remove(Type.JSSE) == null) {
+                configuredProperties.remove(Type.OPENSSL);
+            }
+        } else {
+            configuredProperties.remove(configType);
+        }
         for (Map.Entry<Type,Set<String>> entry : configuredProperties.entrySet()) {
             for (String property : entry.getValue()) {
                 log.warn(sm.getString("sslHostConfig.mismatch",
@@ -137,6 +144,13 @@ public class SSLHostConfig {
                 configuredProperties.put(configType, properties);
             }
             properties.add(name);
+        } else if (this.configType == Type.EITHER) {
+            if (currentConfigType == null) {
+                currentConfigType = configType;
+            } else if (currentConfigType != configType) {
+                log.warn(sm.getString("sslHostConfig.mismatch",
+                        name, getHostName(), configType, currentConfigType));
+            }
         } else {
             if (configType != this.configType) {
                 log.warn(sm.getString("sslHostConfig.mismatch",
@@ -525,6 +539,12 @@ public class SSLHostConfig {
     // TODO: These certificate setters can be removed once it is no longer
     // necessary to support the old configuration attributes (Tomcat 10?).
 
+    public void setCertificateChainFile(String certificateChainFile) {
+        registerDefaultCertificate();
+        defaultCertificate.setCertificateChainFile(certificateChainFile);
+    }
+
+
     public void setCertificateFile(String certificateFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateFile(certificateFile);
@@ -629,7 +649,8 @@ public class SSLHostConfig {
 
     public static enum Type {
         JSSE,
-        OPENSSL
+        OPENSSL,
+        EITHER
     }
 
 

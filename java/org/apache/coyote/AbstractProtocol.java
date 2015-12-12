@@ -36,6 +36,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.WebConnection;
 
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
@@ -418,6 +419,20 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     protected abstract UpgradeProtocol getNegotiatedProtocol(String name);
 
 
+    /**
+     * Create and configure a new Processor instance for the current protocol
+     * implementation.
+     *
+     * @return A fully configured Processor instance that is ready to use
+     */
+    protected abstract Processor createProcessor();
+
+
+    protected abstract Processor createUpgradeProcessor(
+            SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
+            UpgradeToken upgradeToken) throws IOException;
+
+
     // ----------------------------------------------------- JMX related methods
 
     protected String domain;
@@ -592,7 +607,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             getLog().info(sm.getString("abstractProtocolHandler.stop",
                     getName()));
 
-        asyncTimeout.stop();
+        if (asyncTimeout != null) {
+            asyncTimeout.stop();
+        }
 
         try {
             endpoint.stop();
@@ -642,23 +659,25 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     // ------------------------------------------- Connection handler base class
 
-    protected abstract static class AbstractConnectionHandler<S,P extends Processor>
-            implements AbstractEndpoint.Handler<S> {
+    protected static class ConnectionHandler<S> implements AbstractEndpoint.Handler<S> {
 
-        protected abstract Log getLog();
+        private final AbstractProtocol<S> proto;
+        private final RequestGroupInfo global = new RequestGroupInfo();
+        private final AtomicLong registerCount = new AtomicLong(0);
+        private final ConcurrentHashMap<S,Processor> connections = new ConcurrentHashMap<>();
+        private final RecycledProcessors recycledProcessors = new RecycledProcessors(this);
 
-        protected final RequestGroupInfo global = new RequestGroupInfo();
-        protected final AtomicLong registerCount = new AtomicLong(0);
+        public ConnectionHandler(AbstractProtocol<S> proto) {
+            this.proto = proto;
+        }
 
-        protected final ConcurrentHashMap<S,Processor> connections =
-                new ConcurrentHashMap<>();
+        protected AbstractProtocol<S> getProtocol() {
+            return proto;
+        }
 
-        protected final RecycledProcessors<P,S> recycledProcessors =
-                new RecycledProcessors<>(this);
-
-
-        protected abstract AbstractProtocol<S> getProtocol();
-
+        protected Log getLog() {
+            return getProtocol().getLog();
+        }
 
         @Override
         public Object getGlobal() {
@@ -721,7 +740,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     processor = recycledProcessors.pop();
                 }
                 if (processor == null) {
-                    processor = createProcessor();
+                    processor = getProtocol().createProcessor();
+                    register(processor);
                 }
 
                 processor.setSslSupport(
@@ -738,14 +758,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
                     if (state == SocketState.UPGRADING) {
                         // Get the HTTP upgrade handler
-                        HttpUpgradeHandler httpUpgradeHandler = processor.getHttpUpgradeHandler();
+                        UpgradeToken upgradeToken = processor.getUpgradeToken();
+                        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
                         // Retrieve leftover input
                         ByteBuffer leftoverInput = processor.getLeftoverInput();
                         // Release the Http11 processor to be re-used
                         release(wrapper, processor, false);
                         // Create the upgrade processor
-                        processor = createUpgradeProcessor(
-                                wrapper, leftoverInput, httpUpgradeHandler);
+                        processor = getProtocol().createUpgradeProcessor(
+                                wrapper, leftoverInput, upgradeToken);
                         // Mark the connection as upgraded
                         wrapper.setUpgraded(true);
                         // Associate with the processor with the connection
@@ -756,7 +777,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         // This cast should be safe. If it fails the error
                         // handling for the surrounding try/catch will deal with
                         // it.
-                        httpUpgradeHandler.init((WebConnection) processor);
+                        if (upgradeToken.getInstanceManager() == null) {
+                            httpUpgradeHandler.init((WebConnection) processor);
+                        } else {
+                            ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
+                            try {
+                                httpUpgradeHandler.init((WebConnection) processor);
+                            } finally {
+                                upgradeToken.getContextBind().unbind(false, oldCL);
+                            }
+                        }
                     }
                 } while ( state == SocketState.UPGRADING);
 
@@ -794,7 +824,20 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // processors are not recycled.
                     connections.remove(socket);
                     if (processor.isUpgrade()) {
-                        processor.getHttpUpgradeHandler().destroy();
+                        UpgradeToken upgradeToken = processor.getUpgradeToken();
+                        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
+                        InstanceManager instanceManager = upgradeToken.getInstanceManager();
+                        if (instanceManager == null) {
+                            httpUpgradeHandler.destroy();
+                        } else {
+                            ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
+                            try {
+                                httpUpgradeHandler.destroy();
+                                instanceManager.destroyInstance(httpUpgradeHandler);
+                            } finally {
+                                upgradeToken.getContextBind().unbind(false, oldCL);
+                            }
+                        }
                     } else {
                         release(wrapper, processor, false);
                     }
@@ -837,8 +880,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             return SocketState.CLOSED;
         }
 
-        protected abstract P createProcessor();
-
 
         protected void longPoll(SocketWrapperBase<?> socket, Processor processor) {
             if (!processor.isAsync()) {
@@ -849,6 +890,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 //    read
                 socket.registerReadInterest();
             }
+        }
+
+
+        @Override
+        public Set<S> getOpenSockets() {
+            return connections.keySet();
         }
 
 
@@ -889,12 +936,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
 
 
-        protected abstract Processor createUpgradeProcessor(
-                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
-                HttpUpgradeHandler httpUpgradeHandler) throws IOException;
-
-
-        protected void register(AbstractProcessor processor) {
+        protected void register(Processor processor) {
             if (getProtocol().getDomain() != null) {
                 synchronized (this) {
                     try {
@@ -963,13 +1005,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
     }
 
-    protected static class RecycledProcessors<P extends Processor, S>
-            extends SynchronizedStack<Processor> {
+    protected static class RecycledProcessors extends SynchronizedStack<Processor> {
 
-        private final transient AbstractConnectionHandler<S,P> handler;
+        private final transient ConnectionHandler<?> handler;
         protected final AtomicInteger size = new AtomicInteger(0);
 
-        public RecycledProcessors(AbstractConnectionHandler<S,P> handler) {
+        public RecycledProcessors(ConnectionHandler<?> handler) {
             this.handler = handler;
         }
 

@@ -16,12 +16,13 @@
  */
 package org.apache.coyote.ajp;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.servlet.http.HttpUpgradeHandler;
-
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
+import org.apache.coyote.UpgradeToken;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -48,6 +49,9 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         // AJP does not use Send File
         getEndpoint().setUseSendfile(false);
+        ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
+        setHandler(cHandler);
+        getEndpoint().setHandler(cHandler);
     }
 
 
@@ -153,44 +157,23 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
-    protected void configureProcessor(AjpProcessor processor) {
+    @Override
+    protected Processor createProcessor() {
+        AjpProcessor processor = new AjpProcessor(getPacketSize(), getEndpoint());
         processor.setAdapter(getAdapter());
         processor.setTomcatAuthentication(getTomcatAuthentication());
         processor.setTomcatAuthorization(getTomcatAuthorization());
         processor.setRequiredSecret(requiredSecret);
         processor.setKeepAliveTimeout(getKeepAliveTimeout());
         processor.setClientCertProvider(getClientCertProvider());
+        return processor;
     }
 
-    protected abstract static class AbstractAjpConnectionHandler<S>
-            extends AbstractConnectionHandler<S,AjpProcessor> {
 
-        private final AbstractAjpProtocol<S> proto;
-
-        public AbstractAjpConnectionHandler(AbstractAjpProtocol<S> proto) {
-            this.proto = proto;
-        }
-
-        @Override
-        protected AbstractAjpProtocol<S> getProtocol() {
-            return proto;
-        }
-
-
-        @Override
-        protected AjpProcessor createProcessor() {
-            AjpProcessor processor = new AjpProcessor(proto.getPacketSize(), proto.getEndpoint());
-            proto.configureProcessor(processor);
-            register(processor);
-            return processor;
-        }
-
-
-        @Override
-        protected AjpProcessor createUpgradeProcessor(SocketWrapperBase<?> socket,
-                ByteBuffer leftoverInput, HttpUpgradeHandler httpUpgradeHandler) {
-            // TODO should fail - throw IOE
-            return null;
-        }
+    @Override
+    protected Processor createUpgradeProcessor(SocketWrapperBase<?> socket,
+            ByteBuffer leftoverInput, UpgradeToken upgradeToken) throws IOException {
+        throw new IOException(sm.getString("ajpprotocol.noUpgradeHandler",
+                upgradeToken.getHttpUpgradeHandler().getClass().getName()));
     }
 }

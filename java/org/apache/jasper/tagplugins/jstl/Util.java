@@ -99,7 +99,7 @@ public class Util {
             return false;
         }
 
-        int colonPos = url.indexOf(":");
+        int colonPos = url.indexOf(':');
         if(colonPos == -1){
             return false;
         }
@@ -155,9 +155,9 @@ public class Util {
         StringBuilder u = new StringBuilder(url);
         int sessionStart;
         while ((sessionStart = u.toString().indexOf(";" + Constants.SESSION_PARAMETER_NAME + "=")) != -1) {
-            int sessionEnd = u.toString().indexOf(";", sessionStart + 1);
+            int sessionEnd = u.toString().indexOf(';', sessionStart + 1);
             if (sessionEnd == -1)
-                sessionEnd = u.toString().indexOf("?", sessionStart + 1);
+                sessionEnd = u.toString().indexOf('?', sessionStart + 1);
             if (sessionEnd == -1) // still
                 sessionEnd = u.length();
             u.delete(sessionStart, sessionEnd);

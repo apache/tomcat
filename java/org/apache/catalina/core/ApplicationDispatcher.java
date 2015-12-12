@@ -63,9 +63,9 @@ import org.apache.tomcat.util.res.StringManager;
  */
 final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher {
 
-    protected static final boolean STRICT_SERVLET_COMPLIANCE;
+    static final boolean STRICT_SERVLET_COMPLIANCE;
 
-    protected static final boolean WRAP_SAME_OBJECT;
+    static final boolean WRAP_SAME_OBJECT;
 
 
     static {

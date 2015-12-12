@@ -20,7 +20,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.Nio2Channel;
 import org.apache.tomcat.util.net.Nio2Endpoint;
-import org.apache.tomcat.util.net.Nio2Endpoint.Handler;
 
 
 /**
@@ -38,9 +37,6 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
 
     public AjpNio2Protocol() {
         super(new Nio2Endpoint());
-        AjpConnectionHandler cHandler = new AjpConnectionHandler(this);
-        setHandler(cHandler);
-        ((Nio2Endpoint) getEndpoint()).setHandler(cHandler);
     }
 
 
@@ -49,31 +45,5 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
     @Override
     protected String getNamePrefix() {
         return ("ajp-nio2");
-    }
-
-
-    // --------------------------------------  AjpConnectionHandler Inner Class
-
-    protected static class AjpConnectionHandler
-            extends AbstractAjpConnectionHandler<Nio2Channel>
-            implements Handler {
-
-        public AjpConnectionHandler(AjpNio2Protocol proto) {
-            super(proto);
-        }
-
-
-        @Override
-        protected Log getLog() {
-            return log;
-        }
-
-
-        @Override
-        public void closeAll() {
-            for (Nio2Channel channel : connections.keySet()) {
-                ((Nio2Endpoint) getProtocol().getEndpoint()).closeSocket(channel.getSocket());
-            }
-        }
     }
 }

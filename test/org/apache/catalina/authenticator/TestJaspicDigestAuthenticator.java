@@ -37,11 +37,11 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.authenticator.jaspic.JaspicAuthenticator;
 import org.apache.catalina.authenticator.jaspic.provider.TomcatAuthConfigProvider;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.core.TesterContext;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -251,7 +251,6 @@ public class TestJaspicDigestAuthenticator extends TomcatBaseTest {
         // Third request should succeed if we increment nc
         auth.clear();
         bc.recycle();
-        bc.reset();
         auth.add(buildDigestResponse(user, pwd, digestUri, realm,
                 getNonce(respHeaders), getOpaque(respHeaders), nc2, cnonce,
                 qop));
@@ -315,7 +314,7 @@ public class TestJaspicDigestAuthenticator extends TomcatBaseTest {
         String authHeader = authHeaders.iterator().next();
 
         int start = authHeader.indexOf("nonce=\"") + 7;
-        int end = authHeader.indexOf("\"", start);
+        int end = authHeader.indexOf('\"', start);
         return authHeader.substring(start, end);
     }
 
@@ -326,7 +325,7 @@ public class TestJaspicDigestAuthenticator extends TomcatBaseTest {
         String authHeader = authHeaders.iterator().next();
 
         int start = authHeader.indexOf("opaque=\"") + 8;
-        int end = authHeader.indexOf("\"", start);
+        int end = authHeader.indexOf('\"', start);
         return authHeader.substring(start, end);
     }
 

@@ -216,7 +216,7 @@ public class CoyoteAdapter implements Adapter {
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                         writeListener.onError(t);
-                        throw t;
+                        success = false;
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
@@ -238,7 +238,7 @@ public class CoyoteAdapter implements Adapter {
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                         readListener.onError(t);
-                        throw t;
+                        success = false;
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
@@ -757,9 +757,11 @@ public class CoyoteAdapter implements Adapter {
                                 // Reset mapping
                                 request.getMappingData().recycle();
                                 mapRequired = true;
-                                // Recycle cookies in case correct context is
-                                // configured with different settings
+                                // Recycle cookies and session info in case the
+                                // correct context is configured with different
+                                // settings
                                 req.getCookies().recycle();
+                                request.recycleSessionInfo();
                             }
                             break;
                         }

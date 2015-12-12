@@ -242,11 +242,10 @@ public class SecureNioChannel extends NioChannel  {
                     break;
                 }
                 default: throw new IllegalStateException(sm.getString("channel.nio.ssl.invalidStatus", handshakeStatus));
-            }//switch
-        }//while
-        //return 0 if we are complete, otherwise reregister for any activity that
-        //would cause this method to be called again.
-        return handshakeComplete?0:(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+            }
+        }
+        // Handshake is complete if this point is reached
+        return 0;
     }
 
 
@@ -339,12 +338,14 @@ public class SecureNioChannel extends NioChannel  {
         if (!getBufHandler().isReadBufferEmpty()) throw new IOException(sm.getString("channel.nio.ssl.appInputNotEmpty"));
         if (!getBufHandler().isWriteBufferEmpty()) throw new IOException(sm.getString("channel.nio.ssl.appOutputNotEmpty"));
         handshakeComplete = false;
-        boolean isReadable = true;
-        boolean isWriteable = true;
+        boolean isReadable = false;
+        boolean isWriteable = false;
         boolean handshaking = true;
         Selector selector = null;
         SelectionKey key = null;
         try {
+            sslEngine.beginHandshake();
+            handshakeStatus = sslEngine.getHandshakeStatus();
             while (handshaking) {
                 int hsStatus = this.handshake(isReadable, isWriteable);
                 switch (hsStatus) {

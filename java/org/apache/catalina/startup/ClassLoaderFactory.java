@@ -102,6 +102,9 @@ public final class ClassLoaderFactory {
                 if (!directory.isDirectory() || !directory.canRead())
                     continue;
                 String filenames[] = directory.list();
+                if (filenames == null) {
+                    continue;
+                }
                 for (int j = 0; j < filenames.length; j++) {
                     String filename = filenames[j].toLowerCase(Locale.ENGLISH);
                     if (!filename.endsWith(".jar"))
@@ -189,6 +192,9 @@ public final class ClassLoaderFactory {
                         log.debug("  Including directory glob "
                             + directory.getAbsolutePath());
                     String filenames[] = directory.list();
+                    if (filenames == null) {
+                        continue;
+                    }
                     for (int j = 0; j < filenames.length; j++) {
                         String filename = filenames[j].toLowerCase(Locale.ENGLISH);
                         if (!filename.endsWith(".jar"))

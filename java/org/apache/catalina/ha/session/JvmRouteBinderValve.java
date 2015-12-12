@@ -284,7 +284,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             Request request, String sessionId, String localJvmRoute) {
         // get requested jvmRoute.
         String requestJvmRoute = null;
-        int index = sessionId.indexOf(".");
+        int index = sessionId.indexOf('.');
         if (index > 0) {
             requestJvmRoute = sessionId
                     .substring(index + 1, sessionId.length());

@@ -45,7 +45,7 @@ public interface CookieProcessor {
      * Obtain the character set that will be used when converting between bytes
      * and characters when parsing and/or generating HTTP headers for cookies.
      *
-     * @return The character set used for byte<->character conversions
+     * @return The character set used for byte&lt;-&gt;character conversions
      */
     Charset getCharset();
 }

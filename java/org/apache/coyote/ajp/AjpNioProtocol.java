@@ -16,15 +16,10 @@
  */
 package org.apache.coyote.ajp;
 
-import java.nio.channels.SocketChannel;
-import java.util.Iterator;
-
-import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioEndpoint.Handler;
 
 /**
  * This the NIO based protocol handler implementation for AJP.
@@ -41,9 +36,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
     public AjpNioProtocol() {
         super(new NioEndpoint());
-        AjpConnectionHandler cHandler = new AjpConnectionHandler(this);
-        setHandler(cHandler);
-        ((NioEndpoint) getEndpoint()).setHandler(cHandler);
     }
 
 
@@ -52,48 +44,5 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
     @Override
     protected String getNamePrefix() {
         return ("ajp-nio");
-    }
-
-
-    // --------------------------------------  AjpConnectionHandler Inner Class
-
-    protected static class AjpConnectionHandler
-            extends AbstractAjpConnectionHandler<NioChannel>
-            implements Handler {
-
-        public AjpConnectionHandler(AjpNioProtocol proto) {
-            super(proto);
-        }
-
-        @Override
-        protected Log getLog() {
-            return log;
-        }
-
-        /**
-         * Expected to be used by the Poller to release resources on socket
-         * close, errors etc.
-         */
-        @Override
-        public void release(SocketChannel socket) {
-            if (log.isDebugEnabled())
-                log.debug(sm.getString("ajpnioprotocol.releaseStart", socket));
-            boolean released = false;
-            Iterator<java.util.Map.Entry<NioChannel, Processor>> it = connections.entrySet().iterator();
-            while (it.hasNext()) {
-                java.util.Map.Entry<NioChannel, Processor> entry = it.next();
-                if (entry.getKey().getIOChannel()==socket) {
-                    it.remove();
-                    Processor result = entry.getValue();
-                    result.recycle();
-                    unregister(result);
-                    released = true;
-                    break;
-                }
-            }
-            if (log.isDebugEnabled())
-                log.debug(sm.getString("ajpnioprotocol.releaseEnd",
-                        socket, Boolean.valueOf(released)));
-        }
     }
 }

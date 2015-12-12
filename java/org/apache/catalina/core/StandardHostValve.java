@@ -57,9 +57,9 @@ final class StandardHostValve extends ValveBase {
     private static final ClassLoader MY_CLASSLOADER =
             StandardHostValve.class.getClassLoader();
 
-    protected static final boolean STRICT_SERVLET_COMPLIANCE;
+    static final boolean STRICT_SERVLET_COMPLIANCE;
 
-    protected static final boolean ACCESS_SESSION;
+    static final boolean ACCESS_SESSION;
 
     static {
         STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
@@ -231,7 +231,7 @@ final class StandardHostValve extends ValveBase {
             // Look for a default error page
             errorPage = context.findErrorPage(0);
         }
-        if (errorPage != null && response.setErrorReported()) {
+        if (errorPage != null && response.isErrorReportRequired()) {
             response.setAppCommitted(false);
             request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE,
                               Integer.valueOf(statusCode));
@@ -255,6 +255,7 @@ final class StandardHostValve extends ValveBase {
             request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI,
                                  request.getRequestURI());
             if (custom(request, response, errorPage)) {
+                response.setErrorReported();
                 try {
                     response.finishResponse();
                 } catch (ClientAbortException e) {
@@ -378,6 +379,12 @@ final class StandardHostValve extends ValveBase {
                 request.getContext().getServletContext();
             RequestDispatcher rd =
                 servletContext.getRequestDispatcher(errorPage.getLocation());
+
+            if (rd == null) {
+                container.getLogger().error(
+                    sm.getString("standardHostValue.customStatusFailed", errorPage.getLocation()));
+                return false;
+            }
 
             if (response.isCommitted()) {
                 // Response is committed - including the error page is the

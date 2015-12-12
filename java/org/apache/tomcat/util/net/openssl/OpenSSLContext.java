@@ -16,27 +16,18 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
-import javax.crypto.Cipher;
-import javax.crypto.EncryptedPrivateKeyInfo;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
@@ -44,6 +35,7 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.juli.logging.Log;
@@ -56,6 +48,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -99,6 +92,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private static final AtomicIntegerFieldUpdater<OpenSSLContext> DESTROY_UPDATER
             = AtomicIntegerFieldUpdater.newUpdater(OpenSSLContext.class, "aprPoolDestroyed");
     static final CertificateFactory X509_CERT_FACTORY;
+
+    private static final String BEGIN_KEY = "-----BEGIN RSA PRIVATE KEY-----\n";
+
+    private static final Object END_KEY = "\n-----END RSA PRIVATE KEY-----";
     private boolean initialized = false;
 
     static {
@@ -118,7 +115,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         try {
             if (SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()) == null) {
                 // This is required
-                throw new Exception(netSm.getString("endpoint.apr.noSslCertFile"));
+                // throw new Exception(netSm.getString("endpoint.apr.noSslCertFile"));
             }
 
             // SSL protocol
@@ -169,15 +166,20 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             throw new SSLException(sm.getString("openssl.errorSSLCtxInit"), e);
         } finally {
             if (!success) {
-                destroyPools();
+                destroy();
             }
         }
     }
 
-    private void destroyPools() {
+    public synchronized void destroy() {
         // Guard against multiple destroyPools() calls triggered by construction exception and finalize() later
-        if (aprPool != 0 && DESTROY_UPDATER.compareAndSet(this, 0, 1)) {
-            Pool.destroy(aprPool);
+        if (DESTROY_UPDATER.compareAndSet(this, 0, 1)) {
+            if (ctx != 0) {
+                SSLContext.free(ctx);
+            }
+            if (aprPool != 0) {
+                Pool.destroy(aprPool);
+            }
         }
     }
 
@@ -296,7 +298,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // List the ciphers that the client is permitted to negotiate
             String ciphers = sslHostConfig.getCiphers();
-            if (!("ALL".equals(ciphers)) && ciphers.indexOf(":") == -1) {
+            if (!("ALL".equals(ciphers)) && ciphers.indexOf(':') == -1) {
                 StringTokenizer tok = new StringTokenizer(ciphers, ",");
                 this.ciphers = new ArrayList<>();
                 while (tok.hasMoreTokens()) {
@@ -311,20 +313,35 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             SSLContext.setCipherSuite(ctx, ciphers);
             // Load Server key and certificate
-            SSLContext.setCertificate(ctx,
-                    SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
-                    SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
-                    certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
-            // Support Client Certificates
-            SSLContext.setCACertificate(ctx,
-                    SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
-                    SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
-            // Set revocation
-            SSLContext.setCARevocation(ctx,
-                    SSLHostConfig.adjustRelativePath(
-                            sslHostConfig.getCertificateRevocationListFile()),
-                    SSLHostConfig.adjustRelativePath(
-                            sslHostConfig.getCertificateRevocationListPath()));
+            if (certificate.getCertificateFile() != null) {
+                // Set certificate
+                SSLContext.setCertificate(ctx,
+                        SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
+                        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
+                        certificate.getCertificateKeyPassword(), SSL.SSL_AIDX_RSA);
+                // Set certificate chain file
+                SSLContext.setCertificateChainFile(ctx,
+                        SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
+                // Support Client Certificates
+                SSLContext.setCACertificate(ctx,
+                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
+                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
+                // Set revocation
+                SSLContext.setCARevocation(ctx,
+                        SSLHostConfig.adjustRelativePath(
+                                sslHostConfig.getCertificateRevocationListFile()),
+                        SSLHostConfig.adjustRelativePath(
+                                sslHostConfig.getCertificateRevocationListPath()));
+            } else {
+                X509KeyManager keyManager = chooseKeyManager(kms);
+                String alias = certificate.getCertificateKeyAlias();
+                X509Certificate certificate = keyManager.getCertificateChain(alias)[0];
+                PrivateKey key = keyManager.getPrivateKey(alias);
+                StringBuilder sb = new StringBuilder(BEGIN_KEY);
+                sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
+                sb.append(END_KEY);
+                SSLContext.setCertificateRaw(ctx, certificate.getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
+            }
             // Client certificate verification
             int value = 0;
             switch (sslHostConfig.getCertificateVerification()) {
@@ -374,20 +391,20 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             initialized = true;
         } catch (Exception e) {
             log.warn(sm.getString("openssl.errorSSLCtxInit"), e);
-            destroyPools();
+            destroy();
         }
     }
 
-    static OpenSSLKeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
+    private static JSSEKeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
         for (KeyManager manager : managers) {
-            if (manager instanceof OpenSSLKeyManager) {
-                return (OpenSSLKeyManager) manager;
+            if (manager instanceof JSSEKeyManager) {
+                return (JSSEKeyManager) manager;
             }
         }
         throw new IllegalStateException(sm.getString("openssl.keyManagerMissing"));
     }
 
-    static X509TrustManager chooseTrustManager(TrustManager[] managers) {
+    private static X509TrustManager chooseTrustManager(TrustManager[] managers) {
         for (TrustManager m : managers) {
             if (m instanceof X509TrustManager) {
                 return (X509TrustManager) m;
@@ -425,54 +442,4 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Generates a key specification for an (encrypted) private key.
-     *
-     * @param password characters, if {@code null} or empty an unencrypted key
-     * is assumed
-     * @param key bytes of the DER encoded private key
-     *
-     * @return a key specification
-     *
-     * @throws IOException if parsing {@code key} fails
-     * @throws NoSuchAlgorithmException if the algorithm used to encrypt
-     * {@code key} is unknown
-     * @throws NoSuchPaddingException if the padding scheme specified in the
-     * decryption algorithm is unknown
-     * @throws InvalidKeySpecException if the decryption key based on
-     * {@code password} cannot be generated
-     * @throws InvalidKeyException if the decryption key based on
-     * {@code password} cannot be used to decrypt {@code key}
-     * @throws InvalidAlgorithmParameterException if decryption algorithm
-     * parameters are somehow faulty
-     */
-    protected static PKCS8EncodedKeySpec generateKeySpec(char[] password, byte[] key)
-            throws IOException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException,
-            InvalidKeyException, InvalidAlgorithmParameterException {
-
-        if (password == null || password.length == 0) {
-            return new PKCS8EncodedKeySpec(key);
-        }
-
-        EncryptedPrivateKeyInfo encryptedPrivateKeyInfo = new EncryptedPrivateKeyInfo(key);
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(encryptedPrivateKeyInfo.getAlgName());
-        PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
-        SecretKey pbeKey = keyFactory.generateSecret(pbeKeySpec);
-
-        Cipher cipher = Cipher.getInstance(encryptedPrivateKeyInfo.getAlgName());
-        cipher.init(Cipher.DECRYPT_MODE, pbeKey, encryptedPrivateKeyInfo.getAlgParameters());
-
-        return encryptedPrivateKeyInfo.getKeySpec(cipher);
-    }
-
-    @Override
-    protected final void finalize() throws Throwable {
-        super.finalize();
-        synchronized (OpenSSLContext.class) {
-            if (ctx != 0) {
-                SSLContext.free(ctx);
-            }
-        }
-        destroyPools();
-    }
 }

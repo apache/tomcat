@@ -18,6 +18,9 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.Iterator;
 
 import org.apache.coyote.ActionCode;
@@ -39,7 +42,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private static final Response ACK_RESPONSE = new Response();
 
     static {
-        ACK_RESPONSE.setStatus(101);
+        ACK_RESPONSE.setStatus(100);
     }
 
     private volatile int weight = Constants.DEFAULT_WEIGHT;
@@ -82,6 +85,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         this.coyoteRequest.setSendfile(false);
         this.coyoteResponse.setOutputBuffer(outputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
+        this.coyoteRequest.protocol().setString("HTTP/2.0");
     }
 
 
@@ -382,14 +386,52 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         // Set the special HTTP/2 headers
         request.getMimeHeaders().addValue(":method").duplicate(request.method());
         request.getMimeHeaders().addValue(":scheme").duplicate(request.scheme());
-        // TODO: Query string
-        request.getMimeHeaders().addValue(":path").duplicate(request.decodedURI());
-        // TODO: Handle default ports
-        request.getMimeHeaders().addValue(":authority").setString(
-                request.serverName().getString() + ":" + request.getServerPort());
-        handler.push(request, this);
+        StringBuilder path = new StringBuilder(request.requestURI().toString());
+        if (!request.queryString().isNull()) {
+            path.append('?');
+            path.append(request.queryString().toString());
+        }
+        request.getMimeHeaders().addValue(":path").setString(path.toString());
+
+        // Authority needs to include the port only if a non-standard port is
+        // being used.
+        if (!(request.scheme().equals("http") && request.getServerPort() == 80) &&
+                !(request.scheme().equals("https") && request.getServerPort() == 443)) {
+            request.getMimeHeaders().addValue(":authority").setString(
+                    request.serverName().getString() + ":" + request.getServerPort());
+        } else {
+            request.getMimeHeaders().addValue(":authority").duplicate(request.serverName());
+        }
+
+        push(handler, request, this);
     }
 
+
+    private static void push(Http2UpgradeHandler handler, Request request, Stream stream)
+            throws IOException {
+        if (org.apache.coyote.Constants.IS_SECURITY_ENABLED) {
+            try {
+                AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<Void>() {
+                            @Override
+                            public Void run() throws IOException {
+                                handler.push(request, stream);
+                                return null;
+                            }
+                        });
+            } catch (PrivilegedActionException ex) {
+                Exception e = ex.getException();
+                if (e instanceof IOException) {
+                    throw (IOException) e;
+                } else {
+                    throw new IOException(ex);
+                }
+            }
+
+        } else {
+            handler.push(request, stream);
+        }
+    }
 
     class StreamOutputBuffer implements OutputBuffer {
 

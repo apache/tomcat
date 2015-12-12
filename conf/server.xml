@@ -92,7 +92,7 @@
     <!-- Define a SSL/TLS HTTP/1.1 Connector on port 8443 with HTTP/2
          This connector uses the APR/native implementation. When using the
          APR/native implementation or the OpenSSL engine with NIO or NIO2 then
-         the OPenSSL configuration attributes must be used.
+         the OpenSSL configuration attributes must be used.
     -->
     <!--
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
@@ -100,7 +100,7 @@
         <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
         <SSLHostConfig honorCipherOrder="false" >
             <Certificate certificateKeyFile="conf/localhost-rsa-key.pem"
-                         certificateFile="conf/localhost-rsa-cert.pem"
+                         certificateFile="conf/localhost-rsa-chain.pem"
                          type="RSA" />
         </SSLHostConfig>
     </Connector>

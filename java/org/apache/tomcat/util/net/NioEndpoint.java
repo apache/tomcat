@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -140,15 +141,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
 
     /**
-     * Handling of accepted sockets.
-     */
-    private Handler handler = null;
-    public void setHandler(Handler handler ) { this.handler = handler; }
-    @Override
-    public Handler getHandler() { return handler; }
-
-
-    /**
      * Poller thread count.
      */
     private int pollerThreadCount = Math.min(2,Runtime.getRuntime().availableProcessors());
@@ -214,8 +206,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     protected void releaseCaches() {
         this.nioChannels.clear();
         this.processorCache.clear();
-        if ( handler != null ) handler.recycle();
-
+        if (getHandler() != null ) {
+            getHandler().recycle();
+        }
     }
 
 
@@ -355,6 +348,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         serverSock.socket().close();
         serverSock.close();
         serverSock = null;
+        destroySsl();
         super.unbind();
         releaseCaches();
         selectorPool.close();
@@ -771,8 +765,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             try {
                 if ( key == null ) return null;//nothing to do
                 ka = (NioSocketWrapper) key.attach(null);
-                if (ka!=null) handler.release(ka);
-                else handler.release((SocketChannel)key.channel());
+                if (ka != null) {
+                    // If attachment is non-null then there may be a current
+                    // connection with an associated processor.
+                    getHandler().release(ka);
+                }
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) {
                     try {
@@ -1272,6 +1269,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 }
             } else {
                 nRead = channel.read(socketBufferHandler.getReadBuffer());
+                if (nRead == -1) {
+                    throw new EOFException();
+                }
             }
             return nRead;
         }
@@ -1452,19 +1452,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     }
 
 
-    // ------------------------------------------------ Handler Inner Interface
-
-    /**
-     * Bare bones interface used for socket processing. Per thread data is to be
-     * stored in the ThreadWithAttributes extra folders, or alternately in
-     * thread local fields.
-     */
-    public interface Handler extends AbstractEndpoint.Handler<NioChannel> {
-        public void release(SocketChannel socket);
-    }
-
-
     // ---------------------------------------------- SocketProcessor Inner Class
+
     /**
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool.
@@ -1526,9 +1515,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         SocketState state = SocketState.OPEN;
                         // Process the request from this socket
                         if (status == null) {
-                            state = handler.process(ka, SocketStatus.OPEN_READ);
+                            state = getHandler().process(ka, SocketStatus.OPEN_READ);
                         } else {
-                            state = handler.process(ka, status);
+                            state = getHandler().process(ka, status);
                         }
                         if (state == SocketState.CLOSED) {
                             close(socket, key);

@@ -140,7 +140,7 @@ public final class URL implements Serializable {
                     host = context.getHost();
                     port = context.getPort();
                     file = context.getFile();
-                    int question = file.lastIndexOf("?");
+                    int question = file.lastIndexOf('?');
                     if (question < 0)
                         path = file;
                     else
@@ -571,7 +571,7 @@ public final class URL implements Serializable {
 
         // Parse the authority section
         if (spec.indexOf("//", start) == start) {
-            int pathStart = spec.indexOf("/", start + 2);
+            int pathStart = spec.indexOf('/', start + 2);
             if ((pathStart >= 0) && (pathStart < limit)) {
                 authority = spec.substring(start + 2, pathStart);
                 start = pathStart;
@@ -614,7 +614,7 @@ public final class URL implements Serializable {
         }
 
         // Parse the path section
-        if (spec.indexOf("/", start) == start) {     // Absolute path
+        if (spec.indexOf('/', start) == start) {     // Absolute path
             path = spec.substring(start, limit);
             if (query != null)
                 file = path + "?" + query;
@@ -651,7 +651,8 @@ public final class URL implements Serializable {
      *
      * @param c The character to test
      *
-     * @return {@code true} if a the character is allowed, otherwise {@false}
+     * @return {@code true} if a the character is allowed, otherwise {code
+     *         @false}
      */
     private static boolean isSchemeChar(char c) {
         return Character.isLetterOrDigit(c) ||
@@ -664,7 +665,7 @@ public final class URL implements Serializable {
      *
      * @param uri The URI to test
      *
-     * @return {@code true} if a scheme is present, otherwise {@false}
+     * @return {@code true} if a scheme is present, otherwise {code @false}
      */
     public static boolean hasScheme(CharSequence uri) {
         int len = uri.length();

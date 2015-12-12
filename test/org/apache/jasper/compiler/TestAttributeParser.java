@@ -171,14 +171,14 @@ public class TestAttributeParser {
         ctx.setFunctionMapper(new FMapper());
         ValueExpression ve = exprFactory.createValueExpression(ctx,
                 AttributeParser.getUnquoted(expression, quote, false, false,
-                        false),
+                        false, false),
                 String.class);
         return (String) ve.getValue(ctx);
     }
 
     private String parseScriptExpression(String expression, char quote) {
         return AttributeParser.getUnquoted(expression, quote, false, false,
-                false);
+                false, false);
     }
 
     public static class FMapper extends FunctionMapper {

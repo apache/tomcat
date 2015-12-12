@@ -75,15 +75,17 @@ public class MapperListener extends LifecycleMBeanBase
      */
     private final String domain = null;
 
-    // ----------------------------------------------------------- Constructors
 
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Create mapper listener.
+     *
+     * @param service The service this listener is associated with
      */
-    public MapperListener(Mapper mapper, Service service) {
-        this.mapper = mapper;
+    public MapperListener(Service service) {
         this.service = service;
+        this.mapper = service.getMapper();
     }
 
 
@@ -94,12 +96,13 @@ public class MapperListener extends LifecycleMBeanBase
 
         setState(LifecycleState.STARTING);
 
-        // Find any components that have already been initialized since the
-        // MBean listener won't be notified as those components will have
-        // already registered their MBeans
+        Engine engine = service.getContainer();
+        if (engine == null) {
+            return;
+        }
+
         findDefaultHost();
 
-        Engine engine = (Engine) service.getContainer();
         addListeners(engine);
 
         Container[] conHosts = engine.findChildren();
@@ -117,7 +120,10 @@ public class MapperListener extends LifecycleMBeanBase
     public void stopInternal() throws LifecycleException {
         setState(LifecycleState.STOPPING);
 
-        Engine engine = (Engine) service.getContainer();
+        Engine engine = service.getContainer();
+        if (engine == null) {
+            return;
+        }
         removeListeners(engine);
     }
 
@@ -255,7 +261,7 @@ public class MapperListener extends LifecycleMBeanBase
 
     private void findDefaultHost() {
 
-        Engine engine = (Engine) service.getContainer();
+        Engine engine = service.getContainer();
         String defaultHost = engine.getDefaultHost();
 
         boolean found = false;

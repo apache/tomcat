@@ -33,6 +33,8 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
@@ -289,21 +291,28 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         }
 
         long timeout = timeoutExpiry - System.currentTimeMillis();
-        synchronized (messagePartLock) {
-            try {
-                if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
-                    throw new SocketTimeoutException();
-                }
-            } catch (InterruptedException e) {
-                // TODO i18n
-                throw new IOException(e);
+        try {
+            if (!messagePartInProgress.tryAcquire(timeout, TimeUnit.MILLISECONDS)) {
+                String msg = sm.getString("wsRemoteEndpoint.acquireTimeout");
+                wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+                throw new SocketTimeoutException(msg);
             }
+        } catch (InterruptedException e) {
+            String msg = sm.getString("wsRemoteEndpoint.sendInterupt");
+            wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
+                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
+            throw new IOException(msg, e);
         }
 
         for (MessagePart mp : messageParts) {
             writeMessagePart(mp);
             if (!bsh.getSendResult().isOK()) {
-                throw new IOException (bsh.getSendResult().getException());
+                messagePartInProgress.release();
+                Throwable t = bsh.getSendResult().getException();
+                wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, t.getMessage()),
+                        new CloseReason(CloseCodes.CLOSED_ABNORMALLY, t.getMessage()));
+                throw new IOException (t);
             }
             // The BlockingSendHandler doesn't call end message so update the
             // flags.

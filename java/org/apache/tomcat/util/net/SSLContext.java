@@ -37,6 +37,8 @@ public interface SSLContext {
     public void init(KeyManager[] kms, TrustManager[] tms,
             SecureRandom sr) throws KeyManagementException;
 
+    public void destroy();
+
     public SSLSessionContext getServerSessionContext();
 
     public SSLEngine createSSLEngine();

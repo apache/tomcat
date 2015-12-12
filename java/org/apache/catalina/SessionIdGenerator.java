@@ -55,5 +55,4 @@ public interface SessionIdGenerator {
      * @param route   node identifier to include in generated id
      */
     public String generateSessionId(String route);
-
 }

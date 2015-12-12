@@ -414,6 +414,23 @@ For example:
 
         test.relaxTiming=true
 
+ 8. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
+    be the default for the multicast tests to work. This is configured by
+    the following property:
+
+        java.net.preferIPv4Stack=true
+
+ 9. Optional support is provided for FindBugs. It can be enabled using the
+    following property:
+
+        execute.findbugs=true
+
+    The report file by default is written to
+
+        output/findbugs
+
+* NOTE: Findbugs is licensed under LGPL. Using Findbugs during Tomcat build is
+  optional and is off by default.
 
 (8) Source code checks
 

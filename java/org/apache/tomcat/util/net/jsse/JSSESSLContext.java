@@ -44,6 +44,10 @@ class JSSESSLContext implements SSLContext {
     }
 
     @Override
+    public void destroy() {
+    }
+
+    @Override
     public SSLSessionContext getServerSessionContext() {
         return context.getServerSessionContext();
     }

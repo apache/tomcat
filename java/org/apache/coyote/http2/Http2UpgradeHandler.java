@@ -47,6 +47,7 @@ import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -71,8 +72,6 @@ import org.apache.tomcat.util.res.StringManager;
  *     a TLS enabled Connector element in server.xml to enable HTTP/2 support.
  *     </li>
  * </ul>
- *
- * TODO: Review cookie parsing
  */
 public class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler,
         Input, Output {
@@ -94,8 +93,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     private static final String HTTP2_SETTINGS_HEADER = "HTTP2-Settings";
-    private static final byte[] HTTP2_UPGRADE_ACK = ("HTTP/1.1 101 Switching Protocols\r\n" +
-                "Connection: Upgrade\r\nUpgrade: h2c\r\n\r\n").getBytes(StandardCharsets.ISO_8859_1);
 
     private static final HeaderSink HEADER_SINK = new HeaderSink();
 
@@ -191,10 +188,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             // The initial HTTP/1.1 request is available as Stream 1.
 
             try {
-                // Acknowledge the upgrade request
-                socketWrapper.write(true, HTTP2_UPGRADE_ACK, 0, HTTP2_UPGRADE_ACK.length);
-                socketWrapper.flush(true);
-
                 // Process the initial settings frame
                 stream = getStream(1, true);
                 String base64Settings = stream.getCoyoteRequest().getHeader(HTTP2_SETTINGS_HEADER);
@@ -208,7 +201,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     long value = ByteUtil.getFourBytes(settings, (i * 6) + 2);
                     remoteSettings.set(Setting.valueOf(id), value);
                 }
-            } catch (Http2Exception | IOException ioe) {
+            } catch (Http2Exception e) {
                 throw new ProtocolException(
                         sm.getString("upgradeHandler.upgrade.fail", connectionId));
             }
@@ -485,9 +478,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
                     stream.getIdentifier()));
         }
-        MimeHeaders headers = coyoteResponse.getMimeHeaders();
-        // Add the pseudo header for status
-        headers.addValue(":status").setString(Integer.toString(coyoteResponse.getStatus()));
+
+        prepareHeaders(coyoteResponse);
+
         // This ensures the Stream processing thread has control of the socket.
         synchronized (socketWrapper) {
             byte[] header = new byte[9];
@@ -526,11 +519,37 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
+    private void prepareHeaders(Response coyoteResponse) {
+        MimeHeaders headers = coyoteResponse.getMimeHeaders();
+        int statusCode = coyoteResponse.getStatus();
+
+        // Add the pseudo header for status
+        headers.addValue(":status").setString(Integer.toString(statusCode));
+
+        // Check to see if a response body is present
+        if (!(statusCode < 200 || statusCode == 205 || statusCode == 304)) {
+            String contentType = coyoteResponse.getContentType();
+            if (contentType != null) {
+                headers.setValue("content-type").setString(contentType);
+            }
+            String contentLanguage = coyoteResponse.getContentLanguage();
+            if (contentLanguage != null) {
+                headers.setValue("content-language").setString(contentLanguage);
+            }
+        }
+
+        // Add date header unless the application has already set one
+        if (headers.getValue("date") == null) {
+            headers.setValue("date").setString(FastHttpDateFormat.getCurrentDate());
+        }
+    }
+
+
     void writePushHeaders(Stream stream, int pushedStreamId, Request coyoteRequest, int payloadSize)
             throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
-                    stream.getIdentifier()));
+                    stream.getIdentifier(), Integer.toString(pushedStreamId)));
         }
         // This ensures the Stream processing thread has control of the socket.
         synchronized (socketWrapper) {
@@ -904,6 +923,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private void pruneClosedStreams() {
         // Only prune every 10 new streams
         if (newStreamsSinceLastPrune < 9) {
+            // Not atomic. Increments may be lost. Not a problem.
             newStreamsSinceLastPrune++;
             return;
         }

@@ -43,13 +43,14 @@ public class SSLHostConfigCertificate {
     private String certificateKeyPassword = null;
 
     // JSSE
-    private String certificateKeyAlias;
+    private String certificateKeyAlias = "tomcat";
     private String certificateKeystorePassword = "changeit";
     private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;
     private String certificateKeystoreType = DEFAULT_KEYSTORE_TYPE;
 
     // OpenSSL
+    private String certificateChainFile;
     private String certificateFile;
     private String certificateKeyFile;
 
@@ -154,6 +155,18 @@ public class SSLHostConfigCertificate {
 
 
     // OpenSSL
+
+    public void setCertificateChainFile(String certificateChainFile) {
+        sslHostConfig.setProperty(
+                "Certificate.certificateChainFile", SSLHostConfig.Type.OPENSSL);
+        this.certificateChainFile = certificateChainFile;
+    }
+
+
+    public String getCertificateChainFile() {
+        return certificateChainFile;
+    }
+
 
     public void setCertificateFile(String certificateFile) {
         sslHostConfig.setProperty(

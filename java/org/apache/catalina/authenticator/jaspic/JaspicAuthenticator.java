@@ -29,7 +29,6 @@ import javax.security.auth.message.config.AuthConfigFactory;
 import javax.security.auth.message.config.AuthConfigProvider;
 import javax.security.auth.message.config.ServerAuthConfig;
 import javax.security.auth.message.config.ServerAuthContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.LifecycleException;
@@ -51,6 +50,7 @@ public class JaspicAuthenticator extends AuthenticatorBase {
     private static final String AUTH_TYPE = "JASPIC";
     public static final String MESSAGE_LAYER = "HttpServlet";
 
+    private String appContext;
     private Subject serviceSubject;
 
     private Map<String, String> authProperties = new HashMap<>();
@@ -62,6 +62,7 @@ public class JaspicAuthenticator extends AuthenticatorBase {
         super.startInternal();
         serviceSubject = new Subject();
         callbackHandler = getJaspicCallbackHandler();
+        appContext = context.getServletContext().getVirtualServerName() + " " + context.getServletContext().getContextPath();
     }
 
 
@@ -74,7 +75,6 @@ public class JaspicAuthenticator extends AuthenticatorBase {
         MessageInfoImpl messageInfo = new MessageInfoImpl(request, response, true);
 
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
-        String appContext = getAppContextId(request);
 
         AuthConfigProvider configProvider = factory.getConfigProvider(MESSAGE_LAYER, appContext,
                 null);
@@ -125,29 +125,12 @@ public class JaspicAuthenticator extends AuthenticatorBase {
     }
 
 
-    @Override
-    public void login(String userName, String password, Request request) throws ServletException {
-        throw new IllegalStateException("not implemented yet!");
-    }
-
-
-    @Override
-    public void logout(Request request) {
-        throw new IllegalStateException("not implemented yet!");
-    }
-
-
     private void handleUnauthorizedRequest(HttpServletResponse response, AuthException e)
             throws IOException {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("authenticator.jaspic.unauthorized"), e);
         }
-    }
-
-
-    private String getAppContextId(Request request) {
-        return request.getServletContext().getVirtualServerName() + " " + request.getContextPath();
     }
 
 
@@ -169,6 +152,10 @@ public class JaspicAuthenticator extends AuthenticatorBase {
 
     public Map<String, String> getAuthProperties() {
         return Collections.unmodifiableMap(authProperties);
+    }
+
+    public String getAppContext() {
+        return appContext;
     }
 
 }

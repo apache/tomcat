@@ -48,7 +48,7 @@ public final class Mapper {
 
     private static final Log log = LogFactory.getLog(Mapper.class);
 
-    protected static final StringManager sm = StringManager.getManager(Mapper.class);
+    static final StringManager sm = StringManager.getManager(Mapper.class);
 
     // ----------------------------------------------------- Instance Variables
 
@@ -56,20 +56,20 @@ public final class Mapper {
     /**
      * Array containing the virtual hosts definitions.
      */
-    protected volatile MappedHost[] hosts = new MappedHost[0];
+    volatile MappedHost[] hosts = new MappedHost[0];
 
 
     /**
      * Default host name.
      */
-    protected String defaultHostName = null;
+    String defaultHostName = null;
 
 
     /**
      * Mapping from Context object to Context version to support
      * RequestDispatcher mappings.
      */
-    protected Map<Context, ContextVersion> contextObjectToContextVersionMap =
+    Map<Context, ContextVersion> contextObjectToContextVersionMap =
             new ConcurrentHashMap<>();
 
 
@@ -514,9 +514,10 @@ public final class Mapper {
     /**
      * Remove a wrapper from an existing context.
      *
-     * @param hostName Virtual host name this wrapper belongs to
+     * @param hostName    Virtual host name this wrapper belongs to
      * @param contextPath Context path this wrapper belongs to
-     * @param path Wrapper mapping
+     * @param version     Context version this wrapper belongs to
+     * @param path        Wrapper mapping
      */
     public void removeWrapper(String hostName, String contextPath,
             String version, String path) {
@@ -597,36 +598,36 @@ public final class Mapper {
     /**
      * Add a welcome file to the given context.
      *
-     * @param hostName
-     * @param contextPath
-     * @param welcomeFile
+     * @param hostName    The host where the given context can be found
+     * @param contextPath The path of the given context
+     * @param version     The version of the given context
+     * @param welcomeFile The welcome file to add
      */
-    public void addWelcomeFile(String hostName, String contextPath,
-            String version, String welcomeFile) {
-        ContextVersion contextVersion = findContextVersion(hostName,
-                contextPath, version, false);
+    public void addWelcomeFile(String hostName, String contextPath, String version,
+            String welcomeFile) {
+        ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null) {
             return;
         }
         int len = contextVersion.welcomeResources.length + 1;
         String[] newWelcomeResources = new String[len];
-        System.arraycopy(contextVersion.welcomeResources, 0,
-                newWelcomeResources, 0, len - 1);
+        System.arraycopy(contextVersion.welcomeResources, 0, newWelcomeResources, 0, len - 1);
         newWelcomeResources[len - 1] = welcomeFile;
         contextVersion.welcomeResources = newWelcomeResources;
     }
 
+
     /**
      * Remove a welcome file from the given context.
      *
-     * @param hostName
-     * @param contextPath
-     * @param welcomeFile
+     * @param hostName    The host where the given context can be found
+     * @param contextPath The path of the given context
+     * @param version     The version of the given context
+     * @param welcomeFile The welcome file to remove
      */
     public void removeWelcomeFile(String hostName, String contextPath,
             String version, String welcomeFile) {
-        ContextVersion contextVersion = findContextVersion(hostName,
-                contextPath, version, false);
+        ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null || contextVersion.isPaused()) {
             return;
         }
@@ -640,8 +641,7 @@ public final class Mapper {
         if (match > -1) {
             int len = contextVersion.welcomeResources.length - 1;
             String[] newWelcomeResources = new String[len];
-            System.arraycopy(contextVersion.welcomeResources, 0,
-                    newWelcomeResources, 0, match);
+            System.arraycopy(contextVersion.welcomeResources, 0, newWelcomeResources, 0, match);
             if (match < len) {
                 System.arraycopy(contextVersion.welcomeResources, match + 1,
                         newWelcomeResources, match, len - match);
@@ -650,27 +650,29 @@ public final class Mapper {
         }
     }
 
+
     /**
      * Clear the welcome files for the given context.
      *
-     * @param hostName
-     * @param contextPath
+     * @param hostName    The host where the context to be cleared can be found
+     * @param contextPath The path of the context to be cleared
+     * @param version     The version of the context to be cleared
      */
-    public void clearWelcomeFiles(String hostName, String contextPath,
-            String version) {
-        ContextVersion contextVersion = findContextVersion(hostName,
-                contextPath, version, false);
+    public void clearWelcomeFiles(String hostName, String contextPath, String version) {
+        ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null) {
             return;
         }
         contextVersion.welcomeResources = new String[0];
     }
 
+
     /**
      * Map the specified host name and URI, mutating the given mapping data.
      *
      * @param host Virtual host name
      * @param uri URI
+     * @param version The version, if any, included in the request to be mapped
      * @param mappingData This structure will contain the result of the mapping
      *                    operation
      * @throws IOException if the buffers are too small to hold the results of
@@ -686,7 +688,6 @@ public final class Mapper {
         uri.toChars();
         internalMap(host.getCharChunk(), uri.getCharChunk(), version,
                 mappingData);
-
     }
 
 
@@ -710,12 +711,10 @@ public final class Mapper {
         CharChunk uricc = uri.getCharChunk();
         uricc.setLimit(-1);
         internalMapWrapper(contextVersion, uricc, mappingData);
-
     }
 
 
     // -------------------------------------------------------- Private Methods
-
 
     /**
      * Map the specified URI.
@@ -836,20 +835,13 @@ public final class Mapper {
 
         int pathOffset = path.getOffset();
         int pathEnd = path.getEnd();
-        int servletPath = pathOffset;
         boolean noServletPath = false;
 
         int length = contextVersion.path.length();
-        if (length != (pathEnd - pathOffset)) {
-            servletPath = pathOffset + length;
-        } else {
+        if (length == (pathEnd - pathOffset)) {
             noServletPath = true;
-            path.append('/');
-            pathOffset = path.getOffset();
-            pathEnd = path.getEnd();
-            servletPath = pathOffset+length;
         }
-
+        int servletPath = pathOffset + length;
         path.setOffset(servletPath);
 
         // Rule 1 -- Exact Match
@@ -884,10 +876,13 @@ public final class Mapper {
             }
         }
 
-        if(mappingData.wrapper == null && noServletPath) {
+        if(mappingData.wrapper == null && noServletPath &&
+                mappingData.context.getMapperContextRootRedirectEnabled()) {
             // The path is empty, redirect to "/"
+            path.append('/');
+            pathEnd = path.getEnd();
             mappingData.redirectPath.setChars
-                (path.getBuffer(), pathOffset, pathEnd-pathOffset);
+                (path.getBuffer(), pathOffset, pathEnd - pathOffset);
             path.setEnd(pathEnd - 1);
             return;
         }
@@ -1002,9 +997,15 @@ public final class Mapper {
             char[] buf = path.getBuffer();
             if (contextVersion.resources != null && buf[pathEnd -1 ] != '/') {
                 String pathStr = path.toString();
-                WebResource file =
-                        contextVersion.resources.getResource(pathStr);
-                if (file != null && file.isDirectory()) {
+                WebResource file;
+                // Handle context root
+                if (pathStr.length() == 0) {
+                    file = contextVersion.resources.getResource("/");
+                } else {
+                    file = contextVersion.resources.getResource(pathStr);
+                }
+                if (file != null && file.isDirectory() &&
+                        mappingData.context.getMapperDirectoryRedirectEnabled()) {
                     // Note: this mutates the path: do not do any processing
                     // after this (since we set the redirectPath, there
                     // shouldn't be any)
@@ -1021,7 +1022,6 @@ public final class Mapper {
 
         path.setOffset(pathOffset);
         path.setEnd(pathEnd);
-
     }
 
 
@@ -1545,6 +1545,9 @@ public final class Mapper {
 
         /**
          * Constructor used for the primary Host
+         *
+         * @param name The name of the virtual host
+         * @param host The host
          */
         public MappedHost(String name, Host host) {
             super(name, host);
@@ -1555,6 +1558,9 @@ public final class Mapper {
 
         /**
          * Constructor used for an Alias
+         *
+         * @param alias    The alias of the virtual host
+         * @param realHost The host the alias points to
          */
         public MappedHost(String alias, MappedHost realHost) {
             super(alias, realHost.object);

@@ -111,6 +111,12 @@
     <Bug code="IS" />
   </Match>
   <Match>
+  <!-- The header value is safe  -->
+    <Class name="org.apache.catalina.servlets.DefaultServlet" />
+    <Method name="doDirectoryRedirect" />
+    <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
+  </Match>
+  <Match>
     <!-- Non-constant strings are configuration settings rather than client
          supplied -->
     <Class name="org.apache.catalina.session.JDBCStore" />
@@ -137,6 +143,15 @@
     <Class name="org.apache.catalina.startup.Catalina" />
     <Method name="stopServer" />
     <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- The stream is closed in WebXmlParser.parseWebXml -->
+    <Class name="org.apache.catalina.startup.ContextConfig" />
+    <Or>
+      <Method name="getContextWebXmlSource" />
+      <Method name="getWebXmlSource" />
+    </Or>
+    <Bug code="OBL" />
   </Match>
   <Match>
     <!-- Sleep is short, needs to keep lock -->
@@ -183,6 +198,21 @@
     <Bug code="NS"/>
   </Match>
   <Match>
+    <!-- Sync is to protect construction of data not individual fields -->
+    <Class name="org.apache.catalina.tribes.membership.MemberImpl"/>
+    <Or>
+      <Method name="getCommand"/>
+      <Method name="getDomain"/>
+      <Method name="getHost"/>
+      <Method name="getPayload"/>
+      <Method name="getPort"/>
+      <Method name="getSecurePort"/>
+      <Method name="getUdpPort"/>
+      <Method name="getUniqueId"/>
+    </Or>
+    <Bug pattern="UG_SYNC_SET_UNSYNC_GET"/>
+  </Match>
+  <Match>
     <!-- Intentional in case thread is waiting -->
     <Class name="org.apache.catalina.tribes.transport.RxTaskPool"/>
     <Method name="returnWorker"/>
@@ -199,6 +229,17 @@
     <Class name="org.apache.catalina.valves.JDBCAccessLogValve" />
     <Method name="open" />
     <Bug code="SQL" />
+  </Match>
+  <Match>
+    <!-- Use of synchronisation is required to make a sequence of calls in   -->
+    <!-- one method appear to be atomic.                                     -->
+    <Class name="org.apache.coyote.AbstractProcessorLight"/>
+    <Or>
+      <Method name="addDispatch"/>
+      <Method name="getIteratorAndClearDispatches"/>
+      <Method name="clearDispatches"/>
+    </Or>
+    <Bug pattern="JLM_JSR166_UTILCONCURRENT_MONITORENTER" />
   </Match>
   <Match>
     <!-- Correct behaviour does not assume sequential operations on concurrent
@@ -240,6 +281,12 @@
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
     <Method name="createRemoteStream" />
     <Bug pattern="IM_BAD_CHECK_FOR_ODD" />
+  </Match>
+  <Match>
+    <!-- Loss of the occasional increment is acceptable. -->
+    <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
+    <Method name="pruneClosedStreams" />
+    <Bug pattern="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
     <!-- Notify is correct. Condition changed outside of this method. -->
@@ -295,6 +342,12 @@
          silence an Eclipse warning -->
     <Class name="org.apache.jasper.compiler.Parser"/>
     <Bug code="DLS"/>
+  </Match>
+  <Match>
+    <!-- Use of == is deliberate -->
+    <Class name="org.apache.jasper.compiler.Parser"/>
+    <Method name="parseBody"/>
+    <Bug code="ES"/>
   </Match>
   <Match>
     <!-- Simpler to catch Exception than to create dummy implementations of the
@@ -367,12 +420,6 @@
       <Method name="prepare" />
     </Or>
     <Bug code="VO" />
-  </Match>
-  <Match>
-    <!-- Wait is in AprSocket -->
-    <Class name="org.apache.tomcat.jni.socket.AprSocketContext$AprPoller" />
-    <Method name="run"/>
-    <Bug code="NN" />
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.IntrospectionUtils" />
@@ -471,6 +518,15 @@
     <Bug code="ML" />
   </Match>
   <Match>
+    <!-- Modifications to SocketLists are always protected by syncs -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketList"/>
+    <Or>
+      <Method name="add"/>
+      <Method name="remove"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_INCREMENT"/>
+  </Match>
+  <Match>
     <!-- Object is only ever set to null, sync therefore is still valid -->
     <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketProcessor"/>
     <Method name="run"/>
@@ -502,17 +558,6 @@
     <Class name="org.apache.tomcat.util.net.SecureNioChannel"/>
     <Method name="rehandshake"/>
     <Bug code="DE" />
-  </Match>
-  <Match>
-    <!-- Use of synchronisation is required to make a sequence of calls in   -->
-    <!-- one method appear to be atomic.                                     -->
-    <Class name="org.apache.tomcat.util.net.SocketWrapper"/>
-    <Or>
-      <Method name="addDispatch"/>
-      <Method name="getIteratorAndClearDispatches"/>
-      <Method name="clearDispatches"/>
-    </Or>
-    <Bug pattern="JLM_JSR166_UTILCONCURRENT_MONITORENTER" />
   </Match>
   <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
@@ -550,30 +595,26 @@
 
   <!-- Generated code -->
   <Match>
-    <Class name="org.apache.el.parser.ELParserTokenManager" />
-  </Match>
-  <Match>
-    <Class name="org.apache.el.parser.TokenMgrError" />
-  </Match>
-  <Match>
-    <Class name="org.apache.el.parser.ParseException" />
+    <Or>
+      <Class name="org.apache.el.parser.AstFloatingPoint" />
+      <Class name="org.apache.el.parser.AstFunction" />
+      <Class name="org.apache.el.parser.AstInteger" />
+      <Class name="org.apache.el.parser.AstNegative" />
+      <Class name="org.apache.el.parser.AstValue" />
+      <Class name="org.apache.el.parser.ELParser" />
+      <Class name="org.apache.el.parser.ELParserConstants" />
+      <Class name="org.apache.el.parser.ELParserTokenManager" />
+      <Class name="org.apache.el.parser.ELParserTreeConstants" />
+      <Class name="org.apache.el.parser.ParseException" />
+      <Class name="org.apache.el.parser.SimpleCharStream" />
+      <Class name="org.apache.el.parser.TokenMgrError" />
+    </Or>
   </Match>
   <Match>
     <!-- fCurrentEntity may be null after endEntity() call -->
     <Class name="org.apache.jasper.xmlparser.XMLEncodingDetector" />
     <Method name="load" />
     <Bug code="RCN" />
-  </Match>
-  <Match>
-    <Or>
-      <Class name="org.apache.el.parser.AstFloatingPoint" />
-      <Class name="org.apache.el.parser.AstNegative" />
-    </Or>
-    <Bug pattern="DM_FP_NUMBER_CTOR" />
-  </Match>
-  <Match>
-    <Class name="org.apache.el.parser.AstInteger" />
-    <Bug pattern="DM_NUMBER_CTOR" />
   </Match>
 
 
@@ -701,8 +742,8 @@
   <Match>
     <!-- Code is deliberately unused -->
     <Or>
-      <Class name="org.apache.catalina.webresources.AbstractTestDirResourceSet" />
       <Class name="org.apache.catalina.webresources.AbstractTestFileResourceSet" />
+      <Class name="org.apache.catalina.webresources.TestDirResourceSet" />
       <Class name="org.apache.catalina.webresources.TestJarResourceSet" />
       <Class name="org.apache.catalina.webresources.TestJarResourceSetInternal" />
     </Or>
@@ -727,6 +768,30 @@
     <Bug pattern="XSS_REQUEST_PARAMETER_TO_SERVLET_WRITER"/>
   </Match>
   <Match>
+    <Class name="org.apache.tomcat.util.net.TestSsl" />
+    <Or>
+      <Method name="testRenegotiateFail" />
+      <Method name="testRenegotiateWorks" />
+    </Or>
+    <Bug code="RR" />
+  </Match>
+  <Match>
+    <Class name="org.apache.tomcat.util.threads.TestLimitLatch" />
+    <Or>
+      <Method name="waitForThreadToStop" />
+      <Method name="testTenWait" />
+    </Or>
+    <Bug pattern="NN_NAKED_NOTIFY " />
+  </Match>
+  <Match>
+    <Class name="org.apache.tomcat.util.threads.TestLimitLatch$TestThread" />
+     <Method name="run" />
+     <Or>
+      <Bug pattern="WA_NOT_IN_LOOP" />
+      <Bug pattern="UW_UNCOND_WAIT " />
+    </Or>
+  </Match>
+  <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Or>
       <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
@@ -736,12 +801,10 @@
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
-    <Class name="org.apache.tomcat.util.net.TestSsl" />
-    <Or>
-      <Method name="testRenegotiateFail" />
-      <Method name="testRenegotiateWorks" />
-    </Or>
-    <Bug code="RR" />
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestClose" />
+    <Method name="setUp" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
     <!-- Code is deliberately unused -->

@@ -197,8 +197,17 @@ actions or directives be trimmed ?, default <code>false</code>.</li>
 <li><strong>xpoweredBy</strong> - Determines whether X-Powered-By response
 header is added by generated servlet. <code>true</code> or <code>false</code>,
 default <code>false</code>.</li>
-</ul>
 
+<li><strong>strictQuoteEscaping</strong> - When scriptlet expressions are used
+for attribute values, should the rules in JSP.1.6 for the escaping of quote
+characters be strictly applied? <code>true</code> or <code>false</code>, default
+<code>true</code>.</li>
+
+<li><strong>quoteAttributeEL</strong> - When EL is used in an attribute value
+on a JSP page, should the rules for quoting of attributes described in JSP.1.6
+be applied to the expression? <code>true</code> or <code>false</code>, default
+<code>true</code>.</li>
+</ul>
 
 <p>The Java compiler from Eclipse JDT in included as the default compiler. It is
 an advanced Java compiler which will load all dependencies from the Tomcat class

@@ -106,15 +106,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
     // ------------------------------------------------------------- Properties
 
-    /**
-     * Handling of accepted sockets.
-     */
-    private Handler handler = null;
-    public void setHandler(Handler handler ) { this.handler = handler; }
-    @Override
-    public Handler getHandler() { return handler; }
-
-
     public void setSocketProperties(SocketProperties socketProperties) {
         this.socketProperties = socketProperties;
     }
@@ -155,8 +146,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     protected void releaseCaches() {
         this.nioChannels.clear();
         this.processorCache.clear();
-        if ( handler != null ) handler.recycle();
+        if (getHandler() != null) {
+            getHandler().recycle();
+        }
     }
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -254,7 +248,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 public void run() {
                     // Then close all active connections if any remain
                     try {
-                        handler.closeAll();
+                        for (Nio2Channel channel : getHandler().getOpenSockets()) {
+                            closeSocket(channel.getSocket());
+                        }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                     } finally {
@@ -279,6 +275,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         // Close server socket
         serverSock.close();
         serverSock = null;
+        destroySsl();
         super.unbind();
         // Unlike other connectors, the thread pool is tied to the server socket
         shutdownExecutor();
@@ -417,7 +414,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             return;
         }
         try {
-            handler.release(socket);
+            getHandler().release(socket);
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
             if (log.isDebugEnabled()) log.error("",e);
@@ -1169,9 +1166,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 } catch (InterruptedException e) {
                     throw new IOException(e);
                 } catch (TimeoutException e) {
-                    if (integer != null) {
-                        integer.cancel(true);
-                    }
+                    integer.cancel(true);
                     throw new SocketTimeoutException();
                 }
             } else {
@@ -1248,9 +1243,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             } catch (InterruptedException e) {
                 throw new IOException(e);
             } catch (TimeoutException e) {
-                if (integer != null) {
-                    integer.cancel(true);
-                }
+                integer.cancel(true);
                 throw new SocketTimeoutException();
             }
         }
@@ -1588,17 +1581,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     }
 
 
-    // ------------------------------------------------ Handler Inner Interface
-
-    /**
-     * Bare bones interface used for socket processing. Per thread data is to be
-     * stored in the ThreadWithAttributes extra folders, or alternately in
-     * thread local fields.
-     */
-    public interface Handler extends AbstractEndpoint.Handler<Nio2Channel> {
-        public void closeAll();
-    }
-
     public static void startInline() {
         inlineCompletion.set(Boolean.TRUE);
     }
@@ -1675,13 +1657,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                             log.debug(sm.getString("endpoint.err.handshake"), x);
                         }
                     }
-                    if (handshake == 0) {
+                    if (handshake == 0 || status == SocketStatus.ERROR) {
                         SocketState state = SocketState.OPEN;
                         // Process the request from this socket
                         if (status == null) {
-                            state = handler.process(socket, SocketStatus.OPEN_READ);
+                            state = getHandler().process(socket, SocketStatus.OPEN_READ);
                         } else {
-                            state = handler.process(socket, status);
+                            state = getHandler().process(socket, status);
                         }
                         if (state == SocketState.CLOSED) {
                             // Close socket and pool

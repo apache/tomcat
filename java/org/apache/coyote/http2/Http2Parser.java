@@ -56,7 +56,7 @@ class Http2Parser {
      * Read and process a single frame. Once the start of a frame is read, the
      * remainder will be read using blocking IO.
      *
-     * @param block Should this method block until a frame is available is no
+     * @param block Should this method block until a frame is available if no
      *              frame is available immediately?
      *
      * @return <code>true</code> if a frame was read otherwise

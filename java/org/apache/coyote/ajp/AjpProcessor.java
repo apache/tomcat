@@ -28,7 +28,6 @@ import java.security.cert.X509Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
@@ -37,6 +36,7 @@ import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.RequestInfo;
+import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -335,13 +335,6 @@ public class AjpProcessor extends AbstractProcessor {
 
     // --------------------------------------------------------- Public Methods
 
-
-    /**
-     * Send an action to the connector.
-     *
-     * @param actionCode Type of the action
-     * @param param Action parameter
-     */
     @Override
     public final void action(ActionCode actionCode, Object param) {
         switch (actionCode) {
@@ -655,12 +648,6 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    /**
-     * Process pipelined HTTP requests using the specified input and output
-     * streams.
-     *
-     * @throws IOException error during an I/O operation
-     */
     @Override
     public SocketState service(SocketWrapperBase<?> socket) throws IOException {
 
@@ -814,7 +801,7 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    public HttpUpgradeHandler getHttpUpgradeHandler() {
+    public UpgradeToken getUpgradeToken() {
         // Should never reach this code but in case we do...
         throw new IllegalStateException(
                 sm.getString("ajpprocessor.httpupgrade.notsupported"));

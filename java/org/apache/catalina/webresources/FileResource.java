@@ -59,7 +59,7 @@ public class FileResource extends AbstractResource {
                 // Need to return the mounted name, not the real name
                 int endOfName = webAppPath.length() - 1;
                 name = webAppPath.substring(
-                        webAppPath.lastIndexOf("/", endOfName - 1) + 1,
+                        webAppPath.lastIndexOf('/', endOfName - 1) + 1,
                         endOfName);
             }
         } else {

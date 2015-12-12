@@ -79,7 +79,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     private static final String USER = "user";
     private static final String PWD = "pwd";
     private static final String ROLE = "role";
-    private static final String METHOD = "Basic";
+    private static final String METHOD = "BASIC";
     private static final BasicCredentials CREDENTIALS = new BasicCredentials(METHOD, USER, PWD);
 
     private static final String CLIENT_AUTH_HEADER = "authorization";

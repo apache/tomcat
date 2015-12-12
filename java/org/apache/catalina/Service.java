@@ -37,20 +37,19 @@ public interface Service extends Lifecycle {
 
     // ------------------------------------------------------------- Properties
 
-
     /**
-     * @return the <code>Container</code> that handles requests for all
+     * @return the <code>Engine</code> that handles requests for all
      * <code>Connectors</code> associated with this Service.
      */
-    public Container getContainer();
+    public Engine getContainer();
 
     /**
-     * Set the <code>Container</code> that handles requests for all
+     * Set the <code>Engine</code> that handles requests for all
      * <code>Connectors</code> associated with this Service.
      *
-     * @param container The new Container
+     * @param engine The new Engine
      */
-    public void setContainer(Container container);
+    public void setContainer(Engine engine);
 
     /**
      * @return the name of this Service.

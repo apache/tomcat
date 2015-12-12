@@ -655,8 +655,8 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                 for(int k=0; k < patterns.length && !matched; k++) {
                     String pattern = patterns[k];
                     if(pattern.startsWith("*.")){
-                        int slash = uri.lastIndexOf("/");
-                        int dot = uri.lastIndexOf(".");
+                        int slash = uri.lastIndexOf('/');
+                        int dot = uri.lastIndexOf('.');
                         if(slash >= 0 && dot > slash &&
                            dot != uri.length()-1 &&
                            uri.length()-dot == pattern.length()-1) {

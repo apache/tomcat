@@ -65,7 +65,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static final Certificate[] EMPTY_CERTIFICATES = new Certificate[0];
     private static final SSLException ENGINE_CLOSED = new SSLException(sm.getString("engine.engineClosed"));
-    private static final SSLException RENEGOTIATION_UNSUPPORTED = new SSLException(sm.getString("engine.renegociationUnsupported"));
     private static final SSLException ENCRYPTED_PACKET_OVERSIZED = new SSLException(sm.getString("engine.oversizedPacket"));
 
     private static final Set<String> AVAILABLE_CIPHER_SUITES;
@@ -103,7 +102,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     static {
         ENGINE_CLOSED.setStackTrace(new StackTraceElement[0]);
-        RENEGOTIATION_UNSUPPORTED.setStackTrace(new StackTraceElement[0]);
         ENCRYPTED_PACKET_OVERSIZED.setStackTrace(new StackTraceElement[0]);
         DESTROYED_UPDATER = AtomicIntegerFieldUpdater.newUpdater(OpenSSLEngine.class, "destroyed");
     }
@@ -113,7 +111,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final int MAX_CIPHERTEXT_LENGTH = MAX_COMPRESSED_LENGTH + 1024;
 
     // Protocols
-    protected static final int VERIFY_DEPTH = 10;
+    static final int VERIFY_DEPTH = 10;
 
     private static final String[] SUPPORTED_PROTOCOLS = {
         Constants.SSL_PROTO_SSLv2Hello,
@@ -153,6 +151,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      */
     private int accepted;
     private boolean handshakeFinished;
+    private int currentHandshake;
     private boolean receivedShutdown;
     private volatile int destroyed;
 
@@ -161,14 +160,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private volatile String cipher;
     private volatile String applicationProtocol;
 
-    // We store this outside of the SslSession so we not need to create an instance during verifyCertificates(...)
     private volatile Certificate[] peerCerts;
+    private volatile X509Certificate[] x509PeerCerts;
     private volatile ClientAuthMode clientAuth = ClientAuthMode.NONE;
 
     // SSL Engine status variables
     private boolean isInboundDone;
     private boolean isOutboundDone;
     private boolean engineClosed;
+    private boolean sendHandshakeError = false;
 
     private final boolean clientMode;
     private final String fallbackApplicationProtocol;
@@ -629,18 +629,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         // check if SSL_read returned <= 0. In this case we need to check the error and see if it was something
         // fatal.
         if (lastPrimingReadResult <= 0) {
-            // Check for OpenSSL errors caused by the priming read
-            long error = SSL.getLastErrorNumber();
-            if (error != SSL.SSL_ERROR_NONE) {
-                String err = SSL.getErrorString(error);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(sm.getString("engine.readFromSSLFailed", Long.toString(error),
-                            Integer.toString(lastPrimingReadResult), err));
-                }
-                // There was an internal error -- shutdown
-                shutdown();
-                throw new SSLException(err);
-            }
+            checkLastError();
         }
         return SSL.pendingReadableBytesInSSL(ssl);
     }
@@ -835,45 +824,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
     }
 
-    private Certificate[] initPeerCertChain() throws SSLPeerUnverifiedException {
-        byte[][] chain = SSL.getPeerCertChain(ssl);
-        byte[] clientCert;
-        if (!clientMode) {
-            // if used on the server side SSL_get_peer_cert_chain(...) will not include the remote peer certificate.
-            // We use SSL_get_peer_certificate to get it in this case and add it to our array later.
-            //
-            // See https://www.openssl.org/docs/ssl/SSL_get_peer_cert_chain.html
-            clientCert = SSL.getPeerCertificate(ssl);
-        } else {
-            clientCert = null;
-        }
-
-        if (chain == null && clientCert == null) {
-            throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
-        }
-        int len = 0;
-        if (chain != null) {
-            len += chain.length;
-        }
-
-        int i = 0;
-        Certificate[] peerCerts;
-        if (clientCert != null) {
-            len++;
-            peerCerts = new Certificate[len];
-            peerCerts[i++] = new OpenSslX509Certificate(clientCert);
-        } else {
-            peerCerts = new Certificate[len];
-        }
-        if (chain != null) {
-            int a = 0;
-            for (; i < peerCerts.length; i++) {
-                peerCerts[i] = new OpenSslX509Certificate(chain[a++]);
-            }
-        }
-        return peerCerts;
-    }
-
     @Override
     public SSLSession getSession() {
         return session;
@@ -899,7 +849,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 accepted = 2; // Next time this method is invoked by the user, we should raise an exception.
                 break;
             case 2:
-                throw RENEGOTIATION_UNSUPPORTED;
+                renegotiate();
+                break;
             default:
                 throw new Error();
         }
@@ -917,19 +868,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void handshake() throws SSLException {
+        currentHandshake = SSL.getHandshakeCount(ssl);
         int code = SSL.doHandshake(ssl);
         if (code <= 0) {
-            // Check for OpenSSL errors caused by the handshake
-            long error = SSL.getLastErrorNumber();
-            if (error != SSL.SSL_ERROR_NONE) {
-                String err = SSL.getErrorString(error);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(sm.getString("engine.handshakeFailure", err));
-                }
-                // There was an internal error -- shutdown
-                shutdown();
-                throw new SSLException(err);
-            }
+            checkLastError();
         } else {
             if (alpn) {
                 selectedProtocol = SSL.getAlpnSelected(ssl);
@@ -941,6 +883,37 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // if SSL_do_handshake returns > 0 it means the handshake was finished. This means we can update
             // handshakeFinished directly and so eliminate unnecessary calls to SSL.isInInit(...)
             handshakeFinished = true;
+        }
+    }
+
+    private synchronized void renegotiate() throws SSLException {
+        int code = SSL.renegotiate(ssl);
+        if (code <= 0) {
+            checkLastError();
+        }
+        handshakeFinished = false;
+        peerCerts = null;
+        x509PeerCerts = null;
+        currentHandshake = SSL.getHandshakeCount(ssl);
+        int code2 = SSL.doHandshake(ssl);
+        if (code2 <= 0) {
+            checkLastError();
+        }
+    }
+
+    private void checkLastError() throws SSLException {
+        long error = SSL.getLastErrorNumber();
+        if (error != SSL.SSL_ERROR_NONE) {
+            String err = SSL.getErrorString(error);
+            if (logger.isDebugEnabled()) {
+                logger.debug(sm.getString("engine.openSSLError", error, err));
+            }
+            // Many errors can occur during handshake and need to be reported
+            if (!handshakeFinished) {
+                sendHandshakeError = true;
+            } else {
+                throw new SSLException(err);
+            }
         }
     }
 
@@ -960,14 +933,21 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         // Check if we are in the initial handshake phase
         if (!handshakeFinished) {
+
             // There is pending data in the network BIO -- call wrap
-            if (SSL.pendingWrittenBytesInBIO(networkBIO) != 0) {
+            if (sendHandshakeError || SSL.pendingWrittenBytesInBIO(networkBIO) != 0) {
+                if (sendHandshakeError) {
+                    // After a last wrap, consider it is going to be done
+                    sendHandshakeError = false;
+                    currentHandshake++;
+                }
                 return SSLEngineResult.HandshakeStatus.NEED_WRAP;
             }
 
             // No pending data to be sent to the peer
             // Check to see if we have finished handshaking
-            if (SSL.isInInit(ssl) == 0) {
+            int handshakeCount = SSL.getHandshakeCount(ssl);
+            if (handshakeCount != currentHandshake) {
                 if (alpn) {
                     selectedProtocol = SSL.getAlpnSelected(ssl);
                     if (selectedProtocol == null) {
@@ -1109,9 +1089,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private class OpenSSLSession implements SSLSession {
 
-        // SSLSession implementation seems to not need to be thread-safe so no need for volatile etc.
-        private X509Certificate[] x509PeerCerts;
-
         // lazy init for memory reasons
         private Map<String, Object> values;
 
@@ -1222,14 +1199,48 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 if (SSL.isInInit(ssl) != 0) {
                     throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
                 }
-                c = peerCerts = initPeerCertChain();
+                byte[][] chain = SSL.getPeerCertChain(ssl);
+                byte[] clientCert;
+                if (!clientMode) {
+                    // if used on the server side SSL_get_peer_cert_chain(...) will not include the remote peer certificate.
+                    // We use SSL_get_peer_certificate to get it in this case and add it to our array later.
+                    //
+                    // See https://www.openssl.org/docs/ssl/SSL_get_peer_cert_chain.html
+                    clientCert = SSL.getPeerCertificate(ssl);
+                } else {
+                    clientCert = null;
+                }
+                if (chain == null && clientCert == null) {
+                    return null;
+                }
+                int len = 0;
+                if (chain != null) {
+                    len += chain.length;
+                }
+
+                int i = 0;
+                Certificate[] certificates;
+                if (clientCert != null) {
+                    len++;
+                    certificates = new Certificate[len];
+                    certificates[i++] = new OpenSslX509Certificate(clientCert);
+                } else {
+                    certificates = new Certificate[len];
+                }
+                if (chain != null) {
+                    int a = 0;
+                    for (; i < certificates.length; i++) {
+                        certificates[i] = new OpenSslX509Certificate(chain[a++]);
+                    }
+                }
+                c = peerCerts = certificates;
             }
             return c;
         }
 
         @Override
         public Certificate[] getLocalCertificates() {
-            // FIXME: Not currently exposed by the native API
+            // FIXME (if possible): Not available in the OpenSSL API
             return EMPTY_CERTIFICATES;
         }
 

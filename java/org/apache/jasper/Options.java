@@ -231,4 +231,16 @@ public interface Options {
      * If unset or less or equal than 0, no jsps are unloaded.
      */
     public int getJspIdleTimeout();
+
+    /**
+     * @return {@code true} if the quote escaping required by section JSP.1.6 of
+     *         the JSP specification should be applied to scriplet expression.
+     */
+    public boolean getStrictQuoteEscaping();
+
+    /**
+     * @return {@code true} if EL expressions used within attributes should have
+     *         the quoting rules in JSP.1.6 applied to the expression.
+     */
+    public boolean getQuoteAttributeEL();
 }

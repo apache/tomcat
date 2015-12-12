@@ -19,7 +19,6 @@ package org.apache.catalina.webresources;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -100,12 +99,18 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
      * @param classLoader The class loader to release
      */
     public static void release(ClassLoader classLoader) {
-        Iterator<URLStreamHandlerFactory> iter = instance.userFactories.iterator();
-        while (iter.hasNext()) {
-            ClassLoader factoryLoader = iter.next().getClass().getClassLoader();
+        if (instance == null) {
+            return;
+        }
+        List<URLStreamHandlerFactory> factories = instance.userFactories;
+        for (URLStreamHandlerFactory factory : factories) {
+            ClassLoader factoryLoader = factory.getClass().getClassLoader();
             while (factoryLoader != null) {
                 if (classLoader.equals(factoryLoader)) {
-                    iter.remove();
+                    // Implementation note: userFactories is a
+                    // CopyOnWriteArrayList, so items are removed with
+                    // List.remove() instead of usual Iterator.remove()
+                    factories.remove(factory);
                     break;
                 }
                 factoryLoader = factoryLoader.getParent();
@@ -137,7 +142,7 @@ public class TomcatURLStreamHandlerFactory implements URLStreamHandlerFactory {
      * applications to register their own handlers.
      *
      * @param factory The user provided factory to add to the factories Tomcat
-     *                has alredy registered
+     *                has already registered
      */
     public void addUserFactory(URLStreamHandlerFactory factory) {
         userFactories.add(factory);

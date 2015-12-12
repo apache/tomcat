@@ -30,8 +30,6 @@ import javax.management.ObjectName;
  * having to deal with synchronization ( since each thread will have it's own
  * RequestProcessorMX ).
  *
- * TODO: Request notifications will be registered here.
- *
  * @author Costin Manolache
  */
 public class RequestInfo  {

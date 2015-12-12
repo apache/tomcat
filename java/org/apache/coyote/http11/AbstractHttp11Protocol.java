@@ -34,6 +34,7 @@ import javax.servlet.http.HttpUpgradeHandler;
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
+import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
@@ -51,6 +52,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public AbstractHttp11Protocol(AbstractEndpoint<S> endpoint) {
         super(endpoint);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
+        ConnectionHandler<S> cHandler = new ConnectionHandler<>(this);
+        setHandler(cHandler);
+        getEndpoint().setHandler(cHandler);
     }
 
 
@@ -430,6 +434,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateKeystoreFile(keystoreFile);
     }
+    public void setSSLCertificateChainFile(String certificateChainFile) {
+        registerDefaultSSLHostConfig();
+        defaultSSLHostConfig.setCertificateChainFile(certificateChainFile);
+    }
     public void setSSLCertificateFile(String certificateFile) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setCertificateFile(certificateFile);
@@ -614,8 +622,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     // ------------------------------------------------------------- Common code
 
-    // Common configuration required for all new HTTP11 processors
-    protected void configureProcessor(Http11Processor processor) {
+    @Override
+    protected Processor createProcessor() {
+        Http11Processor processor = new Http11Processor(getMaxHttpHeaderSize(), getEndpoint(),
+                getMaxTrailerSize(), allowedTrailerHeaders, getMaxExtensionSize(),
+                getMaxSwallowSize(), httpUpgradeProtocols);
         processor.setAdapter(getAdapter());
         processor.setMaxKeepAliveRequests(getMaxKeepAliveRequests());
         processor.setConnectionUploadTimeout(getConnectionUploadTimeout());
@@ -627,49 +638,20 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setRestrictedUserAgents(getRestrictedUserAgents());
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
+        return processor;
     }
 
 
-    protected abstract static class AbstractHttp11ConnectionHandler<S>
-            extends AbstractConnectionHandler<S,Http11Processor> {
-
-        private final AbstractHttp11Protocol<S> proto;
-
-
-        protected AbstractHttp11ConnectionHandler(AbstractHttp11Protocol<S> proto) {
-            this.proto = proto;
-        }
-
-
-        @Override
-        protected AbstractHttp11Protocol<S> getProtocol() {
-            return proto;
-        }
-
-
-        @Override
-        public Http11Processor createProcessor() {
-            Http11Processor processor = new Http11Processor(
-                    proto.getMaxHttpHeaderSize(), proto.getEndpoint(), proto.getMaxTrailerSize(),
-                    proto.allowedTrailerHeaders, proto.getMaxExtensionSize(),
-                    proto.getMaxSwallowSize(), proto.httpUpgradeProtocols);
-            proto.configureProcessor(processor);
-            register(processor);
-            return processor;
-        }
-
-
-        @Override
-        protected Processor createUpgradeProcessor(
-                SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
-                HttpUpgradeHandler httpUpgradeHandler)
-                throws IOException {
-            if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
-                return new UpgradeProcessorInternal(socket, leftoverInput,
-                        (InternalHttpUpgradeHandler) httpUpgradeHandler);
-            } else {
-                return new UpgradeProcessorExternal(socket, leftoverInput, httpUpgradeHandler);
-            }
+    @Override
+    protected Processor createUpgradeProcessor(
+            SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
+            UpgradeToken upgradeToken)
+            throws IOException {
+        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
+        if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
+            return new UpgradeProcessorInternal(socket, leftoverInput, upgradeToken);
+        } else {
+            return new UpgradeProcessorExternal(socket, leftoverInput, upgradeToken);
         }
     }
 }

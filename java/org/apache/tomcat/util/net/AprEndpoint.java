@@ -134,15 +134,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     /**
-     * Handling of accepted sockets.
-     */
-    protected Handler<Long> handler = null;
-    public void setHandler(Handler<Long> handler ) { this.handler = handler; }
-    @Override
-    public Handler<Long> getHandler() { return handler; }
-
-
-    /**
      * Poll interval, in microseconds. The smaller the value, the more CPU the poller
      * will use, but the more responsive to activity it will be.
      */
@@ -497,6 +488,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                             SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
                             SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()),
                             certificate.getCertificateKeyPassword(), idx++);
+                    // Set certificate chain file
+                    SSLContext.setCertificateChainFile(ctx,
+                            SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
                 }
                 // Support Client Certificates
                 SSLContext.setCACertificate(ctx,
@@ -617,7 +611,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
                 try {
                     socketWrapper.close();
-                    handler.release(socketWrapper);
+                    getHandler().release(socketWrapper);
                 } catch (IOException e) {
                     // Ignore
                 }
@@ -701,7 +695,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             rootPool = 0;
         }
 
-        handler.recycle();
+        getHandler().recycle();
     }
 
 
@@ -1712,8 +1706,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                 }
                                 wrapper.pollerFlags = wrapper.pollerFlags & ~((int) desc[n*2]);
                                 // Check for failed sockets and hand this socket off to a worker
-                                if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
-                                        || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
+                                if ((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP) {
+                                    if (!processSocket(desc[n*2+1], SocketStatus.DISCONNECT)) {
+                                        // Close socket and clear pool
+                                        closeSocket(desc[n*2+1]);
+                                    }
+                                } else if(((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
                                         || ((desc[n*2] & Poll.APR_POLLNVAL) == Poll.APR_POLLNVAL)) {
                                     // Need to trigger error handling. Poller may return error
                                     // codes plus the flags it was waiting for or it may just
@@ -2250,7 +2248,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         return;
                     }
                     // Process the request from this socket
-                    Handler.SocketState state = handler.process(socket,
+                    Handler.SocketState state = getHandler().process(socket,
                             SocketStatus.OPEN_READ);
                     if (state == Handler.SocketState.CLOSED) {
                         // Close socket and pool
@@ -2293,14 +2291,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Closed in another thread
                     return;
                 }
-                SocketState state = handler.process(socket, status);
+                SocketState state = getHandler().process(socket, status);
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     closeSocket(socket.getSocket().longValue());
-                } else if (state == Handler.SocketState.ASYNC_END) {
-                    SocketProcessor proc = new SocketProcessor(socket,
-                            SocketStatus.OPEN_READ);
-                    getExecutor().execute(proc);
                 }
             }
         }

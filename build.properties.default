@@ -27,7 +27,7 @@ version.major=9
 version.minor=0
 version.build=0
 version.patch=0
-version.suffix=-dev
+version.suffix=.M1-dev
 
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
@@ -49,6 +49,13 @@ test.threads=1
 
 # Note the Cobertura code coverage tool is GPLv2 licensed
 test.cobertura=false
+
+# Note the FindBugs is LGPL licensed
+execute.findbugs=false
+
+# Some platforms (e.g. OSX El Capitan) require IPv4 to be the default for the
+# multicast tests to work
+java.net.preferIPv4Stack=false
 
 # Location of GPG executable (used only for releases)
 gpg.exec=/path/to/gpg
@@ -149,7 +156,7 @@ jdt.loc.1=http://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj
 jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 
 # ----- Tomcat native library -----
-tomcat-native.version=1.1.33
+tomcat-native.version=1.2.2
 tomcat-native.home=${base.path}/tomcat-native-${tomcat-native.version}
 tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
 tomcat-native.loc.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
@@ -211,7 +218,7 @@ objenesis.loc=https://objenesis.googlecode.com/files/objenesis-${objenesis.versi
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.0 or later -----
-checkstyle.version=6.11.2
+checkstyle.version=6.13
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
@@ -223,5 +230,9 @@ cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
 cobertura.lib=${cobertura.home}/lib
 cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.1.1-bin.tar.gz
 
-# ----- JVM settings for unit tests
-java.net.preferIPv4Stack=false
+# ----- Findbugs -----
+findbugs.version=3.0.1
+findbugs.home=${base.path}/findbugs-${findbugs.version}
+findbugs.lib=${findbugs.home}/lib
+findbugs.jar=${findbugs.lib}/findbugs-ant.jar
+findbugs.loc=${base-sf.loc}/project/findbugs/findbugs/${findbugs.version}/findbugs-${findbugs.version}.tar.gz

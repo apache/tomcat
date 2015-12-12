@@ -180,6 +180,11 @@
   <property name="tomcat.classes.cobertura" value="${tomcat.classes}-cobertura"/>
   <property name="cobertura.report.format" value="html"/>
 
+  <!-- FindBugs settings -->
+  <property name="findbugs.out" value="${tomcat.output}/findbugs"/>
+  <property name="findbugs.report.format" value="html"/>
+  <property name="findbugs.report.level" value="low"/>
+
   <!-- Workaround against http://bugs.sun.com/view_bug.do?bug_id=6202721 -->
   <available file="/dev/urandom" property="test.jvmarg.egd" value="-Djava.security.egd=file:/dev/./urandom"/>
   <property name="test.jvmarg.egd" value="" />
@@ -1450,6 +1455,7 @@
         <sysproperty key="tomcat.test.reports" value="${test.reports}" />
         <sysproperty key="tomcat.test.openssl.path" value="${test.openssl.path}" />
         <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
+        <sysproperty key="tomcat.test.sslImplementation" value="${test.sslImplementation}" />
         <!-- File for Cobertura to write coverage results to -->
         <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
 
@@ -1542,8 +1548,6 @@
         <exclude name="**/OneLineFormatter*.class"/>
         <exclude name="**/DateFormatCache.class"/>
         <exclude name="**/DateFormatCache*.class"/>
-        <!-- This class cannot be instrumented when tcnative library is not in java.library.path -->
-        <exclude name="**/jni/socket/AprSocket.class"/>
       </fileset>
       <auxClasspath path="${jdt.jar}" />
     </cobertura-instrument>
@@ -1564,6 +1568,32 @@
     <cobertura-report srcdir="${basedir}/java" destdir="${cobertura.out}"
                       datafile="${cobertura.datafile}"
                       format="${cobertura.report.format}"/>
+  </target>
+
+  <target name="findbugs"
+          if="${execute.findbugs}"
+          depends="compile,download-findbugs">
+
+    <path id="findbugs.classpath">
+      <fileset file="${findbugs.jar}" />
+    </path>
+
+    <taskdef classpathref="findbugs.classpath" name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+
+    <mkdir dir="${findbugs.out}" />
+
+    <findbugs home="${findbugs.home}"
+              output="${findbugs.report.format}"
+              outputFile="${findbugs.out}/findbugs-report.${findbugs.report.format}"
+              reportLevel="${findbugs.report.level}"
+              excludeFilter="res/findbugs/filter-false-positives.xml" >
+      <sourcePath path="${basedir}/java" />
+      <class location="${tomcat.classes}" />
+      <auxClasspath>
+        <fileset file="${jdt.jar}" />
+        <fileset file="${ant.core.lib}" />
+      </auxClasspath>
+    </findbugs>
   </target>
 
   <target name="extras-prepare" >
@@ -1894,9 +1924,6 @@
     <!-- 64 bit amd -->
     <copy file="${commons-daemon.home}/windows/amd64/prunsrv.exe"
         tofile="${tomcat.dist}/bin/x64/tomcat${version.major}.exe" />
-    <!-- 64 bit ia -->
-    <copy file="${commons-daemon.home}/windows/ia64/prunsrv.exe"
-        tofile="${tomcat.dist}/bin/i64/tomcat${version.major}.exe" />
     <!-- tc native -->
     <copy todir="${tomcat.dist}/bin">
       <fileset dir="${tomcat-native.home}/bin">
@@ -1906,9 +1933,6 @@
     </copy>
 
     <!-- platform README files -->
-    <echo append="false" file="${tomcat.dist}/bin/i64/README">
-Apache Tomcat ${version} native binaries for Win64 IA64 platform.
-    </echo>
     <echo append="false" file="${tomcat.dist}/bin/x64/README">
 Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </echo>
@@ -2350,7 +2374,6 @@ skip.installer property in build.properties" />
         <include name="BENCHMARKS.txt"/>
         <exclude name="bin/service.bat"/>
         <exclude name="bin/x64/"/>
-        <exclude name="bin/i64/"/>
         <exclude name="bin/*.exe"/>
         <exclude name="bin/*.dll"/>
       </zipfileset>
@@ -2383,7 +2406,6 @@ skip.installer property in build.properties" />
         <include name="RUNNING.txt"/>
         <include name="BENCHMARKS.txt"/>
         <exclude name="bin/x64/"/>
-        <exclude name="bin/i64/"/>
       </zipfileset>
 
     </zip>
@@ -2406,7 +2428,6 @@ skip.installer property in build.properties" />
         <include name="RUNNING.txt"/>
         <include name="BENCHMARKS.txt"/>
         <exclude name="bin/x64/"/>
-        <exclude name="bin/i64/"/>
         <exclude name="bin/*.dll"/>
         <exclude name="bin/tomcat${version.major}.exe"/>
       </zipfileset>
@@ -2416,36 +2437,6 @@ skip.installer property in build.properties" />
       </zipfileset>
     </zip>
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-windows-x64.zip" />
-
-    <!-- Windows i64 package -->
-    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip">
-      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
-        <include name="bin/**"/>
-        <include name="conf/**"/>
-        <include name="logs/**"/>
-        <include name="lib/**"/>
-        <include name="webapps/**"/>
-        <include name="work/**"/>
-        <include name="temp/**"/>
-        <include name="LICENSE"/>
-        <include name="NOTICE"/>
-        <include name="README.txt"/>
-        <include name="RELEASE-NOTES"/>
-        <include name="RUNNING.txt"/>
-        <include name="BENCHMARKS.txt"/>
-        <exclude name="bin/x64/"/>
-        <exclude name="bin/i64/"/>
-        <exclude name="bin/*.dll"/>
-        <exclude name="bin/tomcat${version.major}.exe"/>
-      </zipfileset>
-      <zipfileset dir="${tomcat.dist}/bin/i64" prefix="${final.name}/bin">
-        <include name="*.dll"/>
-        <include name="*.exe"/>
-      </zipfileset>
-    </zip>
-
-    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}-windows-i64.zip" />
-
   </target>
 
   <!-- Packages the deployer distribution in zip format -->
@@ -2479,26 +2470,10 @@ skip.installer property in build.properties" />
 
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}.tar.gz">
-      <tarfileset dir="${tomcat.dist}" mode="755" prefix="${final.name}">
-        <include name="bin/catalina.sh" />
-        <include name="bin/configtest.sh" />
-        <include name="bin/daemon.sh" />
-        <include name="bin/digest.sh" />
-        <include name="bin/jasper.sh" />
-        <include name="bin/jspc.sh" />
-        <include name="bin/setclasspath.sh" />
-        <include name="bin/startup.sh" />
-        <include name="bin/shutdown.sh" />
-        <include name="bin/tool-wrapper.sh" />
-        <include name="bin/tool-wrapper-using-launcher.sh" />
-        <include name="bin/shutdown-using-launcher.sh" />
-        <include name="bin/startup-using-launcher.sh" />
-        <include name="bin/version.sh" />
-      </tarfileset>
-      <tarfileset dir="${tomcat.dist}" mode="600" prefix="${final.name}">
+      <tarfileset dir="${tomcat.dist}" dirmode="700" filemode="600" prefix="${final.name}">
         <include name="conf/**" />
       </tarfileset>
-      <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
+      <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="640" prefix="${final.name}">
         <include name="bin/**" />
         <include name="lib/**" />
         <include name="logs/**" />
@@ -2529,9 +2504,26 @@ skip.installer property in build.properties" />
         <exclude name="conf/**" />
         <exclude name="src/**" />
         <exclude name="bin/x64/"/>
-        <exclude name="bin/i64/"/>
         <exclude name="bin/*.exe"/>
         <exclude name="bin/*.dll"/>
+      </tarfileset>
+      <!-- These need to be added after the bin directory is added else the  -->
+      <!-- bin diretcory will pick up the wrong permissions.                 -->
+      <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="750" prefix="${final.name}">
+        <include name="bin/catalina.sh" />
+        <include name="bin/configtest.sh" />
+        <include name="bin/daemon.sh" />
+        <include name="bin/digest.sh" />
+        <include name="bin/jasper.sh" />
+        <include name="bin/jspc.sh" />
+        <include name="bin/setclasspath.sh" />
+        <include name="bin/startup.sh" />
+        <include name="bin/shutdown.sh" />
+        <include name="bin/tool-wrapper.sh" />
+        <include name="bin/tool-wrapper-using-launcher.sh" />
+        <include name="bin/shutdown-using-launcher.sh" />
+        <include name="bin/startup-using-launcher.sh" />
+        <include name="bin/version.sh" />
       </tarfileset>
     </tar>
 
@@ -2859,6 +2851,17 @@ skip.installer property in build.properties" />
     <antcall target="downloadgz">
       <param name="sourcefile" value="${cobertura.loc}"/>
       <param name="destfile" value="${cobertura.jar}"/>
+    </antcall>
+
+  </target>
+
+  <target name="download-findbugs"
+          if="${execute.findbugs}"
+          description="Download FindBugs" >
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${findbugs.loc}"/>
+      <param name="destfile" value="${findbugs.jar}"/>
     </antcall>
 
   </target>

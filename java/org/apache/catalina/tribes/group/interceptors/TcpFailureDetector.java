@@ -277,6 +277,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             Member m = keys[i];
             if (membership.getMember(m) != null && (!memberAlive(m))) {
                 membership.removeMember(m);
+                if (m instanceof StaticMember) {
+                    addSuspects.put(m, Long.valueOf(System.currentTimeMillis()));
+                }
                 super.memberDisappeared(m);
                 removeSuspects.remove(m);
                 if(log.isInfoEnabled())

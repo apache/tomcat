@@ -52,6 +52,11 @@ import org.apache.tomcat.util.http.MimeHeaders;
  */
 public abstract class Http2TestBase extends TomcatBaseTest {
 
+    // Nothing special about this date apart from it being the date I ran the
+    // test that demonstrated that most HTTP/2 tests were failing because the
+    // response now included a date header
+    protected static final String DEFAULT_DATE = "Wed, 11 Nov 2015 19:18:42 GMT";
+
     static final String DEFAULT_CONNECTION_HEADER_VALUE = "Upgrade, HTTP2-Settings";
     private static final byte[] EMPTY_SETTINGS_FRAME =
         { 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -350,6 +355,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         result.append(streamId);
         result.append("-Header-[:status]-[200]\n");
         result.append(streamId);
+        result.append("-Header-[content-type]-[application/octet-stream]\n");
+        result.append(streamId);
+        result.append("-Header-[date]-[");
+        result.append(DEFAULT_DATE);
+        result.append("]\n");
+        result.append(streamId);
         result.append("-HeadersEnd\n");
         result.append(streamId);
         result.append("-Body-");
@@ -439,15 +450,27 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         if (!responseHeaders[0].startsWith("HTTP/1.1 101")) {
             return false;
         }
-        // TODO: There may be other headers.
-        if (!responseHeaders[1].equals("Connection: Upgrade")) {
+
+        if (!validateHeader(responseHeaders, "Connection: Upgrade")) {
             return false;
         }
-        if (!responseHeaders[2].startsWith("Upgrade: h2c")) {
+        if (!validateHeader(responseHeaders, "Upgrade: h2c")) {
             return false;
         }
 
         return true;
+    }
+
+
+    private boolean validateHeader(String[] responseHeaders, String header) {
+        boolean found = false;
+        for (String responseHeader : responseHeaders) {
+            if (responseHeader.equalsIgnoreCase(header)) {
+                found = true;
+                break;
+            }
+        }
+        return found;
     }
 
 
@@ -764,6 +787,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         @Override
         public void emitHeader(String name, String value, boolean neverIndex) {
+            // Date headers will always change so use a hard-coded default
+            if ("date".equals(name)) {
+                value = DEFAULT_DATE;
+            }
             trace.append(lastStreamId + "-Header-[" + name + "]-[" + value + "]\n");
         }
 
@@ -873,6 +900,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
             // Generate an empty response
+            resp.setContentType("application/octet-stream");
             resp.setContentLength(0);
             resp.flushBuffer();
         }

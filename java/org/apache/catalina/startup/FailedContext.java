@@ -761,4 +761,33 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
 
     @Override
     public CookieProcessor getCookieProcessor() { return null; }
+
+    @Override
+    public void setValidateClientProvidedNewSessionId(boolean validateClientProvidedNewSessionId) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getValidateClientProvidedNewSessionId() { return false; }
+
+    @Override
+    public void setMapperContextRootRedirectEnabled(boolean mapperContextRootRedirectEnabled) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getMapperContextRootRedirectEnabled() { return false; }
+
+    @Override
+    public void setMapperDirectoryRedirectEnabled(boolean mapperDirectoryRedirectEnabled) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getMapperDirectoryRedirectEnabled() { return false; }
+
+    @Override
+    public void setUseRelativeRedirects(boolean useRelativeRedirects) { /* NO-OP */ }
+    @Override
+    public boolean getUseRelativeRedirects() { return true; }
 }

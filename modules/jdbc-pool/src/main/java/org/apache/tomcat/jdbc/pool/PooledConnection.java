@@ -400,7 +400,7 @@ public class PooledConnection {
         if (poolProperties.getRemoveAbandonedTimeout() <= 0) {
             return Long.MAX_VALUE;
         } else {
-            return poolProperties.getRemoveAbandonedTimeout()*1000;
+            return poolProperties.getRemoveAbandonedTimeout() * 1000L;
         } //end if
     }
 

@@ -357,6 +357,11 @@ public final class SSL {
      */
     public static native boolean hasOp(int op);
 
+    /**
+     * Return the handshake completed count.
+     */
+    public static native int getHandshakeCount(long ssl);
+
     /*
      * Begin Twitter API additions
      */
@@ -515,6 +520,12 @@ public final class SSL {
      * @param ssl the SSL instance (SSL *)
      */
     public static native int doHandshake(long ssl);
+
+    /**
+     * SSL_renegotiate
+     * @param ssl the SSL instance (SSL *)
+     */
+    public static native int renegotiate(long ssl);
 
     /**
      * SSL_in_init.

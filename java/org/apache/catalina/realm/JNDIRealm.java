@@ -2178,8 +2178,23 @@ public class JNDIRealm extends RealmBase {
      */
     @Override
     protected String getPassword(String username) {
+        String userPassword = getUserPassword();
+        if (userPassword == null || userPassword.isEmpty()) {
+            return null;
+        }
 
-        return (null);
+        try {
+            User user = getUser(open(), username, null);
+             if (user == null) {
+                // User should be found...
+                return null;
+            } else {
+                // ... and have a password
+                return user.getPassword();
+            }
+        } catch (NamingException e) {
+            return null;
+        }
 
     }
 
@@ -2599,12 +2614,12 @@ public class JNDIRealm extends RealmBase {
                 // strings: (|(something)(somethingelse))
                 while ( (userPatternString.charAt(startParenLoc + 1) == '|') ||
                         (startParenLoc != 0 && userPatternString.charAt(startParenLoc - 1) == '\\') ) {
-                    startParenLoc = userPatternString.indexOf("(", startParenLoc+1);
+                    startParenLoc = userPatternString.indexOf('(', startParenLoc+1);
                 }
-                endParenLoc = userPatternString.indexOf(")", startParenLoc+1);
+                endParenLoc = userPatternString.indexOf(')', startParenLoc+1);
                 // weed out escaped end-parens
                 while (userPatternString.charAt(endParenLoc - 1) == '\\') {
-                    endParenLoc = userPatternString.indexOf(")", endParenLoc+1);
+                    endParenLoc = userPatternString.indexOf(')', endParenLoc+1);
                 }
                 String nextPathPart = userPatternString.substring
                     (startParenLoc+1, endParenLoc);

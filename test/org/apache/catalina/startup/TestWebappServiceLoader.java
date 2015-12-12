@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.core.TesterContext;
+import org.apache.tomcat.unittest.TesterContext;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 

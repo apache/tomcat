@@ -122,8 +122,10 @@
     <attribute name="maxPostSize" required="false">
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
-      setting this attribute to a value less than zero.
-      If not specified, this attribute is set to 2097152 (2 megabytes).</p>
+      setting this attribute to a value less than zero. If not specified, this
+      attribute is set to 2097152 (2 megabytes). Note that the
+      <a href="filter.html#Failed_Request_Filter"><code>FailedRequestFilter</code></a>
+      can be used to reject requests that exceed this limit.</p>
     </attribute>
 
     <attribute name="maxSavePostSize" required="false">
@@ -1258,6 +1260,18 @@
       be concatenated to the certificate file.</p>
     </attribute>
 
+    <attribute name="certificateChainFile" required="false">
+      <p>OpenSSL only.</p>
+      <p>Name of the file that contains the certificate chain associated with
+      the server certificate used. The format is
+      PEM-encoded. Relative paths will be resolved against
+      <code>$CATALINA_BASE</code>.</p>
+      <p>The certificate chain used for Tomcat should not include the server
+      certificate as its first element.</p>
+      <p>Note that when using more than one certificate for different types,
+      they all must use the same certificate chain.</p>
+    </attribute>
+
     <attribute name="certificateKeyAlias" required="false">
       <p>JSSE only.</p>
       <p>The alias used for the server key and certificate in the keystore. If
@@ -1368,9 +1382,11 @@
       Tomcat also bundles a special SSL implementation for JSSE that is backed
       by OpenSSL. To enable it, the native library should be enabled as if
       intending to use the APR connector, the value of this attribute should be
-      <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>,
-      and the SSL attributes configuration used should be the one from the APR
-      connector.</p>
+      <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>.
+      In that case, the attributes from either from either JSSE and OpenSSL
+      configuration styles can be used, as long as the two types are not mixed
+      (for example, it is not allowed to define use of a Java keystore and
+      specify a separate pem private key using the OpenSSL attribute).</p>
     </attribute>
 
   </attributes>
@@ -1411,38 +1427,46 @@
 
     <attribute name="keyAlias" required="false">
       <p>This is an alias for the <code>certificateKeyAlias</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="keyPass" required="false">
       <p>This is an alias for the <code>certificateKeyPassword</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="keystoreFile" required="false">
       <p>This is an alias for the <code>certificateKeystoreFile</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="keystorePass" required="false">
       <p>This is an alias for the <code>certificateKeystorePassword</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      attribute of the first
+      <a href="#SSL_Support_-_Certificate">Certificate</a> element nested in the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="keystoreProvider" required="false">
       <p>This is an alias for the <code>certificateKeystoreProvider</code>
-      attribute of the default
-      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
+      attribute of the first
+      <a href="#SSL_Support_-_Certificate">Certificate</a> element nested in the
+      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      element.</p>
     </attribute>
 
     <attribute name="keystoreType" required="false">
       <p>This is an alias for the <code>certificateKeystoreType</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="sessionCacheSize" required="false">
@@ -1565,13 +1589,15 @@
 
     <attribute name="SSLCertificateFile" required="true">
       <p>This is an alias for the <code>certificateFile</code> attribute of the
-      default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      first <a href="#SSL_Support_-_Certificate">Certificate</a> element nested
+      in the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
       element.</p>
     </attribute>
 
     <attribute name="SSLCertificateKeyFile" required="false">
-      <p>This is an alias for the <code>certificateKeyFile</code> attribute of
-      the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
+      <p>This is an alias for the <code>certificateKeyFile</code> attribute of the
+      first <a href="#SSL_Support_-_Certificate">Certificate</a> element nested
+      in the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
       element.</p>
     </attribute>
 
@@ -1594,8 +1620,9 @@
 
     <attribute name="SSLPassword" required="false">
       <p>This is an alias for the <code>certificateKeyPassword</code> attribute
-      of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
-      element.</p>
+      of the first <a href="#SSL_Support_-_Certificate">Certificate</a> element
+      nested in the default
+      <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="SSLProtocol" required="false">

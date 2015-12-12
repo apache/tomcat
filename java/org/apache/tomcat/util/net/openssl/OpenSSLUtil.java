@@ -26,11 +26,13 @@ import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtil;
+import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
 
 public class OpenSSLUtil implements SSLUtil {
 
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
+    private final JSSESocketFactory jsseUtil;
 
     private String[] enabledProtocols = null;
     private String[] enabledCiphers = null;
@@ -38,6 +40,13 @@ public class OpenSSLUtil implements SSLUtil {
     public OpenSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
         this.sslHostConfig = sslHostConfig;
         this.certificate = certificate;
+        if (certificate.getCertificateFile() == null) {
+            // Using JSSE configuration for keystore and truststore
+            jsseUtil = new JSSESocketFactory(sslHostConfig, certificate);
+        } else {
+            // Use OpenSSL configuration for certificates
+            jsseUtil = null;
+        }
     }
 
     @Override
@@ -47,16 +56,25 @@ public class OpenSSLUtil implements SSLUtil {
 
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
-        KeyManager[] managers = {
-                new OpenSSLKeyManager(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
-                        SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()))
-                };
-        return managers;
+        if (jsseUtil != null) {
+            return jsseUtil.getKeyManagers();
+        } else {
+            // Return something although it is not actually used
+            KeyManager[] managers = {
+                    new OpenSSLKeyManager(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()),
+                            SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()))
+            };
+            return managers;
+        }
     }
 
     @Override
     public TrustManager[] getTrustManagers() throws Exception {
-        return null;
+        if (jsseUtil != null) {
+            return jsseUtil.getTrustManagers();
+        } else {
+            return null;
+        }
     }
 
     @Override

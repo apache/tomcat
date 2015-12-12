@@ -29,8 +29,8 @@ import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Abstract implementation of the Store interface to
- * support most of the functionality required by a Store.
+ * Abstract implementation of the {@link Store} interface to
+ * support most of the functionality required by a {@link Store}.
  *
  * @author Bip Thelin
  */
@@ -54,7 +54,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
-     * The Manager with which this JDBCStore is associated.
+     * The Manager with which this Store is associated.
      */
     protected Manager manager;
 
@@ -62,10 +62,10 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the name for this Store, used for logging.
+     * @return the name for this Store, used for logging.
      */
     public String getStoreName() {
-        return(storeName);
+        return storeName;
     }
 
 
@@ -82,11 +82,11 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     }
 
     /**
-     * Return the Manager with which the Store is associated.
+     * @return the Manager with which the Store is associated.
      */
     @Override
     public Manager getManager() {
-        return(this.manager);
+        return this.manager;
     }
 
 
@@ -95,7 +95,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     /**
      * Add a property change listener to this component.
      *
-     * @param listener a value of type 'PropertyChangeListener'
+     * @param listener a value of type {@link PropertyChangeListener}
      */
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -112,7 +112,17 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         support.removePropertyChangeListener(listener);
     }
 
-    // --------------------------------------------------------- Protected Methods
+    /**
+     * Get only those keys of sessions, that are saved in the Store and are to
+     * be expired.
+     *
+     * @return list of session keys, that are to be expired
+     * @throws IOException
+     *             if an input-/output error occurred
+     */
+    public String[] expiredKeys() throws IOException {
+        return keys();
+    }
 
     /**
      * Called by our background reaper thread to check if Sessions
@@ -128,7 +138,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         }
 
         try {
-            keys = keys();
+            keys = expiredKeys();
         } catch (IOException e) {
             manager.getContext().getLogger().error("Error getting keys", e);
             return;
@@ -183,6 +193,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         }
     }
 
+    // --------------------------------------------------------- Protected Methods
 
     @Override
     protected void initInternal() {
@@ -225,7 +236,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
 
 
     /**
-     * Return a String rendering of this object.
+     * @return a String rendering of this object.
      */
     @Override
     public String toString() {

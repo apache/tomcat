@@ -44,11 +44,218 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<!--
-  Note: Until the first 9.0.x release, the only entries that should appear in
-        the changelog are those are relate only to 9.0.x.
- -->
-<section name="Tomcat 9.0.0">
+<section name="Tomcat 9.0.0.M2">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Refactor creation of <code>MapperListener</code> to ensure that the
+        <code>Mapper</code> used is the <code>Mapper</code> associated with the
+        <code>Service</code> for which the listener was created. (markt)
+      </scode>
+      <add>
+        Move the functionality that provides redirects for context roots and
+        directories where a trailing <code>/</code> is added from the Mapper to
+        the <code>DefaultServlet</code>. This enables such requests to be
+        processed by any configured Valves and Filters before the redirect is
+        made. This behaviour is configurable via the
+        <code>mapperContextRootRedirectEnabled</code> and
+        <code>mapperDirectoryRedirectEnabled</code> attributes of the Context
+        which may be used to restore the previous behaviour. (markt)
+      </add>
+      <scode>
+        Refactor <code>Service.getContainer()</code> to return an
+        <code>Engine</code> rather than a <code>Container</code>. (markt)
+      </scode>
+      <fix>
+        <bug>34319</bug>: Only load those keys in <code>StoreBase.processExpire</code>
+        from JDBCStore, that are old enough, to be expired. Based on a patch
+        by Tom Anderson. (fschumacher)
+      </fix>
+      <add>
+        <bug>56917</bug>: As per RFC7231 (HTTP/1.1), allow HTTP/1.1 and later
+        redirects to use relative URIs. This is controlled by a new attribute
+        <code>useRelativeRedirects</code> on the <strong>Context</strong> and
+        defaults to <code>true</code>. (markt)
+      </add>
+      <fix>
+        <bug>58629</bug>: Allow an embedded Tomcat instance to start when the
+        <code>Service</code> has no <code>Engine</code> configured. (markt)
+      </fix>
+      <fix>
+        Correctly notify the MapperListener associated with a Service if the
+        Engine for that Service is changed. (markt)
+      </fix>
+      <add>
+        Make a web application's CredentialHandler available through a context
+        attribute. This allows a web application to use the same algorithm
+        for validating or generating new stored credentials from cleartext
+        ones. (schultz)
+      </add>
+      <fix>
+        <bug>58635</bug>: Enable break points to be set within agent code when
+        running Tomcat with a Java agent. Based on a patch by Huxing Zhang.
+        (markt)
+      </fix>
+      <fix>
+        Fixed potential NPE in <code>HostConfig</code> while deploying an
+        application. Issue reported by coverity scan. (violetagg)
+      </fix>
+      <fix>
+        <bug>58655</bug>: Fix an <code> IllegalStateException</code> when
+        calling <code>HttpServletResponse.sendRedirect()</code> with the
+        <code>RemoteIpFilter</code>. This was caused by trying to correctly
+        generate the absolute URI for the redirect. With the fix for
+        <bug>56917</bug>, redirects may now be relative making the
+        <code>sendRedirect()</code> implementation for the
+        <code>RemoteIpFilter</code> much simpler. This also addresses issues
+        where the redirect may not have behaved as expected when redirecting
+        from http to https to from https to http. (markt)
+      </fix>
+      <fix>
+        <bug>58657</bug>: Exceptions in a Servlet 3.1 <code>ReadListener</code>
+        or <code>WriteListener</code> do not need to be immediately fatal to the
+        connection. Allow an error response to be written. (markt)
+      </fix>
+      <fix>
+        Correct implementation of
+        <code>validateClientProvidedNewSessionId</code> so client provided
+        session IDs may be rejected if validation is enabled. (markt)
+      </fix>
+      <fix>
+        <bug>58701</bug>: Reset the <code>instanceInitialized</code> field in
+        <code>StandardWrapper</code> when unloading a Servlet so that a new
+        instance may be correctly initialized. (markt)
+      </fix>
+      <update>
+        Add a new flag <code>aprPreferred</code> to the Apr listener. if set to
+        <code>false</code>, when using the connector defaults, it will use
+        NIO + OpenSSL if tomcat-native is available, rather than the APR
+        connector. (remm)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>58621</bug>: The certificate chain cannot be set using the main
+        certificate attribute, so restore the certificate chain property. (remm)
+      </fix>
+      <fix>
+        Allow a new SSL config type where a connector can use either JSSE or
+        OpenSSL. Both could be allowed, but it would likely create support
+        issues. This type is used by the OpenSSL implementation for NIOx. (remm)
+      </fix>
+      <fix>
+        Improve upgrade context classloader handling by using Context.bind and
+        unbind. (remm)
+      </fix>
+      <add>
+        Improve OpenSSL keystore/truststore configuration by using the code
+        from the JSSE implementation. (remm, jfclere)
+      </add>
+      <fix>
+        Fix a potential loop when a client drops the connection unexpectedly.
+        (markt)
+      </fix>
+      <add>
+        OpenSSL renegotiation support for client certificate authentication.
+        (remm)
+      </add>
+      <fix>
+        Fix NIO connector renegotiation. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>57136#c25</bug>: Change default value of
+        <code>quoteAttributeEL</code> setting in Jasper to be <code>true</code>
+        for better compatibility with other implementations and older versions
+        of Tomcat. Add command line option <code>-no-quoteAttributeEL</code> in
+        JspC. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Enable an explicit configuration of local member in the static cluster
+        membership. (kfujino)
+      </fix>
+      <fix>
+        Fix potential integer overflow in <code>DeltaSession</code>.
+        Reported by coverity scan. (fschumacher)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        <bug>55006</bug>: The WebSocket client now honors the
+        <code>java.net.java.net.ProxySelector</code> configuration (using the
+        HTTP type) when establishing WebSocket connections to servers. Based on
+        a patch by Niki Dokovski. (markt)
+      </add>
+      <fix>
+        <bug>58624</bug>: Correct a potential deadlock if the WebSocket
+        connection is closed when a message write is in progress. (markt)
+      </fix>
+      <fix>
+        <bug>57489</bug>: Ensure <code>onClose()</code> is called when a
+        WebSocket connection is closed even if the sending of the close message
+        fails. Includes test cases by Barry Coughlan. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <fix>
+        <bug>58631</bug>: Correct the continuation character use in the Windows
+        Service How-To page of the documentation web application. (markt)
+      </fix>
+      <fix>
+        Correct the SSL documentation for deprecated attributes to point to the
+        correct, new location for attributes related to individual certificates.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Ensure that the static member is registered to the add suspect list even
+        if the static member that is registered to the remove suspect list has
+        disappeared. (kfujino)
+      </fix>
+      <fix>
+        When using a static cluster, add the members that have been cached in
+        the membership service to the map members list in order to ensure that
+        the map member is a static member. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Correct evaluation of system property <code>org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader</code>.
+        It was basically ignored before. Reported by coverity scan. (fschumacher)
+      </fix>
+      <fix>
+        Fix potential integer overflow in <code>ConnectionPool</code> and
+        <code>PooledConnection</code>. Reported by coverity scan. (fschumacher)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update optional Checkstyle library to 6.13. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 9.0.0.M1" rtext="2015-11-17">
   <subsection name="General">
     <changelog>
       <add>
@@ -57,6 +264,17 @@
       </add>
       <update>
         Remove support for Comet. (markt)
+      </update>
+      <update>
+        Tighten up the default file permissions for the <code>.tar.gz</code>
+        distribution so no files or directories are world readable by default.
+        Configure Tomcat to run with a default umask of <code>0027</code> which
+        may be overridden by setting <code>UMASK</code> in
+        <code>setenv.sh</code>. (markt)
+      </update>
+      <update>
+        Remove native code (Windows Service Wrapper, APR/native connector)
+        support for Windows Itanium. (markt)
       </update>
     </changelog>
   </subsection>
@@ -98,6 +316,14 @@
         <code>org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER</code> is no
         longer used and has been removed. (markt)
       </fix>
+      <update>
+        The minimum required Tomcat Native version has been increased to 1.2.2.
+        The 1.2.x branch includes ALPN and SNI support which are required for
+        HTTP/2. (markt)
+      </update>
+      <add>
+        Add support for HTTP/2 including server push. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">

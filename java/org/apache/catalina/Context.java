@@ -29,6 +29,7 @@ import javax.servlet.ServletSecurityElement;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.deploy.NamingResourcesImpl;
+import org.apache.tomcat.ContextBind;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
@@ -57,7 +58,7 @@ import org.apache.tomcat.util.http.CookieProcessor;
  *
  * @author Craig R. McClanahan
  */
-public interface Context extends Container {
+public interface Context extends Container, ContextBind {
 
 
     // ----------------------------------------------------- Manifest Constants
@@ -395,8 +396,9 @@ public interface Context extends Container {
 
 
     /**
-     * Return the document root for this Context.  This can be an absolute
-     * pathname, a relative pathname, or a URL.
+     * Obtain the document root for this Context.
+     *
+     * @return An absolute pathname, a relative pathname, or a URL.
      */
     public String getDocBase();
 
@@ -411,13 +413,18 @@ public interface Context extends Container {
 
 
     /**
-     * Return the URL encoded context path, using UTF-8.
+     * Return the URL encoded context path
+     *
+     * @return The URL encoded (with UTF-8) context path
      */
     public String getEncodedPath();
 
 
     /**
-     * Return the boolean on the annotations parsing.
+     * Determine if annotations parsing is currently disabled
+     *
+     * @return {@code true} if annotation parsing is disabled for this web
+     *         application
      */
     public boolean getIgnoreAnnotations();
 
@@ -1620,45 +1627,6 @@ public interface Context extends Container {
     public Map<String, String> findPreDestroyMethods();
 
     /**
-     * Change the current thread context class loader to the web application
-     * class loader. If no web application class loader is defined, or if the
-     * current thread is already using the web application class loader then no
-     * change will be made. If the class loader is changed and a
-     * {@link ThreadBindingListener} is configured then
-     * {@link ThreadBindingListener#bind()} will be called after the change has
-     * been made.
-     *
-     * @param usePrivilegedAction
-     *          Should a {@link java.security.PrivilegedAction} be used when
-     *          obtaining the current thread context class loader and setting
-     *          the new one?
-     * @param originalClassLoader
-     *          The current class loader if known to save this method having to
-     *          look it up
-     *
-     * @return If the class loader has been changed by the method it will return
-     *         the thread context class loader in use when the method was
-     *         called. If no change was made then this method returns null.
-     */
-    public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader);
-
-    /**
-     * Restore the current thread context class loader to the original class
-     * loader in used before {@link #bind(boolean, ClassLoader)} was called. If
-     * no original class loader is passed to this method then no change will be
-     * made. If the class loader is changed and a {@link ThreadBindingListener}
-     * is configured then {@link ThreadBindingListener#unbind()} will be called
-     * before the change is made.
-     *
-     * @param usePrivilegedAction
-     *          Should a {@link java.security.PrivilegedAction} be used when
-     *          setting the current thread context class loader?
-     * @param originalClassLoader
-     *          The class loader to restore as the thread context class loader
-     */
-    public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader);
-
-    /**
      * Obtain the token necessary for operations on the associated JNDI naming
      * context.
      */
@@ -1680,4 +1648,104 @@ public interface Context extends Container {
      * for this Context.
      */
     public CookieProcessor getCookieProcessor();
+
+    /**
+     * When a client provides the ID for a new session, should that ID be
+     * validated? The only use case for using a client provided session ID is to
+     * have a common session ID across multiple web applications. Therefore,
+     * any client provided session ID should already exist in another web
+     * application. If this check is enabled, the client provided session ID
+     * will only be used if the session ID exists in at least one other web
+     * application for the current host. Note that the following additional
+     * tests are always applied, irrespective of this setting:
+     * <ul>
+     * <li>The session ID is provided by a cookie</li>
+     * <li>The session cookie has a path of {@code /}</li>
+     * </ul>
+     *
+     * @param validateClientProvidedNewSessionId
+     *          {@code true} if validation should be applied
+     */
+    public void setValidateClientProvidedNewSessionId(boolean validateClientProvidedNewSessionId);
+
+    /**
+     * Will client provided session IDs be validated (see {@link
+     * #setValidateClientProvidedNewSessionId(boolean)}) before use?
+     *
+     * @return {@code true} if validation will be applied. Otherwise, {@code
+     *         false}
+     */
+    public boolean getValidateClientProvidedNewSessionId();
+
+    /**
+     * If enabled, requests for a web application context root will be
+     * redirected (adding a trailing slash) by the Mapper. This is more
+     * efficient but has the side effect of confirming that the context path is
+     * valid.
+     *
+     * @param mapperContextRootRedirectEnabled Should the redirects be enabled?
+     */
+    public void setMapperContextRootRedirectEnabled(boolean mapperContextRootRedirectEnabled);
+
+    /**
+     * Determines if requests for a web application context root will be
+     * redirected (adding a trailing slash) by the Mapper. This is more
+     * efficient but has the side effect of confirming that the context path is
+     * valid.
+     *
+     * @return {@code true} if the Mapper level redirect is enabled for this
+     *         Context.
+     */
+    public boolean getMapperContextRootRedirectEnabled();
+
+    /**
+     * If enabled, requests for a directory will be redirected (adding a
+     * trailing slash) by the Mapper. This is more efficient but has the
+     * side effect of confirming that the directory is valid.
+     *
+     * @param mapperDirectoryRedirectEnabled Should the redirects be enabled?
+     */
+    public void setMapperDirectoryRedirectEnabled(boolean mapperDirectoryRedirectEnabled);
+
+    /**
+     * Determines if requests for a directory will be redirected (adding a
+     * trailing slash) by the Mapper. This is more efficient but has the
+     * side effect of confirming that the directory is valid.
+     *
+     * @return {@code true} if the Mapper level redirect is enabled for this
+     *         Context.
+     */
+    public boolean getMapperDirectoryRedirectEnabled();
+
+    /**
+     * Controls whether HTTP 1.1 and later location headers generated by a call
+     * to {@link javax.servlet.http.HttpServletResponse#sendRedirect(String)}
+     * will use relative or absolute redirects.
+     * <p>
+     * Relative redirects are more efficient but may not work with reverse
+     * proxies that change the context path. It should be noted that it is not
+     * recommended to use a reverse proxy to change the context path because of
+     * the multiple issues it creates.
+     * <p>
+     * Absolute redirects should work with reverse proxies that change the
+     * context path but may cause issues with the
+     * {@link org.apache.catalina.filters.RemoteIpFilter} if the filter is
+     * changing the scheme and/or port.
+     *
+     * @param useRelativeRedirects {@code true} to use relative redirects and
+     *                             {@code false} to use absolute redirects
+     */
+    public void setUseRelativeRedirects(boolean useRelativeRedirects);
+
+    /**
+     * Will HTTP 1.1 and later location headers generated by a call to
+     * {@link javax.servlet.http.HttpServletResponse#sendRedirect(String)} use
+     * relative or absolute redirects.
+     *
+     * @return {@code true} if relative redirects will be used {@code false} if
+     *         absolute redirects are used.
+     *
+     * @see #setUseRelativeRedirects(boolean)
+     */
+    public boolean getUseRelativeRedirects();
 }

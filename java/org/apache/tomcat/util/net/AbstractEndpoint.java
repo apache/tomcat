@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -80,6 +81,14 @@ public abstract class AbstractEndpoint<S> {
          */
         public Object getGlobal();
 
+
+        /**
+         * Obtain the currently open sockets.
+         *
+         * @return The sockets for which the handler is tracking a currently
+         *         open connection
+         */
+        public Set<S> getOpenSockets();
 
         /**
          * Release any resources associated with the given SocketWrapper.
@@ -524,6 +533,15 @@ public abstract class AbstractEndpoint<S> {
         return (negotiableProtocols.size() > 0);
     }
 
+
+    /**
+     * Handling of accepted sockets.
+     */
+    private Handler<S> handler = null;
+    public void setHandler(Handler<S> handler ) { this.handler = handler; }
+    public Handler<S> getHandler() { return handler; }
+
+
     /**
      * Attributes provide a way for configuration to be passed to sub-components
      * without the {@link org.apache.coyote.ProtocolHandler} being aware of the
@@ -839,9 +857,6 @@ public abstract class AbstractEndpoint<S> {
             bindState = BindState.UNBOUND;
         }
     }
-
-
-    protected abstract Handler<S> getHandler();
 
     protected abstract Log getLog();
 

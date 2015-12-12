@@ -40,7 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Implementation of <code>LifecycleListener</code> that will init and
  * and destroy APR.
  *
- * @author Remy Maucherat
  * @since 4.1
  */
 public class AprLifecycleListener
@@ -66,10 +65,10 @@ public class AprLifecycleListener
 
 
     protected static final int TCN_REQUIRED_MAJOR = 1;
-    protected static final int TCN_REQUIRED_MINOR = 1;
-    protected static final int TCN_REQUIRED_PATCH = 32;
+    protected static final int TCN_REQUIRED_MINOR = 2;
+    protected static final int TCN_REQUIRED_PATCH = 2;
     protected static final int TCN_RECOMMENDED_MINOR = 2;
-    protected static final int TCN_RECOMMENDED_PV = 0;
+    protected static final int TCN_RECOMMENDED_PV = 2;
 
 
     // ---------------------------------------------- Properties
@@ -79,6 +78,7 @@ public class AprLifecycleListener
     protected static boolean sslInitialized = false;
     protected static boolean aprInitialized = false;
     protected static boolean aprAvailable = false;
+    protected static boolean aprPreferred = true;
     protected static boolean fipsModeActive = false;
 
     /**
@@ -394,4 +394,15 @@ public class AprLifecycleListener
     public boolean isFIPSModeActive() {
         return fipsModeActive;
     }
+
+    public void setAprPreferred(boolean aprPreferred) {
+        if (aprPreferred != AprLifecycleListener.aprPreferred) {
+            AprLifecycleListener.aprPreferred = aprPreferred;
+        }
+    }
+
+    public static boolean isAprPreferred() {
+        return aprPreferred;
+    }
+
 }

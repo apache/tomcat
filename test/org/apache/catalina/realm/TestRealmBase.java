@@ -30,10 +30,10 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.connector.TesterRequest;
-import org.apache.catalina.connector.TesterResponse;
-import org.apache.catalina.core.TesterContext;
 import org.apache.catalina.startup.TesterMapRealm;
+import org.apache.tomcat.unittest.TesterContext;
+import org.apache.tomcat.unittest.TesterRequest;
+import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
@@ -668,7 +668,7 @@ public class TestRealmBase {
         // Set up the mock request and response
         TesterRequest request = new TesterRequest();
         Response response = new TesterResponse();
-        Context context = new TesterContext();
+        Context context = request.getContext();
         context.addSecurityRole(ROLE1);
         context.addSecurityRole(ROLE2);
         request.getMappingData().context = context;

@@ -614,7 +614,7 @@ public class StatusTransformer {
                 if (webModuleName.startsWith("//")) {
                     webModuleName = webModuleName.substring(2);
                 }
-                int slash = webModuleName.indexOf("/");
+                int slash = webModuleName.indexOf('/');
                 if (slash == -1) {
                     count++;
                     continue;
@@ -667,7 +667,7 @@ public class StatusTransformer {
             if (name.startsWith("//")) {
                 name = name.substring(2);
             }
-            int slash = name.indexOf("/");
+            int slash = name.indexOf('/');
             if (slash != -1) {
                 hostName = name.substring(0, slash);
                 contextName = name.substring(slash);

@@ -55,17 +55,22 @@
     the Tomcat process and provide that user with the minimum necessary
     permissions for the operating system. For example, it should not be possible
     to log on remotely using the Tomcat user.</p>
-    <p>File permissions should also be suitably restricted. Taking the Tomcat
-    instances at the ASF as an example (where auto-deployment is disabled and
-    web applications are deployed as exploded directories), the standard
-    configuration is to have all Tomcat files owned by root with group Tomcat
-    and whilst owner has read/write privileges, group only has read and world
-    has no permissions. The exceptions are the logs, temp and work directory
-    that are owned by the Tomcat user rather than root. This means that even if
-    an attacker compromises the Tomcat process, they can&apos;t change the
-    Tomcat configuration, deploy new web applications or modify existing web
-    applications. The Tomcat process runs with a umask of 007 to maintain these
-    permissions.</p>
+    <p>File permissions should also be suitably restricted. In the
+    <code>.tar.gz</code> distribution, files and directories are not world
+    readable and the group does not have write access. On Unix like operating
+    systems, Tomcat runs with a default umask of <code>0027</code> to maintain
+    these permissions for files created while Tomcat is running (e.g. log files,
+    expanded WARs, etc.).</p>
+    <p>Taking the Tomcat instances at the ASF as an example (where
+    auto-deployment is disabled and web applications are deployed as exploded
+    directories), the standard configuration is to have all Tomcat files owned
+    by root with group Tomcat and whilst owner has read/write privileges, group
+    only has read and world has no permissions. The exceptions are the logs,
+    temp and work directory that are owned by the Tomcat user rather than root.
+    This means that even if an attacker compromises the Tomcat process, they
+    can&apos;t change the Tomcat configuration, deploy new web applications or
+    modify existing web applications. The Tomcat process runs with a umask of
+    007 to maintain these permissions.</p>
     <p>At the network level, consider using a firewall to limit both incoming
     and outgoing connections to only those connections you  expect to be
     present.</p>
@@ -463,6 +468,10 @@
     determine the real version installed. The CATALINA_HOME/bin/version.bat|sh
     script will still report the version number.
     </p>
+
+    <p>The CGI Servlet is disabled by default. If enabled, the debug
+    initialisation parameter should not be set to <code>10</code> or higher on a
+    production system because the debug page is not secure.</p>
 
     <p><a href="config/filter.html">FailedRequestFilter</a>
     can be configured and used to reject requests that had errors during

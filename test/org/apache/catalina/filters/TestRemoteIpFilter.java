@@ -49,10 +49,10 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.connector.TesterResponse;
-import org.apache.catalina.core.TesterContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterContext;
+import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
@@ -614,98 +614,5 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         Assert.assertTrue(request.isSecure());
         Assert.assertEquals("https", request.getScheme());
         Assert.assertEquals(443, request.getServerPort());
-    }
-
-
-    @Test
-    public void testSendRedirectWithXForwardedProto01() throws Exception  {
-        doTestSendRedirectWithXForwardedProtol(false, false, 8080, 8080);
-    }
-
-
-    @Test
-    public void testSendRedirectWithXForwardedProto02() throws Exception  {
-        doTestSendRedirectWithXForwardedProtol(false, true, 8080, 8080);
-    }
-
-
-    @Test
-    public void testSendRedirectWithXForwardedProto03() throws Exception  {
-        doTestSendRedirectWithXForwardedProtol(true, false, 8080, 8080);
-    }
-
-
-    @Test
-    public void testSendRedirectWithXForwardedProto04() throws Exception  {
-        doTestSendRedirectWithXForwardedProtol(true, true, 8080, 8080);
-    }
-
-
-    @Test
-    public void testSendRedirectWithXForwardedProto05() throws Exception  {
-        doTestSendRedirectWithXForwardedProtol(false, false, 8080, 80);
-    }
-
-
-    @Test
-    public void testSendRedirectWithXForwardedProto06() throws Exception  {
-        doTestSendRedirectWithXForwardedProtol(false, false, 80, 8080);
-    }
-
-
-    @Test
-    public void testSendRedirectWithXForwardedProto07() throws Exception  {
-        doTestSendRedirectWithXForwardedProtol(false, true, 8443, 443);
-    }
-
-
-    @Test
-    public void testSendRedirectWithXForwardedProto08() throws Exception  {
-        doTestSendRedirectWithXForwardedProtol(false, true, 443, 8443);
-    }
-
-
-    private void doTestSendRedirectWithXForwardedProtol(boolean incomingIsHttps,
-            boolean headerIsHttps, int incomingPort, int headerPort) throws Exception {
-
-        // PREPARE
-        FilterDef filterDef = new FilterDef();
-        filterDef.addInitParameter("protocolHeader", "x-forwarded-proto");
-        filterDef.addInitParameter("remoteIpHeader", "x-my-forwarded-for");
-        if (headerIsHttps) {
-            filterDef.addInitParameter("httpsServerPort", Integer.toString(headerPort));
-        } else {
-            filterDef.addInitParameter("httpServerPort", Integer.toString(headerPort));
-        }
-
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setRemoteAddr("192.168.0.10");
-        request.setServerPort(incomingPort);
-        request.setSecure(true);
-        if (incomingIsHttps) {
-            request.setScheme("https");
-        } else {
-            request.setScheme("http");
-        }
-        request.setHeader("x-my-forwarded-for", "140.211.11.130");
-        if (headerIsHttps) {
-            request.setHeader("x-forwarded-proto", "https");
-        } else {
-            request.setHeader("x-forwarded-proto", "http");
-        }
-
-        // TEST
-        HttpServletResponse actualResponse = testRemoteIpFilter(filterDef, request).getResponse();
-        actualResponse.sendRedirect("/");
-        String location = actualResponse.getHeader("Location");
-
-        // VERIFY
-        Assert.assertEquals(location,
-                Boolean.valueOf(location.startsWith("https")), Boolean.valueOf(headerIsHttps));
-        if (headerPort == 80 && !headerIsHttps || headerPort == 443 && headerIsHttps) {
-            Assert.assertTrue(location, location.contains("://localhost/"));
-        } else {
-            Assert.assertTrue(location, location.contains("://localhost:" + headerPort + "/"));
-        }
     }
 }
