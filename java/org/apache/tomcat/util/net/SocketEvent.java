@@ -72,7 +72,7 @@ public enum SocketEvent {
     ASYNC_READ_ERROR,
 
     /**
-     * Initiated by the container when an I/O error is dedcated on a
+     * Initiated by the container when an I/O error is detected on a
      * non-container thread.
      *
      * TODO: Can this be combined with / replaced by ERROR?
