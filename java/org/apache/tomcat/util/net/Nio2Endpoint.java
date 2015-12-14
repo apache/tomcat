@@ -1635,10 +1635,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                             // For STOP there is no point trying to handshake as the
                             // Poller has been stopped.
                             if (socket.getSocket().isHandshakeComplete() ||
-                                    status == SocketEvent.STOP) {
+                                    status == SocketEvent.STOP ||
+                                    status == SocketEvent.ERROR) {
                                 handshake = 0;
-                            } else if (status == SocketEvent.ERROR) {
-                                handshake = -1;
                             } else {
                                 handshake = socket.getSocket().handshake();
                                 // The handshake process reads/writes from/to the
@@ -1657,7 +1656,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                             log.debug(sm.getString("endpoint.err.handshake"), x);
                         }
                     }
-                    if (handshake == 0 || status == SocketEvent.ERROR) {
+                    if (handshake == 0) {
                         SocketState state = SocketState.OPEN;
                         // Process the request from this socket
                         if (status == null) {
