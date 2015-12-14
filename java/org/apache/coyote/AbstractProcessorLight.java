@@ -44,10 +44,7 @@ public abstract class AbstractProcessorLight implements Processor {
         SocketState state = SocketState.CLOSED;
         Iterator<DispatchType> dispatches = null;
         do {
-            if (status == SocketEvent.CLOSE_NOW) {
-                errorDispatch();
-                state = SocketState.CLOSED;
-            } else if (dispatches != null) {
+            if (dispatches != null) {
                 DispatchType nextDispatch = dispatches.next();
                 state = dispatch(nextDispatch.getSocketStatus());
             } else if (status == SocketEvent.DISCONNECT) {
@@ -151,8 +148,6 @@ public abstract class AbstractProcessorLight implements Processor {
     protected abstract SocketState dispatch(SocketEvent status);
 
     protected abstract SocketState asyncPostProcess();
-
-    protected abstract void errorDispatch();
 
     protected abstract Log getLog();
 }

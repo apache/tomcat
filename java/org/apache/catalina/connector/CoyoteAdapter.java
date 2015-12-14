@@ -157,22 +157,24 @@ public class CoyoteAdapter implements Adapter {
                 if (!asyncConImpl.timeout()) {
                     asyncConImpl.setErrorState(null, false);
                 }
-            } else if (status==SocketEvent.ASYNC_WRITE_ERROR) {
-                // A async write error is an IO error which means the socket
-                // needs to be closed so set success to false to trigger a
-                // close
+            } else if (status==SocketEvent.ERROR) {
+                // An I/O error occurred on a non-container thread which means
+                // that the socket needs to be closed so set success to false to
+                // trigger a close
                 success = false;
-                Throwable t = (Throwable)req.getAttribute(
-                        RequestDispatcher.ERROR_EXCEPTION);
+                Throwable t = (Throwable)req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
                 req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
-                if (res.getWriteListener() != null) {
-                    ClassLoader oldCL = null;
-                    try {
-                        oldCL = request.getContext().bind(false, null);
-                        res.getWriteListener().onError(t);
-                    } finally {
-                        request.getContext().unbind(false, oldCL);
+                ClassLoader oldCL = null;
+                try {
+                    oldCL = request.getContext().bind(false, null);
+                    if (req.getReadListener() != null) {
+                        req.getReadListener().onError(t);
                     }
+                    if (res.getWriteListener() != null) {
+                        res.getWriteListener().onError(t);
+                    }
+                } finally {
+                    request.getContext().unbind(false, oldCL);
                 }
                 if (t != null) {
                     asyncConImpl.setErrorState(t, true);
@@ -391,34 +393,6 @@ public class CoyoteAdapter implements Adapter {
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         return postParseRequest(req, request, res, response);
-    }
-
-
-    @Override
-    public void errorDispatch(org.apache.coyote.Request req,
-            org.apache.coyote.Response res) {
-        Request request = (Request) req.getNote(ADAPTER_NOTES);
-        Response response = (Response) res.getNote(ADAPTER_NOTES);
-
-        if (request != null && request.getMappingData().context != null) {
-            request.getMappingData().context.logAccess(
-                    request, response,
-                    System.currentTimeMillis() - req.getStartTime(),
-                    false);
-        } else {
-            log(req, res, System.currentTimeMillis() - req.getStartTime());
-        }
-
-        if (request != null) {
-            request.recycle();
-        }
-
-        if (response != null) {
-            response.recycle();
-        }
-
-        req.recycle();
-        res.recycle();
     }
 
 

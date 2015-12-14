@@ -319,19 +319,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 result = SocketState.UPGRADED;
                 break;
 
-            case ASYNC_WRITE_ERROR:
-            case CLOSE_NOW:
-                // This should never happen and will be fatal for this connection.
-                // Add the exception to trace how this point was reached.
-                log.error(sm.getString("upgradeHandler.unexpectedStatus", status),
-                        new IllegalStateException());
-                //$FALL-THROUGH$
             case DISCONNECT:
             case ERROR:
             case TIMEOUT:
             case STOP:
-                // For all of the above, including the unexpected values, close the
-                // connection.
                 close();
                 break;
             }

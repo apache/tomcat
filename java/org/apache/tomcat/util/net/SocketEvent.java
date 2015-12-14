@@ -51,25 +51,14 @@ public enum SocketEvent {
     DISCONNECT,
 
     /**
-     * An error has occurred that does not had a dedicated event type. Currently
-     * this is only used by NIO2 to signal the failure of a completion handler.
+     * An error has occurred on a non-container thread and processing needs to
+     * return to the container for any necessary clean-up. Examples of where
+     * this is used include:
+     * <ul>
+     * <li>by NIO2 to signal the failure of a completion handler</li>
+     * <li>by the container to signal an I/O error on a non-container thread
+     *     during Servlet 3.0 asynchronous processing.</li>
+     * </ul>
      */
-    ERROR,
-
-    /**
-     * Used internally by the container to signal that an I/O occurred during an
-     * asynchronous read.
-     *
-     * TODO: Given how this is used, it is possible to refactor the processing
-     *       so this enum value is not required?
-     */
-    ASYNC_WRITE_ERROR,
-
-    /**
-     * Initiated by the container when an I/O error is detected on a
-     * non-container thread.
-     *
-     * TODO: Can this be combined with / replaced by ERROR?
-     */
-    CLOSE_NOW
+    ERROR
 }
