@@ -51,7 +51,7 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -264,7 +264,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public SocketState upgradeDispatch(SocketStatus status) {
+    public SocketState upgradeDispatch(SocketEvent status) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.upgradeDispatch.entry", connectionId, status));
         }

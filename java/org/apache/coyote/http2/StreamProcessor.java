@@ -34,7 +34,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -63,7 +63,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         ContainerThreadMarker.set();
         SocketState state = SocketState.CLOSED;
         try {
-            state = process(socketWrapper, SocketStatus.OPEN_READ);
+            state = process(socketWrapper, SocketEvent.OPEN_READ);
 
             if (state == SocketState.CLOSED) {
                 if (!getErrorState().isConnectionIoAllowed()) {

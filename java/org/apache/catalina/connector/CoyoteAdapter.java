@@ -50,7 +50,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -127,7 +127,7 @@ public class CoyoteAdapter implements Adapter {
 
     @Override
     public boolean asyncDispatch(org.apache.coyote.Request req,
-            org.apache.coyote.Response res, SocketStatus status) throws Exception {
+            org.apache.coyote.Response res, SocketEvent status) throws Exception {
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
@@ -153,11 +153,11 @@ public class CoyoteAdapter implements Adapter {
                 response.setSuspended(false);
             }
 
-            if (status==SocketStatus.TIMEOUT) {
+            if (status==SocketEvent.TIMEOUT) {
                 if (!asyncConImpl.timeout()) {
                     asyncConImpl.setErrorState(null, false);
                 }
-            } else if (status==SocketStatus.ASYNC_READ_ERROR) {
+            } else if (status==SocketEvent.ASYNC_READ_ERROR) {
                 // A async read error is an IO error which means the socket
                 // needs to be closed so set success to false to trigger a
                 // close
@@ -178,7 +178,7 @@ public class CoyoteAdapter implements Adapter {
                 if (t != null) {
                     asyncConImpl.setErrorState(t, true);
                 }
-            } else if (status==SocketStatus.ASYNC_WRITE_ERROR) {
+            } else if (status==SocketEvent.ASYNC_WRITE_ERROR) {
                 // A async write error is an IO error which means the socket
                 // needs to be closed so set success to false to trigger a
                 // close
@@ -204,7 +204,7 @@ public class CoyoteAdapter implements Adapter {
             if (!request.isAsyncDispatching() && request.isAsync()) {
                 WriteListener writeListener = res.getWriteListener();
                 ReadListener readListener = req.getReadListener();
-                if (writeListener != null && status == SocketStatus.OPEN_WRITE) {
+                if (writeListener != null && status == SocketEvent.OPEN_WRITE) {
                     ClassLoader oldCL = null;
                     try {
                         oldCL = request.getContext().bind(false, null);
@@ -220,7 +220,7 @@ public class CoyoteAdapter implements Adapter {
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
-                } else if (readListener != null && status == SocketStatus.OPEN_READ) {
+                } else if (readListener != null && status == SocketEvent.OPEN_READ) {
                     ClassLoader oldCL = null;
                     try {
                         oldCL = request.getContext().bind(false, null);

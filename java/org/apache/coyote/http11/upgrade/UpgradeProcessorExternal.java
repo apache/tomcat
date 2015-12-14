@@ -27,7 +27,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -86,12 +86,12 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     // ------------------------------------------- Implemented Processor methods
 
     @Override
-    public final SocketState dispatch(SocketStatus status) {
-        if (status == SocketStatus.OPEN_READ) {
+    public final SocketState dispatch(SocketEvent status) {
+        if (status == SocketEvent.OPEN_READ) {
             upgradeServletInputStream.onDataAvailable();
-        } else if (status == SocketStatus.OPEN_WRITE) {
+        } else if (status == SocketEvent.OPEN_WRITE) {
             upgradeServletOutputStream.onWritePossible();
-        } else if (status == SocketStatus.STOP) {
+        } else if (status == SocketEvent.STOP) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("upgradeProcessor.stop"));
             }

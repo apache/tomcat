@@ -14,14 +14,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net;
 
 /**
- * Someone, please change the enum name.
- *
- * @author remm
+ * Defines events that occur per socket that require further processing by the
+ * container. Usually these events are triggered by the socket implementation
+ * but they may be triggered by the container.
  */
-public enum SocketStatus {
+public enum SocketEvent {
     OPEN_READ, OPEN_WRITE, STOP, TIMEOUT, DISCONNECT, ERROR, ASYNC_WRITE_ERROR, ASYNC_READ_ERROR, CLOSE_NOW
 }

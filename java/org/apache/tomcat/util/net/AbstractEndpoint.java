@@ -71,7 +71,7 @@ public abstract class AbstractEndpoint<S> {
          * @return The state of the socket after processing
          */
         public SocketState process(SocketWrapperBase<S> socket,
-                SocketStatus status);
+                SocketEvent status);
 
 
         /**
@@ -768,7 +768,7 @@ public abstract class AbstractEndpoint<S> {
      *                          container thread
      */
     public abstract void processSocket(SocketWrapperBase<S> socketWrapper,
-            SocketStatus socketStatus, boolean dispatch);
+            SocketEvent socketStatus, boolean dispatch);
 
 
     // ------------------------------------------------------- Lifecycle methods

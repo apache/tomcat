@@ -26,7 +26,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -97,7 +97,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 response.setStatus(500);
             }
             getLog().info(sm.getString("abstractProcessor.nonContainerThreadError"), t);
-            socketWrapper.processSocket(SocketStatus.CLOSE_NOW, true);
+            socketWrapper.processSocket(SocketEvent.CLOSE_NOW, true);
         }
     }
 
@@ -181,9 +181,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     @Override
-    public final SocketState dispatch(SocketStatus status) {
+    public final SocketState dispatch(SocketEvent status) {
 
-        if (status == SocketStatus.OPEN_WRITE && response.getWriteListener() != null) {
+        if (status == SocketEvent.OPEN_WRITE && response.getWriteListener() != null) {
             asyncStateMachine.asyncOperation();
             try {
                 if (flushBufferedWrite()) {
@@ -193,10 +193,10 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 if (getLog().isDebugEnabled()) {
                     getLog().debug("Unable to write async data.", ioe);
                 }
-                status = SocketStatus.ASYNC_WRITE_ERROR;
+                status = SocketEvent.ASYNC_WRITE_ERROR;
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
             }
-        } else if (status == SocketStatus.OPEN_READ && request.getReadListener() != null) {
+        } else if (status == SocketEvent.OPEN_READ && request.getReadListener() != null) {
             dispatchNonBlockingRead();
         }
 
@@ -256,7 +256,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     private void doTimeoutAsync() {
         // Avoid multiple timeouts
         setAsyncTimeout(-1);
-        socketWrapper.processSocket(SocketStatus.TIMEOUT, true);
+        socketWrapper.processSocket(SocketEvent.TIMEOUT, true);
     }
 
 

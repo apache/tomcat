@@ -16,7 +16,7 @@
  */
 package org.apache.coyote;
 
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 
 /**
  * Adapter. This represents the entry point in a coyote-based servlet container.
@@ -63,7 +63,7 @@ public interface Adapter {
      */
     public boolean prepare(Request req, Response res) throws Exception;
 
-    public boolean asyncDispatch(Request req,Response res, SocketStatus status)
+    public boolean asyncDispatch(Request req,Response res, SocketEvent status)
             throws Exception;
 
     public void errorDispatch(Request request, Response response);
