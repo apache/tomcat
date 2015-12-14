@@ -245,8 +245,6 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             case OPEN_WRITE:
                 break;
             case STOP:
-            case ASYNC_WRITE_ERROR:
-            case CLOSE_NOW:
             case DISCONNECT:
             case ERROR:
             case TIMEOUT:

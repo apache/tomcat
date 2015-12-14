@@ -716,7 +716,7 @@ public class Http11InputBuffer implements InputBuffer {
     private boolean fill(boolean block) throws IOException {
 
         if (parsingHeader) {
-            if (lastValid > headerBufferSize) {
+            if (lastValid >= headerBufferSize) {
                 throw new IllegalArgumentException
                     (sm.getString("iib.requestheadertoolarge.error"));
             }

@@ -97,7 +97,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 response.setStatus(500);
             }
             getLog().info(sm.getString("abstractProcessor.nonContainerThreadError"), t);
-            socketWrapper.processSocket(SocketEvent.CLOSE_NOW, true);
+            socketWrapper.processSocket(SocketEvent.ERROR, true);
         }
     }
 
@@ -174,11 +174,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         return asyncStateMachine.asyncPostProcess();
     }
 
-    @Override
-    public void errorDispatch() {
-        getAdapter().errorDispatch(request, response);
-    }
-
 
     @Override
     public final SocketState dispatch(SocketEvent status) {
@@ -193,7 +188,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 if (getLog().isDebugEnabled()) {
                     getLog().debug("Unable to write async data.", ioe);
                 }
-                status = SocketEvent.ASYNC_WRITE_ERROR;
+                status = SocketEvent.ERROR;
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
             }
         } else if (status == SocketEvent.OPEN_READ && request.getReadListener() != null) {
