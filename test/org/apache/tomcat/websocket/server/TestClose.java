@@ -175,7 +175,7 @@ public class TestClose extends TomcatBaseTest {
         client.forceCloseSocket();
 
         // WebSocket 1.1, section 2.1.5 requires this to be CLOSED_ABNORMALLY if
-        // the container initiates the close and the close close from the client
+        // the container initiates the close and the close code from the client
         // if the client initiates it. When the client resets the TCP connection
         // after sending the close, different operating systems react different
         // ways. Some present the close message then drop the connection, some
