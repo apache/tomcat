@@ -51,7 +51,8 @@ public enum SocketEvent {
     DISCONNECT,
 
     /**
-     * An error has occurred that does not had a dedicated event type.
+     * An error has occurred that does not had a dedicated event type. Currently
+     * this is only used by NIO2 to signal the failure of a completion handler.
      */
     ERROR,
 
