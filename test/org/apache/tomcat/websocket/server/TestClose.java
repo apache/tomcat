@@ -267,7 +267,7 @@ public class TestClose extends TomcatBaseTest {
         awaitLatch(events.onMessageCalled, "onMessage not called");
 
         client.sendCloseFrame(CloseCodes.NORMAL_CLOSURE);
-        client.closeSocket();
+        client.forceCloseSocket();
         events.onMessageWait.countDown();
 
         awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
