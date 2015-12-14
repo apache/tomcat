@@ -319,7 +319,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 result = SocketState.UPGRADED;
                 break;
 
-            case ASYNC_READ_ERROR:
             case ASYNC_WRITE_ERROR:
             case CLOSE_NOW:
                 // This should never happen and will be fatal for this connection.

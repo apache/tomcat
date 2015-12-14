@@ -65,13 +65,6 @@ public enum SocketEvent {
     ASYNC_WRITE_ERROR,
 
     /**
-     * Unused as of 9.0.x.
-     *
-     * TODO: Remove this.
-     */
-    ASYNC_READ_ERROR,
-
-    /**
      * Initiated by the container when an I/O error is detected on a
      * non-container thread.
      *
