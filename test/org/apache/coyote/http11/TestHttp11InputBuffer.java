@@ -348,7 +348,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         // fail and the response won't be read.
         Exception e = client.doRequest();
         if (e == null) {
-            assertTrue(client.isResponse400());
+            assertTrue(client.getResponseLine(), client.isResponse400());
         }
         assertFalse(client.isResponseBodyOK());
     }
