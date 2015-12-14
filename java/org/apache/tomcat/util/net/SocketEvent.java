@@ -22,5 +22,60 @@ package org.apache.tomcat.util.net;
  * but they may be triggered by the container.
  */
 public enum SocketEvent {
-    OPEN_READ, OPEN_WRITE, STOP, TIMEOUT, DISCONNECT, ERROR, ASYNC_WRITE_ERROR, ASYNC_READ_ERROR, CLOSE_NOW
+
+    /**
+     * Data is available to be read.
+     */
+    OPEN_READ,
+
+    /**
+     * The socket is ready to be written to.
+     */
+    OPEN_WRITE,
+
+    /**
+     * The associated Connector/Endpoint is stopping and the connection/socket
+     * needs to be closed cleanly.
+     */
+    STOP,
+
+    /**
+     * A timeout has occurred and the connection needs to be closed cleanly.
+     * Currently this is only used by the Servlet 3.0 async processing.
+     */
+    TIMEOUT,
+
+    /**
+     * The client has disconnected.
+     */
+    DISCONNECT,
+
+    /**
+     * An error has occurred that does not had a dedicated event type.
+     */
+    ERROR,
+
+    /**
+     * Used internally by the container to signal that an I/O occurred during an
+     * asynchronous read.
+     *
+     * TODO: Given how this is used, it is possible to refactor the processing
+     *       so this enum value is not required?
+     */
+    ASYNC_WRITE_ERROR,
+
+    /**
+     * Unused as of 9.0.x.
+     *
+     * TODO: Remove this.
+     */
+    ASYNC_READ_ERROR,
+
+    /**
+     * Initiated by the container when an I/O error is dedcated on a
+     * non-container thread.
+     *
+     * TODO: Can this be combined with / replaced by ERROR?
+     */
+    CLOSE_NOW
 }
