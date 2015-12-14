@@ -157,27 +157,6 @@ public class CoyoteAdapter implements Adapter {
                 if (!asyncConImpl.timeout()) {
                     asyncConImpl.setErrorState(null, false);
                 }
-            } else if (status==SocketEvent.ASYNC_READ_ERROR) {
-                // A async read error is an IO error which means the socket
-                // needs to be closed so set success to false to trigger a
-                // close
-                success = false;
-                Throwable t = (Throwable)req.getAttribute(
-                        RequestDispatcher.ERROR_EXCEPTION);
-                req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
-                ReadListener readListener = req.getReadListener();
-                if (readListener != null) {
-                    ClassLoader oldCL = null;
-                    try {
-                        oldCL = request.getContext().bind(false, null);
-                        readListener.onError(t);
-                    } finally {
-                        request.getContext().unbind(false, oldCL);
-                    }
-                }
-                if (t != null) {
-                    asyncConImpl.setErrorState(t, true);
-                }
             } else if (status==SocketEvent.ASYNC_WRITE_ERROR) {
                 // A async write error is an IO error which means the socket
                 // needs to be closed so set success to false to trigger a
