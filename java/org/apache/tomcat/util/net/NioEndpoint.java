@@ -432,11 +432,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
     @Override
     public void processSocket(SocketWrapperBase<NioChannel> socketWrapper,
-            SocketStatus socketStatus, boolean dispatch) {
+            SocketEvent socketStatus, boolean dispatch) {
         processSocket((NioSocketWrapper) socketWrapper, socketStatus, dispatch);
     }
 
-    protected boolean processSocket(NioSocketWrapper attachment, SocketStatus status, boolean dispatch) {
+    protected boolean processSocket(NioSocketWrapper attachment, SocketEvent status, boolean dispatch) {
         try {
             if (attachment == null) {
                 return false;
@@ -707,7 +707,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             addEvent(r);
             if (close) {
                 NioEndpoint.NioSocketWrapper ka = (NioEndpoint.NioSocketWrapper)socket.getAttachment();
-                processSocket(ka, SocketStatus.STOP, false);
+                processSocket(ka, SocketEvent.STOP, false);
             }
         }
 
@@ -903,12 +903,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                                 boolean closeSocket = false;
                                 // Read goes before write
                                 if (sk.isReadable()) {
-                                    if (!processSocket(attachment, SocketStatus.OPEN_READ, true)) {
+                                    if (!processSocket(attachment, SocketEvent.OPEN_READ, true)) {
                                         closeSocket = true;
                                     }
                                 }
                                 if (!closeSocket && sk.isWritable()) {
-                                    if (!processSocket(attachment, SocketStatus.OPEN_WRITE, true)) {
+                                    if (!processSocket(attachment, SocketEvent.OPEN_WRITE, true)) {
                                         closeSocket = true;
                                     }
                                 }
@@ -1461,13 +1461,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     protected class SocketProcessor implements Runnable {
 
         private NioSocketWrapper ka = null;
-        private SocketStatus status = null;
+        private SocketEvent status = null;
 
-        public SocketProcessor(NioSocketWrapper ka, SocketStatus status) {
+        public SocketProcessor(NioSocketWrapper ka, SocketEvent status) {
             reset(ka, status);
         }
 
-        public void reset(NioSocketWrapper ka, SocketStatus status) {
+        public void reset(NioSocketWrapper ka, SocketEvent status) {
             this.ka = ka;
             this.status = status;
         }
@@ -1490,7 +1490,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                             // For STOP there is no point trying to handshake as the
                             // Poller has been stopped.
                             if (socket.isHandshakeComplete() ||
-                                    status == SocketStatus.STOP) {
+                                    status == SocketEvent.STOP) {
                                 handshake = 0;
                             } else {
                                 handshake = socket.handshake(
@@ -1502,7 +1502,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                                 // must always be OPEN_READ after it completes. It
                                 // is OK to always set this as it is only used if
                                 // the handshake completes.
-                                status = SocketStatus.OPEN_READ;
+                                status = SocketEvent.OPEN_READ;
                             }
                         }
                     } catch (IOException x) {
@@ -1515,7 +1515,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         SocketState state = SocketState.OPEN;
                         // Process the request from this socket
                         if (status == null) {
-                            state = getHandler().process(ka, SocketStatus.OPEN_READ);
+                            state = getHandler().process(ka, SocketEvent.OPEN_READ);
                         } else {
                             state = getHandler().process(ka, status);
                         }

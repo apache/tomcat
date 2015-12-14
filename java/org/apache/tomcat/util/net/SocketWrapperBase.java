@@ -501,7 +501,7 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    public void processSocket(SocketStatus socketStatus, boolean dispatch) {
+    public void processSocket(SocketEvent socketStatus, boolean dispatch) {
         endpoint.processSocket(this, socketStatus, dispatch);
     }
 

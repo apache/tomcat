@@ -42,7 +42,7 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -691,7 +691,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
         @Override
-        public SocketState process(SocketWrapperBase<S> wrapper, SocketStatus status) {
+        public SocketState process(SocketWrapperBase<S> wrapper, SocketEvent status) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("abstractConnectionHandler.process",
                         wrapper.getSocket(), status));
@@ -708,7 +708,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             }
 
             Processor processor = connections.get(socket);
-            if (status == SocketStatus.DISCONNECT && processor == null) {
+            if (status == SocketEvent.DISCONNECT && processor == null) {
                 // Nothing to do. Endpoint requested a close and there is no
                 // longer a processor associated with this socket.
                 return SocketState.CLOSED;
@@ -816,7 +816,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // multiple read events which may lead to thread starvation
                     // in the connector. The write() method will add this socket
                     // to the poller if necessary.
-                    if (status != SocketStatus.OPEN_WRITE) {
+                    if (status != SocketEvent.OPEN_WRITE) {
                         longPoll(wrapper, processor);
                     }
                 } else {
