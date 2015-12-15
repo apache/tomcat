@@ -74,7 +74,6 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
             if (member != null) {
                 super.memberAdded(member);
             }
-            
         } else {
             super.messageReceived(msg);
         }
@@ -130,9 +129,9 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
     }
 
     /**
-     * Send notifications upwards
-     * @param svc int
-     * @throws ChannelException
+     * {@inheritDoc}
+     * <p>
+     * Sends notifications upwards.
      */
     @Override
     public void start(int svc) throws ChannelException {
