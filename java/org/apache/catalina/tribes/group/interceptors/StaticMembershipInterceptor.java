@@ -144,7 +144,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
                 @Override
                 public void run() {
                     base.memberAdded(member);
-                    if (base.getPrevious().getMember(member) != null) {
+                    if (getfirstInterceptor().getMember(member) != null) {
                         sendLocalMember(new Member[]{member});
                     }
                 }
@@ -182,5 +182,15 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
         }catch (ChannelException cx) {
             log.warn(sm.getString("staticMembershipInterceptor.sendLocalMember.failed"),cx);
         }
+    }
+
+    protected ChannelInterceptor getfirstInterceptor() {
+        ChannelInterceptor result = null;
+        ChannelInterceptor now = this;
+        do {
+            result = now;
+            now = now.getPrevious();
+        } while (now.getPrevious() != null);
+        return result;
     }
 }
