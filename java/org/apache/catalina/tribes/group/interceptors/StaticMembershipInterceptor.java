@@ -17,19 +17,27 @@
 package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
+import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
+import org.apache.catalina.tribes.io.ChannelData;
+import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 public class StaticMembershipInterceptor extends ChannelInterceptorBase {
 
     private static final Log log = LogFactory.getLog(StaticMembershipInterceptor.class);
+
+    protected static final byte[] MEMBER_START = new byte[] {
+        76, 111, 99, 97, 108, 32, 83, 116, 97, 116, 105, 99, 77, 101, 109, 98, 101, 114, 32, 78,
+        111, 116, 105, 102, 105, 99, 97, 116, 105, 111, 110, 32, 68, 97, 116, 97};
 
     protected ArrayList<Member> members = new ArrayList<Member>();
     protected Member localMember = null;
@@ -52,6 +60,21 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
 
     public void setLocalMember(Member member) {
         this.localMember = member;
+    }
+
+    @Override
+    public void messageReceived(ChannelMessage msg) {
+        if (msg.getMessage().getLength() == MEMBER_START.length &&
+                Arrays.equals(MEMBER_START, msg.getMessage().getBytes())) {
+            // receive member start
+            Member member = getMember(msg.getAddress());
+            if (member != null) {
+                super.memberAdded(member);
+            }
+            
+        } else {
+            super.messageReceived(msg);
+        }
     }
 
     /**
@@ -112,17 +135,19 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
     public void start(int svc) throws ChannelException {
         if ( (Channel.SND_RX_SEQ&svc)==Channel.SND_RX_SEQ ) super.start(Channel.SND_RX_SEQ); 
         if ( (Channel.SND_TX_SEQ&svc)==Channel.SND_TX_SEQ ) super.start(Channel.SND_TX_SEQ); 
-        final Member[] mbrs = members.toArray(new Member[members.size()]);
         final ChannelInterceptorBase base = this;
-        Thread t = new Thread() {
-            @Override
-            public void run() {
-                for (int i=0; i<mbrs.length; i++ ) {
-                    base.memberAdded(mbrs[i]);
+        for (final Member member : members) {
+            Thread t = new Thread() {
+                @Override
+                public void run() {
+                    base.memberAdded(member);
+                    if (getfirstInterceptor().getMember(member) != null) {
+                        sendLocalMember(new Member[]{member});
+                    }
                 }
-            }
-        };
-        t.start();
+            };
+            t.start();
+        }
         super.start(svc & (~Channel.SND_RX_SEQ) & (~Channel.SND_TX_SEQ));
 
         // check required interceptors
@@ -144,6 +169,30 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
                     + " not work properly. By defining the TcpPingInterceptor, the health check of"
                     + " static member will work.");
         }
+    }
+
+    protected void sendLocalMember(Member[] members) {
+        if ( members == null || members.length == 0 ) return;
+        ChannelData data = new ChannelData(true);
+        data.setAddress(getLocalMember(false));
+        data.setTimestamp(System.currentTimeMillis());
+        data.setOptions(getOptionFlag());
+        data.setMessage(new XByteBuffer(MEMBER_START, false));
+        try {
+            super.sendMessage(members, data, null);
+        }catch (ChannelException cx) {
+            log.warn("Local member notification failed.",cx);
+        }
+    }
+
+    protected ChannelInterceptor getfirstInterceptor() {
+        ChannelInterceptor result = null;
+        ChannelInterceptor now = this;
+        do {
+            result = now;
+            now = now.getPrevious();
+        } while (now.getPrevious() != null);
+        return result;
     }
 
 }

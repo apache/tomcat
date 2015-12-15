@@ -81,6 +81,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Add support for the startup notification of local members in the static
+        cluster. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.67 (violetagg)" rtext="released 2015-12-10">
   <subsection name="Catalina">
