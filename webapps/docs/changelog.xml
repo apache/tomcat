@@ -164,6 +164,10 @@
       <fix>
         Fix NIO connector renegotiation. (remm)
       </fix>
+      <fix>
+        <bug>58659</bug>: Fix a potential deadlock during HTTP/2 processing when
+        the connection window size is limited. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

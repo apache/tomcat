@@ -733,24 +733,35 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
 
+    @SuppressWarnings("sync-override") // notifyAll() needs to be outside sync
+                                       // to avoid deadlock
     @Override
-    protected synchronized void incrementWindowSize(int increment) throws Http2Exception {
-        long windowSize = getWindowSize();
-        if (windowSize < 1 && windowSize + increment > 0) {
-            releaseBackLog((int) (windowSize +increment));
+    protected void incrementWindowSize(int increment) throws Http2Exception {
+        Set<AbstractStream> streamsToNotify = null;
+
+        synchronized (this) {
+            long windowSize = getWindowSize();
+            if (windowSize < 1 && windowSize + increment > 0) {
+                streamsToNotify = releaseBackLog((int) (windowSize +increment));
+            }
+            super.incrementWindowSize(increment);
         }
-        super.incrementWindowSize(increment);
-    }
 
-
-    private synchronized void releaseBackLog(int increment) {
-        if (backLogSize < increment) {
-            // Can clear the whole backlog
-            for (AbstractStream stream : backLogStreams.keySet()) {
+        if (streamsToNotify != null) {
+            for (AbstractStream stream : streamsToNotify) {
                 synchronized (stream) {
                     stream.notifyAll();
                 }
             }
+        }
+    }
+
+
+    private synchronized Set<AbstractStream> releaseBackLog(int increment) {
+        Set<AbstractStream> result = new HashSet<>();
+        if (backLogSize < increment) {
+            // Can clear the whole backlog
+            result.addAll(backLogStreams.keySet());
             backLogStreams.clear();
             backLogSize = 0;
         } else {
@@ -762,12 +773,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 int allocation = entry.getValue()[1];
                 if (allocation > 0) {
                     backLogSize -= allocation;
-                    synchronized (entry.getKey()) {
-                        entry.getKey().doNotifyAll();
-                    }
+                    result.add(entry.getKey());
                 }
             }
         }
+        return result;
     }
 
 
