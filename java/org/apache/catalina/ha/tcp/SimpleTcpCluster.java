@@ -40,6 +40,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
 import org.apache.catalina.ha.CatalinaCluster;
+import org.apache.catalina.ha.ClusterDeployer;
 import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
@@ -155,7 +156,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     private List<Valve> valves = new ArrayList<Valve>();
 
-    private org.apache.catalina.ha.ClusterDeployer clusterDeployer;
+    private ClusterDeployer clusterDeployer;
     private ObjectName onameClusterDeployer;
 
     /**
