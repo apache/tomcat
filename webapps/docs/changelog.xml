@@ -263,7 +263,11 @@
       <update>
         Update the packaged version of the Tomcat Native Library to 1.2.3 to
         pick up the Windows binaries that are based on OpenSSL 1.0.2e and APR
-        1.5.1. (markt) 
+        1.5.1. (markt)
+      </update>
+      <update>
+        Update the NSIS Installer used to build the Windows Installers to
+        version 2.47. (markt)
       </update>
     </changelog>
   </subsection>
