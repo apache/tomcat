@@ -233,6 +233,10 @@
         the membership service to the map members list in order to ensure that
         the map member is a static member. (kfujino)
       </fix>
+      <fix>
+        Add support for the startup notification of local members in the static
+        cluster. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
