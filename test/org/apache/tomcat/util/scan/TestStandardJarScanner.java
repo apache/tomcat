@@ -38,6 +38,12 @@ public class TestStandardJarScanner {
         StandardJarScanner scanner = new StandardJarScanner();
 
         scanner.setScanClassPath(true);
+        // When running the test on Java 9, one or more URLs to jimage files may
+        // be returned. By setting the scanAllFiles option, a callback will be
+        // generated for these files which in turn will mean the number of URLs
+        // and the number of call backs will agree and this test will pass.
+        // There is a TODO in StandardJarScanner to add 'proper' Java 9 support.
+        scanner.setScanAllFiles(true);
 
         LoggingCallback callback = new LoggingCallback();
 

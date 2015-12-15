@@ -225,6 +225,10 @@ public class StandardJarScanner implements JarScanner {
                             continue;
                         }
 
+                        // TODO: Java 9 support. Details are TBD. It will depend
+                        //       on the extent to which Java 8 supports the
+                        //       Java 9 file formats since this code MUST run on
+                        //       Java 8.
                         ClassPathEntry cpe = new ClassPathEntry(urls[i]);
 
                         // JARs are scanned unless the filter says not to.
