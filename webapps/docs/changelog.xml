@@ -89,6 +89,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the NSIS Installer used to build the Windows Installers to
+        version 2.47. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.67 (violetagg)" rtext="released 2015-12-10">
   <subsection name="Catalina">
