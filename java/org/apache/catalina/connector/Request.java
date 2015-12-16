@@ -1908,15 +1908,17 @@ public class Request implements HttpServletRequest {
             }
             lastSlash--;
         }
-        // Now allow for normalization and/or encoding. Essentially, keep
-        // extending the candidate path up to the next slash until the decoded
-        // and normalized candidate path is the same as the canonical path.
+        // Now allow for path parameters, normalization and/or encoding.
+        // Essentially, keep extending the candidate path up to the next slash
+        // until the decoded and normalized candidate path (with the path
+        // parameters removed) is the same as the canonical path.
         String candidate;
         if (pos == -1) {
             candidate = uri;
         } else {
             candidate = uri.substring(0, pos);
         }
+        candidate = removePathParameters(candidate);
         candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
         candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
         boolean match = canonicalContextPath.equals(candidate);
@@ -1927,6 +1929,7 @@ public class Request implements HttpServletRequest {
             } else {
                 candidate = uri.substring(0, pos);
             }
+            candidate = removePathParameters(candidate);
             candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
             candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
             match = canonicalContextPath.equals(candidate);
@@ -1945,6 +1948,32 @@ public class Request implements HttpServletRequest {
     }
 
 
+    private String removePathParameters(String input) {
+        int nextSemiColon = input.indexOf(';');
+        // Shortcut
+        if (nextSemiColon == -1) {
+            return input;
+        }
+        StringBuilder result = new StringBuilder(input.length());
+        result.append(input.substring(0, nextSemiColon));
+        while (true) {
+            int nextSlash = input.indexOf('/', nextSemiColon);
+            if (nextSlash == -1) {
+                break;
+            }
+            nextSemiColon = input.indexOf(';', nextSlash);
+            if (nextSemiColon == -1) {
+                result.append(input.substring(nextSlash));
+                break;
+            } else {
+                result.append(input.substring(nextSlash, nextSemiColon));
+            }
+        }
+
+        return result.toString();
+    }
+
+
     private int nextSlash(char[] uri, int startPos) {
         int len = uri.length;
         int pos = startPos;
@@ -1959,6 +1988,7 @@ public class Request implements HttpServletRequest {
         }
         return -1;
     }
+
 
     /**
      * Return the set of Cookies received with this Request. Triggers parsing of

@@ -132,6 +132,11 @@
         NIO + OpenSSL if tomcat-native is available, rather than the APR
         connector. (remm)
       </update>
+      <fix>
+        Add path parameter handling to
+        <code>HttpServletRequest.getContextPath()</code>. This is a follow-up to
+        the fix for <bug>57215</bug>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
