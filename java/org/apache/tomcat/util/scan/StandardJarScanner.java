@@ -20,7 +20,6 @@ package org.apache.tomcat.util.scan;
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
@@ -35,6 +34,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.file.Matcher;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -271,10 +271,11 @@ public class StandardJarScanner implements JarScanner {
                                 callback.scan(f);
                             }
                         }
-                    } catch (URISyntaxException e) {
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         // Wrap the exception and re-throw
                         IOException ioe = new IOException();
-                        ioe.initCause(e);
+                        ioe.initCause(t);
                         throw ioe;
                     }
                 }
