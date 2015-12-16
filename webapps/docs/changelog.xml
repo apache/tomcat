@@ -312,6 +312,11 @@
         running Tomcat with a Java agent. Based on a patch by Huxing Zhang.
         (markt) 
       </fix>
+      <fix>
+        Add path parameter handling to
+        <code>HttpServletRequest.getContextPath()</code>. This is a follow-up to
+        the fix for <bug>57215</bug>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

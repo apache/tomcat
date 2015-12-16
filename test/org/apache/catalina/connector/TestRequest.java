@@ -783,6 +783,26 @@ public class TestRequest extends TomcatBaseTest {
     }
 
     @Test
+    public void testBug56501p() throws Exception {
+        doBug56501("/path/abc", "/path;a=b/abc/xxx", "/path;a=b/abc");
+    }
+
+    @Test
+    public void testBug56501q() throws Exception {
+        doBug56501("/path/abc", "/path/abc;a=b/xxx", "/path/abc;a=b");
+    }
+
+    @Test
+    public void testBug56501r() throws Exception {
+        doBug56501("/path/abc", "/path/abc/xxx;a=b", "/path/abc");
+    }
+
+    @Test
+    public void testBug56501s() throws Exception {
+        doBug56501("/path/abc", "/.;a=b/path/abc/xxx", "/.;a=b/path/abc");
+    }
+
+    @Test
     public void testBug57215a() throws Exception {
         doBug56501("/path", "//path", "//path");
     }
