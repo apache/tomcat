@@ -19,6 +19,7 @@ package org.apache.tomcat.util.scan;
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -67,6 +68,31 @@ public class TestStandardJarScanner {
             Assert.fail("Unexpected class loader type: " + cl.getClass().getName());
         }
     }
+
+
+    /**
+     * Tomcat should ignore URLs which do not have a file part and do not use the file scheme.
+     */
+    @Test
+    public void skipsInvalidClasspathURLNoFilePartNoFileScheme() {
+        StandardJarScanner scanner = new StandardJarScanner();
+        LoggingCallback callback = new LoggingCallback();
+        TesterServletContext context = new TesterServletContext() {
+            @Override
+            public ClassLoader getClassLoader() {
+                URLClassLoader urlClassLoader;
+                try {
+                    urlClassLoader = new URLClassLoader(
+                            new URL[] { new URL("http://felix.extensions:9/") });
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+                return urlClassLoader;
+            }
+        };
+        scanner.scan(JarScanType.PLUGGABILITY, context, callback);
+    }
+
 
     private static class LoggingCallback implements JarScannerCallback {
 

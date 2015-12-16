@@ -137,6 +137,12 @@
         <code>HttpServletRequest.getContextPath()</code>. This is a follow-up to
         the fix for <bug>57215</bug>. (markt)
       </fix>
+      <fix>
+        <bug>58692</bug>: Make <code>StandardJarScanner</code> more robust. Log
+        a warning if a class path entry cannot be scanned rather than triggering
+        the failure of the web application. Includes a test case written by
+         Derek Abdine. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
