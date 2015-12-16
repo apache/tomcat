@@ -163,7 +163,7 @@ commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool-${commons-
 commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
 
 # ----- NSIS, version 2.0 or later -----
-nsis.version=2.47
+nsis.version=2.49
 nsis.home=${base.path}/nsis-${nsis.version}
 nsis.exe=${nsis.home}/makensis.exe
 nsis.installoptions.dll=${nsis.home}/Plugins/InstallOptions.dll
