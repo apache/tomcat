@@ -98,6 +98,10 @@
         Add support for the startup notification of local members in the static
         cluster. (kfujino)
       </fix>
+      <fix>
+        Ignore the unnecessary member remove operation from different domain.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
