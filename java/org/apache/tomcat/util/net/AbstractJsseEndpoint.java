@@ -64,8 +64,6 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     @Override
     protected Type getSslConfigType() {
-        // TODO: Add configuration to allow the OpenSSLImplementation to optionally use the JSSE configuration
-        // (it should still default to OpenSSL style since it is the most logical and straightforward)
         if (OpenSSLImplementation.IMPLEMENTATION_NAME.equals(sslImplementationName)) {
             return SSLHostConfig.Type.EITHER;
         } else {
