@@ -931,7 +931,7 @@ import javax.naming.spi.ObjectFactory;
 public class MyBeanFactory implements ObjectFactory {
 
   public Object getObjectInstance(Object obj,
-      Name name, Context nameCtx, Hashtable environment)
+      Name name2, Context nameCtx, Hashtable environment)
       throws NamingException {
 
       // Acquire an instance of our specified bean class
@@ -1000,7 +1000,7 @@ public class MyBeanFactory implements ObjectFactory {
   <resource-env-ref-type>
     com.mycompany.MyBean
   </resource-env-ref-type>
-<resource-env-ref>]]></source>
+</resource-env-ref>]]></source>
 
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!

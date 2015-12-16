@@ -230,6 +230,9 @@
         correct, new location for attributes related to individual certificates.
         (markt)
       </fix>
+      <fix>
+        Correct some typos in the JNDI resources How-To. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
