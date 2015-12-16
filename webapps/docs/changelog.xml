@@ -1765,7 +1765,13 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
-        Fix potential issue with BeanELresolver when running under a security
+        CVE-2014-7810:
+        Do not use a privileged code block when evaluating EL expressions
+        when running under a security manager, which allowed to bypass code
+        restrictions. (markt)
+      </fix>
+      <fix>
+        Fix an issue with BeanELResolver when running under a security
         manager. Some classes may not be accessible but may have accessible
         interfaces. (markt)
       </fix>
