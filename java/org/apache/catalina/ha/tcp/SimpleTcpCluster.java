@@ -567,6 +567,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             channel.addInterceptor(new MessageDispatch15Interceptor());
             channel.addInterceptor(new TcpFailureDetector());
         }
+        if (heartbeatBackgroundEnabled) channel.setHeartbeat(false);
     }
 
     /**
