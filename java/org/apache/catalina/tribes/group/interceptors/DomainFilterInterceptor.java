@@ -73,7 +73,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
         boolean notify = false;
         synchronized (membership) {
             notify = Arrays.equals(domain,member.getDomain());
-            membership.removeMember(member);
+            if ( notify ) membership.removeMember(member);
         }
         if ( notify ) super.memberDisappeared(member);
     }
