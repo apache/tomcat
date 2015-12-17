@@ -115,7 +115,6 @@
   <filter-mapping>
     <filter-name>CSRF</filter-name>
     <servlet-name>HTMLManager</servlet-name>
-    <servlet-name>jsp</servlet-name>
   </filter-mapping>
 
   <!-- Define a Security Constraint on this Application -->
